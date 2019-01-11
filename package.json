@@ -24,17 +24,22 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.104"
+    "@types/lodash": "4.14.104",
+    "@types/node": "*",
+    "@types/web3-provider-engine": "^14.0.0"
   },
   "dependencies": {
     "@0x/assert": "^1.0.21",
     "@0x/json-schemas": "^2.1.5",
+    "@0x/types": "^1.5.0",
     "@0x/typescript-typings": "^3.0.6",
+    "@0x/utils": "^2.1.1",
     "@0x/web3-wrapper": "^3.2.2",
     "ethereum-types": "^1.1.4",
     "polymath-contract-artifacts": "git://github.com/PolymathNetwork/polymath-contract-artifacts.git#v2.1.0-beta",
     "polymath-abi-wrappers": "git://github.com/PolymathNetwork/polymath-abi-wrappers.git#v2.1.0-beta",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "typescript": "3.2.2"
   },
   "publishConfig": {
     "access": "public"
