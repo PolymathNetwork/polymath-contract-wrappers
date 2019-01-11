@@ -1,0 +1,69 @@
+## polymath-contract-wrappers
+
+Smart TS wrappers for Polymath smart contracts.
+
+## Installation
+
+**Install**
+
+```bash
+npm install polymath-contract-wrappers --save
+```
+
+**Import**
+
+```javascript
+import { ContractWrappers } from 'polymath-contract-wrappers';
+```
+
+If your project is in [TypeScript](https://www.typescriptlang.org/), add the following to your `tsconfig.json`:
+
+```json
+"compilerOptions": {
+    "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"],
+}
+```
+
+## Contributing
+
+We strongly recommend that the community help us make improvements and determine the future direction of the protocol. To report bugs within this package, please create an issue in this repository.
+
+### Install dependencies
+
+If you don't have yarn workspaces enabled (Yarn < v1.0) - enable them:
+
+```bash
+yarn config set workspaces-experimental true
+```
+
+Then install dependencies
+
+```bash
+yarn install
+```
+
+### Build
+
+To build this package and all other monorepo packages that it depends on, run the following from the monorepo root directory:
+
+```bash
+yarn build
+```
+
+or continuously rebuild on change:
+
+```bash
+yarn watch
+```
+
+### Clean
+
+```bash
+yarn clean
+```
+
+### Lint
+
+```bash
+yarn lint
+```
