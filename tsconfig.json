@@ -17,5 +17,28 @@
     "rootDir": ".",
     "resolveJsonModule": true
   },
-  "include": ["./src/**/*", "src/**/*.json"]
+  "include": ["./src/**/*"],
+  "files": [
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/CappedSTO.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/CappedSTOFactory.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ERC20DividendCheckpoint.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/EtherDividendCheckpoint.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/FeatureRegistry.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/GeneralPermissionManager.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/GeneralTransferManager.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/IModule.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ISTO.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ITransferManager.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ManualApprovalTransferManager.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ModuleFactory.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/ModuleRegistry.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/Ownable.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/PolymathRegistry.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/PolyToken.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/PolyTokenFaucet.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/SecurityToken.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/SecurityTokenRegistry.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/USDTieredSTO.json",
+    "./node_modules/polymath-contract-artifacts/lib/artifacts/USDTieredSTOFactory.json"
+  ]
 }
