@@ -7,20 +7,17 @@ export interface ContractAddresses {
 export enum NetworkId {
   Mainnet = 1,
   Kovan = 42,
-  Ganache = 50,
+  Ganache = 15,
 }
 
 const networkToAddresses: { [networkId: number]: ContractAddresses } = {
   1: {
-    // main
     polymathRegistry: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
   },
   42: {
-    // kovan
     polymathRegistry: '0x5b215a7d39ee305ad28da29bf2f0425c6c2a00b3',
   },
   15: {
-    // local
     polymathRegistry: '0x0f3da9b8682a6054300b8c78a0eca5e79d506380',
   },
 };
