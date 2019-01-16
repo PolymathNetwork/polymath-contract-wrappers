@@ -1,3 +1,3 @@
-import { PolymathRegistryWrapper } from "./index";
+import { PolymathRegistryWrapper } from "./src/index";
 
 console.log("PolymathContractWrappers", PolymathRegistryWrapper);

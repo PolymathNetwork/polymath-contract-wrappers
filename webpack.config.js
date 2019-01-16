@@ -1,20 +1,15 @@
 const path = require("path");
+const merge = require("webpack-merge");
 const DeclarationBundlerPlugin = require("declaration-bundler-webpack-plugin");
 const webpack = require("webpack");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
-module.exports = {
+const baseConfig = {
   devtool: "cheap-module-source-map",
   mode: "development",
-  entry: ["@babel/polyfill", path.resolve(__dirname, "./src/index.ts")],
-  devServer: {
-    contentBase: path.join(__dirname, "dist"),
-    watchContentBase: true,
-    compress: false,
-    port: process.env.PORT || 9000
-  },
+  entry: ["@babel/polyfill"],
   module: {
     rules: [
       {
@@ -32,12 +27,7 @@ module.exports = {
       })
     ]
   },
-  plugins: [
-    new CaseSensitivePathsPlugin(),
-    new HtmlWebpackPlugin({
-      title: "Development Server"
-    })
-  ],
+  plugins: [new CaseSensitivePathsPlugin()],
   output: {
     pathinfo: true,
     filename: "index.js",
@@ -45,3 +35,35 @@ module.exports = {
     publicPath: "/"
   }
 };
+
+const devServerConfig = merge.strategy({
+  entry: "append",
+  plugins: " append"
+})(baseConfig, {
+  entry: path.resolve(__dirname, "dev_sandbox.ts"),
+  devServer: {
+    contentBase: path.join(__dirname, "dist"),
+    watchContentBase: true,
+    compress: false,
+    port: process.env.PORT || 9000
+  },
+  output: {
+    pathinfo: true,
+    filename: "devServer.js",
+    path: path.resolve(__dirname, "lib"),
+    publicPath: "/"
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "Development Server"
+    })
+  ]
+});
+
+const bundleConfig = merge.strategy({
+  entry: "append"
+})(baseConfig, {
+  entry: path.resolve(__dirname, "./src/index.ts")
+});
+
+module.exports = [devServerConfig, bundleConfig];

@@ -9,8 +9,8 @@
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
   "scripts": {
-    "start": "webpack-dev-server --config=webpack.config.dev.js",
-    "build": "webpack --config=webpack.config.dev.js",
+    "start": "webpack-dev-server --config=webpack.config.js",
+    "build": "webpack --config=webpack.config.js",
     "build:ci": "yarn build",
     "lint": "tslint --format stylish --project . --exclude **/lib/**/*",
     "clean": "shx rm -rf lib"
@@ -41,7 +41,8 @@
     "typescript": "3.2.2",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "^3.1.14"
+    "webpack-dev-server": "^3.1.14",
+    "webpack-merge": "^4.2.1"
   },
   "dependencies": {
     "@0x/assert": "^1.0.21",
