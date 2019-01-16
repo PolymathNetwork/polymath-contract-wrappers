@@ -13,9 +13,8 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "lib",
-    "rootDir": "src",
+    "rootDir": ".",
     "resolveJsonModule": true,
     "baseUrl": "."
-  },
-  "include": ["./src/**/*"]
+  }
 }

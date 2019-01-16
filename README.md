@@ -13,7 +13,7 @@ npm install polymath-contract-wrappers --save
 **Import**
 
 ```javascript
-import { ContractWrappers } from 'polymath-contract-wrappers';
+import { ContractWrappers } from "polymath-contract-wrappers";
 ```
 
 If your project is in [TypeScript](https://www.typescriptlang.org/), add the following to your `tsconfig.json`:
@@ -23,6 +23,19 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
     "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"],
 }
 ```
+
+## Sandbox
+
+We provide a sandbox dev server to manually play with the package in the browser
+
+To boot it up:
+
+```
+yarn start
+```
+
+This will generate a git-ignored sandbox.ts file you can edit locally
+to start playing around with the code
 
 ## Contributing
 
@@ -67,3 +80,7 @@ yarn clean
 ```bash
 yarn lint
 ```
+
+## Deployment
+
+** Pending, should run a prepublish script on CI or use Semantic Releases**

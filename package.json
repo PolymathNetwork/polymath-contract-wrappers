@@ -9,8 +9,8 @@
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
   "scripts": {
-    "start": "webpack-dev-server --config=webpack.config.js",
-    "build": "webpack --config=webpack.config.js",
+    "start": "webpack-dev-server --config=webpack.config.dev.js",
+    "build": "webpack",
     "build:ci": "yarn build",
     "lint": "tslint --format stylish --project . --exclude **/lib/**/*",
     "clean": "shx rm -rf lib"
@@ -25,17 +25,11 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/polyfill": "^7.2.5",
-    "@babel/preset-env": "^7.2.3",
-    "@babel/preset-typescript": "^7.1.0",
     "@types/lodash": "4.14.104",
     "@types/node": "*",
     "@types/web3-provider-engine": "^14.0.0",
     "awesome-typescript-loader": "^5.2.1",
-    "babel-loader": "^8.0.5",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
-    "declaration-bundler-webpack-plugin": "^1.0.3",
     "html-webpack-plugin": "^3.2.0",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "3.2.2",
