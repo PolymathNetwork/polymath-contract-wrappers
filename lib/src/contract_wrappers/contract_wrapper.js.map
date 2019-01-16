@@ -1,1 +1,0 @@
-{"version":3,"file":"contract_wrapper.js","sourceRoot":"","sources":["../../../src/contract_wrappers/contract_wrapper.ts"],"names":[],"mappings":";;AAMA;IAII,yBAAY,WAAwB,EAAE,SAAiB;QACnD,IAAI,CAAC,YAAY,GAAG,WAAW,CAAC;QAChC,IAAI,CAAC,UAAU,GAAG,SAAS,CAAC;IAChC,CAAC;IACL,sBAAC;AAAD,CAAC,AARD,IAQC;AARqB,0CAAe"}

@@ -24,6 +24,19 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
 }
 ```
 
+## Sandbox
+
+We provide a sandbox dev server to manually play with the package in the browser
+
+To boot it up:
+
+```
+yarn start
+```
+
+This will generate a git-ignored sandbox.ts file you can edit locally
+to start playing around with the code
+
 ## Contributing
 
 We strongly recommend that the community help us make improvements and determine the future direction of the protocol. To report bugs within this package, please create an issue in this repository.
@@ -67,3 +80,7 @@ yarn clean
 ```bash
 yarn lint
 ```
+
+## Deployment
+
+** Pending, should run a prepublish script on CI or use Semantic Releases**
