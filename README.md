@@ -13,7 +13,7 @@ npm install polymath-contract-wrappers --save
 **Import**
 
 ```javascript
-import { ContractWrappers } from "polymath-contract-wrappers";
+import { ContractWrappers } from 'polymath-contract-wrappers';
 ```
 
 If your project is in [TypeScript](https://www.typescriptlang.org/), add the following to your `tsconfig.json`:
