@@ -2,7 +2,7 @@ import { SecurityTokenRegistryContract } from 'polymath-abi-wrappers';
 import { SecurityTokenRegistry } from 'polymath-contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
@@ -47,7 +47,16 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   public async registerTickerEGas(owner: string, ticker: string, tokenName: string): Promise<number> {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(owner, ticker, tokenName, { 'from': owner });
+    return await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(owner, ticker, tokenName, { from: owner });
+  }
+
+  public async registerTicker(owner: string, ticker: string, tokenName: string, txData: Partial<TxData>): Promise<string> {
+    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    return await SecurityTokenRegistryContractInstance.registerTicker.sendTransactionAsync(owner, ticker, tokenName, txData);
+  }
+
+  public async getAddress(): Promise<string> {
+    return await this._polymathRegistry.getAddress("SecurityTokenRegistry");
   }
 
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
@@ -57,7 +66,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
 
     const contractInstance = new SecurityTokenRegistryContract(
       this.abi,
-      await this._polymathRegistry.getAddress("SecurityTokenRegistry"),
+      await this.getAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
