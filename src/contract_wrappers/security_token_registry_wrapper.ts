@@ -50,9 +50,11 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(owner, ticker, tokenName, { from: owner });
   }
 
-  public async registerTicker(owner: string, ticker: string, tokenName: string, txData: Partial<TxData>): Promise<string> {
+  public async registerTicker(owner: string, ticker: string, tokenName: string, txData: Partial<TxData>) {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.registerTicker.sendTransactionAsync(owner, ticker, tokenName, txData);
+    return () => {
+      return SecurityTokenRegistryContractInstance.registerTicker.sendTransactionAsync(owner, ticker, tokenName, txData);
+    }
   }
 
   public async getAddress(): Promise<string> {

@@ -38,10 +38,12 @@ export class PolyTokenWrapper extends ContractWrapper {
     return await PolyTokenContractInstance.allowance.callAsync(securityTokenRegistryAddress, spender);
   }
 
-  public async approve(value: BigNumber, txData: Partial<TxData>): Promise<string> {
+  public async approve(value: BigNumber, txData: Partial<TxData>) {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     const securityTokenRegistryAddress = await this._securityTokenRegistryWrapper.getAddress();
-    return await PolyTokenContractInstance.approve.sendTransactionAsync(securityTokenRegistryAddress, value, txData);
+    return () => {
+      return PolyTokenContractInstance.approve.sendTransactionAsync(securityTokenRegistryAddress, value, txData);
+    }
   }
 
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
