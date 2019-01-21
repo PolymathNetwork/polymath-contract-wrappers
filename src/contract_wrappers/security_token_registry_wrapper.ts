@@ -5,14 +5,17 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
+import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
+import { string } from 'prop-types';
 
 export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = SecurityTokenRegistry.abi;
   private _polymathRegistry: PolymathRegistryWrapper;
   private _securityTokenRegistryContractIfExists?: SecurityTokenRegistryContract;
+  private _factor = 1.5;
 
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
@@ -33,10 +36,10 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return tokens;
   }
 
-  public async getTickerDetails(tickerName: string): Promise<[string, BigNumber, BigNumber, string, boolean]> {
-    assert.isString('tickerName', tickerName);
+  public async getTickerDetails(tokenName: string): Promise<[string, BigNumber, BigNumber, string, boolean]> {
+    assert.isString('tokenName', tokenName);
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const tickerDetail = await SecurityTokenRegistryContractInstance.getTickerDetails.callAsync(tickerName);
+    const tickerDetail = await SecurityTokenRegistryContractInstance.getTickerDetails.callAsync(tokenName);
     return tickerDetail;
   }
 
@@ -52,8 +55,19 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   public async registerTicker(owner: string, ticker: string, tokenName: string, txData: Partial<TxData>) {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    const estimateGas = await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(owner, ticker, tokenName, txData);
+    txData['gas'] = await estimateGasLimit(this._web3Wrapper, estimateGas, this._factor);
     return () => {
       return SecurityTokenRegistryContractInstance.registerTicker.sendTransactionAsync(owner, ticker, tokenName, txData);
+    }
+  }
+
+  public async transferTickerOwnership(newOwner: string, ticker: string, txData: Partial<TxData>) {
+    assert.isETHAddressHex('newOwner', newOwner);
+    assert.isString('ticker', ticker);
+    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    return () => {
+      return SecurityTokenRegistryContractInstance.transferTickerOwnership.sendTransactionAsync(newOwner, ticker, txData);
     }
   }
 
