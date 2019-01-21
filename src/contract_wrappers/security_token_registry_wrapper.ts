@@ -66,6 +66,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('newOwner', newOwner);
     assert.isString('ticker', ticker);
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    const estimateGas = await SecurityTokenRegistryContractInstance.transferTickerOwnership.estimateGasAsync(newOwner, ticker, txData);
+    txData['gas'] = await estimateGasLimit(this._web3Wrapper, estimateGas, this._factor);
     return () => {
       return SecurityTokenRegistryContractInstance.transferTickerOwnership.sendTransactionAsync(newOwner, ticker, txData);
     }
