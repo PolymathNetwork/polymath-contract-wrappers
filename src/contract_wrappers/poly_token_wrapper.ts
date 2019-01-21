@@ -1,5 +1,6 @@
 import { PolyTokenContract } from 'polymath-abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
+import { SecurityTokenRegistryWrapper } from './security_token_registry_wrapper';
 import { PolyToken } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
@@ -16,10 +17,12 @@ export class PolyTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = PolyToken.abi;
   private _polymathRegistry: PolymathRegistryWrapper;
   private _polyTokenContractIfExists?: PolyTokenContract;
+  private _securityTokenRegistryWrapper: SecurityTokenRegistryWrapper;
 
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper, securityTokenRegistryWrapper: SecurityTokenRegistryWrapper) {
     super(web3Wrapper, networkId);
     this._polymathRegistry = polymathRegistry;
+    this._securityTokenRegistryWrapper = securityTokenRegistryWrapper;
   }
 
   public async getBalanceOf(address: string): Promise<BigNumber> {
@@ -28,16 +31,17 @@ export class PolyTokenWrapper extends ContractWrapper {
     return await PolyTokenContractInstance.balanceOf.callAsync(address);
   }
 
-  public async allowance(owner: string, spender: string): Promise<BigNumber> {
-    assert.isString('owner', owner);
+  public async allowance(spender: string): Promise<BigNumber> {
     assert.isString('spender', spender);
     const PolyTokenContractInstance = await this._getPolyTokenContract();
-    return await PolyTokenContractInstance.allowance.callAsync(owner, spender);
+    const securityTokenRegistryAddress = await this._securityTokenRegistryWrapper.getAddress();
+    return await PolyTokenContractInstance.allowance.callAsync(securityTokenRegistryAddress, spender);
   }
 
-  public async approve(spender: string, value: BigNumber, txData: Partial<TxData>): Promise<string> {
+  public async approve(value: BigNumber, txData: Partial<TxData>): Promise<string> {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
-    return await PolyTokenContractInstance.approve.sendTransactionAsync(spender, value, txData);
+    const securityTokenRegistryAddress = await this._securityTokenRegistryWrapper.getAddress();
+    return await PolyTokenContractInstance.approve.sendTransactionAsync(securityTokenRegistryAddress, value, txData);
   }
 
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
