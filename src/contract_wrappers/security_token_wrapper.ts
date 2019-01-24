@@ -9,6 +9,9 @@ import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 
 import { ContractWrapper } from './contract_wrapper';
 
+/**
+ * This class includes the functionality related to interacting with the SecurityToken contract.
+ */
 export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = SecurityToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;

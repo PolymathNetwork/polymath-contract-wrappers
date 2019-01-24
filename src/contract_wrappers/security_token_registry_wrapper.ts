@@ -10,6 +10,9 @@ import * as _ from 'lodash';
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 
+/**
+ * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
+ */
 export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = SecurityTokenRegistry.abi;
   private polymathRegistry: PolymathRegistryWrapper;

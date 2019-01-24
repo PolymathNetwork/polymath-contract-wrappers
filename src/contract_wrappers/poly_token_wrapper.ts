@@ -11,6 +11,9 @@ import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 
 import { ContractWrapper } from './contract_wrapper';
 
+/**
+ * This class includes the functionality related to interacting with the PolyToken contract.
+ */
 export class PolyTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = PolyToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;
