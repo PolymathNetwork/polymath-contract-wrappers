@@ -16,7 +16,12 @@ export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = SecurityToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenContractIfExists?: SecurityTokenContract;
-
+  /**
+   * Instantiate SecurityTokenWrapper
+   * @param web3Wrapper Web3Wrapper instance to use
+   * @param networkId Desired networkId
+   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   */
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;

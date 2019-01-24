@@ -14,7 +14,6 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = PolymathRegistry.abi;
   public address: string;
   private polymathRegistryContractIfExists?: PolymathRegistryContract;
-
   /**
    * Instantiate PolymathRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -27,6 +26,11 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     this.address = _.isUndefined(address) ? _getDefaultContractAddresses(networkId).polymathRegistry : address;
   }
 
+  /**
+   * Gets the contract address
+   * @param contractName is the key for the contract address mapping
+   * @return address string
+   */
   public async getAddress(contractName: string): Promise<string> {
     assert.isString('contractName', contractName);
     const PolymathRegistryContractInstance = this._getPolymathRegistryContract();

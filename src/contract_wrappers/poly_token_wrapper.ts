@@ -18,12 +18,21 @@ export class PolyTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = PolyToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private polyTokenContractIfExists?: PolyTokenContract;
-
+  /**
+   * Instantiate PolyTokenWrapper
+   * @param web3Wrapper Web3Wrapper instance to use
+   * @param networkId Desired networkId
+   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   */
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
   }
 
+  /**
+   * Returns the balance of the specified address
+   * @return A BigNumber representing the amount owned by the passed address
+   */
   public async getBalanceOf(): Promise<BigNumber> {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     const address = await this._getAddress();
@@ -32,6 +41,11 @@ export class PolyTokenWrapper extends ContractWrapper {
     );
   }
 
+  /**
+   * Function to check the amount of tokens a spender is allowed to spend
+   * @param owner The address which owns the tokens
+   * @return A BigNumber specifying the amount of tokens left available for the spender
+   */
   public async allowance(owner: string): Promise<BigNumber> {
     const spender = await this._getAddress();
     const PolyTokenContractInstance = await this._getPolyTokenContract();
@@ -41,6 +55,11 @@ export class PolyTokenWrapper extends ContractWrapper {
     );
   }
 
+  /**
+   * Approves the passed address to spend the specified amount of tokens
+   * @param spender The address which will spend the funds
+   * @param value The amount of tokens to be spent
+   */
   public async approve(spender: string, value: BigNumber) {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     const txData: TxData = {
