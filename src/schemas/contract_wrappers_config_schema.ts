@@ -1,5 +1,5 @@
 export const ContractWrappersConfigSchema = {
-  id: '/ContractWrappersConfig',
+  id: '/IContractWrappersConfig',
   properties: {
     networkId: {
       type: 'number',

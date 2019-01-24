@@ -6,10 +6,10 @@ import * as _ from 'lodash';
 
 export abstract class ContractWrapper {
     public abstract abi: ContractAbi;
-    protected _networkId: number;
-    protected _web3Wrapper: Web3Wrapper;
+    protected networkId: number;
+    protected web3Wrapper: Web3Wrapper;
     constructor(web3Wrapper: Web3Wrapper, networkId: number) {
-        this._web3Wrapper = web3Wrapper;
-        this._networkId = networkId;
+        this.web3Wrapper = web3Wrapper;
+        this.networkId = networkId;
     }
 }

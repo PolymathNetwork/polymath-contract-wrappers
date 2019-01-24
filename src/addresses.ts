@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-export interface ContractAddresses {
+export interface IContractAddresses {
   polymathRegistry: string;
 }
 
@@ -10,7 +10,7 @@ export enum NetworkId {
   Ganache = 15,
 }
 
-const networkToAddresses: { [networkId: number]: ContractAddresses } = {
+const networkToAddresses: { [networkId: number]: IContractAddresses } = {
   1: {
     polymathRegistry: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
   },
@@ -30,7 +30,7 @@ const networkToAddresses: { [networkId: number]: ContractAddresses } = {
  * @returns The set of addresses for contracts which have been deployed on the
  * given networkId.
  */
-export function getContractAddressesForNetworkOrThrow(networkId: NetworkId): ContractAddresses {
+export function getContractAddressesForNetworkOrThrow(networkId: NetworkId): IContractAddresses {
   if (_.isUndefined(networkToAddresses[networkId])) {
     throw new Error(`Unknown network id (${networkId}). No known 0x contracts have been deployed on this network.`);
   }
