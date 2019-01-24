@@ -28,19 +28,19 @@ declare global {
  */
 export class PolymathAPI {
     /**
-     * An instance of the PolymathRegistryWrapper class containing methods for interacting with Polymath Registry smart contract.
+     * An instance of the PolymathRegistryWrapper class containing methods for interacting with PolymathRegistry smart contract.
      */
     public polymathRegistry: PolymathRegistryWrapper;
     /**
-     * An instance of the SecurityTokenWrapper class containing methods for interacting with Security Token smart contract.
+     * An instance of the SecurityTokenWrapper class containing methods for interacting with SecurityToken smart contract.
      */
     public securityToken: SecurityTokenWrapper;
     /**
-     * An instance of the SecurityTokenRegistryWrapper class containing methods for interacting with Security Token Registry smart contract.
+     * An instance of the SecurityTokenRegistryWrapper class containing methods for interacting with SecurityTokenRegistry smart contract.
      */
     public securityTokenRegistry: SecurityTokenRegistryWrapper;
     /**
-     * An instance of the PolyTokenWrapper class containing methods for interacting with Poly Token smart contract.
+     * An instance of the PolyTokenWrapper class containing methods for interacting with PolyToken smart contract.
      */
     public polyToken: PolyTokenWrapper;
 
