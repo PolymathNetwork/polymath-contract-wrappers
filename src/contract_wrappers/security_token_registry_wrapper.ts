@@ -42,6 +42,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   }
 
   /**
+   * @param securityToken is the address of the security token.
+   * @returns Returns the security token data by address
+   */
+  public async getSecurityTokenData(securityToken: string): Promise<[string, string, string, BigNumber]> {
+    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    return await SecurityTokenRegistryContractInstance.getSecurityTokenData.callAsync(securityToken);
+  }
+
+  /**
    * @param ownerAddress is the address which owns the list of tickers
    * @returns Returns the list of tokens owned by the selected address
    */
@@ -197,6 +206,18 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   private async _getAddress(): Promise<string> {
     const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
+  }
+
+  /**
+   * Returns the security token address by ticker symbol
+   * @param ticker is the ticker of the security token
+   * @return address string
+   */
+  private async _getSecurityTokenAddress(ticker: string): Promise<string> {
+    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
+    return await SecurityTokenRegistryContractInstance.getSecurityTokenAddress.callAsync(
+      ticker,
+    );
   }
 
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
