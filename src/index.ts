@@ -6,6 +6,7 @@ import {
   ModuleRegistry,
   CappedSTO,
   CappedSTOFactory,
+  ModuleFactory,
 } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
@@ -15,6 +16,7 @@ import { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
 import { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapper';
 import { CappedSTOWrapper } from './contract_wrappers/capped_sto_wrapper';
 import { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_wrapper';
+import { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
 import { ContractWrappersConfigSchema } from './schemas/contract_wrappers_config_schema';
 import { IContractWrappersConfig } from './types';
 import { assert } from './utils/assert';
@@ -61,6 +63,10 @@ export class PolymathAPI {
      * An instance of the CappedSTOFactoryWrapper class containing methods for interacting with ModuleRegistry smart contract.
      */
     public cappedSTOFactory: CappedSTOFactoryWrapper;
+    /**
+     * An instance of the ModuleFactoryWrapper class containing methods for interacting with ModuleFactory smart contract.
+     */
+    public moduleFactory: ModuleFactoryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
 
@@ -108,6 +114,7 @@ export class PolymathAPI {
         ModuleRegistry,
         CappedSTO,
         CappedSTOFactory,
+        ModuleFactory,
       ];
       _.forEach(artifactsArray, artifact => {
         this.web3Wrapper.abiDecoder.addABI(artifact.abi);
@@ -146,6 +153,11 @@ export class PolymathAPI {
         this.polymathRegistry,
       );
       this.cappedSTOFactory = new CappedSTOFactoryWrapper(
+        this.web3Wrapper,
+        config.networkId,
+        this.polymathRegistry,
+      );
+      this.moduleFactory = new ModuleFactoryWrapper(
         this.web3Wrapper,
         config.networkId,
         this.polymathRegistry,

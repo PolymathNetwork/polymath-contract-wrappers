@@ -1,0 +1,51 @@
+import { ModuleFactoryContract } from 'polymath-abi-wrappers';
+import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
+import { ModuleFactory } from 'polymath-contract-artifacts';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { ContractAbi } from 'ethereum-types';
+import * as _ from 'lodash';
+
+import { _getDefaultContractAddresses } from '../utils/contract_addresses';
+
+import { ContractWrapper } from './contract_wrapper';
+
+/**
+ * This class includes the functionality related to interacting with the ModuleFactory contract.
+ */
+export class ModuleFactoryWrapper extends ContractWrapper {
+  public abi: ContractAbi = ModuleFactory.abi;
+  private polymathRegistry: PolymathRegistryWrapper;
+  private moduleFactoryContractIfExists?: ModuleFactoryContract;
+  /**
+   * Instantiate ModuleFactoryWrapper
+   * @param web3Wrapper Web3Wrapper instance to use
+   * @param networkId Desired networkId
+   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   */
+  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
+    super(web3Wrapper, networkId);
+    this.polymathRegistry = polymathRegistry;
+  }
+
+  /**
+   * Get the name of the Module
+   */
+  public async getName(): Promise<string> {
+    const ModuleFactoryContractInstance = await this._getModuleFactoryContract();
+    return await ModuleFactoryContractInstance.name.callAsync();
+  }
+
+  private async _getModuleFactoryContract(): Promise<ModuleFactoryContract> {
+    if (!_.isUndefined(this.moduleFactoryContractIfExists)) {
+      return this.moduleFactoryContractIfExists;
+    }
+    const contractInstance = new ModuleFactoryContract(
+      this.abi,
+      await this.polymathRegistry.getAddress('ModuleFactory'),
+      this.web3Wrapper.getProvider(),
+      this.web3Wrapper.getContractDefaults(),
+    );
+    this.moduleFactoryContractIfExists = contractInstance;
+    return this.moduleFactoryContractIfExists;
+  }
+}
