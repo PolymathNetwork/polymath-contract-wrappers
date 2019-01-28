@@ -34,7 +34,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async getTickersByOwner(): Promise<string[]> {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const owner = await this._getAddress();
+    const owner = await this._getOwnerAddress();
     const tickers = await SecurityTokenRegistryContractInstance.getTickersByOwner.callAsync(
       owner,
     );
@@ -93,7 +93,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async registerTicker(ticker: string, tokenName: string) {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const owner = await this._getAddress();
+    const owner = await this._getOwnerAddress();
     const estimateGas = await await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(
       owner,
       ticker,
@@ -127,7 +127,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('newOwner', newOwner);
     assert.isString('ticker', ticker);
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const from = await this._getAddress();
+    const from = await this._getOwnerAddress();
     const estimateGas = await SecurityTokenRegistryContractInstance.transferTickerOwnership.estimateGasAsync(
       newOwner,
       ticker,
@@ -159,7 +159,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async generateSecurityToken(name: string, ticker: string, details: string, divisible: boolean) {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const from = await this._getAddress();
+    const from = await this._getOwnerAddress();
     const estimateGas = await SecurityTokenRegistryContractInstance.generateSecurityToken.estimateGasAsync(
       name,
       ticker,
@@ -203,7 +203,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return await this.polymathRegistry.getAddress('SecurityTokenRegistry');
   }
 
-  private async _getAddress(): Promise<string> {
+  private async _getOwnerAddress(): Promise<string> {
     const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
   }

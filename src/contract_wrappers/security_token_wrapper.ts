@@ -2,8 +2,9 @@ import { SecurityTokenContract } from 'polymath-abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { SecurityToken } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
+import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
@@ -17,6 +18,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = SecurityToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenContractIfExists?: SecurityTokenContract;
+  private factor = 1.2;
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -41,12 +43,56 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   /**
+   * Attachs a module to the SecurityToken
+   */
+  public async addModule(moduleFactory: string, data: string, maxCost: BigNumber, budget: BigNumber) {
+    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
+    const owner = await this._getOwnerAddress();
+    const estimateGas = await await SecurityTokenContractInstance.addModule.estimateGasAsync(
+      moduleFactory,
+      data,
+      maxCost,
+      budget,
+      { from: owner },
+    );
+    const txData: TxData = {
+      from: owner,
+      gas: await estimateGasLimit(
+        this.web3Wrapper,
+        estimateGas,
+        this.factor,
+      ),
+    };
+    return () => {
+      return SecurityTokenContractInstance.addModule.sendTransactionAsync(
+        moduleFactory,
+        data,
+        maxCost,
+        budget,
+      );
+    };
+  }
+
+  /**
    * @param module address of the module
    * @return Returns the data associated to a module
    */
   public async getModule(module: string): Promise<[string, string, string, boolean, BigNumber[]]> {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     return SecurityTokenContractInstance.getModule.callAsync(module);
+  }
+
+  /**
+   * Symbol of the Token
+   */
+  public async getSymbol(): Promise<string> {
+    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
+    return await SecurityTokenContractInstance.symbol.callAsync();
+  }
+
+  private async _getOwnerAddress(): Promise<string> {
+    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
+    return addresses[0];
   }
 
   private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {

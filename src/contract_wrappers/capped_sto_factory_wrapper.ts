@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 
 import { ContractWrapper } from './contract_wrapper';
+import { BigNumber } from '@0x/utils';
 
 /**
  * This class includes the functionality related to interacting with the CappedSTOFactory contract.
@@ -25,6 +26,14 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+  }
+
+  /**
+   * Get the setup cost of the module
+   */
+  public async getSetupCost(): Promise<BigNumber> {
+    const CappedSTOFactoryContractInstance = await this._getCappedSTOFactoryContract();
+    return await CappedSTOFactoryContractInstance.getSetupCost.callAsync();
   }
 
   private async _getCappedSTOFactoryContract(): Promise<CappedSTOFactoryContract> {
