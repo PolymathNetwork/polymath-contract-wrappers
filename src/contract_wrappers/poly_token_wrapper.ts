@@ -35,7 +35,7 @@ export class PolyTokenWrapper extends ContractWrapper {
    */
   public async getBalanceOf(address?: string): Promise<BigNumber> {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
-    let addr:string;
+    let addr: string;
     if (!_.isUndefined(address)) {
       addr = await this._getAddress();
     } else {

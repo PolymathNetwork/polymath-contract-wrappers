@@ -7,6 +7,8 @@ import {
   CappedSTO,
   CappedSTOFactory,
   ModuleFactory,
+  USDTieredSTO,
+  USDTieredSTOFactory,
 } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
@@ -17,6 +19,8 @@ import { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapp
 import { CappedSTOWrapper } from './contract_wrappers/capped_sto_wrapper';
 import { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_wrapper';
 import { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
+import { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
+import { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 import { ContractWrappersConfigSchema } from './schemas/contract_wrappers_config_schema';
 import { IContractWrappersConfig } from './types';
 import { assert } from './utils/assert';
@@ -36,37 +40,55 @@ declare global {
  */
 export class PolymathAPI {
     /**
-     * An instance of the PolymathRegistryWrapper class containing methods for interacting with PolymathRegistry smart contract.
+     * An instance of the PolymathRegistryWrapper class containing methods
+     * for interacting with PolymathRegistry smart contract.
      */
     public polymathRegistry: PolymathRegistryWrapper;
     /**
-     * An instance of the SecurityTokenWrapper class containing methods for interacting with SecurityToken smart contract.
+     * An instance of the SecurityTokenWrapper class containing methods
+     * for interacting with SecurityToken smart contract.
      */
     public securityToken: SecurityTokenWrapper;
     /**
-     * An instance of the SecurityTokenRegistryWrapper class containing methods for interacting with SecurityTokenRegistry smart contract.
+     * An instance of the SecurityTokenRegistryWrapper class containing methods
+     * for interacting with SecurityTokenRegistry smart contract.
      */
     public securityTokenRegistry: SecurityTokenRegistryWrapper;
     /**
-     * An instance of the PolyTokenWrapper class containing methods for interacting with PolyToken smart contract.
+     * An instance of the PolyTokenWrapper class containing methods
+     * for interacting with PolyToken smart contract.
      */
     public polyToken: PolyTokenWrapper;
     /**
-     * An instance of the ModuleRegistryWrapper class containing methods for interacting with ModuleRegistry smart contract.
+     * An instance of the ModuleRegistryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
      */
     public moduleRegistry: ModuleRegistryWrapper;
     /**
-     * An instance of the CappedSTOWrapper class containing methods for interacting with ModuleRegistry smart contract.
+     * An instance of the CappedSTOWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
      */
     public cappedSTO: CappedSTOWrapper;
     /**
-     * An instance of the CappedSTOFactoryWrapper class containing methods for interacting with ModuleRegistry smart contract.
+     * An instance of the CappedSTOFactoryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
      */
     public cappedSTOFactory: CappedSTOFactoryWrapper;
     /**
-     * An instance of the ModuleFactoryWrapper class containing methods for interacting with ModuleFactory smart contract.
+     * An instance of the ModuleFactoryWrapper class containing methods
+     * for interacting with ModuleFactory smart contract.
      */
     public moduleFactory: ModuleFactoryWrapper;
+    /**
+     * An instance of the USDTieredSTOWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public usdTieredSTO: USDTieredSTOWrapper;
+    /**
+     * An instance of the USDTieredSTOFactoryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public usdTieredSTOFactory: USDTieredSTOFactoryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
 
@@ -115,6 +137,8 @@ export class PolymathAPI {
         CappedSTO,
         CappedSTOFactory,
         ModuleFactory,
+        USDTieredSTO,
+        USDTieredSTOFactory,
       ];
       _.forEach(artifactsArray, artifact => {
         this.web3Wrapper.abiDecoder.addABI(artifact.abi);
@@ -158,6 +182,16 @@ export class PolymathAPI {
         this.polymathRegistry,
       );
       this.moduleFactory = new ModuleFactoryWrapper(
+        this.web3Wrapper,
+        config.networkId,
+        this.polymathRegistry,
+      );
+      this.usdTieredSTO = new USDTieredSTOWrapper(
+        this.web3Wrapper,
+        config.networkId,
+        this.polymathRegistry,
+      );
+      this.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
         this.web3Wrapper,
         config.networkId,
         this.polymathRegistry,
