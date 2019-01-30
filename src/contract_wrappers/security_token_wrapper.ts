@@ -48,7 +48,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   public async addModule(moduleFactory: string, data: string, maxCost: BigNumber, budget: BigNumber) {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await await SecurityTokenContractInstance.addModule.estimateGasAsync(
+    const estimateGas = await SecurityTokenContractInstance.addModule.estimateGasAsync(
       moduleFactory,
       data,
       maxCost,
@@ -69,6 +69,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
         data,
         maxCost,
         budget,
+        txData,
       );
     };
   }
@@ -88,6 +89,19 @@ export class SecurityTokenWrapper extends ContractWrapper {
   public async getSymbol(): Promise<string> {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     return await SecurityTokenContractInstance.symbol.callAsync();
+  }
+
+  /**
+   * Validates a transfer with a TransferManager module if it exists
+   * @param from sender of transfer
+   * @param to receiver of transfer
+   * @param value value of transfer
+   * @param data data to indicate validation
+   * @return bool
+   */
+  public async verifyTransfer(from: string, to: string, value: BigNumber, data: string): Promise<boolean> {
+    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
+    return await SecurityTokenContractInstance.verifyTransfer.callAsync(from, to, value, data);
   }
 
   private async _getOwnerAddress(): Promise<string> {

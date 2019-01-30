@@ -94,7 +94,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public async registerTicker(ticker: string, tokenName: string) {
     const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(
+    const estimateGas = await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(
       owner,
       ticker,
       tokenName,
