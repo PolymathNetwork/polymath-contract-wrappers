@@ -41,7 +41,9 @@ export class ModuleFactoryWrapper extends ContractWrapper {
     }
     const contractInstance = new ModuleFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress('ModuleFactory'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'ModuleFactory',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

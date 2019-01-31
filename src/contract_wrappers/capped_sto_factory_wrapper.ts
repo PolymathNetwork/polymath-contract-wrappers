@@ -42,7 +42,9 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
     }
     const contractInstance = new CappedSTOFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress('CappedSTOFactory'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'CappedSTOFactory',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

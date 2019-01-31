@@ -42,7 +42,9 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
     }
     const contractInstance = new USDTieredSTOFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress('USDTieredSTOFactory'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'USDTieredSTOFactory',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

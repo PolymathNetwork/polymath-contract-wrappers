@@ -3,6 +3,7 @@ import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { ModuleRegistry } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
+import { IModulesByTypeAndToken } from '../types';
 import * as _ from 'lodash';
 
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
@@ -29,13 +30,14 @@ export class ModuleRegistryWrapper extends ContractWrapper {
 
   /**
    * Returns the list of available Module factory addresses of a particular type for a given token.
-   * @param moduleType is the module type to look for
-   * @param securityToken is the address of SecurityToken
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public async getModulesByTypeAndToken(moduleType: number, securityToken: string): Promise<string[]> {
+  public async getModulesByTypeAndToken(params: IModulesByTypeAndToken): Promise<string[]> {
     const ModuleRegistryContractInstance = await this._getModuleRegistryContract();
-    return await ModuleRegistryContractInstance.getModulesByTypeAndToken.callAsync(moduleType, securityToken);
+    return await ModuleRegistryContractInstance.getModulesByTypeAndToken.callAsync(
+      params.moduleType,
+      params.securityToken,
+    );
   }
 
   private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
@@ -44,7 +46,9 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     }
     const contractInstance = new ModuleRegistryContract(
       this.abi,
-      await this.polymathRegistry.getAddress('ModuleRegistry'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'ModuleRegistry',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

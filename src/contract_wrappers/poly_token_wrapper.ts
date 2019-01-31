@@ -5,6 +5,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { TxData } from 'ethereum-types';
+import { IBalanceOf, IAllowance, IApprove } from '../types';
 import * as _ from 'lodash';
 
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
@@ -33,13 +34,13 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public async getBalanceOf(address?: string): Promise<BigNumber> {
+  public async getBalanceOf(params: IBalanceOf): Promise<BigNumber> {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     let addr: string;
-    if (!_.isUndefined(address)) {
+    if (!_.isUndefined(params.address)) {
       addr = await this._getAddress();
     } else {
-      addr = address as unknown as string;
+      addr = params.address as unknown as string;
     }
     return await PolyTokenContractInstance.balanceOf.callAsync(
       addr,
@@ -48,32 +49,29 @@ export class PolyTokenWrapper extends ContractWrapper {
 
   /**
    * Function to check the amount of tokens a spender is allowed to spend
-   * @param owner The address which owns the tokens
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
-  public async allowance(owner: string): Promise<BigNumber> {
+  public async allowance(params: IAllowance): Promise<BigNumber> {
     const spender = await this._getAddress();
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     return await PolyTokenContractInstance.allowance.callAsync(
-      owner,
+      params.owner,
       spender,
     );
   }
 
   /**
    * Approves the passed address to spend the specified amount of tokens
-   * @param spender The address which will spend the funds
-   * @param value The amount of tokens to be spent
    */
-  public async approve(spender: string, value: BigNumber) {
+  public async approve(params: IApprove) {
     const PolyTokenContractInstance = await this._getPolyTokenContract();
     const txData: TxData = {
       from: await this._getAddress(),
     };
     return () => {
       return PolyTokenContractInstance.approve.sendTransactionAsync(
-        spender,
-        value,
+        params.spender,
+        params.value,
         txData,
       );
     };
@@ -90,7 +88,9 @@ export class PolyTokenWrapper extends ContractWrapper {
     }
     const contractInstance = new PolyTokenContract(
       this.abi,
-      await this.polymathRegistry.getAddress('PolyToken'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'PolyToken',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

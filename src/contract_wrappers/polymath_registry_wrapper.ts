@@ -6,6 +6,7 @@ import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
+import { IGetAddress } from '../types';
 
 /**
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
@@ -28,14 +29,13 @@ export class PolymathRegistryWrapper extends ContractWrapper {
 
   /**
    * Gets the contract address
-   * @param contractName is the key for the contract address mapping
    * @return address string
    */
-  public async getAddress(contractName: string): Promise<string> {
-    assert.isString('contractName', contractName);
+  public async getAddress(params: IGetAddress): Promise<string> {
+    assert.isString('contractName', params.contractName);
     const PolymathRegistryContractInstance = this._getPolymathRegistryContract();
     const addresse = await PolymathRegistryContractInstance.getAddress.callAsync(
-      contractName,
+      params.contractName,
     );
     return addresse;
   }

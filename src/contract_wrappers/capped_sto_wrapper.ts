@@ -4,6 +4,7 @@ import { CappedSTO } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
+import { IFundRaiseTypes, IFundsRaised } from '../types';
 import * as _ from 'lodash';
 
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
@@ -71,17 +72,17 @@ export class CappedSTOWrapper extends ContractWrapper {
   /**
    * Type of currency used to collect the funds
    */
-  public async getFundRaiseTypes(index: number): Promise<boolean> {
+  public async getFundRaiseTypes(params: IFundRaiseTypes): Promise<boolean> {
     const CappedSTOContractInstance = await this._getCappedSTOContract();
-    return await CappedSTOContractInstance.fundRaiseTypes.callAsync(index);
+    return await CappedSTOContractInstance.fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public async getFundsRaised(index: number): Promise<BigNumber> {
+  public async getFundsRaised(pasams: IFundsRaised): Promise<BigNumber> {
     const CappedSTOContractInstance = await this._getCappedSTOContract();
-    return await CappedSTOContractInstance.fundsRaised.callAsync(index);
+    return await CappedSTOContractInstance.fundsRaised.callAsync(pasams.index);
   }
 
   /**
@@ -106,7 +107,9 @@ export class CappedSTOWrapper extends ContractWrapper {
     }
     const contractInstance = new CappedSTOContract(
       this.abi,
-      await this.polymathRegistry.getAddress('CappedSTO'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'CappedSTO',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

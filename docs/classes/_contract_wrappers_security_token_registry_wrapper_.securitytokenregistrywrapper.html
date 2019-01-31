@@ -136,7 +136,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_contract_wrappers_contract_wrapper_.contractwrapper.html">ContractWrapper</a>.<a href="_contract_wrappers_contract_wrapper_.contractwrapper.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L20">contract_wrappers/security_token_registry_wrapper.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L28">contract_wrappers/security_token_registry_wrapper.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -185,7 +185,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="_contract_wrappers_contract_wrapper_.contractwrapper.html">ContractWrapper</a>.<a href="_contract_wrappers_contract_wrapper_.contractwrapper.html#abi">abi</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L17">contract_wrappers/security_token_registry_wrapper.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L25">contract_wrappers/security_token_registry_wrapper.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -196,7 +196,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_contract_wrappers_contract_wrapper_.contractwrapper.html">ContractWrapper</a>.<a href="_contract_wrappers_contract_wrapper_.contractwrapper.html#networkid">networkId</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/contract_wrapper.ts#L9">contract_wrappers/contract_wrapper.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/contract_wrapper.ts#L9">contract_wrappers/contract_wrapper.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -207,7 +207,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_contract_wrappers_contract_wrapper_.contractwrapper.html">ContractWrapper</a>.<a href="_contract_wrappers_contract_wrapper_.contractwrapper.html#web3wrapper">web3Wrapper</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/contract_wrapper.ts#L10">contract_wrappers/contract_wrapper.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/contract_wrapper.ts#L10">contract_wrappers/contract_wrapper.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,13 +218,13 @@
 					<a name="generatesecuritytoken" class="tsd-anchor"></a>
 					<h3>generate<wbr>Security<wbr>Token</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">generate<wbr>Security<wbr>Token<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, ticker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, details<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, divisible<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Security<wbr>Token<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.igeneratesecuritytoken.html" class="tsd-signature-type">IGenerateSecurityToken</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L160">contract_wrappers/security_token_registry_wrapper.ts:160</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L157">contract_wrappers/security_token_registry_wrapper.ts:157</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -235,28 +235,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the name of the token</p>
-									</div>
-								</li>
-								<li>
-									<h5>ticker: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the ticker symbol of the security token</p>
-									</div>
-								</li>
-								<li>
-									<h5>details: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the off-chain details of the token</p>
-									</div>
-								</li>
-								<li>
-									<h5>divisible: <span class="tsd-signature-type">boolean</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is whether or not the token is divisible</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.igeneratesecuritytoken.html" class="tsd-signature-type">IGenerateSecurityToken</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -273,7 +252,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L202">contract_wrappers/security_token_registry_wrapper.ts:202</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L199">contract_wrappers/security_token_registry_wrapper.ts:199</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -290,13 +269,13 @@
 					<a name="getsecuritytokendata" class="tsd-anchor"></a>
 					<h3>get<wbr>Security<wbr>Token<wbr>Data</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Security<wbr>Token<wbr>Data<span class="tsd-signature-symbol">(</span>securityToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Security<wbr>Token<wbr>Data<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.isecuritytokendata.html" class="tsd-signature-type">ISecurityTokenData</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L48">contract_wrappers/security_token_registry_wrapper.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L55">contract_wrappers/security_token_registry_wrapper.ts:55</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -304,10 +283,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>securityToken: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the address of the security token.</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.isecuritytokendata.html" class="tsd-signature-type">ISecurityTokenData</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -325,7 +301,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L193">contract_wrappers/security_token_registry_wrapper.ts:193</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L190">contract_wrappers/security_token_registry_wrapper.ts:190</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -342,13 +318,13 @@
 					<a name="gettickerdetails" class="tsd-anchor"></a>
 					<h3>get<wbr>Ticker<wbr>Details</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Ticker<wbr>Details<span class="tsd-signature-symbol">(</span>tokenName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Ticker<wbr>Details<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.itickerdetails.html" class="tsd-signature-type">ITickerDetails</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L70">contract_wrappers/security_token_registry_wrapper.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L75">contract_wrappers/security_token_registry_wrapper.ts:75</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -356,10 +332,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>tokenName: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the ticker symbol</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.itickerdetails.html" class="tsd-signature-type">ITickerDetails</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">BigNumber</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -377,7 +350,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L82">contract_wrappers/security_token_registry_wrapper.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L87">contract_wrappers/security_token_registry_wrapper.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -397,7 +370,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L35">contract_wrappers/security_token_registry_wrapper.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L43">contract_wrappers/security_token_registry_wrapper.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -411,13 +384,13 @@
 					<a name="gettokensbyowner" class="tsd-anchor"></a>
 					<h3>get<wbr>Tokens<wbr>ByOwner</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Tokens<wbr>ByOwner<span class="tsd-signature-symbol">(</span>ownerAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Tokens<wbr>ByOwner<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.itokensbyowner.html" class="tsd-signature-type">ITokensByOwner</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L57">contract_wrappers/security_token_registry_wrapper.ts:57</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L63">contract_wrappers/security_token_registry_wrapper.ts:63</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -425,10 +398,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ownerAddress: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the address which owns the list of tickers</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.itokensbyowner.html" class="tsd-signature-type">ITokensByOwner</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -440,13 +410,13 @@
 					<a name="registerticker" class="tsd-anchor"></a>
 					<h3>register<wbr>Ticker</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">register<wbr>Ticker<span class="tsd-signature-symbol">(</span>ticker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">register<wbr>Ticker<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.iregisterticker.html" class="tsd-signature-type">IRegisterTicker</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L94">contract_wrappers/security_token_registry_wrapper.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L97">contract_wrappers/security_token_registry_wrapper.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -459,16 +429,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>ticker: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is unique token ticker</p>
-									</div>
-								</li>
-								<li>
-									<h5>tokenName: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the name of the token</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.iregisterticker.html" class="tsd-signature-type">IRegisterTicker</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -479,13 +440,13 @@
 					<a name="transfertickerownership" class="tsd-anchor"></a>
 					<h3>transfer<wbr>Ticker<wbr>Ownership</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">transfer<wbr>Ticker<wbr>Ownership<span class="tsd-signature-symbol">(</span>newOwner<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, ticker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">transfer<wbr>Ticker<wbr>Ownership<span class="tsd-signature-symbol">(</span>params<span class="tsd-signature-symbol">: </span><a href="../interfaces/_types_.itransfertickerownership.html" class="tsd-signature-type">ITransferTickerOwnership</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/45094db/src/contract_wrappers/security_token_registry_wrapper.ts#L126">contract_wrappers/security_token_registry_wrapper.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/9a1b92a/src/contract_wrappers/security_token_registry_wrapper.ts#L127">contract_wrappers/security_token_registry_wrapper.ts:127</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -496,16 +457,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>newOwner: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the address of the new owner of the ticker</p>
-									</div>
-								</li>
-								<li>
-									<h5>ticker: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>is the ticker symbol</p>
-									</div>
+									<h5>params: <a href="../interfaces/_types_.itransfertickerownership.html" class="tsd-signature-type">ITransferTickerOwnership</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol">&gt;</span></h4>

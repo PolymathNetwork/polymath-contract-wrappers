@@ -6,6 +6,7 @@ import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
+import { IModulesByType, IAddModule, IModule, IVerifyTransfer } from '../types';
 
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 
@@ -32,27 +33,26 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   /**
    * Returns a list of modules that match the provided module type
-   * @param type type of the module
    * @return address[] list of modules with this type
    */
-  public async getModulesByType(type: number): Promise<string[]> {
+  public async getModulesByType(params: IModulesByType): Promise<string[]> {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     return SecurityTokenContractInstance.getModulesByType.callAsync(
-      type,
+      params.type,
     );
   }
 
   /**
    * Attachs a module to the SecurityToken
    */
-  public async addModule(moduleFactory: string, data: string, maxCost: BigNumber, budget: BigNumber) {
+  public async addModule(params: IAddModule) {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     const owner = await this._getOwnerAddress();
     const estimateGas = await SecurityTokenContractInstance.addModule.estimateGasAsync(
-      moduleFactory,
-      data,
-      maxCost,
-      budget,
+      params.moduleFactory,
+      params.data,
+      params.maxCost,
+      params.budget,
       { from: owner },
     );
     const txData: TxData = {
@@ -65,22 +65,21 @@ export class SecurityTokenWrapper extends ContractWrapper {
     };
     return () => {
       return SecurityTokenContractInstance.addModule.sendTransactionAsync(
-        moduleFactory,
-        data,
-        maxCost,
-        budget,
+        params.moduleFactory,
+        params.data,
+        params.maxCost,
+        params.budget,
         txData,
       );
     };
   }
 
   /**
-   * @param module address of the module
    * @return Returns the data associated to a module
    */
-  public async getModule(module: string): Promise<[string, string, string, boolean, BigNumber[]]> {
+  public async getModule(params: IModule): Promise<[string, string, string, boolean, BigNumber[]]> {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return SecurityTokenContractInstance.getModule.callAsync(module);
+    return SecurityTokenContractInstance.getModule.callAsync(params.module);
   }
 
   /**
@@ -93,15 +92,16 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   /**
    * Validates a transfer with a TransferManager module if it exists
-   * @param from sender of transfer
-   * @param to receiver of transfer
-   * @param value value of transfer
-   * @param data data to indicate validation
    * @return bool
    */
-  public async verifyTransfer(from: string, to: string, value: BigNumber, data: string): Promise<boolean> {
+  public async verifyTransfer(params: IVerifyTransfer): Promise<boolean> {
     const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return await SecurityTokenContractInstance.verifyTransfer.callAsync(from, to, value, data);
+    return await SecurityTokenContractInstance.verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      params.value,
+      params.data,
+    );
   }
 
   private async _getOwnerAddress(): Promise<string> {
@@ -115,7 +115,9 @@ export class SecurityTokenWrapper extends ContractWrapper {
     }
     const contractInstance = new SecurityTokenContract(
       this.abi,
-      await this.polymathRegistry.getAddress('SecurityToken'),
+      await this.polymathRegistry.getAddress({
+        contractName: 'SecurityToken',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
