@@ -7,9 +7,7 @@ import { BigNumber } from '@0x/utils';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { IModulesByType, IAddModule, IModule, IVerifyTransfer } from '../types';
-
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
-
 import { ContractWrapper } from './contract_wrapper';
 
 /**

@@ -1,7 +1,5 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {
-    ContractAbi,
-} from 'ethereum-types';
+import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';
 
 export abstract class ContractWrapper {

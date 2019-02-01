@@ -6,9 +6,7 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { IFundRaiseTypes, IFundsRaised } from '../types';
 import * as _ from 'lodash';
-
 import { _getDefaultContractAddresses } from '../utils/contract_addresses';
-
 import { ContractWrapper } from './contract_wrapper';
 
 /**

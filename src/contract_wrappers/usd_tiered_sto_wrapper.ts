@@ -2,11 +2,12 @@ import { USDTieredSTOContract } from 'polymath-abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { USDTieredSTO } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { TxData } from 'ethereum-types';
+import { TxData, ContractAbi } from 'ethereum-types';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
+import { _getDefaultContractAddresses } from '../utils/contract_addresses';
+import { ContractWrapper } from './contract_wrapper';
 import {
   IFundRaiseTypes,
   IFundsRaised,
@@ -23,10 +24,6 @@ import {
   IModifyAddresses,
   IModifyTiers,
 } from '../types';
-
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
-
-import { ContractWrapper } from './contract_wrapper';
 
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.

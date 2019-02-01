@@ -22,7 +22,7 @@ import { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper
 import { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
 import { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 import { ContractWrappersConfigSchema } from './schemas/contract_wrappers_config_schema';
-import { IContractWrappersConfig } from './types';
+import * as types from './types';
 import { assert } from './utils/assert';
 import { _getDefaultContractAddresses } from './utils/contract_addresses';
 import { SignerSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
@@ -99,7 +99,7 @@ export class PolymathAPI {
      * @param   config      The configuration object. Look up the type for the description.
      * @return  An instance of the PolymathAPI class.
      */
-    constructor(rpcurl: string = 'http://127.0.0.1:8545', config: IContractWrappersConfig) {
+    constructor(rpcurl: string = 'http://127.0.0.1:8545', config: types.IContractWrappersConfig) {
       assert.doesConformToSchema(
         'config',
         config,
