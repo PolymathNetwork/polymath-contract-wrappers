@@ -236,3 +236,7 @@ export interface IModifyTiers {
     tokensPerTierTotal: BigNumber[];
     tokensPerTierDiscountPoly: BigNumber[];
 }
+
+export interface PublicNodeUrlsByNetworkId {
+    [networkId: number]: string[];
+}

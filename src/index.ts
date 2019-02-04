@@ -25,8 +25,10 @@ import { ContractWrappersConfigSchema } from './schemas/contract_wrappers_config
 import * as types from './types';
 import { assert } from './utils/assert';
 import { _getDefaultContractAddresses } from './utils/contract_addresses';
-import { SignerSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { configs } from './utils/configs';
+import { SignerSubprovider, RPCSubprovider, Web3ProviderEngine, MetamaskSubprovider, RedundantSubprovider } from '@0x/subproviders';
 import * as _ from 'lodash';
+import { Provider } from 'ethereum-types';
 
 declare global {
   interface Window {
@@ -43,90 +45,89 @@ export class PolymathAPI {
      * An instance of the PolymathRegistryWrapper class containing methods
      * for interacting with PolymathRegistry smart contract.
      */
-    public polymathRegistry: PolymathRegistryWrapper;
+    public polymathRegistry?: PolymathRegistryWrapper;
     /**
      * An instance of the SecurityTokenWrapper class containing methods
      * for interacting with SecurityToken smart contract.
      */
-    public securityToken: SecurityTokenWrapper;
+    public securityToken?: SecurityTokenWrapper;
     /**
      * An instance of the SecurityTokenRegistryWrapper class containing methods
      * for interacting with SecurityTokenRegistry smart contract.
      */
-    public securityTokenRegistry: SecurityTokenRegistryWrapper;
+    public securityTokenRegistry?: SecurityTokenRegistryWrapper;
     /**
      * An instance of the PolyTokenWrapper class containing methods
      * for interacting with PolyToken smart contract.
      */
-    public polyToken: PolyTokenWrapper;
+    public polyToken?: PolyTokenWrapper;
     /**
      * An instance of the ModuleRegistryWrapper class containing methods
      * for interacting with ModuleRegistry smart contract.
      */
-    public moduleRegistry: ModuleRegistryWrapper;
+    public moduleRegistry?: ModuleRegistryWrapper;
     /**
      * An instance of the CappedSTOWrapper class containing methods
      * for interacting with ModuleRegistry smart contract.
      */
-    public cappedSTO: CappedSTOWrapper;
+    public cappedSTO?: CappedSTOWrapper;
     /**
      * An instance of the CappedSTOFactoryWrapper class containing methods
      * for interacting with ModuleRegistry smart contract.
      */
-    public cappedSTOFactory: CappedSTOFactoryWrapper;
+    public cappedSTOFactory?: CappedSTOFactoryWrapper;
     /**
      * An instance of the ModuleFactoryWrapper class containing methods
      * for interacting with ModuleFactory smart contract.
      */
-    public moduleFactory: ModuleFactoryWrapper;
+    public moduleFactory?: ModuleFactoryWrapper;
     /**
      * An instance of the USDTieredSTOWrapper class containing methods
      * for interacting with ModuleRegistry smart contract.
      */
-    public usdTieredSTO: USDTieredSTOWrapper;
+    public usdTieredSTO?: USDTieredSTOWrapper;
     /**
      * An instance of the USDTieredSTOFactoryWrapper class containing methods
      * for interacting with ModuleRegistry smart contract.
      */
-    public usdTieredSTOFactory: USDTieredSTOFactoryWrapper;
+    public usdTieredSTOFactory?: USDTieredSTOFactoryWrapper;
 
-    private readonly web3Wrapper: Web3Wrapper;
+    private web3Wrapper?: Web3Wrapper;
+
+    constructor() {
+    }
 
     /**
      * Instantiates a new PolymathAPI instance.
-     * @param   rpcurl      The RPC url you would like the contract-wrappers library to use for interacting with
-     *                      the Ethereum network.
-     * @param   config      The configuration object. Look up the type for the description.
      * @return  An instance of the PolymathAPI class.
      */
-    constructor(rpcurl: string = 'http://127.0.0.1:8545', config: types.IContractWrappersConfig) {
-      assert.doesConformToSchema(
-        'config',
-        config,
-        ContractWrappersConfigSchema,
-      );
+    public static async init(): Promise<PolymathAPI> {
 
-      const txDefaults = {
-        gasPrice: config.gasPrice,
-      };
-
+      const me = new PolymathAPI();
       const providerEngine = new Web3ProviderEngine();
+      let networkId: number = 1;
 
-      if (window.web3) {
-        providerEngine.addProvider(
-          new SignerSubprovider(window.web3.currentProvider),
-        );
-      } else if (window.ethereum) {
-        providerEngine.addProvider(
-          new SignerSubprovider(window.ethereum),
-        );
+      const injectedProviderIfExists = await me._getInjectedProviderIfExists();
+      if (!_.isUndefined(injectedProviderIfExists)) {
+        try {
+          providerEngine.addProvider(new MetamaskSubprovider(injectedProviderIfExists));
+          networkId = Number((injectedProviderIfExists as any).networkVersion);
+        } catch (err) {
+          // Ignore error and proceed with networkId undefined
+        }
+      } else {
+        networkId = 15; // Remove this with something better.
       }
-      providerEngine.addProvider(new RPCSubprovider(rpcurl));
+
+      const publicNodeUrlsIfExistsForNetworkId = configs.PUBLIC_NODE_URLS_BY_NETWORK_ID[networkId];
+      const rpcSubproviders = _.map(publicNodeUrlsIfExistsForNetworkId, publicNodeUrl => {
+        return new RPCSubprovider(publicNodeUrl);
+      });
+      providerEngine.addProvider(new RedundantSubprovider(rpcSubproviders));
       providerEngine.start();
 
-      this.web3Wrapper = new Web3Wrapper(
-        providerEngine,
-        txDefaults,
+      me.web3Wrapper = new Web3Wrapper(
+        providerEngine
       );
       const artifactsArray = [
         PolymathRegistry,
@@ -141,76 +142,106 @@ export class PolymathAPI {
         USDTieredSTOFactory,
       ];
       _.forEach(artifactsArray, artifact => {
-        this.web3Wrapper.abiDecoder.addABI(artifact.abi);
+        (me.web3Wrapper)!.abiDecoder.addABI((artifact as any).abi);
       });
-      const contractAddresses = _.isUndefined(config.contractAddresses)
-          ? _getDefaultContractAddresses(config.networkId)
-          : config.contractAddresses;
-      this.polymathRegistry = new PolymathRegistryWrapper(
-        this.web3Wrapper,
-        config.networkId,
+      const contractAddresses = _getDefaultContractAddresses(networkId);
+
+      me.polymathRegistry = new PolymathRegistryWrapper(
+        me.web3Wrapper,
+        networkId,
         contractAddresses.polymathRegistry,
       );
-      this.securityToken = new SecurityTokenWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.securityToken = new SecurityTokenWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.securityTokenRegistry = new SecurityTokenRegistryWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.polyToken = new PolyTokenWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.polyToken = new PolyTokenWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.moduleRegistry = new ModuleRegistryWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.moduleRegistry = new ModuleRegistryWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.cappedSTO = new CappedSTOWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.cappedSTO = new CappedSTOWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.cappedSTOFactory = new CappedSTOFactoryWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.cappedSTOFactory = new CappedSTOFactoryWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.moduleFactory = new ModuleFactoryWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.moduleFactory = new ModuleFactoryWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.usdTieredSTO = new USDTieredSTOWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.usdTieredSTO = new USDTieredSTOWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
-      this.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
-        this.web3Wrapper,
-        config.networkId,
-        this.polymathRegistry,
+      me.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
+        me.web3Wrapper,
+        networkId,
+        me.polymathRegistry,
       );
+
+      return me;
     }
 
     /**
      * Get the account currently used by PolymathAPI
      * @return Address string
      */
-    public async getAccount(): Promise<string> {
-      return (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+    public async getAccount(): Promise<string | undefined> {
+      if (!_.isUndefined(this.web3Wrapper)) {
+        return (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+      } else {
+        return undefined;
+      }
     }
 
     /**
      * Get the network id currently used by PolymathAPI
      * @return Number
      */
-    public async getNetworkId(): Promise<number> {
-      return await this.web3Wrapper.getNetworkIdAsync();
+    public async getNetworkId(): Promise<number | undefined> {
+      if (!_.isUndefined(this.web3Wrapper)) {
+        return await this.web3Wrapper.getNetworkIdAsync();
+      } else {
+        return undefined;
+      }
+    }
+
+    private async _getInjectedProviderIfExists(): Promise<Provider | undefined> {
+      let injectedProviderIfExists = (window as any).ethereum;
+      if (!_.isUndefined(injectedProviderIfExists)) {
+        if (!_.isUndefined(injectedProviderIfExists.enable)) {
+          try {
+            await injectedProviderIfExists.enable();
+          } catch (err) {
+            return undefined;
+          }
+        }
+      } else {
+        const injectedWeb3IfExists = (window as any).web3;
+        if (!_.isUndefined(injectedWeb3IfExists) && !_.isUndefined(injectedWeb3IfExists.currentProvider)) {
+          injectedProviderIfExists = injectedWeb3IfExists.currentProvider;
+        } else {
+          return undefined;
+        }
+      }
+      return injectedProviderIfExists;
     }
 }
