@@ -21,81 +21,21 @@ import { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_
 import { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
 import { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
 import { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
-import { ContractWrappersConfigSchema } from './schemas/contract_wrappers_config_schema';
-import * as types from './types';
-import { assert } from './utils/assert';
 import { _getDefaultContractAddresses } from './utils/contract_addresses';
 import { configs } from './utils/configs';
-import { SignerSubprovider, RPCSubprovider, Web3ProviderEngine, MetamaskSubprovider, RedundantSubprovider } from '@0x/subproviders';
+import {
+  RPCSubprovider,
+  Web3ProviderEngine,
+  MetamaskSubprovider,
+  RedundantSubprovider,
+} from '@0x/subproviders';
 import * as _ from 'lodash';
 import { Provider } from 'ethereum-types';
-
-declare global {
-  interface Window {
-    web3: any;
-    ethereum: any;
-  }
-}
 
 /**
  * The PolymathAPI class contains smart contract wrappers helpful to interact with Polymath ecosystem.
  */
 export class PolymathAPI {
-    /**
-     * An instance of the PolymathRegistryWrapper class containing methods
-     * for interacting with PolymathRegistry smart contract.
-     */
-    public polymathRegistry?: PolymathRegistryWrapper;
-    /**
-     * An instance of the SecurityTokenWrapper class containing methods
-     * for interacting with SecurityToken smart contract.
-     */
-    public securityToken?: SecurityTokenWrapper;
-    /**
-     * An instance of the SecurityTokenRegistryWrapper class containing methods
-     * for interacting with SecurityTokenRegistry smart contract.
-     */
-    public securityTokenRegistry?: SecurityTokenRegistryWrapper;
-    /**
-     * An instance of the PolyTokenWrapper class containing methods
-     * for interacting with PolyToken smart contract.
-     */
-    public polyToken?: PolyTokenWrapper;
-    /**
-     * An instance of the ModuleRegistryWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
-     */
-    public moduleRegistry?: ModuleRegistryWrapper;
-    /**
-     * An instance of the CappedSTOWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
-     */
-    public cappedSTO?: CappedSTOWrapper;
-    /**
-     * An instance of the CappedSTOFactoryWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
-     */
-    public cappedSTOFactory?: CappedSTOFactoryWrapper;
-    /**
-     * An instance of the ModuleFactoryWrapper class containing methods
-     * for interacting with ModuleFactory smart contract.
-     */
-    public moduleFactory?: ModuleFactoryWrapper;
-    /**
-     * An instance of the USDTieredSTOWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
-     */
-    public usdTieredSTO?: USDTieredSTOWrapper;
-    /**
-     * An instance of the USDTieredSTOFactoryWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
-     */
-    public usdTieredSTOFactory?: USDTieredSTOFactoryWrapper;
-
-    private web3Wrapper?: Web3Wrapper;
-
-    constructor() {
-    }
 
     /**
      * Instantiates a new PolymathAPI instance.
@@ -120,14 +60,16 @@ export class PolymathAPI {
       }
 
       const publicNodeUrlsIfExistsForNetworkId = configs.PUBLIC_NODE_URLS_BY_NETWORK_ID[networkId];
+      /* tslint:disable */
       const rpcSubproviders = _.map(publicNodeUrlsIfExistsForNetworkId, publicNodeUrl => {
         return new RPCSubprovider(publicNodeUrl);
       });
+      /* tslint:enable */
       providerEngine.addProvider(new RedundantSubprovider(rpcSubproviders));
       providerEngine.start();
 
       me.web3Wrapper = new Web3Wrapper(
-        providerEngine
+        providerEngine,
       );
       const artifactsArray = [
         PolymathRegistry,
@@ -141,9 +83,12 @@ export class PolymathAPI {
         USDTieredSTO,
         USDTieredSTOFactory,
       ];
+
+      /* tslint:disable */
       _.forEach(artifactsArray, artifact => {
         (me.web3Wrapper)!.abiDecoder.addABI((artifact as any).abi);
       });
+      /* tslint:enable */
       const contractAddresses = _getDefaultContractAddresses(networkId);
 
       me.polymathRegistry = new PolymathRegistryWrapper(
@@ -199,6 +144,59 @@ export class PolymathAPI {
 
       return me;
     }
+
+    /**
+     * An instance of the PolymathRegistryWrapper class containing methods
+     * for interacting with PolymathRegistry smart contract.
+     */
+    public polymathRegistry?: PolymathRegistryWrapper;
+    /**
+     * An instance of the SecurityTokenWrapper class containing methods
+     * for interacting with SecurityToken smart contract.
+     */
+    public securityToken?: SecurityTokenWrapper;
+    /**
+     * An instance of the SecurityTokenRegistryWrapper class containing methods
+     * for interacting with SecurityTokenRegistry smart contract.
+     */
+    public securityTokenRegistry?: SecurityTokenRegistryWrapper;
+    /**
+     * An instance of the PolyTokenWrapper class containing methods
+     * for interacting with PolyToken smart contract.
+     */
+    public polyToken?: PolyTokenWrapper;
+    /**
+     * An instance of the ModuleRegistryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public moduleRegistry?: ModuleRegistryWrapper;
+    /**
+     * An instance of the CappedSTOWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public cappedSTO?: CappedSTOWrapper;
+    /**
+     * An instance of the CappedSTOFactoryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public cappedSTOFactory?: CappedSTOFactoryWrapper;
+    /**
+     * An instance of the ModuleFactoryWrapper class containing methods
+     * for interacting with ModuleFactory smart contract.
+     */
+    public moduleFactory?: ModuleFactoryWrapper;
+    /**
+     * An instance of the USDTieredSTOWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public usdTieredSTO?: USDTieredSTOWrapper;
+    /**
+     * An instance of the USDTieredSTOFactoryWrapper class containing methods
+     * for interacting with ModuleRegistry smart contract.
+     */
+    public usdTieredSTOFactory?: USDTieredSTOFactoryWrapper;
+
+    private web3Wrapper?: Web3Wrapper;
 
     /**
      * Get the account currently used by PolymathAPI
