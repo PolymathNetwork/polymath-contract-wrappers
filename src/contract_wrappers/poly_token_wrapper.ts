@@ -7,7 +7,6 @@ import { BigNumber } from '@0x/utils';
 import { TxData } from 'ethereum-types';
 import { IBalanceOf, IAllowance, IApprove } from '../types';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 
 /**

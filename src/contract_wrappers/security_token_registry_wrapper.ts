@@ -7,7 +7,6 @@ import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 import {
   ISecurityTokenData,
@@ -22,7 +21,7 @@ import {
  * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
  */
 export class SecurityTokenRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = SecurityTokenRegistry.abi;
+  public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenRegistryContractIfExists?: SecurityTokenRegistryContract;
   private factor = 1.5;

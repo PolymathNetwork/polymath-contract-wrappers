@@ -4,9 +4,8 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
-import { IGetAddress } from '../types';
+import { IGetAddress, NetworkId } from '../types';
 
 /**
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
@@ -19,12 +18,11 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Instantiate PolymathRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param networkId Desired networkId
-   * @param address The address of the PolymathRegistry contract. If undefined, will
-   * default to the known address corresponding to the networkId.
+   * @param address The address of the PolymathRegistry contract.
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, address?: string) {
+  constructor(web3Wrapper: Web3Wrapper, networkId: NetworkId, address: string) {
     super(web3Wrapper, networkId);
-    this.address = _.isUndefined(address) ? _getDefaultContractAddresses(networkId).polymathRegistry : address;
+    this.address = address;
   }
 
   /**

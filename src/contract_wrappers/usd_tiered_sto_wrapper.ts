@@ -6,7 +6,6 @@ import { BigNumber } from '@0x/utils';
 import { TxData, ContractAbi } from 'ethereum-types';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 import {
   IFundRaiseTypes,
@@ -29,7 +28,7 @@ import {
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
 export class USDTieredSTOWrapper extends ContractWrapper {
-  public abi: ContractAbi = USDTieredSTO.abi;
+  public abi: ContractAbi = (USDTieredSTO as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private usdTieredSTOContractIfExists?: USDTieredSTOContract;
   private factor = 1.2;
