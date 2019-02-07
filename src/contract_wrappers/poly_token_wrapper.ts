@@ -15,7 +15,7 @@ import { ContractWrapper } from './contract_wrapper';
 export class PolyTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = PolyToken.abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private polyTokenContractIfExists?: PolyTokenContract;
+  private polyTokenContract: Promise<PolyTokenContract>;
   /**
    * Instantiate PolyTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -25,6 +25,7 @@ export class PolyTokenWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.polyTokenContract = this._getPolyTokenContract();
   }
 
   /**
@@ -32,14 +33,13 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber representing the amount owned by the passed address
    */
   public async getBalanceOf(params: IBalanceOf): Promise<BigNumber> {
-    const PolyTokenContractInstance = await this._getPolyTokenContract();
     let addr: string;
     if (!_.isUndefined(params.address)) {
       addr = await this._getAddress();
     } else {
       addr = params.address as unknown as string;
     }
-    return await PolyTokenContractInstance.balanceOf.callAsync(
+    return await (await this.polyTokenContract).balanceOf.callAsync(
       addr,
     );
   }
@@ -50,8 +50,7 @@ export class PolyTokenWrapper extends ContractWrapper {
    */
   public async allowance(params: IAllowance): Promise<BigNumber> {
     const spender = await this._getAddress();
-    const PolyTokenContractInstance = await this._getPolyTokenContract();
-    return await PolyTokenContractInstance.allowance.callAsync(
+    return await (await this.polyTokenContract).allowance.callAsync(
       params.owner,
       spender,
     );
@@ -61,12 +60,11 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public async approve(params: IApprove) {
-    const PolyTokenContractInstance = await this._getPolyTokenContract();
     const txData: TxData = {
       from: await this._getAddress(),
     };
-    return () => {
-      return PolyTokenContractInstance.approve.sendTransactionAsync(
+    return async () => {
+      return (await this.polyTokenContract).approve.sendTransactionAsync(
         params.spender,
         params.value,
         txData,
@@ -80,10 +78,7 @@ export class PolyTokenWrapper extends ContractWrapper {
   }
 
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
-    if (!_.isUndefined(this.polyTokenContractIfExists)) {
-      return this.polyTokenContractIfExists;
-    }
-    const contractInstance = new PolyTokenContract(
+    return new PolyTokenContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'PolyToken',
@@ -91,7 +86,5 @@ export class PolyTokenWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.polyTokenContractIfExists = contractInstance;
-    return this.polyTokenContractIfExists;
   }
 }
