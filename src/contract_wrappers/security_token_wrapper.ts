@@ -15,7 +15,7 @@ import { ContractWrapper } from './contract_wrapper';
 export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityToken as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private securityTokenContractIfExists?: SecurityTokenContract;
+  private securityTokenContract: Promise<SecurityTokenContract>;
   private factor = 1.2;
   /**
    * Instantiate SecurityTokenWrapper
@@ -26,6 +26,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.securityTokenContract = this._getSecurityTokenContract();
   }
 
   /**
@@ -33,8 +34,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return address[] list of modules with this type
    */
   public async getModulesByType(params: IModulesByType): Promise<string[]> {
-    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return SecurityTokenContractInstance.getModulesByType.callAsync(
+    return (await this.securityTokenContract).getModulesByType.callAsync(
       params.type,
     );
   }
@@ -43,9 +43,8 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Attachs a module to the SecurityToken
    */
   public async addModule(params: IAddModule) {
-    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await SecurityTokenContractInstance.addModule.estimateGasAsync(
+    const estimateGas = await (await this.securityTokenContract).addModule.estimateGasAsync(
       params.moduleFactory,
       params.data,
       params.maxCost,
@@ -60,8 +59,8 @@ export class SecurityTokenWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return SecurityTokenContractInstance.addModule.sendTransactionAsync(
+    return async () => {
+      return (await this.securityTokenContract).addModule.sendTransactionAsync(
         params.moduleFactory,
         params.data,
         params.maxCost,
@@ -75,16 +74,14 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return Returns the data associated to a module
    */
   public async getModule(params: IModule): Promise<[string, string, string, boolean, BigNumber[]]> {
-    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return SecurityTokenContractInstance.getModule.callAsync(params.module);
+    return (await this.securityTokenContract).getModule.callAsync(params.module);
   }
 
   /**
    * Symbol of the Token
    */
   public async getSymbol(): Promise<string> {
-    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return await SecurityTokenContractInstance.symbol.callAsync();
+    return await (await this.securityTokenContract).symbol.callAsync();
   }
 
   /**
@@ -92,8 +89,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return bool
    */
   public async verifyTransfer(params: IVerifyTransfer): Promise<boolean> {
-    const SecurityTokenContractInstance = await this._getSecurityTokenContract();
-    return await SecurityTokenContractInstance.verifyTransfer.callAsync(
+    return await (await this.securityTokenContract).verifyTransfer.callAsync(
       params.from,
       params.to,
       params.value,
@@ -107,10 +103,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
-    if (!_.isUndefined(this.securityTokenContractIfExists)) {
-      return this.securityTokenContractIfExists;
-    }
-    const contractInstance = new SecurityTokenContract(
+    return new SecurityTokenContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'SecurityToken',
@@ -118,7 +111,5 @@ export class SecurityTokenWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.securityTokenContractIfExists = contractInstance;
-    return this.securityTokenContractIfExists;
   }
 }
