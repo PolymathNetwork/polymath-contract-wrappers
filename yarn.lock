@@ -5593,9 +5593,9 @@ pkg-dir@^3.0.0:
   dependencies:
     find-up "^3.0.0"
 
-"polymath-abi-wrappers@git://github.com/PolymathNetwork/polymath-abi-wrappers.git#v2.1.0-beta":
+"polymath-abi-wrappers@git://github.com/PolymathNetwork/polymath-abi-wrappers.git#v2.1.0-beta.1":
   version "0.0.0"
-  resolved "git://github.com/PolymathNetwork/polymath-abi-wrappers.git#769193f82003d51a37868a669b1ee66585f30975"
+  resolved "git://github.com/PolymathNetwork/polymath-abi-wrappers.git#b6820e30170e0d873584fb5ee3200394f394b0d3"
   dependencies:
     "@0x/base-contract" "^3.0.10"
     "@0x/sol-compiler" "^1.1.16"
@@ -5604,7 +5604,7 @@ pkg-dir@^3.0.0:
     ethereum-types "^1.1.4"
     ethers "^4.0.20"
     lodash "^4.17.11"
-    typescript "3.2.1"
+    typescript "3.2.2"
 
 "polymath-contract-artifacts@git://github.com/PolymathNetwork/polymath-contract-artifacts.git#v2.1.0-beta":
   version "0.0.0"
@@ -7127,10 +7127,6 @@ typescript@3.1.x:
   version "3.1.6"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.6.tgz#b6543a83cfc8c2befb3f4c8fba6896f5b0c9be68"
   integrity sha512-tDMYfVtvpb96msS1lDX9MEdHrW4yOuZ4Kdc4Him9oU796XldPYF/t2+uKoX0BBa0hXXwDlqYQbXY5Rzjzc5hBA==
-
-typescript@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.1.tgz#0b7a04b8cf3868188de914d9568bd030f0c56192"
 
 typescript@3.2.2:
   version "3.2.2"
