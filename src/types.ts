@@ -1,5 +1,8 @@
-import { IContractAddresses } from './addresses';
 import { BigNumber } from '@0x/utils';
+
+export interface IContractAddresses {
+    polymathRegistry: string;
+}
 
 /**
  * networkId: The id of the underlying ethereum network your provider is connected to.
@@ -237,6 +240,8 @@ export interface IModifyTiers {
     tokensPerTierDiscountPoly: BigNumber[];
 }
 
-export interface IPublicNodeUrlsByNetworkId {
-    [networkId: number]: string[];
+export enum NetworkId {
+    Mainnet = 1,
+    Kovan = 42,
+    Local = 15,
 }

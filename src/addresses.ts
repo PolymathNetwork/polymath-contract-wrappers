@@ -1,14 +1,5 @@
 import * as _ from 'lodash';
-
-export interface IContractAddresses {
-  polymathRegistry: string;
-}
-
-export enum NetworkId {
-  Mainnet = 1,
-  Kovan = 42,
-  Ganache = 15,
-}
+import { IContractAddresses, NetworkId } from './types';
 
 const networkToAddresses: { [networkId: number]: IContractAddresses } = {
   1: {
@@ -22,17 +13,27 @@ const networkToAddresses: { [networkId: number]: IContractAddresses } = {
   },
 };
 
-/**
- * Used to get addresses of contracts that have been deployed to either the
- * Ethereum mainnet or a supported testnet. Throws if there are no known
- * contracts deployed on the corresponding network.
- * @param networkId The desired networkId.
- * @returns The set of addresses for contracts which have been deployed on the
- * given networkId.
- */
-export function getContractAddressesForNetworkOrThrow(networkId: NetworkId): IContractAddresses {
+function _getContractAddressesForNetworkOrThrow(networkId: NetworkId): IContractAddresses {
   if (_.isUndefined(networkToAddresses[networkId])) {
-    throw new Error(`Unknown network id (${networkId}). No known 0x contracts have been deployed on this network.`);
+    throw new Error(
+      `Unknown network id (${networkId}).
+      No known Polymath contracts have been deployed on this network.`,
+    );
   }
   return networkToAddresses[networkId];
+}
+
+/**
+ * Returns the default Polymath Registry addresses for the given networkId or throws with
+ * a context-specific error message if the networkId is not recognized.
+ */
+export function _getDefaultContractAddresses(networkId: NetworkId): IContractAddresses {
+  if (!(networkId in NetworkId)) {
+    throw new Error(
+      `No default contract addresses found for the given network id (${networkId}).
+      If you want to use ContractWrappers on this network,
+      you must manually pass in the contract address(es) to the constructor.`,
+    );
+  }
+  return _getContractAddressesForNetworkOrThrow(networkId);
 }

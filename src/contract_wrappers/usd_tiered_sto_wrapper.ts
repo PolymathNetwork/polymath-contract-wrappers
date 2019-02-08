@@ -6,7 +6,6 @@ import { BigNumber } from '@0x/utils';
 import { TxData, ContractAbi } from 'ethereum-types';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 import {
   IFundRaiseTypes,
@@ -29,9 +28,9 @@ import {
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
 export class USDTieredSTOWrapper extends ContractWrapper {
-  public abi: ContractAbi = USDTieredSTO.abi;
+  public abi: ContractAbi = (USDTieredSTO as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private usdTieredSTOContractIfExists?: USDTieredSTOContract;
+  private usdTieredSTOContract: Promise<USDTieredSTOContract>;
   private factor = 1.2;
   /**
    * Instantiate USDTieredSTOWrapper
@@ -42,150 +41,133 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.usdTieredSTOContract = this._getUSDTieredSTOContract();
   }
 
   /**
    * Start time of the Capped STO
    */
   public async getStartTime(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.startTime.callAsync();
+    return await (await this.usdTieredSTOContract).startTime.callAsync();
   }
 
   /**
    * End time of the Capped STO
    */
   public async getEndTime(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.endTime.callAsync();
+    return await (await this.usdTieredSTOContract).endTime.callAsync();
   }
 
   /**
    * Ethereum account address to hold the funds
    */
   public async getWallet(): Promise<string> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.wallet.callAsync();
+    return await (await this.usdTieredSTOContract).wallet.callAsync();
   }
 
   /**
    * Type of currency used to collect the funds
    */
   public async getFundRaiseTypes(params: IFundRaiseTypes): Promise<boolean> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.fundRaiseTypes.callAsync(params.index);
+    return await (await this.usdTieredSTOContract).fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
   public async getFundsRaised(params: IFundsRaised): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.fundsRaised.callAsync(params.index);
+    return await (await this.usdTieredSTOContract).fundsRaised.callAsync(params.index);
   }
 
   /**
    * Return the total no. of tokens sold
    */
   public async getTotalTokensSold(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.totalTokensSold.callAsync();
+    return await (await this.usdTieredSTOContract).totalTokensSold.callAsync();
   }
 
   /**
    * Current tier
    */
   public async getCurrentTier(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.currentTier.callAsync();
+    return await (await this.usdTieredSTOContract).currentTier.callAsync();
   }
 
   /**
    * Get the limit in USD for non-accredited investors
    */
   public async getNonAccreditedLimitUSD(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.nonAccreditedLimitUSD.callAsync();
+    return await (await this.usdTieredSTOContract).nonAccreditedLimitUSD.callAsync();
   }
 
   /**
    * Get the minimun investment in USD
    */
   public async getMinimumInvestmentUSD(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.minimumInvestmentUSD.callAsync();
+    return await (await this.usdTieredSTOContract).minimumInvestmentUSD.callAsync();
   }
 
   /**
    * Ethereum account address to receive unsold tokens
    */
   public async getReserveWallet(): Promise<string> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.reserveWallet.callAsync();
+    return await (await this.usdTieredSTOContract).reserveWallet.callAsync();
   }
 
   /**
    * Return the total no. of tokens sold
    */
   public async getTokensSold(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getTokensSold.callAsync();
+    return await (await this.usdTieredSTOContract).getTokensSold.callAsync();
   }
 
   /**
    * Whether or not the STO has been finalized
    */
   public async isFinalized(): Promise<boolean> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.isFinalized.callAsync();
+    return await (await this.usdTieredSTOContract).isFinalized.callAsync();
   }
 
   /**
    * Return the total no. of tiers
    */
   public async getNumberOfTiers(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getNumberOfTiers.callAsync();
+    return await (await this.usdTieredSTOContract).getNumberOfTiers.callAsync();
   }
 
   /**
    * Return the usd tokens accepted by the STO
    */
   public async getUsdTokens(): Promise<string[]> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getUsdTokens.callAsync();
+    return await (await this.usdTieredSTOContract).getUsdTokens.callAsync();
   }
 
   /**
    * Amount of USD funds raised
    */
   public async getFundsRaisedUSD(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.fundsRaisedUSD.callAsync();
+    return await (await this.usdTieredSTOContract).fundsRaisedUSD.callAsync();
   }
 
   /**
    * Number of individual investors this STO have.
    */
   public async getInvestorCount(): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.investorCount.callAsync();
+    return await (await this.usdTieredSTOContract).investorCount.callAsync();
   }
 
   /**
    * Get specific tier
    */
   public async getTiers(params: ITiers): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.tiers.callAsync(params.index);
+    return await (await this.usdTieredSTOContract).tiers.callAsync(params.index);
   }
 
   /**
    * Return array of minted tokens in each fund raise type for given tier
    */
   public async getTokensMintedByTier(params: ITokensMintedByTier): Promise<BigNumber[]> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getTokensMintedByTier.callAsync(params.tier);
+    return await (await this.usdTieredSTOContract).getTokensMintedByTier.callAsync(params.tier);
   }
 
   /**
@@ -193,8 +175,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * @return Value in USD
    */
   public async convertToUSD(params: IConvertToUSD): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.convertToUSD.callAsync(
+    return await (await this.usdTieredSTOContract).convertToUSD.callAsync(
       params.fundRaiseType,
       params.amount,
     );
@@ -205,16 +186,14 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * @return Total number of tokens sold for ETH
    */
   public async getTokensSoldFor(params: ITokensSoldFor): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getTokensSoldFor.callAsync(params.fundRaiseType);
+    return await (await this.usdTieredSTOContract).getTokensSoldFor.callAsync(params.fundRaiseType);
   }
 
   /**
    * Amount of stable coins raised
    */
   public async getStableCoinsRaised(params: IStableCoinsRaised): Promise<BigNumber> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.stableCoinsRaised.callAsync(params.index);
+    return await (await this.usdTieredSTOContract).stableCoinsRaised.callAsync(params.index);
   }
 
   /**
@@ -222,9 +201,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Reserve address must be whitelisted to successfully finalize
    */
   public async finalize() {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.finalize.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).finalize.estimateGasAsync(
       { from: owner },
     );
     const txData: TxData = {
@@ -235,8 +213,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.finalize.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).finalize.sendTransactionAsync(
         txData,
       );
     };
@@ -246,9 +224,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies the list of accredited addresses
    */
   public async changeAccredited(params: IChangeAccredited) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.changeAccredited.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).changeAccredited.estimateGasAsync(
       params.investors,
       params.accredited,
       { from: owner },
@@ -261,8 +238,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.changeAccredited.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).changeAccredited.sendTransactionAsync(
         params.investors,
         params.accredited,
         txData,
@@ -274,9 +251,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public async changeNonAccreditedLimit(params: IChangeNonAccreditedLimit) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.changeNonAccreditedLimit.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).changeNonAccreditedLimit.estimateGasAsync(
       params.investors,
       params.nonAccreditedLimit,
       { from: owner },
@@ -289,8 +265,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.changeNonAccreditedLimit.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).changeNonAccreditedLimit.sendTransactionAsync(
         params.investors,
         params.nonAccreditedLimit,
         txData,
@@ -302,9 +278,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies STO start and end times
    */
   public async modifyTimes(params: IModifyTimes) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.modifyTimes.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).modifyTimes.estimateGasAsync(
       params.startTime,
       params.endTime,
       { from: owner },
@@ -317,8 +292,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.modifyTimes.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyTimes.sendTransactionAsync(
         params.startTime,
         params.endTime,
         txData,
@@ -330,9 +305,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public async modifyLimits(params: IModifyLimits) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.modifyLimits.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).modifyLimits.estimateGasAsync(
       params.nonAccreditedLimitUSD,
       params.minimumInvestmentUSD,
       { from: owner },
@@ -345,8 +319,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.modifyLimits.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyLimits.sendTransactionAsync(
         params.nonAccreditedLimitUSD,
         params.minimumInvestmentUSD,
         txData,
@@ -358,9 +332,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies fund raise types
    */
   public async modifyFunding(params: IModifyFunding) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.modifyFunding.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).modifyFunding.estimateGasAsync(
       params.fundRaiseTypes,
       { from: owner },
     );
@@ -372,8 +345,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.modifyFunding.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyFunding.sendTransactionAsync(
         params.fundRaiseTypes,
         txData,
       );
@@ -384,9 +357,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public async modifyAddresses(params: IModifyAddresses) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.modifyAddresses.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).modifyAddresses.estimateGasAsync(
       params.wallet,
       params.reserveWallet,
       params.usdToken,
@@ -400,8 +372,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.modifyAddresses.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyAddresses.sendTransactionAsync(
         params.wallet,
         params.reserveWallet,
         params.usdToken,
@@ -414,9 +386,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public async modifyTiers(params: IModifyTiers) {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await USDTieredSTOContractInstance.modifyTiers.estimateGasAsync(
+    const estimateGas = await (await this.usdTieredSTOContract).modifyTiers.estimateGasAsync(
       params.ratePerTier,
       params.ratePerTierDiscountPoly,
       params.tokensPerTierTotal,
@@ -431,8 +402,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return USDTieredSTOContractInstance.modifyTiers.sendTransactionAsync(
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyTiers.sendTransactionAsync(
         params.ratePerTier,
         params.ratePerTierDiscountPoly,
         params.tokensPerTierTotal,
@@ -446,8 +417,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Returns investor accredited & non-accredited override informatiomn
    */
   public async getAccreditedData(): Promise<[string[], boolean[], BigNumber[]]> {
-    const USDTieredSTOContractInstance = await this._getUSDTieredSTOContract();
-    return await USDTieredSTOContractInstance.getAccreditedData.callAsync();
+    return await (await this.usdTieredSTOContract).getAccreditedData.callAsync();
   }
 
   private async _getOwnerAddress(): Promise<string> {
@@ -456,10 +426,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   }
 
   private async _getUSDTieredSTOContract(): Promise<USDTieredSTOContract> {
-    if (!_.isUndefined(this.usdTieredSTOContractIfExists)) {
-      return this.usdTieredSTOContractIfExists;
-    }
-    const contractInstance = new USDTieredSTOContract(
+    return new USDTieredSTOContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'USDTieredSTO',
@@ -467,7 +434,5 @@ export class USDTieredSTOWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.usdTieredSTOContractIfExists = contractInstance;
-    return this.usdTieredSTOContractIfExists;
   }
 }

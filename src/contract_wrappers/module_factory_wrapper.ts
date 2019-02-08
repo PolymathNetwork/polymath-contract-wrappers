@@ -4,7 +4,6 @@ import { ModuleFactory } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 
 /**
@@ -13,7 +12,7 @@ import { ContractWrapper } from './contract_wrapper';
 export class ModuleFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleFactory.abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private moduleFactoryContractIfExists?: ModuleFactoryContract;
+  private moduleFactoryContract: Promise<ModuleFactoryContract>;
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -23,21 +22,18 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.moduleFactoryContract = this._getModuleFactoryContract();
   }
 
   /**
    * Get the name of the Module
    */
   public async getName(): Promise<string> {
-    const ModuleFactoryContractInstance = await this._getModuleFactoryContract();
-    return await ModuleFactoryContractInstance.name.callAsync();
+    return await (await this.moduleFactoryContract).name.callAsync();
   }
 
   private async _getModuleFactoryContract(): Promise<ModuleFactoryContract> {
-    if (!_.isUndefined(this.moduleFactoryContractIfExists)) {
-      return this.moduleFactoryContractIfExists;
-    }
-    const contractInstance = new ModuleFactoryContract(
+    return new ModuleFactoryContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'ModuleFactory',
@@ -45,7 +41,5 @@ export class ModuleFactoryWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.moduleFactoryContractIfExists = contractInstance;
-    return this.moduleFactoryContractIfExists;
   }
 }

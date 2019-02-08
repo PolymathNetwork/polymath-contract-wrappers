@@ -4,7 +4,6 @@ import { USDTieredSTOFactory } from 'polymath-contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 import { BigNumber } from '@0x/utils';
 
@@ -14,7 +13,7 @@ import { BigNumber } from '@0x/utils';
 export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = USDTieredSTOFactory.abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private usdTieredSTOFactoryContractIfExists?: USDTieredSTOFactoryContract;
+  private usdTieredSTOFactoryContract: Promise<USDTieredSTOFactoryContract>;
   /**
    * Instantiate USDTieredSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -24,21 +23,18 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.usdTieredSTOFactoryContract = this._getUSDTieredSTOFactoryContract();
   }
 
   /**
    * Get the setup cost of the module
    */
   public async getSetupCost(): Promise<BigNumber> {
-    const USDTieredSTOFactoryContractInstance = await this._getUSDTieredSTOFactoryContract();
-    return await USDTieredSTOFactoryContractInstance.getSetupCost.callAsync();
+    return await (await this.usdTieredSTOFactoryContract).getSetupCost.callAsync();
   }
 
   private async _getUSDTieredSTOFactoryContract(): Promise<USDTieredSTOFactoryContract> {
-    if (!_.isUndefined(this.usdTieredSTOFactoryContractIfExists)) {
-      return this.usdTieredSTOFactoryContractIfExists;
-    }
-    const contractInstance = new USDTieredSTOFactoryContract(
+    return new USDTieredSTOFactoryContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'USDTieredSTOFactory',
@@ -46,7 +42,5 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.usdTieredSTOFactoryContractIfExists = contractInstance;
-    return this.usdTieredSTOFactoryContractIfExists;
   }
 }
