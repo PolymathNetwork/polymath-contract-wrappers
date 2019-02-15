@@ -1,5 +1,7 @@
 import { BigNumber } from '@0x/utils';
 
+export { PolyResponse } from 'polymath-abi-wrappers';
+
 export interface IContractAddresses {
     polymathRegistry: string;
 }
