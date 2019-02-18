@@ -1,14 +1,14 @@
 {
   "name": "@polymathnetwork/contract-wrappers",
-  "version": "2.1.0-alpha.2",
+  "version": "2.1.0-alpha.3",
   "description": "Smart TS wrappers for Polymath smart contracts",
   "keywords": [
     "polymath",
     "ethereum"
   ],
-  "main": "lib/src/index.js",
+  "main": "lib/index.js",
   "files": ["lib/**/*"],
-  "types": "lib/src/index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config=webpack.config.dev.js",
     "build": "webpack",
