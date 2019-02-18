@@ -1,5 +1,5 @@
-import { SecurityTokenRegistryContract } from 'polymath-abi-wrappers';
-import { SecurityTokenRegistry } from 'polymath-contract-artifacts';
+import { SecurityTokenRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';

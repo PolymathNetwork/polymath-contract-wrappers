@@ -1,6 +1,6 @@
-import { USDTieredSTOContract } from 'polymath-abi-wrappers';
+import { USDTieredSTOContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
-import { USDTieredSTO } from 'polymath-contract-artifacts';
+import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { TxData, ContractAbi } from 'ethereum-types';

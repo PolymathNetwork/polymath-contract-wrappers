@@ -1,6 +1,6 @@
-import { ModuleFactoryContract } from 'polymath-abi-wrappers';
+import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
-import { ModuleFactory } from 'polymath-contract-artifacts';
+import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';

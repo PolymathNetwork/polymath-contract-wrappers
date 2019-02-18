@@ -9,7 +9,7 @@ import {
   ModuleFactory,
   USDTieredSTO,
   USDTieredSTOFactory,
-} from 'polymath-contract-artifacts';
+} from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { Provider, StandardContractOutput } from 'ethereum-types';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
