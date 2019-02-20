@@ -84,13 +84,6 @@ export class PolyTokenWrapper extends ContractWrapper {
     return addresses[0];
   }
 
-  public async getAddress(): Promise<string> {
-    const address = await this.polymathRegistry.getAddress({
-      contractName: 'PolyToken',
-    });
-    return address;
-  }
-
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       this.abi,
