@@ -1,11 +1,10 @@
-import { ModuleRegistryContract } from 'polymath-abi-wrappers';
+import { ModuleRegistryContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
-import { ModuleRegistry } from 'polymath-contract-artifacts';
+import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { IModulesByTypeAndToken } from '../types';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 
 /**
@@ -14,7 +13,7 @@ import { ContractWrapper } from './contract_wrapper';
 export class ModuleRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleRegistry.abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private moduleRegistryContractIfExists?: ModuleRegistryContract;
+  private moduleRegistryContract: Promise<ModuleRegistryContract>;
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -24,6 +23,14 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.moduleRegistryContract = this._getModuleRegistryContract();
+  }
+
+  /**
+   * Returns the contract address
+   */
+  public async getAddress(): Promise<string> {
+    return (await this.moduleRegistryContract).address;
   }
 
   /**
@@ -31,18 +38,14 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * @return address array that contains the list of available addresses of module factory contracts.
    */
   public async getModulesByTypeAndToken(params: IModulesByTypeAndToken): Promise<string[]> {
-    const ModuleRegistryContractInstance = await this._getModuleRegistryContract();
-    return await ModuleRegistryContractInstance.getModulesByTypeAndToken.callAsync(
+    return await (await this.moduleRegistryContract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
     );
   }
 
   private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
-    if (!_.isUndefined(this.moduleRegistryContractIfExists)) {
-      return this.moduleRegistryContractIfExists;
-    }
-    const contractInstance = new ModuleRegistryContract(
+    return new ModuleRegistryContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'ModuleRegistry',
@@ -50,7 +53,5 @@ export class ModuleRegistryWrapper extends ContractWrapper {
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.moduleRegistryContractIfExists = contractInstance;
-    return this.moduleRegistryContractIfExists;
   }
 }

@@ -1,5 +1,5 @@
-import { SecurityTokenRegistryContract } from 'polymath-abi-wrappers';
-import { SecurityTokenRegistry } from 'polymath-contract-artifacts';
+import { SecurityTokenRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
@@ -7,7 +7,6 @@ import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
 import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
-import { _getDefaultContractAddresses } from '../utils/contract_addresses';
 import { ContractWrapper } from './contract_wrapper';
 import {
   ISecurityTokenData,
@@ -22,9 +21,9 @@ import {
  * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
  */
 export class SecurityTokenRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = SecurityTokenRegistry.abi;
+  public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
-  private securityTokenRegistryContractIfExists?: SecurityTokenRegistryContract;
+  private securityTokenRegistryContract: Promise<SecurityTokenRegistryContract>;
   private factor = 1.5;
   /**
    * Instantiate SecurityTokenRegistryWrapper
@@ -35,15 +34,22 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper, networkId);
     this.polymathRegistry = polymathRegistry;
+    this.securityTokenRegistryContract = this._getSecurityTokenRegistryContract();
+  }
+
+  /**
+   * Returns the contract address
+   */
+  public async getAddress(): Promise<string> {
+    return (await this.securityTokenRegistryContract).address;
   }
 
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
   public async getTickersByOwner(): Promise<string[]> {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
     const owner = await this._getOwnerAddress();
-    const tickers = await SecurityTokenRegistryContractInstance.getTickersByOwner.callAsync(
+    const tickers = await (await this.securityTokenRegistryContract).getTickersByOwner.callAsync(
       owner,
     );
     return tickers;
@@ -53,8 +59,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @returns Returns the security token data by address
    */
   public async getSecurityTokenData(params: ISecurityTokenData): Promise<[string, string, string, BigNumber]> {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.getSecurityTokenData.callAsync(params.securityToken);
+    return await (await this.securityTokenRegistryContract).getSecurityTokenData.callAsync(params.securityToken);
   }
 
   /**
@@ -62,8 +67,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async getTokensByOwner(params: ITokensByOwner): Promise<string[]> {
     assert.isETHAddressHex('ownerAddress', params.ownerAddress);
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const tokens = await SecurityTokenRegistryContractInstance.getTokensByOwner.callAsync(
+    const tokens = await (await this.securityTokenRegistryContract).getTokensByOwner.callAsync(
       params.ownerAddress,
     );
     return tokens;
@@ -74,8 +78,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async getTickerDetails(params: ITickerDetails): Promise<[string, BigNumber, BigNumber, string, boolean]> {
     assert.isString('tokenName', params.tokenName);
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    const tickerDetail = await SecurityTokenRegistryContractInstance.getTickerDetails.callAsync(
+    const tickerDetail = await (await this.securityTokenRegistryContract).getTickerDetails.callAsync(
       params.tokenName,
     );
     return tickerDetail;
@@ -85,8 +88,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Gets the ticker registration fee
    */
   public async getTickerRegistrationFee(): Promise<BigNumber> {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.getTickerRegistrationFee.callAsync();
+    return await (await this.securityTokenRegistryContract).getTickerRegistrationFee.callAsync();
   }
 
   /**
@@ -95,9 +97,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
   public async registerTicker(params: IRegisterTicker) {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
     const owner = await this._getOwnerAddress();
-    const estimateGas = await SecurityTokenRegistryContractInstance.registerTicker.estimateGasAsync(
+    const estimateGas = await (await this.securityTokenRegistryContract).registerTicker.estimateGasAsync(
       owner,
       params.ticker,
       params.tokenName,
@@ -111,8 +112,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         this.factor,
       ),
     };
-    return () => {
-      return SecurityTokenRegistryContractInstance.registerTicker.sendTransactionAsync(
+    return async () => {
+      return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
         owner,
         params.ticker,
         params.tokenName,
@@ -127,9 +128,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public async transferTickerOwnership(params: ITransferTickerOwnership) {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
     const from = await this._getOwnerAddress();
-    const estimateGas = await SecurityTokenRegistryContractInstance.transferTickerOwnership.estimateGasAsync(
+    const estimateGas = await (await this.securityTokenRegistryContract).transferTickerOwnership.estimateGasAsync(
       params.newOwner,
       params.ticker,
       { from },
@@ -142,8 +142,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         1.2,
       ),
     };
-    return () => {
-      return SecurityTokenRegistryContractInstance.transferTickerOwnership.sendTransactionAsync(
+    return async () => {
+      return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
         params.newOwner,
         params.ticker,
         txData,
@@ -155,9 +155,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public async generateSecurityToken(params: IGenerateSecurityToken) {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
     const from = await this._getOwnerAddress();
-    const estimateGas = await SecurityTokenRegistryContractInstance.generateSecurityToken.estimateGasAsync(
+    const estimateGas = await (await this.securityTokenRegistryContract).generateSecurityToken.estimateGasAsync(
       name,
       params.ticker,
       params.details,
@@ -172,8 +171,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         1.2,
       ),
     };
-    return () => {
-      return SecurityTokenRegistryContractInstance.generateSecurityToken.sendTransactionAsync(
+    return async () => {
+      return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
         name,
         params.ticker,
         params.details,
@@ -188,18 +187,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Fee amount
    */
   public async getSecurityTokenLaunchFee(): Promise<BigNumber> {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.getSecurityTokenLaunchFee.callAsync();
-  }
-
-  /**
-   * Gets the SecurityTokenRegistry address
-   * @return Address string
-   */
-  public async getAddress(): Promise<string> {
-    return await this.polymathRegistry.getAddress({
-      contractName: 'SecurityTokenRegistry',
-    });
+    return await (await this.securityTokenRegistryContract).getSecurityTokenLaunchFee.callAsync();
   }
 
   private async _getOwnerAddress(): Promise<string> {
@@ -213,25 +201,18 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   private async _getSecurityTokenAddress(ticker: string): Promise<string> {
-    const SecurityTokenRegistryContractInstance = await this._getSecurityTokenRegistryContract();
-    return await SecurityTokenRegistryContractInstance.getSecurityTokenAddress.callAsync(
+    return await (await this.securityTokenRegistryContract).getSecurityTokenAddress.callAsync(
       ticker,
     );
   }
 
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
-    if (!_.isUndefined(this.securityTokenRegistryContractIfExists)) {
-      return this.securityTokenRegistryContractIfExists;
-    }
-
-    const contractInstance = new SecurityTokenRegistryContract(
+    return new SecurityTokenRegistryContract(
       this.abi,
       await this.getAddress(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
-    this.securityTokenRegistryContractIfExists = contractInstance;
-    return this.securityTokenRegistryContractIfExists;
   }
 
 }
