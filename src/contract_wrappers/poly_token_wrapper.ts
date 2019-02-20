@@ -1,6 +1,6 @@
-import { PolyTokenContract } from 'polymath-abi-wrappers';
+import { PolyTokenContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
-import { PolyToken } from 'polymath-contract-artifacts';
+import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';

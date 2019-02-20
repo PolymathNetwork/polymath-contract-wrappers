@@ -1,6 +1,6 @@
-import { CappedSTOContract } from 'polymath-abi-wrappers';
+import { CappedSTOContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
-import { CappedSTO } from 'polymath-contract-artifacts';
+import { CappedSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';

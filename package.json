@@ -1,6 +1,6 @@
 {
   "name": "@polymathnetwork/contract-wrappers",
-  "version": "0.0.0",
+  "version": "2.1.0-beta.1",
   "description": "Smart TS wrappers for Polymath smart contracts",
   "keywords": [
     "polymath",
@@ -16,12 +16,15 @@
     "clean": "shx rm -rf lib docs",
     "docs": "typedoc --excludePrivate --excludeExternals --exclude node_modules/ --name 'Polymath API' --target ES5 --module commonjs --tsconfig typedoc-tsconfig.json --out docs/ src/"
   },
-  "config": {
-    "postpublish": {
-      "assets": []
-    }
-  },
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PolymathNetwork/polymath-contract-wrappers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PolymathNetwork/polymath-contract-wrappers/issues"
+  },
+  "homepage": "https://github.com/PolymathNetwork/polymath-contract-wrappers/blob/master/README.md",
   "engines": {
     "node": ">=6.0.0"
   },
@@ -53,8 +56,8 @@
     "@0x/web3-wrapper": "^3.2.2",
     "ethereum-types": "^1.1.4",
     "lodash": "^4.17.5",
-    "polymath-abi-wrappers": "git://github.com/PolymathNetwork/polymath-abi-wrappers.git#v2.1.0-beta.1",
-    "polymath-contract-artifacts": "git://github.com/PolymathNetwork/polymath-contract-artifacts.git#v2.1.0-beta"
+    "@polymathnetwork/abi-wrappers": "2.1.0-beta",
+    "@polymathnetwork/contract-artifacts": "2.1.0-beta.1"
   },
   "publishConfig": {
     "access": "public"

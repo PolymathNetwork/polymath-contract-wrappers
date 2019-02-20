@@ -1,5 +1,5 @@
-import { PolymathRegistryContract } from 'polymath-abi-wrappers';
-import { PolymathRegistry } from 'polymath-contract-artifacts';
+import { PolymathRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { assert } from '../utils/assert';

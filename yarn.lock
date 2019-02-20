@@ -250,6 +250,25 @@
   dependencies:
     events "^3.0.0"
 
+"@polymathnetwork/abi-wrappers@2.1.0-beta":
+  version "2.1.0-beta"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.tgz#b2c2bf6cb9a74e2d05e2bfd3151bf7cd15f050a1"
+  integrity sha512-Fa2+l2/S4hkgIn/s2/xM7o8e1Y4fmSMCUdjjcWHzTKaHQwXCYuDVo2jBea7ZrKkj7Gr58BojF3yWt95FPZXDAA==
+  dependencies:
+    "@0x/base-contract" "^3.0.10"
+    "@0x/sol-compiler" "^1.1.16"
+    "@0x/utils" "^2.0.8"
+    "@0x/web3-wrapper" "^3.2.1"
+    ethereum-types "^1.1.4"
+    ethers "^4.0.20"
+    lodash "^4.17.11"
+    typescript "3.2.2"
+
+"@polymathnetwork/contract-artifacts@2.1.0-beta.1":
+  version "2.1.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/contract-artifacts/-/contract-artifacts-2.1.0-beta.1.tgz#d349b911121202cf69d4d9e8545ce36e922a6773"
+  integrity sha512-s5OxF0gDWgA3h7yqjlRRJU5vIsDldbF09OgPVEdQDDgOdrNADb21kJdWM/TzyAgZ2W9xN07sdJUx0OMxObc+VQ==
+
 "@types/bn.js@*":
   version "4.11.4"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.4.tgz#a7bed5bdef9f16b25c92ba27745ab261374787d7"
@@ -5592,23 +5611,6 @@ pkg-dir@^3.0.0:
   resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-3.0.0.tgz#2749020f239ed990881b1f71210d51eb6523bea3"
   dependencies:
     find-up "^3.0.0"
-
-"polymath-abi-wrappers@git://github.com/PolymathNetwork/polymath-abi-wrappers.git#v2.1.0-beta.1":
-  version "0.0.0"
-  resolved "git://github.com/PolymathNetwork/polymath-abi-wrappers.git#b6820e30170e0d873584fb5ee3200394f394b0d3"
-  dependencies:
-    "@0x/base-contract" "^3.0.10"
-    "@0x/sol-compiler" "^1.1.16"
-    "@0x/utils" "^2.0.8"
-    "@0x/web3-wrapper" "^3.2.1"
-    ethereum-types "^1.1.4"
-    ethers "^4.0.20"
-    lodash "^4.17.11"
-    typescript "3.2.2"
-
-"polymath-contract-artifacts@git://github.com/PolymathNetwork/polymath-contract-artifacts.git#v2.1.0-beta":
-  version "0.0.0"
-  resolved "git://github.com/PolymathNetwork/polymath-contract-artifacts.git#279775042424149f66f6c9a5a12dfd1c4880ce39"
 
 popper.js@1.14.3:
   version "1.14.3"

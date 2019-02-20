@@ -1,4 +1,4 @@
-## polymath-contract-wrappers
+## @polymathnetwork/contract-wrappers
 
 Smart TS wrappers for Polymath smart contracts.
 
@@ -7,13 +7,13 @@ Smart TS wrappers for Polymath smart contracts.
 **Install**
 
 ```bash
-npm install polymath-contract-wrappers --save
+npm install @polymathnetwork/contract-wrappers --save
 ```
 
 **Import**
 
 ```javascript
-import { PolymathAPI } from 'polymath-contract-wrappers';
+import { PolymathAPI } from '@polymathnetwork/contract-wrappers';
 ```
 
 If your project is in [TypeScript](https://www.typescriptlang.org/), add the following to your `tsconfig.json`:
