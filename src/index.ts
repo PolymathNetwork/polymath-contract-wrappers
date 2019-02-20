@@ -9,6 +9,7 @@ import {
   ModuleFactory,
   USDTieredSTO,
   USDTieredSTOFactory,
+  FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { Provider, StandardContractOutput } from 'ethereum-types';
@@ -22,6 +23,7 @@ import { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_
 import { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
 import { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
 import { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
+import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wrapper';
 import * as types from './types';
 import { assert } from './utils/assert';
 import { _getDefaultContractAddresses } from './addresses';
@@ -60,12 +62,12 @@ export class PolymathAPI {
     public moduleRegistry: ModuleRegistryWrapper;
     /**
      * An instance of the CappedSTOWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
+     * for interacting with CappedSTO smart contract.
      */
     public cappedSTO: CappedSTOWrapper;
     /**
      * An instance of the CappedSTOFactoryWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
+     * for interacting with CappedSTOFactory smart contract.
      */
     public cappedSTOFactory: CappedSTOFactoryWrapper;
     /**
@@ -75,14 +77,19 @@ export class PolymathAPI {
     public moduleFactory: ModuleFactoryWrapper;
     /**
      * An instance of the USDTieredSTOWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
+     * for interacting with USDTieredSTO smart contract.
      */
     public usdTieredSTO: USDTieredSTOWrapper;
     /**
      * An instance of the USDTieredSTOFactoryWrapper class containing methods
-     * for interacting with ModuleRegistry smart contract.
+     * for interacting with USDTieredSTOFactory smart contract.
      */
     public usdTieredSTOFactory: USDTieredSTOFactoryWrapper;
+    /**
+     * An instance of the FeatureRegistryWrapper class containing methods
+     * for interacting with FeatureRegistry smart contract.
+     */
+    public featureRegistry: FeatureRegistryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
     private readonly networkId: types.NetworkId;
@@ -114,6 +121,7 @@ export class PolymathAPI {
         ModuleFactory,
         USDTieredSTO,
         USDTieredSTOFactory,
+        FeatureRegistry,
       ];
 
       _.forEach(artifactsArray, artifact => { // tslint:disable-line
@@ -168,6 +176,11 @@ export class PolymathAPI {
         this.polymathRegistry,
       );
       this.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
+        this.web3Wrapper,
+        networkId,
+        this.polymathRegistry,
+      );
+      this.featureRegistry = new FeatureRegistryWrapper(
         this.web3Wrapper,
         networkId,
         this.polymathRegistry,

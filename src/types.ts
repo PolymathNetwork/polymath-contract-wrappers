@@ -256,3 +256,10 @@ export enum NetworkId {
     Kovan = 42,
     Local = 15,
 }
+
+/**
+ * @param nameKey is the key for the feature status mapping
+ */
+export interface IFeatureStatus {
+    nameKey: string;
+}
