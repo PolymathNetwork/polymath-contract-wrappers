@@ -50,6 +50,9 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     )
   }
 
+  /**
+   * Change a feature status
+   */
   public async setFeatureStatus(params: ISetFeatureStatus) {
     const owner = await this._getOwnerAddress();
     const estimateGas = await (await this.featureRegistryContract).setFeatureStatus.estimateGasAsync(
