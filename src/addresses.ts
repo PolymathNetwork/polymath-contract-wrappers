@@ -9,7 +9,7 @@ const networkToAddresses: { [networkId: number]: IContractAddresses } = {
     polymathRegistry: '0x5b215a7d39ee305ad28da29bf2f0425c6c2a00b3',
   },
   15: {
-    polymathRegistry: '0x0f3da9b8682a6054300b8c78a0eca5e79d506380',
+    polymathRegistry: '0x8b21e65058a5e52b423080044634ffac53c1e5ce',
   },
 };
 
