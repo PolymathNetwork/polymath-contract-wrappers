@@ -28,6 +28,13 @@ export class CappedSTOWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async getAddress(): Promise<string> {
+    return (await this.cappedSTOContract).address;
+  }
+
+  /**
    * Start time of the Capped STO
    */
   public async getStartTime(): Promise<BigNumber> {

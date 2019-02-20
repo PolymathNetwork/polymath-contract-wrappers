@@ -85,6 +85,7 @@ export class PolymathAPI {
     public usdTieredSTOFactory: USDTieredSTOFactoryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
+    private readonly networkId: types.NetworkId;
 
     /**
      * Instantiates a new PolymathAPI instance.
@@ -94,6 +95,9 @@ export class PolymathAPI {
      */
     constructor(provider: Provider, networkId: types.NetworkId) {
       assert.isWeb3Provider('provider', provider);
+      assert.isNumber('networkId', networkId);
+
+      this.networkId = networkId;
 
       this.web3Wrapper = new Web3Wrapper(
         provider,
@@ -180,6 +184,13 @@ export class PolymathAPI {
       } else {
         return undefined;
       }
+    }
+
+    /**
+     * Is it Testnet network?
+     */
+    public isTestnet(): boolean {
+      return this.networkId !== 1;
     }
 
 }

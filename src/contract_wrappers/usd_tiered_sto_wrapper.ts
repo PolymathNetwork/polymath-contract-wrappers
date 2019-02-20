@@ -45,6 +45,13 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async getAddress(): Promise<string> {
+    return (await this.usdTieredSTOContract).address;
+  }
+
+  /**
    * Start time of the Capped STO
    */
   public async getStartTime(): Promise<BigNumber> {

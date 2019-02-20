@@ -7,7 +7,6 @@
     "ethereum"
   ],
   "main": "lib/index.js",
-  "files": ["lib/**/*"],
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config=webpack.config.dev.js",

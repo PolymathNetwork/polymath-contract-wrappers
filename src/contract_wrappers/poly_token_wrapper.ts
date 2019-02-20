@@ -29,6 +29,13 @@ export class PolyTokenWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async getAddress(): Promise<string> {
+    return (await this.polyTokenContract).address;
+  }
+
+  /**
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
