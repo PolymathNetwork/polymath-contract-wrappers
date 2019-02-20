@@ -42,10 +42,10 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    */
   public async getAddress(params: IGetAddress): Promise<string> {
     assert.isString('contractName', params.contractName);
-    const addresse = await (await this.polymathRegistryContract).getAddress.callAsync(
+    const address = await (await this.polymathRegistryContract).getAddress.callAsync(
       params.contractName,
     );
-    return addresse;
+    return address;
   }
 
   /**
