@@ -38,6 +38,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async address(): Promise<string> {
+    return (await this.securityTokenRegistryContract).address;
+  }
+
+  /**
    * @returns Returns the list of tickers owned by the selected address
    */
   public async getTickersByOwner(): Promise<string[]> {

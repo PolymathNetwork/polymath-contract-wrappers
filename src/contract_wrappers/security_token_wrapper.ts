@@ -30,6 +30,13 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async address(): Promise<string> {
+    return (await this.securityTokenContract).address;
+  }
+
+  /**
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */

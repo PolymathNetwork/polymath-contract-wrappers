@@ -27,6 +27,13 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async address(): Promise<string> {
+    return (await this.usdTieredSTOFactoryContract).address;
+  }
+
+  /**
    * Get the setup cost of the module
    */
   public async getSetupCost(): Promise<BigNumber> {

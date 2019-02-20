@@ -26,6 +26,13 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   }
 
   /**
+   * Returns the contract address
+   */
+  public async address(): Promise<string> {
+    return (await this.moduleFactoryContract).address;
+  }
+
+  /**
    * Get the name of the Module
    */
   public async getName(): Promise<string> {
