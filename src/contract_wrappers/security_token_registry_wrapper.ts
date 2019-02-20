@@ -40,7 +40,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async address(): Promise<string> {
+  public async getAddress(): Promise<string> {
     return (await this.securityTokenRegistryContract).address;
   }
 
@@ -188,16 +188,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public async getSecurityTokenLaunchFee(): Promise<BigNumber> {
     return await (await this.securityTokenRegistryContract).getSecurityTokenLaunchFee.callAsync();
-  }
-
-  /**
-   * Gets the SecurityTokenRegistry address
-   * @return Address string
-   */
-  public async getAddress(): Promise<string> {
-    return await this.polymathRegistry.getAddress({
-      contractName: 'SecurityTokenRegistry',
-    });
   }
 
   private async _getOwnerAddress(): Promise<string> {

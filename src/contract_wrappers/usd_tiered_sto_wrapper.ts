@@ -47,7 +47,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async address(): Promise<string> {
+  public async getAddress(): Promise<string> {
     return (await this.usdTieredSTOContract).address;
   }
 
