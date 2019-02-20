@@ -209,7 +209,9 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
     return new SecurityTokenRegistryContract(
       this.abi,
-      await this.getAddress(),
+      await this.polymathRegistry.getAddress({
+        contractName: 'SecurityTokenRegistry',
+      }),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
