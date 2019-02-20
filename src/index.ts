@@ -188,7 +188,7 @@ export class PolymathAPI {
      * Is it Testnet network?
      */
     public isTestnet(): boolean {
-      return this.networkId == 15;
+      return this.networkId !== 1;
     }
 
 }
