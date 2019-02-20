@@ -15,10 +15,7 @@
     "outDir": "lib",
     "rootDir": "src",
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": "src"
   },
-  "include": [
-    "./src/**/*",
-    "./node_modules/web3-typescript-typings/index.d.ts"
-  ]
+  "exclude": ["node_modules", "lib"]
 }
