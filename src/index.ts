@@ -96,18 +96,16 @@ export class PolymathAPI {
 
     /**
      * Instantiates a new PolymathAPI instance.
-     * @param   provider    The Provider instance you would like the contract-wrappers library
-     *                      to use for interacting with the Ethereum network.
      * @return  An instance of the PolymathAPI class.
      */
-    constructor(provider: Provider, networkId: types.NetworkId) {
-      assert.isWeb3Provider('provider', provider);
-      assert.isNumber('networkId', networkId);
+    constructor(params: types.IApiConstructor) {
+      assert.isWeb3Provider('provider', params.dataProvider.provider);
+      assert.isNumber('networkId', params.dataProvider.networkId);
 
-      this.networkId = networkId;
+      this.networkId = params.dataProvider.networkId;
 
       this.web3Wrapper = new Web3Wrapper(
-        provider,
+        params.dataProvider.provider,
       );
 
       const artifactsArray = [
@@ -128,61 +126,63 @@ export class PolymathAPI {
         this.web3Wrapper.abiDecoder.addABI((artifact as any).abi);
       });
 
-      const contractAddresses = _getDefaultContractAddresses(networkId);
+      const contractAddresses = _.isUndefined(params.polymathRegistryAddress)
+      ? _getDefaultContractAddresses(this.networkId)
+      : params.polymathRegistryAddress;
 
       this.polymathRegistry = new PolymathRegistryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         contractAddresses.polymathRegistry,
       );
       this.securityToken = new SecurityTokenWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.polyToken = new PolyTokenWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.moduleRegistry = new ModuleRegistryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.cappedSTO = new CappedSTOWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.cappedSTOFactory = new CappedSTOFactoryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.moduleFactory = new ModuleFactoryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.usdTieredSTO = new USDTieredSTOWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
       this.featureRegistry = new FeatureRegistryWrapper(
         this.web3Wrapper,
-        networkId,
+        this.networkId,
         this.polymathRegistry,
       );
     }
