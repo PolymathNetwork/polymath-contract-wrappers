@@ -35,7 +35,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.featureRegistryContract).address;
   }
 
@@ -43,7 +43,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public async getFeatureStatus(params: IGetFeatureStatus): Promise<boolean> {
+  public getFeatureStatus = async (params: IGetFeatureStatus): Promise<boolean> => {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
         params.nameKey,
     )
@@ -52,7 +52,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Change a feature status
    */
-  public async setFeatureStatus(params: ISetFeatureStatus) {
+  public setFeatureStatus = async (params: ISetFeatureStatus) => {
     const owner = await this._getOwnerAddress();
     const estimateGas = await (await this.featureRegistryContract).setFeatureStatus.estimateGasAsync(
       params.nameKey,
@@ -80,7 +80,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the CustomModulesAllowed status
    * @return bool
    */
-  public async getCustomModulesAllowedStatus(): Promise<boolean> {
+  public getCustomModulesAllowedStatus = async (): Promise<boolean> => {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
         Features.CustomModulesAllowed,
     )
@@ -90,7 +90,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the FreezeMintingAllowed status
    * @return bool
    */
-  public async getFreezeMintingAllowedStatus(): Promise<boolean> {
+  public getFreezeMintingAllowedStatus = async (): Promise<boolean> => {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
       Features.FreezeMintingAllowed,
     )

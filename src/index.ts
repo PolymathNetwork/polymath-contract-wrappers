@@ -12,7 +12,6 @@ import {
   FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { Provider } from 'ethereum-types';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 import { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
@@ -28,7 +27,6 @@ import * as types from './types';
 import { assert } from './utils/assert';
 import { _getDefaultContractAddresses } from './addresses';
 import * as _ from 'lodash';
-
 export * from './types';
 
 /**
@@ -172,7 +170,7 @@ export class PolymathAPI {
      * Get the account currently used by PolymathAPI
      * @return Address string
      */
-    public async getAccount(): Promise<string | undefined> {
+    public getAccount = async (): Promise<string | undefined>  => {
       if (!_.isUndefined(this.web3Wrapper)) {
         return (await this.web3Wrapper.getAvailableAddressesAsync())[0];
       } else {
@@ -183,7 +181,7 @@ export class PolymathAPI {
     /**
      * Is it Testnet network?
      */
-    public async isTestnet(): Promise<boolean> {
+    public isTestnet = async (): Promise<boolean> => {
       return await this.web3Wrapper.getNetworkIdAsync() !== 1;
     }
 

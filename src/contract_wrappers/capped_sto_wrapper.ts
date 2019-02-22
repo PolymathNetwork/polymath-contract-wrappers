@@ -29,70 +29,70 @@ export class CappedSTOWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.cappedSTOContract).address;
   }
 
   /**
    * Start time of the Capped STO
    */
-  public async getStartTime(): Promise<BigNumber> {
+  public getStartTime = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).startTime.callAsync();
   }
 
   /**
    * End time of the Capped STO
    */
-  public async getEndTime(): Promise<BigNumber> {
+  public getEndTime = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).endTime.callAsync();
   }
 
   /**
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
-  public async getRate(): Promise<BigNumber> {
+  public getRate = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).rate.callAsync();
   }
 
   /**
    * How many token base units this STO will be allowed to sell to investors
    */
-  public async getCap(): Promise<BigNumber> {
+  public getCap = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).cap.callAsync();
   }
 
   /**
    * Ethereum account address to hold the funds
    */
-  public async getWallet(): Promise<string> {
+  public getWallet = async (): Promise<string> => {
     return await (await this.cappedSTOContract).wallet.callAsync();
   }
 
   /**
    * Type of currency used to collect the funds
    */
-  public async getFundRaiseTypes(params: IFundRaiseTypes): Promise<boolean> {
+  public getFundRaiseTypes = async (params: IFundRaiseTypes): Promise<boolean> => {
     return await (await this.cappedSTOContract).fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public async getFundsRaised(pasams: IFundsRaised): Promise<BigNumber> {
+  public getFundsRaised = async (pasams: IFundsRaised): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).fundsRaised.callAsync(pasams.index);
   }
 
   /**
    * Return the total no. of tokens sold
    */
-  public async getTotalTokensSold(): Promise<BigNumber> {
+  public getTotalTokensSold = async(): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).totalTokensSold.callAsync();
   }
 
   /**
    * Number of individual investors this STO have.
    */
-  public async getInvestorCount(): Promise<BigNumber> {
+  public getInvestorCount = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).investorCount.callAsync();
   }
 

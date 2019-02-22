@@ -28,14 +28,14 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.cappedSTOFactoryContract).address;
   }
 
   /**
    * Get the setup cost of the module
    */
-  public async getSetupCost(): Promise<BigNumber> {
+  public getSetupCost = async (): Promise<BigNumber> => {
     return await (await this.cappedSTOFactoryContract).getSetupCost.callAsync();
   }
 
