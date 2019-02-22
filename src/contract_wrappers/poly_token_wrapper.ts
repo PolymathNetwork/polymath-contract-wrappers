@@ -86,9 +86,7 @@ export class PolyTokenWrapper extends ContractWrapper {
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'PolyToken',
-      }),
+      await this.polymathRegistry.getPolyTokenAddress(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
