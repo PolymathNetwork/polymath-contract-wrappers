@@ -91,7 +91,6 @@ export class PolymathAPI {
     public featureRegistry: FeatureRegistryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
-    //private readonly networkId: types.NetworkId;
 
     /**
      * Instantiates a new PolymathAPI instance.
@@ -99,9 +98,6 @@ export class PolymathAPI {
      */
     constructor(params: types.IApiConstructor) {
       assert.isWeb3Provider('provider', params.dataProvider);
-      //assert.isNumber('networkId', params.dataProvider.networkId);
-
-      //this.networkId = params.dataProvider.networkId;
 
       this.web3Wrapper = new Web3Wrapper(
         params.dataProvider,
