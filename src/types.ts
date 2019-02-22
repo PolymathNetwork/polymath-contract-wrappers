@@ -2,7 +2,7 @@ import { BigNumber } from '@0x/utils';
 import { Provider } from 'ethereum-types';
 
 /**
- * @param provder The web3 provider 
+ * @param provider The web3 provider 
  * @param polymathRegistry The PolymathRegistry contract address '0x...'
  */
 export interface IApiConstructor {

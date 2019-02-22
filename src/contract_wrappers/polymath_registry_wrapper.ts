@@ -30,7 +30,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param address The address of the PolymathRegistry contract.
    */
-  constructor(web3Wrapper: Web3Wrapper, registryAddress?: string/*, address: string*/) {
+  constructor(web3Wrapper: Web3Wrapper, registryAddress?: string) {
     super(web3Wrapper);
     this.address = registryAddress;
     this.polymathRegistryContract = this._getPolymathRegistryContract();
