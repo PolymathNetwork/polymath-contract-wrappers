@@ -1,27 +1,13 @@
 import { BigNumber } from '@0x/utils';
 import { Provider } from 'ethereum-types';
 
-export interface IApiConstructor {
-    dataProvider: Provider,
-    polymathRegistryAddress?: IContractAddresses
-}
-
 /**
+ * @param provider The web3 provider 
  * @param polymathRegistry The PolymathRegistry contract address '0x...'
  */
-export interface IContractAddresses {
-    polymathRegistry: string;
-}
-
-/**
- * @param networkId The id of the underlying ethereum network your provider is connected to.
- * @param gasPrice Gas price to use with every transaction
- * @param contractAddresses The address of all contracts to use. Defaults to the known addresses based on networkId.
- */
-export interface IContractWrappersConfig {
-    networkId: number;
-    gasPrice?: BigNumber;
-    contractAddresses?: IContractAddresses;
+export interface IApiConstructor {
+    provider: Provider,
+    polymathRegistryAddress?: string
 }
 
 export interface IFundRaiseTypes {
