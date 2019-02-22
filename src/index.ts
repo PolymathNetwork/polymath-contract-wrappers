@@ -12,5 +12,4 @@ export { SecurityTokenWrapper as SecurityToken } from './contract_wrappers/secur
 export { USDTieredSTOFactoryWrapper as USDTieredSTOFactory } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 export { USDTieredSTOWrapper as USDTieredSTO } from './contract_wrappers/usd_tiered_sto_wrapper';
 export { PolyResponse } from '@polymathnetwork/abi-wrappers';
-export * from 'types';
-export { PolymathAPI } from 'PolymathAPI';
+export { PolymathAPI } from './PolymathAPI';
