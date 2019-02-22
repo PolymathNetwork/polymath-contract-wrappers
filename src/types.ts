@@ -1,16 +1,5 @@
 import { BigNumber } from '@0x/utils';
 import { Provider } from 'ethereum-types';
-export { PolyResponse } from '@polymathnetwork/abi-wrappers';
-export { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
-export { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
-export { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
-export { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
-export { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapper';
-export { CappedSTOWrapper } from './contract_wrappers/capped_sto_wrapper';
-export { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_wrapper';
-export { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
-export { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
-export { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 
 export interface IApiConstructor {
     dataProvider: Provider,
