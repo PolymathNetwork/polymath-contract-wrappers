@@ -5,7 +5,8 @@ import { ContractAbi } from 'ethereum-types';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import { IGetAddress, NetworkId } from '../types';
+import { IGetAddress, IContractAddresses, NetworkId } from '../types';
+import { _getDefaultContractAddresses } from '../addresses';
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -21,18 +22,17 @@ enum Contracts {
  */
 export class PolymathRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = PolymathRegistry.abi;
-  public address: string;
-  private polymathRegistryContract: PolymathRegistryContract;
+  public address?: IContractAddresses;
+  private polymathRegistryContract: Promise<PolymathRegistryContract>;
 
   /**
    * Instantiate PolymathRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param address The address of the PolymathRegistry contract.
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: NetworkId, address: string) {
-    super(web3Wrapper, networkId);
-    this.address = address;
+  constructor(web3Wrapper: Web3Wrapper, registryAddress?: IContractAddresses/*, address: string*/) {
+    super(web3Wrapper);
+    this.address = registryAddress;
     this.polymathRegistryContract = this._getPolymathRegistryContract();
   }
 
@@ -108,10 +108,21 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     });
   }
 
-  private _getPolymathRegistryContract(): PolymathRegistryContract {
+  private async _getNetworkId(): Promise<Number> {
+    return Number(await this.web3Wrapper.getNetworkIdAsync());
+  }
+
+  private async _addressResolver(): Promise<IContractAddresses> {
+    const networkId: NetworkId = <NetworkId> await this._getNetworkId();
+    return  _.isUndefined(this.address)
+    ? _getDefaultContractAddresses(networkId)
+    : this.address;
+  }
+
+  private async _getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
     return new PolymathRegistryContract(
       this.abi,
-      this.address,
+      (await this._addressResolver()).polymathRegistry,
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
