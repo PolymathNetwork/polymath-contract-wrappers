@@ -40,7 +40,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public async getAddress(params: IGetAddress): Promise<string> {
+  public getAddress = async (params: IGetAddress): Promise<string> => {
     assert.isString('contractName', params.contractName);
     const address = await (await this.polymathRegistryContract).getAddress.callAsync(
       params.contractName,
@@ -52,7 +52,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyToken contract address
    * @return address string
    */
-  public async getPolyTokenAddress(): Promise<string> {
+  public getPolyTokenAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.PolyToken,
     });
@@ -62,7 +62,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the ModuleRegistry contract address
    * @return address string
    */
-  public async getModuleRegistryAddress(): Promise<string> {
+  public getModuleRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.ModuleRegistry,
     });
@@ -72,7 +72,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the FeatureRegistry contract address
    * @return address string
    */
-  public async getFeatureRegistryAddress(): Promise<string> {
+  public getFeatureRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.FeatureRegistry,
     });
@@ -82,7 +82,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the SecurityTokenRegistry contract address
    * @return address string
    */
-  public async getSecurityTokenRegistryAddress(): Promise<string> {
+  public getSecurityTokenRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.SecurityTokenRegistry,
     });
@@ -92,7 +92,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyUsdOracle contract address
    * @return address string
    */
-  public async getPolyUsdOracleAddress(): Promise<string> {
+  public getPolyUsdOracleAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.PolyUsdOracle,
     });
@@ -102,7 +102,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the EthUsdOracle contract address
    * @return address string
    */
-  public async getEthUsdOracleAddress(): Promise<string> {
+  public getEthUsdOracleAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.EthUsdOracle,
     });

@@ -28,7 +28,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.moduleRegistryContract).address;
   }
 
@@ -36,7 +36,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public async getModulesByTypeAndToken(params: IModulesByTypeAndToken): Promise<string[]> {
+  public getModulesByTypeAndToken = async (params: IModulesByTypeAndToken): Promise<string[]> => {
     return await (await this.moduleRegistryContract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
