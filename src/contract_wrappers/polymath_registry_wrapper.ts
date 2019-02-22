@@ -108,15 +108,12 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     });
   }
 
-  /**
-   * Get the id of the underlying ethereum network your provider is connected to.
-   */
-  public async getNetworkId(): Promise<Number> {
+  private async _getNetworkId(): Promise<Number> {
     return Number(await this.web3Wrapper.getNetworkIdAsync());
   }
 
   private async _addressResolver(): Promise<IContractAddresses> {
-    const networkId: NetworkId = <NetworkId> await this.getNetworkId();
+    const networkId: NetworkId = <NetworkId> await this._getNetworkId();
     return  _.isUndefined(this.address)
     ? _getDefaultContractAddresses(networkId)
     : this.address;

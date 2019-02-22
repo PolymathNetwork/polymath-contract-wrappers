@@ -12,6 +12,7 @@ import {
   FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Provider } from 'ethereum-types';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 import { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
@@ -183,7 +184,7 @@ export class PolymathAPI {
      * Is it Testnet network?
      */
     public async isTestnet(): Promise<boolean> {
-      return await this.polymathRegistry.getNetworkId() !== 1;
+      return await this.web3Wrapper.getNetworkIdAsync() !== 1;
     }
 
 }

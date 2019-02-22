@@ -1,5 +1,5 @@
 import { BigNumber } from '@0x/utils';
-import { Web3ProviderEngine } from '@0x/subproviders';
+import { Provider } from 'ethereum-types';
 export { PolyResponse } from '@polymathnetwork/abi-wrappers';
 export { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 export { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
@@ -13,7 +13,7 @@ export { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper'
 export { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 
 export interface IApiConstructor {
-    dataProvider: Web3ProviderEngine,
+    dataProvider: Provider,
     polymathRegistryAddress?: IContractAddresses
 }
 
