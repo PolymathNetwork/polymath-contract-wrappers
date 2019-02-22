@@ -27,7 +27,6 @@ import {
   import { assert } from './utils/assert';
   import { _getDefaultContractAddresses } from './addresses';
   import * as _ from 'lodash';
-  export * from './types';
   
   /**
    * The PolymathAPI class contains smart contract wrappers helpful to interact with Polymath ecosystem.
