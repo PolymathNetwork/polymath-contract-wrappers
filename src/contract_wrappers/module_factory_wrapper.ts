@@ -16,11 +16,10 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, networkId);
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+    super(web3Wrapper);
     this.polymathRegistry = polymathRegistry;
     this.moduleFactoryContract = this._getModuleFactoryContract();
   }
@@ -28,14 +27,14 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.moduleFactoryContract).address;
   }
 
   /**
    * Get the name of the Module
    */
-  public async getName(): Promise<string> {
+  public getName = async (): Promise<string> => {
     return await (await this.moduleFactoryContract).name.callAsync();
   }
 

@@ -17,11 +17,10 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   /**
    * Instantiate USDTieredSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, networkId);
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+    super(web3Wrapper);
     this.polymathRegistry = polymathRegistry;
     this.usdTieredSTOFactoryContract = this._getUSDTieredSTOFactoryContract();
   }
@@ -29,14 +28,14 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.usdTieredSTOFactoryContract).address;
   }
 
   /**
    * Get the setup cost of the module
    */
-  public async getSetupCost(): Promise<BigNumber> {
+  public getSetupCost = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOFactoryContract).getSetupCost.callAsync();
   }
 

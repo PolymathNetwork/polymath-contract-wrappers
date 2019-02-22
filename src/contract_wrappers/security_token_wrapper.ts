@@ -20,11 +20,10 @@ export class SecurityTokenWrapper extends ContractWrapper {
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, networkId);
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+    super(web3Wrapper);
     this.polymathRegistry = polymathRegistry;
     this.securityTokenContract = this._getSecurityTokenContract();
   }
@@ -32,7 +31,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.securityTokenContract).address;
   }
 
@@ -40,7 +39,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */
-  public async getModulesByType(params: IModulesByType): Promise<string[]> {
+  public getModulesByType = async (params: IModulesByType): Promise<string[]> => {
     return (await this.securityTokenContract).getModulesByType.callAsync(
       params.type,
     );
@@ -49,7 +48,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   /**
    * Attachs a module to the SecurityToken
    */
-  public async addModule(params: IAddModule) {
+  public addModule = async (params: IAddModule) => {
     const owner = await this._getOwnerAddress();
     const estimateGas = await (await this.securityTokenContract).addModule.estimateGasAsync(
       params.moduleFactory,
@@ -80,14 +79,14 @@ export class SecurityTokenWrapper extends ContractWrapper {
   /**
    * @return Returns the data associated to a module
    */
-  public async getModule(params: IModule): Promise<[string, string, string, boolean, BigNumber[]]> {
+  public getModule = async (params: IModule): Promise<[string, string, string, boolean, BigNumber[]]> => {
     return (await this.securityTokenContract).getModule.callAsync(params.module);
   }
 
   /**
    * Symbol of the Token
    */
-  public async getSymbol(): Promise<string> {
+  public getSymbol = async (): Promise<string> => {
     return await (await this.securityTokenContract).symbol.callAsync();
   }
 
@@ -95,7 +94,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Validates a transfer with a TransferManager module if it exists
    * @return bool
    */
-  public async verifyTransfer(params: IVerifyTransfer): Promise<boolean> {
+  public verifyTransfer = async (params: IVerifyTransfer): Promise<boolean> => {
     return await (await this.securityTokenContract).verifyTransfer.callAsync(
       params.from,
       params.to,

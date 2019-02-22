@@ -1,19 +1,13 @@
 import * as _ from 'lodash';
-import { IContractAddresses, NetworkId } from './types';
+import { NetworkId } from './types';
 
-const networkToAddresses: { [networkId: number]: IContractAddresses } = {
-  1: {
-    polymathRegistry: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
-  },
-  42: {
-    polymathRegistry: '0x5b215a7d39ee305ad28da29bf2f0425c6c2a00b3',
-  },
-  15: {
-    polymathRegistry: '0x8b21e65058a5e52b423080044634ffac53c1e5ce',
-  },
+const networkToAddresses: { [networkId: number]: string } = {
+  1: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
+  42: '0x5b215a7d39ee305ad28da29bf2f0425c6c2a00b3',
+  15: '0x8b21e65058a5e52b423080044634ffac53c1e5ce'
 };
 
-function _getContractAddressesForNetworkOrThrow(networkId: NetworkId): IContractAddresses {
+function _getContractAddressesForNetworkOrThrow(networkId: NetworkId): string {
   if (_.isUndefined(networkToAddresses[networkId])) {
     throw new Error(
       `Unknown network id (${networkId}).
@@ -27,7 +21,7 @@ function _getContractAddressesForNetworkOrThrow(networkId: NetworkId): IContract
  * Returns the default Polymath Registry addresses for the given networkId or throws with
  * a context-specific error message if the networkId is not recognized.
  */
-export function _getDefaultContractAddresses(networkId: NetworkId): IContractAddresses {
+export function _getDefaultContractAddresses(networkId: NetworkId): string {
   if (!(networkId in NetworkId)) {
     throw new Error(
       `No default contract addresses found for the given network id (${networkId}).

@@ -6,6 +6,7 @@ import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import { IGetAddress, NetworkId } from '../types';
+import { _getDefaultContractAddresses } from '../addresses';
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -21,18 +22,17 @@ enum Contracts {
  */
 export class PolymathRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = PolymathRegistry.abi;
-  public address: string;
-  private polymathRegistryContract: PolymathRegistryContract;
+  public address?: string;
+  private polymathRegistryContract: Promise<PolymathRegistryContract>;
 
   /**
    * Instantiate PolymathRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param address The address of the PolymathRegistry contract.
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: NetworkId, address: string) {
-    super(web3Wrapper, networkId);
-    this.address = address;
+  constructor(web3Wrapper: Web3Wrapper, registryAddress?: string) {
+    super(web3Wrapper);
+    this.address = registryAddress;
     this.polymathRegistryContract = this._getPolymathRegistryContract();
   }
 
@@ -40,7 +40,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public async getAddress(params: IGetAddress): Promise<string> {
+  public getAddress = async (params: IGetAddress): Promise<string> => {
     assert.isString('contractName', params.contractName);
     const address = await (await this.polymathRegistryContract).getAddress.callAsync(
       params.contractName,
@@ -52,7 +52,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyToken contract address
    * @return address string
    */
-  public async getPolyTokenAddress(): Promise<string> {
+  public getPolyTokenAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.PolyToken,
     });
@@ -62,7 +62,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the ModuleRegistry contract address
    * @return address string
    */
-  public async getModuleRegistryAddress(): Promise<string> {
+  public getModuleRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.ModuleRegistry,
     });
@@ -72,7 +72,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the FeatureRegistry contract address
    * @return address string
    */
-  public async getFeatureRegistryAddress(): Promise<string> {
+  public getFeatureRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.FeatureRegistry,
     });
@@ -82,7 +82,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the SecurityTokenRegistry contract address
    * @return address string
    */
-  public async getSecurityTokenRegistryAddress(): Promise<string> {
+  public getSecurityTokenRegistryAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.SecurityTokenRegistry,
     });
@@ -92,7 +92,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyUsdOracle contract address
    * @return address string
    */
-  public async getPolyUsdOracleAddress(): Promise<string> {
+  public getPolyUsdOracleAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.PolyUsdOracle,
     });
@@ -102,16 +102,27 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the EthUsdOracle contract address
    * @return address string
    */
-  public async getEthUsdOracleAddress(): Promise<string> {
+  public getEthUsdOracleAddress = async (): Promise<string> => {
     return await this.getAddress({
       contractName: Contracts.EthUsdOracle,
     });
   }
 
-  private _getPolymathRegistryContract(): PolymathRegistryContract {
+  private async _getNetworkId(): Promise<Number> {
+    return Number(await this.web3Wrapper.getNetworkIdAsync());
+  }
+
+  private async _addressResolver(): Promise<string> {
+    const networkId: NetworkId = <NetworkId> await this._getNetworkId();
+    return  _.isUndefined(this.address)
+    ? _getDefaultContractAddresses(networkId)
+    : this.address;
+  }
+
+  private async _getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
     return new PolymathRegistryContract(
       this.abi,
-      this.address,
+      await this._addressResolver(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

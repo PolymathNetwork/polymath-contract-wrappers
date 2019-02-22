@@ -17,11 +17,10 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param networkId Desired networkId
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, networkId: number, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, networkId);
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+    super(web3Wrapper);
     this.polymathRegistry = polymathRegistry;
     this.moduleRegistryContract = this._getModuleRegistryContract();
   }
@@ -29,7 +28,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Returns the contract address
    */
-  public async getAddress(): Promise<string> {
+  public getAddress = async (): Promise<string> => {
     return (await this.moduleRegistryContract).address;
   }
 
@@ -37,7 +36,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public async getModulesByTypeAndToken(params: IModulesByTypeAndToken): Promise<string[]> {
+  public getModulesByTypeAndToken = async (params: IModulesByTypeAndToken): Promise<string[]> => {
     return await (await this.moduleRegistryContract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
@@ -47,9 +46,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'ModuleRegistry',
-      }),
+      await this.polymathRegistry.getModuleRegistryAddress(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

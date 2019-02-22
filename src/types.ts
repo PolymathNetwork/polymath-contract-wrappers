@@ -1,29 +1,13 @@
 import { BigNumber } from '@0x/utils';
-export { PolyResponse } from '@polymathnetwork/abi-wrappers';
-export { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
-export { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
-export { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
-export { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
-export { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapper';
-export { CappedSTOWrapper } from './contract_wrappers/capped_sto_wrapper';
-export { CappedSTOFactoryWrapper } from './contract_wrappers/capped_sto_factory_wrapper';
-export { ModuleFactoryWrapper } from './contract_wrappers/module_factory_wrapper';
-export { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper';
-export { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
-
-export interface IContractAddresses {
-    polymathRegistry: string;
-}
+import { Provider } from 'ethereum-types';
 
 /**
- * networkId: The id of the underlying ethereum network your provider is connected to.
- * gasPrice: Gas price to use with every transaction
- * contractAddresses: The address of all contracts to use. Defaults to the known addresses based on networkId.
+ * @param provider The web3 provider 
+ * @param polymathRegistry The PolymathRegistry contract address '0x...'
  */
-export interface IContractWrappersConfig {
-    networkId: number;
-    gasPrice?: BigNumber;
-    contractAddresses?: IContractAddresses;
+export interface IApiConstructor {
+    provider: Provider,
+    polymathRegistryAddress?: string
 }
 
 export interface IFundRaiseTypes {
@@ -255,4 +239,20 @@ export enum NetworkId {
     Mainnet = 1,
     Kovan = 42,
     Local = 15,
+}
+
+/**
+ * @param nameKey is the key for the feature status mapping
+ */
+export interface IGetFeatureStatus {
+    nameKey: string;
+}
+
+/**
+ * @param nameKey is the key for the feature status mapping
+ * @param newStatus is the new feature status
+ */
+export interface ISetFeatureStatus {
+    nameKey: string;
+    newStatus: boolean;
 }
