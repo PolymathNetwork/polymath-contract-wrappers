@@ -12,7 +12,6 @@ import {
   FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { Provider, StandardContractOutput } from 'ethereum-types';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 import { SecurityTokenWrapper } from './contract_wrappers/security_token_wrapper';
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
@@ -92,20 +91,20 @@ export class PolymathAPI {
     public featureRegistry: FeatureRegistryWrapper;
 
     private readonly web3Wrapper: Web3Wrapper;
-    private readonly networkId: types.NetworkId;
+    //private readonly networkId: types.NetworkId;
 
     /**
      * Instantiates a new PolymathAPI instance.
      * @return  An instance of the PolymathAPI class.
      */
     constructor(params: types.IApiConstructor) {
-      assert.isWeb3Provider('provider', params.dataProvider.provider);
-      assert.isNumber('networkId', params.dataProvider.networkId);
+      assert.isWeb3Provider('provider', params.dataProvider);
+      //assert.isNumber('networkId', params.dataProvider.networkId);
 
-      this.networkId = params.dataProvider.networkId;
+      //this.networkId = params.dataProvider.networkId;
 
       this.web3Wrapper = new Web3Wrapper(
-        params.dataProvider.provider,
+        params.dataProvider,
       );
 
       const artifactsArray = [
@@ -126,63 +125,48 @@ export class PolymathAPI {
         this.web3Wrapper.abiDecoder.addABI((artifact as any).abi);
       });
 
-      const contractAddresses = _.isUndefined(params.polymathRegistryAddress)
-      ? _getDefaultContractAddresses(this.networkId)
-      : params.polymathRegistryAddress;
-
       this.polymathRegistry = new PolymathRegistryWrapper(
         this.web3Wrapper,
-        this.networkId,
-        contractAddresses.polymathRegistry,
+        params.polymathRegistryAddress,
       );
       this.securityToken = new SecurityTokenWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.polyToken = new PolyTokenWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.moduleRegistry = new ModuleRegistryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.cappedSTO = new CappedSTOWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.cappedSTOFactory = new CappedSTOFactoryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.moduleFactory = new ModuleFactoryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.usdTieredSTO = new USDTieredSTOWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.usdTieredSTOFactory = new USDTieredSTOFactoryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
       this.featureRegistry = new FeatureRegistryWrapper(
         this.web3Wrapper,
-        this.networkId,
         this.polymathRegistry,
       );
     }
@@ -202,8 +186,8 @@ export class PolymathAPI {
     /**
      * Is it Testnet network?
      */
-    public isTestnet(): boolean {
-      return this.networkId !== 1;
+    public async isTestnet(): Promise<boolean> {
+      return await this.polymathRegistry.getNetworkId() !== 1;
     }
 
 }

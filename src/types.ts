@@ -13,18 +13,8 @@ export { USDTieredSTOWrapper } from './contract_wrappers/usd_tiered_sto_wrapper'
 export { USDTieredSTOFactoryWrapper } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 
 export interface IApiConstructor {
-    dataProvider: DataProvider,
+    dataProvider: Web3ProviderEngine,
     polymathRegistryAddress?: IContractAddresses
-}
-
-/**
- * @param networkId The id of the underlying ethereum network your provider is connected to.
- * @param provider The Provider instance you would like the contract-wrappers library
- *                 to use for interacting with the Ethereum network.
- */
-export interface DataProvider {
-    networkId: NetworkId,
-    provider: Web3ProviderEngine,
 }
 
 /**
