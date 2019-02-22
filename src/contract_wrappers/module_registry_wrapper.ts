@@ -46,9 +46,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'ModuleRegistry',
-      }),
+      await this.polymathRegistry.getModuleRegistryAddress(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );

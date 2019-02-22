@@ -104,9 +104,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'FeatureRegistry',
-      }),
+      await this.polymathRegistry.getFeatureRegistryAddress(),
       this.web3Wrapper.getProvider(),
       this.web3Wrapper.getContractDefaults(),
     );
