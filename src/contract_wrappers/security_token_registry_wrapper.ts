@@ -2,10 +2,9 @@ import { SecurityTokenRegistryContract } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
+import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
-import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import {
@@ -97,28 +96,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerTicker = async (params: IRegisterTicker) => {
     const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).registerTicker.estimateGasAsync(
+    return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
       owner,
       params.ticker,
       params.tokenName,
-      { from: owner },
+      {
+        from: owner,
+      },
+      this.factor,
     );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
-    return async () => {
-      return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
-        owner,
-        params.ticker,
-        params.tokenName,
-        txData,
-      );
-    };
   }
 
   /**
@@ -127,58 +113,30 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public transferTickerOwnership = async (params: ITransferTickerOwnership) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
-    const from = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).transferTickerOwnership.estimateGasAsync(
+    return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
       params.newOwner,
       params.ticker,
-      { from },
+      {
+        from: await this._getOwnerAddress(),
+      },
+      this.factor,
     );
-    const txData: TxData = {
-      from,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        1.2,
-      ),
-    };
-    return async () => {
-      return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.ticker,
-        txData,
-      );
-    };
   }
 
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: IGenerateSecurityToken) => {
-    const from = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).generateSecurityToken.estimateGasAsync(
+    return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
       name,
       params.ticker,
       params.details,
       params.divisible,
-      { from },
+      {
+        from: await this._getOwnerAddress(),
+      },
+      this.factor,
     );
-    const txData: TxData = {
-      from,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        1.2,
-      ),
-    };
-    return async () => {
-      return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
-        name,
-        params.ticker,
-        params.details,
-        params.divisible,
-        txData,
-      );
-    };
   }
 
   /**

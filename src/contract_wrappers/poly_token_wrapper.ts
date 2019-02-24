@@ -4,7 +4,6 @@ import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { TxData } from 'ethereum-types';
 import { IBalanceOf, IAllowance, IApprove } from '../types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
@@ -66,16 +65,13 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: IApprove) => {
-    const txData: TxData = {
-      from: await this._getAddress(),
-    };
-    return async () => {
-      return (await this.polyTokenContract).approve.sendTransactionAsync(
-        params.spender,
-        params.value,
-        txData,
-      );
-    };
+    return (await this.polyTokenContract).approve.sendTransactionAsync(
+      params.spender,
+      params.value,
+      {
+        from: await this._getAddress(),
+      },
+    );
   }
 
   private async _getAddress(): Promise<string> {

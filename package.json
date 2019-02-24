@@ -56,7 +56,7 @@
     "@0x/web3-wrapper": "^3.2.2",
     "ethereum-types": "^1.1.4",
     "lodash": "^4.17.5",
-    "@polymathnetwork/abi-wrappers": "2.1.0-beta",
+    "@polymathnetwork/abi-wrappers": "2.1.0-beta.2",
     "@polymathnetwork/contract-artifacts": "2.1.0-beta.1"
   },
   "publishConfig": {

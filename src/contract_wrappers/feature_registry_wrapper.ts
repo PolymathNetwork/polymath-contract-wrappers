@@ -2,9 +2,8 @@ import { FeatureRegistryContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
+import { ContractAbi } from 'ethereum-types';
 import { IGetFeatureStatus, ISetFeatureStatus } from '../types';
-import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 
@@ -53,27 +52,13 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: ISetFeatureStatus) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.featureRegistryContract).setFeatureStatus.estimateGasAsync(
+    return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
       params.nameKey,
       params.newStatus,
-      { from: owner },
+      {
+        from: await this._getOwnerAddress(),
+      },
     );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
-    return async () => {
-      return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
-        params.nameKey,
-        params.newStatus,
-        txData,
-      );
-    };
   }
 
   /**
