@@ -45,8 +45,8 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
       await this.polymathRegistry.getAddress({
         contractName: 'CappedSTOFactory',
       }),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

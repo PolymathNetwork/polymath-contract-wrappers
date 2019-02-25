@@ -74,7 +74,7 @@ export class PolyTokenWrapper extends ContractWrapper {
   }
 
   private async _getAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
+    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
   }
 
@@ -82,8 +82,8 @@ export class PolyTokenWrapper extends ContractWrapper {
     return new PolyTokenContract(
       this.abi,
       await this.polymathRegistry.getPolyTokenAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

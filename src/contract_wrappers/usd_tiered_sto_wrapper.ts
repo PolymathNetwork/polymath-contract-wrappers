@@ -304,7 +304,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   }
 
   private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
+    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
   }
 
@@ -314,8 +314,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
       await this.polymathRegistry.getAddress({
         contractName: 'USDTieredSTO',
       }),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

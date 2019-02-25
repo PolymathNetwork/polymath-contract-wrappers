@@ -109,7 +109,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   }
 
   private async _getNetworkId(): Promise<Number> {
-    return Number(await this.web3Wrapper.getNetworkIdAsync());
+    return Number(await this._web3Wrapper.getNetworkIdAsync());
   }
 
   private async _addressResolver(): Promise<string> {
@@ -123,8 +123,8 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     return new PolymathRegistryContract(
       this.abi,
       await this._addressResolver(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

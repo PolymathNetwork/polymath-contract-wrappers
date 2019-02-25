@@ -45,8 +45,8 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
       await this.polymathRegistry.getAddress({
         contractName: 'USDTieredSTOFactory',
       }),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

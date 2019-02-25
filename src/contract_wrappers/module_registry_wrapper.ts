@@ -47,8 +47,8 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     return new ModuleRegistryContract(
       this.abi,
       await this.polymathRegistry.getModuleRegistryAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

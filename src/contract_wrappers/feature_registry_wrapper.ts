@@ -83,8 +83,8 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     return new FeatureRegistryContract(
       this.abi,
       await this.polymathRegistry.getFeatureRegistryAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

@@ -53,7 +53,7 @@ import {
        */
       public featureRegistry: FeatureRegistryWrapper;
   
-      private readonly web3Wrapper: Web3Wrapper;
+      private readonly _web3Wrapper: Web3Wrapper;
   
       /**
        * Instantiates a new PolymathAPI instance.
@@ -62,7 +62,7 @@ import {
       constructor(params: types.IApiConstructor) {
         assert.isWeb3Provider('provider', params.provider);
   
-        this.web3Wrapper = new Web3Wrapper(
+        this._web3Wrapper = new Web3Wrapper(
           params.provider,
         );
   
@@ -81,27 +81,27 @@ import {
         ];
   
         _.forEach(artifactsArray, artifact => { // tslint:disable-line
-          this.web3Wrapper.abiDecoder.addABI((artifact as any).abi);
+          this._web3Wrapper.abiDecoder.addABI((artifact as any).abi);
         });
   
         this.polymathRegistry = new PolymathRegistryWrapper(
-          this.web3Wrapper,
+          this._web3Wrapper,
           params.polymathRegistryAddress,
         );
         this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
-          this.web3Wrapper,
+          this._web3Wrapper,
           this.polymathRegistry,
         );
         this.polyToken = new PolyTokenWrapper(
-          this.web3Wrapper,
+          this._web3Wrapper,
           this.polymathRegistry,
         );
         this.moduleRegistry = new ModuleRegistryWrapper(
-          this.web3Wrapper,
+          this._web3Wrapper,
           this.polymathRegistry,
         );
         this.featureRegistry = new FeatureRegistryWrapper(
-          this.web3Wrapper,
+          this._web3Wrapper,
           this.polymathRegistry,
         );
       }
@@ -111,8 +111,8 @@ import {
        * @return Address string
        */
       public getAccount = async (): Promise<string | undefined>  => {
-        if (!_.isUndefined(this.web3Wrapper)) {
-          return (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+        if (!_.isUndefined(this._web3Wrapper,)) {
+          return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
         } else {
           return undefined;
         }
@@ -122,7 +122,7 @@ import {
        * Is it Testnet network?
        */
       public isTestnet = async (): Promise<boolean> => {
-        return await this.web3Wrapper.getNetworkIdAsync() !== 1;
+        return await this._web3Wrapper.getNetworkIdAsync() !== 1;
       }
   
   }
