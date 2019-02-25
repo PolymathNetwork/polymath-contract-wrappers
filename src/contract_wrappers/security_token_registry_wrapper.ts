@@ -95,14 +95,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerTicker = async (params: IRegisterTicker) => {
     const owner = await this._getOwnerAddress();
-    return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
-      owner,
-      params.ticker,
-      params.tokenName,
-      {
-        from: owner,
-      }
-    );
+    return async () => {
+      return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
+        owner,
+        params.ticker,
+        params.tokenName,
+      );
+    }
   }
 
   /**
@@ -111,28 +110,26 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public transferTickerOwnership = async (params: ITransferTickerOwnership) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
-    return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
-      params.newOwner,
-      params.ticker,
-      {
-        from: await this._getOwnerAddress(),
-      }
-    );
+    return async () => {
+      return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
+        params.newOwner,
+        params.ticker
+      );
+    }
   }
 
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: IGenerateSecurityToken) => {
-    return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
-      name,
-      params.ticker,
-      params.details,
-      params.divisible,
-      {
-        from: await this._getOwnerAddress(),
-      }
-    );
+    return async () => {
+      return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
+        name,
+        params.ticker,
+        params.details,
+        params.divisible
+      );
+    }
   }
 
   /**

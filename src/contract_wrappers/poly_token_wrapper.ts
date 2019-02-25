@@ -65,13 +65,12 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: IApprove) => {
-    return (await this.polyTokenContract).approve.sendTransactionAsync(
-      params.spender,
-      params.value,
-      {
-        from: await this._getAddress(),
-      },
-    );
+    return async () => {
+      return (await this.polyTokenContract).approve.sendTransactionAsync(
+        params.spender,
+        params.value
+      );
+    }
   }
 
   private async _getAddress(): Promise<string> {

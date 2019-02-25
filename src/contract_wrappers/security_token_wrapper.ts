@@ -47,15 +47,14 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Attachs a module to the SecurityToken
    */
   public addModule = async (params: IAddModule) => {
-    return (await this.securityTokenContract).addModule.sendTransactionAsync(
-      params.moduleFactory,
-      params.data,
-      params.maxCost,
-      params.budget,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.securityTokenContract).addModule.sendTransactionAsync(
+        params.moduleFactory,
+        params.data,
+        params.maxCost,
+        params.budget
+      );
+    }
   }
 
   /**

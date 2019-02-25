@@ -205,104 +205,95 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Reserve address must be whitelisted to successfully finalize
    */
   public finalize = async () => {
-    return (await this.usdTieredSTOContract).finalize.sendTransactionAsync(
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).finalize.sendTransactionAsync();
+    }
   }
 
   /**
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: IChangeAccredited) => {
-    return (await this.usdTieredSTOContract).changeAccredited.sendTransactionAsync(
-      params.investors,
-      params.accredited,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).changeAccredited.sendTransactionAsync(
+        params.investors,
+        params.accredited
+      );
+    }
   }
 
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: IChangeNonAccreditedLimit) => {
-    return (await this.usdTieredSTOContract).changeNonAccreditedLimit.sendTransactionAsync(
-      params.investors,
-      params.nonAccreditedLimit,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).changeNonAccreditedLimit.sendTransactionAsync(
+        params.investors,
+        params.nonAccreditedLimit
+      );
+    }
   }
 
   /**
    * Modifies STO start and end times
    */
   public modifyTimes = async (params: IModifyTimes) => {
-    return (await this.usdTieredSTOContract).modifyTimes.sendTransactionAsync(
-      params.startTime,
-      params.endTime,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyTimes.sendTransactionAsync(
+        params.startTime,
+        params.endTime
+      );
+    }
   }
 
   /**
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public modifyLimits = async (params: IModifyLimits) => {
-    return (await this.usdTieredSTOContract).modifyLimits.sendTransactionAsync(
-      params.nonAccreditedLimitUSD,
-      params.minimumInvestmentUSD,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyLimits.sendTransactionAsync(
+        params.nonAccreditedLimitUSD,
+        params.minimumInvestmentUSD
+      );
+    }
   }
 
   /**
    * Modifies fund raise types
    */
   public modifyFunding = async (params: IModifyFunding) => {
-    return (await this.usdTieredSTOContract).modifyFunding.sendTransactionAsync(
-      params.fundRaiseTypes,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyFunding.sendTransactionAsync(
+        params.fundRaiseTypes
+      );
+    }
   }
 
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: IModifyAddresses) => {
-    return (await this.usdTieredSTOContract).modifyAddresses.sendTransactionAsync(
-      params.wallet,
-      params.reserveWallet,
-      params.usdToken,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyAddresses.sendTransactionAsync(
+        params.wallet,
+        params.reserveWallet,
+        params.usdToken
+      );
+    }
   }
 
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public modifyTiers = async (params: IModifyTiers) => {
-    return (await this.usdTieredSTOContract).modifyTiers.sendTransactionAsync(
-      params.ratePerTier,
-      params.ratePerTierDiscountPoly,
-      params.tokensPerTierTotal,
-      params.tokensPerTierDiscountPoly,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.usdTieredSTOContract).modifyTiers.sendTransactionAsync(
+        params.ratePerTier,
+        params.ratePerTierDiscountPoly,
+        params.tokensPerTierTotal,
+        params.tokensPerTierDiscountPoly
+      );
+    }
   }
 
   /**

@@ -51,13 +51,12 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: ISetFeatureStatus) => {
-    return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
-      params.nameKey,
-      params.newStatus,
-      {
-        from: await this._getOwnerAddress(),
-      },
-    );
+    return async () => {
+      return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
+        params.nameKey,
+        params.newStatus
+      );
+    }
   }
 
   /**
@@ -78,11 +77,6 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
       Features.FreezeMintingAllowed,
     )
-  }
-
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
   }
 
   private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
