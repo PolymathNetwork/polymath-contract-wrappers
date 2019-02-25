@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { NetworkId } from './types';
+import { NetworkId } from '../types';
 
 const networkToAddresses: { [networkId: number]: string } = {
   1: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
@@ -21,7 +21,7 @@ function _getContractAddressesForNetworkOrThrow(networkId: NetworkId): string {
  * Returns the default Polymath Registry addresses for the given networkId or throws with
  * a context-specific error message if the networkId is not recognized.
  */
-export function _getDefaultContractAddresses(networkId: NetworkId): string {
+export function getDefaultContractAddresses(networkId: NetworkId): string {
   if (!(networkId in NetworkId)) {
     throw new Error(
       `No default contract addresses found for the given network id (${networkId}).

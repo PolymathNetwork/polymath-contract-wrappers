@@ -20,7 +20,6 @@ import {
   import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wrapper';
   import * as types from './types';
   import { assert } from './utils/assert';
-  import { _getDefaultContractAddresses } from './addresses';
   import * as _ from 'lodash';
   
   /**

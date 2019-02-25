@@ -6,7 +6,7 @@ import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import { IGetAddress, NetworkId } from '../types';
-import { _getDefaultContractAddresses } from '../addresses';
+import * as AddressesUtils from '../utils/addresses';
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -108,21 +108,15 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     });
   }
 
-  private async _getNetworkId(): Promise<Number> {
-    return Number(await this._web3Wrapper.getNetworkIdAsync());
-  }
-
-  private async _addressResolver(): Promise<string> {
-    const networkId: NetworkId = <NetworkId> await this._getNetworkId();
-    return  _.isUndefined(this.address)
-    ? _getDefaultContractAddresses(networkId)
-    : this.address;
+  private async _getDefaultAddress(): Promise<string> {
+    const networkId: NetworkId = <NetworkId> await this._web3Wrapper.getNetworkIdAsync();
+    return AddressesUtils.getDefaultContractAddresses(networkId);
   }
 
   private async _getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
     return new PolymathRegistryContract(
       this.abi,
-      await this._addressResolver(),
+      !_.isUndefined(this.address) ? this.address : await this._getDefaultAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
