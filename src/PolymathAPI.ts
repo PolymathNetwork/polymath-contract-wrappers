@@ -110,11 +110,7 @@ import {
        * @return Address string
        */
       public getAccount = async (): Promise<string | undefined>  => {
-        if (!_.isUndefined(this._web3Wrapper,)) {
           return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
-        } else {
-          return undefined;
-        }
       }
   
       /**
