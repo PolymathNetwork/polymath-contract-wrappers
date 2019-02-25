@@ -84,11 +84,6 @@ export class SecurityTokenWrapper extends ContractWrapper {
     );
   }
 
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
-  }
-
   private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
     return new SecurityTokenContract(
       this.abi,

@@ -38,14 +38,9 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber representing the amount owned by the passed address
    */
   public getBalanceOf = async (params: IBalanceOf): Promise<BigNumber> => {
-    let addr: string;
-    if (!_.isUndefined(params.address)) {
-      addr = await this._getAddress();
-    } else {
-      addr = params.address as unknown as string;
-    }
+    const address = !_.isUndefined(params.address) ? params.address! : await this._getDefaultFromAddress();
     return await (await this.polyTokenContract).balanceOf.callAsync(
-      addr,
+      address,
     );
   }
 
@@ -54,7 +49,7 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: IAllowance): Promise<BigNumber> => {
-    const spender = await this._getAddress();
+    const spender = await this._getDefaultFromAddress();
     return await (await this.polyTokenContract).allowance.callAsync(
       params.owner,
       spender,
@@ -71,11 +66,6 @@ export class PolyTokenWrapper extends ContractWrapper {
         params.value
       );
     }
-  }
-
-  private async _getAddress(): Promise<string> {
-    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
   }
 
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {

@@ -303,11 +303,6 @@ export class USDTieredSTOWrapper extends ContractWrapper {
     return await (await this.usdTieredSTOContract).getAccreditedData.callAsync();
   }
 
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
-  }
-
   private async _getUSDTieredSTOContract(): Promise<USDTieredSTOContract> {
     return new USDTieredSTOContract(
       this.abi,

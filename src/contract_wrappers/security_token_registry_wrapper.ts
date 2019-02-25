@@ -14,6 +14,7 @@ import {
   IRegisterTicker,
   ITransferTickerOwnership,
   IGenerateSecurityToken,
+  ITickersByOwner,
 } from '../types';
 
 /**
@@ -44,8 +45,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (): Promise<string[]> => {
-    const owner = await this._getOwnerAddress();
+  public getTickersByOwner = async (params: ITickersByOwner): Promise<string[]> => {
+    const owner = !_.isUndefined(params.owner) ? params.owner! : await this._getDefaultFromAddress();
     const tickers = await (await this.securityTokenRegistryContract).getTickersByOwner.callAsync(
       owner,
     );
@@ -94,7 +95,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
   public registerTicker = async (params: IRegisterTicker) => {
-    const owner = await this._getOwnerAddress();
+    const owner = !_.isUndefined(params.owner) ? params.owner! : await this._getDefaultFromAddress();
     return async () => {
       return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
         owner,
@@ -138,11 +139,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public getSecurityTokenLaunchFee = async (): Promise<BigNumber> => {
     return await (await this.securityTokenRegistryContract).getSecurityTokenLaunchFee.callAsync();
-  }
-
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
   }
 
   /**
