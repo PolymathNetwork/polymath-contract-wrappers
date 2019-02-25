@@ -23,7 +23,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenRegistryContract: Promise<SecurityTokenRegistryContract>;
-  private factor = 1.5;
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -102,8 +101,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.tokenName,
       {
         from: owner,
-      },
-      this.factor,
+      }
     );
   }
 
@@ -118,8 +116,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.ticker,
       {
         from: await this._getOwnerAddress(),
-      },
-      this.factor,
+      }
     );
   }
 
@@ -134,8 +131,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.divisible,
       {
         from: await this._getOwnerAddress(),
-      },
-      this.factor,
+      }
     );
   }
 

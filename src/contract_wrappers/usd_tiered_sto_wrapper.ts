@@ -30,7 +30,6 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   public abi: ContractAbi = (USDTieredSTO as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private usdTieredSTOContract: Promise<USDTieredSTOContract>;
-  private factor = 1.2;
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use

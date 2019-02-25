@@ -15,7 +15,6 @@ export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityToken as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenContract: Promise<SecurityTokenContract>;
-  private factor = 1.2;
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use

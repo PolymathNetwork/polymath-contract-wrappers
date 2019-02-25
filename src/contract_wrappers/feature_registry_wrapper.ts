@@ -19,7 +19,6 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = FeatureRegistry.abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private featureRegistryContract: Promise<FeatureRegistryContract>;
-  private factor = 1.2;
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
