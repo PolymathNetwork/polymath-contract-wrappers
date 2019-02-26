@@ -46,7 +46,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @returns Returns the list of tickers owned by the selected address
    */
   public getTickersByOwner = async (params: ITickersByOwner): Promise<string[]> => {
-    const owner = !_.isUndefined(params.owner) ? params.owner! : await this._getDefaultFromAddress();
+    const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     const tickers = await (await this.securityTokenRegistryContract).getTickersByOwner.callAsync(
       owner,
     );
@@ -95,12 +95,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
   public registerTicker = async (params: IRegisterTicker) => {
-    const owner = !_.isUndefined(params.owner) ? params.owner! : await this._getDefaultFromAddress();
+    const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     return async () => {
       return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
         owner,
         params.ticker,
-        params.tokenName,
+        params.tokenName
       );
     }
   }
