@@ -125,7 +125,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public generateSecurityToken = async (params: IGenerateSecurityToken) => {
     return async () => {
       return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
-        name,
+        params.name,
         params.ticker,
         params.details,
         params.divisible
