@@ -4,8 +4,13 @@ import * as _ from 'lodash';
 
 export abstract class ContractWrapper {
     public abstract abi: ContractAbi;
-    protected web3Wrapper: Web3Wrapper;
+    protected _web3Wrapper: Web3Wrapper;
     constructor(web3Wrapper: Web3Wrapper) {
-        this.web3Wrapper = web3Wrapper;
+        this._web3Wrapper = web3Wrapper;
+    }
+
+    protected _getDefaultFromAddress = async(): Promise<string> => {
+        const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
+        return addresses[0];
     }
 }

@@ -64,6 +64,13 @@ export interface ISecurityTokenData {
 /**
  * @param ownerAddress is the address which owns the list of tickers
  */
+export interface ITickersByOwner {
+    owner?: string;
+}
+
+/**
+ * @param ownerAddress is the address which owns the list of tickers
+ */
 export interface ITokensByOwner {
     ownerAddress: string;
 }
@@ -80,6 +87,7 @@ export interface ITickerDetails {
  * @param tokenName is the name of the token
  */
 export interface IRegisterTicker {
+    owner?: string;
     ticker: string;
     tokenName: string;
 }

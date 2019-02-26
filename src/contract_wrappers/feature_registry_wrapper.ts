@@ -2,9 +2,8 @@ import { FeatureRegistryContract } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
+import { ContractAbi } from 'ethereum-types';
 import { IGetFeatureStatus, ISetFeatureStatus } from '../types';
-import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 
@@ -20,7 +19,6 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = FeatureRegistry.abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private featureRegistryContract: Promise<FeatureRegistryContract>;
-  private factor = 1.2;
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -53,27 +51,12 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: ISetFeatureStatus) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.featureRegistryContract).setFeatureStatus.estimateGasAsync(
-      params.nameKey,
-      params.newStatus,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
         params.nameKey,
-        params.newStatus,
-        txData,
+        params.newStatus
       );
-    };
+    }
   }
 
   /**
@@ -96,17 +79,12 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     )
   }
 
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
-  }
-
   private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       this.abi,
       await this.polymathRegistry.getFeatureRegistryAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

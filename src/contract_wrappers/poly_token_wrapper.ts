@@ -4,7 +4,6 @@ import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { TxData } from 'ethereum-types';
 import { IBalanceOf, IAllowance, IApprove } from '../types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
@@ -39,14 +38,9 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber representing the amount owned by the passed address
    */
   public getBalanceOf = async (params: IBalanceOf): Promise<BigNumber> => {
-    let addr: string;
-    if (!_.isUndefined(params.address)) {
-      addr = await this._getAddress();
-    } else {
-      addr = params.address as unknown as string;
-    }
+    const address = !_.isUndefined(params.address) ? params.address : await this._getDefaultFromAddress();
     return await (await this.polyTokenContract).balanceOf.callAsync(
-      addr,
+      address,
     );
   }
 
@@ -55,7 +49,7 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: IAllowance): Promise<BigNumber> => {
-    const spender = await this._getAddress();
+    const spender = await this._getDefaultFromAddress();
     return await (await this.polyTokenContract).allowance.callAsync(
       params.owner,
       spender,
@@ -66,29 +60,20 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: IApprove) => {
-    const txData: TxData = {
-      from: await this._getAddress(),
-    };
     return async () => {
       return (await this.polyTokenContract).approve.sendTransactionAsync(
         params.spender,
-        params.value,
-        txData,
+        params.value
       );
-    };
-  }
-
-  private async _getAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
+    }
   }
 
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       this.abi,
       await this.polymathRegistry.getPolyTokenAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

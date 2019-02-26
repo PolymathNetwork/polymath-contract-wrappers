@@ -44,8 +44,8 @@ export class ModuleFactoryWrapper extends ContractWrapper {
       await this.polymathRegistry.getAddress({
         contractName: 'ModuleFactory',
       }),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

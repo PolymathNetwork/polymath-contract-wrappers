@@ -3,8 +3,7 @@ import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { TxData, ContractAbi } from 'ethereum-types';
-import { estimateGasLimit } from '../utils/transactions';
+import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import {
@@ -31,7 +30,6 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   public abi: ContractAbi = (USDTieredSTO as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private usdTieredSTOContract: Promise<USDTieredSTOContract>;
-  private factor = 1.2;
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -207,216 +205,95 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Reserve address must be whitelisted to successfully finalize
    */
   public finalize = async () => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).finalize.estimateGasAsync(
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
-      return (await this.usdTieredSTOContract).finalize.sendTransactionAsync(
-        txData,
-      );
-    };
+      return (await this.usdTieredSTOContract).finalize.sendTransactionAsync();
+    }
   }
 
   /**
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: IChangeAccredited) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).changeAccredited.estimateGasAsync(
-      params.investors,
-      params.accredited,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).changeAccredited.sendTransactionAsync(
         params.investors,
-        params.accredited,
-        txData,
+        params.accredited
       );
-    };
+    }
   }
 
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: IChangeNonAccreditedLimit) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).changeNonAccreditedLimit.estimateGasAsync(
-      params.investors,
-      params.nonAccreditedLimit,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).changeNonAccreditedLimit.sendTransactionAsync(
         params.investors,
-        params.nonAccreditedLimit,
-        txData,
+        params.nonAccreditedLimit
       );
-    };
+    }
   }
 
   /**
    * Modifies STO start and end times
    */
   public modifyTimes = async (params: IModifyTimes) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).modifyTimes.estimateGasAsync(
-      params.startTime,
-      params.endTime,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).modifyTimes.sendTransactionAsync(
         params.startTime,
-        params.endTime,
-        txData,
+        params.endTime
       );
-    };
+    }
   }
 
   /**
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public modifyLimits = async (params: IModifyLimits) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).modifyLimits.estimateGasAsync(
-      params.nonAccreditedLimitUSD,
-      params.minimumInvestmentUSD,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).modifyLimits.sendTransactionAsync(
         params.nonAccreditedLimitUSD,
-        params.minimumInvestmentUSD,
-        txData,
+        params.minimumInvestmentUSD
       );
-    };
+    }
   }
 
   /**
    * Modifies fund raise types
    */
   public modifyFunding = async (params: IModifyFunding) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).modifyFunding.estimateGasAsync(
-      params.fundRaiseTypes,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).modifyFunding.sendTransactionAsync(
-        params.fundRaiseTypes,
-        txData,
+        params.fundRaiseTypes
       );
-    };
+    }
   }
 
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: IModifyAddresses) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).modifyAddresses.estimateGasAsync(
-      params.wallet,
-      params.reserveWallet,
-      params.usdToken,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).modifyAddresses.sendTransactionAsync(
         params.wallet,
         params.reserveWallet,
-        params.usdToken,
-        txData,
+        params.usdToken
       );
-    };
+    }
   }
 
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public modifyTiers = async (params: IModifyTiers) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.usdTieredSTOContract).modifyTiers.estimateGasAsync(
-      params.ratePerTier,
-      params.ratePerTierDiscountPoly,
-      params.tokensPerTierTotal,
-      params.tokensPerTierDiscountPoly,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
     return async () => {
       return (await this.usdTieredSTOContract).modifyTiers.sendTransactionAsync(
         params.ratePerTier,
         params.ratePerTierDiscountPoly,
         params.tokensPerTierTotal,
-        params.tokensPerTierDiscountPoly,
-        txData,
+        params.tokensPerTierDiscountPoly
       );
-    };
+    }
   }
 
   /**
@@ -426,19 +303,14 @@ export class USDTieredSTOWrapper extends ContractWrapper {
     return await (await this.usdTieredSTOContract).getAccreditedData.callAsync();
   }
 
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
-  }
-
   private async _getUSDTieredSTOContract(): Promise<USDTieredSTOContract> {
     return new USDTieredSTOContract(
       this.abi,
       await this.polymathRegistry.getAddress({
         contractName: 'USDTieredSTO',
       }),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

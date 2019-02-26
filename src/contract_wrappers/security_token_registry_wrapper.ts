@@ -2,10 +2,9 @@ import { SecurityTokenRegistryContract } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
+import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
-import { estimateGasLimit } from '../utils/transactions';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import {
@@ -15,6 +14,7 @@ import {
   IRegisterTicker,
   ITransferTickerOwnership,
   IGenerateSecurityToken,
+  ITickersByOwner,
 } from '../types';
 
 /**
@@ -24,7 +24,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
   private polymathRegistry: PolymathRegistryWrapper;
   private securityTokenRegistryContract: Promise<SecurityTokenRegistryContract>;
-  private factor = 1.5;
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -46,8 +45,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (): Promise<string[]> => {
-    const owner = await this._getOwnerAddress();
+  public getTickersByOwner = async (params: ITickersByOwner): Promise<string[]> => {
+    const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     const tickers = await (await this.securityTokenRegistryContract).getTickersByOwner.callAsync(
       owner,
     );
@@ -96,29 +95,14 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
   public registerTicker = async (params: IRegisterTicker) => {
-    const owner = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).registerTicker.estimateGasAsync(
-      owner,
-      params.ticker,
-      params.tokenName,
-      { from: owner },
-    );
-    const txData: TxData = {
-      from: owner,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        this.factor,
-      ),
-    };
+    const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     return async () => {
       return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
         owner,
         params.ticker,
-        params.tokenName,
-        txData,
+        params.tokenName
       );
-    };
+    }
   }
 
   /**
@@ -127,58 +111,26 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public transferTickerOwnership = async (params: ITransferTickerOwnership) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
-    const from = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).transferTickerOwnership.estimateGasAsync(
-      params.newOwner,
-      params.ticker,
-      { from },
-    );
-    const txData: TxData = {
-      from,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        1.2,
-      ),
-    };
     return async () => {
       return (await this.securityTokenRegistryContract).transferTickerOwnership.sendTransactionAsync(
         params.newOwner,
-        params.ticker,
-        txData,
+        params.ticker
       );
-    };
+    }
   }
 
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: IGenerateSecurityToken) => {
-    const from = await this._getOwnerAddress();
-    const estimateGas = await (await this.securityTokenRegistryContract).generateSecurityToken.estimateGasAsync(
-      name,
-      params.ticker,
-      params.details,
-      params.divisible,
-      { from },
-    );
-    const txData: TxData = {
-      from,
-      gas: await estimateGasLimit(
-        this.web3Wrapper,
-        estimateGas,
-        1.2,
-      ),
-    };
     return async () => {
       return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
-        name,
+        params.name,
         params.ticker,
         params.details,
-        params.divisible,
-        txData,
+        params.divisible
       );
-    };
+    }
   }
 
   /**
@@ -187,11 +139,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public getSecurityTokenLaunchFee = async (): Promise<BigNumber> => {
     return await (await this.securityTokenRegistryContract).getSecurityTokenLaunchFee.callAsync();
-  }
-
-  private async _getOwnerAddress(): Promise<string> {
-    const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
-    return addresses[0];
   }
 
   /**
@@ -209,8 +156,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return new SecurityTokenRegistryContract(
       this.abi,
       await this.polymathRegistry.getSecurityTokenRegistryAddress(),
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
     );
   }
 
