@@ -4,9 +4,23 @@ import { CappedSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { IFundRaiseTypes, IFundsRaised } from '../types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
+import { ITxParams } from '../types';
+
+/**
+ * 
+ */
+export interface IGetFundRaiseTypesParams {
+  index: number;
+}
+
+/**
+ * 
+ */
+export interface IGetFundsRaisedParams {
+  index: number;
+}
 
 /**
  * This class includes the functionality related to interacting with the CappedSTO contract.
@@ -71,14 +85,14 @@ export class CappedSTOWrapper extends ContractWrapper {
   /**
    * Type of currency used to collect the funds
    */
-  public getFundRaiseTypes = async (params: IFundRaiseTypes): Promise<boolean> => {
+  public getFundRaiseTypes = async (params: IGetFundRaiseTypesParams): Promise<boolean> => {
     return await (await this.cappedSTOContract).fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public getFundsRaised = async (pasams: IFundsRaised): Promise<BigNumber> => {
+  public getFundsRaised = async (pasams: IGetFundsRaisedParams): Promise<BigNumber> => {
     return await (await this.cappedSTOContract).fundsRaised.callAsync(pasams.index);
   }
 
