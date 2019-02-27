@@ -5,8 +5,16 @@ import { ContractAbi } from 'ethereum-types';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import { IGetAddress, NetworkId } from '../types';
 import * as AddressesUtils from '../utils/addresses';
+import { ITxParams, NetworkId } from '../types';
+
+/**
+* @param contractName is the key for the contract address mapping
+*/
+export interface IGetAddressParams {
+  contractName: string;
+}
+
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -40,7 +48,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public getAddress = async (params: IGetAddress): Promise<string> => {
+  public getAddress = async (params: IGetAddressParams): Promise<string> => {
     assert.isString('contractName', params.contractName);
     const address = await (await this.polymathRegistryContract).getAddress.callAsync(
       params.contractName,

@@ -7,15 +7,67 @@ import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import {
-  ISecurityTokenData,
-  ITokensByOwner,
-  ITickerDetails,
-  IRegisterTicker,
-  ITransferTickerOwnership,
-  IGenerateSecurityToken,
-  ITickersByOwner,
-} from '../types';
+import { ITxParams } from '../types';
+
+/**
+ * @param securityToken is the address of the security token.
+ */
+export interface IGetSecurityTokenDataParams {
+  securityToken: string;
+}
+
+/**
+* @param ownerAddress is the address which owns the list of tickers
+*/
+export interface IGetTickersByOwnerParams {
+  owner?: string;
+}
+
+/**
+* @param ownerAddress is the address which owns the list of tickers
+*/
+export interface IGetTokensByOwnerParams {
+  ownerAddress: string;
+}
+
+/**
+* @param tokenName is the ticker symbol
+*/
+export interface IGetTickerDetailsParams {
+  tokenName: string;
+}
+
+/**
+* @param ticker is unique token ticker
+* @param tokenName is the name of the token
+*/
+export interface IRegisterTickerParams extends ITxParams {
+  owner?: string;
+  ticker: string;
+  tokenName: string;
+}
+
+/**
+* @param newOwner is the address of the new owner of the ticker
+* @param ticker is the ticker symbol
+*/
+export interface ITransferTickerOwnershipParams extends ITxParams {
+  newOwner: string;
+  ticker: string;
+}
+
+/**
+* @param name is the name of the token
+* @param ticker is the ticker symbol of the security token
+* @param details is the off-chain details of the token
+* @param divisible is whether or not the token is divisible
+*/
+export interface IGenerateSecurityTokenParams extends ITxParams {
+  name: string;
+  ticker: string;
+  details: string;
+  divisible: boolean;
+}
 
 /**
  * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
@@ -45,7 +97,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (params: ITickersByOwner): Promise<string[]> => {
+  public getTickersByOwner = async (params: IGetTickersByOwnerParams): Promise<string[]> => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     const tickers = await (await this.securityTokenRegistryContract).getTickersByOwner.callAsync(
       owner,
@@ -56,14 +108,14 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the security token data by address
    */
-  public getSecurityTokenData = async (params: ISecurityTokenData): Promise<[string, string, string, BigNumber]> => {
+  public getSecurityTokenData = async (params: IGetSecurityTokenDataParams): Promise<[string, string, string, BigNumber]> => {
     return await (await this.securityTokenRegistryContract).getSecurityTokenData.callAsync(params.securityToken);
   }
 
   /**
    * @returns Returns the list of tokens owned by the selected address
    */
-  public getTokensByOwner = async (params: ITokensByOwner): Promise<string[]> => {
+  public getTokensByOwner = async (params: IGetTokensByOwnerParams): Promise<string[]> => {
     assert.isETHAddressHex('ownerAddress', params.ownerAddress);
     const tokens = await (await this.securityTokenRegistryContract).getTokensByOwner.callAsync(
       params.ownerAddress,
@@ -74,7 +126,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: ITickerDetails): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
+  public getTickerDetails = async (params: IGetTickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
     assert.isString('tokenName', params.tokenName);
     const tickerDetail = await (await this.securityTokenRegistryContract).getTickerDetails.callAsync(
       params.tokenName,
@@ -94,7 +146,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Once the token ticker is registered to its owner then no other issuer can claim
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
-  public registerTicker = async (params: IRegisterTicker) => {
+  public registerTicker = async (params: IRegisterTickerParams) => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     return async () => {
       return (await this.securityTokenRegistryContract).registerTicker.sendTransactionAsync(
@@ -108,7 +160,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Transfers the ownership of the ticker
    */
-  public transferTickerOwnership = async (params: ITransferTickerOwnership) => {
+  public transferTickerOwnership = async (params: ITransferTickerOwnershipParams) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
     return async () => {
@@ -122,7 +174,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
-  public generateSecurityToken = async (params: IGenerateSecurityToken) => {
+  public generateSecurityToken = async (params: IGenerateSecurityTokenParams) => {
     return async () => {
       return (await this.securityTokenRegistryContract).generateSecurityToken.sendTransactionAsync(
         params.name,

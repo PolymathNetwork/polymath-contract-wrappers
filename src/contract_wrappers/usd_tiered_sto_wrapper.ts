@@ -6,22 +6,116 @@ import { BigNumber } from '@0x/utils';
 import { ContractAbi } from 'ethereum-types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import {
-  IFundRaiseTypes,
-  IFundsRaised,
-  ITiers,
-  ITokensMintedByTier,
-  IConvertToUSD,
-  ITokensSoldFor,
-  IStableCoinsRaised,
-  IChangeAccredited,
-  IChangeNonAccreditedLimit,
-  IModifyTimes,
-  IModifyLimits,
-  IModifyFunding,
-  IModifyAddresses,
-  IModifyTiers,
-} from '../types';
+import { ITxParams } from '../types';
+
+/**
+ * 
+ */
+export interface IGetFundRaiseTypesParams {
+  index: number;
+}
+
+/**
+ * 
+ */
+export interface IGetFundsRaisedParams {
+  index: number;
+}
+
+export interface IGetTiersParams {
+  index: BigNumber;
+}
+
+export interface IGetTokensMintedByTierParams {
+  tier: BigNumber;
+}
+
+/**
+* @param fundRaiseType Currency key
+* @param amount Value to convert to USD
+*/
+export interface IConvertToUSDParams {
+  fundRaiseType: number;
+  amount: BigNumber;
+}
+
+/**
+* @param fundRaiseType The fund raising currency (e.g. ETH, POLY, SC) to calculate sold tokens for
+*/
+export interface IGetTokensSoldForParams {
+  fundRaiseType: number;
+}
+
+export interface IGetStableCoinsRaisedParams {
+  index: string;
+}
+
+/**
+* @param investors Array of investor addresses to modify
+* @param accredited Array of bools specifying accreditation status
+*/
+export interface IChangeAccreditedParams extends ITxParams {
+  investors: string[];
+  accredited: boolean[];
+}
+
+/**
+* @param investors Array of investor addresses to modify
+* @param nonAccreditedLimit Array of uints specifying non-accredited limits
+*/
+export interface IChangeNonAccreditedLimitParams extends ITxParams {
+  investors: string[];
+  nonAccreditedLimit: BigNumber[];
+}
+
+/**
+* @param startTime start time of sto
+* @param endTime end time of sto
+*/
+export interface IModifyTimesParams extends ITxParams {
+  startTime: BigNumber;
+  endTime: BigNumber;
+}
+
+/**
+* @param nonAccreditedLimitUSD max non accredited invets limit
+* @param minimumInvestmentUSD overall minimum investment limit
+*/
+export interface IModifyLimitsParams extends ITxParams {
+  nonAccreditedLimitUSD: BigNumber;
+  minimumInvestmentUSD: BigNumber;
+}
+
+/**
+* @param fundRaiseTypes Array of fund raise types to allow
+*/
+export interface IModifyFundingParams extends ITxParams {
+  fundRaiseTypes: number[];
+}
+
+/**
+* @param wallet Address of wallet where funds are sent
+* @param reserveWallet Address of wallet where unsold tokens are sent
+* @param usdTokens Address of usd tokens
+*/
+export interface IModifyAddressesParams extends ITxParams {
+  wallet: string;
+  reserveWallet: string;
+  usdToken: string[];
+}
+
+/**
+* @param ratePerTier Array of rates per tier
+* @param ratePerTierDiscountPoly Array of discounted poly rates per tier
+* @param tokensPerTierTotal Array of total tokens per tier
+* @param tokensPerTierDiscountPoly Array of discounted tokens per tier
+*/
+export interface IModifyTiersParams extends ITxParams {
+  ratePerTier: BigNumber[];
+  ratePerTierDiscountPoly: BigNumber[];
+  tokensPerTierTotal: BigNumber[];
+  tokensPerTierDiscountPoly: BigNumber[];
+}
 
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
@@ -72,14 +166,14 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Type of currency used to collect the funds
    */
-  public getFundRaiseTypes = async (params: IFundRaiseTypes): Promise<boolean> => {
+  public getFundRaiseTypes = async (params: IGetFundRaiseTypesParams): Promise<boolean> => {
     return await (await this.usdTieredSTOContract).fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public getFundsRaised = async (params: IFundsRaised): Promise<BigNumber> => {
+  public getFundsRaised = async (params: IGetFundsRaisedParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).fundsRaised.callAsync(params.index);
   }
 
@@ -163,14 +257,14 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Get specific tier
    */
-  public getTiers = async (params: ITiers): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
+  public getTiers = async (params: IGetTiersParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
     return await (await this.usdTieredSTOContract).tiers.callAsync(params.index);
   }
 
   /**
    * Return array of minted tokens in each fund raise type for given tier
    */
-  public getTokensMintedByTier = async (params: ITokensMintedByTier): Promise<BigNumber[]> => {
+  public getTokensMintedByTier = async (params: IGetTokensMintedByTierParams): Promise<BigNumber[]> => {
     return await (await this.usdTieredSTOContract).getTokensMintedByTier.callAsync(params.tier);
   }
 
@@ -178,7 +272,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * This function converts from ETH or POLY to USD
    * @return Value in USD
    */
-  public convertToUSD = async (params: IConvertToUSD): Promise<BigNumber> => {
+  public convertToUSD = async (params: IConvertToUSDParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).convertToUSD.callAsync(
       params.fundRaiseType,
       params.amount,
@@ -189,14 +283,14 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Return the total no. of tokens sold for the given fund raise type
    * @return Total number of tokens sold for ETH
    */
-  public getTokensSoldFor = async (params: ITokensSoldFor): Promise<BigNumber> => {
+  public getTokensSoldFor = async (params: IGetTokensSoldForParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).getTokensSoldFor.callAsync(params.fundRaiseType);
   }
 
   /**
    * Amount of stable coins raised
    */
-  public getStableCoinsRaised = async (params: IStableCoinsRaised): Promise<BigNumber> => {
+  public getStableCoinsRaised = async (params: IGetStableCoinsRaisedParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).stableCoinsRaised.callAsync(params.index);
   }
 
@@ -213,7 +307,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies the list of accredited addresses
    */
-  public changeAccredited = async (params: IChangeAccredited) => {
+  public changeAccredited = async (params: IChangeAccreditedParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).changeAccredited.sendTransactionAsync(
         params.investors,
@@ -225,7 +319,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
-  public changeNonAccreditedLimit = async (params: IChangeNonAccreditedLimit) => {
+  public changeNonAccreditedLimit = async (params: IChangeNonAccreditedLimitParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).changeNonAccreditedLimit.sendTransactionAsync(
         params.investors,
@@ -237,7 +331,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies STO start and end times
    */
-  public modifyTimes = async (params: IModifyTimes) => {
+  public modifyTimes = async (params: IModifyTimesParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).modifyTimes.sendTransactionAsync(
         params.startTime,
@@ -249,7 +343,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
-  public modifyLimits = async (params: IModifyLimits) => {
+  public modifyLimits = async (params: IModifyLimitsParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).modifyLimits.sendTransactionAsync(
         params.nonAccreditedLimitUSD,
@@ -261,7 +355,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies fund raise types
    */
-  public modifyFunding = async (params: IModifyFunding) => {
+  public modifyFunding = async (params: IModifyFundingParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).modifyFunding.sendTransactionAsync(
         params.fundRaiseTypes
@@ -272,7 +366,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
-  public modifyAddresses = async (params: IModifyAddresses) => {
+  public modifyAddresses = async (params: IModifyAddressesParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).modifyAddresses.sendTransactionAsync(
         params.wallet,
@@ -285,7 +379,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
-  public modifyTiers = async (params: IModifyTiers) => {
+  public modifyTiers = async (params: IModifyTiersParams) => {
     return async () => {
       return (await this.usdTieredSTOContract).modifyTiers.sendTransactionAsync(
         params.ratePerTier,

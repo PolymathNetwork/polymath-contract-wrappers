@@ -3,9 +3,18 @@ import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
-import { IModulesByTypeAndToken } from '../types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
+import { ITxParams } from '../types';
+
+/**
+ * @param moduleType is the module type to look for
+ * @param securityToken is the address of SecurityToken
+ */
+export interface IGetModulesByTypeAndTokenParams {
+  moduleType: number;
+  securityToken: string;
+}
 
 /**
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
@@ -36,7 +45,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: IModulesByTypeAndToken): Promise<string[]> => {
+  public getModulesByTypeAndToken = async (params: IGetModulesByTypeAndTokenParams): Promise<string[]> => {
     return await (await this.moduleRegistryContract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
