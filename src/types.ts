@@ -1,5 +1,15 @@
 import { BigNumber } from '@0x/utils';
-import { Provider } from 'ethereum-types';
+import {
+    Provider,
+    ContractEventArg,
+    DecodedLogArgs,
+    LogWithDecodedArgs,
+    BlockParam,
+} from 'ethereum-types';
+import {
+    PolyTokenEventArgs,
+    PolyTokenEvents,
+} from '@polymathnetwork/abi-wrappers';
 
 /**
  * @param provider The web3 provider 
@@ -8,6 +18,34 @@ import { Provider } from 'ethereum-types';
 export interface IApiConstructor {
     provider: Provider,
     polymathRegistryAddress?: string
+}
+
+export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
+    isRemoved: boolean;
+    log: LogWithDecodedArgs<ArgsType>;
+}
+
+export type EventCallback<ArgsType extends DecodedLogArgs> = (
+    err: null | Error,
+    log?: DecodedLogEvent<ArgsType>,
+) => void;
+
+export interface IndexedFilterValues {
+    [index: string]: ContractEventArg;
+}
+
+export type ContractEventArgs = PolyTokenEventArgs;
+
+export type ContractEvents = PolyTokenEvents;
+
+export interface BlockRange {
+    fromBlock: BlockParam;
+    toBlock: BlockParam;
+}
+
+export interface BlockRange {
+    fromBlock: BlockParam;
+    toBlock: BlockParam;
 }
 
 export interface IFundRaiseTypes {

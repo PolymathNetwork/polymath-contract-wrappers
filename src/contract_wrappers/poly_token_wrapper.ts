@@ -1,4 +1,4 @@
-import { PolyTokenContract } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenContract, PolyTokenEventArgs, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
