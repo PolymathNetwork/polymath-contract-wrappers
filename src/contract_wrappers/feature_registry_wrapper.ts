@@ -3,11 +3,27 @@ import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
-import { IGetFeatureStatus, ISetFeatureStatus } from '../types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
+import { ITxParams } from '../types';
 
-enum Features {
+/**
+ * @param nameKey is the key for the feature status mapping
+ */
+export interface IGetFeatureStatusParams {
+  nameKey: string;
+}
+
+/**
+* @param nameKey is the key for the feature status mapping
+* @param newStatus is the new feature status
+*/
+export interface ISetFeatureStatusParams extends ITxParams {
+  nameKey: string;
+  newStatus: boolean;
+}
+
+export enum Features {
   CustomModulesAllowed = "CustomModulesAllowed",
   FreezeMintingAllowed = "FreezeMintingAllowed",
 }
@@ -41,7 +57,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public getFeatureStatus = async (params: IGetFeatureStatus): Promise<boolean> => {
+  public getFeatureStatus = async (params: IGetFeatureStatusParams): Promise<boolean> => {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
         params.nameKey,
     )
@@ -50,7 +66,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Change a feature status
    */
-  public setFeatureStatus = async (params: ISetFeatureStatus) => {
+  public setFeatureStatus = async (params: ISetFeatureStatusParams) => {
     return async () => {
       return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
         params.nameKey,
