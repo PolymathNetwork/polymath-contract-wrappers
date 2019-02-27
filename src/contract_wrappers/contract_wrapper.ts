@@ -45,7 +45,7 @@ export abstract class ContractWrapper {
         this._filters = {};
         this._filterCallbacks = {};
     }
-/*    protected _unsubscribeAll(): void {
+    protected _unsubscribeAll(): void {
         const filterTokens = _.keys(this._filterCallbacks);
         _.each(filterTokens, filterToken => {
             this._unsubscribe(filterToken);
@@ -181,7 +181,7 @@ export abstract class ContractWrapper {
         if (!_.isUndefined(this._blockAndLogStreamerIfExists)) {
             await this._blockAndLogStreamerIfExists.reconcileNewBlock(latestBlockOrNull);
         }
-    }*/
+    }
     protected _getDefaultFromAddress = async(): Promise<string> => {
         const addresses = await this._web3Wrapper.getAvailableAddressesAsync();
         return addresses[0];
