@@ -12,6 +12,7 @@ import {
   FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
+import { BigNumber } from '@0x/utils';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
 import { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
@@ -27,7 +28,8 @@ import * as _ from 'lodash';
  */
 export interface IApiConstructorParams {
   provider: Provider,
-  polymathRegistryAddress?: string
+  polymathRegistryAddress?: string,
+  defaultGasPrice?: BigNumber
 }
 
 /**
@@ -71,6 +73,9 @@ export class PolymathAPI {
 
     this._web3Wrapper = new Web3Wrapper(
       params.provider,
+      { 
+        gasPrice: params.defaultGasPrice 
+      }
     );
 
     const artifactsArray = [
