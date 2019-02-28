@@ -250,10 +250,10 @@
   dependencies:
     events "^3.0.0"
 
-"@polymathnetwork/abi-wrappers@2.1.0-beta":
-  version "2.1.0-beta"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.tgz#b2c2bf6cb9a74e2d05e2bfd3151bf7cd15f050a1"
-  integrity sha512-Fa2+l2/S4hkgIn/s2/xM7o8e1Y4fmSMCUdjjcWHzTKaHQwXCYuDVo2jBea7ZrKkj7Gr58BojF3yWt95FPZXDAA==
+"@polymathnetwork/abi-wrappers@2.1.0-beta.2":
+  version "2.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.2.tgz#2d68767ab569d6f65ec6573326f3e597991a4a51"
+  integrity sha512-sBlHFfMCTdjZL7A04eXz3jB2SWeoek532fD7+wznoscaumzMaUgPiaFmYH3hWIKq/hlRMVNedoiDdmcNFmDcag==
   dependencies:
     "@0x/base-contract" "^3.0.10"
     "@0x/sol-compiler" "^1.1.16"
