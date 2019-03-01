@@ -1,6 +1,5 @@
 import { TxData } from '@0x/web3-wrapper';
 import {
-    Provider,
     ContractEventArg,
     DecodedLogArgs,
     LogWithDecodedArgs,
@@ -40,16 +39,11 @@ export interface IndexedFilterValues {
     [index: string]: ContractEventArg;
 }
 
+export interface BlockRange {
+    fromBlock: BlockParam;
+    toBlock: BlockParam;
+}
+
 export type ContractEventArgs = PolyTokenEventArgs;
 
 export type ContractEvents = PolyTokenEvents;
-
-export interface BlockRange {
-    fromBlock: BlockParam;
-    toBlock: BlockParam;
-}
-
-export interface BlockRange {
-    fromBlock: BlockParam;
-    toBlock: BlockParam;
-}

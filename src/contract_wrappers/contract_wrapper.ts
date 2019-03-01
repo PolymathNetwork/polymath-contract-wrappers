@@ -20,6 +20,9 @@ import { filterUtils } from '../utils/filter_utils';
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
 import * as _ from 'lodash';
 
+const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
+const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
+
 export abstract class ContractWrapper {
     public abstract abi: ContractAbi;
     protected _web3Wrapper: Web3Wrapper;
@@ -33,8 +36,6 @@ export abstract class ContractWrapper {
         [filterToken: string]: EventCallback<ContractEventArgs>;
     };
     private static _onBlockAndLogStreamerError(isVerbose: boolean, err: Error): void {
-        // Since Blockstream errors are all recoverable, we simply log them if the verbose
-        // config is passed in.
         if (isVerbose) {
             logUtils.warn(err);
         }
@@ -53,7 +54,7 @@ export abstract class ContractWrapper {
     }
     protected _unsubscribe(filterToken: string, err?: Error): void {
         if (_.isUndefined(this._filters[filterToken])) {
-            throw new Error('SUBSCRIPTION_NOT_FOUND');
+            throw new Error(SUBSCRIPTION_NOT_FOUND);
         }
         if (!_.isUndefined(err)) {
             const callback = this._filterCallbacks[filterToken];
@@ -116,7 +117,7 @@ export abstract class ContractWrapper {
     }
     private _startBlockAndLogStream(isVerbose: boolean): void {
         if (!_.isUndefined(this._blockAndLogStreamerIfExists)) {
-            throw new Error('SUBSCRIPTION_ALREADY_PRESENT');
+            throw new Error(SUBSCRIPTION_ALREADY_PRESENT);
         }
         this._blockAndLogStreamerIfExists = new BlockAndLogStreamer(
             this._blockstreamGetBlockOrNullAsync.bind(this),
@@ -159,7 +160,7 @@ export abstract class ContractWrapper {
     }
     private _stopBlockAndLogStream(): void {
         if (_.isUndefined(this._blockAndLogStreamerIfExists)) {
-            throw new Error('SUBSCRIPTION_NOT_FOUND');
+            throw new Error(SUBSCRIPTION_NOT_FOUND);
         }
         this._blockAndLogStreamerIfExists.unsubscribeFromOnLogAdded(this._onLogAddedSubscriptionToken as string);
         this._blockAndLogStreamerIfExists.unsubscribeFromOnLogRemoved(this._onLogRemovedSubscriptionToken as string);
