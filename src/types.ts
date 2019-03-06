@@ -47,3 +47,30 @@ export interface BlockRange {
 export type ContractEventArgs = PolyTokenEventArgs;
 
 export type ContractEvents = PolyTokenEvents;
+
+/**
+ * @param eventName           The contract event you would like to subscribe to.
+ * @param blockRange          Block range to get logs from.
+ * @param indexFilterValues   An object where the keys are indexed args returned by the event and
+ *                            the value is the value you are interested in.
+ */
+export interface IGetLogsAsyncParams<EventType extends ContractEvents> {
+    eventName: EventType,
+    blockRange: BlockRange,
+    indexFilterValues: IndexedFilterValues
+}
+
+/**
+ * @param contractAddress     The hex encoded address where the contract is deployed.
+ * @param eventName           The contract event you would like to subscribe to.
+ * @param indexFilterValues   An object where the keys are indexed args returned by the event and
+ *                            the value is the value you are interested in.
+ * @param callback            Callback that gets called when a log is added/removed
+ * @param isVerbose           Enable verbose subscription warnings (e.g recoverable network issues encountered)
+ */
+export interface ISubscribeAsyncParams<EventType extends ContractEvents, ArgsType extends ContractEventArg> {
+    eventName: EventType,
+    indexFilterValues: IndexedFilterValues,
+    callback: EventCallback<ArgsType>,
+    isVerbose?: boolean,
+}

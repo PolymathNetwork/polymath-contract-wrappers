@@ -8,9 +8,8 @@ import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import {
   ITxParams,
-  EventCallback,
-  BlockRange,
-  IndexedFilterValues,
+  IGetLogsAsyncParams,
+  ISubscribeAsyncParams,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -143,31 +142,22 @@ export class PolyTokenWrapper extends ContractWrapper {
 
   /**
    * Subscribe to an event type emitted by the contract.
-   * @param contractAddress     The hex encoded address where the contract is deployed.
-   * @param eventName           The contract event you would like to subscribe to.
-   * @param indexFilterValues   An object where the keys are indexed args returned by the event and
-   *                            the value is the value you are interested in.
-   * @param callback            Callback that gets called when a log is added/removed
-   * @param isVerbose           Enable verbose subscription warnings (e.g recoverable network issues encountered)
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync = async <ArgsType extends PolyTokenEventArgs>(
-    eventName: PolyTokenEvents,
-    indexFilterValues: IndexedFilterValues,
-    callback: EventCallback<ArgsType>,
-    isVerbose: boolean = false,
+    params: ISubscribeAsyncParams<PolyTokenEvents, ArgsType>
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', eventName, PolyTokenEvents);
-    assert.doesConformToSchema('indexFilterValues', indexFilterValues, schemas.indexFilterValuesSchema);
-    assert.isFunction('callback', callback);
+    assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
-        eventName,
-        indexFilterValues,
+        params.eventName,
+        params.indexFilterValues,
         PolyToken.abi,
-        callback,
-        isVerbose,
+        params.callback,
+        !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
   }
@@ -190,27 +180,20 @@ export class PolyTokenWrapper extends ContractWrapper {
 
   /**
    * Gets historical logs without creating a subscription
-   * @param contractAddress     An address of the contract that emitted the logs.
-   * @param eventName           The contract event you would like to subscribe to.
-   * @param blockRange          Block range to get logs from.
-   * @param indexFilterValues   An object where the keys are indexed args returned by the event and
-   *                            the value is the value you are interested in.
    * @return Array of logs that match the parameters
    */
   public getLogsAsync = async <ArgsType extends PolyTokenEventArgs>(
-    eventName: PolyTokenEvents,
-    blockRange: BlockRange,
-    indexFilterValues: IndexedFilterValues,
+    params: IGetLogsAsyncParams<PolyTokenEvents>
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
-    assert.doesBelongToStringEnum('eventName', eventName, PolyTokenEvents);
-    assert.doesConformToSchema('blockRange', blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
-        eventName,
-        blockRange,
-        indexFilterValues,
+        params.eventName,
+        params.blockRange,
+        params.indexFilterValues,
         PolyToken.abi,
     );
     return logs;
