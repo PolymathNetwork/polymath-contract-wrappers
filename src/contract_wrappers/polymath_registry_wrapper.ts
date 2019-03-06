@@ -15,6 +15,14 @@ export interface IGetAddressParams {
   contractName: string;
 }
 
+/**
+ * @param nameKey is the key for the contract address mapping
+ * @param newAddress is the new contract address
+ */
+export interface IChangeAddressParams extends ITxParams  {
+  nameKey: string;
+  newAddress: string;
+}
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -114,6 +122,18 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     return await this.getAddress({
       contractName: Contracts.EthUsdOracle,
     });
+  }
+
+  /**
+   * Changes the contract address
+   */
+  public changeAddress = async (params: IChangeAddressParams) => {
+    return async () => {
+      return (await this.polymathRegistryContract).changeAddress.sendTransactionAsync(
+        params.nameKey,
+        params.newAddress,
+      );
+    }
   }
 
   private async _getDefaultAddress(): Promise<string> {
