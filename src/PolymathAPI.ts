@@ -123,7 +123,16 @@ export class PolymathAPI {
    * @return Address string
    */
   public getAccount = async (): Promise<string>  => {
-      return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
+    return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
+  }
+
+  /**
+   * Get the ETH balance
+   * @return Balance BigNumber
+   */
+  public getBalance = async (): Promise<BigNumber> => {
+    const owner = await this.getAccount();
+    return (await this._web3Wrapper.getBalanceInWeiAsync(owner));
   }
 
   /**
