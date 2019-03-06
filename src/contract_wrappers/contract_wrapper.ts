@@ -89,11 +89,11 @@ export abstract class ContractWrapper {
         blockRange: BlockRange,
         indexFilterValues: IndexedFilterValues,
         abi: ContractAbi,
-    ): Promise<Array<LogEntry | LogWithDecodedArgs<ArgsType>>> {
+    ): Promise<Array<LogWithDecodedArgs<ArgsType>>> {
         const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi, blockRange);
         const logs = await this._web3Wrapper.getLogsAsync(filter);
         const logsWithDecodedArguments = _.map(logs, this._tryToDecodeLogOrNoop.bind(this));
-        return logsWithDecodedArguments;
+        return logsWithDecodedArguments as LogWithDecodedArgs<ArgsType>[];
     }
     protected _tryToDecodeLogOrNoop<ArgsType extends ContractEventArgs>(
         log: LogEntry,

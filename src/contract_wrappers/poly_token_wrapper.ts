@@ -151,18 +151,16 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @param isVerbose           Enable verbose subscription warnings (e.g recoverable network issues encountered)
    * @return Subscription token used later to unsubscribe
    */
-  public subscribe = <ArgsType extends PolyTokenEventArgs>(
-    contractAddress: string,
+  public subscribeAsync = async <ArgsType extends PolyTokenEventArgs>(
     eventName: PolyTokenEvents,
     indexFilterValues: IndexedFilterValues,
     callback: EventCallback<ArgsType>,
     isVerbose: boolean = false,
-  ): string => {
-    assert.isETHAddressHex('contractAddress', contractAddress);
+  ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', eventName, PolyTokenEvents);
     assert.doesConformToSchema('indexFilterValues', indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', callback);
-    const normalizedContractAddress = contractAddress.toLowerCase();
+    const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         eventName,
@@ -200,16 +198,14 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync = async <ArgsType extends PolyTokenEventArgs>(
-    contractAddress: string,
     eventName: PolyTokenEvents,
     blockRange: BlockRange,
     indexFilterValues: IndexedFilterValues,
-  ): Promise<Array<LogEntry | LogWithDecodedArgs<ArgsType>>> => {
-    assert.isETHAddressHex('contractAddress', contractAddress);
+  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', eventName, PolyTokenEvents);
     assert.doesConformToSchema('blockRange', blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = contractAddress.toLowerCase();
+    const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         eventName,
