@@ -22,7 +22,7 @@ import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wra
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
 
-  /**
+/**
  * @param provider The web3 provider 
  * @param polymathRegistry The PolymathRegistry contract address '0x...'
  */
@@ -30,6 +30,13 @@ export interface IApiConstructorParams {
   provider: Provider,
   polymathRegistryAddress?: string,
   defaultGasPrice?: BigNumber
+}
+
+/**
+ * @param address (optional) Account address
+ */
+export interface IGetBalanceParmas {
+  address?: string
 }
 
 /**
@@ -130,9 +137,9 @@ export class PolymathAPI {
    * Get the ETH balance
    * @return Balance BigNumber
    */
-  public getBalance = async (): Promise<BigNumber> => {
-    const owner = await this.getAccount();
-    return (await this._web3Wrapper.getBalanceInWeiAsync(owner));
+  public getBalance = async (params: IGetBalanceParmas): Promise<BigNumber> => {
+    const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    return (await this._web3Wrapper.getBalanceInWeiAsync(addr));
   }
 
   /**
