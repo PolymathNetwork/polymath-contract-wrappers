@@ -2,7 +2,7 @@ import { PolyTokenContract, PolyTokenEventArgs, PolyTokenEvents } from '@polymat
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, ContractEventArg, LogWithDecodedArgs, LogEntry } from 'ethereum-types';
+import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';

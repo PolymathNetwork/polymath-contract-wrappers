@@ -1,13 +1,18 @@
-import { SecurityTokenRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenRegistryContract, SecurityTokenRegistryEvents, SecurityTokenRegistryEventArgs } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { assert } from '../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import { ITxParams } from '../types';
+import {
+  ITxParams,
+  IGetLogsAsyncParams,
+  ISubscribeAsyncParams,
+} from '../types';
+import { schemas } from '@0x/json-schemas';
 
 /**
  * @param securityToken is the address of the security token.
@@ -202,6 +207,65 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return await (await this.securityTokenRegistryContract).getSecurityTokenAddress.callAsync(
       ticker,
     );
+  }
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync = async <ArgsType extends SecurityTokenRegistryEventArgs>(
+    params: ISubscribeAsyncParams<SecurityTokenRegistryEvents, ArgsType>
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenRegistryEvents);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.securityTokenRegistryContract).address.toLowerCase();
+    const subscriptionToken = this._subscribe<ArgsType>(
+        normalizedContractAddress,
+        params.eventName,
+        params.indexFilterValues,
+        (SecurityTokenRegistry as any).abi,
+        params.callback,
+        !_.isUndefined(params.isVerbose),
+    );
+    return subscriptionToken;
+  }
+
+  /**
+   * Cancel a subscription
+   * @param subscriptionToken Subscription token returned by `subscribe()`
+   */
+  public unsubscribe = (subscriptionToken: string): void => {
+    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
+    this._unsubscribe(subscriptionToken);
+  }
+
+  /**
+   * Cancels all existing subscriptions
+   */
+  public unsubscribeAll = (): void => {
+    super._unsubscribeAll();
+  }
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync = async <ArgsType extends SecurityTokenRegistryEventArgs>(
+    params: IGetLogsAsyncParams<SecurityTokenRegistryEvents>
+  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenRegistryEvents);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    const normalizedContractAddress = (await this.securityTokenRegistryContract).address.toLowerCase();
+    const logs = await this._getLogsAsync<ArgsType>(
+        normalizedContractAddress,
+        params.eventName,
+        params.blockRange,
+        params.indexFilterValues,
+        (SecurityTokenRegistry as any).abi,
+    );
+    return logs;
   }
 
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
