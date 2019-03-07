@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
 import * as AddressesUtils from '../utils/addresses';
 import {
+  ITxParams,
   NetworkId,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
@@ -20,6 +21,14 @@ export interface IGetAddressParams {
   contractName: string;
 }
 
+/**
+ * @param nameKey is the key for the contract address mapping
+ * @param newAddress is the new contract address
+ */
+export interface IChangeAddressParams extends ITxParams  {
+  nameKey: string;
+  newAddress: string;
+}
 
 enum Contracts {
   PolyToken = "PolyToken",
@@ -178,6 +187,18 @@ export class PolymathRegistryWrapper extends ContractWrapper {
         PolymathRegistry.abi,
     );
     return logs;
+  }
+  
+  /**
+   * Changes the contract address
+   */
+  public changeAddress = async (params: IChangeAddressParams) => {
+    return async () => {
+      return (await this.polymathRegistryContract).changeAddress.sendTransactionAsync(
+        params.nameKey,
+        params.newAddress,
+      );
+    }
   }
 
   private async _getDefaultAddress(): Promise<string> {

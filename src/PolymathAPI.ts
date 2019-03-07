@@ -12,6 +12,7 @@ import {
   FeatureRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
+import { BigNumber } from '@0x/utils';
 import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
 import { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
@@ -21,13 +22,21 @@ import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wra
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
 
-  /**
+/**
  * @param provider The web3 provider 
  * @param polymathRegistry The PolymathRegistry contract address '0x...'
  */
 export interface IApiConstructorParams {
   provider: Provider,
-  polymathRegistryAddress?: string
+  polymathRegistryAddress?: string,
+  defaultGasPrice?: BigNumber
+}
+
+/**
+ * @param address (optional) Account address
+ */
+export interface IGetBalanceParams {
+  address?: string
 }
 
 /**
@@ -71,6 +80,9 @@ export class PolymathAPI {
 
     this._web3Wrapper = new Web3Wrapper(
       params.provider,
+      { 
+        gasPrice: params.defaultGasPrice 
+      }
     );
 
     const artifactsArray = [
@@ -118,7 +130,16 @@ export class PolymathAPI {
    * @return Address string
    */
   public getAccount = async (): Promise<string>  => {
-      return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
+    return (await this._web3Wrapper.getAvailableAddressesAsync())[0];
+  }
+
+  /**
+   * Get the ETH balance
+   * @return Balance BigNumber
+   */
+  public getBalance = async (params: IGetBalanceParams): Promise<BigNumber> => {
+    const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    return (await this._web3Wrapper.getBalanceInWeiAsync(addr));
   }
 
   /**
