@@ -35,7 +35,7 @@ export interface IApiConstructorParams {
 /**
  * @param address (optional) Account address
  */
-export interface IGetBalanceParmas {
+export interface IGetBalanceParams {
   address?: string
 }
 
@@ -137,7 +137,7 @@ export class PolymathAPI {
    * Get the ETH balance
    * @return Balance BigNumber
    */
-  public getBalance = async (params: IGetBalanceParmas): Promise<BigNumber> => {
+  public getBalance = async (params: IGetBalanceParams): Promise<BigNumber> => {
     const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
     return (await this._web3Wrapper.getBalanceInWeiAsync(addr));
   }
