@@ -77,40 +77,40 @@ export interface BlockRange {
 }
 
 export type ContractEventArgs = PolyTokenEventArgs |
-CappedSTOFactoryEventArgs |
-CappedSTOEventArgs |
-ERC20DividendCheckpointEventArgs |
-EtherDividendCheckpointEventArgs |
-FeatureRegistryEventArgs |
-GeneralPermissionManagerEventArgs |
-GeneralTransferManagerEventArgs |
-ManualApprovalTransferManagerEventArgs |
-ModuleFactoryEventArgs |
-ModuleRegistryEventArgs |
-PolyTokenFaucetEventArgs |
-PolymathRegistryEventArgs |
-SecurityTokenRegistryEventArgs |
-SecurityTokenEventArgs |
-USDTieredSTOFactoryEventArgs |
-USDTieredSTOEventArgs;
+    CappedSTOFactoryEventArgs |
+    CappedSTOEventArgs |
+    ERC20DividendCheckpointEventArgs |
+    EtherDividendCheckpointEventArgs |
+    FeatureRegistryEventArgs |
+    GeneralPermissionManagerEventArgs |
+    GeneralTransferManagerEventArgs |
+    ManualApprovalTransferManagerEventArgs |
+    ModuleFactoryEventArgs |
+    ModuleRegistryEventArgs |
+    PolyTokenFaucetEventArgs |
+    PolymathRegistryEventArgs |
+    SecurityTokenRegistryEventArgs |
+    SecurityTokenEventArgs |
+    USDTieredSTOFactoryEventArgs |
+    USDTieredSTOEventArgs;
 
 export type ContractEvents = PolyTokenEvents |
-CappedSTOFactoryEvents |
-CappedSTOEvents |
-ERC20DividendCheckpointEvents |
-EtherDividendCheckpointEvents |
-FeatureRegistryEvents |
-GeneralPermissionManagerEvents |
-GeneralTransferManagerEvents |
-ManualApprovalTransferManagerEvents |
-ModuleFactoryEvents |
-ModuleRegistryEvents |
-PolyTokenFaucetEvents |
-PolymathRegistryEvents |
-SecurityTokenRegistryEvents |
-SecurityTokenEvents |
-USDTieredSTOFactoryEvents |
-USDTieredSTOEvents;
+    CappedSTOFactoryEvents |
+    CappedSTOEvents |
+    ERC20DividendCheckpointEvents |
+    EtherDividendCheckpointEvents |
+    FeatureRegistryEvents |
+    GeneralPermissionManagerEvents |
+    GeneralTransferManagerEvents |
+    ManualApprovalTransferManagerEvents |
+    ModuleFactoryEvents |
+    ModuleRegistryEvents |
+    PolyTokenFaucetEvents |
+    PolymathRegistryEvents |
+    SecurityTokenRegistryEvents |
+    SecurityTokenEvents |
+    USDTieredSTOFactoryEvents |
+    USDTieredSTOEvents;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.

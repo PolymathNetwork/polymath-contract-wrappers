@@ -11,6 +11,39 @@ export { SecurityTokenRegistryWrapper as SecurityTokenRegistry } from './contrac
 export { SecurityTokenWrapper as SecurityToken } from './contract_wrappers/security_token_wrapper';
 export { USDTieredSTOFactoryWrapper as USDTieredSTOFactory } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 export { USDTieredSTOWrapper as USDTieredSTO } from './contract_wrappers/usd_tiered_sto_wrapper';
-export { PolyResponse } from '@polymathnetwork/abi-wrappers';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
+export { BlockParamLiteral } from 'ethereum-types'
+export { 
+    PolyResponse,
+    PolyTokenEvents,
+    PolyTokenApprovalEventArgs,
+    PolyTokenTransferEventArgs,
+    PolymathRegistryEvents,
+    PolymathRegistryChangeAddressEventArgs,
+    PolymathRegistryOwnershipRenouncedEventArgs,
+    PolymathRegistryOwnershipTransferredEventArgs,
+    SecurityTokenRegistryEvents,
+    SecurityTokenRegistryPauseEventArgs,
+    SecurityTokenRegistryUnpauseEventArgs,
+    SecurityTokenRegistryTickerRemovedEventArgs,
+    SecurityTokenRegistryChangeExpiryLimitEventArgs,
+    SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs,
+    SecurityTokenRegistryChangeTickerRegistrationFeeEventArgs,
+    SecurityTokenRegistryOwnershipTransferredEventArgs,
+    SecurityTokenRegistryChangeTickerOwnershipEventArgs,
+    SecurityTokenRegistryNewSecurityTokenEventArgs,
+    SecurityTokenRegistryRegisterTickerEventArgs,
+    ModuleRegistryEvents,
+    ModuleRegistryModuleRegisteredEventArgs,
+    ModuleRegistryModuleRemovedEventArgs,
+    ModuleRegistryModuleUsedEventArgs,
+    ModuleRegistryModuleVerifiedEventArgs,
+    ModuleRegistryOwnershipTransferredEventArgs,
+    ModuleRegistryPauseEventArgs,
+    ModuleRegistryUnpauseEventArgs,
+    FeatureRegistryEvents,
+    FeatureRegistryChangeFeatureStatusEventArgs,
+    FeatureRegistryOwnershipRenouncedEventArgs,
+    FeatureRegistryOwnershipTransferredEventArgs,
+} from '@polymathnetwork/abi-wrappers';
