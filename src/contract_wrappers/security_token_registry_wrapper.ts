@@ -38,7 +38,7 @@ export interface IGetTokensByOwnerParams {
 /**
 * @param tokenName is the ticker symbol
 */
-export interface IGetTickerDetailsParams {
+export interface ITickerDetailsParams {
   tokenName: string;
 }
 
@@ -131,7 +131,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: IGetTickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
+  public getTickerDetails = async (params: ITickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
     assert.isString('tokenName', params.tokenName);
     const tickerDetail = await (await this.securityTokenRegistryContract).getTickerDetails.callAsync(
       params.tokenName,
@@ -207,6 +207,37 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return await (await this.securityTokenRegistryContract).getSecurityTokenAddress.callAsync(
       ticker,
     );
+  }
+
+  /**
+   * Gets ticker availability
+   * @return boolean
+   */
+  public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const result = await this.getTickerDetails(params);
+    return result.length ? true : false;
+  }
+
+  /**
+   * Knows if the ticker was registered by the user
+   * @return boolean
+   */
+  public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const tickers = await this.getTickersByOwner({});
+    if (!tickers.length) {
+      return false
+    }
+    for (let t of tickers) {
+      console.log(t)
+      if (t == params.tokenName) {
+        return true
+      }
+    }
+    return false;
+  }
+
+  public isTokenLaunched = async (): Promise<boolean> => {
+    return true;
   }
 
   /**
