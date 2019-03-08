@@ -1,11 +1,17 @@
-import { FeatureRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { FeatureRegistryContract, FeatureRegistryEventArgs, FeatureRegistryEvents } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { ContractWrapper } from './contract_wrapper';
-import { ITxParams } from '../types';
+import {
+  ITxParams,
+  IGetLogsAsyncParams,
+  ISubscribeAsyncParams,
+} from '../types';
+import { assert } from '../utils/assert';
+import { schemas } from '@0x/json-schemas';
 
 /**
  * @param nameKey is the key for the feature status mapping
@@ -93,6 +99,65 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
       Features.FreezeMintingAllowed,
     )
+  }
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: ISubscribeAsyncParams<FeatureRegistryEvents, ArgsType>
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.featureRegistryContract).address.toLowerCase();
+    const subscriptionToken = this._subscribe<ArgsType>(
+        normalizedContractAddress,
+        params.eventName,
+        params.indexFilterValues,
+        FeatureRegistry.abi,
+        params.callback,
+        !_.isUndefined(params.isVerbose),
+    );
+    return subscriptionToken;
+  }
+
+  /**
+   * Cancel a subscription
+   * @param subscriptionToken Subscription token returned by `subscribe()`
+   */
+  public unsubscribe = (subscriptionToken: string): void => {
+    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
+    this._unsubscribe(subscriptionToken);
+  }
+
+  /**
+   * Cancels all existing subscriptions
+   */
+  public unsubscribeAll = (): void => {
+    super._unsubscribeAll();
+  }
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: IGetLogsAsyncParams<FeatureRegistryEvents>
+  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    const normalizedContractAddress = (await this.featureRegistryContract).address.toLowerCase();
+    const logs = await this._getLogsAsync<ArgsType>(
+        normalizedContractAddress,
+        params.eventName,
+        params.blockRange,
+        params.indexFilterValues,
+        FeatureRegistry.abi,
+    );
+    return logs;
   }
 
   private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {

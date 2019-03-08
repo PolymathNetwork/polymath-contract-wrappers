@@ -29,8 +29,10 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
+    "@types/ethereumjs-util": "^5.2.0",
     "@types/lodash": "4.14.104",
     "@types/node": "*",
+    "@types/uuid": "^3.4.4",
     "@types/web3": "^1.0.14",
     "@types/web3-provider-engine": "^14.0.0",
     "awesome-typescript-loader": "^5.2.1",
@@ -41,6 +43,7 @@
     "tslint": "5.11.0",
     "typedoc": "0.13.0",
     "typescript": "3.2.2",
+    "web3-provider-engine": "14.0.6",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
     "webpack-dev-server": "^3.1.14",
@@ -48,16 +51,19 @@
   },
   "dependencies": {
     "@0x/assert": "^1.0.21",
-    "@0x/json-schemas": "^2.1.5",
+    "@0x/json-schemas": "^3.0.5",
     "@0x/subproviders": "^2.1.11",
     "@0x/types": "^1.5.0",
     "@0x/typescript-typings": "^3.0.6",
     "@0x/utils": "^2.1.1",
     "@0x/web3-wrapper": "^3.2.2",
-    "ethereum-types": "^1.1.4",
-    "lodash": "^4.17.5",
     "@polymathnetwork/abi-wrappers": "2.1.0-beta.2",
-    "@polymathnetwork/contract-artifacts": "2.1.0-beta.1"
+    "@polymathnetwork/contract-artifacts": "2.1.0-beta.1",
+    "ethereum-types": "^1.1.4",
+    "ethereumjs-blockstream": "6.0.0",
+    "ethereumjs-util": "^6.1.0",
+    "lodash": "^4.17.5",
+    "uuid": "^3.3.2"
   },
   "publishConfig": {
     "access": "public"
