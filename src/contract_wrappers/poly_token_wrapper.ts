@@ -119,10 +119,9 @@ export class PolyTokenWrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
-    const spender = await this._getDefaultFromAddress();
     return await (await this.polyTokenContract).allowance.callAsync(
       params.owner,
-      spender
+      params.spender
     );
   }
 
