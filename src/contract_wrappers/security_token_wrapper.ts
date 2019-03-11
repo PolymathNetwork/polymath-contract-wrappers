@@ -53,16 +53,16 @@ export interface IVerifyTransferParams {
  */
 export class SecurityTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityToken as any).abi;
-  private polymathRegistry: PolymathRegistryWrapper;
+  private address: string;
   private securityTokenContract: Promise<SecurityTokenContract>;
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
+    this.address = address;
     this.securityTokenContract = this._getSecurityTokenContract();
   }
 
@@ -186,9 +186,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
     return new SecurityTokenContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'SecurityToken',
-      }),
+      this.address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );

@@ -203,7 +203,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @param ticker is the ticker of the security token
    * @return address string
    */
-  private async _getSecurityTokenAddress(ticker: string): Promise<string> {
+  public getSecurityTokenAddress = async (ticker: string): Promise<string> => {
     return await (await this.securityTokenRegistryContract).getSecurityTokenAddress.callAsync(
       ticker,
     );
