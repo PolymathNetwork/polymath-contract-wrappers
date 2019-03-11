@@ -63,6 +63,7 @@
     "ethereumjs-blockstream": "6.0.0",
     "ethereumjs-util": "^6.1.0",
     "lodash": "^4.17.5",
+    "moment": "^2.24.0",
     "uuid": "^3.3.2"
   },
   "publishConfig": {
