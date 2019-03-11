@@ -1,4 +1,18 @@
-import { SecurityTokenRegistryContract, SecurityTokenRegistryEvents, SecurityTokenRegistryEventArgs } from '@polymathnetwork/abi-wrappers';
+import { 
+  SecurityTokenRegistryContract,
+  SecurityTokenRegistryEvents,
+  SecurityTokenRegistryEventArgs,
+  SecurityTokenRegistryChangeExpiryLimitEventArgs,
+  SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs,
+  SecurityTokenRegistryChangeTickerRegistrationFeeEventArgs,
+  SecurityTokenRegistryNewSecurityTokenEventArgs, 
+  SecurityTokenRegistryOwnershipTransferredEventArgs,
+  SecurityTokenRegistryPauseEventArgs,
+  SecurityTokenRegistryUnpauseEventArgs,
+  SecurityTokenRegistryRegisterTickerEventArgs,
+  SecurityTokenRegistryTickerRemovedEventArgs,
+  SecurityTokenRegistryChangeTickerOwnershipEventArgs
+} from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -11,34 +25,151 @@ import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { schemas } from '@0x/json-schemas';
+
+interface IChangeExpiryLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
+  callback: EventCallback<SecurityTokenRegistryChangeExpiryLimitEventArgs>,
+}
+
+interface IGetChangeExpiryLimitLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
+}
+
+interface IChangeSecurityLaunchFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeSecurityLaunchFee,
+  callback: EventCallback<SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>,
+}
+
+interface IGetChangeSecurityLaunchFeeLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeSecurityLaunchFee,
+}
+
+interface IChangeTickerOwnershipSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeTickerOwnership,
+  callback: EventCallback<SecurityTokenRegistryChangeTickerOwnershipEventArgs>,
+}
+
+interface IGetChangeTickerOwnershipLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeTickerOwnership,
+}
+
+interface IChangeTickerRegistrationFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeTickerRegistrationFee,
+  callback: EventCallback<SecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>,
+}
+
+interface IGetChangeTickerRegistrationFeeLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.ChangeTickerRegistrationFee,
+}
+
+interface INewSecurityTokenSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+  callback: EventCallback<SecurityTokenRegistryNewSecurityTokenEventArgs>,
+}
+
+interface IGetNewSecurityTokenLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.OwnershipTransferred,
+  callback: EventCallback<SecurityTokenRegistryOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.OwnershipTransferred,
+}
+
+interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.Pause,
+  callback: EventCallback<SecurityTokenRegistryPauseEventArgs>,
+}
+
+interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.Pause,
+}
+
+interface IRegisterTickerSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.RegisterTicker,
+  callback: EventCallback<SecurityTokenRegistryRegisterTickerEventArgs>,
+}
+
+interface IGetRegisterTickerLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.RegisterTicker,
+}
+
+interface ITickerRemovedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.TickerRemoved,
+  callback: EventCallback<SecurityTokenRegistryTickerRemovedEventArgs>,
+}
+
+interface IGetTickerRemovedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.TickerRemoved,
+}
+
+interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenRegistryEvents.Unpause,
+  callback: EventCallback<SecurityTokenRegistryUnpauseEventArgs>,
+}
+
+interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenRegistryEvents.Unpause,
+}
+
+interface ISecurityTokenRegistrySubscribeAsyncParams {
+  (params: IChangeExpiryLimitSubscribeAsyncParams): Promise<string>,
+  (params: IChangeSecurityLaunchFeeSubscribeAsyncParams): Promise<string>,
+  (params: IChangeTickerOwnershipSubscribeAsyncParams): Promise<string>,
+  (params: IChangeTickerRegistrationFeeSubscribeAsyncParams): Promise<string>,
+  (params: INewSecurityTokenSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+  (params: IPauseSubscribeAsyncParams): Promise<string>,
+  (params: IRegisterTickerSubscribeAsyncParams): Promise<string>,
+  (params: ITickerRemovedSubscribeAsyncParams): Promise<string>,
+  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetSecurityTokenRegistryLogsAsyncParams {
+  (params: IGetChangeExpiryLimitLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeExpiryLimitEventArgs>>>,
+  (params: IGetChangeSecurityLaunchFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>>>,
+  (params: IGetChangeTickerOwnershipLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeTickerOwnershipEventArgs>>>,
+  (params: IGetChangeTickerRegistrationFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>>>,
+  (params: IGetNewSecurityTokenLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryRegisterTickerEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryOwnershipTransferredEventArgs>>>,
+  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryPauseEventArgs>>>,
+  (params: IGetRegisterTickerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryNewSecurityTokenEventArgs>>>,
+  (params: IGetTickerRemovedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryTickerRemovedEventArgs>>>,
+  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryUnpauseEventArgs>>>,
+}
 
 /**
  * @param securityToken is the address of the security token.
  */
-export interface IGetSecurityTokenDataParams {
+interface IGetSecurityTokenDataParams {
   securityToken: string;
 }
 
 /**
 * @param ownerAddress is the address which owns the list of tickers
 */
-export interface IGetTickersByOwnerParams {
+interface IGetTickersByOwnerParams {
   owner?: string;
 }
 
 /**
 * @param ownerAddress is the address which owns the list of tickers
 */
-export interface IGetTokensByOwnerParams {
+interface IGetTokensByOwnerParams {
   ownerAddress: string;
 }
 
 /**
 * @param tokenName is the ticker symbol
 */
-export interface IGetTickerDetailsParams {
+interface IGetTickerDetailsParams {
   tokenName: string;
 }
 
@@ -46,7 +177,7 @@ export interface IGetTickerDetailsParams {
 * @param ticker is unique token ticker
 * @param tokenName is the name of the token
 */
-export interface IRegisterTickerParams extends ITxParams {
+interface IRegisterTickerParams extends ITxParams {
   owner?: string;
   ticker: string;
   tokenName: string;
@@ -56,7 +187,7 @@ export interface IRegisterTickerParams extends ITxParams {
 * @param newOwner is the address of the new owner of the ticker
 * @param ticker is the ticker symbol
 */
-export interface ITransferTickerOwnershipParams extends ITxParams {
+interface ITransferTickerOwnershipParams extends ITxParams {
   newOwner: string;
   ticker: string;
 }
@@ -67,7 +198,7 @@ export interface ITransferTickerOwnershipParams extends ITxParams {
 * @param details is the off-chain details of the token
 * @param divisible is whether or not the token is divisible
 */
-export interface IGenerateSecurityTokenParams extends ITxParams {
+interface IGenerateSecurityTokenParams extends ITxParams {
   name: string;
   ticker: string;
   details: string;
@@ -213,8 +344,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends SecurityTokenRegistryEventArgs>(
-    params: ISubscribeAsyncParams<SecurityTokenRegistryEvents, ArgsType>
+  public subscribeAsync: ISecurityTokenRegistrySubscribeAsyncParams = async <ArgsType extends SecurityTokenRegistryEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -251,8 +382,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends SecurityTokenRegistryEventArgs>(
-    params: IGetLogsAsyncParams<SecurityTokenRegistryEvents>
+  public getLogsAsync: IGetSecurityTokenRegistryLogsAsyncParams = async <ArgsType extends SecurityTokenRegistryEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
