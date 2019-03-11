@@ -13,6 +13,7 @@ import {
   ISubscribeAsyncParams,
 } from '../types';
 import { schemas } from '@0x/json-schemas';
+import * as moment from 'moment';
 
 /**
  * @param securityToken is the address of the security token.
@@ -215,7 +216,17 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
-    return result.length ? true : false;
+    const tickerRegistrationDate = result[1].toNumber();
+    const tokenDeployed = result[4];
+    const expiredDate = result[2].toNumber();
+
+    if (tickerRegistrationDate == 0) {
+      return true
+    } else if (!tokenDeployed && (expiredDate > moment().unix())) {
+      return true
+    } else {
+      return false
+    }
   }
 
   /**
@@ -223,21 +234,23 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
-    const tickers = await this.getTickersByOwner({});
-    if (!tickers.length) {
+    if (this.isTickerAvailable(params)) {
       return false
+    } else {
+      const result = await this.getTickerDetails(params);
+      const tickerOwner = result[0];
+      return (tickerOwner === await this._getDefaultFromAddress())
     }
-    for (let t of tickers) {
-      console.log(t)
-      if (t == params.tokenName) {
-        return true
-      }
-    }
-    return false;
   }
 
-  public isTokenLaunched = async (): Promise<boolean> => {
-    return true;
+  /**
+   * Knows if the ticker was launched
+   * @return boolean
+   */
+  public isTokenLaunched = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const result = await this.getTickerDetails(params);
+    const tokenDeployed = result[4];
+    return tokenDeployed
   }
 
   /**
