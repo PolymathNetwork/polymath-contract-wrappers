@@ -210,6 +210,16 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
   }
 
+  private _availableConditions = (tickerRegistrationDate: number, tokenDeployed: boolean, expiredDate: number): boolean => {
+    if (tickerRegistrationDate == 0) {
+      return true;
+    } else if (!tokenDeployed && (expiredDate > moment().unix())) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Gets ticker availability
    * @return boolean
@@ -217,16 +227,10 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const tickerRegistrationDate = result[1].toNumber();
-    const tokenDeployed = result[4];
     const expiredDate = result[2].toNumber();
+    const tokenDeployed = result[4];
 
-    if (tickerRegistrationDate == 0) {
-      return true
-    } else if (!tokenDeployed && (expiredDate > moment().unix())) {
-      return true
-    } else {
-      return false
-    }
+    return this._availableConditions(tickerRegistrationDate, tokenDeployed, expiredDate);
   }
 
   /**
@@ -234,12 +238,16 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
-    if (this.isTickerAvailable(params)) {
-      return false
+    const result = await this.getTickerDetails(params);
+    const tickerOwner = result[0];
+    const tickerRegistrationDate = result[1].toNumber();
+    const expiredDate = result[2].toNumber();
+    const tokenDeployed = result[4];
+
+    if (this._availableConditions(tickerRegistrationDate, tokenDeployed, expiredDate)) {
+      return false;
     } else {
-      const result = await this.getTickerDetails(params);
-      const tickerOwner = result[0];
-      return (tickerOwner === await this._getDefaultFromAddress())
+      return (tickerOwner === await this._getDefaultFromAddress());
     }
   }
 
@@ -250,7 +258,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public isTokenLaunched = async (params: ITickerDetailsParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const tokenDeployed = result[4];
-    return tokenDeployed
+    return tokenDeployed;
   }
 
   /**
