@@ -210,10 +210,10 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
   }
 
-  private _availableConditions = (tickerRegistrationDate: number, tokenDeployed: boolean, expiredDate: number): boolean => {
-    if (tickerRegistrationDate == 0) {
+  private _isTickerAvailable = (registrationDate: number, expiryDate: number, isDeployed: boolean): boolean => {
+    if (registrationDate == 0) {
       return true;
-    } else if (!tokenDeployed && (expiredDate > moment().unix())) {
+    } else if (!isDeployed && (expiryDate > moment().unix())) {
       return true;
     } else {
       return false;
@@ -226,11 +226,11 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
-    const tickerRegistrationDate = result[1].toNumber();
-    const expiredDate = result[2].toNumber();
-    const tokenDeployed = result[4];
+    const registrationDate = result[1].toNumber();
+    const expiryDate = result[2].toNumber();
+    const isDeployed = result[4];
 
-    return this._availableConditions(tickerRegistrationDate, tokenDeployed, expiredDate);
+    return this._isTickerAvailable(registrationDate, expiryDate, isDeployed);
   }
 
   /**
@@ -240,11 +240,11 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const tickerOwner = result[0];
-    const tickerRegistrationDate = result[1].toNumber();
-    const expiredDate = result[2].toNumber();
-    const tokenDeployed = result[4];
+    const registrationDate = result[1].toNumber();
+    const expiryDate = result[2].toNumber();
+    const isDeployed = result[4];
 
-    if (this._availableConditions(tickerRegistrationDate, tokenDeployed, expiredDate)) {
+    if (this._isTickerAvailable(registrationDate, expiryDate, isDeployed)) {
       return false;
     } else {
       return (tickerOwner === await this._getDefaultFromAddress());
