@@ -32,16 +32,16 @@ export interface IGetFundsRaisedParams {
  */
 export class CappedSTOWrapper extends ContractWrapper {
   public abi: ContractAbi = CappedSTO.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
+  private address: string;
   private cappedSTOContract: Promise<CappedSTOContract>;
   /**
    * Instantiate CappedSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
+    this.address = address;
     this.cappedSTOContract = this._getCappedSTOContract();
   }
 
@@ -177,9 +177,7 @@ export class CappedSTOWrapper extends ContractWrapper {
   private async _getCappedSTOContract(): Promise<CappedSTOContract> {
     return new CappedSTOContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'CappedSTO',
-      }),
+      this.address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );

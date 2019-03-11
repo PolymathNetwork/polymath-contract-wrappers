@@ -128,16 +128,16 @@ export interface IModifyTiersParams extends ITxParams {
  */
 export class USDTieredSTOWrapper extends ContractWrapper {
   public abi: ContractAbi = (USDTieredSTO as any).abi;
-  private polymathRegistry: PolymathRegistryWrapper;
+  private address: string;
   private usdTieredSTOContract: Promise<USDTieredSTOContract>;
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
+    this.address = address;
     this.usdTieredSTOContract = this._getUSDTieredSTOContract();
   }
 
@@ -465,9 +465,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   private async _getUSDTieredSTOContract(): Promise<USDTieredSTOContract> {
     return new USDTieredSTOContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'USDTieredSTO',
-      }),
+      this.address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
