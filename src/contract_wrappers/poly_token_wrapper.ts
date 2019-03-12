@@ -1,4 +1,10 @@
-import { PolyTokenContract, PolyTokenEventArgs, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  PolyTokenContract,
+  PolyTokenEventArgs,
+  PolyTokenEvents,
+  PolyTokenTransferEventArgs,
+  PolyTokenApprovalEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { PolyToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -10,14 +16,43 @@ import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
+interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolyTokenEvents.Transfer,
+  callback: EventCallback<PolyTokenTransferEventArgs>,
+}
+
+interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolyTokenEvents.Transfer,
+}
+
+interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolyTokenEvents.Approval,
+  callback: EventCallback<PolyTokenApprovalEventArgs>,
+}
+
+interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolyTokenEvents.Approval,
+}
+
+interface IPolyTokenSubscribeAsyncParams {
+  (params: ITransferSubscribeAsyncParams): Promise<string>,
+  (params: IApprovalSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetPolyTokenLogsAsyncParams {
+  (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenTransferEventArgs>>>,
+  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenApprovalEventArgs>>>,
+}
+
 /**
  * @param owner The address to query the the balance of
  */
-export interface IGetBalanceOfParams {
+interface IGetBalanceOfParams {
   owner?: string;
 }
 
@@ -25,7 +60,7 @@ export interface IGetBalanceOfParams {
  * @param owner address The address which owns the tokens
  * @param spender address The address which will spend the tokens
  */
-export interface IAllowanceParams {
+interface IAllowanceParams {
   owner: string;
   spender: string;
 }
@@ -34,7 +69,7 @@ export interface IAllowanceParams {
  * @param to The address to transfer tokens to
  * @param value The amount to be transferred
  */
-export interface ITransferParams extends ITxParams {
+interface ITransferParams extends ITxParams {
   to: string;
   value: BigNumber;
 }
@@ -44,7 +79,7 @@ export interface ITransferParams extends ITxParams {
  * @param to The address to transfer tokens to
  * @param value The amount to be transferred
  */
-export interface ITransferFromParams extends ITxParams {
+interface ITransferFromParams extends ITxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -54,7 +89,7 @@ export interface ITransferFromParams extends ITxParams {
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent
  */
-export interface IApproveParams extends ITxParams {
+interface IApproveParams extends ITxParams {
   spender: string;
   value: BigNumber;
 }
@@ -63,7 +98,7 @@ export interface IApproveParams extends ITxParams {
  * @param spender The address which will spend the funds.
  * @param addedValue The amount of tokens to increase the allowance by.
  */
-export interface IncreaseApprovalParams extends ITxParams {
+interface IncreaseApprovalParams extends ITxParams {
   spender: string;
   addedValue: BigNumber;
 }
@@ -72,7 +107,7 @@ export interface IncreaseApprovalParams extends ITxParams {
  * @param spender The address which will spend the funds.
  * @param subtractedValue The amount of tokens to decrease the allowance by.
  */
-export interface DecreaseApprovalParams extends ITxParams {
+interface DecreaseApprovalParams extends ITxParams {
   spender: string;
   subtractedValue: BigNumber;
 }
@@ -143,8 +178,8 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends PolyTokenEventArgs>(
-    params: ISubscribeAsyncParams<PolyTokenEvents, ArgsType>
+  public subscribeAsync: IPolyTokenSubscribeAsyncParams = async <ArgsType extends PolyTokenEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -181,8 +216,8 @@ export class PolyTokenWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends PolyTokenEventArgs>(
-    params: IGetLogsAsyncParams<PolyTokenEvents>
+  public getLogsAsync: IGetPolyTokenLogsAsyncParams = async <ArgsType extends PolyTokenEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);

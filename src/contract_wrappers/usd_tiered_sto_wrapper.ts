@@ -1,4 +1,21 @@
-import { USDTieredSTOContract, USDTieredSTOEventArgs, USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  USDTieredSTOContract,
+  USDTieredSTOEventArgs,
+  USDTieredSTOEvents,
+  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
+  USDTieredSTOSetNonAccreditedLimitEventArgs,
+  USDTieredSTOSetAccreditedEventArgs,
+  USDTieredSTOTokenPurchaseEventArgs,
+  USDTieredSTOFundsReceivedEventArgs,
+  USDTieredSTOReserveTokenMintEventArgs,
+  USDTieredSTOSetAddressesEventArgs,
+  USDTieredSTOSetLimitsEventArgs,
+  USDTieredSTOSetTimesEventArgs,
+  USDTieredSTOSetTiersEventArgs,
+  USDTieredSTOSetFundRaiseTypesEventArgs,
+  USDTieredSTOPauseEventArgs,
+  USDTieredSTOUnpauseEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -10,29 +27,179 @@ import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
+interface ISetAllowBeneficialInvestmentsSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments,
+  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>,
+}
+
+interface IGetSetAllowBeneficialInvestmentsLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments,
+}
+
+interface ISetNonAccreditedLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetNonAccreditedLimit,
+  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs>,
+}
+
+interface IGetSetNonAccreditedLimitLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetNonAccreditedLimit,
+}
+
+interface ISetAccreditedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAccredited,
+  callback: EventCallback<USDTieredSTOSetAccreditedEventArgs>,
+}
+
+interface IGetSetAccreditedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAccredited,
+}
+
+interface ITokenPurchaseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.TokenPurchase,
+  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs>,
+}
+
+interface IGetTokenPurchaseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.TokenPurchase,
+}
+
+interface IFundsReceivedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.FundsReceived,
+  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs>,
+}
+
+interface IGetFundsReceivedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.FundsReceived,
+}
+
+interface IReserveTokenMintSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.ReserveTokenMint,
+  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs>,
+}
+
+interface IGetReserveTokenMintLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.ReserveTokenMint,
+}
+
+interface ISetAddressesSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAddresses,
+  callback: EventCallback<USDTieredSTOSetAddressesEventArgs>,
+}
+
+interface IGetSetAddressesLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAddresses,
+}
+
+interface ISetLimitsSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetLimits,
+  callback: EventCallback<USDTieredSTOSetLimitsEventArgs>,
+}
+
+interface IGetSetLimitsLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetLimits,
+}
+
+interface ISetTimesSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetTimes,
+  callback: EventCallback<USDTieredSTOSetTimesEventArgs>,
+}
+
+interface IGetSetTimesLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetTimes,
+}
+
+interface ISetTiersSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetTiers,
+  callback: EventCallback<USDTieredSTOSetTiersEventArgs>,
+}
+
+interface IGetSetTiersLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetTiers,
+}
+
+interface ISetFundRaiseTypesSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetFundRaiseTypes,
+  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs>,
+}
+
+interface IGetSetFundRaiseTypesLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetFundRaiseTypes,
+}
+
+interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.Pause,
+  callback: EventCallback<USDTieredSTOPauseEventArgs>,
+}
+
+interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.Pause,
+}
+
+interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.Unpause,
+  callback: EventCallback<USDTieredSTOUnpauseEventArgs>,
+}
+
+interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.Unpause,
+}
+
+interface IUSDTieredSTOSubscribeAsyncParams {
+  (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
+  (params: ISetNonAccreditedLimitSubscribeAsyncParams): Promise<string>,
+  (params: ISetAccreditedSubscribeAsyncParams): Promise<string>,
+  (params: ITokenPurchaseSubscribeAsyncParams): Promise<string>,
+  (params: IFundsReceivedSubscribeAsyncParams): Promise<string>,
+  (params: IReserveTokenMintSubscribeAsyncParams): Promise<string>,
+  (params: ISetAddressesSubscribeAsyncParams): Promise<string>,
+  (params: ISetLimitsSubscribeAsyncParams): Promise<string>,
+  (params: ISetTimesSubscribeAsyncParams): Promise<string>,
+  (params: ISetTiersSubscribeAsyncParams): Promise<string>,
+  (params: ISetFundRaiseTypesSubscribeAsyncParams): Promise<string>,
+  (params: IPauseSubscribeAsyncParams): Promise<string>,
+  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetUSDTieredSTOLogsAsyncParams {
+  (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>>>,
+  (params: IGetSetNonAccreditedLimitLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>>>,
+  (params: IGetSetAccreditedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAccreditedEventArgs>>>,
+  (params: IGetTokenPurchaseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs>>>,
+  (params: IGetFundsReceivedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs>>>,
+  (params: IGetReserveTokenMintLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs>>>,
+  (params: IGetSetAddressesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs>>>,
+  (params: IGetSetLimitsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs>>>,
+  (params: IGetSetTimesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs>>>,
+  (params: IGetSetTiersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs>>>,
+  (params: IGetSetFundRaiseTypesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs>>>,
+  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOPauseEventArgs>>>,
+  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>>>,
+}
+
 /**
  * 
  */
-export interface IGetFundRaiseTypesParams {
+interface IGetFundRaiseTypesParams {
   index: number;
 }
 
 /**
  * 
  */
-export interface IGetFundsRaisedParams {
+interface IGetFundsRaisedParams {
   index: number;
 }
 
-export interface IGetTiersParams {
+interface IGetTiersParams {
   index: BigNumber;
 }
 
-export interface IGetTokensMintedByTierParams {
+interface IGetTokensMintedByTierParams {
   tier: BigNumber;
 }
 
@@ -40,7 +207,7 @@ export interface IGetTokensMintedByTierParams {
 * @param fundRaiseType Currency key
 * @param amount Value to convert to USD
 */
-export interface IConvertToUSDParams {
+interface IConvertToUSDParams {
   fundRaiseType: number;
   amount: BigNumber;
 }
@@ -48,11 +215,11 @@ export interface IConvertToUSDParams {
 /**
 * @param fundRaiseType The fund raising currency (e.g. ETH, POLY, SC) to calculate sold tokens for
 */
-export interface IGetTokensSoldForParams {
+interface IGetTokensSoldForParams {
   fundRaiseType: number;
 }
 
-export interface IGetStableCoinsRaisedParams {
+interface IGetStableCoinsRaisedParams {
   index: string;
 }
 
@@ -60,7 +227,7 @@ export interface IGetStableCoinsRaisedParams {
 * @param investors Array of investor addresses to modify
 * @param accredited Array of bools specifying accreditation status
 */
-export interface IChangeAccreditedParams extends ITxParams {
+interface IChangeAccreditedParams extends ITxParams {
   investors: string[];
   accredited: boolean[];
 }
@@ -69,7 +236,7 @@ export interface IChangeAccreditedParams extends ITxParams {
 * @param investors Array of investor addresses to modify
 * @param nonAccreditedLimit Array of uints specifying non-accredited limits
 */
-export interface IChangeNonAccreditedLimitParams extends ITxParams {
+interface IChangeNonAccreditedLimitParams extends ITxParams {
   investors: string[];
   nonAccreditedLimit: BigNumber[];
 }
@@ -78,7 +245,7 @@ export interface IChangeNonAccreditedLimitParams extends ITxParams {
 * @param startTime start time of sto
 * @param endTime end time of sto
 */
-export interface IModifyTimesParams extends ITxParams {
+interface IModifyTimesParams extends ITxParams {
   startTime: BigNumber;
   endTime: BigNumber;
 }
@@ -87,7 +254,7 @@ export interface IModifyTimesParams extends ITxParams {
 * @param nonAccreditedLimitUSD max non accredited invets limit
 * @param minimumInvestmentUSD overall minimum investment limit
 */
-export interface IModifyLimitsParams extends ITxParams {
+interface IModifyLimitsParams extends ITxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
@@ -95,7 +262,7 @@ export interface IModifyLimitsParams extends ITxParams {
 /**
 * @param fundRaiseTypes Array of fund raise types to allow
 */
-export interface IModifyFundingParams extends ITxParams {
+interface IModifyFundingParams extends ITxParams {
   fundRaiseTypes: number[];
 }
 
@@ -104,7 +271,7 @@ export interface IModifyFundingParams extends ITxParams {
 * @param reserveWallet Address of wallet where unsold tokens are sent
 * @param usdTokens Address of usd tokens
 */
-export interface IModifyAddressesParams extends ITxParams {
+interface IModifyAddressesParams extends ITxParams {
   wallet: string;
   reserveWallet: string;
   usdToken: string[];
@@ -116,7 +283,7 @@ export interface IModifyAddressesParams extends ITxParams {
 * @param tokensPerTierTotal Array of total tokens per tier
 * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
 */
-export interface IModifyTiersParams extends ITxParams {
+interface IModifyTiersParams extends ITxParams {
   ratePerTier: BigNumber[];
   ratePerTierDiscountPoly: BigNumber[];
   tokensPerTierTotal: BigNumber[];
@@ -407,8 +574,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends USDTieredSTOEventArgs>(
-    params: ISubscribeAsyncParams<USDTieredSTOEvents, ArgsType>
+  public subscribeAsync: IUSDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -445,8 +612,8 @@ export class USDTieredSTOWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends USDTieredSTOEventArgs>(
-    params: IGetLogsAsyncParams<USDTieredSTOEvents>
+  public getLogsAsync: IGetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
