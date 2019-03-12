@@ -28,6 +28,7 @@ import {
   EventCallback,
 } from '../types';
 import { schemas } from '@0x/json-schemas';
+import * as moment from 'moment';
 
 interface IChangeExpiryLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
@@ -169,7 +170,7 @@ interface IGetTokensByOwnerParams {
 /**
 * @param tokenName is the ticker symbol
 */
-interface IGetTickerDetailsParams {
+export interface ITickerDetailsParams {
   tokenName: string;
 }
 
@@ -262,7 +263,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: IGetTickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
+  public getTickerDetails = async (params: ITickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
     assert.isString('tokenName', params.tokenName);
     const tickerDetail = await (await this.securityTokenRegistryContract).getTickerDetails.callAsync(
       params.tokenName,
@@ -338,6 +339,57 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     return await (await this.securityTokenRegistryContract).getSecurityTokenAddress.callAsync(
       ticker,
     );
+  }
+
+  private _isTickerAvailable = (registrationDate: number, expiryDate: number, isDeployed: boolean): boolean => {
+    if (registrationDate == 0) {
+      return true;
+    } else if (!isDeployed && (expiryDate > moment().unix())) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Gets ticker availability
+   * @return boolean
+   */
+  public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const result = await this.getTickerDetails(params);
+    const registrationDate = result[1].toNumber();
+    const expiryDate = result[2].toNumber();
+    const isDeployed = result[4];
+
+    return this._isTickerAvailable(registrationDate, expiryDate, isDeployed);
+  }
+
+  /**
+   * Knows if the ticker was registered by the user
+   * @return boolean
+   */
+  public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const result = await this.getTickerDetails(params);
+    const tickerOwner = result[0];
+    const registrationDate = result[1].toNumber();
+    const expiryDate = result[2].toNumber();
+    const isDeployed = result[4];
+
+    if (this._isTickerAvailable(registrationDate, expiryDate, isDeployed)) {
+      return false;
+    } else {
+      return (tickerOwner === await this._getDefaultFromAddress());
+    }
+  }
+
+  /**
+   * Knows if the ticker was launched
+   * @return boolean
+   */
+  public isTokenLaunched = async (params: ITickerDetailsParams): Promise<boolean> => {
+    const result = await this.getTickerDetails(params);
+    const tokenDeployed = result[4];
+    return tokenDeployed;
   }
 
   /**
