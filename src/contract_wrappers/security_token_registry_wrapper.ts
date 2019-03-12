@@ -170,7 +170,7 @@ interface IGetTokensByOwnerParams {
 /**
 * @param tokenName is the ticker symbol
 */
-export interface ITickerDetailsParams {
+interface ITickerDetailsParams {
   tokenName: string;
 }
 
