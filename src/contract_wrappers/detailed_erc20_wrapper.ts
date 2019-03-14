@@ -5,7 +5,6 @@ import {
   DetailedERC20ApprovalEventArgs,
   DetailedERC20TransferEventArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { DetailedERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -99,17 +98,17 @@ interface IAllowanceParams {
  */
 export class DetailedERC20Wrapper extends ContractWrapper {
   public abi: ContractAbi = DetailedERC20.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
+  private address: string;
   private detailedERC20Contract: Promise<DetailedERC20Contract>;
 
   /**
    * Instantiate DetailedERC20Wrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param address The contract address
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
+    this.address = address;
     this.detailedERC20Contract = this._getDetailedERC20Contract();
   }
 
@@ -272,10 +271,23 @@ export class DetailedERC20Wrapper extends ContractWrapper {
     return logs;
   }
 
+  public async isValidContract(): Promise<boolean> {
+    try {
+      const contract = await this.detailedERC20Contract;
+      await contract.totalSupply.callAsync();
+      await contract.balanceOf.callAsync(contract.address);
+      await contract.allowance.callAsync(contract.address, contract.address);
+      await contract.symbol.callAsync();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   private async _getDetailedERC20Contract(): Promise<DetailedERC20Contract> {
     return new DetailedERC20Contract(
       this.abi,
-      await this.polymathRegistry.getPolyTokenAddress(),
+      this.address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
