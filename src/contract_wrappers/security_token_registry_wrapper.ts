@@ -207,23 +207,6 @@ interface IGenerateSecurityTokenParams extends ITxParams {
 }
 
 /**
- * @param polymathRegistry is the address of the Polymath Registry
- * @param STFactory is the address of the Proxy contract for Security Tokens
- * @param stLaunchFee is the fee in POLY required to launch a token
- * @param tickerRegFee is the fee in POLY required to register a ticker
- * @param polyToken is the address of the POLY ERC20 token
- * @param owner is the owner of the STR
- */
-interface IInitializeParams extends ITxParams {
-  polymathRegistry: string,
-  STFactory: string,
-  stLaunchFee: BigNumber,
-  tickerRegFee: BigNumber,
-  polyToken: string,
-  owner: string,
-}
-
-/**
  * @param owner is the owner of the token
  * @param ticker is the token ticker
  * @param tokenName is the name of the token
@@ -274,7 +257,7 @@ interface IModifySecurityTokenParams extends ITxParams {
 /**
   * @param securityToken is the address of the security token
   */
-interface IIsSecurityTokenParams extends ITxParams {
+interface IIsSecurityTokenParams {
   securityToken: string,
 }
 
@@ -516,22 +499,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     const result = await this.getTickerDetails(params);
     const tokenDeployed = result[4];
     return tokenDeployed;
-  }
-
-  /**
-   * Initializes instance of STR
-   */
-  public initialize = async (params: IInitializeParams) => {
-    return async () => {
-      return (await this.securityTokenRegistryContract).initialize.sendTransactionAsync(
-        params.polymathRegistry,
-        params.STFactory,
-        params.stLaunchFee,
-        params.tickerRegFee,
-        params.polyToken,
-        params.owner,
-      );
-    }
   }
 
   /**
