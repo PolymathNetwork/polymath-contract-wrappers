@@ -139,25 +139,10 @@ export class PolyTokenWrapper extends ContractWrapper {
   }
 
   /**
-   * Returns the balance of the specified address
-   * @return A BigNumber representing the amount owned by the passed address
+   * Returns the token name
    */
-  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
-    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
-    return await (await this.polyTokenContract).balanceOf.callAsync(
-      address
-    );
-  }
-
-  /**
-   * Function to check the amount of tokens a spender is allowed to spend
-   * @return A BigNumber specifying the amount of tokens left available for the spender
-   */
-  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
-    return await (await this.polyTokenContract).allowance.callAsync(
-      params.owner,
-      params.spender
-    );
+  public getName = async (): Promise<string> => {
+    return await (await this.polyTokenContract).name.callAsync();
   }
 
   /**
@@ -172,6 +157,78 @@ export class PolyTokenWrapper extends ContractWrapper {
         params.safetyFactor
       );
     }
+  }
+
+  /**
+   * Returns the token total supply
+   */
+  public getTotalSupply = async (): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).totalSupply.callAsync();
+  }
+
+  /**
+   * Send tokens amount of tokens from address from to address to
+   */
+  public transferFrom = async (params: ITransferFromParams) => {
+    return async () => {
+      return (await this.polyTokenContract).transferFrom.sendTransactionAsync(
+        params.from,
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Returns the setted decimals
+   */
+  public getDecimals = async (): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).decimals.callAsync();
+  }
+
+  /**
+   * Returns the balance of the specified address
+   * @return A BigNumber representing the amount owned by the passed address
+   */
+  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
+    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+    return await (await this.polyTokenContract).balanceOf.callAsync(
+      address
+    );
+  }
+
+  /**
+   * Returns the token symbol
+   */
+  public getSymbol = async (): Promise<string> => {
+    return await (await this.polyTokenContract).symbol.callAsync();
+  }
+
+  /**
+   * Transfer the balance from token owner's account to 'to' account
+   */
+  public transfer = async (params: ITransferParams) => {
+    return async () => {
+      return (await this.polyTokenContract).transfer.sendTransactionAsync(
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Function to check the amount of tokens a spender is allowed to spend
+   * @return A BigNumber specifying the amount of tokens left available for the spender
+   */
+  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).allowance.callAsync(
+      params.owner,
+      params.spender
+    );
   }
 
   /**

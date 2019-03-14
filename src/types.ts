@@ -10,6 +10,8 @@ import {
     PolyTokenEvents,
     CappedSTOFactoryEventArgs,
     CappedSTOEventArgs,
+    DetailedERC20EventArgs,
+    DetailedERC20Events,
     ERC20DividendCheckpointEventArgs,
     EtherDividendCheckpointEventArgs,
     FeatureRegistryEventArgs,
@@ -79,6 +81,7 @@ export interface BlockRange {
 export type ContractEventArgs = PolyTokenEventArgs |
     CappedSTOFactoryEventArgs |
     CappedSTOEventArgs |
+    DetailedERC20EventArgs |
     ERC20DividendCheckpointEventArgs |
     EtherDividendCheckpointEventArgs |
     FeatureRegistryEventArgs |
@@ -97,6 +100,7 @@ export type ContractEventArgs = PolyTokenEventArgs |
 export type ContractEvents = PolyTokenEvents |
     CappedSTOFactoryEvents |
     CappedSTOEvents |
+    DetailedERC20Events |
     ERC20DividendCheckpointEvents |
     EtherDividendCheckpointEvents |
     FeatureRegistryEvents |

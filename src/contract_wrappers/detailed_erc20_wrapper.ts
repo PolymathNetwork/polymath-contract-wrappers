@@ -1,5 +1,6 @@
-import { SecurityTokenContract, SecurityTokenEventArgs, SecurityTokenEvents } from '@polymathnetwork/abi-wrappers';
-import { SecurityToken } from '@polymathnetwork/contract-artifacts';
+import { DetailedERC20Contract, DetailedERC20EventArgs, DetailedERC20Events } from '@polymathnetwork/abi-wrappers';
+import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
+import { DetailedERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
@@ -14,46 +15,12 @@ import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
 /**
- * @param type type of the module
- */
-export interface IGetModulesByTypeParams {
-  type: number;
-}
-
-export interface IAddModuleParams extends ITxParams {
-  moduleFactory: string;
-  data: string;
-  maxCost: BigNumber;
-  budget: BigNumber;
-}
-
-/**
-* @param module address of the module
-*/
-export interface IGetModuleParams {
-  module: string;
-}
-
-/**
- * @param from sender of transfer
- * @param to receiver of transfer
- * @param value value of transfer
- * @param data data to indicate validation
- */
-export interface IVerifyTransferParams {
-  from: string;
-  to: string;
-  value: BigNumber;
-  data: string;
-}
-
-/**
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent
  */
 export interface IApproveParams extends ITxParams {
-  spender: string;
-  value: BigNumber;
+    spender: string;
+    value: BigNumber;
 }
 
 /**
@@ -62,16 +29,16 @@ export interface IApproveParams extends ITxParams {
  * @param value The amount of tokens to be spent
  */
 export interface ITransferFromParams extends ITxParams {
-  from: string;
-  to: string;
-  value: BigNumber;
+    from: string;
+    to: string;
+    value: BigNumber;
 }
 
 /**
  * @param owner The address to query the the balance of
  */
 export interface IGetBalanceOfParams {
-  owner?: string;
+    owner?: string;
 }
 
 /**
@@ -79,8 +46,8 @@ export interface IGetBalanceOfParams {
  * @param value The amount of tokens to be spent
  */
 export interface ITransferParams extends ITxParams {
-  to: string;
-  value: BigNumber;
+    to: string;
+    value: BigNumber;
 }
 
 /**
@@ -88,40 +55,41 @@ export interface ITransferParams extends ITxParams {
  * @param spender address The address which will spend the tokens
  */
 export interface IAllowanceParams {
-  owner: string;
-  spender: string;
+    owner: string;
+    spender: string;
 }
 
 /**
- * This class includes the functionality related to interacting with the SecurityToken contract.
+ * This class includes the functionality related to interacting with the DetailedERC20 contract.
  */
-export class SecurityTokenWrapper extends ContractWrapper {
-  public abi: ContractAbi = (SecurityToken as any).abi;
-  private address: string;
-  private securityTokenContract: Promise<SecurityTokenContract>;
+export class DetailedERC20Wrapper extends ContractWrapper {
+  public abi: ContractAbi = DetailedERC20.abi;
+  private polymathRegistry: PolymathRegistryWrapper;
+  private detailedERC20Contract: Promise<DetailedERC20Contract>;
+
   /**
-   * Instantiate SecurityTokenWrapper
+   * Instantiate DetailedERC20Wrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address contract
+   * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper);
-    this.address = address;
-    this.securityTokenContract = this._getSecurityTokenContract();
+    this.polymathRegistry = polymathRegistry;
+    this.detailedERC20Contract = this._getDetailedERC20Contract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.securityTokenContract).address;
+    return (await this.detailedERC20Contract).address;
   }
 
   /**
    * Returns the token name
    */
   public getName = async (): Promise<string> => {
-    return await (await this.securityTokenContract).name.callAsync();
+    return await (await this.detailedERC20Contract).name.callAsync();
   }
 
   /**
@@ -129,7 +97,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public approve = async (params: IApproveParams) => {
     return async () => {
-      return (await this.securityTokenContract).approve.sendTransactionAsync(
+      return (await this.detailedERC20Contract).approve.sendTransactionAsync(
         params.spender,
         params.value,
         params.txData,
@@ -142,7 +110,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Returns the token total supply
    */
   public getTotalSupply = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).totalSupply.callAsync();
+    return await (await this.detailedERC20Contract).totalSupply.callAsync();
   }
 
   /**
@@ -150,7 +118,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public transferFrom = async (params: ITransferFromParams) => {
     return async () => {
-      return (await this.securityTokenContract).transferFrom.sendTransactionAsync(
+      return (await this.detailedERC20Contract).transferFrom.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
@@ -164,7 +132,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Returns the setted decimals
    */
   public getDecimals = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).decimals.callAsync();
+    return await (await this.detailedERC20Contract).decimals.callAsync();
   }
 
   /**
@@ -173,7 +141,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
     const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
-    return await (await this.securityTokenContract).balanceOf.callAsync(
+    return await (await this.detailedERC20Contract).balanceOf.callAsync(
       address
     );
   }
@@ -182,7 +150,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Returns the token symbol
    */
   public getSymbol = async (): Promise<string> => {
-    return await (await this.securityTokenContract).symbol.callAsync();
+    return await (await this.detailedERC20Contract).symbol.callAsync();
   }
 
   /**
@@ -190,7 +158,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public transfer = async (params: ITransferParams) => {
     return async () => {
-      return (await this.securityTokenContract).transfer.sendTransactionAsync(
+      return (await this.detailedERC20Contract).transfer.sendTransactionAsync(
         params.to,
         params.value,
         params.txData,
@@ -204,53 +172,9 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).allowance.callAsync(
+    return await (await this.detailedERC20Contract).allowance.callAsync(
       params.owner,
       params.spender
-    );
-  }
-
-  /**
-   * Returns a list of modules that match the provided module type
-   * @return address[] list of modules with this type
-   */
-  public getModulesByType = async (params: IGetModulesByTypeParams): Promise<string[]> => {
-    return (await this.securityTokenContract).getModulesByType.callAsync(
-      params.type,
-    );
-  }
-
-  /**
-   * Attachs a module to the SecurityToken
-   */
-  public addModule = async (params: IAddModuleParams) => {
-    return async () => {
-      return (await this.securityTokenContract).addModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.data,
-        params.maxCost,
-        params.budget
-      );
-    }
-  }
-
-  /**
-   * @return Returns the data associated to a module
-   */
-  public getModule = async (params: IGetModuleParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
-    return (await this.securityTokenContract).getModule.callAsync(params.module);
-  }
-
-  /**
-   * Validates a transfer with a TransferManager module if it exists
-   * @return bool
-   */
-  public verifyTransfer = async (params: IVerifyTransferParams): Promise<boolean> => {
-    return await (await this.securityTokenContract).verifyTransfer.callAsync(
-      params.from,
-      params.to,
-      params.value,
-      params.data,
     );
   }
 
@@ -258,18 +182,18 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends SecurityTokenEventArgs>(
-    params: ISubscribeAsyncParams<SecurityTokenEvents, ArgsType>
+  public subscribeAsync = async <ArgsType extends DetailedERC20EventArgs>(
+    params: ISubscribeAsyncParams<DetailedERC20Events, ArgsType>
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.securityTokenContract).address.toLowerCase();
+    const normalizedContractAddress = (await this.detailedERC20Contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
         params.indexFilterValues,
-        (SecurityToken as any).abi,
+        DetailedERC20.abi,
         params.callback,
         !_.isUndefined(params.isVerbose),
     );
@@ -296,27 +220,27 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends SecurityTokenEventArgs>(
-    params: IGetLogsAsyncParams<SecurityTokenEvents>
+  public getLogsAsync = async <ArgsType extends DetailedERC20EventArgs>(
+    params: IGetLogsAsyncParams<DetailedERC20Events>
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.securityTokenContract).address.toLowerCase();
+    const normalizedContractAddress = (await this.detailedERC20Contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
         params.blockRange,
         params.indexFilterValues,
-        (SecurityToken as any).abi,
+        DetailedERC20.abi,
     );
     return logs;
   }
 
-  private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
-    return new SecurityTokenContract(
+  private async _getDetailedERC20Contract(): Promise<DetailedERC20Contract> {
+    return new DetailedERC20Contract(
       this.abi,
-      this.address,
+      await this.polymathRegistry.getPolyTokenAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
