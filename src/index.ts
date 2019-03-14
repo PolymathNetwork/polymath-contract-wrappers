@@ -11,6 +11,7 @@ export { SecurityTokenRegistryWrapper as SecurityTokenRegistry } from './contrac
 export { SecurityTokenWrapper as SecurityToken } from './contract_wrappers/security_token_wrapper';
 export { USDTieredSTOFactoryWrapper as USDTieredSTOFactory } from './contract_wrappers/usd_tiered_sto_factory_wrapper';
 export { USDTieredSTOWrapper as USDTieredSTO } from './contract_wrappers/usd_tiered_sto_wrapper';
+export { DetailedERC20Wrapper as DetailedERC20 } from './contract_wrappers/detailed_erc20_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export { BlockParamLiteral } from 'ethereum-types'

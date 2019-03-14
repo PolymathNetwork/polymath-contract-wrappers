@@ -1,5 +1,4 @@
 import { SecurityTokenContract, SecurityTokenEventArgs, SecurityTokenEvents } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { SecurityToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -49,6 +48,51 @@ export interface IVerifyTransferParams {
 }
 
 /**
+ * @param spender The address which will spend the funds
+ * @param value The amount of tokens to be spent
+ */
+export interface IApproveParams extends ITxParams {
+  spender: string;
+  value: BigNumber;
+}
+
+/**
+ * @param from The address which will spend the funds
+ * @param to The address who will receive the funds
+ * @param value The amount of tokens to be spent
+ */
+export interface ITransferFromParams extends ITxParams {
+  from: string;
+  to: string;
+  value: BigNumber;
+}
+
+/**
+ * @param owner The address to query the the balance of
+ */
+export interface IGetBalanceOfParams {
+  owner?: string;
+}
+
+/**
+ * @param to The address who will receive the funds
+ * @param value The amount of tokens to be spent
+ */
+export interface ITransferParams extends ITxParams {
+  to: string;
+  value: BigNumber;
+}
+
+/**
+ * @param owner address The address which owns the tokens
+ * @param spender address The address which will spend the tokens
+ */
+export interface IAllowanceParams {
+  owner: string;
+  spender: string;
+}
+
+/**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export class SecurityTokenWrapper extends ContractWrapper {
@@ -58,7 +102,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param address The address contract
    */
   constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
@@ -71,6 +115,99 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public getAddress = async (): Promise<string> => {
     return (await this.securityTokenContract).address;
+  }
+
+  /**
+   * Returns the token name
+   */
+  public getName = async (): Promise<string> => {
+    return await (await this.securityTokenContract).name.callAsync();
+  }
+
+  /**
+   * Approves the passed address to spend the specified amount of tokens
+   */
+  public approve = async (params: IApproveParams) => {
+    return async () => {
+      return (await this.securityTokenContract).approve.sendTransactionAsync(
+        params.spender,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Returns the token total supply
+   */
+  public getTotalSupply = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).totalSupply.callAsync();
+  }
+
+  /**
+   * Send tokens amount of tokens from address from to address to
+   */
+  public transferFrom = async (params: ITransferFromParams) => {
+    return async () => {
+      return (await this.securityTokenContract).transferFrom.sendTransactionAsync(
+        params.from,
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Returns the setted decimals
+   */
+  public getDecimals = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).decimals.callAsync();
+  }
+
+  /**
+   * Returns the balance of the specified address
+   * @return A BigNumber representing the amount owned by the passed address
+   */
+  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
+    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+    return await (await this.securityTokenContract).balanceOf.callAsync(
+      address
+    );
+  }
+
+  /**
+   * Returns the token symbol
+   */
+  public getSymbol = async (): Promise<string> => {
+    return await (await this.securityTokenContract).symbol.callAsync();
+  }
+
+  /**
+   * Transfer the balance from token owner's account to 'to' account
+   */
+  public transfer = async (params: ITransferParams) => {
+    return async () => {
+      return (await this.securityTokenContract).transfer.sendTransactionAsync(
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Function to check the amount of tokens a spender is allowed to spend
+   * @return A BigNumber specifying the amount of tokens left available for the spender
+   */
+  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).allowance.callAsync(
+      params.owner,
+      params.spender
+    );
   }
 
   /**
@@ -102,13 +239,6 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public getModule = async (params: IGetModuleParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
     return (await this.securityTokenContract).getModule.callAsync(params.module);
-  }
-
-  /**
-   * Symbol of the Token
-   */
-  public getSymbol = async (): Promise<string> => {
-    return await (await this.securityTokenContract).symbol.callAsync();
   }
 
   /**
