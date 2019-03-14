@@ -1,4 +1,28 @@
-import { SecurityTokenContract, SecurityTokenEventArgs, SecurityTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  SecurityTokenContract,
+  SecurityTokenEventArgs,
+  SecurityTokenEvents,
+  SecurityTokenModuleAddedEventArgs,
+  SecurityTokenUpdateTokenDetailsEventArgs,
+  SecurityTokenGranularityChangedEventArgs,
+  SecurityTokenModuleArchivedEventArgs,
+  SecurityTokenModuleUnarchivedEventArgs,
+  SecurityTokenModuleRemovedEventArgs,
+  SecurityTokenModuleBudgetChangedEventArgs,
+  SecurityTokenFreezeTransfersEventArgs,
+  SecurityTokenCheckpointCreatedEventArgs,
+  SecurityTokenFreezeMintingEventArgs,
+  SecurityTokenMintedEventArgs,
+  SecurityTokenBurntEventArgs,
+  SecurityTokenSetControllerEventArgs,
+  SecurityTokenForceTransferEventArgs,
+  SecurityTokenForceBurnEventArgs,
+  SecurityTokenDisableControllerEventArgs,
+  SecurityTokenOwnershipRenouncedEventArgs,
+  SecurityTokenOwnershipTransferredEventArgs,
+  SecurityTokenApprovalEventArgs,
+  SecurityTokenTransferEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { SecurityToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -9,18 +33,245 @@ import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
+interface IModuleAddedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleAdded,
+  callback: EventCallback<SecurityTokenModuleAddedEventArgs>,
+}
+
+interface IGetModuleAddedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleAdded,
+}
+
+interface IUpdateTokenDetailsSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.UpdateTokenDetails,
+  callback: EventCallback<SecurityTokenUpdateTokenDetailsEventArgs>,
+}
+
+interface IGetUpdateTokenDetailsLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.UpdateTokenDetails,
+}
+
+interface IGranularityChangedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.GranularityChanged,
+  callback: EventCallback<SecurityTokenGranularityChangedEventArgs>,
+}
+
+interface IGetGranularityChangedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.GranularityChanged,
+}
+
+interface IModuleArchivedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleArchived,
+  callback: EventCallback<SecurityTokenModuleArchivedEventArgs>,
+}
+
+interface IGetModuleArchivedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleArchived,
+}
+
+interface IModuleUnarchivedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleUnarchived,
+  callback: EventCallback<SecurityTokenModuleUnarchivedEventArgs>,
+}
+
+interface IGetModuleUnarchivedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleUnarchived,
+}
+
+interface IModuleRemovedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleRemoved,
+  callback: EventCallback<SecurityTokenModuleRemovedEventArgs>,
+}
+
+interface IGetModuleRemovedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleRemoved,
+}
+
+interface IModuleBudgetChangedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleBudgetChanged,
+  callback: EventCallback<SecurityTokenModuleBudgetChangedEventArgs>,
+}
+
+interface IGetModuleBudgetChangedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleBudgetChanged,
+}
+
+interface IFreezeTransfersSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.FreezeTransfers,
+  callback: EventCallback<SecurityTokenFreezeTransfersEventArgs>,
+}
+
+interface IGetFreezeTransfersLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.FreezeTransfers,
+}
+
+interface ICheckpointCreatedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.CheckpointCreated,
+  callback: EventCallback<SecurityTokenCheckpointCreatedEventArgs>,
+}
+
+interface IGetCheckpointCreatedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.CheckpointCreated,
+}
+
+interface IFreezeMintingSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.FreezeMinting,
+  callback: EventCallback<SecurityTokenFreezeMintingEventArgs>,
+}
+
+interface IGetFreezeMintingLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.FreezeMinting,
+}
+
+interface IMintedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Minted,
+  callback: EventCallback<SecurityTokenMintedEventArgs>,
+}
+
+interface IGetMintedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Minted,
+}
+
+interface IBurntSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Burnt,
+  callback: EventCallback<SecurityTokenBurntEventArgs>,
+}
+
+interface IGetBurntLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Burnt,
+}
+
+interface ISetControllerSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.SetController,
+  callback: EventCallback<SecurityTokenSetControllerEventArgs>,
+}
+
+interface IGetSetControllerLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.SetController,
+}
+
+interface IForceTransferSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ForceTransfer,
+  callback: EventCallback<SecurityTokenForceTransferEventArgs>,
+}
+
+interface IGetForceTransferLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ForceTransfer,
+}
+
+interface IForceBurnSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ForceBurn,
+  callback: EventCallback<SecurityTokenForceBurnEventArgs>,
+}
+
+interface IGetForceBurnLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ForceBurn,
+}
+
+interface IDisableControllerSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.DisableController,
+  callback: EventCallback<SecurityTokenDisableControllerEventArgs>,
+}
+
+interface IGetDisableControllerLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.DisableController,
+}
+
+interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.OwnershipRenounced,
+  callback: EventCallback<SecurityTokenOwnershipRenouncedEventArgs>,
+}
+
+interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.OwnershipRenounced,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.OwnershipTransferred,
+  callback: EventCallback<SecurityTokenOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.OwnershipTransferred,
+}
+
+interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Approval,
+  callback: EventCallback<SecurityTokenApprovalEventArgs>,
+}
+
+interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Approval,
+}
+
+interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Transfer,
+  callback: EventCallback<SecurityTokenTransferEventArgs>,
+}
+
+interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Transfer,
+}
+
+interface ISecurityTokenSubscribeAsyncParams {
+  (params: IModuleAddedSubscribeAsyncParams): Promise<string>,
+  (params: IUpdateTokenDetailsSubscribeAsyncParams): Promise<string>,
+  (params: IGranularityChangedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleArchivedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleUnarchivedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleRemovedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleBudgetChangedSubscribeAsyncParams): Promise<string>,
+  (params: IFreezeTransfersSubscribeAsyncParams): Promise<string>,
+  (params: ICheckpointCreatedSubscribeAsyncParams): Promise<string>,
+  (params: IFreezeMintingSubscribeAsyncParams): Promise<string>,
+  (params: IMintedSubscribeAsyncParams): Promise<string>,
+  (params: IBurntSubscribeAsyncParams): Promise<string>,
+  (params: ISetControllerSubscribeAsyncParams): Promise<string>,
+  (params: IForceTransferSubscribeAsyncParams): Promise<string>,
+  (params: IForceBurnSubscribeAsyncParams): Promise<string>,
+  (params: IDisableControllerSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+  (params: ITransferSubscribeAsyncParams): Promise<string>,
+  (params: IApprovalSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetSecurityTokenLogsAsyncParams {
+  (params: IGetModuleAddedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>>>,
+  (params: IGetUpdateTokenDetailsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>>>,
+  (params: IGetGranularityChangedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>>>,
+  (params: IGetModuleArchivedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleArchivedEventArgs>>>,
+  (params: IGetModuleUnarchivedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleUnarchivedEventArgs>>>,
+  (params: IGetModuleRemovedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleRemovedEventArgs>>>,
+  (params: IGetModuleBudgetChangedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleBudgetChangedEventArgs>>>,
+  (params: IGetFreezeTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>>>,
+  (params: IGetCheckpointCreatedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenCheckpointCreatedEventArgs>>>,
+  (params: IGetFreezeMintingLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenFreezeMintingEventArgs>>>,
+  (params: IGetMintedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenMintedEventArgs>>>,
+  (params: IGetBurntLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenBurntEventArgs>>>,
+  (params: IGetSetControllerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenSetControllerEventArgs>>>,
+  (params: IGetForceTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenForceTransferEventArgs>>>,
+  (params: IGetForceBurnLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenForceBurnEventArgs>>>,
+  (params: IGetDisableControllerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenDisableControllerEventArgs>>>,
+  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenOwnershipRenouncedEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>>>,
+  (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenTransferEventArgs>>>,
+  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>>>,
+}
+
 /**
  * @param type type of the module
  */
-export interface IGetModulesByTypeParams {
+interface IGetModulesByTypeParams {
   type: number;
 }
 
-export interface IAddModuleParams extends ITxParams {
+interface IAddModuleParams extends ITxParams {
   moduleFactory: string;
   data: string;
   maxCost: BigNumber;
@@ -30,7 +281,7 @@ export interface IAddModuleParams extends ITxParams {
 /**
 * @param module address of the module
 */
-export interface IGetModuleParams {
+interface IGetModuleParams {
   module: string;
 }
 
@@ -40,7 +291,7 @@ export interface IGetModuleParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-export interface IVerifyTransferParams {
+interface IVerifyTransferParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -51,7 +302,7 @@ export interface IVerifyTransferParams {
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent
  */
-export interface IApproveParams extends ITxParams {
+interface IApproveParams extends ITxParams {
   spender: string;
   value: BigNumber;
 }
@@ -61,7 +312,7 @@ export interface IApproveParams extends ITxParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-export interface ITransferFromParams extends ITxParams {
+interface ITransferFromParams extends ITxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -70,7 +321,7 @@ export interface ITransferFromParams extends ITxParams {
 /**
  * @param owner The address to query the the balance of
  */
-export interface IGetBalanceOfParams {
+interface IGetBalanceOfParams {
   owner?: string;
 }
 
@@ -78,7 +329,7 @@ export interface IGetBalanceOfParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-export interface ITransferParams extends ITxParams {
+interface ITransferParams extends ITxParams {
   to: string;
   value: BigNumber;
 }
@@ -87,7 +338,7 @@ export interface ITransferParams extends ITxParams {
  * @param owner address The address which owns the tokens
  * @param spender address The address which will spend the tokens
  */
-export interface IAllowanceParams {
+interface IAllowanceParams {
   owner: string;
   spender: string;
 }
@@ -258,8 +509,8 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends SecurityTokenEventArgs>(
-    params: ISubscribeAsyncParams<SecurityTokenEvents, ArgsType>
+  public subscribeAsync: ISecurityTokenSubscribeAsyncParams = async <ArgsType extends SecurityTokenEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -296,8 +547,8 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends SecurityTokenEventArgs>(
-    params: IGetLogsAsyncParams<SecurityTokenEvents>
+  public getLogsAsync: IGetSecurityTokenLogsAsyncParams = async <ArgsType extends SecurityTokenEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);

@@ -1,4 +1,15 @@
-import { USDTieredSTOFactoryContract, USDTieredSTOFactoryEvents, USDTieredSTOFactoryEventArgs } from '@polymathnetwork/abi-wrappers';
+import {
+  USDTieredSTOFactoryContract,
+  USDTieredSTOFactoryEvents,
+  USDTieredSTOFactoryEventArgs,
+  USDTieredSTOFactoryOwnershipRenouncedEventArgs,
+  USDTieredSTOFactoryOwnershipTransferredEventArgs,
+  USDTieredSTOFactoryChangeFactorySetupFeeEventArgs,
+  USDTieredSTOFactoryChangeFactoryUsageFeeEventArgs,
+  USDTieredSTOFactoryChangeFactorySubscriptionFeeEventArgs,
+  USDTieredSTOFactoryGenerateModuleFromFactoryEventArgs,
+  USDTieredSTOFactoryChangeSTVersionBoundEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { USDTieredSTOFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -9,9 +20,93 @@ import { BigNumber } from '@0x/utils';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
+
+interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.OwnershipRenounced,
+  callback: EventCallback<USDTieredSTOFactoryOwnershipRenouncedEventArgs>,
+}
+
+interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.OwnershipRenounced,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.OwnershipTransferred,
+  callback: EventCallback<USDTieredSTOFactoryOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.OwnershipTransferred,
+}
+
+interface IChangeFactorySetupFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactorySetupFee,
+  callback: EventCallback<USDTieredSTOFactoryChangeFactorySetupFeeEventArgs>,
+}
+
+interface IGetChangeFactorySetupFeeLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactorySetupFee,
+}
+
+interface IChangeFactoryUsageFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactoryUsageFee,
+  callback: EventCallback<USDTieredSTOFactoryChangeFactoryUsageFeeEventArgs>,
+}
+
+interface IGetChangeFactoryUsageFeeLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactoryUsageFee,
+}
+
+interface IChangeFactorySubscriptionFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactorySubscriptionFee,
+  callback: EventCallback<USDTieredSTOFactoryChangeFactorySubscriptionFeeEventArgs>,
+}
+
+interface IGetChangeFactorySubscriptionFeeLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeFactorySubscriptionFee,
+}
+
+interface IGenerateModuleFromFactorySubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.GenerateModuleFromFactory,
+  callback: EventCallback<USDTieredSTOFactoryGenerateModuleFromFactoryEventArgs>,
+}
+
+interface IGetGenerateModuleFromFactoryLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.GenerateModuleFromFactory,
+}
+
+interface IChangeSTVersionBoundSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeSTVersionBound,
+  callback: EventCallback<USDTieredSTOFactoryChangeSTVersionBoundEventArgs>,
+}
+
+interface IGetChangeSTVersionBoundLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: USDTieredSTOFactoryEvents.ChangeSTVersionBound,
+}
+
+interface IUSDTieredSTOFactorySubscribeAsyncParams {
+  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+  (params: IChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>,
+  (params: IChangeFactoryUsageFeeSubscribeAsyncParams): Promise<string>,
+  (params: IChangeFactorySubscriptionFeeSubscribeAsyncParams): Promise<string>,
+  (params: IGenerateModuleFromFactorySubscribeAsyncParams): Promise<string>,
+  (params: IChangeSTVersionBoundSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetUSDTieredSTOFactoryLogsAsyncParams {
+  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryOwnershipRenouncedEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryOwnershipTransferredEventArgs>>>,
+  (params: IGetChangeFactorySetupFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryChangeFactorySetupFeeEventArgs>>>,
+  (params: IGetChangeFactoryUsageFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryChangeFactoryUsageFeeEventArgs>>>,
+  (params: IGetChangeFactorySubscriptionFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryChangeFactorySubscriptionFeeEventArgs>>>,
+  (params: IGetGenerateModuleFromFactoryLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryGenerateModuleFromFactoryEventArgs>>>,
+  (params: IGetChangeSTVersionBoundLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryChangeSTVersionBoundEventArgs>>>,
+}
 
 /**
  * This class includes the functionality related to interacting with the USDTieredSTOFactory contract.
@@ -49,8 +144,8 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends USDTieredSTOFactoryEventArgs>(
-    params: ISubscribeAsyncParams<USDTieredSTOFactoryEvents, ArgsType>
+  public subscribeAsync: IUSDTieredSTOFactorySubscribeAsyncParams = async <ArgsType extends USDTieredSTOFactoryEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOFactoryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -87,8 +182,8 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends USDTieredSTOFactoryEventArgs>(
-    params: IGetLogsAsyncParams<USDTieredSTOFactoryEvents>
+  public getLogsAsync: IGetUSDTieredSTOFactoryLogsAsyncParams = async <ArgsType extends USDTieredSTOFactoryEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOFactoryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);

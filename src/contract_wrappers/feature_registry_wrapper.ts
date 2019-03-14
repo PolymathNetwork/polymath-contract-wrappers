@@ -1,4 +1,11 @@
-import { FeatureRegistryContract, FeatureRegistryEventArgs, FeatureRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  FeatureRegistryContract,
+  FeatureRegistryEventArgs,
+  FeatureRegistryEvents,
+  FeatureRegistryChangeFeatureStatusEventArgs,
+  FeatureRegistryOwnershipRenouncedEventArgs,
+  FeatureRegistryOwnershipTransferredEventArgs
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -9,14 +16,54 @@ import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
+interface IChangeFeatureStatusSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.ChangeFeatureStatus,
+  callback: EventCallback<FeatureRegistryChangeFeatureStatusEventArgs>,
+}
+
+interface IGetChangeFeatureStatusLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.ChangeFeatureStatus,
+}
+
+interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipRenounced,
+  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>,
+}
+
+interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipRenounced,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipTransferred,
+  callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipTransferred,
+}
+
+interface IFeatureRegistrySubscribeAsyncParams {
+  (params: IChangeFeatureStatusSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetFeatureRegistryLogsAsyncParams {
+  (params: IGetChangeFeatureStatusLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>>>,
+  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>>>,
+}
+
 /**
  * @param nameKey is the key for the feature status mapping
  */
-export interface IGetFeatureStatusParams {
+interface IGetFeatureStatusParams {
   nameKey: string;
 }
 
@@ -24,7 +71,7 @@ export interface IGetFeatureStatusParams {
 * @param nameKey is the key for the feature status mapping
 * @param newStatus is the new feature status
 */
-export interface ISetFeatureStatusParams extends ITxParams {
+interface ISetFeatureStatusParams extends ITxParams {
   nameKey: string;
   newStatus: boolean;
 }
@@ -105,8 +152,8 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends FeatureRegistryEventArgs>(
-    params: ISubscribeAsyncParams<FeatureRegistryEvents, ArgsType>
+  public subscribeAsync: IFeatureRegistrySubscribeAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -143,8 +190,8 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends FeatureRegistryEventArgs>(
-    params: IGetLogsAsyncParams<FeatureRegistryEvents>
+  public getLogsAsync: IGetFeatureRegistryLogsAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);

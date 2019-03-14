@@ -1,4 +1,15 @@
-import { ModuleRegistryContract, ModuleRegistryEventArgs, ModuleRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  ModuleRegistryContract,
+  ModuleRegistryEventArgs,
+  ModuleRegistryEvents,
+  ModuleRegistryPauseEventArgs,
+  ModuleRegistryUnpauseEventArgs,
+  ModuleRegistryModuleUsedEventArgs,
+  ModuleRegistryModuleRegisteredEventArgs,
+  ModuleRegistryModuleVerifiedEventArgs,
+  ModuleRegistryModuleRemovedEventArgs,
+  ModuleRegistryOwnershipTransferredEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -8,15 +19,99 @@ import { ContractWrapper } from './contract_wrapper';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
+
+interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.Pause,
+  callback: EventCallback<ModuleRegistryPauseEventArgs>,
+}
+
+interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.Pause,
+}
+
+interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.Unpause,
+  callback: EventCallback<ModuleRegistryUnpauseEventArgs>,
+}
+
+interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.Unpause,
+}
+
+interface IModuleUsedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUsed,
+  callback: EventCallback<ModuleRegistryModuleUsedEventArgs>,
+}
+
+interface IGetModuleUsedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUsed,
+}
+
+interface IModuleRegisteredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleRegistered,
+  callback: EventCallback<ModuleRegistryModuleRegisteredEventArgs>,
+}
+
+interface IGetModuleRegisteredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleRegistered,
+}
+
+interface IModuleVerifiedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleVerified,
+  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs>,
+}
+
+interface IGetModuleVerifiedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleVerified,
+}
+
+interface IModuleRemovedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleRemoved,
+  callback: EventCallback<ModuleRegistryModuleRemovedEventArgs>,
+}
+
+interface IGetModuleRemovedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleRemoved,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.OwnershipTransferred,
+  callback: EventCallback<ModuleRegistryOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.OwnershipTransferred,
+}
+
+interface IModuleRegistrySubscribeAsyncParams {
+  (params: IPauseSubscribeAsyncParams): Promise<string>,
+  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+  (params: IModuleUsedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleRegisteredSubscribeAsyncParams): Promise<string>,
+  (params: IModuleVerifiedSubscribeAsyncParams): Promise<string>,
+  (params: IModuleRemovedSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetModuleRegistryLogsAsyncParams {
+  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryPauseEventArgs>>>,
+  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryUnpauseEventArgs>>>,
+  (params: IGetModuleUsedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>>>,
+  (params: IGetModuleRegisteredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleRegisteredEventArgs>>>,
+  (params: IGetModuleVerifiedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleVerifiedEventArgs>>>,
+  (params: IGetModuleRemovedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleRemovedEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs>>>,
+}
 
 /**
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
  */
-export interface IGetModulesByTypeAndTokenParams {
+interface IGetModulesByTypeAndTokenParams {
   moduleType: number;
   securityToken: string;
 }
@@ -61,8 +156,8 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends ModuleRegistryEventArgs>(
-    params: ISubscribeAsyncParams<ModuleRegistryEvents, ArgsType>
+  public subscribeAsync: IModuleRegistrySubscribeAsyncParams = async <ArgsType extends ModuleRegistryEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -99,8 +194,8 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends ModuleRegistryEventArgs>(
-    params: IGetLogsAsyncParams<ModuleRegistryEvents>
+  public getLogsAsync: IGetModuleRegistryLogsAsyncParams = async <ArgsType extends ModuleRegistryEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
