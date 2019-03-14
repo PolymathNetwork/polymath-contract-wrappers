@@ -280,7 +280,6 @@ export class DetailedERC20Wrapper extends ContractWrapper {
       await contract.symbol.callAsync();
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }
