@@ -138,10 +138,10 @@ interface IGetSecurityTokenRegistryLogsAsyncParams {
   (params: IGetChangeSecurityLaunchFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>>>,
   (params: IGetChangeTickerOwnershipLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeTickerOwnershipEventArgs>>>,
   (params: IGetChangeTickerRegistrationFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>>>,
-  (params: IGetNewSecurityTokenLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryRegisterTickerEventArgs>>>,
+  (params: IGetNewSecurityTokenLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryNewSecurityTokenEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryOwnershipTransferredEventArgs>>>,
   (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryPauseEventArgs>>>,
-  (params: IGetRegisterTickerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryNewSecurityTokenEventArgs>>>,
+  (params: IGetRegisterTickerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryRegisterTickerEventArgs>>>,
   (params: IGetTickerRemovedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryTickerRemovedEventArgs>>>,
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryUnpauseEventArgs>>>,
 }

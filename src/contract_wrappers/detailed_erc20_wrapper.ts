@@ -271,6 +271,20 @@ export class DetailedERC20Wrapper extends ContractWrapper {
     return logs;
   }
 
+  public async isValidContract(): Promise<boolean> {
+    try {
+      const contract = await this.detailedERC20Contract;
+      await contract.totalSupply.callAsync();
+      await contract.balanceOf.callAsync(contract.address);
+      await contract.allowance.callAsync(contract.address, contract.address);
+      await contract.symbol.callAsync();
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
   private async _getDetailedERC20Contract(): Promise<DetailedERC20Contract> {
     return new DetailedERC20Contract(
       this.abi,

@@ -26,7 +26,13 @@ export class TokenWrapperFactory {
    * @memberof SecurityTokenWrapperFactory
    */
   public getERC20TokenInstanceFromAddress = async (address: string) : Promise<DetailedERC20Wrapper> => {
-    return new DetailedERC20Wrapper(this._web3Wrapper, address);
+      const token = new DetailedERC20Wrapper(this._web3Wrapper, address);
+    if (await token.isValidContract()) {
+      return token;
+    } else {
+      //TODO: Replace this for a typed Error
+      throw new Error();
+    }
   }
 
   /**
@@ -35,7 +41,12 @@ export class TokenWrapperFactory {
    * @memberof SecurityTokenWrapperFactory
    */
   public getSecurityTokenInstanceFromAddress = async (address: string) : Promise<SecurityTokenWrapper> => {
-    return new SecurityTokenWrapper(this._web3Wrapper, address);
+    if (await this.isValidSecurityToken(address)) {
+      return new SecurityTokenWrapper(this._web3Wrapper, address);
+    } else {
+      //TODO: Replace this for a typed Error
+      throw new Error();
+    }
   }
 
   /**
@@ -47,5 +58,9 @@ export class TokenWrapperFactory {
     const address = await this._securityTokenRegistry.getSecurityTokenAddress(ticker);
     return new SecurityTokenWrapper(this._web3Wrapper, address);
   }
-
+  
+  private async isValidSecurityToken(tokenAddress: string): Promise<boolean> {
+    const stData = await this._securityTokenRegistry.getSecurityTokenData({ securityToken: tokenAddress});
+    return stData[3].toNumber() !== 0;
+  }
 }
