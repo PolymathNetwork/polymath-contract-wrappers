@@ -17,11 +17,10 @@ import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_w
 import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
 import { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
 import { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapper';
-
+import { TokenWrapperFactory } from './factories/tokenWrapperFactory';
 import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wrapper';
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
-import { SecurityTokenWrapperFactory } from './factories/SecurityTokenWrapperFactory';
 
 /**
  * @param provider The web3 provider 
@@ -70,10 +69,10 @@ export class PolymathAPI {
    */
   public featureRegistry: FeatureRegistryWrapper;
   /**
-   * An instance of the SecurityTokenWrapperFactory class to get 
-   * SecurityTokenWrapper instances to interact with SecurityToken smart contracts
+   * An instance of the TokenWrapperFactory class to get 
+   * TokenWrapper instances to interact with SecurityToken or ERC20 smart contracts
    */
-  public securityTokenFactory: SecurityTokenWrapperFactory;
+  public tokenFactory: TokenWrapperFactory;
 
   private readonly _web3Wrapper: Web3Wrapper;
 
@@ -129,7 +128,7 @@ export class PolymathAPI {
       this._web3Wrapper,
       this.polymathRegistry,
     );
-    this.securityTokenFactory = new SecurityTokenWrapperFactory(
+    this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,
       this.securityTokenRegistry
     )
