@@ -76,7 +76,7 @@ interface ISetFeatureStatusParams extends ITxParams {
   newStatus: boolean;
 }
 
-enum Features {
+export enum Features {
   CustomModulesAllowed = "CustomModulesAllowed",
   FreezeMintingAllowed = "FreezeMintingAllowed",
 }
