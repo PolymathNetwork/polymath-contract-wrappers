@@ -268,12 +268,6 @@ interface ITransferOwnershipParams extends ITxParams {
   newOwner: string,
 }
 
-interface IPauseParams extends ITxParams {
-}
-
-interface IUnpauseParams extends ITxParams {
-}
-
 /**
   * @param tickerRegFee is the registration fee in POLY tokens (base 18 decimals)
   */
@@ -578,7 +572,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to pause, triggers stopped state
    */
-  public pause = async (params: IPauseParams) => {
+  public pause = async (params: ITxParams) => {
     return async () => {
       return (await this.securityTokenRegistryContract).pause.sendTransactionAsync(
         params.txData,
@@ -590,7 +584,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to unpause, returns to normal state
    */
-  public unpause = async (params: IUnpauseParams) => {
+  public unpause = async (params: ITxParams) => {
     return async () => {
       return (await this.securityTokenRegistryContract).unpause.sendTransactionAsync(
         params.txData,
