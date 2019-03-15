@@ -343,6 +343,145 @@ interface IAllowanceParams {
   spender: string;
 }
 
+interface IDecreaseApprovalParams extends ITxParams {
+  spender: string,
+  subtractedValue: BigNumber,
+}
+
+interface IIncreaseApprovalParams extends ITxParams {
+  spender: string,
+  addedValue: BigNumber,
+}
+
+interface ITransferOwnershipParams extends ITxParams {
+  newOwner: string,
+}
+
+interface IArchiveModuleParams extends ITxParams {
+  module: string,
+}
+
+interface IUnarchiveModuleParams extends ITxParams {
+  module: string,
+}
+
+interface IRemoveModuleParams extends ITxParams {
+  module: string,
+}
+
+interface IGetModulesByNameParams {
+  name: string,
+}
+
+interface IWithdrawERC20Params extends ITxParams {
+  tokenContract: string,
+  value: BigNumber,
+}
+
+interface IChangeModuleBudgetParams extends ITxParams {
+  module: string,
+  change: BigNumber,
+  increase: boolean,
+}
+
+interface IUpdateTokenDetailsParams extends ITxParams {
+  newTokenDetails: string,
+}
+
+interface IChangeGranularityParams extends ITxParams {
+  granularity: BigNumber,
+}
+
+interface IGetInvestorsAtParams {
+  checkpointId: BigNumber,
+}
+
+interface IIterateInvestorsParams {
+  start: BigNumber,
+  end: BigNumber,
+}
+
+interface ITransferWithDataParams extends ITxParams {
+  to: string,
+  value: BigNumber,
+  data: string,
+}
+
+interface ITransferFromWithDataParams extends ITxParams {
+  from: string,
+  to: string,
+  value: BigNumber,
+  data: string,
+}
+
+interface IMintParams extends ITxParams {
+  investor: string,
+  value: BigNumber,
+}
+
+interface IMintWithDataParams extends ITxParams {
+  investor: string,
+  value: BigNumber,
+  data: string,
+}
+
+interface IMintMultiParams extends ITxParams {
+  investors: string[],
+  values: BigNumber[],
+}
+
+interface ICheckPermissionParams {
+  delegate: string,
+  module: string,
+  perm: string,
+}
+
+interface IBurnWithDataParams extends ITxParams {
+  value: BigNumber,
+  data: string,
+}
+
+interface IBurnFromWithDataParams extends ITxParams {
+  from: string,
+  value: BigNumber,
+  data: string,
+}
+
+interface ITotalSupplyAtParams {
+  checkpointId: BigNumber,
+}
+
+interface IBalanceOfAtParams {
+  investor: string,
+  checkpointId: BigNumber,
+}
+
+interface ISetControllerParams extends ITxParams {
+  controller: string,
+}
+
+interface IForceTransferParams extends ITxParams {
+  from: string,
+  to: string,
+  value: BigNumber,
+  data: string,
+  log: string,
+}
+
+interface IForceBurnParams extends ITxParams {
+  from: string,
+  value: BigNumber,
+  data: string,
+  log: string,
+}
+
+interface IForceBurnParams extends ITxParams {
+  from: string,
+  value: BigNumber,
+  data: string,
+  log: string,
+}
+
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
@@ -359,6 +498,342 @@ export class SecurityTokenWrapper extends ContractWrapper {
     super(web3Wrapper);
     this.address = address;
     this.securityTokenContract = this._getSecurityTokenContract();
+  }
+
+  /**
+   * Value of current checkpoint
+   */
+  public currentCheckpointId = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).currentCheckpointId.callAsync();
+  }
+
+  /**
+   * Granular level of the token
+   */
+  public granularity = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).granularity.callAsync();
+  }
+
+  public decreaseApproval = async (params: IDecreaseApprovalParams) => {
+    return async () => {
+      return (await this.securityTokenContract).decreaseApproval.sendTransactionAsync(
+        params.spender,
+        params.subtractedValue,
+      );
+    }
+  }
+
+  public polyToken = async (): Promise<string> => {
+    return await (await this.securityTokenContract).polyToken.callAsync();
+  }
+
+  public renounceOwnership = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).renounceOwnership.sendTransactionAsync();
+    }
+  }
+
+  public polymathRegistry = async (): Promise<string> => {
+    return await (await this.securityTokenContract).polymathRegistry.callAsync();
+  }
+
+  public controllerDisabled = async (): Promise<boolean> => {
+    return await (await this.securityTokenContract).controllerDisabled.callAsync();
+  }
+
+  public owner = async (): Promise<string> => {
+    return await (await this.securityTokenContract).owner.callAsync();
+  }
+
+  public mintingFrozen = async (): Promise<boolean> => {
+    return await (await this.securityTokenContract).mintingFrozen.callAsync();
+  }
+
+  public moduleRegistry = async (): Promise<string> => {
+    return await (await this.securityTokenContract).moduleRegistry.callAsync();
+  }
+
+  public featureRegistry = async (): Promise<string> => {
+    return await (await this.securityTokenContract).featureRegistry.callAsync();
+  }
+
+  public securityTokenRegistry = async (): Promise<string> => {
+    return await (await this.securityTokenContract).securityTokenRegistry.callAsync();
+  }
+
+  public tokenDetails = async (): Promise<string> => {
+    return (await this.securityTokenContract).tokenDetails.callAsync();
+  }
+
+  public increaseApproval = async (params: IIncreaseApprovalParams) => {
+    return async () => {
+      return (await this.securityTokenContract).increaseApproval.sendTransactionAsync(
+        params.spender,
+        params.addedValue,
+      );
+    }
+  }
+
+  public transfersFrozen = async (): Promise<boolean> => {
+    return await (await this.securityTokenContract).transfersFrozen.callAsync();
+  }
+
+  public transferOwnership = async (params: ITransferOwnershipParams) => {
+    return async () => {
+      return (await this.securityTokenContract).transferOwnership.sendTransactionAsync(
+        params.newOwner,
+      );
+    }
+  }
+
+  public updateFromRegistry = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).updateFromRegistry.sendTransactionAsync();
+    }
+  }
+
+  public archiveModule = async (params: IArchiveModuleParams) => {
+    return async () => {
+      return (await this.securityTokenContract).archiveModule.sendTransactionAsync(
+        params.module,
+      );
+    }
+  }
+
+  public unarchiveModule = async (params: IUnarchiveModuleParams) => {
+    return async () => {
+      return (await this.securityTokenContract).unarchiveModule.sendTransactionAsync(
+        params.module,
+      );
+    }
+  }
+
+  public removeModule = async (params: IRemoveModuleParams) => {
+    return async () => {
+      return (await this.securityTokenContract).removeModule.sendTransactionAsync(
+        params.module,
+      );
+    }
+  }
+
+  public getModulesByName = async (params: IGetModulesByNameParams): Promise<string[]> => {
+    return await (await this.securityTokenContract).getModulesByName.callAsync(
+      params.name,
+    );
+  }
+
+  public withdrawERC20 = async (params: IWithdrawERC20Params) => {
+    return async () => {
+      return (await this.securityTokenContract).withdrawERC20.sendTransactionAsync(
+        params.tokenContract,
+        params.value,
+      );
+    }
+  }
+
+  public changeModuleBudget = async (params: IChangeModuleBudgetParams) => {
+    return async () => {
+      return (await this.securityTokenContract).changeModuleBudget.sendTransactionAsync(
+        params.module,
+        params.change,
+        params.increase,
+      );
+    }
+  }
+
+  public updateTokenDetails = async (params: IUpdateTokenDetailsParams) => {
+    return async () => {
+      return (await this.securityTokenContract).updateTokenDetails.sendTransactionAsync(
+        params.newTokenDetails,
+      );
+    }
+  }
+
+  public changeGranularity = async (params: IChangeGranularityParams) => {
+    return async () => {
+      return (await this.securityTokenContract).changeGranularity.sendTransactionAsync(
+        params.granularity,
+      );
+    }
+  }
+
+  public getInvestors = async (): Promise<string[]> => {
+    return await (await this.securityTokenContract).getInvestors.callAsync();
+  }
+
+  public getInvestorsAt = async (params: IGetInvestorsAtParams): Promise<string[]> => {
+    return await (await this.securityTokenContract).getInvestorsAt.callAsync(
+      params.checkpointId,
+    );
+  }
+
+  public iterateInvestors = async (params: IIterateInvestorsParams): Promise<string[]> => {
+    return await (await this.securityTokenContract).iterateInvestors.callAsync(
+      params.start,
+      params.end,
+    );
+  }
+
+  public getInvestorCount = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).getInvestorCount.callAsync();
+  }
+
+  public freezeTransfers = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).freezeTransfers.sendTransactionAsync();
+    }
+  }
+
+  public unfreezeTransfers = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).unfreezeTransfers.sendTransactionAsync();
+    }
+  }
+
+  public transferWithData = async (params: ITransferWithDataParams) => {
+    return async () => {
+      return (await this.securityTokenContract).transferWithData.sendTransactionAsync(
+        params.to,
+        params.value,
+        params.data,
+      );
+    }
+  }
+
+  public transferFromWithData = async (params: ITransferFromWithDataParams) => {
+    return async () => {
+      return (await this.securityTokenContract).transferFromWithData.sendTransactionAsync(
+        params.from,
+        params.to,
+        params.value,
+        params.data,
+      );
+    }
+  }
+
+  public freezeMinting = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).freezeMinting.sendTransactionAsync();
+    }
+  }
+
+  public mint = async (params: IMintParams) => {
+    return async () => {
+      return (await this.securityTokenContract).mint.sendTransactionAsync(
+        params.investor,
+        params.value,
+      );
+    }
+  }
+
+  public mintWithData = async (params: IMintWithDataParams) => {
+    return async () => {
+      return (await this.securityTokenContract).mintWithData.sendTransactionAsync(
+        params.investor,
+        params.value,
+        params.data,
+      );
+    }
+  }
+
+  public mintMulti = async (params: IMintMultiParams) => {
+    return async () => {
+      return (await this.securityTokenContract).mintMulti.sendTransactionAsync(
+        params.investors,
+        params.values,
+      );
+    }
+  }
+
+  public checkPermission = async (params: ICheckPermissionParams): Promise<boolean> => {
+    return await (await this.securityTokenContract).checkPermission.callAsync(
+      params.delegate,
+      params.module,
+      params.perm,
+    );
+  }
+
+  public burnWithData = async (params: IBurnWithDataParams) => {
+    return async () => {
+      return (await this.securityTokenContract).burnWithData.sendTransactionAsync(
+        params.value,
+        params.data,
+      );
+    }
+  }
+
+  public burnFromWithData = async (params: IBurnFromWithDataParams) => {
+    return async () => {
+      return (await this.securityTokenContract).burnFromWithData.sendTransactionAsync(
+        params.from,
+        params.value,
+        params.data,
+      );
+    }
+  }
+
+  public createCheckpoint = async (params: ITxParams) => {
+    return async () => {
+      return (await this.securityTokenContract).createCheckpoint.sendTransactionAsync();
+    }
+  }
+
+  public getCheckpointTimes = async (): Promise<BigNumber[]> => {
+    return await (await this.securityTokenContract).getCheckpointTimes.callAsync();
+  }
+
+  public totalSupplyAt = async (params: ITotalSupplyAtParams): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).totalSupplyAt.callAsync(
+      params.checkpointId,
+    );
+  }
+
+  public balanceOfAt = async (params: IBalanceOfAtParams): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).balanceOfAt.callAsync(
+      params.investor,
+      params.checkpointId,
+    );
+  }
+
+  public setController = async (params: ISetControllerParams) => {
+    return async () => {
+      return (await this.securityTokenContract).setController.sendTransactionAsync(
+        params.controller,
+      );
+    }
+  }
+
+  public disableController = async (params: ITxParams) => {
+    return async () => {
+    return (await this.securityTokenContract).disableController.sendTransactionAsync();
+    }
+  }
+
+  public forceTransfer = async (params: IForceTransferParams) => {
+    return async () => {
+      return (await this.securityTokenContract).forceTransfer.sendTransactionAsync(
+        params.from,
+        params.to,
+        params.value,
+        params.data,
+        params.log
+      );
+    }
+  }
+
+  public forceBurn = async (params: IForceBurnParams) => {
+    return async () => {
+      return (await this.securityTokenContract).forceBurn.sendTransactionAsync(
+        params.from,
+        params.value,
+        params.data,
+        params.log
+      );
+    }
+  }
+
+  public getVersion = async (): Promise<BigNumber> => {
+    return await (await this.securityTokenContract).totalSupply.callAsync();
   }
 
   /**
