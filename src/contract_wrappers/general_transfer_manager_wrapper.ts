@@ -154,12 +154,12 @@ import {
     }
 
     interface IWhitelistParams {
-        index_0: string,
+        address: string,
     }
 
     interface INonceMapParams {
-        index_0: string,
-        index_1: BigNumber,
+        address: string,
+        nonce: BigNumber,
     }
 
     interface IChangeDefaultsParams extends ITxParams {
@@ -303,14 +303,14 @@ import {
 
     public whitelist = async (params: IWhitelistParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
         return await (await this.generalTransferManagerContract).whitelist.callAsync(
-            params.index_0,
+            params.address,
         );
     }
 
     public nonceMap = async (params: INonceMapParams): Promise<boolean> => {
         return await (await this.generalTransferManagerContract).nonceMap.callAsync(
-            params.index_0,
-            params.index_1,
+            params.address,
+            params.nonce,
         );
     }
 
