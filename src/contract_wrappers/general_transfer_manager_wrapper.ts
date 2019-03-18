@@ -146,7 +146,7 @@ import {
   }
   
     interface IInvestorsParams {
-        index_0: BigNumber,
+        index: BigNumber,
     }
 
     interface ITakeFeeParams extends ITxParams {
@@ -194,9 +194,9 @@ import {
     interface IVerifyTransferParams extends ITxParams {
         from: string,
         to: string,
-        index_2: BigNumber,
-        index_3: string,
-        index_4: boolean,
+        amount: BigNumber,
+        data: string,
+        isTransfer: boolean,
     }
 
     interface IModifyWhitelistParams extends ITxParams {
@@ -271,7 +271,7 @@ import {
 
     public investors = async (params: IInvestorsParams): Promise<string> => {
         return await (await this.generalTransferManagerContract).investors.callAsync(
-            params.index_0,
+            params.index,
         );
     }
 
@@ -412,9 +412,9 @@ import {
             return (await this.generalTransferManagerContract).verifyTransfer.sendTransactionAsync(
                 params.from,
                 params.to,
-                params.index_2,
-                params.index_3,
-                params.index_4,
+                params.amount,
+                params.data,
+                params.isTransfer,
             );
         }
     }
