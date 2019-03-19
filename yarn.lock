@@ -271,10 +271,10 @@
   dependencies:
     events "^3.0.0"
 
-"@polymathnetwork/abi-wrappers@2.1.0-beta.2":
-  version "2.1.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.2.tgz#2d68767ab569d6f65ec6573326f3e597991a4a51"
-  integrity sha512-sBlHFfMCTdjZL7A04eXz3jB2SWeoek532fD7+wznoscaumzMaUgPiaFmYH3hWIKq/hlRMVNedoiDdmcNFmDcag==
+"@polymathnetwork/abi-wrappers@2.1.0-beta.3":
+  version "2.1.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.3.tgz#68f82c9e049a59f3b8a35e9cc0c60439ad3b1cea"
+  integrity sha512-+YtieLjOya/1flQsoV+Ne+5B0XGpG9yMgCz0KX2L8FgtR1UHIeM5puFlsaEmZizLgrMyPMncEt5ho+y6w/f5Hw==
   dependencies:
     "@0x/base-contract" "^3.0.10"
     "@0x/sol-compiler" "^1.1.16"
@@ -285,10 +285,10 @@
     lodash "^4.17.11"
     typescript "3.2.2"
 
-"@polymathnetwork/contract-artifacts@2.1.0-beta.1":
-  version "2.1.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/contract-artifacts/-/contract-artifacts-2.1.0-beta.1.tgz#d349b911121202cf69d4d9e8545ce36e922a6773"
-  integrity sha512-s5OxF0gDWgA3h7yqjlRRJU5vIsDldbF09OgPVEdQDDgOdrNADb21kJdWM/TzyAgZ2W9xN07sdJUx0OMxObc+VQ==
+"@polymathnetwork/contract-artifacts@2.1.0-beta.2":
+  version "2.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/contract-artifacts/-/contract-artifacts-2.1.0-beta.2.tgz#b968b24893a0a029a1c14b26b3d1498c095d1d63"
+  integrity sha512-f8cMZfiwGHQaCTc2XQH/vOyJCDSckU5/rDfSUcVOjmsQnHQCmp79XIAZ0Zko+O8eE/QWUwGKKrVCNBgZDY0oVw==
 
 "@types/bn.js@*":
   version "4.11.4"

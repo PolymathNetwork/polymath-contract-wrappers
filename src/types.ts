@@ -10,6 +10,8 @@ import {
     PolyTokenEvents,
     CappedSTOFactoryEventArgs,
     CappedSTOEventArgs,
+    DetailedERC20EventArgs,
+    DetailedERC20Events,
     ERC20DividendCheckpointEventArgs,
     EtherDividendCheckpointEventArgs,
     FeatureRegistryEventArgs,
@@ -79,6 +81,7 @@ export interface BlockRange {
 export type ContractEventArgs = PolyTokenEventArgs |
     CappedSTOFactoryEventArgs |
     CappedSTOEventArgs |
+    DetailedERC20EventArgs |
     ERC20DividendCheckpointEventArgs |
     EtherDividendCheckpointEventArgs |
     FeatureRegistryEventArgs |
@@ -97,6 +100,7 @@ export type ContractEventArgs = PolyTokenEventArgs |
 export type ContractEvents = PolyTokenEvents |
     CappedSTOFactoryEvents |
     CappedSTOEvents |
+    DetailedERC20Events |
     ERC20DividendCheckpointEvents |
     EtherDividendCheckpointEvents |
     FeatureRegistryEvents |
@@ -118,8 +122,8 @@ export type ContractEvents = PolyTokenEvents |
  * @param indexFilterValues   An object where the keys are indexed args returned by the event and
  *                            the value is the value you are interested in.
  */
-export interface IGetLogsAsyncParams<EventType extends ContractEvents> {
-    eventName: EventType,
+export interface IGetLogsAsyncParams {
+    eventName: ContractEvents,
     blockRange: BlockRange,
     indexFilterValues: IndexedFilterValues
 }
@@ -132,9 +136,9 @@ export interface IGetLogsAsyncParams<EventType extends ContractEvents> {
  * @param callback            Callback that gets called when a log is added/removed
  * @param isVerbose           Enable verbose subscription warnings (e.g recoverable network issues encountered)
  */
-export interface ISubscribeAsyncParams<EventType extends ContractEvents, ArgsType extends ContractEventArg> {
-    eventName: EventType,
+export interface ISubscribeAsyncParams {
+    eventName: ContractEvents,
     indexFilterValues: IndexedFilterValues,
-    callback: EventCallback<ArgsType>,
+    callback: EventCallback<ContractEventArg>,
     isVerbose?: boolean,
 }

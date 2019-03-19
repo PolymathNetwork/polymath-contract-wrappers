@@ -1,4 +1,11 @@
-import { PolymathRegistryContract, PolymathRegistryEventArgs, PolymathRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  PolymathRegistryContract,
+  PolymathRegistryEventArgs,
+  PolymathRegistryEvents,
+  PolymathRegistryChangeAddressEventArgs,
+  PolymathRegistryOwnershipRenouncedEventArgs,
+  PolymathRegistryOwnershipTransferredEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -11,13 +18,53 @@ import {
   NetworkId,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback,
 } from '../types';
 import { schemas } from '@0x/json-schemas';
+
+interface IChangeAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolymathRegistryEvents.ChangeAddress,
+  callback: EventCallback<PolymathRegistryChangeAddressEventArgs>,
+}
+
+interface IGetChangeAddressLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolymathRegistryEvents.ChangeAddress,
+}
+
+interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolymathRegistryEvents.OwnershipRenounced,
+  callback: EventCallback<PolymathRegistryOwnershipRenouncedEventArgs>,
+}
+
+interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolymathRegistryEvents.OwnershipRenounced,
+}
+
+interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolymathRegistryEvents.OwnershipTransferred,
+  callback: EventCallback<PolymathRegistryOwnershipTransferredEventArgs>,
+}
+
+interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolymathRegistryEvents.OwnershipTransferred,
+}
+
+interface IPolymathRegistrySubscribeAsyncParams {
+  (params: IChangeAddressSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetPolymathRegistryLogsAsyncParams {
+  (params: IGetChangeAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>>>,
+  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>>>,
+}
 
 /**
 * @param contractName is the key for the contract address mapping
 */
-export interface IGetAddressParams {
+interface IGetAddressParams {
   contractName: string;
 }
 
@@ -25,7 +72,7 @@ export interface IGetAddressParams {
  * @param nameKey is the key for the contract address mapping
  * @param newAddress is the new contract address
  */
-export interface IChangeAddressParams extends ITxParams  {
+interface IChangeAddressParams extends ITxParams  {
   nameKey: string;
   newAddress: string;
 }
@@ -134,8 +181,8 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends PolymathRegistryEventArgs>(
-    params: ISubscribeAsyncParams<PolymathRegistryEvents, ArgsType>
+  public subscribeAsync: IPolymathRegistrySubscribeAsyncParams = async <ArgsType extends PolymathRegistryEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -172,8 +219,8 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends PolymathRegistryEventArgs>(
-    params: IGetLogsAsyncParams<PolymathRegistryEvents>
+  public getLogsAsync: IGetPolymathRegistryLogsAsyncParams = async <ArgsType extends PolymathRegistryEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);

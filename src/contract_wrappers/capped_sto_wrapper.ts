@@ -1,4 +1,13 @@
-import { CappedSTOContract, CappedSTOEventArgs, CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  CappedSTOContract,
+  CappedSTOEventArgs,
+  CappedSTOEvents,
+  CappedSTOTokenPurchaseEventArgs,
+  CappedSTOSetAllowBeneficialInvestmentsEventArgs,
+  CappedSTOSetFundRaiseTypesEventArgs,
+  CappedSTOPauseEventArgs,
+  CappedSTOUnpauseEventArgs
+} from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { CappedSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -9,21 +18,83 @@ import { ContractWrapper } from './contract_wrapper';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
+  EventCallback
 } from '../types';
 import { assert } from '../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
+interface ITokenPurchaseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: CappedSTOEvents.TokenPurchase,
+  callback: EventCallback<CappedSTOTokenPurchaseEventArgs>,
+}
+
+interface IGetTokenPurchaseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: CappedSTOEvents.TokenPurchase,
+}
+
+interface ISetAllowBeneficialInvestmentsSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: CappedSTOEvents.SetAllowBeneficialInvestments,
+  callback: EventCallback<CappedSTOSetAllowBeneficialInvestmentsEventArgs>,
+}
+
+interface IGetSetAllowBeneficialInvestmentsLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: CappedSTOEvents.SetAllowBeneficialInvestments,
+}
+
+interface ISetFundRaiseTypesSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: CappedSTOEvents.SetFundRaiseTypes,
+  callback: EventCallback<CappedSTOSetFundRaiseTypesEventArgs>,
+}
+
+interface IGetSetFundRaiseTypesLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: CappedSTOEvents.SetFundRaiseTypes,
+}
+
+interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: CappedSTOEvents.Pause,
+  callback: EventCallback<CappedSTOPauseEventArgs>,
+}
+
+interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: CappedSTOEvents.Pause,
+}
+
+interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: CappedSTOEvents.Unpause,
+  callback: EventCallback<CappedSTOUnpauseEventArgs>,
+}
+
+interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: CappedSTOEvents.Unpause,
+}
+
+interface ICappedSTOSubscribeAsyncParams {
+  (params: ITokenPurchaseSubscribeAsyncParams): Promise<string>,
+  (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
+  (params: ISetFundRaiseTypesSubscribeAsyncParams): Promise<string>,
+  (params: IPauseSubscribeAsyncParams): Promise<string>,
+  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+}
+
+interface IGetCappedSTOLogsAsyncParams {
+  (params: IGetTokenPurchaseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOTokenPurchaseEventArgs>>>,
+  (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetAllowBeneficialInvestmentsEventArgs>>>,
+  (params: IGetSetFundRaiseTypesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetFundRaiseTypesEventArgs>>>,
+  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOPauseEventArgs>>>,
+  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOUnpauseEventArgs>>>,
+}
+
 /**
  * 
  */
-export interface IGetFundRaiseTypesParams {
+interface IGetFundRaiseTypesParams {
   index: number;
 }
 
 /**
  * 
  */
-export interface IGetFundsRaisedParams {
+interface IGetFundsRaisedParams {
   index: number;
 }
 
@@ -119,8 +190,8 @@ export class CappedSTOWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync = async <ArgsType extends CappedSTOEventArgs>(
-    params: ISubscribeAsyncParams<CappedSTOEvents, ArgsType>
+  public subscribeAsync: ICappedSTOSubscribeAsyncParams = async <ArgsType extends CappedSTOEventArgs>(
+    params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
@@ -157,8 +228,8 @@ export class CappedSTOWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync = async <ArgsType extends CappedSTOEventArgs>(
-    params: IGetLogsAsyncParams<CappedSTOEvents>
+  public getLogsAsync: IGetCappedSTOLogsAsyncParams = async <ArgsType extends CappedSTOEventArgs>(
+    params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
