@@ -11,6 +11,7 @@ import {
   USDTieredSTOFactory,
   FeatureRegistry,
   GeneralTransferManager,
+  GeneralPermissionManager,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -111,6 +112,7 @@ export class PolymathAPI {
       USDTieredSTOFactory,
       FeatureRegistry,
       GeneralTransferManager,
+      GeneralPermissionManager,
     ];
 
     _.forEach(artifactsArray, artifact => { // tslint:disable-line

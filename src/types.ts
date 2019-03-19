@@ -15,7 +15,6 @@ import {
     ERC20DividendCheckpointEventArgs,
     EtherDividendCheckpointEventArgs,
     FeatureRegistryEventArgs,
-    GeneralPermissionManagerEventArgs,
     GeneralTransferManagerEventArgs,
     ManualApprovalTransferManagerEventArgs,
     ModuleFactoryEventArgs,
@@ -31,7 +30,6 @@ import {
     ERC20DividendCheckpointEvents,
     EtherDividendCheckpointEvents,
     FeatureRegistryEvents,
-    GeneralPermissionManagerEvents,
     GeneralTransferManagerEvents,
     ManualApprovalTransferManagerEvents,
     ModuleFactoryEvents,
@@ -42,6 +40,8 @@ import {
     SecurityTokenEvents,
     USDTieredSTOFactoryEvents,
     USDTieredSTOEvents,
+    GeneralPermissionManagerEventArgs,
+    GeneralPermissionManagerEvents,
 } from '@polymathnetwork/abi-wrappers';
 
 /**

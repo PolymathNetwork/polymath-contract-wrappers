@@ -333,10 +333,6 @@ import {
         return await (await this.generalTransferManagerContract).factory.callAsync();
     }
 
-    public FEE_ADMIN = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).FEE_ADMIN.callAsync();
-    }
-
     public allowAllWhitelistIssuances = async (): Promise<boolean> => {
         return await (await this.generalTransferManagerContract).allowAllWhitelistIssuances.callAsync();
     }

@@ -79,4 +79,8 @@ export {
     GeneralTransferManagerModifyWhitelistEventArgs,
     GeneralTransferManagerPauseEventArgs,
     GeneralTransferManagerUnpauseEventArgs,
+    GeneralPermissionManagerEventArgs,
+    GeneralPermissionManagerEvents,
+    GeneralPermissionManagerChangePermissionEventArgs,
+    GeneralPermissionManagerAddDelegateEventArgs,
 } from '@polymathnetwork/abi-wrappers';
