@@ -183,18 +183,18 @@ interface IGetUSDTieredSTOLogsAsyncParams {
 /**
  * 
  */
-interface IGetFundRaiseTypesParams {
+interface IFundRaiseTypesParams {
   index: number;
 }
 
 /**
  * 
  */
-interface IGetFundsRaisedParams {
+interface IFundsRaisedParams {
   index: number;
 }
 
-interface IGetTiersParams {
+interface ITiersParams {
   index: BigNumber;
 }
 
@@ -218,7 +218,7 @@ interface IGetTokensSoldForParams {
   fundRaiseType: number;
 }
 
-interface IGetStableCoinsRaisedParams {
+interface IStableCoinsRaisedParams {
   index: string;
 }
 
@@ -289,6 +289,114 @@ interface IModifyTiersParams extends ITxParams {
   tokensPerTierDiscountPoly: BigNumber[];
 }
 
+interface IInvestorsListParams {
+  index_0: BigNumber,
+}
+
+interface ITakeFeeParams extends ITxParams {
+  amount: BigNumber,
+}
+
+interface IInvestorsParams {
+  index_0: string,
+}
+
+interface IInvestorInvestedParams {
+  index_0: string,
+  index_1: number|BigNumber,
+}
+
+interface IReclaimERC20Params extends ITxParams {
+  tokenContract: string,
+}
+
+interface IUsdTokenEnabledParams {
+  index_0: string,
+}
+
+interface IGetRaisedParams {
+  fundRaiseType: number|BigNumber,
+}
+
+interface IUsdTokensParams {
+  index_0: BigNumber,
+}
+
+interface IInvestorInvestedUSDParams {
+  index_0: string,
+}
+
+interface IConfigureParams extends ITxParams {
+  startTime: BigNumber,
+  endTime: BigNumber,
+  ratePerTier: BigNumber[],
+  ratePerTierDiscountPoly: BigNumber[],
+  tokensPerTierTotal: BigNumber[],
+  tokensPerTierDiscountPoly: BigNumber[],
+  nonAccreditedLimitUSD: BigNumber,
+  minimumInvestmentUSD: BigNumber,
+  fundRaiseTypes: Array<number|BigNumber>,
+  wallet: string,
+  reserveWallet: string,
+  usdTokens: string[],
+}
+
+interface IChangeAllowBeneficialInvestmentsParams extends ITxParams {
+  allowBeneficialInvestments: boolean,
+}
+
+interface IBuyWithETHParams extends ITxParams {
+  beneficiary: string,
+}
+
+interface IBuyWithPOLYParams extends ITxParams {
+  beneficiary: string,
+  investedPOLY: BigNumber,
+}
+
+interface IBuyWithUSDParams extends ITxParams {
+  beneficiary: string,
+  investedSC: BigNumber,
+  usdToken: string,
+}
+
+interface IBuyWithETHRateLimitedParams extends ITxParams {
+  beneficiary: string,
+  minTokens: BigNumber,
+}
+
+interface IBuyWithPOLYRateLimitedParams extends ITxParams {
+  beneficiary: string,
+  investedPOLY: BigNumber,
+  minTokens: BigNumber,
+}
+
+interface IBuyWithUSDRateLimitedParams extends ITxParams {
+  beneficiary: string,
+  investedSC: BigNumber,
+  minTokens: BigNumber,
+  usdToken: string,
+}
+
+interface IBuyTokensViewParams {
+  beneficiary: string,
+  investmentValue: BigNumber,
+  fundRaiseType: number|BigNumber,
+}
+
+interface IGetRateParams {
+  fundRaiseType: number|BigNumber,
+}
+
+interface IConvertFromUSDParams {
+  fundRaiseType: number|BigNumber,
+  amount: BigNumber,
+}
+
+interface IGetTokensSoldByTierParams {
+  tier: BigNumber,
+}
+
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
@@ -314,73 +422,315 @@ export class USDTieredSTOWrapper extends ContractWrapper {
     return (await this.usdTieredSTOContract).address;
   }
 
+  public investorsList = async (params: IInvestorsListParams): Promise<string> => {
+    return await (await this.usdTieredSTOContract).investorsList.callAsync(
+      params.index_0,
+    );
+  }
+
+  public allowBeneficialInvestments = async (): Promise<boolean> => {
+    return await (await this.usdTieredSTOContract).allowBeneficialInvestments.callAsync();
+  }
+
+  public unpause = async (params: ITxParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).unpause.sendTransactionAsync();
+    }
+  }
+
+  public paused = async (): Promise<boolean> => {
+    return await (await this.usdTieredSTOContract).paused.callAsync();
+  }
+  
+  public takeFee = async (params: ITakeFeeParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).takeFee.sendTransactionAsync(
+        params.amount,
+      );
+    }
+  }
+
+  public finalAmountReturned = async (): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).finalAmountReturned.callAsync();
+  }
+
+  public investors = async (params: IInvestorsParams): Promise<[BigNumber, BigNumber, BigNumber]> => {
+    return await (await this.usdTieredSTOContract).investors.callAsync(
+      params.index_0,
+    );
+  }
+
+  public polyToken = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).polyToken.callAsync();
+  }
+
+  public pause = async (params: ITxParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).pause.sendTransactionAsync();
+    }
+  }
+
+  public investorInvested = async (params: IInvestorInvestedParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).investorInvested.callAsync(
+      params.index_0,
+      params.index_1,
+    );
+  }
+
+  public reclaimERC20 = async (params: IReclaimERC20Params) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).reclaimERC20.sendTransactionAsync(
+        params.tokenContract,
+      );
+    }
+  }
+
+  public usdTokenEnabled = async (params: IUsdTokenEnabledParams): Promise<boolean> => {
+    return await (await this.usdTieredSTOContract).usdTokenEnabled.callAsync(
+      params.index_0,
+    );
+  }
+
+  public ETH_ORACLE = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).ETH_ORACLE.callAsync();
+  }
+
+  public getRaised = async (params: IGetRaisedParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).getRaised.callAsync(
+      params.fundRaiseType,
+    );
+  }
+
+  public POLY_ORACLE = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).POLY_ORACLE.callAsync();
+  }
+
+  public pausedTime = async (): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).pausedTime.callAsync();
+  }
+
+  public securityToken = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).securityToken.callAsync();
+  }
+
+  public usdTokens = async (params: IUsdTokensParams): Promise<string> => {
+    return await (await this.usdTieredSTOContract).usdTokens.callAsync(
+      params.index_0,
+    );
+  }
+
+  public factory = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).factory.callAsync();
+  }
+
+  public investorInvestedUSD = async (params: IInvestorInvestedUSDParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).investorInvestedUSD.callAsync(
+      params.index_0,
+    );
+  }
+
+  public configure = async (params: IConfigureParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).configure.sendTransactionAsync(
+        params.startTime,
+        params.endTime,
+        params.ratePerTier,
+        params.ratePerTierDiscountPoly,
+        params.tokensPerTierTotal,
+        params.tokensPerTierDiscountPoly,
+        params.nonAccreditedLimitUSD,
+        params.minimumInvestmentUSD,
+        params.fundRaiseTypes,
+        params.wallet,
+        params.reserveWallet,
+        params.usdTokens,
+      );
+    }
+  }
+
+  public changeAllowBeneficialInvestments = async (params: IChangeAllowBeneficialInvestmentsParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).changeAllowBeneficialInvestments.sendTransactionAsync(
+        params.allowBeneficialInvestments,
+      );
+    }
+  }
+
+  public buyWithETH = async (params: IBuyWithETHParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithETH.sendTransactionAsync(
+        params.beneficiary,
+      );
+    }
+  }
+
+  public buyWithPOLY = async (params: IBuyWithPOLYParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithPOLY.sendTransactionAsync(
+        params.beneficiary,
+        params.investedPOLY,
+      );
+    }
+  }
+
+  public buyWithUSD = async (params: IBuyWithUSDParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithUSD.sendTransactionAsync(
+        params.beneficiary,
+        params.investedSC,
+        params.usdToken,
+      );
+    }
+  }
+
+  public buyWithETHRateLimited = async (params: IBuyWithETHRateLimitedParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithETHRateLimited.sendTransactionAsync(
+        params.beneficiary,
+        params.minTokens,
+      );
+    }
+  }
+
+  public buyWithPOLYRateLimited = async (params: IBuyWithPOLYRateLimitedParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithPOLYRateLimited.sendTransactionAsync(
+        params.beneficiary,
+        params.investedPOLY,
+        params.minTokens,
+      );
+    }
+  }
+
+  public buyWithUSDRateLimited = async (params: IBuyWithUSDRateLimitedParams) => {
+    return async () => {
+      return (await this.usdTieredSTOContract).buyWithUSDRateLimited.sendTransactionAsync(
+        params.beneficiary,
+        params.investedSC,
+        params.minTokens,
+        params.usdToken,
+      );
+    }
+  }
+
+  public buyTokensView = async (params: IBuyTokensViewParams): Promise<[BigNumber, BigNumber, BigNumber]> => {
+    return await (await this.usdTieredSTOContract).buyTokensView.callAsync(
+      params.beneficiary,
+      params.investmentValue,
+      params.fundRaiseType,
+    );
+  }
+
+  public isOpen = async (): Promise<boolean> => {
+    return await (await this.usdTieredSTOContract).isOpen.callAsync();
+  }
+
+  public capReached = async (): Promise<boolean> => {
+    return await (await this.usdTieredSTOContract).capReached.callAsync();
+  }
+
+  public getRate = async (params: IGetRateParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).getRate.callAsync(
+      params.fundRaiseType,
+    );
+  }
+
+  public convertFromUSD = async (params: IConvertFromUSDParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).convertFromUSD.callAsync(
+      params.fundRaiseType,
+      params.amount,
+    );
+  }
+
+  public getTokensMinted = async (): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).getTokensMinted.callAsync();
+  }
+
+  public getTokensSoldByTier = async (params: IGetTokensSoldByTierParams): Promise<BigNumber> => {
+    return await (await this.usdTieredSTOContract).getTokensSoldByTier.callAsync(
+      params.tier,
+    );
+  }
+
+  public getPermissions = async (): Promise<string[]> => {
+    return await (await this.usdTieredSTOContract).getPermissions.callAsync();
+  }
+
+  public getSTODetails = async (): Promise<[BigNumber, BigNumber, BigNumber, BigNumber[], BigNumber[], BigNumber, BigNumber, BigNumber, boolean[]]> => {
+    return await (await this.usdTieredSTOContract).getSTODetails.callAsync();
+  }
+
+  public getInitFunction = async (): Promise<string> => {
+    return await (await this.usdTieredSTOContract).getInitFunction.callAsync();
+  }
+
   /**
    * Start time of the Capped STO
    */
-  public getStartTime = async (): Promise<BigNumber> => {
+  public startTime = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).startTime.callAsync();
   }
 
   /**
    * End time of the Capped STO
    */
-  public getEndTime = async (): Promise<BigNumber> => {
+  public endTime = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).endTime.callAsync();
   }
 
   /**
    * Ethereum account address to hold the funds
    */
-  public getWallet = async (): Promise<string> => {
+  public wallet = async (): Promise<string> => {
     return await (await this.usdTieredSTOContract).wallet.callAsync();
   }
 
   /**
    * Type of currency used to collect the funds
    */
-  public getFundRaiseTypes = async (params: IGetFundRaiseTypesParams): Promise<boolean> => {
+  public fundRaiseTypes = async (params: IFundRaiseTypesParams): Promise<boolean> => {
     return await (await this.usdTieredSTOContract).fundRaiseTypes.callAsync(params.index);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public getFundsRaised = async (params: IGetFundsRaisedParams): Promise<BigNumber> => {
+  public fundsRaised = async (params: IFundsRaisedParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).fundsRaised.callAsync(params.index);
   }
 
   /**
    * Return the total no. of tokens sold
    */
-  public getTotalTokensSold  = async (): Promise<BigNumber> => {
+  public totalTokensSold  = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).totalTokensSold.callAsync();
   }
 
   /**
    * Current tier
    */
-  public getCurrentTier = async (): Promise<BigNumber> => {
+  public currentTier = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).currentTier.callAsync();
   }
 
   /**
    * Get the limit in USD for non-accredited investors
    */
-  public getNonAccreditedLimitUSD = async (): Promise<BigNumber> => {
+  public nonAccreditedLimitUSD = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).nonAccreditedLimitUSD.callAsync();
   }
 
   /**
    * Get the minimun investment in USD
    */
-  public getMinimumInvestmentUSD = async (): Promise<BigNumber> => {
+  public minimumInvestmentUSD = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).minimumInvestmentUSD.callAsync();
   }
 
   /**
    * Ethereum account address to receive unsold tokens
    */
-  public getReserveWallet = async (): Promise<string> => {
+  public reserveWallet = async (): Promise<string> => {
     return await (await this.usdTieredSTOContract).reserveWallet.callAsync();
   }
 
@@ -415,21 +765,21 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Amount of USD funds raised
    */
-  public getFundsRaisedUSD = async (): Promise<BigNumber> => {
+  public fundsRaisedUSD = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).fundsRaisedUSD.callAsync();
   }
 
   /**
    * Number of individual investors this STO have.
    */
-  public getInvestorCount = async (): Promise<BigNumber> => {
+  public investorCount = async (): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).investorCount.callAsync();
   }
 
   /**
    * Get specific tier
    */
-  public getTiers = async (params: IGetTiersParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
+  public tiers = async (params: ITiersParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
     return await (await this.usdTieredSTOContract).tiers.callAsync(params.index);
   }
 
@@ -462,7 +812,7 @@ export class USDTieredSTOWrapper extends ContractWrapper {
   /**
    * Amount of stable coins raised
    */
-  public getStableCoinsRaised = async (params: IGetStableCoinsRaisedParams): Promise<BigNumber> => {
+  public stableCoinsRaised = async (params: IStableCoinsRaisedParams): Promise<BigNumber> => {
     return await (await this.usdTieredSTOContract).stableCoinsRaised.callAsync(params.index);
   }
 
