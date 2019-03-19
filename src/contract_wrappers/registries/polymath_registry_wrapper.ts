@@ -9,17 +9,17 @@ import {
 import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { assert } from '../utils/assert';
+import { assert } from '../../utils/assert';
 import * as _ from 'lodash';
-import { ContractWrapper } from './contract_wrapper';
-import * as AddressesUtils from '../utils/addresses';
+import { ContractWrapper } from '../contract_wrapper';
+import * as AddressesUtils from '../../utils/addresses';
 import {
   ITxParams,
   NetworkId,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
-} from '../types';
+} from '../../types';
 import { schemas } from '@0x/json-schemas';
 
 interface IChangeAddressSubscribeAsyncParams extends ISubscribeAsyncParams {

@@ -1,7 +1,7 @@
 import { Web3Wrapper } from "@0x/web3-wrapper";
-import { CappedSTOWrapper } from "../contract_wrappers/capped_sto_wrapper";
-import { USDTieredSTOWrapper } from "../contract_wrappers/usd_tiered_sto_wrapper";
-import { GeneralTransferManagerWrapper } from "../contract_wrappers/general_transfer_manager_wrapper";
+import { CappedSTOWrapper } from "../contract_wrappers/modules/sto/capped_sto_wrapper";
+import { USDTieredSTOWrapper } from "../contract_wrappers/modules/sto/usd_tiered_sto_wrapper";
+import { GeneralTransferManagerWrapper } from "../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper";
 
 interface IGetModuleParams {
   address: string, 
