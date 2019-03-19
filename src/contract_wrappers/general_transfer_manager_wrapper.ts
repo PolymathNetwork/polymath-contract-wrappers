@@ -13,7 +13,6 @@ import {
     GeneralTransferManagerPauseEventArgs,
     GeneralTransferManagerUnpauseEventArgs
   } from '@polymathnetwork/abi-wrappers';
-  import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
   import { GeneralTransferManager } from '@polymathnetwork/contract-artifacts';
   import { Web3Wrapper } from '@0x/web3-wrapper';
   import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -230,17 +229,17 @@ import {
    */
   export class GeneralTransferManagerWrapper extends ContractWrapper {
     public abi: ContractAbi = GeneralTransferManager.abi;
-    private polymathRegistry: PolymathRegistryWrapper;
+    private address: string;
     private generalTransferManagerContract: Promise<GeneralTransferManagerContract>;
   
     /**
      * Instantiate GeneralTransferManagerWrapper
      * @param web3Wrapper Web3Wrapper instance to use
-     * @param polymathRegistry The PolymathRegistryWrapper instance contract
+     * @param address The address of the GTM
      */
-    constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+    constructor(web3Wrapper: Web3Wrapper, address: string) {
       super(web3Wrapper);
-      this.polymathRegistry = polymathRegistry;
+      this.address = address;
       this.generalTransferManagerContract = this._getGeneralTransferManagerContract();
     }
   
@@ -529,7 +528,7 @@ import {
     private async _getGeneralTransferManagerContract(): Promise<GeneralTransferManagerContract> {
       return new GeneralTransferManagerContract(
         this.abi,
-        await this.polymathRegistry.getPolyTokenAddress(),
+        this.address,
         this._web3Wrapper.getProvider(),
         this._web3Wrapper.getContractDefaults(),
       );
