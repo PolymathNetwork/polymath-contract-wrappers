@@ -8,6 +8,11 @@ interface IGetModuleParams {
   name: string
 }
 
+interface IGetGeneralTransferManager extends IGetModuleParams {
+  address: string, 
+  name: 'GeneralTransferManager'
+}
+
 interface IGetCappedSTO extends IGetModuleParams {
   address: string, 
   name: 'CappedSTO'
@@ -19,6 +24,7 @@ interface IGetUSDTieredSTO extends IGetModuleParams {
 }
 
 interface IGetModuleInstance {
+  (params: IGetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
   (params: IGetCappedSTO): Promise<CappedSTOWrapper>;
   (params: IGetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
 }
