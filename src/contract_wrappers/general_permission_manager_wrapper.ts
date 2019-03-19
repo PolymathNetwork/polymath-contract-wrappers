@@ -173,10 +173,6 @@ import {
     public factory = async (): Promise<string> => {
         return await (await this.generalPermissionManagerContract).factory.callAsync();
     }
-  
-    public FEE_ADMIN = async (): Promise<string> => {
-        return await (await this.generalPermissionManagerContract).FEE_ADMIN.callAsync();
-    }
 
     public delegateDetails = async (params: IDelegateDetailsParams): Promise<string> => {
         return await (await this.generalPermissionManagerContract).delegateDetails.callAsync(
