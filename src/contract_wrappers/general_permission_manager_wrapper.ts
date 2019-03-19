@@ -50,9 +50,9 @@ import {
   }
 
     interface IPermsParams {
-        index_0: string,
-        index_1: string,
-        index_2: string,
+        moduleAddress: string,
+        delegateAddress: string,
+        permission: string,
     }
 
     interface ITakeFeeParams extends ITxParams {
@@ -60,11 +60,11 @@ import {
     }
 
     interface IAllDelegatesParams {
-        index_0: BigNumber,
+        index: BigNumber,
     }
 
     interface IDelegateDetailsParams {
-        index_0: string,
+        address: string,
     }
 
     interface ICheckPermissionParams {
@@ -138,9 +138,9 @@ import {
 
     public perms = async (params: IPermsParams): Promise<boolean> => {
         return await (await this.generalPermissionManagerContract).perms.callAsync(
-            params.index_0,
-            params.index_1,
-            params.index_2,
+            params.moduleAddress,
+            params.delegateAddress,
+            params.permission,
         );
     }
 
@@ -162,7 +162,7 @@ import {
 
     public allDelegates = async (params: IAllDelegatesParams): Promise<string> => {
         return await (await this.generalPermissionManagerContract).allDelegates.callAsync(
-            params.index_0,
+            params.index,
         );
     }
 
@@ -180,7 +180,7 @@ import {
 
     public delegateDetails = async (params: IDelegateDetailsParams): Promise<string> => {
         return await (await this.generalPermissionManagerContract).delegateDetails.callAsync(
-            params.index_0,
+            params.address,
         );
     }
 
