@@ -1,6 +1,6 @@
-import { SecurityTokenRegistryWrapper } from "../contract_wrappers/security_token_registry_wrapper";
-import { SecurityTokenWrapper } from "../contract_wrappers/security_token_wrapper";
-import { DetailedERC20Wrapper } from "../contract_wrappers/detailed_erc20_wrapper";
+import { SecurityTokenRegistryWrapper } from "../contract_wrappers/registries/security_token_registry_wrapper";
+import { SecurityTokenWrapper } from "../contract_wrappers/tokens/security_token_wrapper";
+import { DetailedERC20Wrapper } from "../contract_wrappers/tokens/detailed_erc20_wrapper";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 
 /**

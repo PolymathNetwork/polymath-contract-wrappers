@@ -8,19 +8,18 @@ import {
   CappedSTOPauseEventArgs,
   CappedSTOUnpauseEventArgs
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { CappedSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import { ContractWrapper } from './contract_wrapper';
+import { ContractWrapper } from '../../contract_wrapper';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback
-} from '../types';
-import { assert } from '../utils/assert';
+} from '../../../types';
+import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
 interface ITokenPurchaseSubscribeAsyncParams extends ISubscribeAsyncParams {

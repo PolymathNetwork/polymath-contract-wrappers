@@ -10,14 +10,14 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import { ContractWrapper } from './contract_wrapper';
+import { ContractWrapper } from '../contract_wrapper';
 import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
-} from '../types';
-import { assert } from '../utils/assert';
+} from '../../types';
+import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
 interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {

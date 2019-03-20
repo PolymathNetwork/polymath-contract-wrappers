@@ -15,13 +15,13 @@ import {
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { PolymathRegistryWrapper } from './contract_wrappers/polymath_registry_wrapper';
-import { SecurityTokenRegistryWrapper } from './contract_wrappers/security_token_registry_wrapper';
-import { PolyTokenWrapper } from './contract_wrappers/poly_token_wrapper';
-import { ModuleRegistryWrapper } from './contract_wrappers/module_registry_wrapper';
+import { PolymathRegistryWrapper } from './contract_wrappers/registries/polymath_registry_wrapper';
+import { SecurityTokenRegistryWrapper } from './contract_wrappers/registries/security_token_registry_wrapper';
+import { PolyTokenWrapper } from './contract_wrappers/tokens/poly_token_wrapper';
+import { ModuleRegistryWrapper } from './contract_wrappers/registries/module_registry_wrapper';
 import { TokenWrapperFactory } from './factories/tokenWrapperFactory';
 import { ModuleWrapperFactory } from './factories/moduleWrapperFactory';
-import { FeatureRegistryWrapper } from './contract_wrappers/feature_registry_wrapper';
+import { FeatureRegistryWrapper } from './contract_wrappers/registries/feature_registry_wrapper';
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
 

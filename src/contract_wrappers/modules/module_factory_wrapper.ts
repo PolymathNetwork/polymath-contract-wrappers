@@ -10,18 +10,18 @@ import {
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
   ModuleFactoryChangeSTVersionBoundEventArgs
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
+import { PolymathRegistryWrapper } from '../registries/polymath_registry_wrapper';
 import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
-import { ContractWrapper } from './contract_wrapper';
+import { ContractWrapper } from '../contract_wrapper';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
-} from '../types';
-import { assert } from '../utils/assert';
+} from '../../types';
+import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 
 interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {

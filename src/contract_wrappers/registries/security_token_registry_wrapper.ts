@@ -18,15 +18,15 @@ import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { assert } from '../utils/assert';
+import { assert } from '../../utils/assert';
 import * as _ from 'lodash';
-import { ContractWrapper } from './contract_wrapper';
+import { ContractWrapper } from '../contract_wrapper';
 import {
   ITxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
-} from '../types';
+} from '../../types';
 import { schemas } from '@0x/json-schemas';
 import * as moment from 'moment';
 
