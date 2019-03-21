@@ -112,31 +112,32 @@ interface IGetModuleFactoryLogsAsyncParams {
  */
 export class ModuleFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleFactory.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
-  private moduleFactoryContract: Promise<ModuleFactoryContract>;
+  protected _contract: Promise<ModuleFactoryContract>;
+  private _address: string;
+  
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param address The contract instance address
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
-    this.moduleFactoryContract = this._getModuleFactoryContract();
+    this._address = address;
+    this._contract = this._getModuleFactoryContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.moduleFactoryContract).address;
+    return (await this._contract).address;
   }
 
   /**
    * Get the name of the Module
    */
   public getName = async (): Promise<string> => {
-    return await (await this.moduleFactoryContract).name.callAsync();
+    return await (await this._contract).name.callAsync();
   }
 
   /**
@@ -149,7 +150,7 @@ export class ModuleFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.moduleFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -187,7 +188,7 @@ export class ModuleFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.moduleFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -201,9 +202,7 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   private async _getModuleFactoryContract(): Promise<ModuleFactoryContract> {
     return new ModuleFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'ModuleFactory',
-      }),
+      this._address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );

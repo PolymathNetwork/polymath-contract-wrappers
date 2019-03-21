@@ -15,7 +15,6 @@ import {
   import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
   import { BigNumber } from '@0x/utils';
   import * as _ from 'lodash';
-  import { ContractWrapper } from '../../contract_wrapper';
   import {
     ITxParams,
     IGetLogsAsyncParams,
@@ -24,6 +23,7 @@ import {
   } from '../../../types';
   import { assert } from '../../../utils/assert';
   import { schemas } from '@0x/json-schemas';
+  import { ModuleWrapper } from '../module_wrapper';
   
   interface IERC20DividendDepositedSubscribeAsyncParams extends ISubscribeAsyncParams {
     eventName: ERC20DividendCheckpointEvents.ERC20DividendDeposited,
@@ -139,10 +139,6 @@ import {
     interface IGetDividendIndexParams {
         checkpointId: BigNumber,
     }
-
-    interface ITakeFeeParams extends ITxParams {
-        amount: BigNumber,
-    }
     
     interface IWithholdingTaxParams {
         investor: string,
@@ -235,50 +231,40 @@ import {
   /**
    * This class includes the functionality related to interacting with the ERC20DividendCheckpoint contract.
    */
-  export class ERC20DividendCheckpointWrapper extends ContractWrapper {
+  export class ERC20DividendCheckpointWrapper extends ModuleWrapper {
     public abi: ContractAbi = ERC20DividendCheckpoint.abi;
-    private polymathRegistry: PolymathRegistryWrapper;
-    private erc20DividendCheckpointContract: Promise<ERC20DividendCheckpointContract>;
+    protected _address: string;
+    protected _contract: Promise<ERC20DividendCheckpointContract>;
   
     /**
      * Instantiate ERC20DividendCheckpointWrapper
      * @param web3Wrapper Web3Wrapper instance to use
-     * @param polymathRegistry The PolymathRegistryWrapper instance contract
+     * @param address The contract instance address
      */
     constructor(web3Wrapper: Web3Wrapper, address: string) {
-      super(web3Wrapper, address);
-      this.erc20DividendCheckpointContract = this._getERC20DividendCheckpointContract();
-    }
-  
-    /**
-     * Returns the contract address
-     */
-    public getAddress = async (): Promise<string> => {
-      return (await this.erc20DividendCheckpointContract).address;
+        super(web3Wrapper, address);
+        this._address = address;
+        this._contract = this._getERC20DividendCheckpointContract();
     }
   
     public setWithholdingFixed = async (params: ISetWithholdingFixedParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).setWithholdingFixed.sendTransactionAsync(
+            return (await this._contract).setWithholdingFixed.sendTransactionAsync(
                 params.investors,
                 params.withholding,
             );
         }
     }
 
-    public getInitFunction = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).getInitFunction.callAsync();
-    }
-
     public getDividendData = async (params: IGetDividendDataParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
-        return await (await this.erc20DividendCheckpointContract).getDividendData.callAsync(
+        return await (await this._contract).getDividendData.callAsync(
             params.dividendIndex,
         );
     }
 
     public pullDividendPayment = async (params: IPullDividendPaymentParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).pullDividendPayment.sendTransactionAsync(
+            return (await this._contract).pullDividendPayment.sendTransactionAsync(
                 params.dividendIndex,
             );
         }
@@ -286,7 +272,7 @@ import {
 
     public pushDividendPaymentToAddresses = async (params: IPushDividendPaymentToAddressesParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).pushDividendPaymentToAddresses.sendTransactionAsync(
+            return (await this._contract).pushDividendPaymentToAddresses.sendTransactionAsync(
                 params.dividendIndex,
                 params.payees,
             );
@@ -294,61 +280,49 @@ import {
     }
 
     public isClaimed = async (params: IIsClaimedParams): Promise<boolean> => {
-        return await (await this.erc20DividendCheckpointContract).isClaimed.callAsync(
+        return await (await this._contract).isClaimed.callAsync(
             params.investor,
             params.dividendIndex,
         );
     }
 
     public calculateDividend = async (params: ICalculateDividendParams): Promise<[BigNumber, BigNumber]> => {
-        return await (await this.erc20DividendCheckpointContract).calculateDividend.callAsync(
+        return await (await this._contract).calculateDividend.callAsync(
             params.dividendIndex,
             params.payee,
         );
     }
 
     public getDividendIndex = async (params: IGetDividendIndexParams): Promise<BigNumber[]> => {
-        return await (await this.erc20DividendCheckpointContract).getDividendIndex.callAsync(
+        return await (await this._contract).getDividendIndex.callAsync(
             params.checkpointId,
         );
     }
 
-    public takeFee = async (params: ITakeFeeParams) => {
-        return async () => {
-            return (await this.erc20DividendCheckpointContract).takeFee.sendTransactionAsync(
-                params.amount,
-            );
-        }
-    }
-
-    public polyToken = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).polyToken.callAsync();
-    }
-
     public withholdingTax = async (params: IWithholdingTaxParams): Promise<BigNumber> => {
-        return await (await this.erc20DividendCheckpointContract).withholdingTax.callAsync(
+        return await (await this._contract).withholdingTax.callAsync(
             params.investor,
         );
     }
 
     public getCheckpointData = async (params: IGetCheckpointDataParams): Promise<[string[], BigNumber[], BigNumber[]]> => {
-        return await (await this.erc20DividendCheckpointContract).getCheckpointData.callAsync(
+        return await (await this._contract).getCheckpointData.callAsync(
             params.checkpointId,
         );
     }
 
     public DISTRIBUTE = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).DISTRIBUTE.callAsync();
+        return await (await this._contract).DISTRIBUTE.callAsync();
     }
 
     public dividends = async (params: IDividendsParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber, BigNumber, string]> => {
-        return await (await this.erc20DividendCheckpointContract).dividends.callAsync(
+        return await (await this._contract).dividends.callAsync(
             params.dividendIndex,
         );
     }
 
     public isExcluded = async (params: IIsExcludedParams): Promise<boolean> => {
-        return await (await this.erc20DividendCheckpointContract).isExcluded.callAsync(
+        return await (await this._contract).isExcluded.callAsync(
             params.investor,
             params.dividendIndex,
         );
@@ -356,7 +330,7 @@ import {
 
     public setWithholding = async (params: ISetWithholdingParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).setWithholding.sendTransactionAsync(
+            return (await this._contract).setWithholding.sendTransactionAsync(
                 params.investors,
                 params.withholding,
             );
@@ -364,36 +338,24 @@ import {
     }
 
     public dividendTokens = async (params: IDividendTokensParams): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).dividendTokens.callAsync(
+        return await (await this._contract).dividendTokens.callAsync(
             params.investor,
         );
     }
 
     public getDividendsData = async (): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]]> => {
-        return await (await this.erc20DividendCheckpointContract).getDividendsData.callAsync();
-    }
-
-    public securityToken = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).securityToken.callAsync();
+        return await (await this._contract).getDividendsData.callAsync();
     }
 
     public excluded = async (params: IExcludedParams): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).excluded.callAsync(
+        return await (await this._contract).excluded.callAsync(
             params.dividendIndex,
         );
     }
 
-    public getPermissions = async (): Promise<string[]> => {
-        return await (await this.erc20DividendCheckpointContract).getPermissions.callAsync();
-    }
-
-    public factory = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).factory.callAsync();
-    }
-
     public setDefaultExcluded = async (params: ISetDefaultExcludedParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).setDefaultExcluded.sendTransactionAsync(
+            return (await this._contract).setDefaultExcluded.sendTransactionAsync(
                 params.excluded,
             );
         }
@@ -401,7 +363,7 @@ import {
 
     public pushDividendPayment = async (params: IPushDividendPaymentParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).pushDividendPayment.sendTransactionAsync(
+            return (await this._contract).pushDividendPayment.sendTransactionAsync(
                 params.dividendIndex,
                 params.start,
                 params.iterations,
@@ -410,24 +372,24 @@ import {
     }
 
     public getDefaultExcluded = async (): Promise<string[]> => {
-        return await (await this.erc20DividendCheckpointContract).getDefaultExcluded.callAsync();
+        return await (await this._contract).getDefaultExcluded.callAsync();
     }
 
     public getDividendProgress = async (params: IGetDividendProgressParams): Promise<[string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]]> => {
-        return await (await this.erc20DividendCheckpointContract).getDividendProgress.callAsync(
+        return await (await this._contract).getDividendProgress.callAsync(
             params.dividendIndex,
         );
     }
 
     public createCheckpoint = async (params: ITxParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).createCheckpoint.sendTransactionAsync();
+            return (await this._contract).createCheckpoint.sendTransactionAsync();
         }
     }
 
     public createDividend = async (params: ICreateDividendParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).createDividend.sendTransactionAsync(
+            return (await this._contract).createDividend.sendTransactionAsync(
                 params.maturity,
                 params.expiry,
                 params.token,
@@ -439,7 +401,7 @@ import {
 
     public createDividendWithCheckpoint = async (params: ICreateDividendWithCheckpointParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).createDividendWithCheckpoint.sendTransactionAsync(
+            return (await this._contract).createDividendWithCheckpoint.sendTransactionAsync(
                 params.maturity,
                 params.expiry,
                 params.token,
@@ -452,7 +414,7 @@ import {
 
     public createDividendWithExclusions = async (params: ICreateDividendWithExclusionsParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).createDividendWithExclusions.sendTransactionAsync(
+            return (await this._contract).createDividendWithExclusions.sendTransactionAsync(
                 params.maturity,
                 params.expiry,
                 params.token,
@@ -465,7 +427,7 @@ import {
 
     public createDividendWithCheckpointAndExclusions = async (params: ICreateDividendWithCheckpointAndExclusionsParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
+            return (await this._contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
                 params.maturity,
                 params.expiry,
                 params.token,
@@ -479,7 +441,7 @@ import {
 
     public reclaimDividend = async (params: IReclaimDividendParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).reclaimDividend.sendTransactionAsync(
+            return (await this._contract).reclaimDividend.sendTransactionAsync(
                 params.dividendIndex,
             );
         }
@@ -487,7 +449,7 @@ import {
 
     public withdrawWithholding = async (params: IWithdrawWithholdingParams) => {
         return async () => {
-            return (await this.erc20DividendCheckpointContract).reclaimDividend.sendTransactionAsync(
+            return (await this._contract).reclaimDividend.sendTransactionAsync(
                 params.dividendIndex,
             );
         }
@@ -503,7 +465,7 @@ import {
       assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DividendCheckpointEvents);
       assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
       assert.isFunction('callback', params.callback);
-      const normalizedContractAddress = (await this.erc20DividendCheckpointContract).address.toLowerCase();
+      const normalizedContractAddress = (await this._contract).address.toLowerCase();
       const subscriptionToken = this._subscribe<ArgsType>(
           normalizedContractAddress,
           params.eventName,
@@ -541,7 +503,7 @@ import {
       assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DividendCheckpointEvents);
       assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
       assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-      const normalizedContractAddress = (await this.erc20DividendCheckpointContract).address.toLowerCase();
+      const normalizedContractAddress = (await this._contract).address.toLowerCase();
       const logs = await this._getLogsAsync<ArgsType>(
           normalizedContractAddress,
           params.eventName,

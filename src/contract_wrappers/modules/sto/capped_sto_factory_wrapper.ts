@@ -113,8 +113,9 @@ interface IGetCappedSTOFactoryLogsAsyncParams {
  */
 export class CappedSTOFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = CappedSTOFactory.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
-  private cappedSTOFactoryContract: Promise<CappedSTOFactoryContract>;
+  protected _contract: Promise<CappedSTOFactoryContract>;
+  private _polymathRegistry: PolymathRegistryWrapper;
+  
   /**
    * Instantiate CappedSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -122,22 +123,22 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
-    this.cappedSTOFactoryContract = this._getCappedSTOFactoryContract();
+    this._polymathRegistry = polymathRegistry;
+    this._contract = this._getCappedSTOFactoryContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.cappedSTOFactoryContract).address;
+    return (await this._contract).address;
   }
 
   /**
    * Get the setup cost of the module
    */
   public getSetupCost = async (): Promise<BigNumber> => {
-    return await (await this.cappedSTOFactoryContract).getSetupCost.callAsync();
+    return await (await this._contract).getSetupCost.callAsync();
   }
 
   /**
@@ -150,7 +151,7 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOFactoryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.cappedSTOFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -188,7 +189,7 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOFactoryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.cappedSTOFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -202,7 +203,7 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
   private async _getCappedSTOFactoryContract(): Promise<CappedSTOFactoryContract> {
     return new CappedSTOFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
+      await this._polymathRegistry.getAddress({
         contractName: 'CappedSTOFactory',
       }),
       this._web3Wrapper.getProvider(),

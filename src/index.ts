@@ -11,7 +11,7 @@ export { SecurityTokenRegistryWrapper as SecurityTokenRegistry } from './contrac
 export { SecurityTokenWrapper as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
 export { USDTieredSTOFactoryWrapper as USDTieredSTOFactory } from './contract_wrappers/modules/sto/usd_tiered_sto_factory_wrapper';
 export { USDTieredSTOWrapper as USDTieredSTO } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-export { DetailedERC20Wrapper as DetailedERC20 } from './contract_wrappers/tokens/detailed_erc20_wrapper';
+export { ERC20TokenWrapper as DetailedERC20 } from './contract_wrappers/tokens/erc20_wrapper';
 export { ERC20DividendCheckpointWrapper as ERC20DividendCheckpoint } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';

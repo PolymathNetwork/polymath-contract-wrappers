@@ -19,12 +19,14 @@ import {
 import { filterUtils } from '../utils/filter_utils';
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
 import * as _ from 'lodash';
+import { BaseContract } from '@0x/base-contract';
 
 const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
 const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
 
 export abstract class ContractWrapper {
     public abstract abi: ContractAbi;
+    protected abstract _contract: Promise<BaseContract>;
     protected _web3Wrapper: Web3Wrapper;
     private _blockAndLogStreamerIfExists: BlockAndLogStreamer<Block, Log> | undefined;
     private _blockAndLogStreamIntervalIfExists?: NodeJS.Timer;
