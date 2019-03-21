@@ -1,5 +1,9 @@
 import {
-    ModuleContract
+    ModuleContract, 
+    GeneralPermissionManagerContract, 
+    GeneralTransferManagerContract, 
+    CappedSTOContract, 
+    USDTieredSTOContract
   } from '@polymathnetwork/abi-wrappers';
 import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -13,21 +17,30 @@ interface ITakeFeeParams extends ITxParams {
   amount: BigNumber,
 }
 
+type GenericModuleContract = 
+  ModuleContract |
+  GeneralPermissionManagerContract |
+  GeneralTransferManagerContract |
+  CappedSTOContract |
+  USDTieredSTOContract;
+
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
-export abstract class ModuleWrapper extends ContractWrapper {
+export class ModuleWrapper extends ContractWrapper {
   public abi: ContractAbi = Module.abi;
-  protected _contract: Promise<ModuleContract>;
+  protected _address: string;
+  protected _contract: Promise<GenericModuleContract>;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param address The module contract instance address
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleContract>) {
+  constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this._contract = contract;
+    this._address = address;
+    this._contract = this._getModuleContract();
   }
 
   /**
@@ -65,4 +78,12 @@ export abstract class ModuleWrapper extends ContractWrapper {
     }
   }
 
+  private async _getModuleContract(): Promise<ModuleContract> {
+    return new ModuleContract(
+      this.abi,
+      this._address,
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
+    );
+  }
 }

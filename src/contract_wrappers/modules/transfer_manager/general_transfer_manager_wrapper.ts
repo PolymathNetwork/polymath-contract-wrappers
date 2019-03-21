@@ -12,21 +12,21 @@ import {
     GeneralTransferManagerModifyWhitelistEventArgs,
     GeneralTransferManagerPauseEventArgs,
     GeneralTransferManagerUnpauseEventArgs
-  } from '@polymathnetwork/abi-wrappers';
-  import { GeneralTransferManager } from '@polymathnetwork/contract-artifacts';
-  import { Web3Wrapper } from '@0x/web3-wrapper';
-  import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-  import { BigNumber } from '@0x/utils';
-  import * as _ from 'lodash';
-  import { ContractWrapper } from '../../contract_wrapper';
-  import {
+} from '@polymathnetwork/abi-wrappers';
+import { GeneralTransferManager } from '@polymathnetwork/contract-artifacts';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
+import { BigNumber } from '@0x/utils';
+import * as _ from 'lodash';
+import {
     ITxParams,
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
-  } from '../../../types';
-  import { assert } from '../../../utils/assert';
-  import { schemas } from '@0x/json-schemas';
+} from '../../../types';
+import { assert } from '../../../utils/assert';
+import { schemas } from '@0x/json-schemas';
+import { ModuleWrapper } from '../module_wrapper';
   
   interface IChangeIssuanceAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
     eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress,
@@ -148,10 +148,6 @@ import {
         index: BigNumber,
     }
 
-    interface ITakeFeeParams extends ITxParams {
-        amount: BigNumber,
-    }
-
     interface IWhitelistParams {
         address: string,
     }
@@ -227,10 +223,9 @@ import {
   /**
    * This class includes the functionality related to interacting with the General Transfer Manager contract.
    */
-  export class GeneralTransferManagerWrapper extends ContractWrapper {
+  export class GeneralTransferManagerWrapper extends ModuleWrapper {
     public abi: ContractAbi = GeneralTransferManager.abi;
-    private address: string;
-    private generalTransferManagerContract: Promise<GeneralTransferManagerContract>;
+    protected _contract: Promise<GeneralTransferManagerContract>;
   
     /**
      * Instantiate GeneralTransferManagerWrapper
@@ -238,116 +233,83 @@ import {
      * @param address The address of the GTM
      */
     constructor(web3Wrapper: Web3Wrapper, address: string) {
-      super(web3Wrapper);
-      this.address = address;
-      this.generalTransferManagerContract = this._getGeneralTransferManagerContract();
+      super(web3Wrapper, address);
+      this._contract = this._getGeneralTransferManagerContract();
     }
   
     /**
      * Returns the contract address
      */
     public getAddress = async (): Promise<string> => {
-      return (await this.generalTransferManagerContract).address;
+      return (await this._contract).address;
     }
   
     public allowAllBurnTransfers = async (): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).allowAllBurnTransfers.callAsync();
-    }
-
-    public WHITELIST = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).WHITELIST.callAsync();
+        return await (await this._contract).allowAllBurnTransfers.callAsync();
     }
 
     public allowAllWhitelistTransfers = async (): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).allowAllWhitelistTransfers.callAsync();
+        return await (await this._contract).allowAllWhitelistTransfers.callAsync();
     }
 
     public unpause = async (params: ITxParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).unpause.sendTransactionAsync();
+            return (await this._contract).unpause.sendTransactionAsync();
         }
     }
 
     public investors = async (params: IInvestorsParams): Promise<string> => {
-        return await (await this.generalTransferManagerContract).investors.callAsync(
+        return await (await this._contract).investors.callAsync(
             params.index,
         );
     }
 
     public paused = async (): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).paused.callAsync();
-    }
-
-    public takeFee = async (params: ITakeFeeParams) => {
-        return async () => {
-            return (await this.generalTransferManagerContract).takeFee.sendTransactionAsync(
-                params.amount,
-            );
-        }
-    }
-
-    public polyToken = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).polyToken.callAsync();
+        return await (await this._contract).paused.callAsync();
     }
 
     public pause = async (params: ITxParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).pause.sendTransactionAsync();
+            return (await this._contract).pause.sendTransactionAsync();
         }
     } 
-    
-    public FLAGS = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).FLAGS.callAsync();
-    }
 
     public whitelist = async (params: IWhitelistParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
-        return await (await this.generalTransferManagerContract).whitelist.callAsync(
+        return await (await this._contract).whitelist.callAsync(
             params.address,
         );
     }
 
     public nonceMap = async (params: INonceMapParams): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).nonceMap.callAsync(
+        return await (await this._contract).nonceMap.callAsync(
             params.address,
             params.nonce,
         );
     }
 
     public allowAllTransfers = async (): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).allowAllTransfers.callAsync();
+        return await (await this._contract).allowAllTransfers.callAsync();
     }
 
     public signingAddress = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).signingAddress.callAsync();
+        return await (await this._contract).signingAddress.callAsync();
     }
 
     public issuanceAddress = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).issuanceAddress.callAsync();
-    }
-
-    public securityToken = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).securityToken.callAsync();
-    }
-
-    public factory = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).factory.callAsync();
+        return await (await this._contract).issuanceAddress.callAsync();
     }
 
     public allowAllWhitelistIssuances = async (): Promise<boolean> => {
-        return await (await this.generalTransferManagerContract).allowAllWhitelistIssuances.callAsync();
+        return await (await this._contract).allowAllWhitelistIssuances.callAsync();
     }
 
     public defaults = async (): Promise<[BigNumber, BigNumber]> => {
-        return await (await this.generalTransferManagerContract).defaults.callAsync();
-    }
-
-    public getInitFunction = async (): Promise<string> => {
-        return await (await this.generalTransferManagerContract).getInitFunction.callAsync();
+        return await (await this._contract).defaults.callAsync();
     }
 
     public changeDefaults = async (params: IChangeDefaultsParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeDefaults.sendTransactionAsync(
+            return (await this._contract).changeDefaults.sendTransactionAsync(
                 params.defaultFromTime,
                 params.defaultToTime,
             );
@@ -356,7 +318,7 @@ import {
 
     public changeIssuanceAddress = async (params: IChangeIssuanceAddressParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeIssuanceAddress.sendTransactionAsync(
+            return (await this._contract).changeIssuanceAddress.sendTransactionAsync(
                 params.issuanceAddress,
             );
         }
@@ -364,7 +326,7 @@ import {
 
     public changeSigningAddress = async (params: IChangeSigningAddressParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeSigningAddress.sendTransactionAsync(
+            return (await this._contract).changeSigningAddress.sendTransactionAsync(
                 params.signingAddress,
             );
         }
@@ -372,7 +334,7 @@ import {
 
     public changeAllowAllTransfers = async (params: IChangeAllowAllTransfersParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeAllowAllTransfers.sendTransactionAsync(
+            return (await this._contract).changeAllowAllTransfers.sendTransactionAsync(
                 params.allowAllTransfers,
             );
         }
@@ -380,7 +342,7 @@ import {
 
     public changeAllowAllWhitelistTransfers = async (params: IChangeAllowAllWhitelistTransfersParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
+            return (await this._contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
                 params.allowAllWhitelistTransfers,
             );
         }
@@ -388,7 +350,7 @@ import {
 
     public changeAllowAllWhitelistIssuances = async (params: IChangeAllowAllWhitelistIssuancesParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
+            return (await this._contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
                 params.allowAllWhitelistIssuances,
             );
         }
@@ -396,7 +358,7 @@ import {
 
     public changeAllowAllBurnTransfers = async (params: IChangeAllowAllBurnTransfersParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).changeAllowAllBurnTransfers.sendTransactionAsync(
+            return (await this._contract).changeAllowAllBurnTransfers.sendTransactionAsync(
                 params.allowAllBurnTransfers,
             );
         }
@@ -404,7 +366,7 @@ import {
 
     public verifyTransfer = async (params: IVerifyTransferParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).verifyTransfer.sendTransactionAsync(
+            return (await this._contract).verifyTransfer.sendTransactionAsync(
                 params.from,
                 params.to,
                 params.amount,
@@ -416,7 +378,7 @@ import {
 
     public modifyWhitelist = async (params: IModifyWhitelistParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).modifyWhitelist.sendTransactionAsync(
+            return (await this._contract).modifyWhitelist.sendTransactionAsync(
                 params.investor,
                 params.fromTime,
                 params.toTime,
@@ -428,7 +390,7 @@ import {
 
     public modifyWhitelistSigned = async (params: IModifyWhitelistSignedParams) => {
         return async () => {
-            return (await this.generalTransferManagerContract).modifyWhitelistSigned.sendTransactionAsync(
+            return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
                 params.investor,
                 params.fromTime,
                 params.toTime,
@@ -445,21 +407,17 @@ import {
     }
 
     public getInvestors = async (): Promise<string[]> => {
-        return await (await this.generalTransferManagerContract).getInvestors.callAsync();
+        return await (await this._contract).getInvestors.callAsync();
     }
 
     public getAllInvestorsData = async (): Promise<[string[], BigNumber[], BigNumber[], BigNumber[], boolean[]]> => {
-        return await (await this.generalTransferManagerContract).getAllInvestorsData.callAsync();
+        return await (await this._contract).getAllInvestorsData.callAsync();
     }
 
     public getInvestorsData = async (params: IGetInvestorsDataParams): Promise<[BigNumber[], BigNumber[], BigNumber[], boolean[]]> => {
-        return await (await this.generalTransferManagerContract).getInvestorsData.callAsync(
+        return await (await this._contract).getInvestorsData.callAsync(
             params.investors,
         );
-    }
-
-    public getPermissions = async (): Promise<string[]> => {
-        return await (await this.generalTransferManagerContract).getPermissions.callAsync();
     }
   
     /**
@@ -472,7 +430,7 @@ import {
       assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
       assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
       assert.isFunction('callback', params.callback);
-      const normalizedContractAddress = (await this.generalTransferManagerContract).address.toLowerCase();
+      const normalizedContractAddress = (await this._contract).address.toLowerCase();
       const subscriptionToken = this._subscribe<ArgsType>(
           normalizedContractAddress,
           params.eventName,
@@ -510,7 +468,7 @@ import {
       assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
       assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
       assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-      const normalizedContractAddress = (await this.generalTransferManagerContract).address.toLowerCase();
+      const normalizedContractAddress = (await this._contract).address.toLowerCase();
       const logs = await this._getLogsAsync<ArgsType>(
           normalizedContractAddress,
           params.eventName,
@@ -524,7 +482,7 @@ import {
     private async _getGeneralTransferManagerContract(): Promise<GeneralTransferManagerContract> {
       return new GeneralTransferManagerContract(
         this.abi,
-        this.address,
+        this._address,
         this._web3Wrapper.getProvider(),
         this._web3Wrapper.getContractDefaults(),
       );
