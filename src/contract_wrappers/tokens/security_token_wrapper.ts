@@ -20,15 +20,12 @@ import {
   SecurityTokenDisableControllerEventArgs,
   SecurityTokenOwnershipRenouncedEventArgs,
   SecurityTokenOwnershipTransferredEventArgs,
-  SecurityTokenApprovalEventArgs,
-  SecurityTokenTransferEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { SecurityToken } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import { ContractWrapper } from '../contract_wrapper';
 import {
   ITxParams,
   IGetLogsAsyncParams,
@@ -37,6 +34,11 @@ import {
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
+import { 
+  ERC20TokenWrapper, 
+  IERC20TokenSubscribeAsyncParams, 
+  IGetERC20TokenLogsAsyncParams 
+} from './erc20_wrapper';
 
 interface IModuleAddedSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenEvents.ModuleAdded,
@@ -200,25 +202,7 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: SecurityTokenEvents.OwnershipTransferred,
 }
 
-interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Approval,
-  callback: EventCallback<SecurityTokenApprovalEventArgs>,
-}
-
-interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Approval,
-}
-
-interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Transfer,
-  callback: EventCallback<SecurityTokenTransferEventArgs>,
-}
-
-interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Transfer,
-}
-
-interface ISecurityTokenSubscribeAsyncParams {
+interface ISecurityTokenSubscribeAsyncParams extends IERC20TokenSubscribeAsyncParams {
   (params: IModuleAddedSubscribeAsyncParams): Promise<string>,
   (params: IUpdateTokenDetailsSubscribeAsyncParams): Promise<string>,
   (params: IGranularityChangedSubscribeAsyncParams): Promise<string>,
@@ -236,12 +220,10 @@ interface ISecurityTokenSubscribeAsyncParams {
   (params: IForceBurnSubscribeAsyncParams): Promise<string>,
   (params: IDisableControllerSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
-  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
-  (params: ITransferSubscribeAsyncParams): Promise<string>,
-  (params: IApprovalSubscribeAsyncParams): Promise<string>,
+  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>
 }
 
-interface IGetSecurityTokenLogsAsyncParams {
+interface IGetSecurityTokenLogsAsyncParams extends IGetERC20TokenLogsAsyncParams {
   (params: IGetModuleAddedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>>>,
   (params: IGetUpdateTokenDetailsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>>>,
   (params: IGetGranularityChangedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>>>,
@@ -259,9 +241,7 @@ interface IGetSecurityTokenLogsAsyncParams {
   (params: IGetForceBurnLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenForceBurnEventArgs>>>,
   (params: IGetDisableControllerLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenDisableControllerEventArgs>>>,
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenOwnershipRenouncedEventArgs>>>,
-  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>>>,
-  (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenTransferEventArgs>>>,
-  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>>>,
+  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>>>
 }
 
 /**
@@ -296,51 +276,6 @@ interface IVerifyTransferParams {
   to: string;
   value: BigNumber;
   data: string;
-}
-
-/**
- * @param spender The address which will spend the funds
- * @param value The amount of tokens to be spent
- */
-interface IApproveParams extends ITxParams {
-  spender: string;
-  value: BigNumber;
-}
-
-/**
- * @param from The address which will spend the funds
- * @param to The address who will receive the funds
- * @param value The amount of tokens to be spent
- */
-interface ITransferFromParams extends ITxParams {
-  from: string;
-  to: string;
-  value: BigNumber;
-}
-
-/**
- * @param owner The address to query the the balance of
- */
-interface IGetBalanceOfParams {
-  owner?: string;
-}
-
-/**
- * @param to The address who will receive the funds
- * @param value The amount of tokens to be spent
- */
-interface ITransferParams extends ITxParams {
-  to: string;
-  value: BigNumber;
-}
-
-/**
- * @param owner address The address which owns the tokens
- * @param spender address The address which will spend the tokens
- */
-interface IAllowanceParams {
-  owner: string;
-  spender: string;
 }
 
 interface IDecreaseApprovalParams extends ITxParams {
@@ -485,38 +420,37 @@ interface IForceBurnParams extends ITxParams {
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
-export class SecurityTokenWrapper extends ContractWrapper {
+export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public abi: ContractAbi = (SecurityToken as any).abi;
-  private address: string;
-  private securityTokenContract: Promise<SecurityTokenContract>;
+  protected _contract: Promise<SecurityTokenContract>;
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param address The address contract
    */
   constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper);
-    this.address = address;
-    this.securityTokenContract = this._getSecurityTokenContract();
+    super(web3Wrapper, address);
+    this._contract = this._getSecurityTokenContract();
   }
 
   /**
    * Value of current checkpoint
    */
   public currentCheckpointId = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).currentCheckpointId.callAsync();
+    return await (await this._contract).currentCheckpointId.callAsync();
   }
 
   /**
    * Granular level of the token
    */
   public granularity = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).granularity.callAsync();
+    return await (await this._contract).granularity.callAsync();
   }
 
   public decreaseApproval = async (params: IDecreaseApprovalParams) => {
     return async () => {
-      return (await this.securityTokenContract).decreaseApproval.sendTransactionAsync(
+      return (await this._contract).decreaseApproval.sendTransactionAsync(
         params.spender,
         params.subtractedValue,
       );
@@ -524,50 +458,50 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   public polyToken = async (): Promise<string> => {
-    return await (await this.securityTokenContract).polyToken.callAsync();
+    return await (await this._contract).polyToken.callAsync();
   }
 
   public renounceOwnership = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).renounceOwnership.sendTransactionAsync();
+      return (await this._contract).renounceOwnership.sendTransactionAsync();
     }
   }
 
   public polymathRegistry = async (): Promise<string> => {
-    return await (await this.securityTokenContract).polymathRegistry.callAsync();
+    return await (await this._contract).polymathRegistry.callAsync();
   }
 
   public controllerDisabled = async (): Promise<boolean> => {
-    return await (await this.securityTokenContract).controllerDisabled.callAsync();
+    return await (await this._contract).controllerDisabled.callAsync();
   }
 
   public owner = async (): Promise<string> => {
-    return await (await this.securityTokenContract).owner.callAsync();
+    return await (await this._contract).owner.callAsync();
   }
 
   public mintingFrozen = async (): Promise<boolean> => {
-    return await (await this.securityTokenContract).mintingFrozen.callAsync();
+    return await (await this._contract).mintingFrozen.callAsync();
   }
 
   public moduleRegistry = async (): Promise<string> => {
-    return await (await this.securityTokenContract).moduleRegistry.callAsync();
+    return await (await this._contract).moduleRegistry.callAsync();
   }
 
   public featureRegistry = async (): Promise<string> => {
-    return await (await this.securityTokenContract).featureRegistry.callAsync();
+    return await (await this._contract).featureRegistry.callAsync();
   }
 
   public securityTokenRegistry = async (): Promise<string> => {
-    return await (await this.securityTokenContract).securityTokenRegistry.callAsync();
+    return await (await this._contract).securityTokenRegistry.callAsync();
   }
 
   public tokenDetails = async (): Promise<string> => {
-    return (await this.securityTokenContract).tokenDetails.callAsync();
+    return (await this._contract).tokenDetails.callAsync();
   }
 
   public increaseApproval = async (params: IIncreaseApprovalParams) => {
     return async () => {
-      return (await this.securityTokenContract).increaseApproval.sendTransactionAsync(
+      return (await this._contract).increaseApproval.sendTransactionAsync(
         params.spender,
         params.addedValue,
       );
@@ -575,12 +509,12 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   public transfersFrozen = async (): Promise<boolean> => {
-    return await (await this.securityTokenContract).transfersFrozen.callAsync();
+    return await (await this._contract).transfersFrozen.callAsync();
   }
 
   public transferOwnership = async (params: ITransferOwnershipParams) => {
     return async () => {
-      return (await this.securityTokenContract).transferOwnership.sendTransactionAsync(
+      return (await this._contract).transferOwnership.sendTransactionAsync(
         params.newOwner,
       );
     }
@@ -588,13 +522,13 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public updateFromRegistry = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).updateFromRegistry.sendTransactionAsync();
+      return (await this._contract).updateFromRegistry.sendTransactionAsync();
     }
   }
 
   public archiveModule = async (params: IArchiveModuleParams) => {
     return async () => {
-      return (await this.securityTokenContract).archiveModule.sendTransactionAsync(
+      return (await this._contract).archiveModule.sendTransactionAsync(
         params.module,
       );
     }
@@ -602,7 +536,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public unarchiveModule = async (params: IUnarchiveModuleParams) => {
     return async () => {
-      return (await this.securityTokenContract).unarchiveModule.sendTransactionAsync(
+      return (await this._contract).unarchiveModule.sendTransactionAsync(
         params.module,
       );
     }
@@ -610,21 +544,21 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public removeModule = async (params: IRemoveModuleParams) => {
     return async () => {
-      return (await this.securityTokenContract).removeModule.sendTransactionAsync(
+      return (await this._contract).removeModule.sendTransactionAsync(
         params.module,
       );
     }
   }
 
   public getModulesByName = async (params: IGetModulesByNameParams): Promise<string[]> => {
-    return await (await this.securityTokenContract).getModulesByName.callAsync(
+    return await (await this._contract).getModulesByName.callAsync(
       params.name,
     );
   }
 
   public withdrawERC20 = async (params: IWithdrawERC20Params) => {
     return async () => {
-      return (await this.securityTokenContract).withdrawERC20.sendTransactionAsync(
+      return (await this._contract).withdrawERC20.sendTransactionAsync(
         params.tokenContract,
         params.value,
       );
@@ -633,7 +567,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public changeModuleBudget = async (params: IChangeModuleBudgetParams) => {
     return async () => {
-      return (await this.securityTokenContract).changeModuleBudget.sendTransactionAsync(
+      return (await this._contract).changeModuleBudget.sendTransactionAsync(
         params.module,
         params.change,
         params.increase,
@@ -643,7 +577,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public updateTokenDetails = async (params: IUpdateTokenDetailsParams) => {
     return async () => {
-      return (await this.securityTokenContract).updateTokenDetails.sendTransactionAsync(
+      return (await this._contract).updateTokenDetails.sendTransactionAsync(
         params.newTokenDetails,
       );
     }
@@ -651,48 +585,48 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public changeGranularity = async (params: IChangeGranularityParams) => {
     return async () => {
-      return (await this.securityTokenContract).changeGranularity.sendTransactionAsync(
+      return (await this._contract).changeGranularity.sendTransactionAsync(
         params.granularity,
       );
     }
   }
 
   public getInvestors = async (): Promise<string[]> => {
-    return await (await this.securityTokenContract).getInvestors.callAsync();
+    return await (await this._contract).getInvestors.callAsync();
   }
 
   public getInvestorsAt = async (params: IGetInvestorsAtParams): Promise<string[]> => {
-    return await (await this.securityTokenContract).getInvestorsAt.callAsync(
+    return await (await this._contract).getInvestorsAt.callAsync(
       params.checkpointId,
     );
   }
 
   public iterateInvestors = async (params: IIterateInvestorsParams): Promise<string[]> => {
-    return await (await this.securityTokenContract).iterateInvestors.callAsync(
+    return await (await this._contract).iterateInvestors.callAsync(
       params.start,
       params.end,
     );
   }
 
   public getInvestorCount = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).getInvestorCount.callAsync();
+    return await (await this._contract).getInvestorCount.callAsync();
   }
 
   public freezeTransfers = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).freezeTransfers.sendTransactionAsync();
+      return (await this._contract).freezeTransfers.sendTransactionAsync();
     }
   }
 
   public unfreezeTransfers = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).unfreezeTransfers.sendTransactionAsync();
+      return (await this._contract).unfreezeTransfers.sendTransactionAsync();
     }
   }
 
   public transferWithData = async (params: ITransferWithDataParams) => {
     return async () => {
-      return (await this.securityTokenContract).transferWithData.sendTransactionAsync(
+      return (await this._contract).transferWithData.sendTransactionAsync(
         params.to,
         params.value,
         params.data,
@@ -702,7 +636,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public transferFromWithData = async (params: ITransferFromWithDataParams) => {
     return async () => {
-      return (await this.securityTokenContract).transferFromWithData.sendTransactionAsync(
+      return (await this._contract).transferFromWithData.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
@@ -713,13 +647,13 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public freezeMinting = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).freezeMinting.sendTransactionAsync();
+      return (await this._contract).freezeMinting.sendTransactionAsync();
     }
   }
 
   public mint = async (params: IMintParams) => {
     return async () => {
-      return (await this.securityTokenContract).mint.sendTransactionAsync(
+      return (await this._contract).mint.sendTransactionAsync(
         params.investor,
         params.value,
       );
@@ -728,7 +662,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public mintWithData = async (params: IMintWithDataParams) => {
     return async () => {
-      return (await this.securityTokenContract).mintWithData.sendTransactionAsync(
+      return (await this._contract).mintWithData.sendTransactionAsync(
         params.investor,
         params.value,
         params.data,
@@ -738,7 +672,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public mintMulti = async (params: IMintMultiParams) => {
     return async () => {
-      return (await this.securityTokenContract).mintMulti.sendTransactionAsync(
+      return (await this._contract).mintMulti.sendTransactionAsync(
         params.investors,
         params.values,
       );
@@ -746,7 +680,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   public checkPermission = async (params: ICheckPermissionParams): Promise<boolean> => {
-    return await (await this.securityTokenContract).checkPermission.callAsync(
+    return await (await this._contract).checkPermission.callAsync(
       params.delegate,
       params.module,
       params.perm,
@@ -755,7 +689,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public burnWithData = async (params: IBurnWithDataParams) => {
     return async () => {
-      return (await this.securityTokenContract).burnWithData.sendTransactionAsync(
+      return (await this._contract).burnWithData.sendTransactionAsync(
         params.value,
         params.data,
       );
@@ -764,7 +698,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public burnFromWithData = async (params: IBurnFromWithDataParams) => {
     return async () => {
-      return (await this.securityTokenContract).burnFromWithData.sendTransactionAsync(
+      return (await this._contract).burnFromWithData.sendTransactionAsync(
         params.from,
         params.value,
         params.data,
@@ -774,22 +708,22 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public createCheckpoint = async (params: ITxParams) => {
     return async () => {
-      return (await this.securityTokenContract).createCheckpoint.sendTransactionAsync();
+      return (await this._contract).createCheckpoint.sendTransactionAsync();
     }
   }
 
   public getCheckpointTimes = async (): Promise<BigNumber[]> => {
-    return await (await this.securityTokenContract).getCheckpointTimes.callAsync();
+    return await (await this._contract).getCheckpointTimes.callAsync();
   }
 
   public totalSupplyAt = async (params: ITotalSupplyAtParams): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).totalSupplyAt.callAsync(
+    return await (await this._contract).totalSupplyAt.callAsync(
       params.checkpointId,
     );
   }
 
   public balanceOfAt = async (params: IBalanceOfAtParams): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).balanceOfAt.callAsync(
+    return await (await this._contract).balanceOfAt.callAsync(
       params.investor,
       params.checkpointId,
     );
@@ -797,7 +731,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public setController = async (params: ISetControllerParams) => {
     return async () => {
-      return (await this.securityTokenContract).setController.sendTransactionAsync(
+      return (await this._contract).setController.sendTransactionAsync(
         params.controller,
       );
     }
@@ -805,13 +739,13 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public disableController = async (params: ITxParams) => {
     return async () => {
-    return (await this.securityTokenContract).disableController.sendTransactionAsync();
+    return (await this._contract).disableController.sendTransactionAsync();
     }
   }
 
   public forceTransfer = async (params: IForceTransferParams) => {
     return async () => {
-      return (await this.securityTokenContract).forceTransfer.sendTransactionAsync(
+      return (await this._contract).forceTransfer.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
@@ -823,7 +757,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
 
   public forceBurn = async (params: IForceBurnParams) => {
     return async () => {
-      return (await this.securityTokenContract).forceBurn.sendTransactionAsync(
+      return (await this._contract).forceBurn.sendTransactionAsync(
         params.from,
         params.value,
         params.data,
@@ -833,107 +767,14 @@ export class SecurityTokenWrapper extends ContractWrapper {
   }
 
   public getVersion = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).totalSupply.callAsync();
+    return await (await this._contract).totalSupply.callAsync();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.securityTokenContract).address;
-  }
-
-  /**
-   * Returns the token name
-   */
-  public getName = async (): Promise<string> => {
-    return await (await this.securityTokenContract).name.callAsync();
-  }
-
-  /**
-   * Approves the passed address to spend the specified amount of tokens
-   */
-  public approve = async (params: IApproveParams) => {
-    return async () => {
-      return (await this.securityTokenContract).approve.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
-  }
-
-  /**
-   * Returns the token total supply
-   */
-  public getTotalSupply = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).totalSupply.callAsync();
-  }
-
-  /**
-   * Send tokens amount of tokens from address from to address to
-   */
-  public transferFrom = async (params: ITransferFromParams) => {
-    return async () => {
-      return (await this.securityTokenContract).transferFrom.sendTransactionAsync(
-        params.from,
-        params.to,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
-  }
-
-  /**
-   * Returns the setted decimals
-   */
-  public getDecimals = async (): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).decimals.callAsync();
-  }
-
-  /**
-   * Returns the balance of the specified address
-   * @return A BigNumber representing the amount owned by the passed address
-   */
-  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
-    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
-    return await (await this.securityTokenContract).balanceOf.callAsync(
-      address
-    );
-  }
-
-  /**
-   * Returns the token symbol
-   */
-  public getSymbol = async (): Promise<string> => {
-    return await (await this.securityTokenContract).symbol.callAsync();
-  }
-
-  /**
-   * Transfer the balance from token owner's account to 'to' account
-   */
-  public transfer = async (params: ITransferParams) => {
-    return async () => {
-      return (await this.securityTokenContract).transfer.sendTransactionAsync(
-        params.to,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
-  }
-
-  /**
-   * Function to check the amount of tokens a spender is allowed to spend
-   * @return A BigNumber specifying the amount of tokens left available for the spender
-   */
-  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
-    return await (await this.securityTokenContract).allowance.callAsync(
-      params.owner,
-      params.spender
-    );
+    return (await this._contract).address;
   }
 
   /**
@@ -941,7 +782,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return address[] list of modules with this type
    */
   public getModulesByType = async (params: IGetModulesByTypeParams): Promise<string[]> => {
-    return (await this.securityTokenContract).getModulesByType.callAsync(
+    return (await this._contract).getModulesByType.callAsync(
       params.type,
     );
   }
@@ -951,7 +792,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    */
   public addModule = async (params: IAddModuleParams) => {
     return async () => {
-      return (await this.securityTokenContract).addModule.sendTransactionAsync(
+      return (await this._contract).addModule.sendTransactionAsync(
         params.moduleFactory,
         params.data,
         params.maxCost,
@@ -964,7 +805,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return Returns the data associated to a module
    */
   public getModule = async (params: IGetModuleParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
-    return (await this.securityTokenContract).getModule.callAsync(params.module);
+    return (await this._contract).getModule.callAsync(params.module);
   }
 
   /**
@@ -972,7 +813,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
    * @return bool
    */
   public verifyTransfer = async (params: IVerifyTransferParams): Promise<boolean> => {
-    return await (await this.securityTokenContract).verifyTransfer.callAsync(
+    return await (await this._contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       params.value,
@@ -990,7 +831,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.securityTokenContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -1028,7 +869,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.securityTokenContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -1042,7 +883,7 @@ export class SecurityTokenWrapper extends ContractWrapper {
   private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
     return new SecurityTokenContract(
       this.abi,
-      this.address,
+      this._address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
