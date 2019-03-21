@@ -154,7 +154,7 @@ import {
     }
     
     interface IDividendsParams {
-        index_0: BigNumber,
+        dividendIndex: BigNumber,
     }
     
     interface IIsExcludedParams {
@@ -168,11 +168,11 @@ import {
     }
     
     interface IDividendTokensParams {
-        index_0: BigNumber
+        investor: BigNumber
     }
     
     interface IExcludedParams {
-        index_0: BigNumber
+        dividendIndex: BigNumber
     }
 
     interface ISetDefaultExcludedParams extends ITxParams {
@@ -268,10 +268,6 @@ import {
         }
     }
 
-    public EXCLUDED_ADDRESS_LIMIT = async (): Promise<BigNumber> => {
-        return await (await this.erc20DividendCheckpointContract).EXCLUDED_ADDRESS_LIMIT.callAsync();
-    }
-
     public getInitFunction = async (): Promise<string> => {
         return await (await this.erc20DividendCheckpointContract).getInitFunction.callAsync();
     }
@@ -288,10 +284,6 @@ import {
                 params.dividendIndex,
             );
         }
-    }
-
-    public CHECKPOINT = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).CHECKPOINT.callAsync();
     }
 
     public pushDividendPaymentToAddresses = async (params: IPushDividendPaymentToAddressesParams) => {
@@ -317,10 +309,6 @@ import {
         );
     }
 
-    public MANAGE = async (): Promise<string> => {
-        return await (await this.erc20DividendCheckpointContract).MANAGE.callAsync();
-    }
-
     public getDividendIndex = async (params: IGetDividendIndexParams): Promise<BigNumber[]> => {
         return await (await this.erc20DividendCheckpointContract).getDividendIndex.callAsync(
             params.checkpointId,
@@ -341,7 +329,7 @@ import {
 
     public withholdingTax = async (params: IWithholdingTaxParams): Promise<BigNumber> => {
         return await (await this.erc20DividendCheckpointContract).withholdingTax.callAsync(
-            params.index_0,
+            params.investor,
         );
     }
 
@@ -357,7 +345,7 @@ import {
 
     public dividends = async (params: IDividendsParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber, BigNumber, string]> => {
         return await (await this.erc20DividendCheckpointContract).dividends.callAsync(
-            params.index_0,
+            params.dividendIndex,
         );
     }
 
@@ -379,7 +367,7 @@ import {
 
     public dividendTokens = async (params: IDividendTokensParams): Promise<string> => {
         return await (await this.erc20DividendCheckpointContract).dividendTokens.callAsync(
-            params.index_0,
+            params.investor,
         );
     }
 
@@ -393,7 +381,7 @@ import {
 
     public excluded = async (params: IExcludedParams): Promise<string> => {
         return await (await this.erc20DividendCheckpointContract).excluded.callAsync(
-            params.index_0,
+            params.dividendIndex,
         );
     }
 
