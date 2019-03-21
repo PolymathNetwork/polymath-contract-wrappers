@@ -21,7 +21,6 @@ import {
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { PolyToken } from 'index';
 
 interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: DetailedERC20Events.Approval,

@@ -86,8 +86,9 @@ export enum Features {
  */
 export class FeatureRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = FeatureRegistry.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
-  private featureRegistryContract: Promise<FeatureRegistryContract>;
+  protected _contract: Promise<FeatureRegistryContract>;
+  private _polymathRegistry: PolymathRegistryWrapper;
+  
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -95,15 +96,15 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
-    this.featureRegistryContract = this._getFeatureRegistryContract();
+    this._polymathRegistry = polymathRegistry;
+    this._contract = this._getFeatureRegistryContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.featureRegistryContract).address;
+    return (await this._contract).address;
   }
 
   /**
@@ -111,7 +112,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getFeatureStatus = async (params: IGetFeatureStatusParams): Promise<boolean> => {
-    return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
+    return await (await this._contract).getFeatureStatus.callAsync(
         params.nameKey,
     )
   }
@@ -121,7 +122,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    */
   public setFeatureStatus = async (params: ISetFeatureStatusParams) => {
     return async () => {
-      return (await this.featureRegistryContract).setFeatureStatus.sendTransactionAsync(
+      return (await this._contract).setFeatureStatus.sendTransactionAsync(
         params.nameKey,
         params.newStatus
       );
@@ -133,7 +134,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getCustomModulesAllowedStatus = async (): Promise<boolean> => {
-    return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
+    return await (await this._contract).getFeatureStatus.callAsync(
         Features.CustomModulesAllowed,
     )
   }
@@ -143,7 +144,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getFreezeMintingAllowedStatus = async (): Promise<boolean> => {
-    return await (await this.featureRegistryContract).getFeatureStatus.callAsync(
+    return await (await this._contract).getFeatureStatus.callAsync(
       Features.FreezeMintingAllowed,
     )
   }
@@ -158,7 +159,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.featureRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -196,7 +197,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.featureRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -210,7 +211,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       this.abi,
-      await this.polymathRegistry.getFeatureRegistryAddress(),
+      await this._polymathRegistry.getFeatureRegistryAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
