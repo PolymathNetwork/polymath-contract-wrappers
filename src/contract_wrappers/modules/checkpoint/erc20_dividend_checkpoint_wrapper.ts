@@ -10,7 +10,6 @@ import {
     ERC20DividendCheckpointSetWithholdingEventArgs,
     ERC20DividendCheckpointSetWithholdingFixedEventArgs,
   } from '@polymathnetwork/abi-wrappers';
-  import { PolymathRegistryWrapper } from '../../registries/polymath_registry_wrapper';
   import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
   import { Web3Wrapper } from '@0x/web3-wrapper';
   import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -246,9 +245,8 @@ import {
      * @param web3Wrapper Web3Wrapper instance to use
      * @param polymathRegistry The PolymathRegistryWrapper instance contract
      */
-    constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-      super(web3Wrapper);
-      this.polymathRegistry = polymathRegistry;
+    constructor(web3Wrapper: Web3Wrapper, address: string) {
+      super(web3Wrapper, address);
       this.erc20DividendCheckpointContract = this._getERC20DividendCheckpointContract();
     }
   
@@ -557,7 +555,7 @@ import {
     private async _getERC20DividendCheckpointContract(): Promise<ERC20DividendCheckpointContract> {
       return new ERC20DividendCheckpointContract(
         this.abi,
-        await this.polymathRegistry.getPolyTokenAddress(),
+        this._address,
         this._web3Wrapper.getProvider(),
         this._web3Wrapper.getContractDefaults(),
       );
