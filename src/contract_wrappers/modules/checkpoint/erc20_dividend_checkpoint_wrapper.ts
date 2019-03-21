@@ -146,7 +146,7 @@ import {
     }
     
     interface IWithholdingTaxParams {
-        index_0: string,
+        investor: string,
     }
     
     interface IGetCheckpointDataParams {
