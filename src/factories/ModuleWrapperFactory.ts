@@ -2,28 +2,31 @@ import { Web3Wrapper } from "@0x/web3-wrapper";
 import { CappedSTOWrapper } from "../contract_wrappers/modules/sto/capped_sto_wrapper";
 import { USDTieredSTOWrapper } from "../contract_wrappers/modules/sto/usd_tiered_sto_wrapper";
 import { GeneralTransferManagerWrapper } from "../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper";
+import { GeneralPermissionManagerWrapper } from "contract_wrappers/modules/permission_manager/general_permission_manager_wrapper";
 
 interface IGetModuleParams {
   address: string, 
   name: string
 }
 
+interface IGetGeneralPermissionManager extends IGetModuleParams {
+  name: 'GeneralPermissionManager'
+}
+
 interface IGetGeneralTransferManager extends IGetModuleParams {
-  address: string, 
   name: 'GeneralTransferManager'
 }
 
 interface IGetCappedSTO extends IGetModuleParams {
-  address: string, 
   name: 'CappedSTO'
 }
 
-interface IGetUSDTieredSTO extends IGetModuleParams {
-  address: string, 
+interface IGetUSDTieredSTO extends IGetModuleParams { 
   name: 'USDTieredSTO'
 }
 
 interface IGetModuleInstance {
+  (params: IGetGeneralPermissionManager): Promise<GeneralPermissionManagerWrapper>;
   (params: IGetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
   (params: IGetCappedSTO): Promise<CappedSTOWrapper>;
   (params: IGetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
@@ -43,6 +46,8 @@ export class ModuleWrapperFactory {
   public getModuleInstance: IGetModuleInstance = async (params: IGetModuleParams): Promise<any> => {
     switch (params.name) {
       // Permission
+      case 'GeneralPermissionManager':
+        return new GeneralPermissionManagerWrapper(this._web3Wrapper, params.address);
       // TMs
       case 'GeneralTransferManager':
         return new GeneralTransferManagerWrapper(this._web3Wrapper, params.address);
