@@ -4,6 +4,8 @@ import {
   DetailedERC20Events,
   DetailedERC20ApprovalEventArgs,
   DetailedERC20TransferEventArgs,
+  PolyTokenContract,
+  SecurityTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import { DetailedERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -38,12 +40,12 @@ interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: DetailedERC20Events.Transfer,
 }
 
-interface IDetailedERC20SubscribeAsyncParams {
+export interface IERC20TokenSubscribeAsyncParams {
   (params: IApprovalSubscribeAsyncParams): Promise<string>,
   (params: ITransferSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetDetailedERC20LogsAsyncParams {
+export interface IGetERC20TokenLogsAsyncParams {
   (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<DetailedERC20ApprovalEventArgs>>>,
   (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<DetailedERC20TransferEventArgs>>>,
 }
@@ -93,13 +95,15 @@ interface IAllowanceParams {
     spender: string;
 }
 
+type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract;
+
 /**
  * This class includes the functionality related to interacting with the DetailedERC20 contract.
  */
-export class DetailedERC20Wrapper extends ContractWrapper {
+export class ERC20TokenWrapper extends ContractWrapper {
   public abi: ContractAbi = DetailedERC20.abi;
-  private address: string;
-  private detailedERC20Contract: Promise<DetailedERC20Contract>;
+  protected _address: string;
+  protected _contract: Promise<ERC20Contract>;
 
   /**
    * Instantiate DetailedERC20Wrapper
@@ -108,22 +112,22 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper);
-    this.address = address;
-    this.detailedERC20Contract = this._getDetailedERC20Contract();
+    this._address = address;
+    this._contract = this._getDetailedERC20Contract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.detailedERC20Contract).address;
+    return (await this._contract).address;
   }
 
   /**
    * Returns the token name
    */
-  public getName = async (): Promise<string> => {
-    return await (await this.detailedERC20Contract).name.callAsync();
+  public name = async (): Promise<string> => {
+    return await (await this._contract).name.callAsync();
   }
 
   /**
@@ -131,7 +135,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    */
   public approve = async (params: IApproveParams) => {
     return async () => {
-      return (await this.detailedERC20Contract).approve.sendTransactionAsync(
+      return (await this._contract).approve.sendTransactionAsync(
         params.spender,
         params.value,
         params.txData,
@@ -143,8 +147,8 @@ export class DetailedERC20Wrapper extends ContractWrapper {
   /**
    * Returns the token total supply
    */
-  public getTotalSupply = async (): Promise<BigNumber> => {
-    return await (await this.detailedERC20Contract).totalSupply.callAsync();
+  public totalSupply = async (): Promise<BigNumber> => {
+    return await (await this._contract).totalSupply.callAsync();
   }
 
   /**
@@ -152,7 +156,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    */
   public transferFrom = async (params: ITransferFromParams) => {
     return async () => {
-      return (await this.detailedERC20Contract).transferFrom.sendTransactionAsync(
+      return (await this._contract).transferFrom.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
@@ -165,17 +169,17 @@ export class DetailedERC20Wrapper extends ContractWrapper {
   /**
    * Returns the setted decimals
    */
-  public getDecimals = async (): Promise<BigNumber> => {
-    return await (await this.detailedERC20Contract).decimals.callAsync();
+  public decimals = async (): Promise<BigNumber> => {
+    return await (await this._contract).decimals.callAsync();
   }
 
   /**
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
+  public balanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
     const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
-    return await (await this.detailedERC20Contract).balanceOf.callAsync(
+    return await (await this._contract).balanceOf.callAsync(
       address
     );
   }
@@ -183,8 +187,8 @@ export class DetailedERC20Wrapper extends ContractWrapper {
   /**
    * Returns the token symbol
    */
-  public getSymbol = async (): Promise<string> => {
-    return await (await this.detailedERC20Contract).symbol.callAsync();
+  public symbol = async (): Promise<string> => {
+    return await (await this._contract).symbol.callAsync();
   }
 
   /**
@@ -192,7 +196,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    */
   public transfer = async (params: ITransferParams) => {
     return async () => {
-      return (await this.detailedERC20Contract).transfer.sendTransactionAsync(
+      return (await this._contract).transfer.sendTransactionAsync(
         params.to,
         params.value,
         params.txData,
@@ -206,7 +210,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
-    return await (await this.detailedERC20Contract).allowance.callAsync(
+    return await (await this._contract).allowance.callAsync(
       params.owner,
       params.spender
     );
@@ -216,13 +220,13 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IDetailedERC20SubscribeAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
+  public subscribeAsync: IERC20TokenSubscribeAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
     params: ISubscribeAsyncParams
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.detailedERC20Contract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -254,13 +258,13 @@ export class DetailedERC20Wrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetDetailedERC20LogsAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
+  public getLogsAsync: IGetERC20TokenLogsAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
     params: IGetLogsAsyncParams
   ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.detailedERC20Contract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -273,7 +277,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
 
   public async isValidContract(): Promise<boolean> {
     try {
-      const contract = await this.detailedERC20Contract;
+      const contract = await this._contract;
       await contract.totalSupply.callAsync();
       await contract.balanceOf.callAsync(contract.address);
       await contract.allowance.callAsync(contract.address, contract.address);
@@ -287,7 +291,7 @@ export class DetailedERC20Wrapper extends ContractWrapper {
   private async _getDetailedERC20Contract(): Promise<DetailedERC20Contract> {
     return new DetailedERC20Contract(
       this.abi,
-      this.address,
+      this._address,
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );

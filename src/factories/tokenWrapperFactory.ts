@@ -1,6 +1,6 @@
 import { SecurityTokenRegistryWrapper } from "../contract_wrappers/registries/security_token_registry_wrapper";
 import { SecurityTokenWrapper } from "../contract_wrappers/tokens/security_token_wrapper";
-import { DetailedERC20Wrapper } from "../contract_wrappers/tokens/detailed_erc20_wrapper";
+import { ERC20TokenWrapper } from "../contract_wrappers/tokens/erc20_wrapper";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 
 /**
@@ -25,8 +25,8 @@ export class TokenWrapperFactory {
    *
    * @memberof SecurityTokenWrapperFactory
    */
-  public getERC20TokenInstanceFromAddress = async (address: string) : Promise<DetailedERC20Wrapper> => {
-      const token = new DetailedERC20Wrapper(this._web3Wrapper, address);
+  public getERC20TokenInstanceFromAddress = async (address: string) : Promise<ERC20TokenWrapper> => {
+      const token = new ERC20TokenWrapper(this._web3Wrapper, address);
     if (await token.isValidContract()) {
       return token;
     } else {

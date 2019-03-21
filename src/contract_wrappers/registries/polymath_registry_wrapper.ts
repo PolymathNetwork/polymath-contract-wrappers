@@ -92,7 +92,7 @@ enum Contracts {
 export class PolymathRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = PolymathRegistry.abi;
   public address?: string;
-  private polymathRegistryContract: Promise<PolymathRegistryContract>;
+  protected _contract: Promise<PolymathRegistryContract>;
 
   /**
    * Instantiate PolymathRegistryWrapper
@@ -102,7 +102,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   constructor(web3Wrapper: Web3Wrapper, registryAddress?: string) {
     super(web3Wrapper);
     this.address = registryAddress;
-    this.polymathRegistryContract = this._getPolymathRegistryContract();
+    this._contract = this._getPolymathRegistryContract();
   }
 
   /**
@@ -111,7 +111,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    */
   public getAddress = async (params: IGetAddressParams): Promise<string> => {
     assert.isString('contractName', params.contractName);
-    const address = await (await this.polymathRegistryContract).getAddress.callAsync(
+    const address = await (await this._contract).getAddress.callAsync(
       params.contractName,
     );
     return address;
@@ -187,7 +187,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.polymathRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -225,7 +225,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.polymathRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -241,7 +241,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    */
   public changeAddress = async (params: IChangeAddressParams) => {
     return async () => {
-      return (await this.polymathRegistryContract).changeAddress.sendTransactionAsync(
+      return (await this._contract).changeAddress.sendTransactionAsync(
         params.nameKey,
         params.newAddress,
       );

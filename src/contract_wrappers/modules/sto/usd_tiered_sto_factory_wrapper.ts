@@ -113,8 +113,8 @@ interface IGetUSDTieredSTOFactoryLogsAsyncParams {
  */
 export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = USDTieredSTOFactory.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
-  private usdTieredSTOFactoryContract: Promise<USDTieredSTOFactoryContract>;
+  protected _contract: Promise<USDTieredSTOFactoryContract>;
+  private _polymathRegistry: PolymathRegistryWrapper;
   /**
    * Instantiate USDTieredSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -122,22 +122,22 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
-    this.usdTieredSTOFactoryContract = this._getUSDTieredSTOFactoryContract();
+    this._polymathRegistry = polymathRegistry;
+    this._contract = this._getUSDTieredSTOFactoryContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.usdTieredSTOFactoryContract).address;
+    return (await this._contract).address;
   }
 
   /**
    * Get the setup cost of the module
    */
   public getSetupCost = async (): Promise<BigNumber> => {
-    return await (await this.usdTieredSTOFactoryContract).getSetupCost.callAsync();
+    return await (await this._contract).getSetupCost.callAsync();
   }
 
   /**
@@ -150,7 +150,7 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOFactoryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.usdTieredSTOFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -188,7 +188,7 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOFactoryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.usdTieredSTOFactoryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -202,7 +202,7 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   private async _getUSDTieredSTOFactoryContract(): Promise<USDTieredSTOFactoryContract> {
     return new USDTieredSTOFactoryContract(
       this.abi,
-      await this.polymathRegistry.getAddress({
+      await this._polymathRegistry.getAddress({
         contractName: 'USDTieredSTOFactory',
       }),
       this._web3Wrapper.getProvider(),

@@ -121,8 +121,9 @@ interface IGetModulesByTypeAndTokenParams {
  */
 export class ModuleRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleRegistry.abi;
-  private polymathRegistry: PolymathRegistryWrapper;
-  private moduleRegistryContract: Promise<ModuleRegistryContract>;
+  protected _contract: Promise<ModuleRegistryContract>;
+  private _polymathRegistry: PolymathRegistryWrapper;
+
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -130,15 +131,15 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     super(web3Wrapper);
-    this.polymathRegistry = polymathRegistry;
-    this.moduleRegistryContract = this._getModuleRegistryContract();
+    this._polymathRegistry = polymathRegistry;
+    this._contract = this._getModuleRegistryContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this.moduleRegistryContract).address;
+    return (await this._contract).address;
   }
 
   /**
@@ -146,7 +147,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * @return address array that contains the list of available addresses of module factory contracts.
    */
   public getModulesByTypeAndToken = async (params: IGetModulesByTypeAndTokenParams): Promise<string[]> => {
-    return await (await this.moduleRegistryContract).getModulesByTypeAndToken.callAsync(
+    return await (await this._contract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
     );
@@ -162,7 +163,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.moduleRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -200,7 +201,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.moduleRegistryContract).address.toLowerCase();
+    const normalizedContractAddress = (await this._contract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -214,7 +215,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       this.abi,
-      await this.polymathRegistry.getModuleRegistryAddress(),
+      await this._polymathRegistry.getModuleRegistryAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
