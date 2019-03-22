@@ -42,6 +42,15 @@ import {
     USDTieredSTOEvents,
     GeneralPermissionManagerEventArgs,
     GeneralPermissionManagerEvents,
+    ModuleContract,
+    GeneralPermissionManagerContract,
+    GeneralTransferManagerContract,
+    CappedSTOContract,
+    USDTieredSTOContract,
+    ERC20DividendCheckpointContract,
+    STOContract,
+    STOEvents,
+    STOEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -95,7 +104,8 @@ export type ContractEventArgs = PolyTokenEventArgs |
     SecurityTokenRegistryEventArgs |
     SecurityTokenEventArgs |
     USDTieredSTOFactoryEventArgs |
-    USDTieredSTOEventArgs;
+    USDTieredSTOEventArgs |
+    STOEventArgs;
 
 export type ContractEvents = PolyTokenEvents |
     CappedSTOFactoryEvents |
@@ -114,7 +124,8 @@ export type ContractEvents = PolyTokenEvents |
     SecurityTokenRegistryEvents |
     SecurityTokenEvents |
     USDTieredSTOFactoryEvents |
-    USDTieredSTOEvents;
+    USDTieredSTOEvents |
+    STOEvents;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -142,3 +153,15 @@ export interface ISubscribeAsyncParams {
     callback: EventCallback<ContractEventArg>,
     isVerbose?: boolean,
 }
+
+export type GenericModuleContract = 
+  ModuleContract |
+  GeneralPermissionManagerContract |
+  GeneralTransferManagerContract |
+  STOBaseContract |
+  ERC20DividendCheckpointContract;
+
+export type STOBaseContract = 
+    STOContract |
+    CappedSTOContract |
+    USDTieredSTOContract;
