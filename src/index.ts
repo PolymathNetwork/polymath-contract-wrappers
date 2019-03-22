@@ -12,6 +12,7 @@ export { SecurityTokenWrapper as SecurityToken } from './contract_wrappers/token
 export { USDTieredSTOFactoryWrapper as USDTieredSTOFactory } from './contract_wrappers/modules/sto/usd_tiered_sto_factory_wrapper';
 export { USDTieredSTOWrapper as USDTieredSTO } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export { ERC20TokenWrapper as DetailedERC20 } from './contract_wrappers/tokens/erc20_wrapper';
+export { ERC20DividendCheckpointWrapper as ERC20DividendCheckpoint } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export { BlockParamLiteral } from 'ethereum-types'
@@ -83,4 +84,12 @@ export {
     GeneralPermissionManagerEvents,
     GeneralPermissionManagerChangePermissionEventArgs,
     GeneralPermissionManagerAddDelegateEventArgs,
+    ERC20DividendCheckpointEvents,
+    ERC20DividendCheckpointERC20DividendDepositedEventArgs,
+    ERC20DividendCheckpointERC20DividendClaimedEventArgs,
+    ERC20DividendCheckpointERC20DividendReclaimedEventArgs,
+    ERC20DividendCheckpointERC20DividendWithholdingWithdrawnEventArgs,
+    ERC20DividendCheckpointSetDefaultExcludedAddressesEventArgs,
+    ERC20DividendCheckpointSetWithholdingEventArgs,
+    ERC20DividendCheckpointSetWithholdingFixedEventArgs,
 } from '@polymathnetwork/abi-wrappers';
