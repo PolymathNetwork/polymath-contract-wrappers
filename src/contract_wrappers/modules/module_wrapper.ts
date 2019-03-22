@@ -3,7 +3,8 @@ import {
     GeneralPermissionManagerContract, 
     GeneralTransferManagerContract, 
     CappedSTOContract, 
-    USDTieredSTOContract
+    USDTieredSTOContract,
+    ERC20DividendCheckpointContract
   } from '@polymathnetwork/abi-wrappers';
 import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -22,7 +23,8 @@ type GenericModuleContract =
   GeneralPermissionManagerContract |
   GeneralTransferManagerContract |
   CappedSTOContract |
-  USDTieredSTOContract;
+  USDTieredSTOContract |
+  ERC20DividendCheckpointContract;
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
