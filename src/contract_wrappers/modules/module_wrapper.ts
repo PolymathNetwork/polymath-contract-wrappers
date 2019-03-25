@@ -13,6 +13,7 @@ import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import { ITxParams } from '../../types';
+import { PermissionsList } from './permissions_list';
 
 interface ITakeFeeParams extends ITxParams {
   amount: BigNumber,
@@ -78,6 +79,11 @@ export class ModuleWrapper extends ContractWrapper {
         params.amount,
       );
     }
+  }
+
+  protected checkPermissions = async (functionName: string): Promise<boolean> => {
+    const response = PermissionsList.checkPermission('', functionName);
+    return true;
   }
 
   private async _getModuleContract(): Promise<ModuleContract> {
