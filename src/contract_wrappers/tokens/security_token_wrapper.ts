@@ -2,6 +2,8 @@ import {
   SecurityTokenContract,
   SecurityTokenEventArgs,
   SecurityTokenEvents,
+  SecurityTokenApprovalEventArgs,
+  SecurityTokenTransferEventArgs,
   SecurityTokenModuleAddedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
   SecurityTokenGranularityChangedEventArgs,
@@ -34,11 +36,25 @@ import {
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { 
-  ERC20TokenWrapper, 
-  IERC20TokenSubscribeAsyncParams, 
-  IGetERC20TokenLogsAsyncParams 
-} from './erc20_wrapper';
+import { ERC20TokenWrapper } from './erc20_wrapper';
+
+interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Approval,
+  callback: EventCallback<SecurityTokenApprovalEventArgs>,
+}
+
+interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Approval,
+}
+
+interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: SecurityTokenEvents.Transfer,
+  callback: EventCallback<SecurityTokenTransferEventArgs>,
+}
+
+interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: SecurityTokenEvents.Transfer,
+}
 
 interface IModuleAddedSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenEvents.ModuleAdded,
@@ -202,7 +218,9 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: SecurityTokenEvents.OwnershipTransferred,
 }
 
-interface ISecurityTokenSubscribeAsyncParams extends IERC20TokenSubscribeAsyncParams {
+interface ISecurityTokenSubscribeAsyncParams {
+  (params: IApprovalSubscribeAsyncParams): Promise<string>,
+  (params: ITransferSubscribeAsyncParams): Promise<string>,
   (params: IModuleAddedSubscribeAsyncParams): Promise<string>,
   (params: IUpdateTokenDetailsSubscribeAsyncParams): Promise<string>,
   (params: IGranularityChangedSubscribeAsyncParams): Promise<string>,
@@ -223,7 +241,9 @@ interface ISecurityTokenSubscribeAsyncParams extends IERC20TokenSubscribeAsyncPa
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>
 }
 
-interface IGetSecurityTokenLogsAsyncParams extends IGetERC20TokenLogsAsyncParams {
+interface IGetSecurityTokenLogsAsyncParams {
+  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>>>,
+  (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenTransferEventArgs>>>,
   (params: IGetModuleAddedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>>>,
   (params: IGetUpdateTokenDetailsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>>>,
   (params: IGetGranularityChangedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>>>,

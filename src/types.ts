@@ -51,6 +51,9 @@ import {
     STOContract,
     STOEvents,
     STOEventArgs,
+    DetailedERC20Contract,
+    PolyTokenContract,
+    SecurityTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -154,6 +157,11 @@ export interface ISubscribeAsyncParams {
     isVerbose?: boolean,
 }
 
+export type ERC20Contract = 
+  DetailedERC20Contract | 
+  SecurityTokenContract | 
+  PolyTokenContract;
+
 export type GenericModuleContract = 
   ModuleContract |
   GeneralPermissionManagerContract |
@@ -162,6 +170,6 @@ export type GenericModuleContract =
   ERC20DividendCheckpointContract;
 
 export type STOBaseContract = 
-    STOContract |
-    CappedSTOContract |
-    USDTieredSTOContract;
+  STOContract |
+  CappedSTOContract |
+  USDTieredSTOContract;
