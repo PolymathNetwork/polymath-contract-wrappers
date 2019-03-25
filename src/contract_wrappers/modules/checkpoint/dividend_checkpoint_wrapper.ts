@@ -103,6 +103,7 @@ interface IIsExcludedParams {
 export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   protected abstract _contract: Promise<DividendCheckpointBaseContract>;
 
+  //TODO: Once updated abi-wrappers to latest 2.1.1 release
   //public wallet = async (): Promise<string> => {
     //return await (await this._contract).wallet.callAsync();
   //}
