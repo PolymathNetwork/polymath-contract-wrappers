@@ -12,20 +12,12 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
-import { ITxParams } from '../../types';
+import { ITxParams, GenericModuleContract } from '../../types';
 import { PermissionsList } from './permissions_list';
 
 interface ITakeFeeParams extends ITxParams {
   amount: BigNumber,
 }
-
-type GenericModuleContract = 
-  ModuleContract |
-  GeneralPermissionManagerContract |
-  GeneralTransferManagerContract |
-  CappedSTOContract |
-  USDTieredSTOContract |
-  ERC20DividendCheckpointContract;
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.

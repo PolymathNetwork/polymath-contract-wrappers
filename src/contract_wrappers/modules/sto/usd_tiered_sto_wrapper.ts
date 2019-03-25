@@ -29,7 +29,7 @@ import {
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { ModuleWrapper } from '../module_wrapper';
+import { STOWrapper } from './sto_wrapper';
 
 interface ISetAllowBeneficialInvestmentsSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments,
@@ -180,20 +180,6 @@ interface IGetUSDTieredSTOLogsAsyncParams {
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>>>,
 }
 
-/**
- * 
- */
-interface IFundRaiseTypesParams {
-  index: number;
-}
-
-/**
- * 
- */
-interface IFundsRaisedParams {
-  index: number;
-}
-
 interface ITiersParams {
   index: BigNumber;
 }
@@ -302,16 +288,8 @@ interface IInvestorInvestedParams {
   index_1: number|BigNumber,
 }
 
-interface IReclaimERC20Params extends ITxParams {
-  tokenContract: string,
-}
-
 interface IUsdTokenEnabledParams {
   index_0: string,
-}
-
-interface IGetRaisedParams {
-  fundRaiseType: number|BigNumber,
 }
 
 interface IUsdTokensParams {
@@ -396,7 +374,7 @@ interface IGetTokensSoldByTierParams {
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
-export class USDTieredSTOWrapper extends ModuleWrapper {
+export class USDTieredSTOWrapper extends STOWrapper {
   public abi: ContractAbi = (USDTieredSTO as any).abi;
   protected _contract: Promise<USDTieredSTOContract>;
 
@@ -427,12 +405,6 @@ export class USDTieredSTOWrapper extends ModuleWrapper {
     return await (await this._contract).allowBeneficialInvestments.callAsync();
   }
 
-  public unpause = async (params: ITxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync();
-    }
-  }
-
   public paused = async (): Promise<boolean> => {
     return await (await this._contract).paused.callAsync();
   }
@@ -447,25 +419,11 @@ export class USDTieredSTOWrapper extends ModuleWrapper {
     );
   }
 
-  public pause = async (params: ITxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync();
-    }
-  }
-
   public investorInvested = async (params: IInvestorInvestedParams): Promise<BigNumber> => {
     return await (await this._contract).investorInvested.callAsync(
       params.index_0,
       params.index_1,
     );
-  }
-
-  public reclaimERC20 = async (params: IReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-      );
-    }
   }
 
   public usdTokenEnabled = async (params: IUsdTokenEnabledParams): Promise<boolean> => {
@@ -476,16 +434,6 @@ export class USDTieredSTOWrapper extends ModuleWrapper {
 
   public ETH_ORACLE = async (): Promise<string> => {
     return await (await this._contract).ETH_ORACLE.callAsync();
-  }
-
-  public getRaised = async (params: IGetRaisedParams): Promise<BigNumber> => {
-    return await (await this._contract).getRaised.callAsync(
-      params.fundRaiseType,
-    );
-  }
-
-  public pausedTime = async (): Promise<BigNumber> => {
-    return await (await this._contract).pausedTime.callAsync();
   }
 
   public usdTokens = async (params: IUsdTokensParams): Promise<string> => {
@@ -628,48 +576,6 @@ export class USDTieredSTOWrapper extends ModuleWrapper {
   }
 
   /**
-   * Start time of the Capped STO
-   */
-  public startTime = async (): Promise<BigNumber> => {
-    return await (await this._contract).startTime.callAsync();
-  }
-
-  /**
-   * End time of the Capped STO
-   */
-  public endTime = async (): Promise<BigNumber> => {
-    return await (await this._contract).endTime.callAsync();
-  }
-
-  /**
-   * Ethereum account address to hold the funds
-   */
-  public wallet = async (): Promise<string> => {
-    return await (await this._contract).wallet.callAsync();
-  }
-
-  /**
-   * Type of currency used to collect the funds
-   */
-  public fundRaiseTypes = async (params: IFundRaiseTypesParams): Promise<boolean> => {
-    return await (await this._contract).fundRaiseTypes.callAsync(params.index);
-  }
-
-  /**
-   * Returns funds raised by the STO
-   */
-  public fundsRaised = async (params: IFundsRaisedParams): Promise<BigNumber> => {
-    return await (await this._contract).fundsRaised.callAsync(params.index);
-  }
-
-  /**
-   * Return the total no. of tokens sold
-   */
-  public totalTokensSold  = async (): Promise<BigNumber> => {
-    return await (await this._contract).totalTokensSold.callAsync();
-  }
-
-  /**
    * Current tier
    */
   public currentTier = async (): Promise<BigNumber> => {
@@ -730,13 +636,6 @@ export class USDTieredSTOWrapper extends ModuleWrapper {
    */
   public fundsRaisedUSD = async (): Promise<BigNumber> => {
     return await (await this._contract).fundsRaisedUSD.callAsync();
-  }
-
-  /**
-   * Number of individual investors this STO have.
-   */
-  public investorCount = async (): Promise<BigNumber> => {
-    return await (await this._contract).investorCount.callAsync();
   }
 
   /**
