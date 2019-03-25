@@ -115,6 +115,7 @@ export abstract class STOWrapper extends ModuleWrapper {
 
   public reclaimETH = async () => {
     return async () => {
+      //TODO: Once updated abi-wrappers to latest 2.1.1 release
       //return (await this._contract).reclaimETH.sendTransactionAsync();
     }
   }

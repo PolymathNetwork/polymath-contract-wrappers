@@ -125,6 +125,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   }
 
+  //TODO: Once updated abi-wrappers to latest 2.1.1 release
   /* public pause = async (params: ITxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync();
@@ -251,6 +252,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   }
 
   /*
+  //TODO: Once updated abi-wrappers to latest 2.1.1 release
   public updateDividendDates = async (params: IUpdateDividendDatesParams) => {
     return async () => {
       return (await this._contract).updateDividendDates.sendTransactionAsync(
