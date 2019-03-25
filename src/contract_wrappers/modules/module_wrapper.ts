@@ -73,8 +73,9 @@ export class ModuleWrapper extends ContractWrapper {
     }
   }
 
-  protected checkPermissions = async (functionName: string): Promise<boolean> => {
-    const response = PermissionsList.checkPermission('', functionName);
+  protected _checkPermissions = async (functionName: string): Promise<boolean> => {
+    const response = PermissionsList.checkPermission((await this._contract).contractName, functionName);
+    // CALL checkPermission from SECURITY TOKEN INSTANCE
     return true;
   }
 

@@ -160,6 +160,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     }
 
     public addDelegate = async (params: IAddDelegateParams) => {
+        //await this._checkPermissions(this.addDelegate.name);
         return async () => {
             return (await this._contract).addDelegate.sendTransactionAsync(
                 params.delegate,
