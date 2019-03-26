@@ -67,6 +67,16 @@ interface DecreaseApprovalParams extends ITxParams {
   subtractedValue: BigNumber;
 }
 
+interface IIncreaseParams extends ITxParams {
+  spender: string,
+  addedValue: BigNumber,
+}
+
+interface IDecreaseApprovalParams extends ITxParams {
+  spender: string,
+  subtractedValue: BigNumber,
+}
+
 /**
  * This class includes the functionality related to interacting with the PolyToken contract.
  */
@@ -91,6 +101,28 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
    */
   public getAddress = async (): Promise<string> => {
     return (await this._contract).address;
+  }
+
+  public increaseApproval = async (params: IIncreaseParams) => {
+    return async () => {
+      return (await this._contract).increaseApproval.sendTransactionAsync(
+        params.spender,
+        params.addedValue,
+      );
+    }
+  }
+
+  public decreaseApproval = async (params: IDecreaseApprovalParams) => {
+    return async () => {
+      return (await this._contract).decreaseApproval.sendTransactionAsync(
+        params.spender,
+        params.subtractedValue,
+      );
+    }
+  }
+
+  public decimalFactor = async (): Promise<BigNumber> => {
+    return await (await this._contract).decimalFactor.callAsync();
   }
 
   /**
