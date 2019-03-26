@@ -29,7 +29,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -271,7 +271,7 @@ interface IGetModulesByTypeParams {
   type: number;
 }
 
-interface IAddModuleParams extends ITxParams {
+interface IAddModuleParams extends TxParams {
   moduleFactory: string;
   data: string;
   maxCost: BigNumber;
@@ -298,29 +298,29 @@ interface IVerifyTransferParams {
   data: string;
 }
 
-interface IDecreaseApprovalParams extends ITxParams {
+interface IDecreaseApprovalParams extends TxParams {
   spender: string,
   subtractedValue: BigNumber,
 }
 
-interface IIncreaseApprovalParams extends ITxParams {
+interface IIncreaseApprovalParams extends TxParams {
   spender: string,
   addedValue: BigNumber,
 }
 
-interface ITransferOwnershipParams extends ITxParams {
+interface ITransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
-interface IArchiveModuleParams extends ITxParams {
+interface IArchiveModuleParams extends TxParams {
   module: string,
 }
 
-interface IUnarchiveModuleParams extends ITxParams {
+interface IUnarchiveModuleParams extends TxParams {
   module: string,
 }
 
-interface IRemoveModuleParams extends ITxParams {
+interface IRemoveModuleParams extends TxParams {
   module: string,
 }
 
@@ -328,22 +328,22 @@ interface IGetModulesByNameParams {
   name: string,
 }
 
-interface IWithdrawERC20Params extends ITxParams {
+interface IWithdrawERC20Params extends TxParams {
   tokenContract: string,
   value: BigNumber,
 }
 
-interface IChangeModuleBudgetParams extends ITxParams {
+interface IChangeModuleBudgetParams extends TxParams {
   module: string,
   change: BigNumber,
   increase: boolean,
 }
 
-interface IUpdateTokenDetailsParams extends ITxParams {
+interface IUpdateTokenDetailsParams extends TxParams {
   newTokenDetails: string,
 }
 
-interface IChangeGranularityParams extends ITxParams {
+interface IChangeGranularityParams extends TxParams {
   granularity: BigNumber,
 }
 
@@ -356,31 +356,31 @@ interface IIterateInvestorsParams {
   end: BigNumber,
 }
 
-interface ITransferWithDataParams extends ITxParams {
+interface ITransferWithDataParams extends TxParams {
   to: string,
   value: BigNumber,
   data: string,
 }
 
-interface ITransferFromWithDataParams extends ITxParams {
+interface ITransferFromWithDataParams extends TxParams {
   from: string,
   to: string,
   value: BigNumber,
   data: string,
 }
 
-interface IMintParams extends ITxParams {
+interface IMintParams extends TxParams {
   investor: string,
   value: BigNumber,
 }
 
-interface IMintWithDataParams extends ITxParams {
+interface IMintWithDataParams extends TxParams {
   investor: string,
   value: BigNumber,
   data: string,
 }
 
-interface IMintMultiParams extends ITxParams {
+interface IMintMultiParams extends TxParams {
   investors: string[],
   values: BigNumber[],
 }
@@ -391,12 +391,12 @@ interface ICheckPermissionParams {
   perm: string,
 }
 
-interface IBurnWithDataParams extends ITxParams {
+interface IBurnWithDataParams extends TxParams {
   value: BigNumber,
   data: string,
 }
 
-interface IBurnFromWithDataParams extends ITxParams {
+interface IBurnFromWithDataParams extends TxParams {
   from: string,
   value: BigNumber,
   data: string,
@@ -411,11 +411,11 @@ interface IBalanceOfAtParams {
   checkpointId: BigNumber,
 }
 
-interface ISetControllerParams extends ITxParams {
+interface ISetControllerParams extends TxParams {
   controller: string,
 }
 
-interface IForceTransferParams extends ITxParams {
+interface IForceTransferParams extends TxParams {
   from: string,
   to: string,
   value: BigNumber,
@@ -423,14 +423,14 @@ interface IForceTransferParams extends ITxParams {
   log: string,
 }
 
-interface IForceBurnParams extends ITxParams {
+interface IForceBurnParams extends TxParams {
   from: string,
   value: BigNumber,
   data: string,
   log: string,
 }
 
-interface IForceBurnParams extends ITxParams {
+interface IForceBurnParams extends TxParams {
   from: string,
   value: BigNumber,
   data: string,
@@ -481,7 +481,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).polyToken.callAsync();
   }
 
-  public renounceOwnership = async (params: ITxParams) => {
+  public renounceOwnership = async (params: TxParams) => {
     return async () => {
       return (await this._contract).renounceOwnership.sendTransactionAsync();
     }
@@ -540,7 +540,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     }
   }
 
-  public updateFromRegistry = async (params: ITxParams) => {
+  public updateFromRegistry = async (params: TxParams) => {
     return async () => {
       return (await this._contract).updateFromRegistry.sendTransactionAsync();
     }
@@ -632,13 +632,13 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).getInvestorCount.callAsync();
   }
 
-  public freezeTransfers = async (params: ITxParams) => {
+  public freezeTransfers = async (params: TxParams) => {
     return async () => {
       return (await this._contract).freezeTransfers.sendTransactionAsync();
     }
   }
 
-  public unfreezeTransfers = async (params: ITxParams) => {
+  public unfreezeTransfers = async (params: TxParams) => {
     return async () => {
       return (await this._contract).unfreezeTransfers.sendTransactionAsync();
     }
@@ -665,7 +665,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     }
   }
 
-  public freezeMinting = async (params: ITxParams) => {
+  public freezeMinting = async (params: TxParams) => {
     return async () => {
       return (await this._contract).freezeMinting.sendTransactionAsync();
     }
@@ -726,7 +726,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     }
   }
 
-  public createCheckpoint = async (params: ITxParams) => {
+  public createCheckpoint = async (params: TxParams) => {
     return async () => {
       return (await this._contract).createCheckpoint.sendTransactionAsync();
     }
@@ -757,7 +757,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     }
   }
 
-  public disableController = async (params: ITxParams) => {
+  public disableController = async (params: TxParams) => {
     return async () => {
     return (await this._contract).disableController.sendTransactionAsync();
     }

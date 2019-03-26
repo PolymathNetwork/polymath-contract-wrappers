@@ -61,7 +61,7 @@ import {
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
  * @param safetyFactor Factor to use for gas limit estimation
  */
-export interface ITxParams {
+export interface TxParams {
     txData?: Partial<TxData>;
     safetyFactor?: number;
 }

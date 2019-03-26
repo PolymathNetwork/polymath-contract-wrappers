@@ -19,7 +19,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-    ITxParams,
+    TxParams,
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
@@ -157,36 +157,36 @@ import { ModuleWrapper } from '../module_wrapper';
         nonce: BigNumber,
     }
 
-    interface IChangeDefaultsParams extends ITxParams {
+    interface IChangeDefaultsParams extends TxParams {
         defaultFromTime: BigNumber,
         defaultToTime: BigNumber,
     }
 
-    interface IChangeIssuanceAddressParams extends ITxParams {
+    interface IChangeIssuanceAddressParams extends TxParams {
         issuanceAddress: string,
     }
 
-    interface IChangeSigningAddressParams extends ITxParams {
+    interface IChangeSigningAddressParams extends TxParams {
         signingAddress: string,
     }
 
-    interface IChangeAllowAllTransfersParams extends ITxParams {
+    interface IChangeAllowAllTransfersParams extends TxParams {
         allowAllTransfers: boolean,
     }
 
-    interface IChangeAllowAllWhitelistTransfersParams extends ITxParams {
+    interface IChangeAllowAllWhitelistTransfersParams extends TxParams {
         allowAllWhitelistTransfers: boolean,
     }
 
-    interface IChangeAllowAllWhitelistIssuancesParams extends ITxParams {
+    interface IChangeAllowAllWhitelistIssuancesParams extends TxParams {
         allowAllWhitelistIssuances: boolean,
     }
 
-    interface IChangeAllowAllBurnTransfersParams extends ITxParams {
+    interface IChangeAllowAllBurnTransfersParams extends TxParams {
         allowAllBurnTransfers: boolean,
     }
 
-    interface IVerifyTransferParams extends ITxParams {
+    interface IVerifyTransferParams extends TxParams {
         from: string,
         to: string,
         amount: BigNumber,
@@ -194,7 +194,7 @@ import { ModuleWrapper } from '../module_wrapper';
         isTransfer: boolean,
     }
 
-    interface IModifyWhitelistParams extends ITxParams {
+    interface IModifyWhitelistParams extends TxParams {
         investor: string,
         fromTime: BigNumber,
         toTime: BigNumber,
@@ -202,7 +202,7 @@ import { ModuleWrapper } from '../module_wrapper';
         canBuyFromSTO: boolean,
     }
 
-    interface IModifyWhitelistSignedParams extends ITxParams {
+    interface IModifyWhitelistSignedParams extends TxParams {
         investor: string,
         fromTime: BigNumber,
         toTime: BigNumber,
@@ -252,7 +252,7 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).allowAllWhitelistTransfers.callAsync();
     }
 
-    public unpause = async (params: ITxParams) => {
+    public unpause = async (params: TxParams) => {
         return async () => {
             return (await this._contract).unpause.sendTransactionAsync();
         }
@@ -268,7 +268,7 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).paused.callAsync();
     }
 
-    public pause = async (params: ITxParams) => {
+    public pause = async (params: TxParams) => {
         return async () => {
             return (await this._contract).pause.sendTransactionAsync();
         }

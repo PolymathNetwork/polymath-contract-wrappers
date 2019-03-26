@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import * as AddressesUtils from '../../utils/addresses';
 import {
-  ITxParams,
+  TxParams,
   NetworkId,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
@@ -72,7 +72,7 @@ interface IGetAddressParams {
  * @param nameKey is the key for the contract address mapping
  * @param newAddress is the new contract address
  */
-interface IChangeAddressParams extends ITxParams  {
+interface IChangeAddressParams extends TxParams  {
   nameKey: string;
   newAddress: string;
 }

@@ -11,7 +11,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-    ITxParams,
+    TxParams,
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
@@ -68,12 +68,12 @@ interface ICheckPermissionParams {
     perm: string,
 }
 
-interface IAddDelegateParams extends ITxParams {
+interface IAddDelegateParams extends TxParams {
     delegate: string,
     details: string,
 }
 
-interface IDeleteDelegateParams extends ITxParams {
+interface IDeleteDelegateParams extends TxParams {
     delegate: string,
 }
 
@@ -81,14 +81,14 @@ interface ICheckDelegateParams {
     potentialDelegate: string,
 }
 
-interface IChangePermissionParams extends ITxParams {
+interface IChangePermissionParams extends TxParams {
     delegate: string,
     module: string,
     perm: string,
     valid: boolean,
 }
 
-interface IChangePermissionMultiParams extends ITxParams {
+interface IChangePermissionMultiParams extends TxParams {
     delegate: string,
     modules: string[],
     perms: string[],

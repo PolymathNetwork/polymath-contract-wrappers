@@ -13,7 +13,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -71,7 +71,7 @@ interface IGetFeatureStatusParams {
 * @param nameKey is the key for the feature status mapping
 * @param newStatus is the new feature status
 */
-interface ISetFeatureStatusParams extends ITxParams {
+interface ISetFeatureStatusParams extends TxParams {
   nameKey: string;
   newStatus: boolean;
 }

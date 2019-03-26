@@ -22,7 +22,7 @@ import { BigNumber } from '@0x/utils';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -212,7 +212,7 @@ interface IStableCoinsRaisedParams {
 * @param investors Array of investor addresses to modify
 * @param accredited Array of bools specifying accreditation status
 */
-interface IChangeAccreditedParams extends ITxParams {
+interface IChangeAccreditedParams extends TxParams {
   investors: string[];
   accredited: boolean[];
 }
@@ -221,7 +221,7 @@ interface IChangeAccreditedParams extends ITxParams {
 * @param investors Array of investor addresses to modify
 * @param nonAccreditedLimit Array of uints specifying non-accredited limits
 */
-interface IChangeNonAccreditedLimitParams extends ITxParams {
+interface IChangeNonAccreditedLimitParams extends TxParams {
   investors: string[];
   nonAccreditedLimit: BigNumber[];
 }
@@ -230,7 +230,7 @@ interface IChangeNonAccreditedLimitParams extends ITxParams {
 * @param startTime start time of sto
 * @param endTime end time of sto
 */
-interface IModifyTimesParams extends ITxParams {
+interface IModifyTimesParams extends TxParams {
   startTime: BigNumber;
   endTime: BigNumber;
 }
@@ -239,7 +239,7 @@ interface IModifyTimesParams extends ITxParams {
 * @param nonAccreditedLimitUSD max non accredited invets limit
 * @param minimumInvestmentUSD overall minimum investment limit
 */
-interface IModifyLimitsParams extends ITxParams {
+interface IModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
@@ -247,7 +247,7 @@ interface IModifyLimitsParams extends ITxParams {
 /**
 * @param fundRaiseTypes Array of fund raise types to allow
 */
-interface IModifyFundingParams extends ITxParams {
+interface IModifyFundingParams extends TxParams {
   fundRaiseTypes: number[];
 }
 
@@ -256,7 +256,7 @@ interface IModifyFundingParams extends ITxParams {
 * @param reserveWallet Address of wallet where unsold tokens are sent
 * @param usdTokens Address of usd tokens
 */
-interface IModifyAddressesParams extends ITxParams {
+interface IModifyAddressesParams extends TxParams {
   wallet: string;
   reserveWallet: string;
   usdToken: string[];
@@ -268,7 +268,7 @@ interface IModifyAddressesParams extends ITxParams {
 * @param tokensPerTierTotal Array of total tokens per tier
 * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
 */
-interface IModifyTiersParams extends ITxParams {
+interface IModifyTiersParams extends TxParams {
   ratePerTier: BigNumber[];
   ratePerTierDiscountPoly: BigNumber[];
   tokensPerTierTotal: BigNumber[];
@@ -300,7 +300,7 @@ interface IInvestorInvestedUSDParams {
   index_0: string,
 }
 
-interface IConfigureParams extends ITxParams {
+interface IConfigureParams extends TxParams {
   startTime: BigNumber,
   endTime: BigNumber,
   ratePerTier: BigNumber[],
@@ -315,37 +315,37 @@ interface IConfigureParams extends ITxParams {
   usdTokens: string[],
 }
 
-interface IChangeAllowBeneficialInvestmentsParams extends ITxParams {
+interface IChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean,
 }
 
-interface IBuyWithETHParams extends ITxParams {
+interface IBuyWithETHParams extends TxParams {
   beneficiary: string,
 }
 
-interface IBuyWithPOLYParams extends ITxParams {
+interface IBuyWithPOLYParams extends TxParams {
   beneficiary: string,
   investedPOLY: BigNumber,
 }
 
-interface IBuyWithUSDParams extends ITxParams {
+interface IBuyWithUSDParams extends TxParams {
   beneficiary: string,
   investedSC: BigNumber,
   usdToken: string,
 }
 
-interface IBuyWithETHRateLimitedParams extends ITxParams {
+interface IBuyWithETHRateLimitedParams extends TxParams {
   beneficiary: string,
   minTokens: BigNumber,
 }
 
-interface IBuyWithPOLYRateLimitedParams extends ITxParams {
+interface IBuyWithPOLYRateLimitedParams extends TxParams {
   beneficiary: string,
   investedPOLY: BigNumber,
   minTokens: BigNumber,
 }
 
-interface IBuyWithUSDRateLimitedParams extends ITxParams {
+interface IBuyWithUSDRateLimitedParams extends TxParams {
   beneficiary: string,
   investedSC: BigNumber,
   minTokens: BigNumber,

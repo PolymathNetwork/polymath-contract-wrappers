@@ -1,7 +1,7 @@
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   STOBaseContract,
 } from '../../../types';
 import { ModuleWrapper } from '../module_wrapper';
@@ -24,7 +24,7 @@ interface IGetRaisedParams {
   fundRaiseType: number|BigNumber,
 }
 
-interface IReclaimERC20Params extends ITxParams {
+interface IReclaimERC20Params extends TxParams {
   tokenContract: string,
 }
 
@@ -93,13 +93,13 @@ export abstract class STOWrapper extends ModuleWrapper {
     );
   }
 
-  public pause = async (params: ITxParams) => {
+  public pause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync();
     }
   }
 
-  public unpause = async (params: ITxParams) => {
+  public unpause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).unpause.sendTransactionAsync();
     }

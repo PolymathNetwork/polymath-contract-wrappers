@@ -16,7 +16,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -112,7 +112,7 @@ import { DividendCheckpointWrapper } from './dividend_checkpoint_wrapper';
         investor: BigNumber
     }
     
-    interface ICreateDividendParams extends ITxParams {
+    interface ICreateDividendParams extends TxParams {
         maturity: BigNumber,
         expiry: BigNumber,
         token: string,
@@ -120,7 +120,7 @@ import { DividendCheckpointWrapper } from './dividend_checkpoint_wrapper';
         name: string,
     }
     
-    interface ICreateDividendWithCheckpointParams extends ITxParams {
+    interface ICreateDividendWithCheckpointParams extends TxParams {
         maturity: BigNumber,
         expiry: BigNumber,
         token: string,
@@ -129,7 +129,7 @@ import { DividendCheckpointWrapper } from './dividend_checkpoint_wrapper';
         name: string,
     }
     
-    interface ICreateDividendWithExclusionsParams extends ITxParams {
+    interface ICreateDividendWithExclusionsParams extends TxParams {
         maturity: BigNumber,
         expiry: BigNumber,
         token: string,
@@ -138,7 +138,7 @@ import { DividendCheckpointWrapper } from './dividend_checkpoint_wrapper';
         name: string,
     }
 
-    interface ICreateDividendWithCheckpointAndExclusionsParams extends ITxParams {
+    interface ICreateDividendWithCheckpointAndExclusionsParams extends TxParams {
         maturity: BigNumber,
         expiry: BigNumber,
         token: string,

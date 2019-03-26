@@ -12,9 +12,9 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
-import { ITxParams, GenericModuleContract } from '../../types';
+import { TxParams, GenericModuleContract } from '../../types';
 
-interface ITakeFeeParams extends ITxParams {
+interface ITakeFeeParams extends TxParams {
   amount: BigNumber,
 }
 

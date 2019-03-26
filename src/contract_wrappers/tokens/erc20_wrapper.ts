@@ -3,7 +3,7 @@ import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import {
-  ITxParams,
+  TxParams,
   ERC20Contract,
 } from '../../types';
 
@@ -11,7 +11,7 @@ import {
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent
  */
-interface IApproveParams extends ITxParams {
+interface IApproveParams extends TxParams {
     spender: string;
     value: BigNumber;
 }
@@ -21,7 +21,7 @@ interface IApproveParams extends ITxParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-interface ITransferFromParams extends ITxParams {
+interface ITransferFromParams extends TxParams {
     from: string;
     to: string;
     value: BigNumber;
@@ -38,7 +38,7 @@ interface IGetBalanceOfParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-interface ITransferParams extends ITxParams {
+interface ITransferParams extends TxParams {
     to: string;
     value: BigNumber;
 }

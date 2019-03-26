@@ -22,7 +22,7 @@ import { assert } from '../../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -178,7 +178,7 @@ interface ITickerDetailsParams {
 * @param ticker is unique token ticker
 * @param tokenName is the name of the token
 */
-interface IRegisterTickerParams extends ITxParams {
+interface IRegisterTickerParams extends TxParams {
   owner?: string;
   ticker: string;
   tokenName: string;
@@ -188,7 +188,7 @@ interface IRegisterTickerParams extends ITxParams {
 * @param newOwner is the address of the new owner of the ticker
 * @param ticker is the ticker symbol
 */
-interface ITransferTickerOwnershipParams extends ITxParams {
+interface ITransferTickerOwnershipParams extends TxParams {
   newOwner: string;
   ticker: string;
 }
@@ -199,7 +199,7 @@ interface ITransferTickerOwnershipParams extends ITxParams {
 * @param details is the off-chain details of the token
 * @param divisible is whether or not the token is divisible
 */
-interface IGenerateSecurityTokenParams extends ITxParams {
+interface IGenerateSecurityTokenParams extends TxParams {
   name: string;
   ticker: string;
   details: string;
@@ -214,7 +214,7 @@ interface IGenerateSecurityTokenParams extends ITxParams {
  * @param expiryDate is the expiry date for the ticker
  * @param status is the token deployment status
  */
-interface IModifyTickerParams extends ITxParams {
+interface IModifyTickerParams extends TxParams {
   owner: string,
   ticker: string,
   tokenName: string,
@@ -226,14 +226,14 @@ interface IModifyTickerParams extends ITxParams {
 /**
  * @param ticker is the token ticker
  */
-interface IRemoveTickerParams extends ITxParams {
+interface IRemoveTickerParams extends TxParams {
   ticker: string,
 }
 
 /**
  * @param newExpiry is the new expiry for newly generated tickers
  */
-interface IChangeExpiryLimitParams extends ITxParams {
+interface IChangeExpiryLimitParams extends TxParams {
   newExpiry: BigNumber,
 }
 
@@ -245,7 +245,7 @@ interface IChangeExpiryLimitParams extends ITxParams {
  * @param tokenDetails is the off-chain details of the token
  * @param deployedAt is the timestamp at which the security token is deployed
  */
-interface IModifySecurityTokenParams extends ITxParams {
+interface IModifySecurityTokenParams extends TxParams {
   name: string,
   ticker: string,
   owner: string,
@@ -264,28 +264,28 @@ interface IIsSecurityTokenParams {
 /**
   * @param newOwner The address to transfer ownership to.
   */
-interface ITransferOwnershipParams extends ITxParams {
+interface ITransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
 /**
   * @param tickerRegFee is the registration fee in POLY tokens (base 18 decimals)
   */
-interface IChangeTickerRegistrationFeeParams extends ITxParams {
+interface IChangeTickerRegistrationFeeParams extends TxParams {
   tickerRegFee: BigNumber,
 }
 
 /**
   * @param _stLaunchFee is the registration fee in POLY tokens (base 18 decimals)
   */
-interface IChangeSecurityLaunchFeeParams extends ITxParams {
+interface IChangeSecurityLaunchFeeParams extends TxParams {
   stLaunchFee: BigNumber,
 }
 
 /**
   * @param tokenContract is the address of the token contract
   */
-interface IReclaimERC20Params extends ITxParams {
+interface IReclaimERC20Params extends TxParams {
   tokenContract: string
 }
 
@@ -295,7 +295,7 @@ interface IReclaimERC20Params extends ITxParams {
   * @param minor Minor version of the proxy.
   * @param patch Patch version of the proxy
   */
-interface ISetProtocolVersionParams extends ITxParams {
+interface ISetProtocolVersionParams extends TxParams {
   STFactoryAddress: string,
   major: number|BigNumber,
   minor: number|BigNumber,
@@ -305,7 +305,7 @@ interface ISetProtocolVersionParams extends ITxParams {
 /**
  * @param newAddress is the address of the polytoken.
  */
-interface IUpdatePolyTokenAddressParams extends ITxParams {
+interface IUpdatePolyTokenAddressParams extends TxParams {
   newAddress: string,
 }
 
@@ -573,7 +573,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to pause, triggers stopped state
    */
-  public pause = async (params: ITxParams) => {
+  public pause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync(
         params.txData,
@@ -585,7 +585,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to unpause, returns to normal state
    */
-  public unpause = async (params: ITxParams) => {
+  public unpause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).unpause.sendTransactionAsync(
         params.txData,

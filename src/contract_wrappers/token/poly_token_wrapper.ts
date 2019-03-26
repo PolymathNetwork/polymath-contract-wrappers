@@ -11,6 +11,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
+import { ContractWrapper } from '../contract_wrapper';
 import {
   TxParams,
   IGetLogsAsyncParams,
@@ -19,16 +20,6 @@ import {
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { ERC20TokenWrapper } from './erc20_wrapper';
-
-interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: PolyTokenEvents.Approval,
-  callback: EventCallback<PolyTokenApprovalEventArgs>,
-}
-
-interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: PolyTokenEvents.Approval,
-}
 
 interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: PolyTokenEvents.Transfer,
@@ -39,14 +30,68 @@ interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: PolyTokenEvents.Transfer,
 }
 
+interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
+  eventName: PolyTokenEvents.Approval,
+  callback: EventCallback<PolyTokenApprovalEventArgs>,
+}
+
+interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
+  eventName: PolyTokenEvents.Approval,
+}
+
 interface IPolyTokenSubscribeAsyncParams {
-  (params: IApprovalSubscribeAsyncParams): Promise<string>,
   (params: ITransferSubscribeAsyncParams): Promise<string>,
+  (params: IApprovalSubscribeAsyncParams): Promise<string>,
 }
 
 interface IGetPolyTokenLogsAsyncParams {
-  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenApprovalEventArgs>>>,
   (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenTransferEventArgs>>>,
+  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenApprovalEventArgs>>>,
+}
+
+/**
+ * @param owner The address to query the the balance of
+ */
+interface IGetBalanceOfParams {
+  owner?: string;
+}
+
+/**
+ * @param owner address The address which owns the tokens
+ * @param spender address The address which will spend the tokens
+ */
+interface IAllowanceParams {
+  owner: string;
+  spender: string;
+}
+
+/**
+ * @param to The address to transfer tokens to
+ * @param value The amount to be transferred
+ */
+interface ITransferParams extends TxParams {
+  to: string;
+  value: BigNumber;
+}
+
+/**
+ * @param from The address to transfer tokens from
+ * @param to The address to transfer tokens to
+ * @param value The amount to be transferred
+ */
+interface ITransferFromParams extends TxParams {
+  from: string;
+  to: string;
+  value: BigNumber;
+}
+
+/**
+ * @param spender The address which will spend the funds
+ * @param value The amount of tokens to be spent
+ */
+interface IApproveParams extends TxParams {
+  spender: string;
+  value: BigNumber;
 }
 
 /**
@@ -67,23 +112,13 @@ interface DecreaseApprovalParams extends TxParams {
   subtractedValue: BigNumber;
 }
 
-interface IIncreaseParams extends TxParams {
-  spender: string,
-  addedValue: BigNumber,
-}
-
-interface IDecreaseApprovalParams extends TxParams {
-  spender: string,
-  subtractedValue: BigNumber,
-}
-
 /**
  * This class includes the functionality related to interacting with the PolyToken contract.
  */
-export class PolyTokenWrapper extends ERC20TokenWrapper {
+export class PolyTokenWrapper extends ContractWrapper {
   public abi: ContractAbi = PolyToken.abi;
-  protected _polymathRegistry: PolymathRegistryWrapper;
-  protected _contract: Promise<PolyTokenContract>;
+  private polymathRegistry: PolymathRegistryWrapper;
+  private polyTokenContract: Promise<PolyTokenContract>;
 
   /**
    * Instantiate PolyTokenWrapper
@@ -91,38 +126,109 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
   constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, ''); //Address is not needed as it is obtained from polymathRegistry async
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getPolyTokenContract();
+    super(web3Wrapper);
+    this.polymathRegistry = polymathRegistry;
+    this.polyTokenContract = this._getPolyTokenContract();
   }
 
   /**
    * Returns the contract address
    */
   public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
+    return (await this.polyTokenContract).address;
   }
 
-  public increaseApproval = async (params: IIncreaseParams) => {
+  /**
+   * Returns the token name
+   */
+  public getName = async (): Promise<string> => {
+    return await (await this.polyTokenContract).name.callAsync();
+  }
+
+  /**
+   * Approves the passed address to spend the specified amount of tokens
+   */
+  public approve = async (params: IApproveParams) => {
     return async () => {
-      return (await this._contract).increaseApproval.sendTransactionAsync(
+      return (await this.polyTokenContract).approve.sendTransactionAsync(
         params.spender,
-        params.addedValue,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public decreaseApproval = async (params: IDecreaseApprovalParams) => {
+  /**
+   * Returns the token total supply
+   */
+  public getTotalSupply = async (): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).totalSupply.callAsync();
+  }
+
+  /**
+   * Send tokens amount of tokens from address from to address to
+   */
+  public transferFrom = async (params: ITransferFromParams) => {
     return async () => {
-      return (await this._contract).decreaseApproval.sendTransactionAsync(
-        params.spender,
-        params.subtractedValue,
+      return (await this.polyTokenContract).transferFrom.sendTransactionAsync(
+        params.from,
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public decimalFactor = async (): Promise<BigNumber> => {
-    return await (await this._contract).decimalFactor.callAsync();
+  /**
+   * Returns the setted decimals
+   */
+  public getDecimals = async (): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).decimals.callAsync();
+  }
+
+  /**
+   * Returns the balance of the specified address
+   * @return A BigNumber representing the amount owned by the passed address
+   */
+  public getBalanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
+    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+    return await (await this.polyTokenContract).balanceOf.callAsync(
+      address
+    );
+  }
+
+  /**
+   * Returns the token symbol
+   */
+  public getSymbol = async (): Promise<string> => {
+    return await (await this.polyTokenContract).symbol.callAsync();
+  }
+
+  /**
+   * Transfer the balance from token owner's account to 'to' account
+   */
+  public transfer = async (params: ITransferParams) => {
+    return async () => {
+      return (await this.polyTokenContract).transfer.sendTransactionAsync(
+        params.to,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  /**
+   * Function to check the amount of tokens a spender is allowed to spend
+   * @return A BigNumber specifying the amount of tokens left available for the spender
+   */
+  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
+    return await (await this.polyTokenContract).allowance.callAsync(
+      params.owner,
+      params.spender
+    );
   }
 
   /**
@@ -135,7 +241,7 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
+    const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const subscriptionToken = this._subscribe<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -173,7 +279,7 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
+    const normalizedContractAddress = (await this.polyTokenContract).address.toLowerCase();
     const logs = await this._getLogsAsync<ArgsType>(
         normalizedContractAddress,
         params.eventName,
@@ -187,7 +293,7 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
   private async _getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       this.abi,
-      await this._polymathRegistry.getPolyTokenAddress(),
+      await this.polymathRegistry.getPolyTokenAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
