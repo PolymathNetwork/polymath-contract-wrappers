@@ -19,6 +19,7 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  Contracts,
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 
@@ -64,7 +65,7 @@ interface IGetPolymathRegistryLogsAsyncParams {
 /**
 * @param contractName is the key for the contract address mapping
 */
-interface IGetAddressParams {
+interface GetAddressParams {
   contractName: string;
 }
 
@@ -72,18 +73,9 @@ interface IGetAddressParams {
  * @param nameKey is the key for the contract address mapping
  * @param newAddress is the new contract address
  */
-interface IChangeAddressParams extends TxParams  {
+interface ChangeAddressParams extends TxParams  {
   nameKey: string;
   newAddress: string;
-}
-
-enum Contracts {
-  PolyToken = "PolyToken",
-  ModuleRegistry = "ModuleRegistry",
-  FeatureRegistry = "FeatureRegistry",
-  SecurityTokenRegistry = "SecurityTokenRegistry",
-  PolyUsdOracle = "PolyUsdOracle",
-  EthUsdOracle = "EthUsdOracle"
 }
 
 /**
@@ -109,7 +101,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public getAddress = async (params: IGetAddressParams): Promise<string> => {
+  public getAddress = async (params: GetAddressParams): Promise<string> => {
     assert.isString('contractName', params.contractName);
     const address = await (await this._contract).getAddress.callAsync(
       params.contractName,
@@ -239,11 +231,13 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   /**
    * Changes the contract address
    */
-  public changeAddress = async (params: IChangeAddressParams) => {
+  public changeAddress = async (params: ChangeAddressParams) => {
     return async () => {
       return (await this._contract).changeAddress.sendTransactionAsync(
         params.nameKey,
         params.newAddress,
+        params.txData,
+        params.safetyFactor
       );
     }
   }

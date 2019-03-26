@@ -17,6 +17,7 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  Features,
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -63,7 +64,7 @@ interface IGetFeatureRegistryLogsAsyncParams {
 /**
  * @param nameKey is the key for the feature status mapping
  */
-interface IGetFeatureStatusParams {
+interface GetFeatureStatusParams {
   nameKey: string;
 }
 
@@ -71,14 +72,9 @@ interface IGetFeatureStatusParams {
 * @param nameKey is the key for the feature status mapping
 * @param newStatus is the new feature status
 */
-interface ISetFeatureStatusParams extends TxParams {
+interface SetFeatureStatusParams extends TxParams {
   nameKey: string;
   newStatus: boolean;
-}
-
-export enum Features {
-  CustomModulesAllowed = "CustomModulesAllowed",
-  FreezeMintingAllowed = "FreezeMintingAllowed",
 }
 
 /**
@@ -111,7 +107,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public getFeatureStatus = async (params: IGetFeatureStatusParams): Promise<boolean> => {
+  public getFeatureStatus = async (params: GetFeatureStatusParams): Promise<boolean> => {
     return await (await this._contract).getFeatureStatus.callAsync(
         params.nameKey,
     )
@@ -120,11 +116,13 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Change a feature status
    */
-  public setFeatureStatus = async (params: ISetFeatureStatusParams) => {
+  public setFeatureStatus = async (params: SetFeatureStatusParams) => {
     return async () => {
       return (await this._contract).setFeatureStatus.sendTransactionAsync(
         params.nameKey,
-        params.newStatus
+        params.newStatus,
+        params.txData,
+        params.safetyFactor
       );
     }
   }

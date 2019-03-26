@@ -77,6 +77,20 @@ export enum NetworkId {
     Local = 15,
 }
 
+export enum Features {
+    CustomModulesAllowed = "CustomModulesAllowed",
+    FreezeMintingAllowed = "FreezeMintingAllowed",
+}
+
+export enum Contracts {
+    PolyToken = "PolyToken",
+    ModuleRegistry = "ModuleRegistry",
+    FeatureRegistry = "FeatureRegistry",
+    SecurityTokenRegistry = "SecurityTokenRegistry",
+    PolyUsdOracle = "PolyUsdOracle",
+    EthUsdOracle = "EthUsdOracle"
+}
+
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
     isRemoved: boolean;
     log: LogWithDecodedArgs<ArgsType>;
