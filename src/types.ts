@@ -1,4 +1,4 @@
-import { TxData } from '@0x/web3-wrapper';
+import { TxData, TxDataPayable } from '@0x/web3-wrapper';
 import {
     ContractEventArg,
     DecodedLogArgs,
@@ -63,6 +63,11 @@ import {
  */
 export interface TxParams {
     txData?: Partial<TxData>;
+    safetyFactor?: number;
+}
+
+export interface TxPayableParams {
+    txData?: Partial<TxDataPayable>;
     safetyFactor?: number;
 }
 
