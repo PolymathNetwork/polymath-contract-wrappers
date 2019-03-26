@@ -267,22 +267,26 @@ interface IGetSecurityTokenLogsAsyncParams {
 /**
  * @param type type of the module
  */
-interface IGetModulesByTypeParams {
+interface ModuleTypeParams {
   type: number;
 }
 
-interface IAddModuleParams extends TxParams {
+interface AddModuleParams extends TxParams {
   moduleFactory: string;
   data: string;
   maxCost: BigNumber;
   budget: BigNumber;
 }
 
+interface ModuleAddressParams {
+  moduleAddress: string;
+}
+
 /**
 * @param module address of the module
 */
-interface IGetModuleParams {
-  module: string;
+interface ModuleAddressTxParams extends TxParams {
+  moduleAddress: string;
 }
 
 /**
@@ -291,131 +295,108 @@ interface IGetModuleParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface IVerifyTransferParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   value: BigNumber;
   data: string;
 }
 
-interface IDecreaseApprovalParams extends TxParams {
+interface ChangeApprovalParams extends TxParams {
   spender: string,
-  subtractedValue: BigNumber,
-}
-
-interface IIncreaseApprovalParams extends TxParams {
-  spender: string,
-  addedValue: BigNumber,
+  value: BigNumber,
 }
 
 interface ITransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
-interface IArchiveModuleParams extends TxParams {
-  module: string,
+interface ModuleNameParams {
+  moduleName: string,
 }
 
-interface IUnarchiveModuleParams extends TxParams {
-  module: string,
-}
-
-interface IRemoveModuleParams extends TxParams {
-  module: string,
-}
-
-interface IGetModulesByNameParams {
-  name: string,
-}
-
-interface IWithdrawERC20Params extends TxParams {
+interface WithdrawERC20Params extends TxParams {
   tokenContract: string,
   value: BigNumber,
 }
 
-interface IChangeModuleBudgetParams extends TxParams {
+interface ChangeModuleBudgetParams extends TxParams {
   module: string,
   change: BigNumber,
   increase: boolean,
 }
 
-interface IUpdateTokenDetailsParams extends TxParams {
+interface UpdateTokenDetailsParams extends TxParams {
   newTokenDetails: string,
 }
 
-interface IChangeGranularityParams extends TxParams {
+interface ChangeGranularityParams extends TxParams {
   granularity: BigNumber,
 }
 
-interface IGetInvestorsAtParams {
+interface CheckpointIdParams {
   checkpointId: BigNumber,
 }
 
-interface IIterateInvestorsParams {
+interface IterateInvestorsParams {
   start: BigNumber,
   end: BigNumber,
 }
 
-interface ITransferWithDataParams extends TxParams {
+interface TransferWithDataParams extends TxParams {
   to: string,
   value: BigNumber,
   data: string,
 }
 
-interface ITransferFromWithDataParams extends TxParams {
+interface TransferFromWithDataParams extends TxParams {
   from: string,
   to: string,
   value: BigNumber,
   data: string,
 }
 
-interface IMintParams extends TxParams {
+interface MintParams extends TxParams {
   investor: string,
   value: BigNumber,
 }
 
-interface IMintWithDataParams extends TxParams {
-  investor: string,
-  value: BigNumber,
+interface MintWithDataParams extends MintParams {
   data: string,
 }
 
-interface IMintMultiParams extends TxParams {
+interface MintMultiParams extends TxParams {
   investors: string[],
   values: BigNumber[],
 }
 
-interface ICheckPermissionParams {
-  delegate: string,
-  module: string,
-  perm: string,
+interface CheckPermissionParams {
+  delegateAddress: string,
+  moduleAddress: string,
+  permission: string,
 }
 
-interface IBurnWithDataParams extends TxParams {
+interface BurnWithDataParams extends TxParams {
   value: BigNumber,
   data: string,
 }
 
-interface IBurnFromWithDataParams extends TxParams {
+interface BurnFromWithDataParams extends TxParams {
   from: string,
   value: BigNumber,
   data: string,
 }
 
-interface ITotalSupplyAtParams {
-  checkpointId: BigNumber,
-}
-
-interface IBalanceOfAtParams {
+interface BalanceOfAtParams {
   investor: string,
   checkpointId: BigNumber,
 }
 
-interface ISetControllerParams extends TxParams {
+interface SetControllerParams extends TxParams {
   controller: string,
 }
 
-interface IForceTransferParams extends TxParams {
+interface ForceTransferParams extends TxParams {
   from: string,
   to: string,
   value: BigNumber,
@@ -423,14 +404,7 @@ interface IForceTransferParams extends TxParams {
   log: string,
 }
 
-interface IForceBurnParams extends TxParams {
-  from: string,
-  value: BigNumber,
-  data: string,
-  log: string,
-}
-
-interface IForceBurnParams extends TxParams {
+interface ForceBurnParams extends TxParams {
   from: string,
   value: BigNumber,
   data: string,
@@ -468,11 +442,13 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).granularity.callAsync();
   }
 
-  public decreaseApproval = async (params: IDecreaseApprovalParams) => {
+  public decreaseApproval = async (params: ChangeApprovalParams) => {
     return async () => {
       return (await this._contract).decreaseApproval.sendTransactionAsync(
         params.spender,
-        params.subtractedValue,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -483,7 +459,10 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public renounceOwnership = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).renounceOwnership.sendTransactionAsync();
+      return (await this._contract).renounceOwnership.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
@@ -519,11 +498,13 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this._contract).tokenDetails.callAsync();
   }
 
-  public increaseApproval = async (params: IIncreaseApprovalParams) => {
+  public increaseApproval = async (params: ChangeApprovalParams) => {
     return async () => {
       return (await this._contract).increaseApproval.sendTransactionAsync(
         params.spender,
-        params.addedValue,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -536,77 +517,96 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return async () => {
       return (await this._contract).transferOwnership.sendTransactionAsync(
         params.newOwner,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
   public updateFromRegistry = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).updateFromRegistry.sendTransactionAsync();
+      return (await this._contract).updateFromRegistry.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
-  public archiveModule = async (params: IArchiveModuleParams) => {
+  public archiveModule = async (params: ModuleAddressTxParams) => {
     return async () => {
       return (await this._contract).archiveModule.sendTransactionAsync(
-        params.module,
+        params.moduleAddress,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public unarchiveModule = async (params: IUnarchiveModuleParams) => {
+  public unarchiveModule = async (params: ModuleAddressTxParams) => {
     return async () => {
       return (await this._contract).unarchiveModule.sendTransactionAsync(
-        params.module,
+        params.moduleAddress,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public removeModule = async (params: IRemoveModuleParams) => {
+  public removeModule = async (params: ModuleAddressTxParams) => {
     return async () => {
       return (await this._contract).removeModule.sendTransactionAsync(
-        params.module,
+        params.moduleAddress,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public getModulesByName = async (params: IGetModulesByNameParams): Promise<string[]> => {
+  public getModulesByName = async (params: ModuleNameParams): Promise<string[]> => {
     return await (await this._contract).getModulesByName.callAsync(
-      params.name,
+      params.moduleName,
     );
   }
 
-  public withdrawERC20 = async (params: IWithdrawERC20Params) => {
+  public withdrawERC20 = async (params: WithdrawERC20Params) => {
     return async () => {
       return (await this._contract).withdrawERC20.sendTransactionAsync(
         params.tokenContract,
         params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public changeModuleBudget = async (params: IChangeModuleBudgetParams) => {
+  public changeModuleBudget = async (params: ChangeModuleBudgetParams) => {
     return async () => {
       return (await this._contract).changeModuleBudget.sendTransactionAsync(
         params.module,
         params.change,
         params.increase,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public updateTokenDetails = async (params: IUpdateTokenDetailsParams) => {
+  public updateTokenDetails = async (params: UpdateTokenDetailsParams) => {
     return async () => {
       return (await this._contract).updateTokenDetails.sendTransactionAsync(
         params.newTokenDetails,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public changeGranularity = async (params: IChangeGranularityParams) => {
+  public changeGranularity = async (params: ChangeGranularityParams) => {
     return async () => {
       return (await this._contract).changeGranularity.sendTransactionAsync(
         params.granularity,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -615,13 +615,13 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).getInvestors.callAsync();
   }
 
-  public getInvestorsAt = async (params: IGetInvestorsAtParams): Promise<string[]> => {
+  public getInvestorsAt = async (params: CheckpointIdParams): Promise<string[]> => {
     return await (await this._contract).getInvestorsAt.callAsync(
       params.checkpointId,
     );
   }
 
-  public iterateInvestors = async (params: IIterateInvestorsParams): Promise<string[]> => {
+  public iterateInvestors = async (params: IterateInvestorsParams): Promise<string[]> => {
     return await (await this._contract).iterateInvestors.callAsync(
       params.start,
       params.end,
@@ -634,101 +634,127 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public freezeTransfers = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).freezeTransfers.sendTransactionAsync();
+      return (await this._contract).freezeTransfers.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
   public unfreezeTransfers = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).unfreezeTransfers.sendTransactionAsync();
+      return (await this._contract).unfreezeTransfers.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
-  public transferWithData = async (params: ITransferWithDataParams) => {
+  public transferWithData = async (params: TransferWithDataParams) => {
     return async () => {
       return (await this._contract).transferWithData.sendTransactionAsync(
         params.to,
         params.value,
         params.data,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public transferFromWithData = async (params: ITransferFromWithDataParams) => {
+  public transferFromWithData = async (params: TransferFromWithDataParams) => {
     return async () => {
       return (await this._contract).transferFromWithData.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
         params.data,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
   public freezeMinting = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).freezeMinting.sendTransactionAsync();
-    }
-  }
-
-  public mint = async (params: IMintParams) => {
-    return async () => {
-      return (await this._contract).mint.sendTransactionAsync(
-        params.investor,
-        params.value,
+      return (await this._contract).freezeMinting.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public mintWithData = async (params: IMintWithDataParams) => {
+  public mint = async (params: MintParams) => {
+    return async () => {
+      return (await this._contract).mint.sendTransactionAsync(
+        params.investor,
+        params.value,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  public mintWithData = async (params: MintWithDataParams) => {
     return async () => {
       return (await this._contract).mintWithData.sendTransactionAsync(
         params.investor,
         params.value,
         params.data,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public mintMulti = async (params: IMintMultiParams) => {
+  public mintMulti = async (params: MintMultiParams) => {
     return async () => {
       return (await this._contract).mintMulti.sendTransactionAsync(
         params.investors,
         params.values,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public checkPermission = async (params: ICheckPermissionParams): Promise<boolean> => {
+  public checkPermission = async (params: CheckPermissionParams): Promise<boolean> => {
     return await (await this._contract).checkPermission.callAsync(
-      params.delegate,
-      params.module,
-      params.perm,
+      params.delegateAddress,
+      params.moduleAddress,
+      params.permission,
     );
   }
 
-  public burnWithData = async (params: IBurnWithDataParams) => {
+  public burnWithData = async (params: BurnWithDataParams) => {
     return async () => {
       return (await this._contract).burnWithData.sendTransactionAsync(
         params.value,
         params.data,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public burnFromWithData = async (params: IBurnFromWithDataParams) => {
+  public burnFromWithData = async (params: BurnFromWithDataParams) => {
     return async () => {
       return (await this._contract).burnFromWithData.sendTransactionAsync(
         params.from,
         params.value,
         params.data,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
   public createCheckpoint = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).createCheckpoint.sendTransactionAsync();
+      return (await this._contract).createCheckpoint.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
@@ -736,52 +762,61 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).getCheckpointTimes.callAsync();
   }
 
-  public totalSupplyAt = async (params: ITotalSupplyAtParams): Promise<BigNumber> => {
+  public totalSupplyAt = async (params: CheckpointIdParams): Promise<BigNumber> => {
     return await (await this._contract).totalSupplyAt.callAsync(
       params.checkpointId,
     );
   }
 
-  public balanceOfAt = async (params: IBalanceOfAtParams): Promise<BigNumber> => {
+  public balanceOfAt = async (params: BalanceOfAtParams): Promise<BigNumber> => {
     return await (await this._contract).balanceOfAt.callAsync(
       params.investor,
       params.checkpointId,
     );
   }
 
-  public setController = async (params: ISetControllerParams) => {
+  public setController = async (params: SetControllerParams) => {
     return async () => {
       return (await this._contract).setController.sendTransactionAsync(
         params.controller,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
   public disableController = async (params: TxParams) => {
     return async () => {
-    return (await this._contract).disableController.sendTransactionAsync();
+      return (await this._contract).disableController.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
-  public forceTransfer = async (params: IForceTransferParams) => {
+  public forceTransfer = async (params: ForceTransferParams) => {
     return async () => {
       return (await this._contract).forceTransfer.sendTransactionAsync(
         params.from,
         params.to,
         params.value,
         params.data,
-        params.log
+        params.log,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public forceBurn = async (params: IForceBurnParams) => {
+  public forceBurn = async (params: ForceBurnParams) => {
     return async () => {
       return (await this._contract).forceBurn.sendTransactionAsync(
         params.from,
         params.value,
         params.data,
-        params.log
+        params.log,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -801,7 +836,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */
-  public getModulesByType = async (params: IGetModulesByTypeParams): Promise<string[]> => {
+  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return (await this._contract).getModulesByType.callAsync(
       params.type,
     );
@@ -810,13 +845,15 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Attachs a module to the SecurityToken
    */
-  public addModule = async (params: IAddModuleParams) => {
+  public addModule = async (params: AddModuleParams) => {
     return async () => {
       return (await this._contract).addModule.sendTransactionAsync(
         params.moduleFactory,
         params.data,
         params.maxCost,
-        params.budget
+        params.budget,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -824,15 +861,15 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * @return Returns the data associated to a module
    */
-  public getModule = async (params: IGetModuleParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
-    return (await this._contract).getModule.callAsync(params.module);
+  public getModule = async (params: ModuleAddressParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
+    return (await this._contract).getModule.callAsync(params.moduleAddress);
   }
 
   /**
    * Validates a transfer with a TransferManager module if it exists
    * @return bool
    */
-  public verifyTransfer = async (params: IVerifyTransferParams): Promise<boolean> => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<boolean> => {
     return await (await this._contract).verifyTransfer.callAsync(
       params.from,
       params.to,

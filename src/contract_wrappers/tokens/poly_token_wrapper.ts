@@ -51,30 +51,11 @@ interface IGetPolyTokenLogsAsyncParams {
 
 /**
  * @param spender The address which will spend the funds.
- * @param addedValue The amount of tokens to increase the allowance by.
+ * @param value The amount of tokens to increase the allowance by.
  */
-interface IncreaseApprovalParams extends TxParams {
+interface ChangeApprovalParams extends TxParams {
   spender: string;
-  addedValue: BigNumber;
-}
-
-/**
- * @param spender The address which will spend the funds.
- * @param subtractedValue The amount of tokens to decrease the allowance by.
- */
-interface DecreaseApprovalParams extends TxParams {
-  spender: string;
-  subtractedValue: BigNumber;
-}
-
-interface IIncreaseParams extends TxParams {
-  spender: string,
-  addedValue: BigNumber,
-}
-
-interface IDecreaseApprovalParams extends TxParams {
-  spender: string,
-  subtractedValue: BigNumber,
+  value: BigNumber;
 }
 
 /**
@@ -103,20 +84,24 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     return (await this._contract).address;
   }
 
-  public increaseApproval = async (params: IIncreaseParams) => {
+  public increaseApproval = async (params: ChangeApprovalParams) => {
     return async () => {
       return (await this._contract).increaseApproval.sendTransactionAsync(
         params.spender,
-        params.addedValue,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public decreaseApproval = async (params: IDecreaseApprovalParams) => {
+  public decreaseApproval = async (params: ChangeApprovalParams) => {
     return async () => {
       return (await this._contract).decreaseApproval.sendTransactionAsync(
         params.spender,
-        params.subtractedValue,
+        params.value,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
