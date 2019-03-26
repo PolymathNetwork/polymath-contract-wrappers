@@ -97,16 +97,25 @@ interface IIsExcludedParams {
   dividendIndex: BigNumber,
 }
 
+interface IChangeWalletParams {
+  wallet: string,
+}
+
+interface IUpdateDividendDatesParams {
+  dividendIndex: BigNumber,
+  maturity: BigNumber,
+  expiry: BigNumber,
+}
+
 /**
  * This class includes the functionality related to interacting with the DividendCheckpoint contract.
  */
 export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   protected abstract _contract: Promise<DividendCheckpointBaseContract>;
 
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
-  //public wallet = async (): Promise<string> => {
-    //return await (await this._contract).wallet.callAsync();
-  //}
+  public wallet = async (): Promise<string> => {
+    return await (await this._contract).wallet.callAsync();
+  }
 
   public dividends = async (params: IDividendsParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber, BigNumber, string]> => {
     return await (await this._contract).dividends.callAsync(
@@ -126,8 +135,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   }
 
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
-  /* public pause = async (params: ITxParams) => {
+  public pause = async (params: ITxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync();
     }
@@ -158,7 +166,6 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
       params.wallet
     );
   }
-  */
 
   public getDefaultExcluded = async (): Promise<string[]> => {
     return await (await this._contract).getDefaultExcluded.callAsync();
@@ -252,8 +259,6 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
     }
   }
 
-  /*
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
   public updateDividendDates = async (params: IUpdateDividendDatesParams) => {
     return async () => {
       return (await this._contract).updateDividendDates.sendTransactionAsync(
@@ -263,8 +268,6 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
       );
     }
   }
-  */
-
 
   public getDividendsData = async (): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]]> => {
     return await (await this._contract).getDividendsData.callAsync();
