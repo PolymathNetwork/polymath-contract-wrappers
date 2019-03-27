@@ -177,6 +177,14 @@ export interface ISubscribeAsyncParams {
     isVerbose?: boolean,
 }
 
+export interface IGetLogs {
+    (params: IGetLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ContractEventArgs>>>
+}
+
+export interface ISubscribe {
+    (params: ISubscribeAsyncParams): Promise<string>
+}
+
 export type ERC20Contract = 
   DetailedERC20Contract | 
   SecurityTokenContract | 

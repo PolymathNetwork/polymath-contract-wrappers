@@ -18,6 +18,8 @@ import {
   ISubscribeAsyncParams,
   EventCallback,
   Features,
+  ISubscribe,
+  IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -49,13 +51,13 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: FeatureRegistryEvents.OwnershipTransferred,
 }
 
-interface IFeatureRegistrySubscribeAsyncParams {
+interface IFeatureRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IChangeFeatureStatusSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetFeatureRegistryLogsAsyncParams {
+interface IGetFeatureRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetChangeFeatureStatusLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>>>,
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>>>,
@@ -167,22 +169,6 @@ export class FeatureRegistryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

@@ -27,6 +27,8 @@ import {
   ISubscribeAsyncParams,
   EventCallback,
   TxPayableParams,
+  ISubscribe,
+  IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -149,7 +151,7 @@ interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: USDTieredSTOEvents.Unpause,
 }
 
-interface IUSDTieredSTOSubscribeAsyncParams {
+interface IUSDTieredSTOSubscribeAsyncParams extends ISubscribe {
   (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
   (params: ISetNonAccreditedLimitSubscribeAsyncParams): Promise<string>,
   (params: ISetAccreditedSubscribeAsyncParams): Promise<string>,
@@ -165,7 +167,7 @@ interface IUSDTieredSTOSubscribeAsyncParams {
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetUSDTieredSTOLogsAsyncParams {
+interface IGetUSDTieredSTOLogsAsyncParams extends IGetLogs {
   (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>>>,
   (params: IGetSetNonAccreditedLimitLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>>>,
   (params: IGetSetAccreditedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAccreditedEventArgs>>>,
@@ -797,22 +799,6 @@ export class USDTieredSTOWrapper extends STOWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

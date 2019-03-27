@@ -21,6 +21,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  IGetLogs,
+  ISubscribe 
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -88,7 +90,7 @@ interface IGetChangeSTVersionBoundLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: CappedSTOFactoryEvents.ChangeSTVersionBound,
 }
 
-interface ICappedSTOFactorySubscribeAsyncParams {
+interface ICappedSTOFactorySubscribeAsyncParams extends ISubscribe {
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
   (params: IChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>,
@@ -98,7 +100,7 @@ interface ICappedSTOFactorySubscribeAsyncParams {
   (params: IChangeSTVersionBoundSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetCappedSTOFactoryLogsAsyncParams {
+interface IGetCappedSTOFactoryLogsAsyncParams extends IGetLogs {
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOFactoryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOFactoryOwnershipTransferredEventArgs>>>,
   (params: IGetChangeFactorySetupFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOFactoryChangeFactorySetupFeeEventArgs>>>,
@@ -161,22 +163,6 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

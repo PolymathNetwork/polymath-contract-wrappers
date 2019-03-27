@@ -26,6 +26,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  ISubscribe,
+  IGetLogs
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 import * as moment from 'moment';
@@ -120,7 +122,7 @@ interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: SecurityTokenRegistryEvents.Unpause,
 }
 
-interface ISecurityTokenRegistrySubscribeAsyncParams {
+interface ISecurityTokenRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IChangeExpiryLimitSubscribeAsyncParams): Promise<string>,
   (params: IChangeSecurityLaunchFeeSubscribeAsyncParams): Promise<string>,
   (params: IChangeTickerOwnershipSubscribeAsyncParams): Promise<string>,
@@ -133,7 +135,7 @@ interface ISecurityTokenRegistrySubscribeAsyncParams {
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetSecurityTokenRegistryLogsAsyncParams {
+interface IGetSecurityTokenRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetChangeExpiryLimitLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeExpiryLimitEventArgs>>>,
   (params: IGetChangeSecurityLaunchFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>>>,
   (params: IGetChangeTickerOwnershipLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenRegistryChangeTickerOwnershipEventArgs>>>,
@@ -713,22 +715,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

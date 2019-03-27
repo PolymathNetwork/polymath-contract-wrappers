@@ -16,7 +16,9 @@ import * as _ from 'lodash';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
-  EventCallback
+  EventCallback,
+  ISubscribe,
+  IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -67,7 +69,7 @@ interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: CappedSTOEvents.Unpause,
 }
 
-interface ICappedSTOSubscribeAsyncParams {
+interface ICappedSTOSubscribeAsyncParams extends ISubscribe {
   (params: ITokenPurchaseSubscribeAsyncParams): Promise<string>,
   (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
   (params: ISetFundRaiseTypesSubscribeAsyncParams): Promise<string>,
@@ -75,7 +77,7 @@ interface ICappedSTOSubscribeAsyncParams {
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetCappedSTOLogsAsyncParams {
+interface IGetCappedSTOLogsAsyncParams extends IGetLogs {
   (params: IGetTokenPurchaseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOTokenPurchaseEventArgs>>>,
   (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetAllowBeneficialInvestmentsEventArgs>>>,
   (params: IGetSetFundRaiseTypesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetFundRaiseTypesEventArgs>>>,
@@ -147,22 +149,6 @@ export class CappedSTOWrapper extends STOWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

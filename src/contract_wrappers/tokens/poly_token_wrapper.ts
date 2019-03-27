@@ -16,6 +16,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  ISubscribe,
+  IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -39,12 +41,12 @@ interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: PolyTokenEvents.Transfer,
 }
 
-interface IPolyTokenSubscribeAsyncParams {
+interface IPolyTokenSubscribeAsyncParams extends ISubscribe {
   (params: IApprovalSubscribeAsyncParams): Promise<string>,
   (params: ITransferSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetPolyTokenLogsAsyncParams {
+interface IGetPolyTokenLogsAsyncParams extends IGetLogs {
   (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenApprovalEventArgs>>>,
   (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolyTokenTransferEventArgs>>>,
 }
@@ -130,22 +132,6 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

@@ -21,6 +21,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  ISubscribe,
+  IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -88,7 +90,7 @@ interface IGetChangeSTVersionBoundLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: USDTieredSTOFactoryEvents.ChangeSTVersionBound,
 }
 
-interface IUSDTieredSTOFactorySubscribeAsyncParams {
+interface IUSDTieredSTOFactorySubscribeAsyncParams extends ISubscribe {
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
   (params: IChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>,
@@ -98,7 +100,7 @@ interface IUSDTieredSTOFactorySubscribeAsyncParams {
   (params: IChangeSTVersionBoundSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetUSDTieredSTOFactoryLogsAsyncParams {
+interface IGetUSDTieredSTOFactoryLogsAsyncParams extends IGetLogs {
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryOwnershipTransferredEventArgs>>>,
   (params: IGetChangeFactorySetupFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFactoryChangeFactorySetupFeeEventArgs>>>,
@@ -160,22 +162,6 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

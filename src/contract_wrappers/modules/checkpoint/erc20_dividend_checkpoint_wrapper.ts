@@ -20,6 +20,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  ISubscribe,
+  IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -88,7 +90,7 @@ interface IGetSetWithholdingFixedLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: ERC20DividendCheckpointEvents.SetWithholdingFixed,
 }
 
-interface IERC20DividendCheckpointSubscribeAsyncParams {
+interface IERC20DividendCheckpointSubscribeAsyncParams extends ISubscribe {
   (params: IERC20DividendDepositedSubscribeAsyncParams): Promise<string>,
   (params: IERC20DividendClaimedSubscribeAsyncParams): Promise<string>,
   (params: IERC20DividendReclaimedSubscribeAsyncParams): Promise<string>,
@@ -98,7 +100,7 @@ interface IERC20DividendCheckpointSubscribeAsyncParams {
   (params: ISetWithholdingFixedSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetERC20DividendCheckpointLogsAsyncParams {
+interface IGetERC20DividendCheckpointLogsAsyncParams extends IGetLogs {
   (params: IGetERC20DividendDepositedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ERC20DividendCheckpointERC20DividendDepositedEventArgs>>>,
   (params: IGetERC20DividendClaimedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ERC20DividendCheckpointERC20DividendClaimedEventArgs>>>,
   (params: IGetERC20DividendReclaimedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ERC20DividendCheckpointERC20DividendReclaimedEventArgs>>>,
@@ -239,22 +241,6 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

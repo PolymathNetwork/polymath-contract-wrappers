@@ -15,6 +15,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  IGetLogs,
+  ISubscribe
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -38,12 +40,12 @@ interface IGetAddDelegateLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: GeneralPermissionManagerEvents.AddDelegate,
 }
 
-interface IGeneralPermissionManagerSubscribeAsyncParams {
+interface IGeneralPermissionManagerSubscribeAsyncParams extends ISubscribe {
   (params: IChangePermissionSubscribeAsyncParams): Promise<string>,
   (params: IAddDelegateSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetGeneralPermissionManagerLogsAsyncParams {
+interface IGetGeneralPermissionManagerLogsAsyncParams extends IGetLogs {
   (params: IGetChangePermissionLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs>>>,
   (params: IGetAddDelegateLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>>>,
 }
@@ -240,22 +242,6 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
       !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**
