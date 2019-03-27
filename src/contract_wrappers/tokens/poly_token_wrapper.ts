@@ -87,25 +87,21 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
   }
 
   public increaseApproval = async (params: ChangeApprovalParams) => {
-    return async () => {
-      return (await this._contract).increaseApproval.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).increaseApproval.sendTransactionAsync(
+      params.spender,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public decreaseApproval = async (params: ChangeApprovalParams) => {
-    return async () => {
-      return (await this._contract).decreaseApproval.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).decreaseApproval.sendTransactionAsync(
+      params.spender,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public decimalFactor = async (): Promise<BigNumber> => {

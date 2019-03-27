@@ -413,104 +413,88 @@ export class USDTieredSTOWrapper extends STOWrapper {
     );
   }
 
-  public configure = async (params: ConfigureParams) => {
-    return async () => {
-      return (await this._contract).configure.sendTransactionAsync(
-        params.startTime,
-        params.endTime,
-        params.ratePerTier,
-        params.ratePerTierDiscountPoly,
-        params.tokensPerTierTotal,
-        params.tokensPerTierDiscountPoly,
-        params.nonAccreditedLimitUSD,
-        params.minimumInvestmentUSD,
-        params.fundRaiseTypes,
-        params.wallet,
-        params.reserveWallet,
-        params.usdTokens,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+public configure = async (params: ConfigureParams) => {
+    return (await this._contract).configure.sendTransactionAsync(
+      params.startTime,
+      params.endTime,
+      params.ratePerTier,
+      params.ratePerTierDiscountPoly,
+      params.tokensPerTierTotal,
+      params.tokensPerTierDiscountPoly,
+      params.nonAccreditedLimitUSD,
+      params.minimumInvestmentUSD,
+      params.fundRaiseTypes,
+      params.wallet,
+      params.reserveWallet,
+      params.usdTokens,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
-    return async () => {
-      return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
-        params.allowBeneficialInvestments,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
+      params.allowBeneficialInvestments,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithETH = async (params: BuyWithETHParams) => {
-    return async () => {
-      return (await this._contract).buyWithETH.sendTransactionAsync(
-        params.beneficiary,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithETH.sendTransactionAsync(
+      params.beneficiary,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
-    return async () => {
-      return (await this._contract).buyWithPOLY.sendTransactionAsync(
-        params.beneficiary,
-        params.investedPOLY,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithPOLY.sendTransactionAsync(
+      params.beneficiary,
+      params.investedPOLY,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithUSD = async (params: BuyWithUSDParams) => {
-    return async () => {
-      return (await this._contract).buyWithUSD.sendTransactionAsync(
-        params.beneficiary,
-        params.investedSC,
-        params.usdToken,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithUSD.sendTransactionAsync(
+      params.beneficiary,
+      params.investedSC,
+      params.usdToken,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
-    return async () => {
-      return (await this._contract).buyWithETHRateLimited.sendTransactionAsync(
-        params.beneficiary,
-        params.minTokens,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithETHRateLimited.sendTransactionAsync(
+      params.beneficiary,
+      params.minTokens,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
-    return async () => {
-      return (await this._contract).buyWithPOLYRateLimited.sendTransactionAsync(
-        params.beneficiary,
-        params.investedPOLY,
-        params.minTokens,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithPOLYRateLimited.sendTransactionAsync(
+      params.beneficiary,
+      params.investedPOLY,
+      params.minTokens,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
-    return async () => {
-      return (await this._contract).buyWithUSDRateLimited.sendTransactionAsync(
-        params.beneficiary,
-        params.investedSC,
-        params.minTokens,
-        params.usdToken,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).buyWithUSDRateLimited.sendTransactionAsync(
+      params.beneficiary,
+      params.investedSC,
+      params.minTokens,
+      params.usdToken,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public buyTokensView = async (params: BuyTokensViewParams): Promise<[BigNumber, BigNumber, BigNumber]> => {
@@ -664,112 +648,96 @@ export class USDTieredSTOWrapper extends STOWrapper {
    * Reserve address must be whitelisted to successfully finalize
    */
   public finalize = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).finalize.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).finalize.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
-    return async () => {
-      return (await this._contract).changeAccredited.sendTransactionAsync(
-        params.investors,
-        params.accredited,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeAccredited.sendTransactionAsync(
+      params.investors,
+      params.accredited,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
-    return async () => {
-      return (await this._contract).changeNonAccreditedLimit.sendTransactionAsync(
-        params.investors,
-        params.nonAccreditedLimit,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeNonAccreditedLimit.sendTransactionAsync(
+      params.investors,
+      params.nonAccreditedLimit,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies STO start and end times
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
-    return async () => {
-      return (await this._contract).modifyTimes.sendTransactionAsync(
-        params.startTime,
-        params.endTime,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyTimes.sendTransactionAsync(
+      params.startTime,
+      params.endTime,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
-    return async () => {
-      return (await this._contract).modifyLimits.sendTransactionAsync(
-        params.nonAccreditedLimitUSD,
-        params.minimumInvestmentUSD,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyLimits.sendTransactionAsync(
+      params.nonAccreditedLimitUSD,
+      params.minimumInvestmentUSD,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies fund raise types
    */
   public modifyFunding = async (params: ModifyFundingParams) => {
-    return async () => {
-      return (await this._contract).modifyFunding.sendTransactionAsync(
-        params.fundRaiseTypes,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyFunding.sendTransactionAsync(
+      params.fundRaiseTypes,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
-    return async () => {
-      return (await this._contract).modifyAddresses.sendTransactionAsync(
-        params.wallet,
-        params.reserveWallet,
-        params.usdToken,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyAddresses.sendTransactionAsync(
+      params.wallet,
+      params.reserveWallet,
+      params.usdToken,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public modifyTiers = async (params: ModifyTiersParams) => {
-    return async () => {
-      return (await this._contract).modifyTiers.sendTransactionAsync(
-        params.ratePerTier,
-        params.ratePerTierDiscountPoly,
-        params.tokensPerTierTotal,
-        params.tokensPerTierDiscountPoly,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyTiers.sendTransactionAsync(
+      params.ratePerTier,
+      params.ratePerTierDiscountPoly,
+      params.tokensPerTierTotal,
+      params.tokensPerTierDiscountPoly,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**

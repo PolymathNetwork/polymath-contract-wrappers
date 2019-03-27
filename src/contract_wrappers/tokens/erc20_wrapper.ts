@@ -87,14 +87,12 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: ApproveParams) => {
-    return async () => {
-      return (await this._contract).approve.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).approve.sendTransactionAsync(
+      params.spender,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -108,15 +106,13 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Send tokens amount of tokens from address from to address to
    */
   public transferFrom = async (params: TransferFromParams) => {
-    return async () => {
-      return (await this._contract).transferFrom.sendTransactionAsync(
-        params.from,
-        params.to,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferFrom.sendTransactionAsync(
+      params.from,
+      params.to,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -148,14 +144,12 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Transfer the balance from token owner's account to 'to' account
    */
   public transfer = async (params: TransferParams) => {
-    return async () => {
-      return (await this._contract).transfer.sendTransactionAsync(
-        params.to,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transfer.sendTransactionAsync(
+      params.to,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**

@@ -80,39 +80,31 @@ export abstract class STOWrapper extends ModuleWrapper {
   }
 
   public pause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).pause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public unpause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).unpause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public reclaimERC20 = async (params: IReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public reclaimETH = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).reclaimETH.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimETH.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 }

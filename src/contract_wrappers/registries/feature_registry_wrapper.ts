@@ -119,14 +119,12 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
-    return async () => {
-      return (await this._contract).setFeatureStatus.sendTransactionAsync(
-        params.nameKey,
-        params.newStatus,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setFeatureStatus.sendTransactionAsync(
+      params.nameKey,
+      params.newStatus,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**

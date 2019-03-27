@@ -101,34 +101,32 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   }
 
   public pause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync();
-    }
+    return (await this._contract).pause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public unpause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync();
-    }
+    return (await this._contract).unpause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public reclaimETH = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).reclaimETH.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimETH.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changeWallet = async (params: ChangeWalletParams) => {
@@ -144,87 +142,71 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   }
 
   public createCheckpoint = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).createCheckpoint.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createCheckpoint.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
-    return async () => {
-      return (await this._contract).setDefaultExcluded.sendTransactionAsync(
-        params.excluded,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setDefaultExcluded.sendTransactionAsync(
+      params.excluded,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public setWithholding = async (params: SetWithholdingParams) => {
-    return async () => {
-      return (await this._contract).setWithholding.sendTransactionAsync(
-        params.investors,
-        params.withholding,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setWithholding.sendTransactionAsync(
+      params.investors,
+      params.withholding,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
-    return async () => {
-      return (await this._contract).setWithholdingFixed.sendTransactionAsync(
-        params.investors,
-        params.withholding,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setWithholdingFixed.sendTransactionAsync(
+      params.investors,
+      params.withholding,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
-    return async () => {
-      return (await this._contract).pushDividendPaymentToAddresses.sendTransactionAsync(
-        params.dividendIndex,
-        params.payees,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).pushDividendPaymentToAddresses.sendTransactionAsync(
+      params.dividendIndex,
+      params.payees,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
-    return async () => {
-      return (await this._contract).pushDividendPayment.sendTransactionAsync(
-        params.dividendIndex,
-        params.start,
-        params.iterations,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).pushDividendPayment.sendTransactionAsync(
+      params.dividendIndex,
+      params.start,
+      params.iterations,
+      params.txData,
+      params.safetyFactor
+    );
   }
   
   public pullDividendPayment = async (params: DividendIndexTxParams) => {
-    return async () => {
-      return (await this._contract).pullDividendPayment.sendTransactionAsync(
-        params.dividendIndex,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).pullDividendPayment.sendTransactionAsync(
+      params.dividendIndex,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public reclaimDividend = async (params: DividendIndexTxParams) => {
-    return async () => {
-      return (await this._contract).reclaimDividend.sendTransactionAsync(
-        params.dividendIndex,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimDividend.sendTransactionAsync(
+      params.dividendIndex,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public calculateDividend = async (params: CalculateDividendParams): Promise<[BigNumber, BigNumber]> => {
@@ -241,25 +223,21 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   }
 
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
-    return async () => {
-      return (await this._contract).reclaimDividend.sendTransactionAsync(
-        params.dividendIndex,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimDividend.sendTransactionAsync(
+      params.dividendIndex,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public updateDividendDates = async (params: UpdateDividendDatesParams) => {
-    return async () => {
-      return (await this._contract).updateDividendDates.sendTransactionAsync(
-        params.dividendIndex,
-        params.maturity,
-        params.expiry,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).updateDividendDates.sendTransactionAsync(
+      params.dividendIndex,
+      params.maturity,
+      params.expiry,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getDividendsData = async (): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]]> => {

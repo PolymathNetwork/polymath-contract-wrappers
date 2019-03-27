@@ -241,55 +241,48 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public initialize = async (params: InitializeParams) => {
-    return async () => {
-      return (await this._contract).initialize.sendTransactionAsync(
-        params.polymathRegistry,
-        params.owner,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).initialize.sendTransactionAsync(
+      params.polymathRegistry,
+      params.owner,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public useModule = async (params: ModuleFactoryParams) => {
-    return async () => {
-      return (await this._contract).useModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    
+    return (await this._contract).useModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    return async () => {
-      return (await this._contract).registerModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    
+    return (await this._contract).registerModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public removeModule = async (params: ModuleFactoryParams) => {
-    return async () => {
+    
       return (await this._contract).removeModule.sendTransactionAsync(
         params.moduleFactory,
         params.txData,
         params.safetyFactor,
       );
-    }
   }
 
   public verifyModule = async (params: VerifyModuleParams) => {
-    return async () => {
-      return (await this._contract).verifyModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.verified,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).verifyModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.verified,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams): Promise<[string[], string[]]> => {
@@ -329,50 +322,40 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public pause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).pause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public unpause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).unpause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public updateFromRegistry = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).updateFromRegistry.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).updateFromRegistry.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    return async () => {
-      return (await this._contract).transferOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).transferOwnership.sendTransactionAsync(
+      params.newOwner,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public owner = async (): Promise<string> => {

@@ -218,14 +218,12 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Changes the contract address
    */
   public changeAddress = async (params: ChangeAddressParams) => {
-    return async () => {
-      return (await this._contract).changeAddress.sendTransactionAsync(
-        params.nameKey,
-        params.newAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeAddress.sendTransactionAsync(
+      params.nameKey,
+      params.newAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   private async _getDefaultAddress(): Promise<string> {
