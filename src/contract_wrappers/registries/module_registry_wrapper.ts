@@ -111,7 +111,7 @@ interface IGetModuleRegistryLogsAsyncParams {
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
  */
-interface IGetModulesByTypeAndTokenParams {
+interface GetModulesByTypeAndTokenParams {
   moduleType: number;
   securityToken: string;
 }
@@ -146,7 +146,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: IGetModulesByTypeAndTokenParams): Promise<string[]> => {
+  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams): Promise<string[]> => {
     return await (await this._contract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
