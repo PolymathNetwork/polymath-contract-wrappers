@@ -137,18 +137,9 @@ interface GetTagsByTypeAndTokenParams {
   securityToken: string,
 }
 
-interface GetTagsByTypeParams {
-  moduleType: number|BigNumber,
+interface ModuleTypeParams {
+  moduleType: number,
 }
-
-interface GetReputationByFactoryParams {
-  factoryAddress: string
-}
-
-interface GetModulesByTypeParams {
-  moduleType: number|BigNumber,
-}
-
 
 /**
  * @param moduleType is the module type to look for
@@ -306,19 +297,19 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     )
   }
 
-  public getTagsByType = async (params: GetTagsByTypeParams): Promise<[string[], string[]]> => {
+  public getTagsByType = async (params: ModuleTypeParams): Promise<[string[], string[]]> => {
     return await (await this._contract).getTagsByType.callAsync(
       params.moduleType,
     )
   }
 
-  public getReputationByFactory = async (params: GetReputationByFactoryParams): Promise<string[]> => {
+  public getReputationByFactory = async (params: ModuleFactoryParams): Promise<string[]> => {
     return await (await this._contract).getReputationByFactory.callAsync(
-      params.factoryAddress,
+      params.moduleFactory,
     )
   }
 
-  public getModulesByType = async (params: GetModulesByTypeParams): Promise<string[]> => {
+  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return await (await this._contract).getModulesByType.callAsync(
       params.moduleType,
     )
