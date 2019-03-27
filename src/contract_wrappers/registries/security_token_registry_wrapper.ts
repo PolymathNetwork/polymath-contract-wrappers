@@ -172,8 +172,11 @@ interface TokenNameParams {
 * @param tokenName is the name of the token
 */
 interface RegisterTickerParams extends TxParams {
+  /** Ticker owner */
   owner?: string;
+  /** Ticker symbol */
   ticker: string;
+  /** Token name */
   tokenName: string;
 }
 
