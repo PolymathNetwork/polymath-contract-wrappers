@@ -8,9 +8,7 @@ import {
 import { DetailedERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import { ContractWrapper } from '../contract_wrapper';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,

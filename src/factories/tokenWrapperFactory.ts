@@ -61,6 +61,6 @@ export class TokenWrapperFactory {
   }
   
   private async isValidSecurityToken(tokenAddress: string): Promise<boolean> {
-    return await this._securityTokenRegistry.isSecurityToken({ securityToken: tokenAddress});
+    return await this._securityTokenRegistry.isSecurityToken({ securityTokenAddress: tokenAddress});
   }
 }

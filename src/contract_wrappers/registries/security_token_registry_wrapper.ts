@@ -22,7 +22,7 @@ import { assert } from '../../utils/assert';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import {
-  ITxParams,
+  TxParams,
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
@@ -149,28 +149,21 @@ interface IGetSecurityTokenRegistryLogsAsyncParams {
 /**
  * @param securityToken is the address of the security token.
  */
-interface IGetSecurityTokenDataParams {
-  securityToken: string;
+interface SecurityTokenAddressParams {
+  securityTokenAddress: string;
 }
 
 /**
 * @param ownerAddress is the address which owns the list of tickers
 */
-interface IGetTickersByOwnerParams {
+interface OwnerParams {
   owner?: string;
-}
-
-/**
-* @param ownerAddress is the address which owns the list of tickers
-*/
-interface IGetTokensByOwnerParams {
-  ownerAddress: string;
 }
 
 /**
 * @param tokenName is the ticker symbol
 */
-interface ITickerDetailsParams {
+interface TokenNameParams {
   tokenName: string;
 }
 
@@ -178,9 +171,12 @@ interface ITickerDetailsParams {
 * @param ticker is unique token ticker
 * @param tokenName is the name of the token
 */
-interface IRegisterTickerParams extends ITxParams {
+interface RegisterTickerParams extends TxParams {
+  /** Ticker owner */
   owner?: string;
+  /** Ticker symbol */
   ticker: string;
+  /** Token name */
   tokenName: string;
 }
 
@@ -188,7 +184,7 @@ interface IRegisterTickerParams extends ITxParams {
 * @param newOwner is the address of the new owner of the ticker
 * @param ticker is the ticker symbol
 */
-interface ITransferTickerOwnershipParams extends ITxParams {
+interface TransferTickerOwnershipParams extends TxParams {
   newOwner: string;
   ticker: string;
 }
@@ -199,7 +195,7 @@ interface ITransferTickerOwnershipParams extends ITxParams {
 * @param details is the off-chain details of the token
 * @param divisible is whether or not the token is divisible
 */
-interface IGenerateSecurityTokenParams extends ITxParams {
+interface GenerateSecurityTokenParams extends TxParams {
   name: string;
   ticker: string;
   details: string;
@@ -214,7 +210,7 @@ interface IGenerateSecurityTokenParams extends ITxParams {
  * @param expiryDate is the expiry date for the ticker
  * @param status is the token deployment status
  */
-interface IModifyTickerParams extends ITxParams {
+interface ModifyTickerParams extends TxParams {
   owner: string,
   ticker: string,
   tokenName: string,
@@ -226,14 +222,14 @@ interface IModifyTickerParams extends ITxParams {
 /**
  * @param ticker is the token ticker
  */
-interface IRemoveTickerParams extends ITxParams {
+interface RemoveTickerParams extends TxParams {
   ticker: string,
 }
 
 /**
  * @param newExpiry is the new expiry for newly generated tickers
  */
-interface IChangeExpiryLimitParams extends ITxParams {
+interface ChangeExpiryLimitParams extends TxParams {
   newExpiry: BigNumber,
 }
 
@@ -245,7 +241,7 @@ interface IChangeExpiryLimitParams extends ITxParams {
  * @param tokenDetails is the off-chain details of the token
  * @param deployedAt is the timestamp at which the security token is deployed
  */
-interface IModifySecurityTokenParams extends ITxParams {
+interface ModifySecurityTokenParams extends TxParams {
   name: string,
   ticker: string,
   owner: string,
@@ -255,37 +251,20 @@ interface IModifySecurityTokenParams extends ITxParams {
 }
 
 /**
-  * @param securityToken is the address of the security token
-  */
-interface IIsSecurityTokenParams {
-  securityToken: string,
-}
-
-/**
   * @param newOwner The address to transfer ownership to.
   */
-interface ITransferOwnershipParams extends ITxParams {
+interface TransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
-/**
-  * @param tickerRegFee is the registration fee in POLY tokens (base 18 decimals)
-  */
-interface IChangeTickerRegistrationFeeParams extends ITxParams {
-  tickerRegFee: BigNumber,
-}
-
-/**
-  * @param _stLaunchFee is the registration fee in POLY tokens (base 18 decimals)
-  */
-interface IChangeSecurityLaunchFeeParams extends ITxParams {
-  stLaunchFee: BigNumber,
+interface ChangeFeeParams extends TxParams {
+  newFee: BigNumber,
 }
 
 /**
   * @param tokenContract is the address of the token contract
   */
-interface IReclaimERC20Params extends ITxParams {
+interface ReclaimERC20Params extends TxParams {
   tokenContract: string
 }
 
@@ -295,17 +274,17 @@ interface IReclaimERC20Params extends ITxParams {
   * @param minor Minor version of the proxy.
   * @param patch Patch version of the proxy
   */
-interface ISetProtocolVersionParams extends ITxParams {
+interface SetProtocolVersionParams extends TxParams {
   STFactoryAddress: string,
-  major: number|BigNumber,
-  minor: number|BigNumber,
-  patch: number|BigNumber,
+  major: number,
+  minor: number,
+  patch: number,
 }
 
 /**
  * @param newAddress is the address of the polytoken.
  */
-interface IUpdatePolyTokenAddressParams extends ITxParams {
+interface UpdatePolyTokenAddressParams extends TxParams {
   newAddress: string,
 }
 
@@ -338,8 +317,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (params: IGetTickersByOwnerParams): Promise<string[]> => {
-    const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+  public getTickersByOwner = async (params?: OwnerParams): Promise<string[]> => {
+    const owner = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
     const tickers = await (await this._contract).getTickersByOwner.callAsync(
       owner,
     );
@@ -349,17 +328,18 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the security token data by address
    */
-  public getSecurityTokenData = async (params: IGetSecurityTokenDataParams): Promise<[string, string, string, BigNumber]> => {
-    return await (await this._contract).getSecurityTokenData.callAsync(params.securityToken);
+  public getSecurityTokenData = async (params: SecurityTokenAddressParams): Promise<[string, string, string, BigNumber]> => {
+    return await (await this._contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
   }
 
   /**
    * @returns Returns the list of tokens owned by the selected address
    */
-  public getTokensByOwner = async (params: IGetTokensByOwnerParams): Promise<string[]> => {
-    assert.isETHAddressHex('ownerAddress', params.ownerAddress);
+  public getTokensByOwner = async (params?: OwnerParams): Promise<string[]> => {
+    const owner = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
+    assert.isETHAddressHex('ownerAddress', owner);
     const tokens = await (await this._contract).getTokensByOwner.callAsync(
-      params.ownerAddress,
+      owner,
     );
     return tokens;
   }
@@ -367,7 +347,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: ITickerDetailsParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
+  public getTickerDetails = async (params: TokenNameParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
     assert.isString('tokenName', params.tokenName);
     const tickerDetail = await (await this._contract).getTickerDetails.callAsync(
       params.tokenName,
@@ -387,13 +367,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Once the token ticker is registered to its owner then no other issuer can claim
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
-  public registerTicker = async (params: IRegisterTickerParams) => {
+  public registerTicker = async (params: RegisterTickerParams) => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
     return async () => {
       return (await this._contract).registerTicker.sendTransactionAsync(
         owner,
         params.ticker,
-        params.tokenName
+        params.tokenName,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -401,13 +383,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Transfers the ownership of the ticker
    */
-  public transferTickerOwnership = async (params: ITransferTickerOwnershipParams) => {
+  public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
     return async () => {
       return (await this._contract).transferTickerOwnership.sendTransactionAsync(
         params.newOwner,
-        params.ticker
+        params.ticker,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -415,13 +399,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
-  public generateSecurityToken = async (params: IGenerateSecurityTokenParams) => {
+  public generateSecurityToken = async (params: GenerateSecurityTokenParams) => {
     return async () => {
       return (await this._contract).generateSecurityToken.sendTransactionAsync(
         params.name,
         params.ticker,
         params.details,
-        params.divisible
+        params.divisible,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -459,7 +445,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets ticker availability
    * @return boolean
    */
-  public isTickerAvailable = async (params: ITickerDetailsParams): Promise<boolean> => {
+  public isTickerAvailable = async (params: TokenNameParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const registrationDate = result[1].toNumber();
     const expiryDate = result[2].toNumber();
@@ -472,7 +458,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Knows if the ticker was registered by the user
    * @return boolean
    */
-  public isTickerRegisteredByCurrentIssuer = async (params: ITickerDetailsParams): Promise<boolean> => {
+  public isTickerRegisteredByCurrentIssuer = async (params: TokenNameParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const tickerOwner = result[0];
     const registrationDate = result[1].toNumber();
@@ -490,7 +476,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Knows if the ticker was launched
    * @return boolean
    */
-  public isTokenLaunched = async (params: ITickerDetailsParams): Promise<boolean> => {
+  public isTokenLaunched = async (params: TokenNameParams): Promise<boolean> => {
     const result = await this.getTickerDetails(params);
     const tokenDeployed = result[4];
     return tokenDeployed;
@@ -499,7 +485,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
-  public modifyTicker = async (params: IModifyTickerParams) => {
+  public modifyTicker = async (params: ModifyTickerParams) => {
     return async () => {
       return (await this._contract).modifyTicker.sendTransactionAsync(
         params.owner,
@@ -508,6 +494,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         params.registrationDate,
         params.expiryDate,
         params.status,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -515,10 +503,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Removes the ticker details, associated ownership & security token mapping
    */
-  public removeTicker = async (params: IRemoveTickerParams) => {
+  public removeTicker = async (params: RemoveTickerParams) => {
     return async () => {
       return (await this._contract).removeTicker.sendTransactionAsync(
         params.ticker,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -526,10 +516,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the expiry time for the token ticker. Only available to Polymath.
    */
-  public changeExpiryLimit = async (params: IChangeExpiryLimitParams) => {
+  public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
     return async () => {
       return (await this._contract).changeExpiryLimit.sendTransactionAsync(
         params.newExpiry,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -537,7 +529,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
-  public modifySecurityToken = async (params: IModifySecurityTokenParams) => {
+  public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
     return async () => {
       return (await this._contract).modifySecurityToken.sendTransactionAsync(
         params.owner,
@@ -546,6 +538,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         params.securityToken,
         params.tokenDetails,
         params.deployedAt,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -553,19 +547,21 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Checks that Security Token is registered
    */
-  public isSecurityToken = async (params: IIsSecurityTokenParams): Promise<boolean> => {
+  public isSecurityToken = async (params: SecurityTokenAddressParams): Promise<boolean> => {
     return await (await this._contract).isSecurityToken.callAsync(
-      params.securityToken,
+      params.securityTokenAddress,
     );
   }
 
   /**
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
-  public transferOwnership = async (params: ITransferOwnershipParams) => {
+  public transferOwnership = async (params: TransferOwnershipParams) => {
     return async () => {
       return (await this._contract).transferOwnership.sendTransactionAsync(
         params.newOwner,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -573,7 +569,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to pause, triggers stopped state
    */
-  public pause = async (params: ITxParams) => {
+  public pause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync(
         params.txData,
@@ -585,7 +581,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to unpause, returns to normal state
    */
-  public unpause = async (params: ITxParams) => {
+  public unpause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).unpause.sendTransactionAsync(
         params.txData,
@@ -597,10 +593,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
-  public changeTickerRegistrationFee = async (params: IChangeTickerRegistrationFeeParams) => {
+  public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
     return async () => {
       return (await this._contract).changeTickerRegistrationFee.sendTransactionAsync(
-        params.tickerRegFee,
+        params.newFee,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -608,10 +606,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
-  public changeSecurityLaunchFee = async (params: IChangeSecurityLaunchFeeParams) => {
+  public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
     return async () => {
       return (await this._contract).changeSecurityLaunchFee.sendTransactionAsync(
-        params.stLaunchFee,
+        params.newFee,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -619,10 +619,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Reclaims all ERC20Basic compatible tokens
    */
-  public reclaimERC20 = async (params: IReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params) => {
     return async () => {
       return (await this._contract).reclaimERC20.sendTransactionAsync(
         params.tokenContract,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -630,13 +632,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the protocol version and the SecurityToken contract
    */
-  public setProtocolVersion = async (params: ISetProtocolVersionParams) => {
+  public setProtocolVersion = async (params: SetProtocolVersionParams) => {
     return async () => {
       return (await this._contract).setProtocolVersion.sendTransactionAsync(
         params.STFactoryAddress,
         params.major,
         params.minor,
         params.patch,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
@@ -658,10 +662,12 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the PolyToken address. Only Polymath.
    */
-  public updatePolyTokenAddress = async (params: IUpdatePolyTokenAddressParams) => {
+  public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
     return async () => {
       return (await this._contract).updatePolyTokenAddress.sendTransactionAsync(
         params.newAddress,
+        params.txData,
+        params.safetyFactor
       );
     }
   }

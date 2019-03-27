@@ -2,99 +2,74 @@
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   DividendCheckpointBaseContract,
 } from '../../../types';
 import { ModuleWrapper } from '../module_wrapper';
 
-interface IDividendsParams {
+interface DividendIndexParams {
   dividendIndex: BigNumber,
 }
 
-interface IExcludedParams {
-  dividendIndex: BigNumber
+interface CheckpointIdParams {
+  checkpointId: BigNumber,
 }
 
-interface IWithholdingTaxParams {
+interface InvestorParams {
   investor: string,
 }
 
-interface IReclaimERC20Params extends ITxParams {
+interface CalculateDividendParams {
+  dividendIndex: BigNumber,
+  payee: string,
+}
+
+interface InvestorStatus {
+  investor: string,
+  dividendIndex: BigNumber,
+}
+
+interface ChangeWalletParams extends TxParams {
+  wallet: string,
+}
+
+interface ReclaimERC20Params extends TxParams {
   tokenContract: string,
 }
 
-interface ISetDefaultExcludedParams extends ITxParams {
+interface SetDefaultExcludedParams extends TxParams {
   excluded: string[],
 }
 
-interface ISetWithholdingParams extends ITxParams {
+interface SetWithholdingParams extends TxParams {
   investors: string[],
   withholding: BigNumber[],
 }
 
-interface ISetWithholdingFixedParams extends ITxParams {
+interface SetWithholdingFixedParams extends TxParams {
   investors: string[],
   withholding: BigNumber,
 }
 
-interface IPushDividendPaymentToAddressesParams extends ITxParams {
+interface PushDividendPaymentToAddressesParams extends TxParams {
   dividendIndex: BigNumber,
   payees: string[],
 }
 
-interface IPushDividendPaymentParams extends ITxParams {
+interface PushDividendPaymentParams extends TxParams {
   dividendIndex: BigNumber,
   start: BigNumber,
   iterations: BigNumber,
 }
 
-interface IPullDividendPaymentParams extends ITxParams {
+interface DividendIndexTxParams extends TxParams {
   dividendIndex: BigNumber,
 }
 
-interface IReclaimDividendParams extends ITxParams {
-  dividendIndex: BigNumber
-}
-
-interface ICalculateDividendParams {
-  dividendIndex: BigNumber,
-  payee: string,
-}
-
-interface IGetDividendIndexParams {
-  checkpointId: BigNumber,
-}
-
-interface IWithdrawWithholdingParams extends ITxParams {
-  dividendIndex: BigNumber
-}
-
-interface IUpdateDividendsDatesParams extends ITxParams {
+interface UpdateDividendDatesParams extends TxParams {
   dividendIndex: BigNumber,
   maturity: BigNumber,
   expiry: BigNumber,
-}
-
-interface IGetDividendDataParams {
-  dividendIndex: BigNumber,
-}
-
-interface IGetDividendProgressParams {
-  dividendIndex: BigNumber
-}
-
-interface IGetCheckpointDataParams {
-  checkpointId: BigNumber,
-}
-
-interface IIsClaimedParams {
-  investor: string,
-  dividendIndex: BigNumber,
-}
-
-interface IIsExcludedParams {
-  investor: string,
-  dividendIndex: BigNumber,
 }
 
 /**
@@ -103,199 +78,220 @@ interface IIsExcludedParams {
 export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   protected abstract _contract: Promise<DividendCheckpointBaseContract>;
 
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
-  //public wallet = async (): Promise<string> => {
-    //return await (await this._contract).wallet.callAsync();
-  //}
+  public wallet = async (): Promise<string> => {
+    return await (await this._contract).wallet.callAsync();
+  }
 
-  public dividends = async (params: IDividendsParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber, BigNumber, string]> => {
+  public dividends = async (params: DividendIndexParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber, BigNumber, string]> => {
     return await (await this._contract).dividends.callAsync(
       params.dividendIndex,
     );
   }
 
-  public excluded = async (params: IExcludedParams): Promise<string> => {
+  public excluded = async (params: DividendIndexParams): Promise<string> => {
     return await (await this._contract).excluded.callAsync(
       params.dividendIndex,
     );
   }
 
-  public withholdingTax = async (params: IWithholdingTaxParams): Promise<BigNumber> => {
+  public withholdingTax = async (params: InvestorParams): Promise<BigNumber> => {
     return await (await this._contract).withholdingTax.callAsync(
       params.investor,
     );
   }
 
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
-  /* public pause = async (params: ITxParams) => {
+  public pause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).pause.sendTransactionAsync();
     }
   }
 
-  public unpause = async (params: ITxParams) => {
+  public unpause = async (params: TxParams) => {
     return async () => {
       return (await this._contract).unpause.sendTransactionAsync();
     }
   }
 
-  public reclaimERC20 = async (params: IReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params) => {
     return async () => {
       return (await this._contract).reclaimERC20.sendTransactionAsync(
         params.tokenContract,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public reclaimETH = async () => {
+  public reclaimETH = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).reclaimETH.sendTransactionAsync();
+      return (await this._contract).reclaimETH.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
-  public changeWallet = async (params: IChangeWalletParams) => {
+  public changeWallet = async (params: ChangeWalletParams) => {
     return await (await this._contract).changeWallet.sendTransactionAsync(
-      params.wallet
+      params.wallet,
+      params.txData,
+      params.safetyFactor
     );
   }
-  */
 
   public getDefaultExcluded = async (): Promise<string[]> => {
     return await (await this._contract).getDefaultExcluded.callAsync();
   }
 
-  public createCheckpoint = async (params: ITxParams) => {
+  public createCheckpoint = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).createCheckpoint.sendTransactionAsync();
-    }
-  }
-
-  public setDefaultExcluded = async (params: ISetDefaultExcludedParams) => {
-    return async () => {
-      return (await this._contract).setDefaultExcluded.sendTransactionAsync(
-        params.excluded,
+      return (await this._contract).createCheckpoint.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public setWithholding = async (params: ISetWithholdingParams) => {
+  public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
+    return async () => {
+      return (await this._contract).setDefaultExcluded.sendTransactionAsync(
+        params.excluded,
+        params.txData,
+        params.safetyFactor
+      );
+    }
+  }
+
+  public setWithholding = async (params: SetWithholdingParams) => {
     return async () => {
       return (await this._contract).setWithholding.sendTransactionAsync(
         params.investors,
         params.withholding,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public setWithholdingFixed = async (params: ISetWithholdingFixedParams) => {
+  public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
     return async () => {
       return (await this._contract).setWithholdingFixed.sendTransactionAsync(
         params.investors,
         params.withholding,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public pushDividendPaymentToAddresses = async (params: IPushDividendPaymentToAddressesParams) => {
+  public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     return async () => {
       return (await this._contract).pushDividendPaymentToAddresses.sendTransactionAsync(
         params.dividendIndex,
         params.payees,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public pushDividendPayment = async (params: IPushDividendPaymentParams) => {
+  public pushDividendPayment = async (params: PushDividendPaymentParams) => {
     return async () => {
       return (await this._contract).pushDividendPayment.sendTransactionAsync(
         params.dividendIndex,
         params.start,
         params.iterations,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
   
-  public pullDividendPayment = async (params: IPullDividendPaymentParams) => {
+  public pullDividendPayment = async (params: DividendIndexTxParams) => {
     return async () => {
       return (await this._contract).pullDividendPayment.sendTransactionAsync(
         params.dividendIndex,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public reclaimDividend = async (params: IReclaimDividendParams) => {
+  public reclaimDividend = async (params: DividendIndexTxParams) => {
     return async () => {
       return (await this._contract).reclaimDividend.sendTransactionAsync(
         params.dividendIndex,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public calculateDividend = async (params: ICalculateDividendParams): Promise<[BigNumber, BigNumber]> => {
+  public calculateDividend = async (params: CalculateDividendParams): Promise<[BigNumber, BigNumber]> => {
     return await (await this._contract).calculateDividend.callAsync(
       params.dividendIndex,
       params.payee,
     );
   }
 
-  public getDividendIndex = async (params: IGetDividendIndexParams): Promise<BigNumber[]> => {
+  public getDividendIndex = async (params: CheckpointIdParams): Promise<BigNumber[]> => {
     return await (await this._contract).getDividendIndex.callAsync(
       params.checkpointId,
     );
   }
 
-  public withdrawWithholding = async (params: IWithdrawWithholdingParams) => {
+  public withdrawWithholding = async (params: DividendIndexTxParams) => {
     return async () => {
       return (await this._contract).reclaimDividend.sendTransactionAsync(
         params.dividendIndex,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  /*
-  //TODO: Once updated abi-wrappers to latest 2.1.1 release
-  public updateDividendDates = async (params: IUpdateDividendDatesParams) => {
+  public updateDividendDates = async (params: UpdateDividendDatesParams) => {
     return async () => {
       return (await this._contract).updateDividendDates.sendTransactionAsync(
         params.dividendIndex,
         params.maturity,
-        params.expiry
+        params.expiry,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
-  */
-
 
   public getDividendsData = async (): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]]> => {
     return await (await this._contract).getDividendsData.callAsync();
   }
 
-  public getDividendData = async (params: IGetDividendDataParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
+  public getDividendData = async (params: DividendIndexParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
     return await (await this._contract).getDividendData.callAsync(
       params.dividendIndex,
     );
   }
 
-  public getDividendProgress = async (params: IGetDividendProgressParams): Promise<[string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]]> => {
+  public getDividendProgress = async (params: DividendIndexParams): Promise<[string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]]> => {
     return await (await this._contract).getDividendProgress.callAsync(
       params.dividendIndex,
     );
   }
 
-  public getCheckpointData = async (params: IGetCheckpointDataParams): Promise<[string[], BigNumber[], BigNumber[]]> => {
+  public getCheckpointData = async (params: CheckpointIdParams): Promise<[string[], BigNumber[], BigNumber[]]> => {
     return await (await this._contract).getCheckpointData.callAsync(
       params.checkpointId,
     );
   }
 
-  public isClaimed = async (params: IIsClaimedParams): Promise<boolean> => {
+  public isClaimed = async (params: InvestorStatus): Promise<boolean> => {
     return await (await this._contract).isClaimed.callAsync(
       params.investor,
       params.dividendIndex,
     );
   }
 
-  public isExcluded = async (params: IIsExcludedParams): Promise<boolean> => {
+  public isExcluded = async (params: InvestorStatus): Promise<boolean> => {
     return await (await this._contract).isExcluded.callAsync(
       params.investor,
       params.dividendIndex,

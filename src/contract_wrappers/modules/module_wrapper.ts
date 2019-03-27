@@ -12,9 +12,9 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
-import { ITxParams, GenericModuleContract } from '../../types';
+import { TxParams, GenericModuleContract } from '../../types';
 
-interface ITakeFeeParams extends ITxParams {
+interface TakeFeeParams extends TxParams {
   amount: BigNumber,
 }
 
@@ -64,10 +64,12 @@ export class ModuleWrapper extends ContractWrapper {
     return await (await this._contract).factory.callAsync();
   }
 
-  public takeFee = async (params: ITakeFeeParams) => {
+  public takeFee = async (params: TakeFeeParams) => {
     return async () => {
       return (await this._contract).takeFee.sendTransactionAsync(
         params.amount,
+        params.txData,
+        params.safetyFactor
       );
     }
   }

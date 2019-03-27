@@ -1,4 +1,4 @@
-import { TxData } from '@0x/web3-wrapper';
+import { TxData, TxDataPayable } from '@0x/web3-wrapper';
 import {
     ContractEventArg,
     DecodedLogArgs,
@@ -61,8 +61,13 @@ import {
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
  * @param safetyFactor Factor to use for gas limit estimation
  */
-export interface ITxParams {
+export interface TxParams {
     txData?: Partial<TxData>;
+    safetyFactor?: number;
+}
+
+export interface TxPayableParams {
+    txData?: Partial<TxDataPayable>;
     safetyFactor?: number;
 }
 
@@ -70,6 +75,20 @@ export enum NetworkId {
     Mainnet = 1,
     Kovan = 42,
     Local = 15,
+}
+
+export enum Features {
+    CustomModulesAllowed = "CustomModulesAllowed",
+    FreezeMintingAllowed = "FreezeMintingAllowed",
+}
+
+export enum Contracts {
+    PolyToken = "PolyToken",
+    ModuleRegistry = "ModuleRegistry",
+    FeatureRegistry = "FeatureRegistry",
+    SecurityTokenRegistry = "SecurityTokenRegistry",
+    PolyUsdOracle = "PolyUsdOracle",
+    EthUsdOracle = "EthUsdOracle"
 }
 
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {

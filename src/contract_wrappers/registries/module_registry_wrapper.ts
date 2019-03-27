@@ -20,7 +20,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
-  ITxParams,
+  TxPayableParams,
+  TxParams,
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -109,42 +110,42 @@ interface IGetModuleRegistryLogsAsyncParams {
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs>>>,
 }
 
-interface IGetValueByVariableParams {
+interface GetValueByVariableParams {
   variable: string,
 }
 
-interface IGetValueByKeyParams {
+interface GetValueByKeyParams {
   key: string,
 }
 
-interface IInitializeParams extends ITxParams {
+interface InitializeParams extends TxPayableParams {
   polymathRegistry: string,
   owner: string,
 }
 
-interface IModuleFactoryParams extends ITxParams {
+interface ModuleFactoryParams extends TxParams {
   moduleFactory: string,
 }
 
-interface IVerifyModuleParams extends ITxParams {
+interface VerifyModuleParams extends TxParams {
   moduleFactory: string,
   verified: boolean,
 }
 
-interface IGetTagsByTypeAndTokenParams {
+interface GetTagsByTypeAndTokenParams {
   moduleType: number|BigNumber,
   securityToken: string,
 }
 
-interface IGetTagsByTypeParams {
+interface GetTagsByTypeParams {
   moduleType: number|BigNumber,
 }
 
-interface IGetReputationByFactoryParams {
+interface GetReputationByFactoryParams {
   factoryAddress: string
 }
 
-interface IGetModulesByTypeParams {
+interface GetModulesByTypeParams {
   moduleType: number|BigNumber,
 }
 
@@ -153,16 +154,16 @@ interface IGetModulesByTypeParams {
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
  */
-interface IGetModulesByTypeAndTokenParams {
+interface GetModulesByTypeAndTokenParams {
   moduleType: number|BigNumber,
   securityToken: string,
 }
 
-interface IReclaimERC20Params extends ITxParams {
+interface ReclaimERC20Params extends TxParams {
   tokenContract: string,
 }
 
-interface ITransferOwnershipParams extends ITxParams {
+interface TransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
@@ -192,122 +193,132 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     return (await this._contract).address;
   }
 
-  public getBytes32Value = async (params: IGetValueByVariableParams): Promise<string> => {
+  public getBytes32Value = async (params: GetValueByVariableParams): Promise<string> => {
     return await (await this._contract).getBytes32Value.callAsync(
       params.variable,
     )
   }
 
-  public getBytesValue = async (params: IGetValueByVariableParams): Promise<string> => {
+  public getBytesValue = async (params: GetValueByVariableParams): Promise<string> => {
     return await (await this._contract).getBytesValue.callAsync(
       params.variable,
     )
   }
 
-  public getAddressValue = async (params: IGetValueByVariableParams): Promise<string> => {
+  public getAddressValue = async (params: GetValueByVariableParams): Promise<string> => {
     return await (await this._contract).getAddressValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayAddress = async (params: IGetValueByKeyParams): Promise<string[]> => {
+  public getArrayAddress = async (params: GetValueByKeyParams): Promise<string[]> => {
     return await (await this._contract).getArrayAddress.callAsync(
       params.key,
     )
   }
 
-  public getBoolValue = async (params: IGetValueByVariableParams): Promise<boolean> => {
+  public getBoolValue = async (params: GetValueByVariableParams): Promise<boolean> => {
     return await (await this._contract).getBoolValue.callAsync(
       params.variable,
     )
   }
 
-  public getStringValue = async (params: IGetValueByVariableParams): Promise<string> => {
+  public getStringValue = async (params: GetValueByVariableParams): Promise<string> => {
     return await (await this._contract).getStringValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayBytes32 = async (params: IGetValueByKeyParams): Promise<string[]> => {
+  public getArrayBytes32 = async (params: GetValueByKeyParams): Promise<string[]> => {
     return await (await this._contract).getArrayBytes32.callAsync(
       params.key,
     )
   }
   
-  public getUintValue = async (params: IGetValueByVariableParams): Promise<BigNumber> => {
+  public getUintValue = async (params: GetValueByVariableParams): Promise<BigNumber> => {
     return await (await this._contract).getUintValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayUint = async (params: IGetValueByKeyParams): Promise<BigNumber[]> => {
+  public getArrayUint = async (params: GetValueByKeyParams): Promise<BigNumber[]> => {
     return await (await this._contract).getArrayUint.callAsync(
       params.key,
     )
   }
 
-  public initialize = async (params: IInitializeParams) => {
+  public initialize = async (params: InitializeParams) => {
     return async () => {
       return (await this._contract).initialize.sendTransactionAsync(
         params.polymathRegistry,
         params.owner,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public useModule = async (params: IModuleFactoryParams) => {
+  public useModule = async (params: ModuleFactoryParams) => {
     return async () => {
       return (await this._contract).useModule.sendTransactionAsync(
         params.moduleFactory,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public registerModule = async (params: IModuleFactoryParams) => {
+  public registerModule = async (params: ModuleFactoryParams) => {
     return async () => {
       return (await this._contract).registerModule.sendTransactionAsync(
         params.moduleFactory,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public removeModule = async (params: IModuleFactoryParams) => {
+  public removeModule = async (params: ModuleFactoryParams) => {
     return async () => {
       return (await this._contract).removeModule.sendTransactionAsync(
         params.moduleFactory,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public verifyModule = async (params: IVerifyModuleParams) => {
+  public verifyModule = async (params: VerifyModuleParams) => {
     return async () => {
       return (await this._contract).verifyModule.sendTransactionAsync(
         params.moduleFactory,
         params.verified,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public getTagsByTypeAndToken = async (params: IGetTagsByTypeAndTokenParams): Promise<[string[], string[]]> => {
+  public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams): Promise<[string[], string[]]> => {
     return await (await this._contract).getTagsByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
     )
   }
 
-  public getTagsByType = async (params: IGetTagsByTypeParams): Promise<[string[], string[]]> => {
+  public getTagsByType = async (params: GetTagsByTypeParams): Promise<[string[], string[]]> => {
     return await (await this._contract).getTagsByType.callAsync(
       params.moduleType,
     )
   }
 
-  public getReputationByFactory = async (params: IGetReputationByFactoryParams): Promise<string[]> => {
+  public getReputationByFactory = async (params: GetReputationByFactoryParams): Promise<string[]> => {
     return await (await this._contract).getReputationByFactory.callAsync(
       params.factoryAddress,
     )
   }
 
-  public getModulesByType = async (params: IGetModulesByTypeParams): Promise<string[]> => {
+  public getModulesByType = async (params: GetModulesByTypeParams): Promise<string[]> => {
     return await (await this._contract).getModulesByType.callAsync(
       params.moduleType,
     )
@@ -317,43 +328,56 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: IGetModulesByTypeAndTokenParams): Promise<string[]> => {
+  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams): Promise<string[]> => {
     return await (await this._contract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
     )
   }
 
-  public reclaimERC20 = async (params: IReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params) => {
     return async () => {
       return (await this._contract).reclaimERC20.sendTransactionAsync(
         params.tokenContract,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }
 
-  public pause = async () => {
+  public pause = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).pause.sendTransactionAsync();
+      return (await this._contract).pause.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor,
+      );
     }
   }
 
-  public unpause = async () => {
+  public unpause = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).unpause.sendTransactionAsync();
+      return (await this._contract).unpause.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor,
+      );
     }
   }
 
-  public updateFromRegistry = async () => {
+  public updateFromRegistry = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).updateFromRegistry.sendTransactionAsync();
+      return (await this._contract).updateFromRegistry.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor,
+      );
     }
   }
 
-  public transferOwnership = async (params: ITransferOwnershipParams) => {
+  public transferOwnership = async (params: TransferOwnershipParams) => {
     return async () => {
       return (await this._contract).transferOwnership.sendTransactionAsync(
         params.newOwner,
+        params.txData,
+        params.safetyFactor,
       );
     }
   }

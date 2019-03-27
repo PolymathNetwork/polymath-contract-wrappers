@@ -1,30 +1,16 @@
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-  ITxParams,
+  TxParams,
   STOBaseContract,
 } from '../../../types';
 import { ModuleWrapper } from '../module_wrapper';
 
-/**
- * 
- */
-interface IFundRaiseTypesParams {
-  index: number;
+interface FundRaiseTypesParams {
+  type: number;
 }
 
-/**
- * 
- */
-interface IFundsRaisedParams {
-  index: number;
-}
-
-interface IGetRaisedParams {
-  fundRaiseType: number|BigNumber,
-}
-
-interface IReclaimERC20Params extends ITxParams {
+interface IReclaimERC20Params extends TxParams {
   tokenContract: string,
 }
 
@@ -37,15 +23,15 @@ export abstract class STOWrapper extends ModuleWrapper {
   /**
    * Type of currency used to collect the funds
    */
-  public fundRaiseTypes = async (params: IFundRaiseTypesParams): Promise<boolean> => {
-    return await (await this._contract).fundRaiseTypes.callAsync(params.index);
+  public fundRaiseTypes = async (params: FundRaiseTypesParams): Promise<boolean> => {
+    return await (await this._contract).fundRaiseTypes.callAsync(params.type);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public fundsRaised = async (params: IFundsRaisedParams): Promise<BigNumber> => {
-    return await (await this._contract).fundsRaised.callAsync(params.index);
+  public fundsRaised = async (params: FundRaiseTypesParams): Promise<BigNumber> => {
+    return await (await this._contract).fundsRaised.callAsync(params.type);
   }
 
     /**
@@ -87,21 +73,27 @@ export abstract class STOWrapper extends ModuleWrapper {
     return await (await this._contract).totalTokensSold.callAsync();
   }
 
-  public getRaised = async (params: IGetRaisedParams): Promise<BigNumber> => {
+  public getRaised = async (params: FundRaiseTypesParams): Promise<BigNumber> => {
     return await (await this._contract).getRaised.callAsync(
-      params.fundRaiseType,
+      params.type,
     );
   }
 
-  public pause = async (params: ITxParams) => {
+  public pause = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).pause.sendTransactionAsync();
+      return (await this._contract).pause.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
-  public unpause = async (params: ITxParams) => {
+  public unpause = async (params: TxParams) => {
     return async () => {
-      return (await this._contract).unpause.sendTransactionAsync();
+      return (await this._contract).unpause.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 
@@ -109,14 +101,18 @@ export abstract class STOWrapper extends ModuleWrapper {
     return async () => {
       return (await this._contract).reclaimERC20.sendTransactionAsync(
         params.tokenContract,
+        params.txData,
+        params.safetyFactor
       );
     }
   }
 
-  public reclaimETH = async () => {
+  public reclaimETH = async (params: TxParams) => {
     return async () => {
-      //TODO: Once updated abi-wrappers to latest 2.1.1 release
-      //return (await this._contract).reclaimETH.sendTransactionAsync();
+      return (await this._contract).reclaimETH.sendTransactionAsync(
+        params.txData,
+        params.safetyFactor
+      );
     }
   }
 }

@@ -3,7 +3,7 @@ import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
 import {
-  ITxParams,
+  TxParams,
   ERC20Contract,
 } from '../../types';
 
@@ -11,7 +11,7 @@ import {
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent
  */
-interface IApproveParams extends ITxParams {
+interface ApproveParams extends TxParams {
     spender: string;
     value: BigNumber;
 }
@@ -21,7 +21,7 @@ interface IApproveParams extends ITxParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-interface ITransferFromParams extends ITxParams {
+interface TransferFromParams extends TxParams {
     from: string;
     to: string;
     value: BigNumber;
@@ -30,7 +30,7 @@ interface ITransferFromParams extends ITxParams {
 /**
  * @param owner The address to query the the balance of
  */
-interface IGetBalanceOfParams {
+interface GetBalanceOfParams {
     owner?: string;
 }
 
@@ -38,7 +38,7 @@ interface IGetBalanceOfParams {
  * @param to The address who will receive the funds
  * @param value The amount of tokens to be spent
  */
-interface ITransferParams extends ITxParams {
+interface TransferParams extends TxParams {
     to: string;
     value: BigNumber;
 }
@@ -47,7 +47,7 @@ interface ITransferParams extends ITxParams {
  * @param owner address The address which owns the tokens
  * @param spender address The address which will spend the tokens
  */
-interface IAllowanceParams {
+interface AllowanceParams {
     owner: string;
     spender: string;
 }
@@ -86,7 +86,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Approves the passed address to spend the specified amount of tokens
    */
-  public approve = async (params: IApproveParams) => {
+  public approve = async (params: ApproveParams) => {
     return async () => {
       return (await this._contract).approve.sendTransactionAsync(
         params.spender,
@@ -107,7 +107,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Send tokens amount of tokens from address from to address to
    */
-  public transferFrom = async (params: ITransferFromParams) => {
+  public transferFrom = async (params: TransferFromParams) => {
     return async () => {
       return (await this._contract).transferFrom.sendTransactionAsync(
         params.from,
@@ -130,8 +130,8 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public balanceOf = async (params: IGetBalanceOfParams): Promise<BigNumber> => {
-    const address = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+  public balanceOf = async (params?: GetBalanceOfParams): Promise<BigNumber> => {
+    const address = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
     return await (await this._contract).balanceOf.callAsync(
       address
     );
@@ -147,7 +147,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Transfer the balance from token owner's account to 'to' account
    */
-  public transfer = async (params: ITransferParams) => {
+  public transfer = async (params: TransferParams) => {
     return async () => {
       return (await this._contract).transfer.sendTransactionAsync(
         params.to,
@@ -162,7 +162,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Function to check the amount of tokens a spender is allowed to spend
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
-  public allowance = async (params: IAllowanceParams): Promise<BigNumber> => {
+  public allowance = async (params: AllowanceParams): Promise<BigNumber> => {
     return await (await this._contract).allowance.callAsync(
       params.owner,
       params.spender

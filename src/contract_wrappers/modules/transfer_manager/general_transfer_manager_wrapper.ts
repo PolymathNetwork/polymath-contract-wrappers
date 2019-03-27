@@ -19,7 +19,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import {
-    ITxParams,
+    TxParams,
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
@@ -144,49 +144,49 @@ import { ModuleWrapper } from '../module_wrapper';
     (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>>>,
   }
   
-    interface IInvestorsParams {
-        index: BigNumber,
+    interface InvestorIndexParams {
+        investorIndex: BigNumber,
     }
 
-    interface IWhitelistParams {
-        address: string,
+    interface InvestorAddressParams {
+        investorAddress: string,
     }
 
-    interface INonceMapParams {
+    interface NonceMapParams {
         address: string,
         nonce: BigNumber,
     }
 
-    interface IChangeDefaultsParams extends ITxParams {
+    interface ChangeDefaultsParams extends TxParams {
         defaultFromTime: BigNumber,
         defaultToTime: BigNumber,
     }
 
-    interface IChangeIssuanceAddressParams extends ITxParams {
+    interface ChangeIssuanceAddressParams extends TxParams {
         issuanceAddress: string,
     }
 
-    interface IChangeSigningAddressParams extends ITxParams {
+    interface ChangeSigningAddressParams extends TxParams {
         signingAddress: string,
     }
 
-    interface IChangeAllowAllTransfersParams extends ITxParams {
+    interface ChangeAllowAllTransfersParams extends TxParams {
         allowAllTransfers: boolean,
     }
 
-    interface IChangeAllowAllWhitelistTransfersParams extends ITxParams {
+    interface ChangeAllowAllWhitelistTransfersParams extends TxParams {
         allowAllWhitelistTransfers: boolean,
     }
 
-    interface IChangeAllowAllWhitelistIssuancesParams extends ITxParams {
+    interface ChangeAllowAllWhitelistIssuancesParams extends TxParams {
         allowAllWhitelistIssuances: boolean,
     }
 
-    interface IChangeAllowAllBurnTransfersParams extends ITxParams {
+    interface ChangeAllowAllBurnTransfersParams extends TxParams {
         allowAllBurnTransfers: boolean,
     }
 
-    interface IVerifyTransferParams extends ITxParams {
+    interface VerifyTransferParams extends TxParams {
         from: string,
         to: string,
         amount: BigNumber,
@@ -194,7 +194,7 @@ import { ModuleWrapper } from '../module_wrapper';
         isTransfer: boolean,
     }
 
-    interface IModifyWhitelistParams extends ITxParams {
+    interface ModifyWhitelistParams extends TxParams {
         investor: string,
         fromTime: BigNumber,
         toTime: BigNumber,
@@ -202,7 +202,7 @@ import { ModuleWrapper } from '../module_wrapper';
         canBuyFromSTO: boolean,
     }
 
-    interface IModifyWhitelistSignedParams extends ITxParams {
+    interface ModifyWhitelistSignedParams extends TxParams {
         investor: string,
         fromTime: BigNumber,
         toTime: BigNumber,
@@ -216,7 +216,7 @@ import { ModuleWrapper } from '../module_wrapper';
         s: string,
     }
 
-    interface IGetInvestorsDataParams {
+    interface GetInvestorsDataParams {
         investors: string[],
     }
 
@@ -252,15 +252,18 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).allowAllWhitelistTransfers.callAsync();
     }
 
-    public unpause = async (params: ITxParams) => {
+    public unpause = async (params: TxParams) => {
         return async () => {
-            return (await this._contract).unpause.sendTransactionAsync();
+            return (await this._contract).unpause.sendTransactionAsync(
+                params.txData,
+                params.safetyFactor
+            );
         }
     }
 
-    public investors = async (params: IInvestorsParams): Promise<string> => {
+    public investors = async (params: InvestorIndexParams): Promise<string> => {
         return await (await this._contract).investors.callAsync(
-            params.index,
+            params.investorIndex,
         );
     }
 
@@ -268,19 +271,22 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).paused.callAsync();
     }
 
-    public pause = async (params: ITxParams) => {
+    public pause = async (params: TxParams) => {
         return async () => {
-            return (await this._contract).pause.sendTransactionAsync();
+            return (await this._contract).pause.sendTransactionAsync(
+                params.txData,
+                params.safetyFactor
+            );
         }
     } 
 
-    public whitelist = async (params: IWhitelistParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
+    public whitelist = async (params: InvestorAddressParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
         return await (await this._contract).whitelist.callAsync(
-            params.address,
+            params.investorAddress,
         );
     }
 
-    public nonceMap = async (params: INonceMapParams): Promise<boolean> => {
+    public nonceMap = async (params: NonceMapParams): Promise<boolean> => {
         return await (await this._contract).nonceMap.callAsync(
             params.address,
             params.nonce,
@@ -307,64 +313,78 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).defaults.callAsync();
     }
 
-    public changeDefaults = async (params: IChangeDefaultsParams) => {
+    public changeDefaults = async (params: ChangeDefaultsParams) => {
         return async () => {
             return (await this._contract).changeDefaults.sendTransactionAsync(
                 params.defaultFromTime,
                 params.defaultToTime,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeIssuanceAddress = async (params: IChangeIssuanceAddressParams) => {
+    public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
         return async () => {
             return (await this._contract).changeIssuanceAddress.sendTransactionAsync(
                 params.issuanceAddress,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeSigningAddress = async (params: IChangeSigningAddressParams) => {
+    public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
         return async () => {
             return (await this._contract).changeSigningAddress.sendTransactionAsync(
                 params.signingAddress,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeAllowAllTransfers = async (params: IChangeAllowAllTransfersParams) => {
+    public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
         return async () => {
             return (await this._contract).changeAllowAllTransfers.sendTransactionAsync(
                 params.allowAllTransfers,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeAllowAllWhitelistTransfers = async (params: IChangeAllowAllWhitelistTransfersParams) => {
+    public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
         return async () => {
             return (await this._contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
                 params.allowAllWhitelistTransfers,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeAllowAllWhitelistIssuances = async (params: IChangeAllowAllWhitelistIssuancesParams) => {
+    public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
         return async () => {
             return (await this._contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
                 params.allowAllWhitelistIssuances,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public changeAllowAllBurnTransfers = async (params: IChangeAllowAllBurnTransfersParams) => {
+    public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
         return async () => {
             return (await this._contract).changeAllowAllBurnTransfers.sendTransactionAsync(
                 params.allowAllBurnTransfers,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public verifyTransfer = async (params: IVerifyTransferParams) => {
+    public verifyTransfer = async (params: VerifyTransferParams) => {
         return async () => {
             return (await this._contract).verifyTransfer.sendTransactionAsync(
                 params.from,
@@ -372,11 +392,13 @@ import { ModuleWrapper } from '../module_wrapper';
                 params.amount,
                 params.data,
                 params.isTransfer,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public modifyWhitelist = async (params: IModifyWhitelistParams) => {
+    public modifyWhitelist = async (params: ModifyWhitelistParams) => {
         return async () => {
             return (await this._contract).modifyWhitelist.sendTransactionAsync(
                 params.investor,
@@ -384,11 +406,13 @@ import { ModuleWrapper } from '../module_wrapper';
                 params.toTime,
                 params.expiryTime,
                 params.canBuyFromSTO,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
 
-    public modifyWhitelistSigned = async (params: IModifyWhitelistSignedParams) => {
+    public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
         return async () => {
             return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
                 params.investor,
@@ -402,6 +426,8 @@ import { ModuleWrapper } from '../module_wrapper';
                 params.v,
                 params.r,
                 params.s,
+                params.txData,
+                params.safetyFactor
             );
         }
     }
@@ -414,7 +440,7 @@ import { ModuleWrapper } from '../module_wrapper';
         return await (await this._contract).getAllInvestorsData.callAsync();
     }
 
-    public getInvestorsData = async (params: IGetInvestorsDataParams): Promise<[BigNumber[], BigNumber[], BigNumber[], boolean[]]> => {
+    public getInvestorsData = async (params: GetInvestorsDataParams): Promise<[BigNumber[], BigNumber[], BigNumber[], boolean[]]> => {
         return await (await this._contract).getInvestorsData.callAsync(
             params.investors,
         );
