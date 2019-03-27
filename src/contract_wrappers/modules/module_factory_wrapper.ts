@@ -10,7 +10,6 @@ import {
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
   ModuleFactoryChangeSTVersionBoundEventArgs
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from '../registries/polymath_registry_wrapper';
 import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -20,6 +19,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  ISubscribe,
+  IGetLogs,
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -87,7 +88,7 @@ interface IGetChangeSTVersionBoundLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: ModuleFactoryEvents.ChangeSTVersionBound,
 }
 
-interface IModuleFactorySubscribeAsyncParams {
+interface IModuleFactorySubscribeAsyncParams extends ISubscribe {
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
   (params: IChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>,
@@ -97,7 +98,7 @@ interface IModuleFactorySubscribeAsyncParams {
   (params: IChangeSTVersionBoundSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetModuleFactoryLogsAsyncParams {
+interface IGetModuleFactoryLogsAsyncParams extends IGetLogs {
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs>>>,
   (params: IGetChangeFactorySetupFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryChangeFactorySetupFeeEventArgs>>>,
@@ -160,22 +161,6 @@ export class ModuleFactoryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

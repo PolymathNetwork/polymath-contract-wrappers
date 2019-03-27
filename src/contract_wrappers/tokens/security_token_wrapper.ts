@@ -33,6 +33,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  IGetLogs,
+  ISubscribe
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -218,7 +220,7 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: SecurityTokenEvents.OwnershipTransferred,
 }
 
-interface ISecurityTokenSubscribeAsyncParams {
+interface ISecurityTokenSubscribeAsyncParams extends ISubscribe {
   (params: IApprovalSubscribeAsyncParams): Promise<string>,
   (params: ITransferSubscribeAsyncParams): Promise<string>,
   (params: IModuleAddedSubscribeAsyncParams): Promise<string>,
@@ -241,7 +243,7 @@ interface ISecurityTokenSubscribeAsyncParams {
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>
 }
 
-interface IGetSecurityTokenLogsAsyncParams {
+interface IGetSecurityTokenLogsAsyncParams extends IGetLogs {
   (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>>>,
   (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenTransferEventArgs>>>,
   (params: IGetModuleAddedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>>>,
@@ -898,22 +900,6 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

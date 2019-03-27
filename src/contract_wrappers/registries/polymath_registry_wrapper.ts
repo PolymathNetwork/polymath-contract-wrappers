@@ -20,6 +20,8 @@ import {
   ISubscribeAsyncParams,
   EventCallback,
   Contracts,
+  IGetLogs,
+  ISubscribe
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 
@@ -50,13 +52,13 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: PolymathRegistryEvents.OwnershipTransferred,
 }
 
-interface IPolymathRegistrySubscribeAsyncParams {
+interface IPolymathRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IChangeAddressSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetPolymathRegistryLogsAsyncParams {
+interface IGetPolymathRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetChangeAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>>>,
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>>>,
@@ -189,22 +191,6 @@ export class PolymathRegistryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

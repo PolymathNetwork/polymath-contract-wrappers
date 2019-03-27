@@ -23,6 +23,8 @@ import {
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
+    ISubscribe,
+    IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -118,7 +120,7 @@ import { ModuleWrapper } from '../module_wrapper';
     eventName: GeneralTransferManagerEvents.Unpause,
   }
 
-  interface IGeneralTransferManagerSubscribeAsyncParams {
+  interface IGeneralTransferManagerSubscribeAsyncParams extends ISubscribe {
     (params: IChangeIssuanceAddressSubscribeAsyncParams): Promise<string>,
     (params: IAllowAllTransfersSubscribeAsyncParams): Promise<string>,
     (params: IAllowAllWhitelistTransfersSubscribeAsyncParams): Promise<string>,
@@ -131,7 +133,7 @@ import { ModuleWrapper } from '../module_wrapper';
     (params: IUnpauseSubscribeAsyncParams): Promise<string>,
   }
   
-  interface IGetGeneralTransferManagerLogsAsyncParams {
+  interface IGetGeneralTransferManagerLogsAsyncParams extends IGetLogs {
     (params: IGetChangeIssuanceAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs>>>,
     (params: IGetAllowAllTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllTransfersEventArgs>>>,
     (params: IGetAllowAllWhitelistTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>>>,
@@ -466,22 +468,6 @@ import { ModuleWrapper } from '../module_wrapper';
           !_.isUndefined(params.isVerbose),
       );
       return subscriptionToken;
-    }
-  
-    /**
-     * Cancel a subscription
-     * @param subscriptionToken Subscription token returned by `subscribe()`
-     */
-    public unsubscribe = (subscriptionToken: string): void => {
-      assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-      this._unsubscribe(subscriptionToken);
-    }
-  
-    /**
-     * Cancels all existing subscriptions
-     */
-    public unsubscribeAll = (): void => {
-      super._unsubscribeAll();
     }
   
     /**

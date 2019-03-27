@@ -22,6 +22,8 @@ import {
   EventCallback,
   TxPayableParams,
   TxParams,
+  ISubscribe,
+  IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -90,7 +92,7 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: ModuleRegistryEvents.OwnershipTransferred,
 }
 
-interface IModuleRegistrySubscribeAsyncParams {
+interface IModuleRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IPauseSubscribeAsyncParams): Promise<string>,
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
   (params: IModuleUsedSubscribeAsyncParams): Promise<string>,
@@ -100,7 +102,7 @@ interface IModuleRegistrySubscribeAsyncParams {
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetModuleRegistryLogsAsyncParams {
+interface IGetModuleRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryPauseEventArgs>>>,
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryUnpauseEventArgs>>>,
   (params: IGetModuleUsedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>>>,
@@ -401,22 +403,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**
