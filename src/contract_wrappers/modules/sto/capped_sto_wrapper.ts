@@ -87,10 +87,6 @@ interface IGetCappedSTOLogsAsyncParams extends IGetLogs {
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOUnpauseEventArgs>>>,
 }
 
-interface TakenFeeParams extends TxParams {
-  amount: BigNumber,
-}
-
 interface InvestorsParams extends TxParams {
   amount: string,
 }
@@ -168,85 +164,47 @@ export class CappedSTOWrapper extends STOWrapper {
     return await (await this._contract).paused.callAsync();
   }
 
-  public takeFee = async (params: TakenFeeParams) => {
-    return async () => {
-      return (await this._contract).takeFee.sendTransactionAsync(
-        params.amount,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
-  }
-
   public investors = async(params: InvestorsParams): Promise<BigNumber> => {
     return await (await this._contract).investors.callAsync(
       params.amount,
     );
   }
 
-  public polyToken = async(): Promise<string> => {
-    return await (await this._contract).polyToken.callAsync();
-  }
-
-  public securityToken = async(): Promise<string> => {
-    return await (await this._contract).securityToken.callAsync();
-  }
-
-  public factory = async(): Promise<string> => {
-    return await (await this._contract).factory.callAsync();
-  }
-
-  public investorCount = async(): Promise<BigNumber> => {
-    return await (await this._contract).investorCount.callAsync();
-  }
-
   public configure = async (params: ConfigureParams) => {
-    return async () => {
-      return (await this._contract).configure.sendTransactionAsync(
-        params.startTime,
-        params.endTime,
-        params.cap,
-        params.rate,
-        params.fundRaiseTypes,
-        params.fundsReceiver,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
-  }
-
-  public getInitFunction = async(): Promise<string> => {
-    return await (await this._contract).getInitFunction.callAsync();
+    return (await this._contract).configure.sendTransactionAsync(
+      params.startTime,
+      params.endTime,
+      params.cap,
+      params.rate,
+      params.fundRaiseTypes,
+      params.fundsReceiver,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
-    return async () => {
-      return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
-        params.allowBeneficialInvestments,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
+      params.allowBeneficialInvestments,
+      params.txData,
+      params.safetyFactor,
+    );
   }
   
   public buyTokens = async (params: BuyTokensParams) => {
-    return async () => {
-      return (await this._contract).buyTokens.sendTransactionAsync(
-        params.beneficiary,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).buyTokens.sendTransactionAsync(
+      params.beneficiary,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
-    return async () => {
-      return (await this._contract).buyTokensWithPoly.sendTransactionAsync(
-        params.investedPOLY,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).buyTokensWithPoly.sendTransactionAsync(
+      params.investedPOLY,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public capReached = async(): Promise<boolean> => {
