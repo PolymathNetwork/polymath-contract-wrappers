@@ -70,7 +70,7 @@ import { ModuleWrapper } from '../module_wrapper';
     eventName: ManualApprovalTransferManagerEvents.Unpause,
   }
 
-  interface IManualApprovalTransferManagerSubscribeAsyncParams {
+  interface IManualApprovalTransferManagerSubscribeAsyncParams extends ISubscribe {
     (params: IAddManualApprovalSubscribeAsyncParams): Promise<string>,
     (params: IModifyManualApprovalSubscribeAsyncParams): Promise<string>,
     (params: IRevokeManualApprovalSubscribeAsyncParams): Promise<string>,
@@ -78,7 +78,7 @@ import { ModuleWrapper } from '../module_wrapper';
     (params: IUnpauseSubscribeAsyncParams): Promise<string>,
   }
   
-  interface IGetManualApprovalTransferManagerLogsAsyncParams {
+  interface IGetManualApprovalTransferManagerLogsAsyncParams extends IGetLogs {
     (params: IGetAddManualApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ManualApprovalTransferManagerAddManualApprovalEventArgs>>>,
     (params: IGetModifyManualApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ManualApprovalTransferManagerModifyManualApprovalEventArgs>>>,
     (params: IGetRevokeManualApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs>>>,
@@ -87,7 +87,7 @@ import { ModuleWrapper } from '../module_wrapper';
   }
 
     interface ApprovalsParams {
-        index_0: BigNumber,
+        index: BigNumber,
     }
 
     interface VerifyTransferParams extends TxParams {
@@ -181,7 +181,7 @@ import { ModuleWrapper } from '../module_wrapper';
 
     public approvals = async (params: ApprovalsParams): Promise<[string, string, BigNumber, BigNumber, string]> => {
         return await (await this._contract).approvals.callAsync(
-            params.index_0,
+            params.index,
         );
     }
 
