@@ -55,6 +55,7 @@ import {
     PolyTokenContract,
     SecurityTokenContract,
     EtherDividendCheckpointContract,
+    ManualApprovalTransferManagerContract,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -187,7 +188,8 @@ export type GenericModuleContract =
   GeneralPermissionManagerContract |
   GeneralTransferManagerContract |
   STOBaseContract |
-  DividendCheckpointBaseContract;
+  DividendCheckpointBaseContract |
+  ManualApprovalTransferManagerContract;
 
 export type STOBaseContract = 
   STOContract |

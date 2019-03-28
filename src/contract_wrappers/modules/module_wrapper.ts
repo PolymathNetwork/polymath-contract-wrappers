@@ -1,11 +1,4 @@
-import {
-    ModuleContract, 
-    GeneralPermissionManagerContract, 
-    GeneralTransferManagerContract, 
-    CappedSTOContract, 
-    USDTieredSTOContract,
-    ERC20DividendCheckpointContract
-  } from '@polymathnetwork/abi-wrappers';
+import { ModuleContract } from '@polymathnetwork/abi-wrappers';
 import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
