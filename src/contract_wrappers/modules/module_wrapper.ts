@@ -5,7 +5,7 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { ContractWrapper } from '../contract_wrapper';
-import { TxParams, GenericModuleContract } from '../../types';
+import { TxParams, GenericModuleContract, IGetLogs, ISubscribe } from '../../types';
 
 interface TakeFeeParams extends TxParams {
   amount: BigNumber,
@@ -18,6 +18,8 @@ export class ModuleWrapper extends ContractWrapper {
   public abi: ContractAbi = Module.abi;
   protected _address: string;
   protected _contract: Promise<GenericModuleContract>;
+  public getLogsAsync: IGetLogs | undefined;
+  public subscribeAsync: ISubscribe | undefined;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper
@@ -58,13 +60,11 @@ export class ModuleWrapper extends ContractWrapper {
   }
 
   public takeFee = async (params: TakeFeeParams) => {
-    return async () => {
-      return (await this._contract).takeFee.sendTransactionAsync(
-        params.amount,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).takeFee.sendTransactionAsync(
+      params.amount,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   private async _getModuleContract(): Promise<ModuleContract> {

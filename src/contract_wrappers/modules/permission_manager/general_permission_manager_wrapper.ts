@@ -15,6 +15,8 @@ import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
   EventCallback,
+  IGetLogs,
+  ISubscribe
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -38,12 +40,12 @@ interface IGetAddDelegateLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: GeneralPermissionManagerEvents.AddDelegate,
 }
 
-interface IGeneralPermissionManagerSubscribeAsyncParams {
+interface IGeneralPermissionManagerSubscribeAsyncParams extends ISubscribe {
   (params: IChangePermissionSubscribeAsyncParams): Promise<string>,
   (params: IAddDelegateSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetGeneralPermissionManagerLogsAsyncParams {
+interface IGetGeneralPermissionManagerLogsAsyncParams extends IGetLogs {
   (params: IGetChangePermissionLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs>>>,
   (params: IGetAddDelegateLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>>>,
 }
@@ -150,24 +152,20 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   }
 
   public addDelegate = async (params: AddDelegateParams) => {
-    return async () => {
-      return (await this._contract).addDelegate.sendTransactionAsync(
-        params.delegate,
-        params.details,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).addDelegate.sendTransactionAsync(
+      params.delegate,
+      params.details,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public deleteDelegate = async (params: DelegateTxParams) => {
-    return async () => {
-      return (await this._contract).deleteDelegate.sendTransactionAsync(
-        params.delegate,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).deleteDelegate.sendTransactionAsync(
+      params.delegate,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public checkDelegate = async (params: DelegateParams): Promise<boolean> => {
@@ -177,29 +175,25 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   }
 
   public changePermission = async (params: ChangePermissionParams) => {
-    return async () => {
-      return (await this._contract).changePermission.sendTransactionAsync(
-        params.delegate,
-        params.module,
-        params.perm,
-        params.valid,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changePermission.sendTransactionAsync(
+      params.delegate,
+      params.module,
+      params.perm,
+      params.valid,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
-    return async () => {
-      return (await this._contract).changePermissionMulti.sendTransactionAsync(
-        params.delegate,
-        params.modules,
-        params.perms,
-        params.valids,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changePermissionMulti.sendTransactionAsync(
+      params.delegate,
+      params.modules,
+      params.perms,
+      params.valids,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams): Promise<string[]> => {
@@ -240,22 +234,6 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
       !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

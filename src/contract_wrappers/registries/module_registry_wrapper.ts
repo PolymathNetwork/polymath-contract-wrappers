@@ -22,6 +22,8 @@ import {
   EventCallback,
   TxPayableParams,
   TxParams,
+  ISubscribe,
+  IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -90,7 +92,7 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: ModuleRegistryEvents.OwnershipTransferred,
 }
 
-interface IModuleRegistrySubscribeAsyncParams {
+interface IModuleRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IPauseSubscribeAsyncParams): Promise<string>,
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
   (params: IModuleUsedSubscribeAsyncParams): Promise<string>,
@@ -100,7 +102,7 @@ interface IModuleRegistrySubscribeAsyncParams {
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetModuleRegistryLogsAsyncParams {
+interface IGetModuleRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryPauseEventArgs>>>,
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryUnpauseEventArgs>>>,
   (params: IGetModuleUsedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>>>,
@@ -239,55 +241,48 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public initialize = async (params: InitializeParams) => {
-    return async () => {
-      return (await this._contract).initialize.sendTransactionAsync(
-        params.polymathRegistry,
-        params.owner,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).initialize.sendTransactionAsync(
+      params.polymathRegistry,
+      params.owner,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public useModule = async (params: ModuleFactoryParams) => {
-    return async () => {
-      return (await this._contract).useModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    
+    return (await this._contract).useModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    return async () => {
-      return (await this._contract).registerModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    
+    return (await this._contract).registerModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public removeModule = async (params: ModuleFactoryParams) => {
-    return async () => {
+    
       return (await this._contract).removeModule.sendTransactionAsync(
         params.moduleFactory,
         params.txData,
         params.safetyFactor,
       );
-    }
   }
 
   public verifyModule = async (params: VerifyModuleParams) => {
-    return async () => {
-      return (await this._contract).verifyModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.verified,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).verifyModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.verified,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams): Promise<[string[], string[]]> => {
@@ -327,50 +322,40 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public pause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).pause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public unpause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).unpause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public updateFromRegistry = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).updateFromRegistry.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).updateFromRegistry.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    return async () => {
-      return (await this._contract).transferOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).transferOwnership.sendTransactionAsync(
+      params.newOwner,
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   public owner = async (): Promise<string> => {
@@ -401,22 +386,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**

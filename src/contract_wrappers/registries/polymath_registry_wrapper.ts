@@ -20,6 +20,8 @@ import {
   ISubscribeAsyncParams,
   EventCallback,
   Contracts,
+  IGetLogs,
+  ISubscribe
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 
@@ -50,13 +52,13 @@ interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: PolymathRegistryEvents.OwnershipTransferred,
 }
 
-interface IPolymathRegistrySubscribeAsyncParams {
+interface IPolymathRegistrySubscribeAsyncParams extends ISubscribe {
   (params: IChangeAddressSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
   (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetPolymathRegistryLogsAsyncParams {
+interface IGetPolymathRegistryLogsAsyncParams extends IGetLogs {
   (params: IGetChangeAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>>>,
   (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>>>,
   (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>>>,
@@ -192,22 +194,6 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   }
 
   /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
-  }
-
-  /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
@@ -232,14 +218,12 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    * Changes the contract address
    */
   public changeAddress = async (params: ChangeAddressParams) => {
-    return async () => {
-      return (await this._contract).changeAddress.sendTransactionAsync(
-        params.nameKey,
-        params.newAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeAddress.sendTransactionAsync(
+      params.nameKey,
+      params.newAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   private async _getDefaultAddress(): Promise<string> {

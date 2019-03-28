@@ -16,7 +16,11 @@ import * as _ from 'lodash';
 import {
   IGetLogsAsyncParams,
   ISubscribeAsyncParams,
-  EventCallback
+  EventCallback,
+  TxParams,
+  TxPayableParams,
+  ISubscribe,
+  IGetLogs,
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -67,7 +71,7 @@ interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
   eventName: CappedSTOEvents.Unpause,
 }
 
-interface ICappedSTOSubscribeAsyncParams {
+interface ICappedSTOSubscribeAsyncParams extends ISubscribe {
   (params: ITokenPurchaseSubscribeAsyncParams): Promise<string>,
   (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
   (params: ISetFundRaiseTypesSubscribeAsyncParams): Promise<string>,
@@ -75,12 +79,37 @@ interface ICappedSTOSubscribeAsyncParams {
   (params: IUnpauseSubscribeAsyncParams): Promise<string>,
 }
 
-interface IGetCappedSTOLogsAsyncParams {
+interface IGetCappedSTOLogsAsyncParams extends IGetLogs {
   (params: IGetTokenPurchaseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOTokenPurchaseEventArgs>>>,
   (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetAllowBeneficialInvestmentsEventArgs>>>,
   (params: IGetSetFundRaiseTypesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOSetFundRaiseTypesEventArgs>>>,
   (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOPauseEventArgs>>>,
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<CappedSTOUnpauseEventArgs>>>,
+}
+
+interface InvestorsParams extends TxParams {
+  amount: string,
+}
+
+interface ConfigureParams extends TxParams {
+  startTime: BigNumber,
+  endTime: BigNumber,
+  cap: BigNumber,
+  rate: BigNumber,
+  fundRaiseTypes: Array<number|BigNumber>,
+  fundsReceiver: string,
+}
+
+interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
+  allowBeneficialInvestments: boolean,
+}
+
+interface BuyTokensParams extends TxPayableParams {
+  beneficiary: string,
+}
+
+interface BuyTokensWithPolyParams extends TxParams {
+  investedPOLY: BigNumber,
 }
 
 /**
@@ -109,22 +138,89 @@ export class CappedSTOWrapper extends STOWrapper {
   /**
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
-  public getRate = async (): Promise<BigNumber> => {
+  public rate = async (): Promise<BigNumber> => {
     return await (await this._contract).rate.callAsync();
   }
 
   /**
    * How many token base units this STO will be allowed to sell to investors
    */
-  public getCap = async (): Promise<BigNumber> => {
+  public cap = async (): Promise<BigNumber> => {
     return await (await this._contract).cap.callAsync();
   }
 
   /**
    * Return the total no. of tokens sold
    */
-  public getTotalTokensSold = async(): Promise<BigNumber> => {
+  public totalTokensSold = async(): Promise<BigNumber> => {
     return await (await this._contract).totalTokensSold.callAsync();
+  }
+
+  public allowBeneficialInvestments = async(): Promise<boolean> => {
+    return await (await this._contract).allowBeneficialInvestments.callAsync();
+  }
+
+  public paused = async(): Promise<boolean> => {
+    return await (await this._contract).paused.callAsync();
+  }
+
+  public investors = async(params: InvestorsParams): Promise<BigNumber> => {
+    return await (await this._contract).investors.callAsync(
+      params.amount,
+    );
+  }
+
+  public configure = async (params: ConfigureParams) => {
+    return (await this._contract).configure.sendTransactionAsync(
+      params.startTime,
+      params.endTime,
+      params.cap,
+      params.rate,
+      params.fundRaiseTypes,
+      params.fundsReceiver,
+      params.txData,
+      params.safetyFactor,
+    );
+  }
+
+  public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+    return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
+      params.allowBeneficialInvestments,
+      params.txData,
+      params.safetyFactor,
+    );
+  }
+  
+  public buyTokens = async (params: BuyTokensParams) => {
+    return (await this._contract).buyTokens.sendTransactionAsync(
+      params.beneficiary,
+      params.txData,
+      params.safetyFactor,
+    );
+  }
+
+  public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
+    return (await this._contract).buyTokensWithPoly.sendTransactionAsync(
+      params.investedPOLY,
+      params.txData,
+      params.safetyFactor,
+    );
+  }
+
+  public capReached = async(): Promise<boolean> => {
+    return await (await this._contract).capReached.callAsync();
+  }
+
+  public getTokensSold = async(): Promise<BigNumber> => {
+    return await (await this._contract).getTokensSold.callAsync();
+  }
+
+  public getPermissions = async(): Promise<string[]> => {
+    return await (await this._contract).getPermissions.callAsync();
+  }
+
+  public getSTODetails = async(): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean]> => {
+    return await (await this._contract).getSTODetails.callAsync();
   }
 
   /**
@@ -147,22 +243,6 @@ export class CappedSTOWrapper extends STOWrapper {
         !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionToken Subscription token returned by `subscribe()`
-   */
-  public unsubscribe = (subscriptionToken: string): void => {
-    assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-    this._unsubscribe(subscriptionToken);
-  }
-
-  /**
-   * Cancels all existing subscriptions
-   */
-  public unsubscribeAll = (): void => {
-    super._unsubscribeAll();
   }
 
   /**
