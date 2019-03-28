@@ -255,12 +255,10 @@ import { ModuleWrapper } from '../module_wrapper';
     }
 
     public unpause = async (params: TxParams) => {
-        return async () => {
-            return (await this._contract).unpause.sendTransactionAsync(
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).unpause.sendTransactionAsync(
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public investors = async (params: InvestorIndexParams): Promise<string> => {
@@ -274,12 +272,10 @@ import { ModuleWrapper } from '../module_wrapper';
     }
 
     public pause = async (params: TxParams) => {
-        return async () => {
-            return (await this._contract).pause.sendTransactionAsync(
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).pause.sendTransactionAsync(
+            params.txData,
+            params.safetyFactor
+        );
     } 
 
     public whitelist = async (params: InvestorAddressParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]> => {
@@ -316,122 +312,102 @@ import { ModuleWrapper } from '../module_wrapper';
     }
 
     public changeDefaults = async (params: ChangeDefaultsParams) => {
-        return async () => {
-            return (await this._contract).changeDefaults.sendTransactionAsync(
-                params.defaultFromTime,
-                params.defaultToTime,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeDefaults.sendTransactionAsync(
+            params.defaultFromTime,
+            params.defaultToTime,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
-        return async () => {
-            return (await this._contract).changeIssuanceAddress.sendTransactionAsync(
-                params.issuanceAddress,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeIssuanceAddress.sendTransactionAsync(
+            params.issuanceAddress,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
-        return async () => {
-            return (await this._contract).changeSigningAddress.sendTransactionAsync(
-                params.signingAddress,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeSigningAddress.sendTransactionAsync(
+            params.signingAddress,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
-        return async () => {
-            return (await this._contract).changeAllowAllTransfers.sendTransactionAsync(
-                params.allowAllTransfers,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeAllowAllTransfers.sendTransactionAsync(
+            params.allowAllTransfers,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
-        return async () => {
-            return (await this._contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
-                params.allowAllWhitelistTransfers,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
+            params.allowAllWhitelistTransfers,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
-        return async () => {
-            return (await this._contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
-                params.allowAllWhitelistIssuances,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
+            params.allowAllWhitelistIssuances,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
-        return async () => {
-            return (await this._contract).changeAllowAllBurnTransfers.sendTransactionAsync(
-                params.allowAllBurnTransfers,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).changeAllowAllBurnTransfers.sendTransactionAsync(
+            params.allowAllBurnTransfers,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public verifyTransfer = async (params: VerifyTransferParams) => {
-        return async () => {
-            return (await this._contract).verifyTransfer.sendTransactionAsync(
-                params.from,
-                params.to,
-                params.amount,
-                params.data,
-                params.isTransfer,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).verifyTransfer.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.amount,
+            params.data,
+            params.isTransfer,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-        return async () => {
-            return (await this._contract).modifyWhitelist.sendTransactionAsync(
-                params.investor,
-                params.fromTime,
-                params.toTime,
-                params.expiryTime,
-                params.canBuyFromSTO,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).modifyWhitelist.sendTransactionAsync(
+            params.investor,
+            params.fromTime,
+            params.toTime,
+            params.expiryTime,
+            params.canBuyFromSTO,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
-        return async () => {
-            return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
-                params.investor,
-                params.fromTime,
-                params.toTime,
-                params.expiryTime,
-                params.canBuyFromSTO,
-                params.validFrom,
-                params.validTo,
-                params.nonce,
-                params.v,
-                params.r,
-                params.s,
-                params.txData,
-                params.safetyFactor
-            );
-        }
+        return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
+            params.investor,
+            params.fromTime,
+            params.toTime,
+            params.expiryTime,
+            params.canBuyFromSTO,
+            params.validFrom,
+            params.validTo,
+            params.nonce,
+            params.v,
+            params.r,
+            params.s,
+            params.txData,
+            params.safetyFactor
+        );
     }
 
     public getInvestors = async (): Promise<string[]> => {

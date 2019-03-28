@@ -162,63 +162,55 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
   }
 
   public createDividend = async (params: CreateDividendParams) => {
-    return async () => {
-      return (await this._contract).createDividend.sendTransactionAsync(
-        params.maturity,
-        params.expiry,
-        params.token,
-        params.amount,
-        params.name,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createDividend.sendTransactionAsync(
+      params.maturity,
+      params.expiry,
+      params.token,
+      params.amount,
+      params.name,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    return async () => {
-      return (await this._contract).createDividendWithCheckpoint.sendTransactionAsync(
-        params.maturity,
-        params.expiry,
-        params.token,
-        params.amount,
-        params.checkpointId,
-        params.name,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createDividendWithCheckpoint.sendTransactionAsync(
+      params.maturity,
+      params.expiry,
+      params.token,
+      params.amount,
+      params.checkpointId,
+      params.name,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    return async () => {
-      return (await this._contract).createDividendWithExclusions.sendTransactionAsync(
-        params.maturity,
-        params.expiry,
-        params.token,
-        params.amount,
-        params.excluded,
-        params.name,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createDividendWithExclusions.sendTransactionAsync(
+      params.maturity,
+      params.expiry,
+      params.token,
+      params.amount,
+      params.excluded,
+      params.name,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public createDividendWithCheckpointAndExclusions = async (params: CreateDividendWithCheckpointAndExclusionsParams) => {
-    return async () => {
-      return (await this._contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
-        params.maturity,
-        params.expiry,
-        params.token,
-        params.amount,
-        params.checkpointId,
-        params.excluded,
-        params.name,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
+      params.maturity,
+      params.expiry,
+      params.token,
+      params.amount,
+      params.checkpointId,
+      params.excluded,
+      params.name,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**

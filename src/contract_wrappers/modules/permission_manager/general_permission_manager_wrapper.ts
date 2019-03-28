@@ -152,24 +152,20 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   }
 
   public addDelegate = async (params: AddDelegateParams) => {
-    return async () => {
-      return (await this._contract).addDelegate.sendTransactionAsync(
-        params.delegate,
-        params.details,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).addDelegate.sendTransactionAsync(
+      params.delegate,
+      params.details,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public deleteDelegate = async (params: DelegateTxParams) => {
-    return async () => {
-      return (await this._contract).deleteDelegate.sendTransactionAsync(
-        params.delegate,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).deleteDelegate.sendTransactionAsync(
+      params.delegate,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public checkDelegate = async (params: DelegateParams): Promise<boolean> => {
@@ -179,29 +175,25 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   }
 
   public changePermission = async (params: ChangePermissionParams) => {
-    return async () => {
-      return (await this._contract).changePermission.sendTransactionAsync(
-        params.delegate,
-        params.module,
-        params.perm,
-        params.valid,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changePermission.sendTransactionAsync(
+      params.delegate,
+      params.module,
+      params.perm,
+      params.valid,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
-    return async () => {
-      return (await this._contract).changePermissionMulti.sendTransactionAsync(
-        params.delegate,
-        params.modules,
-        params.perms,
-        params.valids,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changePermissionMulti.sendTransactionAsync(
+      params.delegate,
+      params.modules,
+      params.perms,
+      params.valids,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams): Promise<string[]> => {

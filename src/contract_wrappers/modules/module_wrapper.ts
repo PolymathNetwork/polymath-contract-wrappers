@@ -60,13 +60,11 @@ export class ModuleWrapper extends ContractWrapper {
   }
 
   public takeFee = async (params: TakeFeeParams) => {
-    return async () => {
-      return (await this._contract).takeFee.sendTransactionAsync(
-        params.amount,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).takeFee.sendTransactionAsync(
+      params.amount,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   private async _getModuleContract(): Promise<ModuleContract> {

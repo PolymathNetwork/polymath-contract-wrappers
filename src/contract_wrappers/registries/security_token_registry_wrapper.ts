@@ -371,15 +371,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerTicker = async (params: RegisterTickerParams) => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
-    return async () => {
-      return (await this._contract).registerTicker.sendTransactionAsync(
-        owner,
-        params.ticker,
-        params.tokenName,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).registerTicker.sendTransactionAsync(
+      owner,
+      params.ticker,
+      params.tokenName,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -388,30 +386,26 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isString('ticker', params.ticker);
-    return async () => {
-      return (await this._contract).transferTickerOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.ticker,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferTickerOwnership.sendTransactionAsync(
+      params.newOwner,
+      params.ticker,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: GenerateSecurityTokenParams) => {
-    return async () => {
-      return (await this._contract).generateSecurityToken.sendTransactionAsync(
-        params.name,
-        params.ticker,
-        params.details,
-        params.divisible,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).generateSecurityToken.sendTransactionAsync(
+      params.name,
+      params.ticker,
+      params.details,
+      params.divisible,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -488,62 +482,54 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
   public modifyTicker = async (params: ModifyTickerParams) => {
-    return async () => {
-      return (await this._contract).modifyTicker.sendTransactionAsync(
-        params.owner,
-        params.ticker,
-        params.tokenName,
-        params.registrationDate,
-        params.expiryDate,
-        params.status,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifyTicker.sendTransactionAsync(
+      params.owner,
+      params.ticker,
+      params.tokenName,
+      params.registrationDate,
+      params.expiryDate,
+      params.status,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Removes the ticker details, associated ownership & security token mapping
    */
   public removeTicker = async (params: RemoveTickerParams) => {
-    return async () => {
-      return (await this._contract).removeTicker.sendTransactionAsync(
-        params.ticker,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).removeTicker.sendTransactionAsync(
+      params.ticker,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Changes the expiry time for the token ticker. Only available to Polymath.
    */
   public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
-    return async () => {
-      return (await this._contract).changeExpiryLimit.sendTransactionAsync(
-        params.newExpiry,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeExpiryLimit.sendTransactionAsync(
+      params.newExpiry,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
-    return async () => {
-      return (await this._contract).modifySecurityToken.sendTransactionAsync(
-        params.owner,
-        params.ticker,
-        params.owner,
-        params.securityToken,
-        params.tokenDetails,
-        params.deployedAt,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).modifySecurityToken.sendTransactionAsync(
+      params.owner,
+      params.ticker,
+      params.owner,
+      params.securityToken,
+      params.tokenDetails,
+      params.deployedAt,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -559,92 +545,78 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    return async () => {
-      return (await this._contract).transferOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferOwnership.sendTransactionAsync(
+      params.newOwner,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Called by the owner to pause, triggers stopped state
    */
   public pause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).pause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).pause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   /**
    * Called by the owner to unpause, returns to normal state
    */
   public unpause = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unpause.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor,
-      );
-    }
+    return (await this._contract).unpause.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor,
+    );
   }
 
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
-    return async () => {
-      return (await this._contract).changeTickerRegistrationFee.sendTransactionAsync(
-        params.newFee,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeTickerRegistrationFee.sendTransactionAsync(
+      params.newFee,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
-    return async () => {
-      return (await this._contract).changeSecurityLaunchFee.sendTransactionAsync(
-        params.newFee,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeSecurityLaunchFee.sendTransactionAsync(
+      params.newFee,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Reclaims all ERC20Basic compatible tokens
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    return async () => {
-      return (await this._contract).reclaimERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
    * Changes the protocol version and the SecurityToken contract
    */
   public setProtocolVersion = async (params: SetProtocolVersionParams) => {
-    return async () => {
-      return (await this._contract).setProtocolVersion.sendTransactionAsync(
-        params.STFactoryAddress,
-        params.major,
-        params.minor,
-        params.patch,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setProtocolVersion.sendTransactionAsync(
+      params.STFactoryAddress,
+      params.major,
+      params.minor,
+      params.patch,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
@@ -665,13 +637,11 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the PolyToken address. Only Polymath.
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
-    return async () => {
-      return (await this._contract).updatePolyTokenAddress.sendTransactionAsync(
-        params.newAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).updatePolyTokenAddress.sendTransactionAsync(
+      params.newAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**

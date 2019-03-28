@@ -445,14 +445,12 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public decreaseApproval = async (params: ChangeApprovalParams) => {
-    return async () => {
-      return (await this._contract).decreaseApproval.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).decreaseApproval.sendTransactionAsync(
+      params.spender,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public polyToken = async (): Promise<string> => {
@@ -460,12 +458,10 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public renounceOwnership = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).renounceOwnership.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).renounceOwnership.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public polymathRegistry = async (): Promise<string> => {
@@ -501,14 +497,12 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public increaseApproval = async (params: ChangeApprovalParams) => {
-    return async () => {
-      return (await this._contract).increaseApproval.sendTransactionAsync(
-        params.spender,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).increaseApproval.sendTransactionAsync(
+      params.spender,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public transfersFrozen = async (): Promise<boolean> => {
@@ -516,52 +510,42 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public transferOwnership = async (params: ITransferOwnershipParams) => {
-    return async () => {
-      return (await this._contract).transferOwnership.sendTransactionAsync(
-        params.newOwner,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferOwnership.sendTransactionAsync(
+      params.newOwner,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public updateFromRegistry = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).updateFromRegistry.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).updateFromRegistry.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public archiveModule = async (params: ModuleAddressTxParams) => {
-    return async () => {
-      return (await this._contract).archiveModule.sendTransactionAsync(
-        params.moduleAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).archiveModule.sendTransactionAsync(
+      params.moduleAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public unarchiveModule = async (params: ModuleAddressTxParams) => {
-    return async () => {
-      return (await this._contract).unarchiveModule.sendTransactionAsync(
-        params.moduleAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).unarchiveModule.sendTransactionAsync(
+      params.moduleAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public removeModule = async (params: ModuleAddressTxParams) => {
-    return async () => {
-      return (await this._contract).removeModule.sendTransactionAsync(
-        params.moduleAddress,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).removeModule.sendTransactionAsync(
+      params.moduleAddress,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getModulesByName = async (params: ModuleNameParams): Promise<string[]> => {
@@ -571,46 +555,38 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public withdrawERC20 = async (params: WithdrawERC20Params) => {
-    return async () => {
-      return (await this._contract).withdrawERC20.sendTransactionAsync(
-        params.tokenContract,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).withdrawERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changeModuleBudget = async (params: ChangeModuleBudgetParams) => {
-    return async () => {
-      return (await this._contract).changeModuleBudget.sendTransactionAsync(
-        params.module,
-        params.change,
-        params.increase,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeModuleBudget.sendTransactionAsync(
+      params.module,
+      params.change,
+      params.increase,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public updateTokenDetails = async (params: UpdateTokenDetailsParams) => {
-    return async () => {
-      return (await this._contract).updateTokenDetails.sendTransactionAsync(
-        params.newTokenDetails,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).updateTokenDetails.sendTransactionAsync(
+      params.newTokenDetails,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public changeGranularity = async (params: ChangeGranularityParams) => {
-    return async () => {
-      return (await this._contract).changeGranularity.sendTransactionAsync(
-        params.granularity,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).changeGranularity.sendTransactionAsync(
+      params.granularity,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getInvestors = async (): Promise<string[]> => {
@@ -635,89 +611,73 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public freezeTransfers = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).freezeTransfers.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).freezeTransfers.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public unfreezeTransfers = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).unfreezeTransfers.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).unfreezeTransfers.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public transferWithData = async (params: TransferWithDataParams) => {
-    return async () => {
-      return (await this._contract).transferWithData.sendTransactionAsync(
-        params.to,
-        params.value,
-        params.data,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferWithData.sendTransactionAsync(
+      params.to,
+      params.value,
+      params.data,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public transferFromWithData = async (params: TransferFromWithDataParams) => {
-    return async () => {
-      return (await this._contract).transferFromWithData.sendTransactionAsync(
-        params.from,
-        params.to,
-        params.value,
-        params.data,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).transferFromWithData.sendTransactionAsync(
+      params.from,
+      params.to,
+      params.value,
+      params.data,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public freezeMinting = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).freezeMinting.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).freezeMinting.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public mint = async (params: MintParams) => {
-    return async () => {
-      return (await this._contract).mint.sendTransactionAsync(
-        params.investor,
-        params.value,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).mint.sendTransactionAsync(
+      params.investor,
+      params.value,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public mintWithData = async (params: MintWithDataParams) => {
-    return async () => {
-      return (await this._contract).mintWithData.sendTransactionAsync(
-        params.investor,
-        params.value,
-        params.data,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).mintWithData.sendTransactionAsync(
+      params.investor,
+      params.value,
+      params.data,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public mintMulti = async (params: MintMultiParams) => {
-    return async () => {
-      return (await this._contract).mintMulti.sendTransactionAsync(
-        params.investors,
-        params.values,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).mintMulti.sendTransactionAsync(
+      params.investors,
+      params.values,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public checkPermission = async (params: CheckPermissionParams): Promise<boolean> => {
@@ -729,35 +689,29 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public burnWithData = async (params: BurnWithDataParams) => {
-    return async () => {
-      return (await this._contract).burnWithData.sendTransactionAsync(
-        params.value,
-        params.data,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).burnWithData.sendTransactionAsync(
+      params.value,
+      params.data,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public burnFromWithData = async (params: BurnFromWithDataParams) => {
-    return async () => {
-      return (await this._contract).burnFromWithData.sendTransactionAsync(
-        params.from,
-        params.value,
-        params.data,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).burnFromWithData.sendTransactionAsync(
+      params.from,
+      params.value,
+      params.data,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public createCheckpoint = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).createCheckpoint.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).createCheckpoint.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getCheckpointTimes = async (): Promise<BigNumber[]> => {
@@ -778,49 +732,41 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public setController = async (params: SetControllerParams) => {
-    return async () => {
-      return (await this._contract).setController.sendTransactionAsync(
-        params.controller,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).setController.sendTransactionAsync(
+      params.controller,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public disableController = async (params: TxParams) => {
-    return async () => {
-      return (await this._contract).disableController.sendTransactionAsync(
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).disableController.sendTransactionAsync(
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public forceTransfer = async (params: ForceTransferParams) => {
-    return async () => {
-      return (await this._contract).forceTransfer.sendTransactionAsync(
-        params.from,
-        params.to,
-        params.value,
-        params.data,
-        params.log,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).forceTransfer.sendTransactionAsync(
+      params.from,
+      params.to,
+      params.value,
+      params.data,
+      params.log,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public forceBurn = async (params: ForceBurnParams) => {
-    return async () => {
-      return (await this._contract).forceBurn.sendTransactionAsync(
-        params.from,
-        params.value,
-        params.data,
-        params.log,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).forceBurn.sendTransactionAsync(
+      params.from,
+      params.value,
+      params.data,
+      params.log,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   public getVersion = async (): Promise<BigNumber> => {
@@ -848,16 +794,14 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Attachs a module to the SecurityToken
    */
   public addModule = async (params: AddModuleParams) => {
-    return async () => {
-      return (await this._contract).addModule.sendTransactionAsync(
-        params.moduleFactory,
-        params.data,
-        params.maxCost,
-        params.budget,
-        params.txData,
-        params.safetyFactor
-      );
-    }
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.moduleFactory,
+      params.data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
   }
 
   /**
