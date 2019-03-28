@@ -155,7 +155,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
     this._contract = this._getERC20DividendCheckpointContract();
   }
 
-  public dividendTokens = async (params: DividendIndexParams): Promise<string> => {
+  public dividendTokens = async (params: DividendIndexParams) => {
     return await (await this._contract).dividendTokens.callAsync(
       params.dividendIndex,
     );
