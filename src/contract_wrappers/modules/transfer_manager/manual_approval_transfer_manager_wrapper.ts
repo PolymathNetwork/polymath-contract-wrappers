@@ -18,6 +18,8 @@ import {
     IGetLogsAsyncParams,
     ISubscribeAsyncParams,
     EventCallback,
+    ISubscribe,
+    IGetLogs
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -84,6 +86,71 @@ import { ModuleWrapper } from '../module_wrapper';
     (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs>>>,
   }
 
+    interface ApprovalsParams {
+        index_0: BigNumber,
+    }
+
+    interface VerifyTransferParams extends TxParams {
+        from: string,
+        to: string,
+        amount: BigNumber,
+        data: string,
+        isTransfer: boolean,
+    }
+
+    interface AddManualApprovalParams extends TxParams {
+        from: string,
+        to: string,
+        allowance: BigNumber,
+        expiryTime: BigNumber,
+        description: string,
+    }
+
+    interface AddManualApprovalMultiParams extends TxParams {
+        from: string[],
+        to: string[],
+        allowances: BigNumber[],
+        expiryTimes: BigNumber[],
+        descriptions: string[],
+    }
+
+    interface ModifyManualApprovalParams extends TxParams {
+        from: string,
+        to: string,
+        expiryTime: BigNumber,
+        changeInAllowance: BigNumber,
+        description: string,
+        increase: boolean,
+    }
+
+    interface ModifyManualApprovalMultiParams extends TxParams {
+        from: string[],
+        to: string[],
+        expiryTimes: BigNumber[],
+        changedAllowances: BigNumber[],
+        descriptions: string[],
+        increase: boolean[],
+    }
+
+    interface RevokeManualApprovalParams extends TxParams {
+        from: string,
+        to: string,
+    }
+
+    interface RevokeManualApprovalMultiParams extends TxParams {
+        from: string[],
+        to: string[],
+    }
+
+    interface GetActiveApprovalsToUserParams {
+        user: string,
+    }
+
+    interface GetApprovalDetailsParams {
+        from: string,
+        to: string,
+    }
+
   /**
    * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
    */
@@ -101,13 +168,134 @@ import { ModuleWrapper } from '../module_wrapper';
       this._contract = this._getManualApprovalTransferManagerContract();
     }
   
-    /**
-     * Returns the contract address
-     */
-    public getAddress = async (): Promise<string> => {
-      return (await this._contract).address;
+    public unpause = async (params: TxParams) => {
+        return (await this._contract).unpause.sendTransactionAsync(
+            params.txData,
+            params.safetyFactor
+        );
     }
-  
+
+    public paused = async (): Promise<boolean> => {
+        return await (await this._contract).paused.callAsync();
+    }
+
+    public approvals = async (params: ApprovalsParams): Promise<[string, string, BigNumber, BigNumber, string]> => {
+        return await (await this._contract).approvals.callAsync(
+            params.index_0,
+        );
+    }
+
+    public pause = async (params: TxParams) => {
+        return (await this._contract).pause.sendTransactionAsync(
+            params.txData,
+            params.safetyFactor
+        );
+    } 
+
+    public getInitFunction = async (): Promise<string> => {
+        return await (await this._contract).getInitFunction.callAsync();
+    }
+
+    public verifyTransfer = async (params: VerifyTransferParams) => {
+        return (await this._contract).verifyTransfer.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.amount,
+            params.data,
+            params.isTransfer,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public addManualApproval = async (params: AddManualApprovalParams) => {
+        return (await this._contract).addManualApproval.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.allowance,
+            params.expiryTime,
+            params.description,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
+        return (await this._contract).addManualApprovalMulti.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.allowances,
+            params.expiryTimes,
+            params.descriptions,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
+        return (await this._contract).modifyManualApproval.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.expiryTime,
+            params.changeInAllowance,
+            params.description,
+            params.increase,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
+        return (await this._contract).modifyManualApprovalMulti.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.expiryTimes,
+            params.changedAllowances,
+            params.descriptions,
+            params.increase,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
+        return (await this._contract).revokeManualApproval.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
+        return (await this._contract).revokeManualApprovalMulti.sendTransactionAsync(
+            params.from,
+            params.to,
+            params.txData,
+            params.safetyFactor
+        );
+    }
+
+    public getActiveApprovalsToUser = async (params: GetActiveApprovalsToUserParams): Promise<[string[], string[], BigNumber[], BigNumber[], string[]]> => {
+        return await (await this._contract).getActiveApprovalsToUser.callAsync(
+            params.user,
+        );
+    }
+
+    public getApprovalDetails = async (params: GetApprovalDetailsParams): Promise<[BigNumber, BigNumber, string]> => {
+        return await (await this._contract).getApprovalDetails.callAsync(
+            params.from,
+            params.to,
+        );
+    }
+
+    public getTotalApprovalsLength = async (): Promise<BigNumber> => {
+        return await (await this._contract).getTotalApprovalsLength.callAsync();
+    }
+
+    public getAllApprovals = async (): Promise<[string[], string[], BigNumber[], BigNumber[], string[]]> => {
+        return await (await this._contract).getAllApprovals.callAsync();
+    }
   
     /**
      * Subscribe to an event type emitted by the contract.
@@ -129,22 +317,6 @@ import { ModuleWrapper } from '../module_wrapper';
           !_.isUndefined(params.isVerbose),
       );
       return subscriptionToken;
-    }
-  
-    /**
-     * Cancel a subscription
-     * @param subscriptionToken Subscription token returned by `subscribe()`
-     */
-    public unsubscribe = (subscriptionToken: string): void => {
-      assert.isValidSubscriptionToken('subscriptionToken', subscriptionToken);
-      this._unsubscribe(subscriptionToken);
-    }
-  
-    /**
-     * Cancels all existing subscriptions
-     */
-    public unsubscribeAll = (): void => {
-      super._unsubscribeAll();
     }
   
     /**
