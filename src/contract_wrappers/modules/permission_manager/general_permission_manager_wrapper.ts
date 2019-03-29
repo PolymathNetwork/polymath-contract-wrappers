@@ -124,13 +124,6 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     this._contract = this._getGeneralPermissionManagerContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async () => {
-    return (await this._contract).address;
-  }
-
   public perms = async (params: PermsParams) => {
     return await (await this._contract).perms.callAsync(
       params.module,

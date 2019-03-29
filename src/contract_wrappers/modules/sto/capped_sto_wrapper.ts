@@ -129,13 +129,6 @@ export class CappedSTOWrapper extends STOWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
   public rate = async (): Promise<BigNumber> => {
@@ -147,13 +140,6 @@ export class CappedSTOWrapper extends STOWrapper {
    */
   public cap = async (): Promise<BigNumber> => {
     return await (await this._contract).cap.callAsync();
-  }
-
-  /**
-   * Return the total no. of tokens sold
-   */
-  public totalTokensSold = async(): Promise<BigNumber> => {
-    return await (await this._contract).totalTokensSold.callAsync();
   }
 
   public allowBeneficialInvestments = async(): Promise<boolean> => {
@@ -213,10 +199,6 @@ export class CappedSTOWrapper extends STOWrapper {
 
   public getTokensSold = async(): Promise<BigNumber> => {
     return await (await this._contract).getTokensSold.callAsync();
-  }
-
-  public getPermissions = async(): Promise<string[]> => {
-    return await (await this._contract).getPermissions.callAsync();
   }
 
   public getSTODetails = async(): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean]> => {
