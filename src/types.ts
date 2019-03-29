@@ -59,6 +59,9 @@ import {
     CountTransferManagerContract,
     CountTransferManagerEventArgs,
     CountTransferManagerEvents,
+    PercentageTransferManagerContract,
+    PercentageTransferManagerEventArgs,
+    PercentageTransferManagerEvents,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -133,7 +136,8 @@ export type ContractEventArgs = PolyTokenEventArgs |
     USDTieredSTOFactoryEventArgs |
     USDTieredSTOEventArgs |
     STOEventArgs |
-    CountTransferManagerEventArgs;
+    CountTransferManagerEventArgs |
+    PercentageTransferManagerEventArgs;
 
 export type ContractEvents = PolyTokenEvents |
     CappedSTOFactoryEvents |
@@ -154,7 +158,8 @@ export type ContractEvents = PolyTokenEvents |
     USDTieredSTOFactoryEvents |
     USDTieredSTOEvents |
     STOEvents |
-    CountTransferManagerEvents;
+    CountTransferManagerEvents |
+    PercentageTransferManagerEvents;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -203,7 +208,8 @@ export type GenericModuleContract =
   STOBaseContract |
   DividendCheckpointBaseContract |
   ManualApprovalTransferManagerContract |
-  CountTransferManagerContract;
+  CountTransferManagerContract |
+  PercentageTransferManagerContract;
 
 export type STOBaseContract = 
   STOContract |

@@ -15,6 +15,7 @@ import {
   ERC20DividendCheckpoint,
   ManualApprovalTransferManager,
   CountTransferManager,
+  PercentageTransferManager,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -119,6 +120,7 @@ export class PolymathAPI {
       ERC20DividendCheckpoint,
       ManualApprovalTransferManager,
       CountTransferManager,
+      PercentageTransferManager,
     ];
 
     _.forEach(artifactsArray, artifact => { // tslint:disable-line
