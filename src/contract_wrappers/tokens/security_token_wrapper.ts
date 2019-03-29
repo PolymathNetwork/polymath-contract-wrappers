@@ -39,6 +39,7 @@ import {
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ERC20TokenWrapper } from './erc20_wrapper';
+import { stringToBytes32, bytes32ToString } from '../../utils/convert';
 
 interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenEvents.Approval,
@@ -549,8 +550,9 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   public getModulesByName = async (params: ModuleNameParams): Promise<string[]> => {
+    const moduleNameHex = stringToBytes32(params.moduleName);
     return await (await this._contract).getModulesByName.callAsync(
-      params.moduleName,
+      moduleNameHex
     );
   }
 
