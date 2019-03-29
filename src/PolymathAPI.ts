@@ -16,6 +16,7 @@ import {
   ManualApprovalTransferManager,
   CountTransferManager,
   PercentageTransferManager,
+  EtherDividendCheckpoint,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -121,6 +122,7 @@ export class PolymathAPI {
       ManualApprovalTransferManager,
       CountTransferManager,
       PercentageTransferManager,
+      EtherDividendCheckpoint,
     ];
 
     _.forEach(artifactsArray, artifact => { // tslint:disable-line
