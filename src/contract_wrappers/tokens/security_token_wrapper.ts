@@ -23,10 +23,11 @@ import {
   SecurityTokenOwnershipRenouncedEventArgs,
   SecurityTokenOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { SecurityToken } from '@polymathnetwork/contract-artifacts';
+import { SecurityToken, CountTransferManager } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
+import { ethers } from 'ethers';
 import * as _ from 'lodash';
 import {
   TxParams,
@@ -413,6 +414,13 @@ interface ForceBurnParams extends TxParams {
   log: string,
 }
 
+interface AddCountTransferManagerParams extends TxParams {
+  address: string,
+  maxHolderCount: number,
+  maxCost: BigNumber,
+  budget: BigNumber,
+}
+
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
@@ -797,6 +805,19 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this._contract).addModule.sendTransactionAsync(
       params.moduleFactory,
       params.data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addCountTransferManager = async (params: AddCountTransferManagerParams) => {
+    const iface = new ethers.utils.Interface(CountTransferManager.abi);
+    const data = iface.functions.configure.encode([params.maxHolderCount]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
       params.maxCost,
       params.budget,
       params.txData,
