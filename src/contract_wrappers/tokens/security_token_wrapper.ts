@@ -23,7 +23,14 @@ import {
   SecurityTokenOwnershipRenouncedEventArgs,
   SecurityTokenOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { SecurityToken, CountTransferManager } from '@polymathnetwork/contract-artifacts';
+import {
+  SecurityToken,
+  CountTransferManager,
+  ERC20DividendCheckpoint,
+  CappedSTO,
+  USDTieredSTO,
+  PercentageTransferManager,
+} from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
@@ -421,6 +428,57 @@ interface AddCountTransferManagerParams extends TxParams {
   budget: BigNumber,
 }
 
+interface AddPercentageTransferManagerParams extends TxParams {
+  address: string,
+  maxHolderPercentage: number,
+  allowPrimaryIssuance: boolean,
+  maxCost: BigNumber,
+  budget: BigNumber,
+}
+
+interface AddErc20DividendCheckpointParams extends TxParams {
+  address: string,
+  wallet: string,
+  maxCost: BigNumber,
+  budget: BigNumber,
+}
+
+interface AddGeneralPermissionManagerParams extends TxParams {
+  address: string,
+  maxCost: BigNumber,
+  budget: BigNumber,
+}
+
+interface AddCappedSTOParams extends TxParams {
+  address: string,
+  maxCost: BigNumber,
+  budget: BigNumber,
+  startTime: number,
+  endTime: number,
+  cap: BigNumber,
+  rate: BigNumber,
+  fundRaiseTypes: BigNumber[],
+  fundsReceiver: string
+}
+
+interface AddUSDTieredSTOParams extends TxParams {
+  address: string,
+  maxCost: BigNumber,
+  budget: BigNumber,
+  startTime: number,
+  endTime: number,
+  ratePerTier: number[],
+  ratePerTierDiscountPoly: number[],
+  tokensPerTierTotal: number[],
+  tokensPerTierDiscountPoly: number[],
+  nonAccreditedLimitUSD: number,
+  minimumInvestmentUSD: number,
+  fundRaiseTypes: number[],
+  wallet: string,
+  reserveWallet: string,
+  usdTokens: string[],
+}
+
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
@@ -815,6 +873,89 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addCountTransferManager = async (params: AddCountTransferManagerParams) => {
     const iface = new ethers.utils.Interface(CountTransferManager.abi);
     const data = iface.functions.configure.encode([params.maxHolderCount]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addPercentageTransferManager = async (params: AddPercentageTransferManagerParams) => {
+    const iface = new ethers.utils.Interface(PercentageTransferManager.abi);
+    const data = iface.functions.configure.encode([params.maxHolderPercentage, params.allowPrimaryIssuance]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addErc20DividendCheckpoint = async (params: AddErc20DividendCheckpointParams) => {
+    const iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+    const data = iface.functions.configure.encode([params.wallet]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addGeneralPermissionManager = async (params: AddGeneralPermissionManagerParams) => {
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      "0x0000000000000000",
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addCappedSTO = async (params: AddCappedSTOParams) => {
+    const iface = new ethers.utils.Interface(CappedSTO.abi);
+    const data = iface.functions.configure.encode([
+      params.startTime,
+      params.endTime,
+      params.cap,
+      params.rate,
+      params.fundRaiseTypes,
+      params.fundsReceiver
+    ]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addUSDTieredSTO = async (params: AddUSDTieredSTOParams) => {
+    const iface = new ethers.utils.Interface((USDTieredSTO as any).abi);
+    const data = iface.functions.configure.encode([
+      params.startTime,
+      params.endTime,
+      params.ratePerTier,
+      params.ratePerTierDiscountPoly,
+      params.tokensPerTierTotal,
+      params.tokensPerTierDiscountPoly,
+      params.nonAccreditedLimitUSD,
+      params.minimumInvestmentUSD,
+      params.fundRaiseTypes,
+      params.wallet,
+      params.reserveWallet,
+      params.usdTokens,
+    ]);
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
       data,
