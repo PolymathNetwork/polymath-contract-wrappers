@@ -421,38 +421,26 @@ interface ForceBurnParams extends TxParams {
   log: string,
 }
 
-interface AddCountTransferManagerParams extends TxParams {
+interface AddModuleParams extends TxParams {
   address: string,
-  maxHolderCount: number,
   maxCost: BigNumber,
   budget: BigNumber,
 }
 
-interface AddPercentageTransferManagerParams extends TxParams {
-  address: string,
+interface AddCountTransferManagerParams extends AddModuleParams {
+  maxHolderCount: number,
+}
+
+interface AddPercentageTransferManagerParams extends AddModuleParams {
   maxHolderPercentage: number,
   allowPrimaryIssuance: boolean,
-  maxCost: BigNumber,
-  budget: BigNumber,
 }
 
-interface AddErc20DividendCheckpointParams extends TxParams {
-  address: string,
+interface AddErc20DividendCheckpointParams extends AddModuleParams {
   wallet: string,
-  maxCost: BigNumber,
-  budget: BigNumber,
 }
 
-interface AddGeneralPermissionManagerParams extends TxParams {
-  address: string,
-  maxCost: BigNumber,
-  budget: BigNumber,
-}
-
-interface AddCappedSTOParams extends TxParams {
-  address: string,
-  maxCost: BigNumber,
-  budget: BigNumber,
+interface AddCappedSTOParams extends AddModuleParams {
   startTime: number,
   endTime: number,
   cap: BigNumber,
@@ -461,10 +449,7 @@ interface AddCappedSTOParams extends TxParams {
   fundsReceiver: string
 }
 
-interface AddUSDTieredSTOParams extends TxParams {
-  address: string,
-  maxCost: BigNumber,
-  budget: BigNumber,
+interface AddUSDTieredSTOParams extends AddModuleParams {
   startTime: number,
   endTime: number,
   ratePerTier: number[],
@@ -909,7 +894,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public addGeneralPermissionManager = async (params: AddGeneralPermissionManagerParams) => {
+  public addGeneralPermissionManager = async (params: AddModuleParams) => {
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
       "0x0000000000000000",
