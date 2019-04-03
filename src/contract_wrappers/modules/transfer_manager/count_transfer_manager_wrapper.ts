@@ -70,7 +70,7 @@ interface VerifyTransferParams extends TxParams {
     isTransfer: boolean,
 }
 
-interface ConfigureParams extends TxParams {
+interface ChangeHolderCountParams extends TxParams {
     maxHolderCount: BigNumber,
 }
 
@@ -125,15 +125,7 @@ export class CountTransferManagerWrapper extends ModuleWrapper {
       );
   }
 
-  public configure = async (params: ConfigureParams) => {
-      return (await this._contract).configure.sendTransactionAsync(
-          params.maxHolderCount,
-          params.txData,
-          params.safetyFactor
-      );
-  }
-
-  public changeHolderCount = async (params: ConfigureParams) => {
+  public changeHolderCount = async (params: ChangeHolderCountParams) => {
       return (await this._contract).changeHolderCount.sendTransactionAsync(
           params.maxHolderCount,
           params.txData,

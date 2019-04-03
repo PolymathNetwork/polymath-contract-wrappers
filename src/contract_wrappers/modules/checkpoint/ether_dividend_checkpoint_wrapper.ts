@@ -209,20 +209,8 @@ import {
         expiry: BigNumber,
     }
 
-    interface ConfigureParams extends TxParams {
-        wallet: string,
-    }
-
-    interface WithholdingTaxParams {
-        index: string,
-    }
-
     interface GetCheckpointDataParams {
         checkpointId: BigNumber,
-    }
-
-    interface DividendsParams {
-        index: BigNumber,
     }
 
     interface IsExcludedParams {
@@ -241,10 +229,6 @@ import {
 
     interface ChangeWalletParams extends TxParams {
         wallet: string,
-    }
-
-    interface ExcludedParams {
-        index: BigNumber,
     }
 
     interface SetDefaultExcludedParams extends TxParams {
@@ -332,12 +316,6 @@ import {
         );
     }
 
-    public getDividendData = async (params: GetDividendDataParams): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
-        return await (await this._contract).getDividendData.callAsync(
-            params.dividendIndex,
-        );
-    }
-
     public pullDividendPayment = async (params: PullDividendPaymentParams) => {
         return (await this._contract).pullDividendPayment.sendTransactionAsync(
             params.dividendIndex,
@@ -373,13 +351,6 @@ import {
         );
     }
 
-    public calculateDividend = async (params: CalculateDividendParams): Promise<[BigNumber, BigNumber]> => {
-        return await (await this._contract).calculateDividend.callAsync(
-            params.dividendIndex,
-            params.payee,
-        );
-    }
-
     public paused = async (): Promise<boolean> => {
         return await (await this._contract).paused.callAsync();
     }
@@ -397,20 +368,6 @@ import {
             params.expiry,
             params.txData,
             params.safetyFactor
-        );
-    }
-
-    public configure = async (params: ConfigureParams) => {
-        return (await this._contract).configure.sendTransactionAsync(
-            params.wallet,
-            params.txData,
-            params.safetyFactor
-        );
-    }
-
-    public getCheckpointData = async (params: GetCheckpointDataParams): Promise<[string[], BigNumber[], BigNumber[]]> => {
-        return await (await this._contract).getCheckpointData.callAsync(
-            params.checkpointId,
         );
     }
 
@@ -453,10 +410,6 @@ import {
         );
     }
 
-    public getDividendsData = async (): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]]> => {
-        return await (await this._contract).getDividendsData.callAsync();
-    }
-
     public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
         return (await this._contract).setDefaultExcluded.sendTransactionAsync(
             params.excluded,
@@ -477,12 +430,6 @@ import {
 
     public getDefaultExcluded = async (): Promise<string[]> => {
         return await (await this._contract).getDefaultExcluded.callAsync();
-    }
-
-    public getDividendProgress = async (params: GetDividendProgressParams): Promise<[string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]]> => {
-        return await (await this._contract).getDividendProgress.callAsync(
-            params.dividendIndex,
-        );
     }
 
     public createCheckpoint = async (params: TxParams) => {

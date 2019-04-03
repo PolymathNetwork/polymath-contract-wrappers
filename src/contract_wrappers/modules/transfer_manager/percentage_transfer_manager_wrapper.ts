@@ -98,11 +98,6 @@ interface VerifyTransferParams extends TxParams {
   isTransfer: boolean,
 }
 
-interface ConfigureParams extends TxParams {
-  maxHolderPercentage: BigNumber,
-  allowPrimaryIssuance: boolean,
-}
-
 interface ChangeHolderPercentageParams extends TxParams {
   maxHolderPercentage: BigNumber,
 }
@@ -177,15 +172,6 @@ export class PercentageTransferManagerWrapper extends ModuleWrapper {
       params.amount,
       params.data,
       params.isTransfer,
-      params.txData,
-      params.safetyFactor
-    );
-  }
-
-  public configure = async (params: ConfigureParams) => {
-    return (await this._contract).configure.sendTransactionAsync(
-      params.maxHolderPercentage,
-      params.allowPrimaryIssuance,
       params.txData,
       params.safetyFactor
     );

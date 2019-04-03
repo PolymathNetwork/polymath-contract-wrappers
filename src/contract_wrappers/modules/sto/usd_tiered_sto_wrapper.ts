@@ -290,21 +290,6 @@ interface ModifyTiersParams extends TxParams {
   tokensPerTierDiscountPoly: BigNumber[];
 }
 
-interface ConfigureParams extends TxParams {
-  startTime: BigNumber,
-  endTime: BigNumber,
-  ratePerTier: BigNumber[],
-  ratePerTierDiscountPoly: BigNumber[],
-  tokensPerTierTotal: BigNumber[],
-  tokensPerTierDiscountPoly: BigNumber[],
-  nonAccreditedLimitUSD: BigNumber,
-  minimumInvestmentUSD: BigNumber,
-  fundRaiseTypes: Array<number|BigNumber>,
-  wallet: string,
-  reserveWallet: string,
-  usdTokens: string[],
-}
-
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean,
 }
@@ -473,25 +458,6 @@ export class USDTieredSTOWrapper extends STOWrapper {
   public investorInvestedUSD = async (params: InvestorAddressParams) => {
     return await (await this._contract).investorInvestedUSD.callAsync(
       params.investorAddress,
-    );
-  }
-
-public configure = async (params: ConfigureParams) => {
-    return (await this._contract).configure.sendTransactionAsync(
-      params.startTime,
-      params.endTime,
-      params.ratePerTier,
-      params.ratePerTierDiscountPoly,
-      params.tokensPerTierTotal,
-      params.tokensPerTierDiscountPoly,
-      params.nonAccreditedLimitUSD,
-      params.minimumInvestmentUSD,
-      params.fundRaiseTypes,
-      params.wallet,
-      params.reserveWallet,
-      params.usdTokens,
-      params.txData,
-      params.safetyFactor
     );
   }
 
