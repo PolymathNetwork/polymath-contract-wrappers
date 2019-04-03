@@ -49,6 +49,8 @@ import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ERC20TokenWrapper } from './erc20_wrapper';
 
+const NO_MODULE_DATA = "0x0000000000000000";
+
 interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenEvents.Approval,
   callback: EventCallback<SecurityTokenApprovalEventArgs>,
@@ -902,7 +904,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addGeneralPermissionManager = async (params: AddModuleParams) => {
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
-      "0x0000000000000000",
+      NO_MODULE_DATA,
       params.maxCost,
       params.budget,
       params.txData,
@@ -974,7 +976,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addManualApprovalTransferManager = async (params: AddModuleParams) => {
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
-      "0x0000000000000000",
+      NO_MODULE_DATA,
       params.maxCost,
       params.budget,
       params.txData,
@@ -985,7 +987,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addGeneralTransferManager = async (params: AddModuleParams) => {
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
-      "0x0000000000000000",
+      NO_MODULE_DATA,
       params.maxCost,
       params.budget,
       params.txData,
