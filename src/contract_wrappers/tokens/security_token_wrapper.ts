@@ -284,13 +284,6 @@ interface ModuleTypeParams {
   type: number;
 }
 
-interface GeneralAddModuleParams extends TxParams {
-  moduleFactory: string;
-  data: string;
-  maxCost: BigNumber;
-  budget: BigNumber;
-}
-
 interface ModuleAddressParams {
   moduleAddress: string;
 }
@@ -845,20 +838,6 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return (await this._contract).getModulesByType.callAsync(
       params.type,
-    );
-  }
-
-  /**
-   * Attachs a module to the SecurityToken
-   */
-  public addModule = async (params: GeneralAddModuleParams) => {
-    return (await this._contract).addModule.sendTransactionAsync(
-      params.moduleFactory,
-      params.data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor
     );
   }
 
