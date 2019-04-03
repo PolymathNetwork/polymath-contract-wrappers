@@ -91,15 +91,6 @@ interface InvestorsParams extends TxParams {
   amount: string,
 }
 
-interface ConfigureParams extends TxParams {
-  startTime: BigNumber,
-  endTime: BigNumber,
-  cap: BigNumber,
-  rate: BigNumber,
-  fundRaiseTypes: Array<number|BigNumber>,
-  fundsReceiver: string,
-}
-
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean,
 }
@@ -167,19 +158,6 @@ export class CappedSTOWrapper extends STOWrapper {
   public investors = async(params: InvestorsParams): Promise<BigNumber> => {
     return await (await this._contract).investors.callAsync(
       params.amount,
-    );
-  }
-
-  public configure = async (params: ConfigureParams) => {
-    return (await this._contract).configure.sendTransactionAsync(
-      params.startTime,
-      params.endTime,
-      params.cap,
-      params.rate,
-      params.fundRaiseTypes,
-      params.fundsReceiver,
-      params.txData,
-      params.safetyFactor,
     );
   }
 

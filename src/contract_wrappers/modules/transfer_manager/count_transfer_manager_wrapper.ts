@@ -125,14 +125,6 @@ import { ModuleWrapper } from '../module_wrapper';
         );
     }
 
-    public configure = async (params: ConfigureParams) => {
-        return (await this._contract).configure.sendTransactionAsync(
-            params.maxHolderCount,
-            params.txData,
-            params.safetyFactor
-        );
-    }
-
     public changeHolderCount = async (params: ConfigureParams) => {
         return (await this._contract).changeHolderCount.sendTransactionAsync(
             params.maxHolderCount,
