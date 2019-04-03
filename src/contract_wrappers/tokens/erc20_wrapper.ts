@@ -70,13 +70,6 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * Returns the token name
    */
   public name = async (): Promise<string> => {

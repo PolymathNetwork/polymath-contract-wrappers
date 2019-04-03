@@ -128,13 +128,6 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * Get the name of the Module
    */
   public getName = async (): Promise<string> => {

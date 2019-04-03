@@ -776,13 +776,6 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */

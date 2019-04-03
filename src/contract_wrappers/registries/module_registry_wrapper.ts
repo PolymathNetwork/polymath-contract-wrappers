@@ -179,13 +179,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     this._contract = this._getModuleRegistryContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
   public getBytes32Value = async (params: GetValueByVariableParams): Promise<string> => {
     return await (await this._contract).getBytes32Value.callAsync(
       params.variable,

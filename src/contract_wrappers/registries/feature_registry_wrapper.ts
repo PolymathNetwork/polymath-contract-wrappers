@@ -99,13 +99,6 @@ export class FeatureRegistryWrapper extends ContractWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * Get the status of a feature
    * @return bool
    */

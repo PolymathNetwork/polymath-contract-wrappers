@@ -34,6 +34,14 @@ export abstract class ContractWrapper {
 
     public abstract getLogsAsync: IGetLogs | undefined;
     public abstract subscribeAsync: ISubscribe | undefined;
+
+    /**
+    * Returns the contract address
+    */
+    public address = async () => {
+        return (await this._contract).address;
+    }
+
     /**
      * Cancel a subscription
      * @param subscriptionToken Subscription token returned by `subscribe()`

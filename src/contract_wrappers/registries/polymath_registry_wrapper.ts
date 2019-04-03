@@ -85,8 +85,8 @@ interface ChangeAddressParams extends TxParams  {
  */
 export class PolymathRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = PolymathRegistry.abi;
-  public address?: string;
   protected _contract: Promise<PolymathRegistryContract>;
+  private _address?: string;
 
   /**
    * Instantiate PolymathRegistryWrapper
@@ -95,7 +95,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, registryAddress?: string) {
     super(web3Wrapper);
-    this.address = registryAddress;
+    this._address = registryAddress;
     this._contract = this._getPolymathRegistryContract();
   }
 
@@ -234,7 +234,7 @@ export class PolymathRegistryWrapper extends ContractWrapper {
   private async _getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
     return new PolymathRegistryContract(
       this.abi,
-      !_.isUndefined(this.address) ? this.address : await this._getDefaultAddress(),
+      !_.isUndefined(this._address) ? this._address : await this._getDefaultAddress(),
       this._web3Wrapper.getProvider(),
       this._web3Wrapper.getContractDefaults(),
     );
