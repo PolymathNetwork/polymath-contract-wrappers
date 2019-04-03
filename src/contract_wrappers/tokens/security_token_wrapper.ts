@@ -30,6 +30,7 @@ import {
   CappedSTO,
   USDTieredSTO,
   PercentageTransferManager,
+  EtherDividendCheckpoint,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -462,6 +463,10 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
   wallet: string,
   reserveWallet: string,
   usdTokens: string[],
+}
+
+interface AddEtherDividendCheckpointParams extends AddModuleParams {
+  wallet: string,
 }
 
 /**
@@ -944,6 +949,43 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this._contract).addModule.sendTransactionAsync(
       params.address,
       data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addEtherDividendCheckpoint = async (params: AddEtherDividendCheckpointParams) => {
+    const iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+    const data = iface.functions.configure.encode([
+      params.wallet
+    ]);
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      data,
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addManualApprovalTransferManager = async (params: AddModuleParams) => {
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      "0x0000000000000000",
+      params.maxCost,
+      params.budget,
+      params.txData,
+      params.safetyFactor
+    );
+  }
+
+  public addGeneralTransferManager = async (params: AddModuleParams) => {
+    return (await this._contract).addModule.sendTransactionAsync(
+      params.address,
+      "0x0000000000000000",
       params.maxCost,
       params.budget,
       params.txData,
