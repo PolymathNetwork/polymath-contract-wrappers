@@ -209,20 +209,8 @@ import {
         expiry: BigNumber,
     }
 
-    interface ConfigureParams extends TxParams {
-        wallet: string,
-    }
-
-    interface WithholdingTaxParams {
-        index: string,
-    }
-
     interface GetCheckpointDataParams {
         checkpointId: BigNumber,
-    }
-
-    interface DividendsParams {
-        index: BigNumber,
     }
 
     interface IsExcludedParams {
@@ -241,10 +229,6 @@ import {
 
     interface ChangeWalletParams extends TxParams {
         wallet: string,
-    }
-
-    interface ExcludedParams {
-        index: BigNumber,
     }
 
     interface SetDefaultExcludedParams extends TxParams {
@@ -395,14 +379,6 @@ import {
             params.dividendIndex,
             params.maturity,
             params.expiry,
-            params.txData,
-            params.safetyFactor
-        );
-    }
-
-    public configure = async (params: ConfigureParams) => {
-        return (await this._contract).configure.sendTransactionAsync(
-            params.wallet,
             params.txData,
             params.safetyFactor
         );
