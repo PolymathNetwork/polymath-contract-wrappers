@@ -24,7 +24,6 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-import { string } from 'prop-types';
   
 interface IAddManualApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents.AddManualApproval,
