@@ -212,10 +212,8 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     // [module1, module1, module2, module3, module3], [perm1, perm2, perm1, perm2, perm3]
     const zippedResult = _.zip(result[0], result[1]); // [[module1, perm1], [module1, perm2], [module2, perm1] ...]
     const groupedResult = _.groupBy(zippedResult, (value) => { return value[0]}); // [module1: [[module1, perm1], [module1, perm2]], ...]
-    console.log('GroupedResult:', groupedResult);
     let typedResult: PermissonsPerModule[] = [];
     _.forEach(groupedResult, function(value, key) {
-      console.log('value', value)
       const permissonsPerModule: PermissonsPerModule = {
         module: key,
         permissions: value.map((pair) => bytes32ToString(pair[1] as string))

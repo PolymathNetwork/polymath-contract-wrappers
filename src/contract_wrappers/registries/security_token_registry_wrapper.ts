@@ -31,6 +31,7 @@ import {
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 import * as moment from 'moment';
+import { type } from 'os';
 
 interface IChangeExpiryLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
@@ -290,6 +291,23 @@ interface UpdatePolyTokenAddressParams extends TxParams {
   newAddress: string,
 }
 
+//// Return types ////
+interface SecurityTokenData {
+  ticker: string;
+  owner: string;
+  tokenDetails: string;
+  deployedAt: BigNumber;
+}
+
+interface TickerDetails {
+    owner: string;
+    registrationDate: BigNumber;
+    expiryDate: BigNumber;
+    tokenName: string;
+    status: boolean;
+}
+//// End of return types ////
+
 /**
  * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
  */
@@ -312,7 +330,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (params?: OwnerParams): Promise<string[]> => {
+  public getTickersByOwner = async (params?: OwnerParams) => {
     const owner = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
     const tickers = await (await this._contract).getTickersByOwner.callAsync(
       owner,
@@ -323,14 +341,21 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the security token data by address
    */
-  public getSecurityTokenData = async (params: SecurityTokenAddressParams): Promise<[string, string, string, BigNumber]> => {
-    return await (await this._contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
+  public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
+    const result = await (await this._contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
+    const typedResult: SecurityTokenData = {
+      ticker: result[0],
+      owner: result[1],
+      tokenDetails: result[2],
+      deployedAt: result[3]
+    };
+    return typedResult;
   }
 
   /**
    * @returns Returns the list of tokens owned by the selected address
    */
-  public getTokensByOwner = async (params?: OwnerParams): Promise<string[]> => {
+  public getTokensByOwner = async (params?: OwnerParams) => {
     const owner = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
     assert.isETHAddressHex('ownerAddress', owner);
     const tokens = await (await this._contract).getTokensByOwner.callAsync(
@@ -342,18 +367,15 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: TokenNameParams): Promise<[string, BigNumber, BigNumber, string, boolean]> => {
+  public getTickerDetails = async (params: TokenNameParams) => {
     assert.isString('tokenName', params.tokenName);
-    const tickerDetail = await (await this._contract).getTickerDetails.callAsync(
-      params.tokenName,
-    );
-    return tickerDetail;
+    return this._getTickerDetails(params.tokenName)
   }
 
   /**
    * @return Gets the ticker registration fee
    */
-  public getTickerRegistrationFee = async (): Promise<BigNumber> => {
+  public getTickerRegistrationFee = async () => {
     return await (await this._contract).getTickerRegistrationFee.callAsync();
   }
 
@@ -405,7 +427,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets the security token launch fee
    * @return Fee amount
    */
-  public getSecurityTokenLaunchFee = async (): Promise<BigNumber> => {
+  public getSecurityTokenLaunchFee = async () => {
     return await (await this._contract).getSecurityTokenLaunchFee.callAsync();
   }
 
@@ -414,13 +436,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @param ticker is the ticker of the security token
    * @return address string
    */
-  public getSecurityTokenAddress = async (ticker: string): Promise<string> => {
+  public getSecurityTokenAddress = async (ticker: string) => {
     return await (await this._contract).getSecurityTokenAddress.callAsync(
       ticker,
     );
   }
 
-  private _isTickerAvailable = (registrationDate: number, expiryDate: number, isDeployed: boolean): boolean => {
+  private _isTickerAvailable = (registrationDate: number, expiryDate: number, isDeployed: boolean) => {
     if (registrationDate == 0) {
       return true;
     } else if (!isDeployed && (expiryDate > moment().unix())) {
@@ -434,30 +456,23 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets ticker availability
    * @return boolean
    */
-  public isTickerAvailable = async (params: TokenNameParams): Promise<boolean> => {
-    const result = await this.getTickerDetails(params);
-    const registrationDate = result[1].toNumber();
-    const expiryDate = result[2].toNumber();
-    const isDeployed = result[4];
-
-    return this._isTickerAvailable(registrationDate, expiryDate, isDeployed);
+  public isTickerAvailable = async (params: TokenNameParams) => {
+    assert.isString('tokenName', params.tokenName);
+    const result = await this._getTickerDetails(params.tokenName);
+    return this._isTickerAvailable(result.registrationDate.toNumber(), result.expiryDate.toNumber(), result.status);
   }
 
   /**
    * Knows if the ticker was registered by the user
    * @return boolean
    */
-  public isTickerRegisteredByCurrentIssuer = async (params: TokenNameParams): Promise<boolean> => {
-    const result = await this.getTickerDetails(params);
-    const tickerOwner = result[0];
-    const registrationDate = result[1].toNumber();
-    const expiryDate = result[2].toNumber();
-    const isDeployed = result[4];
-
-    if (this._isTickerAvailable(registrationDate, expiryDate, isDeployed)) {
+  public isTickerRegisteredByCurrentIssuer = async (params: TokenNameParams) => {
+    assert.isString('tokenName', params.tokenName);
+    const result = await this._getTickerDetails(params.tokenName);
+    if (this._isTickerAvailable(result.registrationDate.toNumber(), result.expiryDate.toNumber(), result.status)) {
       return false;
     } else {
-      return (tickerOwner === await this._getDefaultFromAddress());
+      return (result.owner === await this._getDefaultFromAddress());
     }
   }
 
@@ -465,10 +480,10 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Knows if the ticker was launched
    * @return boolean
    */
-  public isTokenLaunched = async (params: TokenNameParams): Promise<boolean> => {
-    const result = await this.getTickerDetails(params);
-    const tokenDeployed = result[4];
-    return tokenDeployed;
+  public isTokenLaunched = async (params: TokenNameParams) => {
+    assert.isString('tokenName', params.tokenName);
+    const result = await this._getTickerDetails(params.tokenName);
+    return result.status;
   }
 
   /**
@@ -528,7 +543,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Checks that Security Token is registered
    */
-  public isSecurityToken = async (params: SecurityTokenAddressParams): Promise<boolean> => {
+  public isSecurityToken = async (params: SecurityTokenAddressParams) => {
     return await (await this._contract).isSecurityToken.callAsync(
       params.securityTokenAddress,
     );
@@ -615,14 +630,14 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Returns the current STFactory Address
    */
-  public getSTFactoryAddress = async (): Promise<string> => {
+  public getSTFactoryAddress = async () => {
     return await (await this._contract).getSTFactoryAddress.callAsync();
   }
 
   /**
    * Gets Protocol version
    */
-  public getProtocolVersion = async (): Promise<BigNumber[]> => {
+  public getProtocolVersion = async () => {
     return await (await this._contract).getProtocolVersion.callAsync();
   }
 
@@ -640,21 +655,21 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Gets the expiry limit
    */
-  public getExpiryLimit = async (): Promise<BigNumber> => {
+  public getExpiryLimit = async ()=> {
     return await (await this._contract).getExpiryLimit.callAsync();
   }
 
   /**
    * Check whether the registry is paused or not
    */
-  public isPaused = async (): Promise<boolean> => {
+  public isPaused = async ()=> {
     return await (await this._contract).isPaused.callAsync();
   }
 
   /**
    * Gets the owner of the contract
    */
-  public owner = async (): Promise<string> => {
+  public owner = async ()=> {
     return await (await this._contract).owner.callAsync();
   }
 
@@ -699,6 +714,20 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
         (SecurityTokenRegistry as any).abi,
     );
     return logs;
+  }
+
+  private _getTickerDetails = async (tokenName: string) => {
+    const result = await (await this._contract).getTickerDetails.callAsync(
+      tokenName,
+    );
+    const typedResult: TickerDetails = {
+      owner: result[0],
+      registrationDate: result[1],
+      expiryDate: result[2],
+      tokenName: result[3],
+      status: result[4],
+    };
+    return typedResult;
   }
 
   private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {

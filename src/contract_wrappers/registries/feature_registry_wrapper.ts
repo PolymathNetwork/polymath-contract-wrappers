@@ -102,7 +102,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public getFeatureStatus = async (params: GetFeatureStatusParams): Promise<boolean> => {
+  public getFeatureStatus = async (params: GetFeatureStatusParams) => {
     return await (await this._contract).getFeatureStatus.callAsync(
         params.nameKey,
     )
@@ -124,7 +124,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the CustomModulesAllowed status
    * @return bool
    */
-  public getCustomModulesAllowedStatus = async (): Promise<boolean> => {
+  public getCustomModulesAllowedStatus = async () => {
     return await (await this._contract).getFeatureStatus.callAsync(
         Features.CustomModulesAllowed,
     )
@@ -134,7 +134,7 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * Get the FreezeMintingAllowed status
    * @return bool
    */
-  public getFreezeMintingAllowedStatus = async (): Promise<boolean> => {
+  public getFreezeMintingAllowedStatus = async () => {
     return await (await this._contract).getFeatureStatus.callAsync(
       Features.FreezeMintingAllowed,
     )
