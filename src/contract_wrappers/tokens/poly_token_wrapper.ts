@@ -79,13 +79,6 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     this._contract = this._getPolyTokenContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
   public increaseApproval = async (params: ChangeApprovalParams) => {
     return (await this._contract).increaseApproval.sendTransactionAsync(
       params.spender,
@@ -104,7 +97,7 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public decimalFactor = async (): Promise<BigNumber> => {
+  public decimalFactor = async () => {
     return await (await this._contract).decimalFactor.callAsync();
   }
 

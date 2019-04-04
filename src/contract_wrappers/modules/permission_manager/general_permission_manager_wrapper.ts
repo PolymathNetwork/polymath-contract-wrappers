@@ -21,6 +21,7 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
+import { stringToBytes32, bytes32ToString } from '../../../utils/convert';
   
 interface IChangePermissionSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission,
@@ -97,12 +98,20 @@ interface ChangePermissionMultiParams extends TxParams {
   valids: boolean[],
 }
 
+//// Return types ////
+interface PermissonsPerModule {
+  /** Module address */
+  module: string
+  /** List of permissions */
+  permissions: string[]
+}
+//// End of return types ////
+
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public abi: ContractAbi = GeneralPermissionManager.abi;
-  protected _address: string;
   protected _contract: Promise<GeneralPermissionManagerContract>;
 
   /**
@@ -112,18 +121,10 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
    */
   constructor(web3Wrapper: Web3Wrapper, address: string) {
     super(web3Wrapper, address);
-    this._address = address;
     this._contract = this._getGeneralPermissionManagerContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  public perms = async (params: PermsParams): Promise<boolean> => {
+  public perms = async (params: PermsParams) => {
     return await (await this._contract).perms.callAsync(
       params.module,
       params.delegate,
@@ -131,19 +132,19 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   }
 
-  public allDelegates = async (params: DelegateIndexParams): Promise<string> => {
+  public allDelegates = async (params: DelegateIndexParams) => {
     return await (await this._contract).allDelegates.callAsync(
       params.delegateIndex,
     );
   }
 
-  public delegateDetails = async (params: DelegateParams): Promise<string> => {
+  public delegateDetails = async (params: DelegateParams) => {
     return await (await this._contract).delegateDetails.callAsync(
       params.delegate,
     );
   }
 
-  public checkPermission = async (params: PermsParams): Promise<boolean> => {
+  public checkPermission = async (params: PermsParams) => {
     return await (await this._contract).checkPermission.callAsync(
       params.delegate,
       params.module,
@@ -168,7 +169,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   }
 
-  public checkDelegate = async (params: DelegateParams): Promise<boolean> => {
+  public checkDelegate = async (params: DelegateParams) => {
     return await (await this._contract).checkDelegate.callAsync(
       params.delegate,
     );
@@ -196,21 +197,33 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   }
 
-  public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams): Promise<string[]> => {
+  public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams) => {
     return await (await this._contract).getAllDelegatesWithPerm.callAsync(
       params.module,
       params.perm,
     );
   }
 
-  public getAllModulesAndPermsFromTypes = async (params: GetAllModulesAndPermsFromTypesParams): Promise<[string[], string[]]> => {
-    return await (await this._contract).getAllModulesAndPermsFromTypes.callAsync(
+  public getAllModulesAndPermsFromTypes = async (params: GetAllModulesAndPermsFromTypesParams) => {
+    const result = await (await this._contract).getAllModulesAndPermsFromTypes.callAsync(
       params.delegate,
       params.types,
-    );
+    ); 
+    // [module1, module1, module2, module3, module3], [perm1, perm2, perm1, perm2, perm3]
+    const zippedResult = _.zip(result[0], result[1]); // [[module1, perm1], [module1, perm2], [module2, perm1] ...]
+    const groupedResult = _.groupBy(zippedResult, (value) => { return value[0]}); // [module1: [[module1, perm1], [module1, perm2]], ...]
+    let typedResult: PermissonsPerModule[] = [];
+    _.forEach(groupedResult, function(value, key) {
+      const permissonsPerModule: PermissonsPerModule = {
+        module: key,
+        permissions: value.map((pair) => bytes32ToString(pair[1] as string))
+      }
+      typedResult.push(permissonsPerModule);
+    });
+    return typedResult;
   }
 
-  public getAllDelegates = async (): Promise<string[]> => {
+  public getAllDelegates = async () => {
     return await (await this._contract).getAllDelegates.callAsync();
   }
 

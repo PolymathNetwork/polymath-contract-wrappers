@@ -66,13 +66,6 @@ export class DetailedERC20TokenWrapper extends ERC20TokenWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */

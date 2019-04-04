@@ -26,6 +26,7 @@ import {
   IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
+import { bytes32ToString } from '../../utils/convert';
 import { schemas } from '@0x/json-schemas';
 import { BigNumber } from '@0x/utils';
 
@@ -160,6 +161,13 @@ interface TransferOwnershipParams extends TxParams {
   newOwner: string,
 }
 
+//// Return types ////
+interface TagsByModule {
+  module: string;
+  tags: string[]
+}
+//// End of return types ////
+
 /**
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
  */
@@ -179,62 +187,55 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     this._contract = this._getModuleRegistryContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  public getBytes32Value = async (params: GetValueByVariableParams): Promise<string> => {
+  public getBytes32Value = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getBytes32Value.callAsync(
       params.variable,
     )
   }
 
-  public getBytesValue = async (params: GetValueByVariableParams): Promise<string> => {
+  public getBytesValue = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getBytesValue.callAsync(
       params.variable,
     )
   }
 
-  public getAddressValue = async (params: GetValueByVariableParams): Promise<string> => {
+  public getAddressValue = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getAddressValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayAddress = async (params: GetValueByKeyParams): Promise<string[]> => {
+  public getArrayAddress = async (params: GetValueByKeyParams)=> {
     return await (await this._contract).getArrayAddress.callAsync(
       params.key,
     )
   }
 
-  public getBoolValue = async (params: GetValueByVariableParams): Promise<boolean> => {
+  public getBoolValue = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getBoolValue.callAsync(
       params.variable,
     )
   }
 
-  public getStringValue = async (params: GetValueByVariableParams): Promise<string> => {
+  public getStringValue = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getStringValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayBytes32 = async (params: GetValueByKeyParams): Promise<string[]> => {
+  public getArrayBytes32 = async (params: GetValueByKeyParams) => {
     return await (await this._contract).getArrayBytes32.callAsync(
       params.key,
     )
   }
   
-  public getUintValue = async (params: GetValueByVariableParams): Promise<BigNumber> => {
+  public getUintValue = async (params: GetValueByVariableParams) => {
     return await (await this._contract).getUintValue.callAsync(
       params.variable,
     )
   }
 
-  public getArrayUint = async (params: GetValueByKeyParams): Promise<BigNumber[]> => {
+  public getArrayUint = async (params: GetValueByKeyParams) => {
     return await (await this._contract).getArrayUint.callAsync(
       params.key,
     )
@@ -250,7 +251,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public useModule = async (params: ModuleFactoryParams) => {
-    
     return (await this._contract).useModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -259,7 +259,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    
     return (await this._contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -268,7 +267,6 @@ export class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public removeModule = async (params: ModuleFactoryParams) => {
-    
       return (await this._contract).removeModule.sendTransactionAsync(
         params.moduleFactory,
         params.txData,
@@ -285,26 +283,50 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     );
   }
 
-  public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams): Promise<[string[], string[]]> => {
-    return await (await this._contract).getTagsByTypeAndToken.callAsync(
+  public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams) => {
+    const result = await (await this._contract).getTagsByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
     )
+    // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
+    const zippedResult = _.zip(result[0], result[1]); // [[tag1, module1], [tag2, module1], [tag3, module1] ...]
+    const groupedResult = _.groupBy(zippedResult, (value) => { return value[1]}); // [module1: [[tag1, module1], [tag2, module1]], ...]
+    let typedResult: TagsByModule[] = [];
+    _.forEach(groupedResult, function(value, key) {
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: value.map((pair) => bytes32ToString(pair[1] as string))
+      }
+      typedResult.push(tagsByModule);
+    });
+    return typedResult;
   }
 
-  public getTagsByType = async (params: ModuleTypeParams): Promise<[string[], string[]]> => {
-    return await (await this._contract).getTagsByType.callAsync(
+  public getTagsByType = async (params: ModuleTypeParams) => {
+    const result = await (await this._contract).getTagsByType.callAsync(
       params.moduleType,
-    )
+    );
+    // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
+    const zippedResult = _.zip(result[0], result[1]); // [[tag1, module1], [tag2, module1], [tag3, module1] ...]
+    const groupedResult = _.groupBy(zippedResult, (value) => { return value[1]}); // [module1: [[tag1, module1], [tag2, module1]], ...]
+    let typedResult: TagsByModule[] = [];
+    _.forEach(groupedResult, function(value, key) {
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: value.map((pair) => bytes32ToString(pair[1] as string))
+      }
+      typedResult.push(tagsByModule);
+    });
+    return typedResult;
   }
 
-  public getReputationByFactory = async (params: ModuleFactoryParams): Promise<string[]> => {
+  public getReputationByFactory = async (params: ModuleFactoryParams) => {
     return await (await this._contract).getReputationByFactory.callAsync(
       params.moduleFactory,
     )
   }
 
-  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
+  public getModulesByType = async (params: ModuleTypeParams) => {
     return await (await this._contract).getModulesByType.callAsync(
       params.moduleType,
     )
@@ -314,7 +336,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams): Promise<string[]> => {
+  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams) => {
     return await (await this._contract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
@@ -358,11 +380,11 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     );
   }
 
-  public owner = async (): Promise<string> => {
+  public owner = async () => {
     return await (await this._contract).owner.callAsync()
   }
 
-  public isPaused = async (): Promise<boolean> => {
+  public isPaused = async () => {
     return await (await this._contract).isPaused.callAsync()
   }
 
