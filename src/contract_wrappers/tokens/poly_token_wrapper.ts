@@ -97,7 +97,7 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public decimalFactor = async (): Promise<BigNumber> => {
+  public decimalFactor = async () => {
     return await (await this._contract).decimalFactor.callAsync();
   }
 

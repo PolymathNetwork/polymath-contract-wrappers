@@ -72,7 +72,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Returns the token name
    */
-  public name = async (): Promise<string> => {
+  public name = async () => {
     return await (await this._contract).name.callAsync();
   }
 
@@ -91,7 +91,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Returns the token total supply
    */
-  public totalSupply = async (): Promise<BigNumber> => {
+  public totalSupply = async () => {
     return await (await this._contract).totalSupply.callAsync();
   }
 
@@ -111,7 +111,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Returns the setted decimals
    */
-  public decimals = async (): Promise<BigNumber> => {
+  public decimals = async () => {
     return await (await this._contract).decimals.callAsync();
   }
 
@@ -119,7 +119,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public balanceOf = async (params?: GetBalanceOfParams): Promise<BigNumber> => {
+  public balanceOf = async (params?: GetBalanceOfParams) => {
     const address = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
     return await (await this._contract).balanceOf.callAsync(
       address
@@ -129,7 +129,7 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Returns the token symbol
    */
-  public symbol = async (): Promise<string> => {
+  public symbol = async () => {
     return await (await this._contract).symbol.callAsync();
   }
 
@@ -149,14 +149,14 @@ export abstract class ERC20TokenWrapper extends ContractWrapper {
    * Function to check the amount of tokens a spender is allowed to spend
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
-  public allowance = async (params: AllowanceParams): Promise<BigNumber> => {
+  public allowance = async (params: AllowanceParams) => {
     return await (await this._contract).allowance.callAsync(
       params.owner,
       params.spender
     );
   }
 
-  public async isValidContract(): Promise<boolean> {
+  public async isValidContract() {
     try {
       const contract = await this._contract;
       await contract.totalSupply.callAsync();

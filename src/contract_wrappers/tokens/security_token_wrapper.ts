@@ -49,6 +49,7 @@ import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ERC20TokenWrapper } from './erc20_wrapper';
 import { stringToBytes32, bytes32ToString } from '../../utils/convert';
+import { string } from 'prop-types';
 
 const NO_MODULE_DATA = "0x0000000000000000";
 
@@ -465,6 +466,22 @@ interface AddEtherDividendCheckpointParams extends AddModuleParams {
   wallet: string,
 }
 
+//// Return types ////
+interface ModuleData {
+  /** Module name */
+  name: string;
+  /** Module address */
+  address: string;
+  /** Module factory address */
+  factoryAddress: string;
+  /** Whether module is archived */
+  archived: boolean;
+  /** Modules types */
+  types: number[];
+}
+//// End of return types ////
+
+
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
@@ -485,14 +502,14 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Value of current checkpoint
    */
-  public currentCheckpointId = async (): Promise<BigNumber> => {
+  public currentCheckpointId = async ()=> {
     return await (await this._contract).currentCheckpointId.callAsync();
   }
 
   /**
    * Granular level of the token
    */
-  public granularity = async (): Promise<BigNumber> => {
+  public granularity = async () => {
     return await (await this._contract).granularity.callAsync();
   }
 
@@ -505,7 +522,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public polyToken = async (): Promise<string> => {
+  public polyToken = async () => {
     return await (await this._contract).polyToken.callAsync();
   }
 
@@ -516,35 +533,35 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public polymathRegistry = async (): Promise<string> => {
+  public polymathRegistry = async () => {
     return await (await this._contract).polymathRegistry.callAsync();
   }
 
-  public controllerDisabled = async (): Promise<boolean> => {
+  public controllerDisabled = async () => {
     return await (await this._contract).controllerDisabled.callAsync();
   }
 
-  public owner = async (): Promise<string> => {
+  public owner = async () => {
     return await (await this._contract).owner.callAsync();
   }
 
-  public mintingFrozen = async (): Promise<boolean> => {
+  public mintingFrozen = async () => {
     return await (await this._contract).mintingFrozen.callAsync();
   }
 
-  public moduleRegistry = async (): Promise<string> => {
+  public moduleRegistry = async () => {
     return await (await this._contract).moduleRegistry.callAsync();
   }
 
-  public featureRegistry = async (): Promise<string> => {
+  public featureRegistry = async () => {
     return await (await this._contract).featureRegistry.callAsync();
   }
 
-  public securityTokenRegistry = async (): Promise<string> => {
+  public securityTokenRegistry = async () => {
     return await (await this._contract).securityTokenRegistry.callAsync();
   }
 
-  public tokenDetails = async (): Promise<string> => {
+  public tokenDetails = async () => {
     return (await this._contract).tokenDetails.callAsync();
   }
 
@@ -557,7 +574,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public transfersFrozen = async (): Promise<boolean> => {
+  public transfersFrozen = async () => {
     return await (await this._contract).transfersFrozen.callAsync();
   }
 
@@ -600,7 +617,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public getModulesByName = async (params: ModuleNameParams): Promise<string[]> => {
+  public getModulesByName = async (params: ModuleNameParams) => {
     const moduleNameHex = stringToBytes32(params.moduleName);
     return await (await this._contract).getModulesByName.callAsync(
       moduleNameHex
@@ -642,24 +659,24 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public getInvestors = async (): Promise<string[]> => {
+  public getInvestors = async () => {
     return await (await this._contract).getInvestors.callAsync();
   }
 
-  public getInvestorsAt = async (params: CheckpointIdParams): Promise<string[]> => {
+  public getInvestorsAt = async (params: CheckpointIdParams) => {
     return await (await this._contract).getInvestorsAt.callAsync(
       params.checkpointId,
     );
   }
 
-  public iterateInvestors = async (params: IterateInvestorsParams): Promise<string[]> => {
+  public iterateInvestors = async (params: IterateInvestorsParams) => {
     return await (await this._contract).iterateInvestors.callAsync(
       params.start,
       params.end,
     );
   }
 
-  public getInvestorCount = async (): Promise<BigNumber> => {
+  public getInvestorCount = async () => {
     return await (await this._contract).getInvestorCount.callAsync();
   }
 
@@ -767,17 +784,17 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   }
 
-  public getCheckpointTimes = async (): Promise<BigNumber[]> => {
+  public getCheckpointTimes = async () => {
     return await (await this._contract).getCheckpointTimes.callAsync();
   }
 
-  public totalSupplyAt = async (params: CheckpointIdParams): Promise<BigNumber> => {
+  public totalSupplyAt = async (params: CheckpointIdParams) => {
     return await (await this._contract).totalSupplyAt.callAsync(
       params.checkpointId,
     );
   }
 
-  public balanceOfAt = async (params: BalanceOfAtParams): Promise<BigNumber> => {
+  public balanceOfAt = async (params: BalanceOfAtParams)=> {
     return await (await this._contract).balanceOfAt.callAsync(
       params.investor,
       params.checkpointId,
@@ -830,7 +847,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */
-  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
+  public getModulesByType = async (params: ModuleTypeParams) => {
     return (await this._contract).getModulesByType.callAsync(
       params.type,
     );
@@ -972,15 +989,23 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * @return Returns the data associated to a module
    */
-  public getModule = async (params: ModuleAddressParams): Promise<[string, string, string, boolean, BigNumber[]]> => {
-    return (await this._contract).getModule.callAsync(params.moduleAddress);
+  public getModule = async (params: ModuleAddressParams) => {
+    const result = await (await this._contract).getModule.callAsync(params.moduleAddress);
+    const typedResult: ModuleData = {
+      name: result[0],
+      address: result[1],
+      factoryAddress: result[2],
+      archived: result[3],
+      types: result[4].map(t => t.toNumber()),
+    };
+    return typedResult;
   }
 
   /**
    * Validates a transfer with a TransferManager module if it exists
    * @return bool
    */
-  public verifyTransfer = async (params: VerifyTransferParams): Promise<boolean> => {
+  public verifyTransfer = async (params: VerifyTransferParams) => {
     return await (await this._contract).verifyTransfer.callAsync(
       params.from,
       params.to,
