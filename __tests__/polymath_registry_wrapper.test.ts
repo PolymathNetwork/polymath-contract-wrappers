@@ -76,4 +76,13 @@ describe('PolyMathRegistryWrapper getAddressTests', () => {
             // Confirm that the right contract name was used
             expect(getAddressSpy.mock.calls[0][0].contractName).toBe(Contracts.EthUsdOracle);
     });
+
+    test('Contract name used as an argument to getAddress when calling getAddress overload',
+        async () => {
+            polyMathRegistry.getAddress({contractName: 'contractName'});
+            // Confirm that the mocked getAddress function was called once
+            expect(getAddressSpy).toHaveBeenCalledTimes(1);
+            // Confirm that the right contract name was used
+            expect(getAddressSpy.mock.calls[0][0].contractName).toBe('contractName');
+        });
 });
