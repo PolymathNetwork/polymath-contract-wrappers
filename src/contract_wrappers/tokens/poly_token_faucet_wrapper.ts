@@ -5,9 +5,7 @@ import {
   PolyTokenFaucetTransferEventArgs,
   PolyTokenFaucetApprovalEventArgs
 } from '@polymathnetwork/abi-wrappers';
-import {
-  PolyTokenFaucet
-} from '@polymathnetwork/contract-artifacts';
+import { PolyTokenFaucet } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
