@@ -32,30 +32,23 @@ export class ModuleWrapper extends ContractWrapper {
     this._contract = this._getModuleContract();
   }
 
-  /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  public getInitFunction = async (): Promise<string> => {
+  public getInitFunction = async () => {
     return await (await this._contract).getInitFunction.callAsync();
   }
 
-  public polyToken = async (): Promise<string> => {
+  public polyToken = async () => {
     return await (await this._contract).polyToken.callAsync();
   }
 
-  public securityToken = async (): Promise<string> => {
+  public securityToken = async () => {
     return await (await this._contract).securityToken.callAsync();
   }
 
-  public getPermissions = async (): Promise<string[]> => {
+  public getPermissions = async () => {
     return await (await this._contract).getPermissions.callAsync();
   }
 
-  public factory = async (): Promise<string> => {
+  public factory = async () => {
     return await (await this._contract).factory.callAsync();
   }
 

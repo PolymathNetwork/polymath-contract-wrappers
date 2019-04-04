@@ -103,6 +103,27 @@ interface BuyTokensWithPolyParams extends TxParams {
   investedPOLY: BigNumber,
 }
 
+//// Return types ////
+interface CappedSTODetails {
+  /** Timestamp at which offering gets start. */
+  startTime: BigNumber,
+  /** Timestamp at which offering ends. */
+  endTime: BigNumber,
+  /** Number of token base units this STO will be allowed to sell to investors. */
+  cap: BigNumber,
+  /** Token units a buyer gets(multiplied by 10^18) per wei / base unit of POLY */
+  rate: BigNumber,
+  /** Amount of funds raised */
+  fundsRaised: BigNumber,
+  /** Number of individual investors this STO have. */
+  investorCount: BigNumber,
+  /** Amount of tokens get sold. */
+  totalTokensSold: BigNumber,
+  /** Boolean value to justify whether the fund raise type is POLY or not, i.e true for POLY. */
+  isRaisedInPoly: boolean,
+}
+//// End of return types ////
+
 /**
  * This class includes the functionality related to interacting with the CappedSTO contract.
  */
@@ -120,42 +141,28 @@ export class CappedSTOWrapper extends STOWrapper {
   }
 
   /**
-   * Returns the contract address
-   */
-  public getAddress = async (): Promise<string> => {
-    return (await this._contract).address;
-  }
-
-  /**
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
-  public rate = async (): Promise<BigNumber> => {
+  public rate = async () => {
     return await (await this._contract).rate.callAsync();
   }
 
   /**
    * How many token base units this STO will be allowed to sell to investors
    */
-  public cap = async (): Promise<BigNumber> => {
+  public cap = async () => {
     return await (await this._contract).cap.callAsync();
   }
 
-  /**
-   * Return the total no. of tokens sold
-   */
-  public totalTokensSold = async(): Promise<BigNumber> => {
-    return await (await this._contract).totalTokensSold.callAsync();
-  }
-
-  public allowBeneficialInvestments = async(): Promise<boolean> => {
+  public allowBeneficialInvestments = async() => {
     return await (await this._contract).allowBeneficialInvestments.callAsync();
   }
 
-  public paused = async(): Promise<boolean> => {
+  public paused = async() => {
     return await (await this._contract).paused.callAsync();
   }
 
-  public investors = async(params: InvestorsParams): Promise<BigNumber> => {
+  public investors = async(params: InvestorsParams) => {
     return await (await this._contract).investors.callAsync(
       params.amount,
     );
@@ -185,20 +192,27 @@ export class CappedSTOWrapper extends STOWrapper {
     );
   }
 
-  public capReached = async(): Promise<boolean> => {
+  public capReached = async() => {
     return await (await this._contract).capReached.callAsync();
   }
 
-  public getTokensSold = async(): Promise<BigNumber> => {
+  public getTokensSold = async() => {
     return await (await this._contract).getTokensSold.callAsync();
   }
 
-  public getPermissions = async(): Promise<string[]> => {
-    return await (await this._contract).getPermissions.callAsync();
-  }
-
-  public getSTODetails = async(): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean]> => {
-    return await (await this._contract).getSTODetails.callAsync();
+  public getSTODetails = async() => {
+    const result = await (await this._contract).getSTODetails.callAsync();
+    const typedResult: CappedSTODetails = {
+      startTime: result[0],
+      endTime: result[1],
+      cap: result[2],
+      rate: result[3],
+      fundsRaised: result[4],
+      investorCount: result[5],
+      totalTokensSold: result[6],
+      isRaisedInPoly: result[7],
+    }
+    return typedResult;
   }
 
   /**

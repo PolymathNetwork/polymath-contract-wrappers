@@ -23,57 +23,57 @@ export abstract class STOWrapper extends ModuleWrapper {
   /**
    * Type of currency used to collect the funds
    */
-  public fundRaiseTypes = async (params: FundRaiseTypesParams): Promise<boolean> => {
+  public fundRaiseTypes = async (params: FundRaiseTypesParams) => {
     return await (await this._contract).fundRaiseTypes.callAsync(params.type);
   }
 
   /**
    * Returns funds raised by the STO
    */
-  public fundsRaised = async (params: FundRaiseTypesParams): Promise<BigNumber> => {
+  public fundsRaised = async (params: FundRaiseTypesParams) => {
     return await (await this._contract).fundsRaised.callAsync(params.type);
   }
 
     /**
    * Start time of the Capped STO
    */
-  public startTime = async (): Promise<BigNumber> => {
+  public startTime = async () => {
     return await (await this._contract).startTime.callAsync();
   }
 
   /**
    * End time of the Capped STO
    */
-  public endTime = async (): Promise<BigNumber> => {
+  public endTime = async () => {
     return await (await this._contract).endTime.callAsync();
   }
 
-  public pausedTime = async (): Promise<BigNumber> => {
+  public pausedTime = async () => {
     return await (await this._contract).pausedTime.callAsync();
   }
 
   /**
    * Number of individual investors this STO have.
    */
-  public investorCount = async (): Promise<BigNumber> => {
+  public investorCount = async () => {
     return await (await this._contract).investorCount.callAsync();
   }
 
   /**
    * Ethereum account address to hold the funds
    */
-  public wallet = async (): Promise<string> => {
+  public wallet = async () => {
     return await (await this._contract).wallet.callAsync();
   }
 
   /**
    * Return the total no. of tokens sold
    */
-  public totalTokensSold  = async (): Promise<BigNumber> => {
+  public totalTokensSold  = async () => {
     return await (await this._contract).totalTokensSold.callAsync();
   }
 
-  public getRaised = async (params: FundRaiseTypesParams): Promise<BigNumber> => {
+  public getRaised = async (params: FundRaiseTypesParams) => {
     return await (await this._contract).getRaised.callAsync(
       params.type,
     );
