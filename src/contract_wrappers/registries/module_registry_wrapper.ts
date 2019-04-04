@@ -26,9 +26,9 @@ import {
   IGetLogs
 } from '../../types';
 import { assert } from '../../utils/assert';
+import { bytes32ToString } from '../../utils/convert';
 import { schemas } from '@0x/json-schemas';
 import { BigNumber } from '@0x/utils';
-import { bytes32ToString } from 'utils/convert';
 
 interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause,
