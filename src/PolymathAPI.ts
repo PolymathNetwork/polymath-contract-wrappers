@@ -99,7 +99,7 @@ export class PolymathAPI {
    * An instance of the PolyTokenFaucetWrapper class containing methods
    * for interacting with PolyTokenFaucet smart contract.
    */
-  public polyTokenFaucet: PolyTokenFaucetWrapper;
+  private polyTokenFaucet: PolyTokenFaucetWrapper;
 
   private readonly _web3Wrapper: Web3Wrapper;
 
