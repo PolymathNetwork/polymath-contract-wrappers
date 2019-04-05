@@ -179,6 +179,7 @@ export class PolymathAPI {
   public getTokens = async (params: GetTokensParams) => {
     assert.isNumber('amount', params.amount);
     const address = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    assert.isETHAddressHex('address', address);
 
     const networkId = await this._web3Wrapper.getNetworkIdAsync();
     if (networkId === 1) {
