@@ -56,7 +56,8 @@ export class ModuleWrapperFactory {
     switch (params.name) {
       // Permission
       case 'GeneralPermissionManager':
-        return new GeneralPermissionManagerWrapper(this._web3Wrapper, params.address);
+        return new GeneralPermissionManagerWrapper(this._web3Wrapper,
+            this._contractFactory._getGeneralPermissionManagerContract(params.address));
       // TMs
       case 'GeneralTransferManager':
         return new GeneralTransferManagerWrapper(this._web3Wrapper, params.address);

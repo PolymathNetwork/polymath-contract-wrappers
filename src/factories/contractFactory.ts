@@ -7,6 +7,7 @@ import { ERC20DividendCheckpointContract,
     DetailedERC20Contract,
     SecurityTokenContract,
     PolyTokenContract,
+    GeneralPermissionManagerContract,
     PolyTokenFaucetContract} from "@polymathnetwork/abi-wrappers";
 
 import { ERC20DividendCheckpoint,
@@ -16,6 +17,7 @@ import { ERC20DividendCheckpoint,
     DetailedERC20,
     SecurityToken,
     PolyToken,
+    GeneralPermissionManager,
     PolyTokenFaucet} from "@polymathnetwork/contract-artifacts";
 import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
@@ -97,6 +99,15 @@ export class ContractFactory {
     return new PolyTokenContract(
         PolyToken.abi,
         await this._polymathRegistry.getPolyTokenAddress(),
+        this._provider,
+        this._contractDefaults,
+    );
+  }
+
+  public async _getGeneralPermissionManagerContract(address: string): Promise<GeneralPermissionManagerContract> {
+    return new GeneralPermissionManagerContract(
+        GeneralPermissionManager.abi,
+        address,
         this._provider,
         this._contractDefaults,
     );
