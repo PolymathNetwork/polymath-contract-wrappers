@@ -12,7 +12,8 @@
     "start": "webpack-dev-server --config=webpack.config.dev.js",
     "build": "webpack",
     "build:ci": "yarn build",
-    "lint": "tslint --format stylish --project . --exclude **/lib/**/*",
+    "lint": "./node_modules/eslint/bin/eslint.js .",
+    "lint:fix": "./node_modules/eslint/bin/eslint.js . --fix",
     "clean": "shx rm -rf lib docs",
     "docs": "typedoc --excludePrivate --excludeExternals --exclude node_modules/ --name 'Polymath API' --target ES5 --module commonjs --tsconfig typedoc-tsconfig.json --out docs/ src/"
   },
@@ -58,6 +59,7 @@
   },
   "dependencies": {
     "@0x/assert": "^1.0.21",
+    "@0x/base-contract": "^5.0.4",
     "@0x/json-schemas": "^3.0.5",
     "@0x/subproviders": "^2.1.11",
     "@0x/types": "^1.5.0",
