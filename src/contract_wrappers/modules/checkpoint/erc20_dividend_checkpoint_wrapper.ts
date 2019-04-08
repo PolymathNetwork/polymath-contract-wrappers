@@ -146,7 +146,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
   /**
    * Instantiate ERC20DividendCheckpointWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The contract instance address
+   * @param contract
    */
   constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DividendCheckpointContract>) {
     super(web3Wrapper, contract);

@@ -23,7 +23,7 @@ export class ModuleWrapper extends ContractWrapper {
   /**
    * Instantiate GeneralPermissionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The module contract instance address
+   * @param contract
    */
   constructor(web3Wrapper: Web3Wrapper, contract: Promise<GenericModuleContract>) {
     super(web3Wrapper, contract);

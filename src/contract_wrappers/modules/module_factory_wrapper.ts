@@ -115,16 +115,15 @@ export class ModuleFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleFactory.abi;
   protected _contract: Promise<ModuleFactoryContract>;
   private _address: string;
-  
+
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The contract instance address
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper);
-    this._address = address;
-    this._contract = this._getModuleFactoryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleFactoryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -175,14 +174,5 @@ export class ModuleFactoryWrapper extends ContractWrapper {
         ModuleFactory.abi,
     );
     return logs;
-  }
-
-  private async _getModuleFactoryContract(): Promise<ModuleFactoryContract> {
-    return new ModuleFactoryContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }
