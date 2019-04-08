@@ -18,6 +18,7 @@ import {
   PercentageTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
+  PolyTokenFaucet,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -30,6 +31,8 @@ import { ModuleWrapperFactory } from './factories/moduleWrapperFactory';
 import { FeatureRegistryWrapper } from './contract_wrappers/registries/feature_registry_wrapper';
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
+import { PolyTokenFaucetWrapper } from 'contract_wrappers/tokens/poly_token_faucet_wrapper';
+import { BigNumber } from '@0x/utils';
 
 
 /**
@@ -47,6 +50,11 @@ export interface IApiConstructorParams {
  */
 export interface IGetBalanceParams {
   address?: string
+}
+
+export interface GetTokensParams {
+  amount: number,
+  address?: string,
 }
 
 /**
@@ -88,6 +96,11 @@ export class PolymathAPI {
    * different module wrapper instances to interact with SecurityToken smart contracts
    */
   public moduleFactory: ModuleWrapperFactory;
+  /**
+   * An instance of the PolyTokenFaucetWrapper class containing methods
+   * for interacting with PolyTokenFaucet smart contract.
+   */
+  private polyTokenFaucet: PolyTokenFaucetWrapper;
 
   private readonly _web3Wrapper: Web3Wrapper;
 
@@ -125,6 +138,7 @@ export class PolymathAPI {
       PercentageTransferManager,
       EtherDividendCheckpoint,
       VolumeRestrictionTransferManager,
+      PolyTokenFaucet,
     ];
 
     _.forEach(artifactsArray, artifact => { // tslint:disable-line
@@ -154,10 +168,29 @@ export class PolymathAPI {
     this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,
       this.securityTokenRegistry
-    )
+    );
     this.moduleFactory = new ModuleWrapperFactory(
       this._web3Wrapper
-    )
+    );
+    this.polyTokenFaucet = new PolyTokenFaucetWrapper(
+      this._web3Wrapper,
+      this.polymathRegistry
+    );
+  }
+
+  public getTokens = async (params: GetTokensParams) => {
+    assert.isNumber('amount', params.amount);
+    const address = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    assert.isETHAddressHex('address', address);
+
+    const networkId = await this._web3Wrapper.getNetworkIdAsync();
+    if (networkId === 1) {
+      throw new Error('Only for testnet');
+    }
+    return await this.polyTokenFaucet.getTokens({
+      amount: new BigNumber(params.amount),
+      recipient: address,
+    })
   }
 
   /**
