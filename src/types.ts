@@ -62,6 +62,7 @@ import {
     PercentageTransferManagerContract,
     PercentageTransferManagerEventArgs,
     PercentageTransferManagerEvents,
+    PolyTokenFaucetContract,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -199,7 +200,8 @@ export interface ISubscribe {
 export type ERC20Contract = 
   DetailedERC20Contract | 
   SecurityTokenContract | 
-  PolyTokenContract;
+  PolyTokenContract |
+  PolyTokenFaucetContract;
 
 export type GenericModuleContract = 
   ModuleContract |
