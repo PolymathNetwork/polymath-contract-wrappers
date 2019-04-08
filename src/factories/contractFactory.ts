@@ -1,7 +1,14 @@
 import { Provider, TxData } from "ethereum-types";
-import { ERC20DividendCheckpointContract, ModuleContract } from "@polymathnetwork/abi-wrappers";
-import { ERC20DividendCheckpoint, Module, ModuleFactory } from "@polymathnetwork/contract-artifacts";
-import {ModuleFactoryContract} from '@polymathnetwork/abi-wrappers/lib/src';
+
+import { ERC20DividendCheckpointContract,
+  ModuleContract,
+  ModuleFactoryContract,
+  EtherDividendCheckpointContract} from "@polymathnetwork/abi-wrappers";
+
+import { ERC20DividendCheckpoint,
+  Module,
+  ModuleFactory,
+  EtherDividendCheckpoint } from "@polymathnetwork/contract-artifacts";
 
 export class ContractFactory {
   private _provider: Provider;
@@ -36,6 +43,15 @@ export class ContractFactory {
         address,
         this._provider,
         this._contractDefaults,
+    );
+  }
+
+  private async _getEtherDividendCheckpointContract(): Promise<EtherDividendCheckpointContract> {
+    return new EtherDividendCheckpointContract(
+        this.abi,
+        this._address,
+        this._web3Wrapper.getProvider(),
+        this._web3Wrapper.getContractDefaults(),
     );
   }
 }

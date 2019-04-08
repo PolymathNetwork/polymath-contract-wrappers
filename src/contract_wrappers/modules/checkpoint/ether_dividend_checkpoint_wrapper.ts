@@ -286,20 +286,18 @@ import {
    */
   export class EtherDividendCheckpointWrapper extends DividendCheckpointWrapper {
     public abi: ContractAbi = EtherDividendCheckpoint.abi;
-    protected _address: string;
     protected _contract: Promise<EtherDividendCheckpointContract>;
-  
+
     /**
      * Instantiate EtherDividendCheckpointWrapper
      * @param web3Wrapper Web3Wrapper instance to use
-     * @param address The contract instance address
+     * @param contract
      */
-    constructor(web3Wrapper: Web3Wrapper, address: string) {
-      super(web3Wrapper, address);
-      this._address = address;
-      this._contract = this._getEtherDividendCheckpointContract();
+    constructor(web3Wrapper: Web3Wrapper, contract: Promise<EtherDividendCheckpointContract>) {
+      super(web3Wrapper, contract);
+      this._contract = contract;
     }
-  
+
     public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
         return (await this._contract).setWithholdingFixed.sendTransactionAsync(
             params.investors,
@@ -537,15 +535,5 @@ import {
       );
       return logs;
     }
-  
-    private async _getEtherDividendCheckpointContract(): Promise<EtherDividendCheckpointContract> {
-      return new EtherDividendCheckpointContract(
-        this.abi,
-        this._address,
-        this._web3Wrapper.getProvider(),
-        this._web3Wrapper.getContractDefaults(),
-      );
-    }
   }
-    
-  
+
