@@ -141,7 +141,6 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
  */
 export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
   public abi: ContractAbi = ERC20DividendCheckpoint.abi;
-  protected _address: string;
   protected _contract: Promise<ERC20DividendCheckpointContract>;
 
   /**
@@ -149,10 +148,9 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param address The contract instance address
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._address = address;
-    this._contract = this._getERC20DividendCheckpointContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DividendCheckpointContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public dividendTokens = async (params: DividendIndexParams) => {
@@ -254,15 +252,6 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       ERC20DividendCheckpoint.abi,
     );
     return logs;
-  }
-
-  private async _getERC20DividendCheckpointContract(): Promise<ERC20DividendCheckpointContract> {
-    return new ERC20DividendCheckpointContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }
   
