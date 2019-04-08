@@ -114,7 +114,6 @@ interface IGetModuleFactoryLogsAsyncParams extends IGetLogs {
 export class ModuleFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleFactory.abi;
   protected _contract: Promise<ModuleFactoryContract>;
-  private _address: string;
 
   /**
    * Instantiate ModuleFactoryWrapper
