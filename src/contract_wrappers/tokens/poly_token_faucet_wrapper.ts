@@ -24,12 +24,13 @@ export class PolyTokenFaucetWrapper extends ContractWrapper {
   /**
    * Instantiate PolyTokenFaucetWrapper
    * @param web3Wrapper Web3Wrapper instance to use
+   * @param contract
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper, contract: Promise<PolyTokenFaucetContract>) {
+    super(web3Wrapper, contract);
     this._polymathRegistry = polymathRegistry;
-    this._contract = this._getPolyTokenFaucetContract();
+    this._contract = contract;
   }
 
   public getTokens = async (params: GetTokensParams) => {
@@ -43,13 +44,4 @@ export class PolyTokenFaucetWrapper extends ContractWrapper {
 
   public getLogsAsync: undefined;
   public subscribeAsync: undefined;
-
-  private async _getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
-    return new PolyTokenFaucetContract(
-      this.abi,
-      await this._polymathRegistry.getPolyTokenAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }

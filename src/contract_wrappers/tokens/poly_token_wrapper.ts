@@ -71,12 +71,13 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
   /**
    * Instantiate PolyTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
+   * @param contract
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper, ''); //Address is not needed as it is obtained from polymathRegistry async
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper, contract: Promise<PolyTokenContract>) {
+    super(web3Wrapper, contract);
     this._polymathRegistry = polymathRegistry;
-    this._contract = this._getPolyTokenContract();
+    this._contract = contract;
   }
 
   public increaseApproval = async (params: ChangeApprovalParams) => {
@@ -142,14 +143,5 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
         PolyToken.abi,
     );
     return logs;
-  }
-
-  private async _getPolyTokenContract(): Promise<PolyTokenContract> {
-    return new PolyTokenContract(
-      this.abi,
-      await this._polymathRegistry.getPolyTokenAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

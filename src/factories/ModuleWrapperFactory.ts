@@ -3,9 +3,11 @@ import { CappedSTOWrapper } from "../contract_wrappers/modules/sto/capped_sto_wr
 import { USDTieredSTOWrapper } from "../contract_wrappers/modules/sto/usd_tiered_sto_wrapper";
 import { GeneralTransferManagerWrapper } from "../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper";
 import { GeneralPermissionManagerWrapper } from "../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper";
+import {ContractFactory} from './contractFactory';
+import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
 interface IGetModuleParams {
-  address: string, 
+  address: string,
   name: string
 }
 
@@ -21,7 +23,7 @@ interface IGetCappedSTO extends IGetModuleParams {
   name: 'CappedSTO'
 }
 
-interface IGetUSDTieredSTO extends IGetModuleParams { 
+interface IGetUSDTieredSTO extends IGetModuleParams {
   name: 'USDTieredSTO'
 }
 
@@ -38,9 +40,16 @@ interface IGetModuleInstance {
 export class ModuleWrapperFactory {
 
   private readonly _web3Wrapper: Web3Wrapper;
+  private _contractFactory;
+  private _polymathRegistry: PolymathRegistryWrapper;
 
-  constructor(web3Wrapper: Web3Wrapper) {
+  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
     this._web3Wrapper = web3Wrapper;
+    this._polymathRegistry = polymathRegistry;
+    this._contractFactory = new ContractFactory(
+        this._web3Wrapper.getProvider(),
+        this._web3Wrapper.getContractDefaults(),
+        this._polymathRegistry);
   }
 
   public getModuleInstance: IGetModuleInstance = async (params: IGetModuleParams): Promise<any> => {

@@ -33,6 +33,7 @@ import { assert } from './utils/assert';
 import * as _ from 'lodash';
 import { PolyTokenFaucetWrapper } from 'contract_wrappers/tokens/poly_token_faucet_wrapper';
 import { BigNumber } from '@0x/utils';
+import {ContractFactory} from './factories/contractFactory';
 
 
 /**
@@ -103,6 +104,7 @@ export class PolymathAPI {
   private polyTokenFaucet: PolyTokenFaucetWrapper;
 
   private readonly _web3Wrapper: Web3Wrapper;
+  private _contractFactory;
 
   /**
    * Instantiates a new PolymathAPI instance.
@@ -149,6 +151,13 @@ export class PolymathAPI {
       this._web3Wrapper,
       params.polymathRegistryAddress,
     );
+
+    this._contractFactory = new ContractFactory(
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
+      this.polymathRegistry,
+    );
+
     this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
       this._web3Wrapper,
       this.polymathRegistry,
@@ -156,6 +165,7 @@ export class PolymathAPI {
     this.polyToken = new PolyTokenWrapper(
       this._web3Wrapper,
       this.polymathRegistry,
+      this._contractFactory._getPolyTokenContract(),
     );
     this.moduleRegistry = new ModuleRegistryWrapper(
       this._web3Wrapper,
@@ -167,14 +177,17 @@ export class PolymathAPI {
     );
     this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,
-      this.securityTokenRegistry
+      this.securityTokenRegistry,
+      this.polymathRegistry,
     );
     this.moduleFactory = new ModuleWrapperFactory(
-      this._web3Wrapper
+      this._web3Wrapper,
+      this.polymathRegistry,
     );
     this.polyTokenFaucet = new PolyTokenFaucetWrapper(
       this._web3Wrapper,
-      this.polymathRegistry
+      this.polymathRegistry,
+      this._contractFactory._getPolyTokenFaucetContract(),
     );
   }
 
@@ -217,4 +230,3 @@ export class PolymathAPI {
     return await this._web3Wrapper.getNetworkIdAsync() !== 1;
   }
 }
-  
