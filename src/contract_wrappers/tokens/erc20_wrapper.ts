@@ -56,17 +56,16 @@ interface AllowanceParams {
  * This class includes the functionality related to interacting with the DetailedERC20 contract.
  */
 export abstract class ERC20TokenWrapper extends ContractWrapper {
-  protected _address: string;
-  protected abstract _contract: Promise<ERC20Contract>;
+  protected _contract: Promise<ERC20Contract>;
 
   /**
    * Instantiate DetailedERC20Wrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The contract address
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper);
-    this._address = address;
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20Contract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
