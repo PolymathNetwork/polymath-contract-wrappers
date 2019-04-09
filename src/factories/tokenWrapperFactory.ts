@@ -3,7 +3,6 @@ import { SecurityTokenWrapper } from "../contract_wrappers/tokens/security_token
 import { ERC20TokenWrapper } from "../contract_wrappers/tokens/erc20_wrapper";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import { DetailedERC20TokenWrapper } from "../contract_wrappers/tokens/detailed_erc20_wrapper";
-import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 import {ContractFactory} from './contractFactory';
 
 /**

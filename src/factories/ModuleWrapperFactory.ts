@@ -4,7 +4,6 @@ import { USDTieredSTOWrapper } from "../contract_wrappers/modules/sto/usd_tiered
 import { GeneralTransferManagerWrapper } from "../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper";
 import { GeneralPermissionManagerWrapper } from "../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper";
 import {ContractFactory} from './contractFactory';
-import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
 interface IGetModuleParams {
   address: string,
@@ -55,7 +54,8 @@ export class ModuleWrapperFactory {
             this._contractFactory._getGeneralPermissionManagerContract(params.address));
       // TMs
       case 'GeneralTransferManager':
-        return new GeneralTransferManagerWrapper(this._web3Wrapper, params.address);
+        return new GeneralTransferManagerWrapper(this._web3Wrapper,
+            this._contractFactory._getGeneralTransferManagerContract(params.address));
       // STOs
       case 'CappedSTO':
         return new CappedSTOWrapper(this._web3Wrapper,
