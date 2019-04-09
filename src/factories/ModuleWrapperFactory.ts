@@ -58,9 +58,11 @@ export class ModuleWrapperFactory {
         return new GeneralTransferManagerWrapper(this._web3Wrapper, params.address);
       // STOs
       case 'CappedSTO':
-        return new CappedSTOWrapper(this._web3Wrapper, params.address);
+        return new CappedSTOWrapper(this._web3Wrapper,
+            this._contractFactory._getCappedSTOContract(params.address));
       case 'USDTieredSTO':
-        return new USDTieredSTOWrapper(this._web3Wrapper, params.address);
+        return new USDTieredSTOWrapper(this._web3Wrapper,
+            this._contractFactory._getUSDTieredSTOContract(params.address));
       // Checkpoint
       // Burn
     }

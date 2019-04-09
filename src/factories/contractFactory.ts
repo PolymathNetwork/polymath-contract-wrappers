@@ -8,7 +8,11 @@ import { ERC20DividendCheckpointContract,
     SecurityTokenContract,
     PolyTokenContract,
     GeneralPermissionManagerContract,
-    PolyTokenFaucetContract} from "@polymathnetwork/abi-wrappers";
+    PolyTokenFaucetContract,
+    CappedSTOContract,
+    CappedSTOFactoryContract,
+    USDTieredSTOFactoryContract,
+    USDTieredSTOContract} from "@polymathnetwork/abi-wrappers";
 
 import { ERC20DividendCheckpoint,
     Module,
@@ -18,7 +22,11 @@ import { ERC20DividendCheckpoint,
     SecurityToken,
     PolyToken,
     GeneralPermissionManager,
-    PolyTokenFaucet} from "@polymathnetwork/contract-artifacts";
+    PolyTokenFaucet,
+    CappedSTO,
+    CappedSTOFactory,
+    USDTieredSTOFactory,
+    USDTieredSTO} from "@polymathnetwork/contract-artifacts";
 import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
 export class ContractFactory {
@@ -112,4 +120,42 @@ export class ContractFactory {
         this._contractDefaults,
     );
   }
+
+  public async _getCappedSTOFactoryContract(): Promise<CappedSTOFactoryContract> {
+        return new CappedSTOFactoryContract(
+            CappedSTOFactory.abi,
+            await this._polymathRegistry.getAddress({
+                contractName: 'CappedSTOFactory',
+            }),
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+  public async _getCappedSTOContract(address: string): Promise<CappedSTOContract> {
+        return new CappedSTOContract(
+            CappedSTO.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+  public async _getUSDTieredSTOFactoryContract(address: string): Promise<USDTieredSTOFactoryContract> {
+        return new USDTieredSTOFactoryContract(
+            USDTieredSTOFactory.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+  public async _getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract> {
+        return new USDTieredSTOContract(
+            (USDTieredSTO as any).abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
 }

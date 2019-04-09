@@ -400,11 +400,11 @@ export class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getUSDTieredSTOContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public investorsList = async (params: InvestorIndexParams) => {
@@ -864,14 +864,5 @@ export class USDTieredSTOWrapper extends STOWrapper {
         (USDTieredSTO as any).abi,
     );
     return logs;
-  }
-
-  private async _getUSDTieredSTOContract(): Promise<USDTieredSTOContract> {
-    return new USDTieredSTOContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }
