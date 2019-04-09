@@ -12,7 +12,12 @@ import { ERC20DividendCheckpointContract,
     CappedSTOContract,
     CappedSTOFactoryContract,
     USDTieredSTOFactoryContract,
-    USDTieredSTOContract} from "@polymathnetwork/abi-wrappers";
+    USDTieredSTOContract,
+    CountTransferManagerContract,
+    GeneralTransferManagerContract,
+    ManualApprovalTransferManagerContract,
+    PercentageTransferManagerContract,
+    VolumeRestrictionTMContract} from "@polymathnetwork/abi-wrappers";
 
 import { ERC20DividendCheckpoint,
     Module,
@@ -26,7 +31,12 @@ import { ERC20DividendCheckpoint,
     CappedSTO,
     CappedSTOFactory,
     USDTieredSTOFactory,
-    USDTieredSTO} from "@polymathnetwork/contract-artifacts";
+    USDTieredSTO,
+    CountTransferManager,
+    GeneralTransferManager,
+    ManualApprovalTransferManager,
+    PercentageTransferManager,
+    VolumeRestrictionTM} from "@polymathnetwork/contract-artifacts";
 import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
 export class ContractFactory {
@@ -153,6 +163,51 @@ export class ContractFactory {
   public async _getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract> {
         return new USDTieredSTOContract(
             (USDTieredSTO as any).abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getCountTransferManagerContract(address: string): Promise<CountTransferManagerContract> {
+        return new CountTransferManagerContract(
+            CountTransferManager.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getGeneralTransferManagerContract(address: string): Promise<GeneralTransferManagerContract> {
+        return new GeneralTransferManagerContract(
+            GeneralTransferManager.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getManualApprovalTransferManagerContract(address: string): Promise<ManualApprovalTransferManagerContract> {
+        return new ManualApprovalTransferManagerContract(
+            ManualApprovalTransferManager.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getPercentageTransferManagerContract(address: string): Promise<PercentageTransferManagerContract> {
+        return new PercentageTransferManagerContract(
+            PercentageTransferManager.abi,
+            address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
+        return new VolumeRestrictionTMContract(
+            VolumeRestrictionTM.abi,
             address,
             this._provider,
             this._contractDefaults,

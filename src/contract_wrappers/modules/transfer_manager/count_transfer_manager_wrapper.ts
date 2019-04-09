@@ -84,11 +84,11 @@ export class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    * Instantiate CountTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address of the GTM
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getCountTransferManagerContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<CountTransferManagerContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public unpause = async (params: TxParams) => {
@@ -175,14 +175,4 @@ export class CountTransferManagerWrapper extends ModuleWrapper {
     );
     return logs;
   }
-
-  private async _getCountTransferManagerContract(): Promise<CountTransferManagerContract> {
-    return new CountTransferManagerContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }
-  
