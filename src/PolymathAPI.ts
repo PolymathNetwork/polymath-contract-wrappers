@@ -185,7 +185,6 @@ export class PolymathAPI {
     );
     this.polyTokenFaucet = new PolyTokenFaucetWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
       this._contractFactory._getPolyTokenFaucetContract(),
     );
   }
