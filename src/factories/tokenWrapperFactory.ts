@@ -13,21 +13,16 @@ export class TokenWrapperFactory {
 
   private readonly _web3Wrapper: Web3Wrapper;
   private _contractFactory;
-  private _polymathRegistry: PolymathRegistryWrapper;
     /**
    * An instance of the SecurityTokenRegistryWrapper class containing methods
    * for interacting with SecurityTokenRegistry smart contract.
    */
   private _securityTokenRegistry: SecurityTokenRegistryWrapper;
 
-  constructor(web3Wrapper: Web3Wrapper, securityTokenRegistry: SecurityTokenRegistryWrapper, polymathRegistryWrapper: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, securityTokenRegistry: SecurityTokenRegistryWrapper, contractFactory: ContractFactory) {
     this._web3Wrapper = web3Wrapper;
     this._securityTokenRegistry = securityTokenRegistry;
-    this._polymathRegistry = polymathRegistryWrapper;
-    this._contractFactory = new ContractFactory(
-        web3Wrapper.getProvider(),
-        web3Wrapper.getContractDefaults(),
-        this._polymathRegistry);
+    this._contractFactory = contractFactory;
   }
 
     /**

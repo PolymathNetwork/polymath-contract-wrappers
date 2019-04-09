@@ -65,7 +65,6 @@ interface ChangeApprovalParams extends TxParams {
  */
 export class PolyTokenWrapper extends ERC20TokenWrapper {
   public abi: ContractAbi = PolyToken.abi;
-  protected _polymathRegistry: PolymathRegistryWrapper;
   protected _contract: Promise<PolyTokenContract>;
 
   /**
@@ -74,9 +73,8 @@ export class PolyTokenWrapper extends ERC20TokenWrapper {
    * @param contract
    * @param polymathRegistry The PolymathRegistryWrapper instance contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper, contract: Promise<PolyTokenContract>) {
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<PolyTokenContract>) {
     super(web3Wrapper, contract);
-    this._polymathRegistry = polymathRegistry;
     this._contract = contract;
   }
 

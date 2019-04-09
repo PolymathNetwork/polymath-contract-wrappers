@@ -41,15 +41,10 @@ export class ModuleWrapperFactory {
 
   private readonly _web3Wrapper: Web3Wrapper;
   private _contractFactory;
-  private _polymathRegistry: PolymathRegistryWrapper;
 
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
+  constructor(web3Wrapper: Web3Wrapper, contractFactory: ContractFactory) {
     this._web3Wrapper = web3Wrapper;
-    this._polymathRegistry = polymathRegistry;
-    this._contractFactory = new ContractFactory(
-        this._web3Wrapper.getProvider(),
-        this._web3Wrapper.getContractDefaults(),
-        this._polymathRegistry);
+    this._contractFactory = contractFactory;
   }
 
   public getModuleInstance: IGetModuleInstance = async (params: IGetModuleParams): Promise<any> => {

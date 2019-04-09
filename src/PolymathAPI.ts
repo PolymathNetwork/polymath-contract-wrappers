@@ -164,7 +164,6 @@ export class PolymathAPI {
     );
     this.polyToken = new PolyTokenWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
       this._contractFactory._getPolyTokenContract(),
     );
     this.moduleRegistry = new ModuleRegistryWrapper(
@@ -178,11 +177,11 @@ export class PolymathAPI {
     this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,
       this.securityTokenRegistry,
-      this.polymathRegistry,
+      this._contractFactory,
     );
     this.moduleFactory = new ModuleWrapperFactory(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory,
     );
     this.polyTokenFaucet = new PolyTokenFaucetWrapper(
       this._web3Wrapper,
