@@ -31,7 +31,7 @@ import {
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 import * as moment from 'moment';
-import { type } from 'os';
+import { bigNumberToDate, dateToBigNumber } from '../../utils/convert';
 
 interface IChangeExpiryLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
@@ -217,8 +217,8 @@ interface ModifyTickerParams extends TxParams {
   owner: string,
   ticker: string,
   tokenName: string,
-  registrationDate: BigNumber,
-  expiryDate: BigNumber,
+  registrationDate: Date,
+  expiryDate: Date,
   status: boolean,
 }
 
@@ -233,7 +233,7 @@ interface RemoveTickerParams extends TxParams {
  * @param newExpiry is the new expiry for newly generated tickers
  */
 interface ChangeExpiryLimitParams extends TxParams {
-  newExpiry: BigNumber,
+  newExpiry: Date,
 }
 
 /**
@@ -250,7 +250,7 @@ interface ModifySecurityTokenParams extends TxParams {
   owner: string,
   securityToken: string,
   tokenDetails: string,
-  deployedAt: BigNumber,
+  deployedAt: Date,
 }
 
 /**
@@ -296,13 +296,13 @@ interface SecurityTokenData {
   ticker: string;
   owner: string;
   tokenDetails: string;
-  deployedAt: BigNumber;
+  deployedAt: Date;
 }
 
 interface TickerDetails {
     owner: string;
-    registrationDate: BigNumber;
-    expiryDate: BigNumber;
+    registrationDate: Date;
+    expiryDate: Date;
     tokenName: string;
     status: boolean;
 }
@@ -332,6 +332,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public getTickersByOwner = async (params?: OwnerParams) => {
     const owner = (!_.isUndefined(params) && !_.isUndefined(params.owner)) ? params.owner : await this._getDefaultFromAddress();
+    assert.isETHAddressHex('owner', owner);
     const tickers = await (await this._contract).getTickersByOwner.callAsync(
       owner,
     );
@@ -342,12 +343,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @returns Returns the security token data by address
    */
   public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
+    assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     const result = await (await this._contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
     const typedResult: SecurityTokenData = {
       ticker: result[0],
       owner: result[1],
       tokenDetails: result[2],
-      deployedAt: result[3]
+      deployedAt: bigNumberToDate(result[3])
     };
     return typedResult;
   }
@@ -368,7 +370,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @returns Returns the owner and timestamp for a given ticker
    */
   public getTickerDetails = async (params: TokenNameParams) => {
-    assert.isString('tokenName', params.tokenName);
     return this._getTickerDetails(params.tokenName)
   }
 
@@ -386,6 +387,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerTicker = async (params: RegisterTickerParams) => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this._getDefaultFromAddress();
+    assert.isETHAddressHex('owner', owner);
     return (await this._contract).registerTicker.sendTransactionAsync(
       owner,
       params.ticker,
@@ -400,7 +402,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
-    assert.isString('ticker', params.ticker);
     return (await this._contract).transferTickerOwnership.sendTransactionAsync(
       params.newOwner,
       params.ticker,
@@ -457,7 +458,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public isTickerAvailable = async (params: TokenNameParams) => {
-    assert.isString('tokenName', params.tokenName);
     const result = await this._getTickerDetails(params.tokenName);
     return this._isTickerAvailable(result.registrationDate.toNumber(), result.expiryDate.toNumber(), result.status);
   }
@@ -467,7 +467,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public isTickerRegisteredByCurrentIssuer = async (params: TokenNameParams) => {
-    assert.isString('tokenName', params.tokenName);
     const result = await this._getTickerDetails(params.tokenName);
     if (this._isTickerAvailable(result.registrationDate.toNumber(), result.expiryDate.toNumber(), result.status)) {
       return false;
@@ -481,7 +480,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public isTokenLaunched = async (params: TokenNameParams) => {
-    assert.isString('tokenName', params.tokenName);
     const result = await this._getTickerDetails(params.tokenName);
     return result.status;
   }
@@ -490,12 +488,13 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
   public modifyTicker = async (params: ModifyTickerParams) => {
+    assert.isETHAddressHex('owner', params.owner);
     return (await this._contract).modifyTicker.sendTransactionAsync(
       params.owner,
       params.ticker,
       params.tokenName,
-      params.registrationDate,
-      params.expiryDate,
+      dateToBigNumber(params.registrationDate),
+      dateToBigNumber(params.expiryDate),
       params.status,
       params.txData,
       params.safetyFactor
@@ -518,7 +517,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
     return (await this._contract).changeExpiryLimit.sendTransactionAsync(
-      params.newExpiry,
+      dateToBigNumber(params.newExpiry),
       params.txData,
       params.safetyFactor
     );
@@ -534,7 +533,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.owner,
       params.securityToken,
       params.tokenDetails,
-      params.deployedAt,
+      dateToBigNumber(params.deployedAt),
       params.txData,
       params.safetyFactor
     );
@@ -722,8 +721,8 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
     const typedResult: TickerDetails = {
       owner: result[0],
-      registrationDate: result[1],
-      expiryDate: result[2],
+      registrationDate: bigNumberToDate(result[1]),
+      expiryDate: bigNumberToDate(result[2]),
       tokenName: result[3],
       status: result[4],
     };

@@ -32,7 +32,6 @@ import { FeatureRegistryWrapper } from './contract_wrappers/registries/feature_r
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
 import { PolyTokenFaucetWrapper } from 'contract_wrappers/tokens/poly_token_faucet_wrapper';
-import { BigNumber } from '@0x/utils';
 
 
 /**
@@ -110,6 +109,10 @@ export class PolymathAPI {
    */
   constructor(params: IApiConstructorParams) {
     assert.isWeb3Provider('provider', params.provider);
+    
+    if (!_.isUndefined(params.polymathRegistryAddress)) {
+      assert.isETHAddressHex('polymathRegistryAddress', params.polymathRegistryAddress)
+    }
 
     this._web3Wrapper = new Web3Wrapper(
       params.provider,
@@ -207,6 +210,7 @@ export class PolymathAPI {
    */
   public getBalance = async (params: IGetBalanceParams): Promise<BigNumber> => {
     const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    assert.isETHAddressHex('address', addr);
     return (await this._web3Wrapper.getBalanceInWeiAsync(addr));
   }
 
