@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     parser: '@typescript-eslint/parser', // Specifies the ESLint parser
     plugins: ['@typescript-eslint'],
@@ -17,5 +19,13 @@ module.exports = {
     rules: {
         // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
         // e.g. "@typescript-eslint/explicit-function-return-type": "off",
+    },
+    settings: {
+        'import/resolver': {
+            node: {
+                extensions: ['.js', '.ts'],
+                paths: [path.resolve(__dirname, 'src')],
+          },
+        },
     },
 };
