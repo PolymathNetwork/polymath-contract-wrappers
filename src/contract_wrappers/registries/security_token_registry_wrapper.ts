@@ -337,13 +337,6 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
   }
 
   /**
-   * @returns Returns the contract address
-   */
-  public async getAddress(): Promise<string> {
-    return (await this._contract).address;
-  }
-
-  /**
    * @returns Returns the security token data by address
    */
   public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
