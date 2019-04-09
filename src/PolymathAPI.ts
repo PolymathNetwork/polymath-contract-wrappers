@@ -160,7 +160,7 @@ export class PolymathAPI {
 
     this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getSecurityTokenRegistryContract(),
     );
     this.polyToken = new PolyTokenWrapper(
       this._web3Wrapper,
@@ -168,11 +168,11 @@ export class PolymathAPI {
     );
     this.moduleRegistry = new ModuleRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getModuleRegistryContract(),
     );
     this.featureRegistry = new FeatureRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getFeatureRegistryContract(),
     );
     this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,

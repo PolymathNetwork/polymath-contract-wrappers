@@ -17,7 +17,10 @@ import { ERC20DividendCheckpointContract,
     GeneralTransferManagerContract,
     ManualApprovalTransferManagerContract,
     PercentageTransferManagerContract,
-    VolumeRestrictionTMContract} from "@polymathnetwork/abi-wrappers";
+    VolumeRestrictionTMContract,
+    FeatureRegistryContract,
+    ModuleRegistryContract,
+    SecurityTokenRegistryContract} from "@polymathnetwork/abi-wrappers";
 
 import { ERC20DividendCheckpoint,
     Module,
@@ -36,7 +39,10 @@ import { ERC20DividendCheckpoint,
     GeneralTransferManager,
     ManualApprovalTransferManager,
     PercentageTransferManager,
-    VolumeRestrictionTM} from "@polymathnetwork/contract-artifacts";
+    VolumeRestrictionTM,
+    FeatureRegistry,
+    ModuleRegistry,
+    SecurityTokenRegistry} from "@polymathnetwork/contract-artifacts";
 import {PolymathRegistryWrapper} from '../contract_wrappers/registries/polymath_registry_wrapper';
 
 export class ContractFactory {
@@ -209,6 +215,33 @@ export class ContractFactory {
         return new VolumeRestrictionTMContract(
             VolumeRestrictionTM.abi,
             address,
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
+        return new FeatureRegistryContract(
+            FeatureRegistry.abi,
+            await this._polymathRegistry.getFeatureRegistryAddress(),
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
+        return new ModuleRegistryContract(
+            ModuleRegistry.abi,
+            await this._polymathRegistry.getModuleRegistryAddress(),
+            this._provider,
+            this._contractDefaults,
+        );
+    }
+
+    public async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
+        return new SecurityTokenRegistryContract(
+            (SecurityTokenRegistry as any).abi,
+            await this._polymathRegistry.getSecurityTokenRegistryAddress(),
             this._provider,
             this._contractDefaults,
         );
