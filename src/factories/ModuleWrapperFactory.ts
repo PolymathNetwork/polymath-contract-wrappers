@@ -39,7 +39,7 @@ interface IGetModuleInstance {
 export class ModuleWrapperFactory {
 
   private readonly _web3Wrapper: Web3Wrapper;
-  private _contractFactory;
+  private _contractFactory: ContractFactory;
 
   constructor(web3Wrapper: Web3Wrapper, contractFactory: ContractFactory) {
     this._web3Wrapper = web3Wrapper;

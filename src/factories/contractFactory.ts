@@ -39,7 +39,7 @@ import { ERC20DividendCheckpoint,
     GeneralTransferManager,
     ManualApprovalTransferManager,
     PercentageTransferManager,
-    VolumeRestrictionTM,
+    VolumeRestrictionTransferManager,
     FeatureRegistry,
     ModuleRegistry,
     SecurityTokenRegistry} from "@polymathnetwork/contract-artifacts";
@@ -213,7 +213,7 @@ export class ContractFactory {
 
     public async _getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
         return new VolumeRestrictionTMContract(
-            VolumeRestrictionTM.abi,
+            (VolumeRestrictionTransferManager as any).abi,
             address,
             this._provider,
             this._contractDefaults,

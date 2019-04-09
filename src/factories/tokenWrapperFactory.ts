@@ -11,7 +11,7 @@ import {ContractFactory} from './contractFactory';
 export class TokenWrapperFactory {
 
   private readonly _web3Wrapper: Web3Wrapper;
-  private _contractFactory;
+  private _contractFactory: ContractFactory;
     /**
    * An instance of the SecurityTokenRegistryWrapper class containing methods
    * for interacting with SecurityTokenRegistry smart contract.
