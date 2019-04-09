@@ -222,14 +222,6 @@ interface HolderIndividualRestrictionParams extends TxParams {
   holder: string,
 }
 
-interface IndividualRestriction {
-  allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
-  restrictionType: BigNumber
-}
-
 interface ExemptAddressesParams {
   index: BigNumber,
 }
@@ -345,18 +337,12 @@ interface GetIndividualBucketDetailsToUserParams {
   user: string,
 }
 
-interface GetIndividualBucketDetails {
-  lastTradedDayTime: BigNumber,
-  sumOfLastPeriod: BigNumber,
-  daysCovered: BigNumber,
-  dailyLastTradedDayTime: BigNumber,
-  lastTradedTimestamp: BigNumber
-}
-
 interface GetTotalTradedByUserParams {
   user: string,
   at: BigNumber,
 }
+
+//// Return Types ////
 
 interface GetRestrictedData {
   allAddresses: string,
@@ -366,6 +352,24 @@ interface GetRestrictedData {
   endTime: BigNumber,
   typeOfRestriction: BigNumber
 }
+
+interface GetIndividualBucketDetails {
+  lastTradedDayTime: BigNumber,
+  sumOfLastPeriod: BigNumber,
+  daysCovered: BigNumber,
+  dailyLastTradedDayTime: BigNumber,
+  lastTradedTimestamp: BigNumber
+}
+
+interface IndividualRestriction {
+  allowedTokens: BigNumber,
+  startTime: BigNumber,
+  rollingPeriodInDays: BigNumber,
+  endTime: BigNumber,
+  restrictionType: BigNumber
+}
+
+//// End of return types ////
 
 /**
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.

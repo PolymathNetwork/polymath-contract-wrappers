@@ -215,7 +215,6 @@ export type GenericModuleContract =
   ManualApprovalTransferManagerContract |
   CountTransferManagerContract |
   PercentageTransferManagerContract |
-  PercentageTransferManagerContract |
   VolumeRestrictionTMContract;
 
 export type STOBaseContract = 
