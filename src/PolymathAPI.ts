@@ -17,7 +17,8 @@ import {
   CountTransferManager,
   PercentageTransferManager,
   EtherDividendCheckpoint,
-  PolyTokenFaucet
+  VolumeRestrictionTransferManager,
+  PolyTokenFaucet,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -136,6 +137,7 @@ export class PolymathAPI {
       CountTransferManager,
       PercentageTransferManager,
       EtherDividendCheckpoint,
+      VolumeRestrictionTransferManager,
       PolyTokenFaucet,
     ];
 
