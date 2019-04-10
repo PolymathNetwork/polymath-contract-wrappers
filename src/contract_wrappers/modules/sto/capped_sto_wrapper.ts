@@ -25,6 +25,8 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { STOWrapper } from './sto_wrapper';
+import { bigNumberToDate, bigNumberToNumber,
+} from '../../../utils/convert';
 
 interface ITokenPurchaseSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase,
@@ -106,9 +108,9 @@ interface BuyTokensWithPolyParams extends TxParams {
 //// Return types ////
 interface CappedSTODetails {
   /** Timestamp at which offering gets start. */
-  startTime: BigNumber,
+  startTime: Date,
   /** Timestamp at which offering ends. */
-  endTime: BigNumber,
+  endTime: Date,
   /** Number of token base units this STO will be allowed to sell to investors. */
   cap: BigNumber,
   /** Token units a buyer gets(multiplied by 10^18) per wei / base unit of POLY */
@@ -116,7 +118,7 @@ interface CappedSTODetails {
   /** Amount of funds raised */
   fundsRaised: BigNumber,
   /** Number of individual investors this STO have. */
-  investorCount: BigNumber,
+  investorCount: number,
   /** Amount of tokens get sold. */
   totalTokensSold: BigNumber,
   /** Boolean value to justify whether the fund raise type is POLY or not, i.e true for POLY. */
@@ -203,12 +205,12 @@ export class CappedSTOWrapper extends STOWrapper {
   public getSTODetails = async() => {
     const result = await (await this._contract).getSTODetails.callAsync();
     const typedResult: CappedSTODetails = {
-      startTime: result[0],
-      endTime: result[1],
+      startTime: bigNumberToDate(result[0]),
+      endTime: bigNumberToDate(result[1]),
       cap: result[2],
       rate: result[3],
       fundsRaised: result[4],
-      investorCount: result[5],
+      investorCount: bigNumberToNumber(result[5]),
       totalTokensSold: result[6],
       isRaisedInPoly: result[7],
     }
