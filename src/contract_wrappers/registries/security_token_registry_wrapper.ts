@@ -31,7 +31,7 @@ import {
 } from '../../types';
 import { schemas } from '@0x/json-schemas';
 import * as moment from 'moment';
-import { bigNumberToDate, dateToBigNumber } from '../../utils/convert';
+import {bigNumberToDate, dateToBigNumber, numberToBigNumber} from '../../utils/convert';
 
 interface IChangeExpiryLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
@@ -261,7 +261,7 @@ interface TransferOwnershipParams extends TxParams {
 }
 
 interface ChangeFeeParams extends TxParams {
-  newFee: BigNumber,
+  newFee: number,
 }
 
 /**
@@ -593,7 +593,7 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
     return (await this._contract).changeSecurityLaunchFee.sendTransactionAsync(
-      params.newFee,
+      numberToBigNumber(params.newFee),
       params.txData,
       params.safetyFactor
     );
