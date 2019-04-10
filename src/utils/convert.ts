@@ -32,3 +32,9 @@ export function dateArrayToBigNumberArray(value: Date[]) {
     return dateToBigNumber(x);
   });
 }
+
+export function numberArrayToBigNumberArray(value: number[]) {
+  return value.map<BigNumber>((x) => {
+    return numberToBigNumber(x);
+  });
+}

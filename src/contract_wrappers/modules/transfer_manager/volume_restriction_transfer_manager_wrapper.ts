@@ -34,7 +34,14 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-  
+import {
+  bigNumberToDate, bigNumberToNumber,
+  dateArrayToBigNumberArray,
+  dateToBigNumber,
+  numberArrayToBigNumberArray,
+  numberToBigNumber
+} from '../../../utils/convert';
+
 interface IChangedExemptWalletListSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList,
   callback: EventCallback<VolumeRestrictionTMChangedExemptWalletListEventArgs>,
@@ -223,7 +230,7 @@ interface HolderIndividualRestrictionParams extends TxParams {
 }
 
 interface ExemptAddressesParams {
-  index: BigNumber,
+  index: number,
 }
 
 interface ChangeExemptWalletListParams extends TxParams {
@@ -234,49 +241,49 @@ interface ChangeExemptWalletListParams extends TxParams {
 interface AddIndividualRestrictionParams extends TxParams {
   holder: string,
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface AddIndividualDailyRestrictionParams extends TxParams {
   holder: string,
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface AddIndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[],
   allowedTokens: BigNumber[],
-  startTimes: BigNumber[],
-  endTimes: BigNumber[],
+  startTimes: Date[],
+  endTimes: Date[],
   restrictionTypes: Array<number|BigNumber>,
 }
 
 interface AddIndividualRestrictionMultiParams extends TxParams {
   holders: string[],
   allowedTokens: BigNumber[],
-  startTimes: BigNumber[],
-  rollingPeriodInDays: BigNumber[],
-  endTimes: BigNumber[],
+  startTimes: Date[],
+  rollingPeriodInDays: number[],
+  endTimes: Date[],
   restrictionTypes: Array<number|BigNumber>,
 }
 
 interface AddDefaultRestrictionParams extends TxParams {
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface AddDefaultDailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
@@ -287,49 +294,49 @@ interface IndividualRestrictionMultiParams extends TxParams {
 interface ModifyIndividualRestrictionParams extends TxParams {
   holder: string,
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface ModifyIndividualDailyRestrictionParams extends TxParams {
   holder: string,
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface ModifyIndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[],
   allowedTokens: BigNumber[],
-  startTimes: BigNumber[],
-  endTimes: BigNumber[],
+  startTimes: Date[],
+  endTimes: Date[],
   restrictionTypes: Array<number|BigNumber>,
 }
 
 interface ModifyIndividualRestrictionMultiParams extends TxParams {
   holders: string[],
   allowedTokens: BigNumber[],
-  startTimes: BigNumber[],
-  rollingPeriodInDays: BigNumber[],
-  endTimes: BigNumber[],
+  startTimes: Date[],
+  rollingPeriodInDays: number[],
+  endTimes: Date[],
   restrictionTypes: Array<number|BigNumber>,
 }
 
 interface ModifyDefaultRestrictionParams extends TxParams {
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
 interface ModifyDefaultDailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  endTime: Date,
   restrictionType: number|BigNumber,
 }
 
@@ -339,7 +346,7 @@ interface GetIndividualBucketDetailsToUserParams {
 
 interface GetTotalTradedByUserParams {
   user: string,
-  at: BigNumber,
+  at: Date,
 }
 
 //// Return Types ////
@@ -347,26 +354,26 @@ interface GetTotalTradedByUserParams {
 interface GetRestrictedData {
   allAddresses: string,
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
   typeOfRestriction: BigNumber
 }
 
 interface GetIndividualBucketDetails {
-  lastTradedDayTime: BigNumber,
+  lastTradedDayTime: Date,
   sumOfLastPeriod: BigNumber,
-  daysCovered: BigNumber,
-  dailyLastTradedDayTime: BigNumber,
-  lastTradedTimestamp: BigNumber
+  daysCovered: number,
+  dailyLastTradedDayTime: Date,
+  lastTradedTimestamp: Date
 }
 
 interface IndividualRestriction {
   allowedTokens: BigNumber,
-  startTime: BigNumber,
-  rollingPeriodInDays: BigNumber,
-  endTime: BigNumber,
-  restrictionType: BigNumber
+  startTime: Date,
+  rollingPeriodInDays: number,
+  endTime: Date,
+  restrictionType: number|BigNumber
 }
 
 //// End of return types ////
@@ -424,9 +431,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     );
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
-      startTime: result[1],
-      rollingPeriodInDays: result[2],
-      endTime: result[3],
+      startTime: bigNumberToDate(result[1]),
+      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      endTime: bigNumberToDate(result[3]),
       restrictionType: result[4]
     }
     return typedResult
@@ -436,9 +443,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this._contract).defaultRestriction.callAsync();
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
-      startTime: result[1],
-      rollingPeriodInDays: result[2],
-      endTime: result[3],
+      startTime: bigNumberToDate(result[1]),
+      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      endTime: bigNumberToDate(result[3]),
       restrictionType: result[4]
     }
     return typedResult
@@ -448,9 +455,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this._contract).defaultDailyRestriction.callAsync();
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
-      startTime: result[1],
-      rollingPeriodInDays: result[2],
-      endTime: result[3],
+      startTime: bigNumberToDate(result[1]),
+      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      endTime: bigNumberToDate(result[3]),
       restrictionType: result[4]
     }
     return typedResult
@@ -458,7 +465,7 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
 
   public exemptAddresses = async (params: ExemptAddressesParams) => {
     return await (await this._contract).exemptAddresses.callAsync(
-      params.index,
+      numberToBigNumber(params.index),
     );
   }
 
@@ -468,9 +475,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     );
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
-      startTime: result[1],
-      rollingPeriodInDays: result[2],
-      endTime: result[3],
+      startTime: bigNumberToDate(result[1]),
+      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      endTime: bigNumberToDate(result[3]),
       restrictionType: result[4]
     }
     return typedResult
@@ -489,9 +496,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).addIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
-      params.startTime,
-      params.rollingPeriodInDays,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      numberToBigNumber(params.rollingPeriodInDays),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -502,8 +509,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -514,8 +521,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).addIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
-      params.startTimes,
-      params.endTimes,
+      dateArrayToBigNumberArray(params.startTimes),
+      dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
       params.txData,
       params.safetyFactor,
@@ -526,9 +533,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).addIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
-      params.startTimes,
-      params.rollingPeriodInDays,
-      params.endTimes,
+      dateArrayToBigNumberArray(params.startTimes),
+      numberArrayToBigNumberArray(params.rollingPeriodInDays),
+      dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
       params.txData,
       params.safetyFactor,
@@ -538,9 +545,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   public addDefaultRestriction = async (params: AddDefaultRestrictionParams) => {
     return (await this._contract).addDefaultRestriction.sendTransactionAsync(
       params.allowedTokens,
-      params.startTime,
-      params.rollingPeriodInDays,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      numberToBigNumber(params.rollingPeriodInDays),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -550,8 +557,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   public addDefaultDailyRestriction = async (params: AddDefaultDailyRestrictionParams) => {
     return (await this._contract).addDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -608,9 +615,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
-      params.startTime,
-      params.rollingPeriodInDays,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      numberToBigNumber(params.rollingPeriodInDays),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -621,8 +628,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -633,8 +640,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
-      params.startTimes,
-      params.endTimes,
+      dateArrayToBigNumberArray(params.startTimes),
+      dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
       params.txData,
       params.safetyFactor,
@@ -645,9 +652,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
-      params.startTimes,
-      params.rollingPeriodInDays,
-      params.endTimes,
+      dateArrayToBigNumberArray(params.startTimes),
+      numberArrayToBigNumberArray(params.rollingPeriodInDays),
+      dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
       params.txData,
       params.safetyFactor,
@@ -657,9 +664,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   public modifyDefaultRestriction = async (params: ModifyDefaultRestrictionParams) => {
     return (await this._contract).modifyDefaultRestriction.sendTransactionAsync(
       params.allowedTokens,
-      params.startTime,
-      params.rollingPeriodInDays,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      numberToBigNumber(params.rollingPeriodInDays),
+      dateToBigNumber( params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -669,8 +676,8 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   public modifyDefaultDailyRestriction = async (params: ModifyDefaultDailyRestrictionParams) => {
     return (await this._contract).modifyDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.restrictionType,
       params.txData,
       params.safetyFactor,
@@ -682,11 +689,11 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
       params.user,
     );
     const typedResult: GetIndividualBucketDetails = {
-      lastTradedDayTime: result[0],
+      lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: result[1],
-      daysCovered: result[2],
-      dailyLastTradedDayTime: result[3],
-      lastTradedTimestamp: result[4]
+      daysCovered: bigNumberToNumber(result[2]),
+      dailyLastTradedDayTime: bigNumberToDate(result[3]),
+      lastTradedTimestamp: bigNumberToDate(result[4])
     }
     return typedResult
   }
@@ -696,11 +703,11 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
       params.user,
     );
     const typedResult: GetIndividualBucketDetails = {
-      lastTradedDayTime: result[0],
+      lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: result[1],
-      daysCovered: result[2],
-      dailyLastTradedDayTime: result[3],
-      lastTradedTimestamp: result[4]
+      daysCovered: bigNumberToNumber(result[2]),
+      dailyLastTradedDayTime: bigNumberToDate(result[3]),
+      lastTradedTimestamp: bigNumberToDate(result[4])
     }
     return typedResult
   }
@@ -708,7 +715,7 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   public getTotalTradedByUser = async (params: GetTotalTradedByUserParams) => {
     return await (await this._contract).getTotalTradedByUser.callAsync(
       params.user,
-      params.at,
+      dateToBigNumber(params.at),
     );
   }
 
@@ -727,9 +734,9 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
       const getRestrictedData: GetRestrictedData = {
         allAddresses: result[0][i],
         allowedTokens: result[1][i],
-        startTime: result[2][i],
-        rollingPeriodInDays: result[3][i],
-        endTime: result[4][i],
+        startTime: bigNumberToDate(result[2][i]),
+        rollingPeriodInDays: bigNumberToNumber(result[3][i]),
+        endTime: bigNumberToDate(result[4][i]),
         typeOfRestriction: result[5][i]
       }
       typedResult.push(getRestrictedData);
