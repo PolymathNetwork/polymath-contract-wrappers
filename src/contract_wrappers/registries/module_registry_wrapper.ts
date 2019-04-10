@@ -10,7 +10,6 @@ import {
   ModuleRegistryModuleRemovedEventArgs,
   ModuleRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
@@ -23,7 +22,8 @@ import {
   TxPayableParams,
   TxParams,
   ISubscribe,
-  IGetLogs
+  IGetLogs,
+  ModuleType
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { bytes32ToString } from '../../utils/convert';
@@ -135,22 +135,17 @@ interface VerifyModuleParams extends TxParams {
   verified: boolean,
 }
 
-interface GetTagsByTypeAndTokenParams {
-  moduleType: number|BigNumber,
-  securityToken: string,
-}
-
-interface ModuleTypeParams {
-  moduleType: number,
-}
-
 /**
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
  */
-interface GetModulesByTypeAndTokenParams {
-  moduleType: number|BigNumber,
+interface TypeAndTokenParams {
+  moduleType: ModuleType,
   securityToken: string,
+}
+
+interface ModuleTypeParams {
+  moduleType: ModuleType,
 }
 
 interface ReclaimERC20Params extends TxParams {
@@ -281,7 +276,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
     );
   }
 
-  public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams) => {
+  public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
     const result = await (await this._contract).getTagsByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
@@ -334,7 +329,7 @@ export class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams) => {
+  public getModulesByTypeAndToken = async (params: TypeAndTokenParams) => {
     return await (await this._contract).getModulesByTypeAndToken.callAsync(
       params.moduleType,
       params.securityToken,
