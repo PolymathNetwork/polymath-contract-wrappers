@@ -43,13 +43,13 @@ import {
   ISubscribeAsyncParams,
   EventCallback,
   IGetLogs,
-  ISubscribe
+  ISubscribe,
+  ModuleType
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ERC20TokenWrapper } from './erc20_wrapper';
-import { stringToBytes32, bytes32ToString } from '../../utils/convert';
-import { string } from 'prop-types';
+import { stringToBytes32, numberToBigNumber, dateToBigNumber } from '../../utils/convert';
 
 const NO_MODULE_DATA = "0x0000000000000000";
 
@@ -283,7 +283,7 @@ interface IGetSecurityTokenLogsAsyncParams extends IGetLogs {
  * @param type type of the module
  */
 interface ModuleTypeParams {
-  type: number;
+  type: ModuleType;
 }
 
 interface ModuleAddressParams {
@@ -343,12 +343,12 @@ interface ChangeGranularityParams extends TxParams {
 }
 
 interface CheckpointIdParams {
-  checkpointId: BigNumber,
+  checkpointId: number,
 }
 
 interface IterateInvestorsParams {
-  start: BigNumber,
-  end: BigNumber,
+  start: Date,
+  end: Date,
 }
 
 interface TransferWithDataParams extends TxParams {
@@ -397,7 +397,7 @@ interface BurnFromWithDataParams extends TxParams {
 
 interface BalanceOfAtParams {
   investor: string,
-  checkpointId: BigNumber,
+  checkpointId: number,
 }
 
 interface SetControllerParams extends TxParams {
@@ -665,14 +665,14 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public getInvestorsAt = async (params: CheckpointIdParams) => {
     return await (await this._contract).getInvestorsAt.callAsync(
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
     );
   }
 
   public iterateInvestors = async (params: IterateInvestorsParams) => {
     return await (await this._contract).iterateInvestors.callAsync(
-      params.start,
-      params.end,
+      dateToBigNumber(params.start),
+      dateToBigNumber(params.end),
     );
   }
 
@@ -790,14 +790,14 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
     return await (await this._contract).totalSupplyAt.callAsync(
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
     );
   }
 
   public balanceOfAt = async (params: BalanceOfAtParams)=> {
     return await (await this._contract).balanceOfAt.callAsync(
       params.investor,
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
     );
   }
 

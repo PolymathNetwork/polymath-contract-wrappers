@@ -6,7 +6,6 @@ import {
   FeatureRegistryOwnershipRenouncedEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';

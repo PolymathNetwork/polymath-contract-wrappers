@@ -18,3 +18,11 @@ export function bigNumberToDate(value: BigNumber) {
 export function dateToBigNumber(value: Date) {
   return new BigNumber(parseInt((value.getTime() / 1000).toFixed(0)))
 }
+
+export function numberToBigNumber(value: number) {
+  return new BigNumber(value)
+}
+
+export function bigNumberToNumber(value: BigNumber) {
+  return value.toNumber();
+}
