@@ -30,6 +30,7 @@ import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
 import { type } from 'os';
+import {bigNumberToDate, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
 
 interface IChangeIssuanceAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress,
@@ -146,9 +147,9 @@ interface IGetGeneralTransferManagerLogsAsyncParams extends IGetLogs {
   (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs>>>,
   (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>>>,
 }
-  
+
 interface InvestorIndexParams {
-  investorIndex: BigNumber,
+  investorIndex: number,
 }
 
 interface InvestorAddressParams {
@@ -157,12 +158,12 @@ interface InvestorAddressParams {
 
 interface NonceMapParams {
   address: string,
-  nonce: BigNumber,
+  nonce: number,
 }
 
 interface ChangeDefaultsParams extends TxParams {
-  defaultFromTime: BigNumber,
-  defaultToTime: BigNumber,
+  defaultFromTime: Date,
+  defaultToTime: Date,
 }
 
 interface ChangeIssuanceAddressParams extends TxParams {
@@ -199,21 +200,21 @@ interface VerifyTransferParams extends TxParams {
 
 interface ModifyWhitelistParams extends TxParams {
   investor: string,
-  fromTime: BigNumber,
-  toTime: BigNumber,
-  expiryTime: BigNumber,
+  fromTime: Date,
+  toTime: Date,
+  expiryTime: Date,
   canBuyFromSTO: boolean,
 }
 
 interface ModifyWhitelistSignedParams extends TxParams {
   investor: string,
-  fromTime: BigNumber,
-  toTime: BigNumber,
-  expiryTime: BigNumber,
+  fromTime: Date,
+  toTime: Date,
+  expiryTime: Date,
   canBuyFromSTO: boolean,
-  validFrom: BigNumber,
-  validTo: BigNumber,
-  nonce: BigNumber,
+  validFrom: Date,
+  validTo: Date,
+  nonce: number,
   v: number|BigNumber,
   r: string,
   s: string,
@@ -226,18 +227,18 @@ interface GetInvestorsDataParams {
 //// Return types ////
 interface TimeRestriction {
   /** The moment when the sale lockup period ends and the investor can freely sell or transfer away their tokens */
-  canSendAfter: BigNumber, 
+  canSendAfter: Date,
   /** The moment when the purchase lockup period ends and the investor can freely purchase or receive from others */
-  canReceiveAfter: BigNumber, 
+  canReceiveAfter: Date,
   /** The moment till investors KYC will be validated. After that investor need to do re-KYC */
-  expiryTime: BigNumber, 
+  expiryTime: Date,
   /** Used to know whether the investor is restricted investor or not */
-  canBuyFromSTO: boolean, 
+  canBuyFromSTO: boolean,
 }
 
 interface Defaults {
-  canSendAfter: BigNumber,
-  canReceiveAfter: BigNumber;
+  canSendAfter: Date,
+  canReceiveAfter: Date;
 }
 
 interface WhitelistData {
@@ -280,7 +281,7 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public investors = async (params: InvestorIndexParams) => {
     return await (await this._contract).investors.callAsync(
-      params.investorIndex,
+      numberToBigNumber(params.investorIndex),
     );
   }
 
@@ -300,9 +301,9 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.investorAddress,
     );
     const typedResult: TimeRestriction = {
-      canSendAfter: result[0], 
-      canReceiveAfter: result[1], 
-      expiryTime: result[2], 
+      canSendAfter: bigNumberToDate(result[0]),
+      canReceiveAfter: bigNumberToDate(result[1]),
+      expiryTime: bigNumberToDate(result[2]),
       canBuyFromSTO: result[3].toNumber() === 1
     }
     return typedResult;
@@ -311,7 +312,7 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
   public nonceMap = async (params: NonceMapParams) => {
     return await (await this._contract).nonceMap.callAsync(
       params.address,
-      params.nonce,
+      numberToBigNumber(params.nonce),
     );
   }
 
@@ -334,16 +335,16 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
   public defaults = async () => {
     const result = await (await this._contract).defaults.callAsync();
     const typedResult: Defaults = {
-      canSendAfter: result[0],
-      canReceiveAfter: result[1]
+      canSendAfter: bigNumberToDate(result[0]),
+      canReceiveAfter: bigNumberToDate(result[1]),
     }
     return typedResult;
   }
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
     return (await this._contract).changeDefaults.sendTransactionAsync(
-      params.defaultFromTime,
-      params.defaultToTime,
+      dateToBigNumber(params.defaultFromTime),
+      dateToBigNumber(params.defaultToTime),
       params.txData,
       params.safetyFactor
     );
@@ -412,9 +413,9 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
     return (await this._contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
-      params.fromTime,
-      params.toTime,
-      params.expiryTime,
+      dateToBigNumber(params.fromTime),
+      dateToBigNumber(params.toTime),
+      dateToBigNumber(params.expiryTime),
       params.canBuyFromSTO,
       params.txData,
       params.safetyFactor
@@ -424,18 +425,18 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
     return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
       params.investor,
-      params.fromTime,
-      params.toTime,
-      params.expiryTime,
+      dateToBigNumber(params.fromTime),
+      dateToBigNumber(params.toTime),
+      dateToBigNumber(params.expiryTime),
       params.canBuyFromSTO,
-      params.validFrom,
-      params.validTo,
-      params.nonce,
+      dateToBigNumber(params.validFrom),
+      dateToBigNumber(params.validTo),
+      numberToBigNumber(params.nonce),
       params.v,
       params.r,
       params.s,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
   }
 
@@ -450,10 +451,10 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
       const whitelistData: WhitelistData = {
         investor: result[0][i],
         timeRestriction: {
-          canSendAfter: result[1][i], 
-          canReceiveAfter: result[2][i], 
-          expiryTime: result[3][i], 
-          canBuyFromSTO: result[4][i]
+          canSendAfter: bigNumberToDate(result[1][i]),
+          canReceiveAfter: bigNumberToDate(result[2][i]),
+          expiryTime: bigNumberToDate(result[3][i]),
+          canBuyFromSTO: result[4][i],
         }
       }
       typedResult.push(whitelistData);
@@ -470,10 +471,10 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
       const whitelistData: WhitelistData = {
         investor: params.investors[i],
         timeRestriction: {
-          canSendAfter: result[0][i], 
-          canReceiveAfter: result[1][i], 
-          expiryTime: result[2][i], 
-          canBuyFromSTO: result[3][i]
+          canSendAfter: bigNumberToDate(result[0][i]),
+          canReceiveAfter: bigNumberToDate(result[1][i]),
+          expiryTime: bigNumberToDate(result[2][i]),
+          canBuyFromSTO: result[3][i],
         }
       }
       typedResult.push(whitelistData);
