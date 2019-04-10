@@ -26,3 +26,9 @@ export function numberToBigNumber(value: number) {
 export function bigNumberToNumber(value: BigNumber) {
   return value.toNumber();
 }
+
+export function dateArrayToBigNumberArray(value: Date[]) {
+  return value.map<BigNumber>((x) => {
+    return dateToBigNumber(x);
+  });
+}
