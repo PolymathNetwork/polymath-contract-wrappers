@@ -116,17 +116,15 @@ interface IGetCappedSTOFactoryLogsAsyncParams extends IGetLogs {
 export class CappedSTOFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = CappedSTOFactory.abi;
   protected _contract: Promise<CappedSTOFactoryContract>;
-  private _polymathRegistry: PolymathRegistryWrapper;
-  
+
   /**
    * Instantiate CappedSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getCappedSTOFactoryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOFactoryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -177,16 +175,5 @@ export class CappedSTOFactoryWrapper extends ContractWrapper {
         CappedSTOFactory.abi,
     );
     return logs;
-  }
-
-  private async _getCappedSTOFactoryContract(): Promise<CappedSTOFactoryContract> {
-    return new CappedSTOFactoryContract(
-      this.abi,
-      await this._polymathRegistry.getAddress({
-        contractName: 'CappedSTOFactory',
-      }),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

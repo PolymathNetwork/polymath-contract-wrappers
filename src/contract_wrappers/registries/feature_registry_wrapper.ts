@@ -85,17 +85,15 @@ interface SetFeatureStatusParams extends TxParams {
 export class FeatureRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = FeatureRegistry.abi;
   protected _contract: Promise<FeatureRegistryContract>;
-  private _polymathRegistry: PolymathRegistryWrapper;
-  
+
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getFeatureRegistryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<FeatureRegistryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -181,14 +179,5 @@ export class FeatureRegistryWrapper extends ContractWrapper {
         FeatureRegistry.abi,
     );
     return logs;
-  }
-
-  private async _getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
-    return new FeatureRegistryContract(
-      this.abi,
-      await this._polymathRegistry.getFeatureRegistryAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

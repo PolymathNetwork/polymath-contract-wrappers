@@ -16,7 +16,6 @@ interface TakeFeeParams extends TxParams {
  */
 export class ModuleWrapper extends ContractWrapper {
   public abi: ContractAbi = Module.abi;
-  protected _address: string;
   protected _contract: Promise<GenericModuleContract>;
   public getLogsAsync: IGetLogs | undefined;
   public subscribeAsync: ISubscribe | undefined;
@@ -24,12 +23,11 @@ export class ModuleWrapper extends ContractWrapper {
   /**
    * Instantiate GeneralPermissionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The module contract instance address
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper);
-    this._address = address;
-    this._contract = this._getModuleContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<GenericModuleContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public getInitFunction = async () => {
@@ -57,15 +55,6 @@ export class ModuleWrapper extends ContractWrapper {
       params.amount,
       params.txData,
       params.safetyFactor
-    );
-  }
-
-  private async _getModuleContract(): Promise<ModuleContract> {
-    return new ModuleContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
     );
   }
 }

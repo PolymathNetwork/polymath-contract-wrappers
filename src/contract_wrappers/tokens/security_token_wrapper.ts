@@ -492,11 +492,11 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getSecurityTokenContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<SecurityTokenContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -1055,14 +1055,5 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
         (SecurityToken as any).abi,
     );
     return logs;
-  }
-
-  private async _getSecurityTokenContract(): Promise<SecurityTokenContract> {
-    return new SecurityTokenContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }
