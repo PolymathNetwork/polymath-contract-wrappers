@@ -314,17 +314,15 @@ interface TickerDetails {
 export class SecurityTokenRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
   protected _contract: Promise<SecurityTokenRegistryContract>;
-  private _polymathRegistry: PolymathRegistryWrapper;
-  
+
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getSecurityTokenRegistryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<SecurityTokenRegistryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -728,14 +726,4 @@ export class SecurityTokenRegistryWrapper extends ContractWrapper {
     };
     return typedResult;
   }
-
-  private async _getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
-    return new SecurityTokenRegistryContract(
-      this.abi,
-      await this._polymathRegistry.getSecurityTokenRegistryAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
-
 }

@@ -16,7 +16,9 @@
           "single",
           "avoid-escape",
           "avoid-template"
-      ]
+      ],
+    "no-console": false
   },
   "rulesDirectory": []
+
 }

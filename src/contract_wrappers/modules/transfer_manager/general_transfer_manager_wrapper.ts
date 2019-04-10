@@ -256,11 +256,11 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Instantiate GeneralTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address of the GTM
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getGeneralTransferManagerContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public allowAllBurnTransfers = async () => {
@@ -523,14 +523,4 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
     return logs;
   }
-
-  private async _getGeneralTransferManagerContract(): Promise<GeneralTransferManagerContract> {
-    return new GeneralTransferManagerContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }
-  

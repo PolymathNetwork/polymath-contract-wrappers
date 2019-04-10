@@ -174,17 +174,15 @@ interface TagsByModule {
 export class ModuleRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleRegistry.abi;
   protected _contract: Promise<ModuleRegistryContract>;
-  private _polymathRegistry: PolymathRegistryWrapper;
 
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getModuleRegistryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleRegistryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public getBytes32Value = async (params: GetValueByVariableParams) => {
@@ -429,14 +427,5 @@ export class ModuleRegistryWrapper extends ContractWrapper {
         ModuleRegistry.abi,
     );
     return logs;
-  }
-
-  private async _getModuleRegistryContract(): Promise<ModuleRegistryContract> {
-    return new ModuleRegistryContract(
-      this.abi,
-      await this._polymathRegistry.getModuleRegistryAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

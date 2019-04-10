@@ -176,11 +176,11 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
   /**
    * Instantiate ManualApprovalTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address of the GTM
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getManualApprovalTransferManagerContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ManualApprovalTransferManagerContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public unpause = async (params: TxParams) => {
@@ -394,14 +394,4 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
     );
     return logs;
   }
-
-  private async _getManualApprovalTransferManagerContract(): Promise<ManualApprovalTransferManagerContract> {
-    return new ManualApprovalTransferManagerContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }
-  

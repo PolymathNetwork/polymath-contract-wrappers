@@ -116,16 +116,14 @@ interface IGetUSDTieredSTOFactoryLogsAsyncParams extends IGetLogs {
 export class USDTieredSTOFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = USDTieredSTOFactory.abi;
   protected _contract: Promise<USDTieredSTOFactoryContract>;
-  private _polymathRegistry: PolymathRegistryWrapper;
   /**
    * Instantiate USDTieredSTOFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getUSDTieredSTOFactoryContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOFactoryContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -176,16 +174,5 @@ export class USDTieredSTOFactoryWrapper extends ContractWrapper {
         USDTieredSTOFactory.abi,
     );
     return logs;
-  }
-
-  private async _getUSDTieredSTOFactoryContract(): Promise<USDTieredSTOFactoryContract> {
-    return new USDTieredSTOFactoryContract(
-      this.abi,
-      await this._polymathRegistry.getAddress({
-        contractName: 'USDTieredSTOFactory',
-      }),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }
