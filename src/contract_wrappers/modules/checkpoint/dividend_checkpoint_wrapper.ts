@@ -5,14 +5,19 @@ import {
   TxParams,
   DividendCheckpointBaseContract,
 } from '../../../types';
+import {
+  numberToBigNumber,
+  dateToBigNumber,
+  bigNumberToDate,
+} from '../../../utils/convert';
 import { ModuleWrapper } from '../module_wrapper';
 
 interface DividendIndexParams {
-  dividendIndex: BigNumber,
+  dividendIndex: number,
 }
 
 interface CheckpointIdParams {
-  checkpointId: BigNumber,
+  checkpointId: number,
 }
 
 interface InvestorParams {
@@ -20,13 +25,13 @@ interface InvestorParams {
 }
 
 interface CalculateDividendParams {
-  dividendIndex: BigNumber,
+  dividendIndex: number,
   payee: string,
 }
 
 interface InvestorStatus {
   investor: string,
-  dividendIndex: BigNumber,
+  dividendIndex: number,
 }
 
 interface ChangeWalletParams extends TxParams {
@@ -52,24 +57,24 @@ interface SetWithholdingFixedParams extends TxParams {
 }
 
 interface PushDividendPaymentToAddressesParams extends TxParams {
-  dividendIndex: BigNumber,
+  dividendIndex: number,
   payees: string[],
 }
 
 interface PushDividendPaymentParams extends TxParams {
-  dividendIndex: BigNumber,
-  start: BigNumber,
-  iterations: BigNumber,
+  dividendIndex: number,
+  start: Date,
+  iterations: number,
 }
 
 interface DividendIndexTxParams extends TxParams {
-  dividendIndex: BigNumber,
+  dividendIndex: number,
 }
 
 interface UpdateDividendDatesParams extends TxParams {
-  dividendIndex: BigNumber,
-  maturity: BigNumber,
-  expiry: BigNumber,
+  dividendIndex: number,
+  maturity: Date,
+  expiry: Date,
 }
 
 //// Return types ////
@@ -77,15 +82,15 @@ interface UpdateDividendDatesParams extends TxParams {
 interface Dividend {
   checkpointId: number,
   /** Time at which the dividend was created */
-  created: BigNumber,
+  created: Date,
   /** Time after which dividend can be claimed - set to 0 to bypass */
-  maturity: BigNumber, 
+  maturity: Date, 
   /** 
    * Time until which dividend can be claimed 
    * After this time any remaining amount can be withdrawn by issuer
    * Set to very high value to bypass
    */
-  expiry: BigNumber,
+  expiry: Date,
   /** Dividend amount in WEI */ 
   amount: BigNumber,
   /** Amount of dividend claimed so far */
@@ -109,11 +114,11 @@ interface CalculateDividendResult {
 
 interface DividendData {
   /** Timestamp of dividend creation */
-  created: BigNumber,
+  created: Date,
   /** Timestamp of dividend maturity */
-  maturity: BigNumber,
+  maturity: Date,
   /** Timestamp of dividend expiry */
-  expiry: BigNumber,
+  expiry: Date,
   /** Amount of dividend */
   amount: BigNumber,
   /** Claimed amount of dividend */
@@ -160,13 +165,13 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public dividends = async (params: DividendIndexParams) => {
     const result = await (await this._contract).dividends.callAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
     const typedResult: Dividend = {
       checkpointId: result[0].toNumber(),
-      created: result[1],
-      maturity: result[2], 
-      expiry: result[3],
+      created: bigNumberToDate(result[1]),
+      maturity: bigNumberToDate(result[2]), 
+      expiry: bigNumberToDate(result[3]),
       amount: result[4],
       claimedAmount: result[5],
       totalSupply: result[6],
@@ -180,7 +185,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public excluded = async (params: DividendIndexParams)=> {
     return await (await this._contract).excluded.callAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
   }
 
@@ -266,7 +271,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     return (await this._contract).pushDividendPaymentToAddresses.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.payees,
       params.txData,
       params.safetyFactor
@@ -275,9 +280,9 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
     return (await this._contract).pushDividendPayment.sendTransactionAsync(
-      params.dividendIndex,
-      params.start,
-      params.iterations,
+      numberToBigNumber(params.dividendIndex),
+      dateToBigNumber(params.start),
+      numberToBigNumber(params.iterations),
       params.txData,
       params.safetyFactor
     );
@@ -285,7 +290,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   
   public pullDividendPayment = async (params: DividendIndexTxParams) => {
     return (await this._contract).pullDividendPayment.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.txData,
       params.safetyFactor
     );
@@ -293,7 +298,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public reclaimDividend = async (params: DividendIndexTxParams) => {
     return (await this._contract).reclaimDividend.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.txData,
       params.safetyFactor
     );
@@ -301,7 +306,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public calculateDividend = async (params: CalculateDividendParams) => {
     const result = await (await this._contract).calculateDividend.callAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.payee,
     );
     const typedResult: CalculateDividendResult = {
@@ -313,13 +318,13 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getDividendIndex = async (params: CheckpointIdParams) => {
     return await (await this._contract).getDividendIndex.callAsync(
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
     );
   }
 
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
     return (await this._contract).reclaimDividend.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.txData,
       params.safetyFactor
     );
@@ -327,9 +332,9 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public updateDividendDates = async (params: UpdateDividendDatesParams) => {
     return (await this._contract).updateDividendDates.sendTransactionAsync(
-      params.dividendIndex,
-      params.maturity,
-      params.expiry,
+      numberToBigNumber(params.dividendIndex),
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.txData,
       params.safetyFactor
     );
@@ -340,9 +345,9 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
     let typedResult: DividendData[] = [];
     for (let i = 0; i < result[0].length; i++) {
       const dividendData: DividendData = {
-        created: result[0][i],
-        maturity: result[1][i],
-        expiry: result[2][i],
+        created: bigNumberToDate(result[0][i]),
+        maturity: bigNumberToDate(result[1][i]),
+        expiry: bigNumberToDate(result[2][i]),
         amount: result[3][i],
         claimedAmount: result[4][i],
         name: result[5][i]
@@ -354,12 +359,12 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getDividendData = async (params: DividendIndexParams) => {
     const result = await (await this._contract).getDividendData.callAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
     const typedResult: DividendData = {
-      created: result[0],
-      maturity: result[1],
-      expiry: result[2],
+      created: bigNumberToDate(result[0]),
+      maturity: bigNumberToDate(result[1]),
+      expiry: bigNumberToDate(result[2]),
       amount: result[3],
       claimedAmount: result[4],
       name: result[5]
@@ -369,7 +374,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getDividendProgress = async (params: DividendIndexParams) => {
     const result = await (await this._contract).getDividendProgress.callAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
     let typedResult: DividendProgress[] = [];
     for (let i = 0; i < result[0].length; i++) {
@@ -388,7 +393,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getCheckpointData = async (params: CheckpointIdParams) => {
     const result = await (await this._contract).getCheckpointData.callAsync(
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
     );
     let typedResult: CheckpointData[] = [];
     for (let i = 0; i < result[0].length; i++) {
@@ -405,14 +410,14 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public isClaimed = async (params: InvestorStatus) => {
     return await (await this._contract).isClaimed.callAsync(
       params.investor,
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
   }
 
   public isExcluded = async (params: InvestorStatus) => {
     return await (await this._contract).isExcluded.callAsync(
       params.investor,
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
     );
   }
 } 
