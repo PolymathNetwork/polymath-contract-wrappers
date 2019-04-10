@@ -133,11 +133,11 @@ export class CappedSTOWrapper extends STOWrapper {
   /**
    * Instantiate CappedSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getCappedSTOContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -256,14 +256,5 @@ export class CappedSTOWrapper extends STOWrapper {
         CappedSTO.abi,
     );
     return logs;
-  }
-
-  private async _getCappedSTOContract(): Promise<CappedSTOContract> {
-    return new CappedSTOContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

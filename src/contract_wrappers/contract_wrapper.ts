@@ -29,7 +29,7 @@ const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
 
 export abstract class ContractWrapper {
     public abstract abi: ContractAbi;
-    protected abstract _contract: Promise<BaseContract>;
+    protected _contract: Promise<BaseContract>;
     protected _web3Wrapper: Web3Wrapper;
 
     public abstract getLogsAsync: IGetLogs | undefined;
@@ -75,8 +75,9 @@ export abstract class ContractWrapper {
             logUtils.warn(err);
         }
     }
-    constructor(web3Wrapper: Web3Wrapper) {
+    constructor(web3Wrapper: Web3Wrapper, contract: Promise<BaseContract>) {
         this._web3Wrapper = web3Wrapper;
+        this._contract = contract;
         this._blockPollingIntervalMs = 1000;
         this._filters = {};
         this._filterCallbacks = {};

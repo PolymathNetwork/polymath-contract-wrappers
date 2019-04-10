@@ -20,6 +20,7 @@ import {
   VolumeRestrictionTransferManager,
   PolyTokenFaucet,
 } from '@polymathnetwork/contract-artifacts';
+import {PolymathRegistryContract} from "@polymathnetwork/abi-wrappers";
 import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { PolymathRegistryWrapper } from './contract_wrappers/registries/polymath_registry_wrapper';
@@ -31,8 +32,8 @@ import { ModuleWrapperFactory } from './factories/moduleWrapperFactory';
 import { FeatureRegistryWrapper } from './contract_wrappers/registries/feature_registry_wrapper';
 import { assert } from './utils/assert';
 import * as _ from 'lodash';
-import { PolyTokenFaucetWrapper } from 'contract_wrappers/tokens/poly_token_faucet_wrapper';
-import { BigNumber } from '@0x/utils';
+import { PolyTokenFaucetWrapper } from './contract_wrappers/tokens/poly_token_faucet_wrapper';
+import {ContractFactory} from './factories/contractFactory';
 
 
 /**
@@ -41,7 +42,7 @@ import { BigNumber } from '@0x/utils';
  */
 export interface IApiConstructorParams {
   provider: Provider,
-  polymathRegistryAddress?: string,
+  polymathRegistryAddress: string,
   defaultGasPrice?: BigNumber
 }
 
@@ -103,6 +104,7 @@ export class PolymathAPI {
   private polyTokenFaucet: PolyTokenFaucetWrapper;
 
   private readonly _web3Wrapper: Web3Wrapper;
+  private _contractFactory: ContractFactory;
 
   /**
    * Instantiates a new PolymathAPI instance.
@@ -147,34 +149,43 @@ export class PolymathAPI {
 
     this.polymathRegistry = new PolymathRegistryWrapper(
       this._web3Wrapper,
-      params.polymathRegistryAddress,
+      this._getPolymathRegistryContract(params.polymathRegistryAddress),
     );
+
+    this._contractFactory = new ContractFactory(
+      this._web3Wrapper.getProvider(),
+      this._web3Wrapper.getContractDefaults(),
+      this.polymathRegistry,
+    );
+
     this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getSecurityTokenRegistryContract(),
     );
     this.polyToken = new PolyTokenWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getPolyTokenContract(),
     );
     this.moduleRegistry = new ModuleRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getModuleRegistryContract(),
     );
     this.featureRegistry = new FeatureRegistryWrapper(
       this._web3Wrapper,
-      this.polymathRegistry,
+      this._contractFactory._getFeatureRegistryContract(),
     );
     this.tokenFactory = new TokenWrapperFactory(
       this._web3Wrapper,
-      this.securityTokenRegistry
+      this.securityTokenRegistry,
+      this._contractFactory,
     );
     this.moduleFactory = new ModuleWrapperFactory(
-      this._web3Wrapper
+      this._web3Wrapper,
+      this._contractFactory,
     );
     this.polyTokenFaucet = new PolyTokenFaucetWrapper(
       this._web3Wrapper,
-      this.polymathRegistry
+      this._contractFactory._getPolyTokenFaucetContract(),
     );
   }
 
@@ -216,5 +227,21 @@ export class PolymathAPI {
   public isTestnet = async (): Promise<boolean> => {
     return await this._web3Wrapper.getNetworkIdAsync() !== 1;
   }
+
+  public async _getPolymathRegistryContract(address: string): Promise<PolymathRegistryContract> {
+    return new PolymathRegistryContract(
+        PolymathRegistry.abi,
+        // (address) ? address : await this._getDefaultPolymathRegistryAddress(), //for optional address
+        address,
+        this._web3Wrapper.getProvider(),
+        this._web3Wrapper.getContractDefaults(),
+    );
+  }
+/*
+//_getDefaultPolymathRegistryAddress - can be used in a case where the polymath registry address is unknown
+  private async _getDefaultPolymathRegistryAddress(): Promise<string> {
+    const networkId: NetworkId = await this._web3Wrapper.getNetworkIdAsync() as NetworkId;
+    return AddressesUtils.getDefaultContractAddresses(networkId);
+  }
+ */
 }
-  

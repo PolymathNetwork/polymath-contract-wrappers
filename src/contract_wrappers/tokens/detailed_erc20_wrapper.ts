@@ -58,11 +58,11 @@ export class DetailedERC20TokenWrapper extends ERC20TokenWrapper {
   /**
    * Instantiate DetailedERC20Wrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The contract address
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getDetailedERC20Contract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<DetailedERC20Contract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   /**
@@ -106,14 +106,5 @@ export class DetailedERC20TokenWrapper extends ERC20TokenWrapper {
         DetailedERC20.abi,
     );
     return logs;
-  }
-
-  private async _getDetailedERC20Contract(): Promise<DetailedERC20Contract> {
-    return new DetailedERC20Contract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
   }
 }

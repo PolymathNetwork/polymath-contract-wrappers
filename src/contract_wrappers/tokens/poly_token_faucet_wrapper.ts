@@ -1,11 +1,9 @@
 import { PolyTokenFaucetContract } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from '../registries/polymath_registry_wrapper';
 import { PolyTokenFaucet } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { ContractWrapper } from '../contract_wrapper';
 import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { TxParams } from '../../types';
 
 interface GetTokensParams extends TxParams {
@@ -19,17 +17,15 @@ interface GetTokensParams extends TxParams {
 export class PolyTokenFaucetWrapper extends ContractWrapper {
   public abi: ContractAbi = (PolyTokenFaucet as any).abi;
   protected _contract: Promise<PolyTokenFaucetContract>;
-  protected _polymathRegistry: PolymathRegistryWrapper;
 
   /**
    * Instantiate PolyTokenFaucetWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param polymathRegistry The PolymathRegistryWrapper instance contract
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, polymathRegistry: PolymathRegistryWrapper) {
-    super(web3Wrapper);
-    this._polymathRegistry = polymathRegistry;
-    this._contract = this._getPolyTokenFaucetContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<PolyTokenFaucetContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public getTokens = async (params: GetTokensParams) => {
@@ -43,13 +39,4 @@ export class PolyTokenFaucetWrapper extends ContractWrapper {
 
   public getLogsAsync: undefined;
   public subscribeAsync: undefined;
-
-  private async _getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
-    return new PolyTokenFaucetContract(
-      this.abi,
-      await this._polymathRegistry.getPolyTokenAddress(),
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }

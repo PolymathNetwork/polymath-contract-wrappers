@@ -381,11 +381,11 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
   /**
    * Instantiate VolumeRestrictionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The address of the GTM
+   * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getPercentageTransferManagerContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<VolumeRestrictionTMContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public unpause = async (params: TxParams) => {
@@ -779,14 +779,4 @@ export class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
     );
     return logs;
   }
-  
-  private async _getPercentageTransferManagerContract(): Promise<VolumeRestrictionTMContract> {
-    return new VolumeRestrictionTMContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }
-  

@@ -119,9 +119,9 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param address The contract instance address
    */
-  constructor(web3Wrapper: Web3Wrapper, address: string) {
-    super(web3Wrapper, address);
-    this._contract = this._getGeneralPermissionManagerContract();
+  constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract>) {
+    super(web3Wrapper, contract);
+    this._contract = contract;
   }
 
   public perms = async (params: PermsParams) => {
@@ -269,14 +269,4 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
     return logs;
   }
-
-  private async _getGeneralPermissionManagerContract(): Promise<GeneralPermissionManagerContract> {
-    return new GeneralPermissionManagerContract(
-      this.abi,
-      this._address,
-      this._web3Wrapper.getProvider(),
-      this._web3Wrapper.getContractDefaults(),
-    );
-  }
 }
-  
