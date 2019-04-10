@@ -9,6 +9,11 @@ import { GeneralPermissionManager } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
+import {
+  numberToBigNumber,
+  bigNumberToNumber,
+} from '../../../utils/convert';
+
 import * as _ from 'lodash';
 import {
   TxParams,
@@ -58,7 +63,7 @@ interface PermsParams {
 }
 
 interface DelegateIndexParams {
-  delegateIndex: BigNumber,
+  delegateIndex: number,
 }
 
 interface DelegateParams {
@@ -134,7 +139,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public allDelegates = async (params: DelegateIndexParams) => {
     return await (await this._contract).allDelegates.callAsync(
-      params.delegateIndex,
+      numberToBigNumber(params.delegateIndex),
     );
   }
 
