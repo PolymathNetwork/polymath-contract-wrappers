@@ -4,63 +4,68 @@ import {
   FeatureRegistryEvents,
   FeatureRegistryChangeFeatureStatusEventArgs,
   FeatureRegistryOwnershipRenouncedEventArgs,
-  FeatureRegistryOwnershipTransferredEventArgs
+  FeatureRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistryWrapper } from './polymath_registry_wrapper';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
-import { ContractWrapper } from '../contract_wrapper';
+import { schemas } from '@0x/json-schemas';
+import ContractWrapper from '../contract_wrapper';
 import {
   TxParams,
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
   EventCallback,
   Features,
-  ISubscribe,
-  IGetLogs
+  Subscribe,
+  GetLogs,
 } from '../../types';
-import { assert } from '../../utils/assert';
-import { schemas } from '@0x/json-schemas';
+import assert from '../../utils/assert';
 
-interface IChangeFeatureStatusSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.ChangeFeatureStatus,
-  callback: EventCallback<FeatureRegistryChangeFeatureStatusEventArgs>,
+interface ChangeFeatureStatusSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.ChangeFeatureStatus;
+  callback: EventCallback<FeatureRegistryChangeFeatureStatusEventArgs>;
 }
 
-interface IGetChangeFeatureStatusLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.ChangeFeatureStatus,
+interface GetChangeFeatureStatusLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.ChangeFeatureStatus;
 }
 
-interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced,
-  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>,
+interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipRenounced;
+  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>;
 }
 
-interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced,
+interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipRenounced;
 }
 
-interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipTransferred,
-  callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>,
+interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipTransferred;
+  callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>;
 }
 
-interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipTransferred,
+interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: FeatureRegistryEvents.OwnershipTransferred;
 }
 
-interface IFeatureRegistrySubscribeAsyncParams extends ISubscribe {
-  (params: IChangeFeatureStatusSubscribeAsyncParams): Promise<string>,
-  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
-  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
+interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
+  (params: ChangeFeatureStatusSubscribeAsyncParams): Promise<string>;
+  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
+  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
-interface IGetFeatureRegistryLogsAsyncParams extends IGetLogs {
-  (params: IGetChangeFeatureStatusLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>>>,
-  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>>>,
-  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>>>,
+interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
+  (params: GetChangeFeatureStatusLogsAsyncParams): Promise<
+    LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>[]
+  >;
+  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>[]
+  >;
+  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
+    LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]
+  >;
 }
 
 /**
@@ -71,9 +76,9 @@ interface GetFeatureStatusParams {
 }
 
 /**
-* @param nameKey is the key for the feature status mapping
-* @param newStatus is the new feature status
-*/
+ * @param nameKey is the key for the feature status mapping
+ * @param newStatus is the new feature status
+ */
 interface SetFeatureStatusParams extends TxParams {
   nameKey: string;
   newStatus: boolean;
@@ -82,18 +87,19 @@ interface SetFeatureStatusParams extends TxParams {
 /**
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
-export class FeatureRegistryWrapper extends ContractWrapper {
+export default class FeatureRegistryWrapper extends ContractWrapper {
   public abi: ContractAbi = FeatureRegistry.abi;
-  protected _contract: Promise<FeatureRegistryContract>;
+
+  protected contract: Promise<FeatureRegistryContract>;
 
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<FeatureRegistryContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<FeatureRegistryContract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   /**
@@ -101,83 +107,77 @@ export class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getFeatureStatus = async (params: GetFeatureStatusParams) => {
-    return await (await this._contract).getFeatureStatus.callAsync(
-        params.nameKey,
-    )
-  }
+    return (await this.contract).getFeatureStatus.callAsync(params.nameKey);
+  };
 
   /**
    * Change a feature status
    */
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
-    return (await this._contract).setFeatureStatus.sendTransactionAsync(
+    return (await this.contract).setFeatureStatus.sendTransactionAsync(
       params.nameKey,
       params.newStatus,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Get the CustomModulesAllowed status
    * @return bool
    */
   public getCustomModulesAllowedStatus = async () => {
-    return await (await this._contract).getFeatureStatus.callAsync(
-        Features.CustomModulesAllowed,
-    )
-  }
+    return (await this.contract).getFeatureStatus.callAsync(Features.CustomModulesAllowed);
+  };
 
   /**
    * Get the FreezeMintingAllowed status
    * @return bool
    */
   public getFreezeMintingAllowedStatus = async () => {
-    return await (await this._contract).getFeatureStatus.callAsync(
-      Features.FreezeMintingAllowed,
-    )
-  }
+    return (await this.contract).getFeatureStatus.callAsync(Features.FreezeMintingAllowed);
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IFeatureRegistrySubscribeAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: FeatureRegistrySubscribeAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        FeatureRegistry.abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      FeatureRegistry.abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetFeatureRegistryLogsAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: GetFeatureRegistryLogsAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.blockRange,
-        params.indexFilterValues,
-        FeatureRegistry.abi,
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+      FeatureRegistry.abi,
     );
     return logs;
-  }
+  };
 }

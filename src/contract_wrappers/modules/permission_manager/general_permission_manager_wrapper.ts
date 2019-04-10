@@ -10,235 +10,218 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import {
-  TxParams,
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
-  EventCallback,
-  IGetLogs,
-  ISubscribe
-} from '../../../types';
-import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { ModuleWrapper } from '../module_wrapper';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
+import assert from '../../../utils/assert';
+import ModuleWrapper from '../module_wrapper';
 import { stringToBytes32, bytes32ToString } from '../../../utils/convert';
-  
-interface IChangePermissionSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents.ChangePermission,
-  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs>,
+
+interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents.ChangePermission;
+  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs>;
 }
 
-interface IGetChangePermissionLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents.ChangePermission,
+interface GetChangePermissionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents.ChangePermission;
 }
 
-interface IAddDelegateSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents.AddDelegate,
-  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs>,
+interface AddDelegateSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents.AddDelegate;
+  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs>;
 }
 
-interface IGetAddDelegateLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents.AddDelegate,
+interface GetAddDelegateLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents.AddDelegate;
 }
 
-interface IGeneralPermissionManagerSubscribeAsyncParams extends ISubscribe {
-  (params: IChangePermissionSubscribeAsyncParams): Promise<string>,
-  (params: IAddDelegateSubscribeAsyncParams): Promise<string>,
+interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
+  (params: ChangePermissionSubscribeAsyncParams): Promise<string>;
+  (params: AddDelegateSubscribeAsyncParams): Promise<string>;
 }
 
-interface IGetGeneralPermissionManagerLogsAsyncParams extends IGetLogs {
-  (params: IGetChangePermissionLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs>>>,
-  (params: IGetAddDelegateLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>>>,
+interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
+  (params: GetChangePermissionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs>[]
+  >;
+  (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>[]>;
 }
 
 interface PermsParams {
-  module: string,
-  delegate: string,
-  permission: string,
+  module: string;
+  delegate: string;
+  permission: string;
 }
 
 interface DelegateIndexParams {
-  delegateIndex: BigNumber,
+  delegateIndex: BigNumber;
 }
 
 interface DelegateParams {
-  delegate: string,
+  delegate: string;
 }
 
 interface GetAllDelegatesWithPermParams {
-  module: string,
-  perm: string,
+  module: string;
+  perm: string;
 }
 
 interface GetAllModulesAndPermsFromTypesParams {
-  delegate: string,
-  types: Array<number>,
+  delegate: string;
+  types: number[];
 }
 
 interface DelegateTxParams extends TxParams {
-  delegate: string,
+  delegate: string;
 }
 
 interface AddDelegateParams extends TxParams {
-  delegate: string,
-  details: string,
+  delegate: string;
+  details: string;
 }
 
 interface ChangePermissionParams extends TxParams {
-  delegate: string,
-  module: string,
-  perm: string,
-  valid: boolean,
+  delegate: string;
+  module: string;
+  perm: string;
+  valid: boolean;
 }
 
 interface ChangePermissionMultiParams extends TxParams {
-  delegate: string,
-  modules: string[],
-  perms: string[],
-  valids: boolean[],
+  delegate: string;
+  modules: string[];
+  perms: string[];
+  valids: boolean[];
 }
 
-//// Return types ////
+// // Return types ////
 interface PermissonsPerModule {
   /** Module address */
-  module: string
+  module: string;
   /** List of permissions */
-  permissions: string[]
+  permissions: string[];
 }
-//// End of return types ////
+// // End of return types ////
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
-export class GeneralPermissionManagerWrapper extends ModuleWrapper {
+export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public abi: ContractAbi = GeneralPermissionManager.abi;
-  protected _contract: Promise<GeneralPermissionManagerContract>;
+
+  protected contract: Promise<GeneralPermissionManagerContract>;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param address The contract instance address
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   public perms = async (params: PermsParams) => {
-    return await (await this._contract).perms.callAsync(
-      params.module,
-      params.delegate,
-      params.permission,
-    );
-  }
+    return (await this.contract).perms.callAsync(params.module, params.delegate, params.permission);
+  };
 
   public allDelegates = async (params: DelegateIndexParams) => {
-    return await (await this._contract).allDelegates.callAsync(
-      params.delegateIndex,
-    );
-  }
+    return (await this.contract).allDelegates.callAsync(params.delegateIndex);
+  };
 
   public delegateDetails = async (params: DelegateParams) => {
-    return await (await this._contract).delegateDetails.callAsync(
-      params.delegate,
-    );
-  }
+    return (await this.contract).delegateDetails.callAsync(params.delegate);
+  };
 
   public checkPermission = async (params: PermsParams) => {
-    return await (await this._contract).checkPermission.callAsync(
-      params.delegate,
-      params.module,
-      params.permission,
-    );
-  }
+    return (await this.contract).checkPermission.callAsync(params.delegate, params.module, params.permission);
+  };
 
   public addDelegate = async (params: AddDelegateParams) => {
-    return (await this._contract).addDelegate.sendTransactionAsync(
+    return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       params.details,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public deleteDelegate = async (params: DelegateTxParams) => {
-    return (await this._contract).deleteDelegate.sendTransactionAsync(
+    return (await this.contract).deleteDelegate.sendTransactionAsync(
       params.delegate,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public checkDelegate = async (params: DelegateParams) => {
-    return await (await this._contract).checkDelegate.callAsync(
-      params.delegate,
-    );
-  }
+    return (await this.contract).checkDelegate.callAsync(params.delegate);
+  };
 
   public changePermission = async (params: ChangePermissionParams) => {
-    return (await this._contract).changePermission.sendTransactionAsync(
+    return (await this.contract).changePermission.sendTransactionAsync(
       params.delegate,
       params.module,
       params.perm,
       params.valid,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
-    return (await this._contract).changePermissionMulti.sendTransactionAsync(
+    return (await this.contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,
       params.perms,
       params.valids,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams) => {
-    return await (await this._contract).getAllDelegatesWithPerm.callAsync(
-      params.module,
-      params.perm,
-    );
-  }
+    return (await this.contract).getAllDelegatesWithPerm.callAsync(params.module, params.perm);
+  };
 
   public getAllModulesAndPermsFromTypes = async (params: GetAllModulesAndPermsFromTypesParams) => {
-    const result = await (await this._contract).getAllModulesAndPermsFromTypes.callAsync(
-      params.delegate,
-      params.types,
-    ); 
+    const result = await (await this.contract).getAllModulesAndPermsFromTypes.callAsync(params.delegate, params.types);
     // [module1, module1, module2, module3, module3], [perm1, perm2, perm1, perm2, perm3]
     const zippedResult = _.zip(result[0], result[1]); // [[module1, perm1], [module1, perm2], [module2, perm1] ...]
-    const groupedResult = _.groupBy(zippedResult, (value) => { return value[0]}); // [module1: [[module1, perm1], [module1, perm2]], ...]
-    let typedResult: PermissonsPerModule[] = [];
-    _.forEach(groupedResult, function(value, key) {
-      const permissonsPerModule: PermissonsPerModule = {
-        module: key,
-        permissions: value.map((pair) => bytes32ToString(pair[1] as string))
-      }
-      typedResult.push(permissonsPerModule);
-    });
+    const groupedResult = _.groupBy(zippedResult, value => {
+      return value[0];
+    }); // [module1: [[module1, perm1], [module1, perm2]], ...]
+    const typedResult: PermissonsPerModule[] = [];
+    _.forEach(
+      groupedResult,
+      (value, key): void => {
+        const permissonsPerModule: PermissonsPerModule = {
+          module: key,
+          permissions: value.map(pair => bytes32ToString(pair[1] as string)),
+        };
+        typedResult.push(permissonsPerModule);
+      },
+    );
     return typedResult;
-  }
+  };
 
   public getAllDelegates = async () => {
-    return await (await this._contract).getAllDelegates.callAsync();
-  }
+    return (await this.contract).getAllDelegates.callAsync();
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IGeneralPermissionManagerSubscribeAsyncParams = async <ArgsType extends GeneralPermissionManagerEventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: GeneralPermissionManagerSubscribeAsyncParams = async <
+    ArgsType extends GeneralPermissionManagerEventArgs
+  >(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
@@ -247,20 +230,22 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
       !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetGeneralPermissionManagerLogsAsyncParams = async <ArgsType extends GeneralPermissionManagerEventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: GetGeneralPermissionManagerLogsAsyncParams = async <
+    ArgsType extends GeneralPermissionManagerEventArgs
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
@@ -268,5 +253,5 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
       GeneralPermissionManager.abi,
     );
     return logs;
-  }
+  };
 }
