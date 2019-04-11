@@ -22,7 +22,7 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-import {bigNumberToNumber, numberToBigNumber} from '../../../utils/convert';
+import {numberToBigNumber} from '../../../utils/convert';
 
 interface IModifyHolderCountSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: CountTransferManagerEvents.ModifyHolderCount,

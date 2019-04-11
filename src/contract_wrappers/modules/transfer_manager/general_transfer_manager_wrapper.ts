@@ -29,7 +29,6 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-import { type } from 'os';
 import {bigNumberToDate, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
 
 interface IChangeIssuanceAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
