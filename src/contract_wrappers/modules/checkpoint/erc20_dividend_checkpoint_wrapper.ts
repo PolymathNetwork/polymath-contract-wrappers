@@ -26,7 +26,6 @@ import {
 import {
   numberToBigNumber,
   dateToBigNumber,
-  bigNumberToDate,
 } from '../../../utils/convert';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
