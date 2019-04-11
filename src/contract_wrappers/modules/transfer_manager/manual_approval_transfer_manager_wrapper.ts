@@ -24,7 +24,8 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-  
+import {bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
+
 interface IAddManualApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents.AddManualApproval,
   callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs>,
@@ -87,7 +88,7 @@ interface IGetManualApprovalTransferManagerLogsAsyncParams extends IGetLogs {
 }
 
 interface ApprovalsParams {
-  index: BigNumber,
+  index: number,
 }
 
 interface VerifyTransferParams extends TxParams {
@@ -102,7 +103,7 @@ interface AddManualApprovalParams extends TxParams {
   from: string,
   to: string,
   allowance: BigNumber,
-  expiryTime: BigNumber,
+  expiryTime: Date,
   description: string,
 }
 
@@ -110,14 +111,14 @@ interface AddManualApprovalMultiParams extends TxParams {
   from: string[],
   to: string[],
   allowances: BigNumber[],
-  expiryTimes: BigNumber[],
+  expiryTimes: Date[],
   descriptions: string[],
 }
 
 interface ModifyManualApprovalParams extends TxParams {
   from: string,
   to: string,
-  expiryTime: BigNumber,
+  expiryTime: Date,
   changeInAllowance: BigNumber,
   description: string,
   increase: boolean,
@@ -126,7 +127,7 @@ interface ModifyManualApprovalParams extends TxParams {
 interface ModifyManualApprovalMultiParams extends TxParams {
   from: string[],
   to: string[],
-  expiryTimes: BigNumber[],
+  expiryTimes: Date[],
   changedAllowances: BigNumber[],
   descriptions: string[],
   increase: boolean[],
@@ -160,7 +161,7 @@ interface Approval {
   /**  */
   allowance: BigNumber,
   /**  */
-  expiryTime: BigNumber,
+  expiryTime: Date,
   /**  */
   description: string
 }
@@ -196,13 +197,13 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
 
   public approvals = async (params: ApprovalsParams) => {
     const result = await (await this._contract).approvals.callAsync(
-        params.index,
+        numberToBigNumber(params.index),
     );
     const typedResult: Approval = {
       from: result[0],
       to: result[1],
       allowance: result[2],
-      expiryTime: result[3],
+      expiryTime: bigNumberToDate(result[3]),
       description: result[4],
     }
     return typedResult;
@@ -236,7 +237,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.from,
       params.to,
       params.allowance,
-      params.expiryTime,
+      dateToBigNumber(params.expiryTime),
       params.description,
       params.txData,
       params.safetyFactor
@@ -248,7 +249,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.from,
       params.to,
       params.allowances,
-      params.expiryTimes,
+      dateArrayToBigNumberArray(params.expiryTimes),
       params.descriptions,
       params.txData,
       params.safetyFactor
@@ -259,7 +260,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
-      params.expiryTime,
+      dateToBigNumber(params.expiryTime),
       params.changeInAllowance,
       params.description,
       params.increase,
@@ -272,7 +273,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
     return (await this._contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
-      params.expiryTimes,
+      dateArrayToBigNumberArray(params.expiryTimes),
       params.changedAllowances,
       params.descriptions,
       params.increase,
@@ -309,7 +310,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
         from: result[0][i],
         to: result[1][i],
         allowance: result[2][i],
-        expiryTime: result[3][i],
+        expiryTime: bigNumberToDate(result[3][i]),
         description: result[4][i]
       }; 
       typedResult.push(approval);
@@ -326,7 +327,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       from: params.from,
       to: params.to,
       allowance: result[0],
-      expiryTime: result[1],
+      expiryTime: bigNumberToDate(result[1]),
       description: result[2]
     }
     return typedResult;
@@ -344,7 +345,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
         from: result[0][i],
         to: result[1][i],
         allowance: result[2][i],
-        expiryTime: result[3][i],
+        expiryTime: bigNumberToDate(result[3][i]),
         description: result[4][i]
       }; 
       typedResult.push(approval);

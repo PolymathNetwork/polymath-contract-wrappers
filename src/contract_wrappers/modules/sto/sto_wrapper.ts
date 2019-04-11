@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
 import {
   TxParams,
-  STOBaseContract,
+  STOBaseContract, FundRaiseType,
 } from '../../../types';
 import { ModuleWrapper } from '../module_wrapper';
 
 interface FundRaiseTypesParams {
-  type: number;
+  type: FundRaiseType;
 }
 
 interface IReclaimERC20Params extends TxParams {
