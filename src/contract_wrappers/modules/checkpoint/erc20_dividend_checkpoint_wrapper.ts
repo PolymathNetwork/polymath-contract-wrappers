@@ -25,7 +25,7 @@ import {
 } from '../../../types';
 import {
   numberToBigNumber,
-  dateToBigNumber,
+  dateToBigNumber, stringToBytes32,
 } from '../../../utils/convert';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -169,7 +169,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       dateToBigNumber(params.expiry),
       params.token,
       params.amount,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor
     );
@@ -182,7 +182,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       params.token,
       params.amount,
       numberToBigNumber(params.checkpointId),
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor
     );
@@ -195,7 +195,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       params.token,
       params.amount,
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor
     );
@@ -209,7 +209,7 @@ export class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
       params.amount,
       numberToBigNumber(params.checkpointId),
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor
     );
