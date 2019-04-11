@@ -96,6 +96,12 @@ export enum ModuleType {
     Burn = 5,
 }
 
+export enum FundRaiseType {
+    ETH = 0,
+    POLY = 1,
+    StableCoin = 2,
+}
+
 export enum Features {
     CustomModulesAllowed = "CustomModulesAllowed",
     FreezeMintingAllowed = "FreezeMintingAllowed",

@@ -28,7 +28,7 @@ import {
   EventCallback,
   TxPayableParams,
   ISubscribe,
-  IGetLogs
+  IGetLogs, FundRaiseType
 } from '../../../types';
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -189,12 +189,12 @@ interface TierIndexParams {
 }
 
 interface ConvertToOrFromUSDParams {
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
   amount: BigNumber;
 }
 
 interface FundRaiseTypeParams {
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
 }
 
 interface StableCoinParams {
@@ -211,7 +211,7 @@ interface InvestorAddressParams {
 
 interface InvestorInvestedParams {
   investorAddress: string,
-  fundRaiseType: number,
+  fundRaiseType: FundRaiseType,
 }
 
 interface UsdTokenIndexParams {
@@ -221,7 +221,7 @@ interface UsdTokenIndexParams {
 interface BuyTokensViewParams {
   beneficiary: string,
   investmentValue: BigNumber,
-  fundRaiseType: number,
+  fundRaiseType: FundRaiseType,
 }
 
 /**
@@ -264,7 +264,7 @@ interface ModifyLimitsParams extends TxParams {
 * @param fundRaiseTypes Array of fund raise types to allow
 */
 interface ModifyFundingParams extends TxParams {
-  fundRaiseTypes: number[];
+  fundRaiseTypes: FundRaiseType[];
 }
 
 /**

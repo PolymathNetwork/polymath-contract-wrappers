@@ -44,7 +44,7 @@ import {
   EventCallback,
   IGetLogs,
   ISubscribe,
-  ModuleType
+  ModuleType, FundRaiseType
 } from '../../types';
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
@@ -443,7 +443,7 @@ interface AddCappedSTOParams extends AddModuleParams {
   endTime: number,
   cap: BigNumber,
   rate: BigNumber,
-  fundRaiseTypes: BigNumber[],
+  fundRaiseTypes: FundRaiseType[],
   fundsReceiver: string
 }
 
@@ -456,7 +456,7 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
   tokensPerTierDiscountPoly: number[],
   nonAccreditedLimitUSD: number,
   minimumInvestmentUSD: number,
-  fundRaiseTypes: number[],
+  fundRaiseTypes: FundRaiseType[],
   wallet: string,
   reserveWallet: string,
   usdTokens: string[],
