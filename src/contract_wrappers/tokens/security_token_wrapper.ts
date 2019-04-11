@@ -49,7 +49,7 @@ import {
 import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ERC20TokenWrapper } from './erc20_wrapper';
-import { stringToBytes32, numberToBigNumber, dateToBigNumber } from '../../utils/convert';
+import {stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString} from '../../utils/convert';
 
 const NO_MODULE_DATA = "0x0000000000000000";
 
@@ -754,7 +754,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
     return await (await this._contract).checkPermission.callAsync(
       params.delegateAddress,
       params.moduleAddress,
-      params.permission,
+      stringToBytes32(params.permission),
     );
   }
 
@@ -992,7 +992,7 @@ export class SecurityTokenWrapper extends ERC20TokenWrapper {
   public getModule = async (params: ModuleAddressParams) => {
     const result = await (await this._contract).getModule.callAsync(params.moduleAddress);
     const typedResult: ModuleData = {
-      name: result[0],
+      name: bytes32ToString(result[0]),
       address: result[1],
       factoryAddress: result[2],
       archived: result[3],
