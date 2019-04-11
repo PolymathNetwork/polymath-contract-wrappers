@@ -8,170 +8,179 @@ import {
   ModuleFactoryChangeFactoryUsageFeeEventArgs,
   ModuleFactoryChangeFactorySubscriptionFeeEventArgs,
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
-  ModuleFactoryChangeSTVersionBoundEventArgs
+  ModuleFactoryChangeSTVersionBoundEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
-import { ContractWrapper } from '../contract_wrapper';
-import {
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
-  EventCallback,
-  ISubscribe,
-  IGetLogs,
-} from '../../types';
-import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
+import ContractWrapper from '../contract_wrapper';
+import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import assert from '../../utils/assert';
 
-interface IOwnershipRenouncedSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipRenounced,
-  callback: EventCallback<ModuleFactoryOwnershipRenouncedEventArgs>,
+interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.OwnershipRenounced;
+  callback: EventCallback<ModuleFactoryOwnershipRenouncedEventArgs>;
 }
 
-interface IGetOwnershipRenouncedLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipRenounced,
+interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.OwnershipRenounced;
 }
 
-interface IOwnershipTransferredSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipTransferred,
-  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs>,
+interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.OwnershipTransferred;
+  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs>;
 }
 
-interface IGetOwnershipTransferredLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipTransferred,
+interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.OwnershipTransferred;
 }
 
-interface IChangeFactorySetupFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySetupFee,
-  callback: EventCallback<ModuleFactoryChangeFactorySetupFeeEventArgs>,
+interface ChangeFactorySetupFeeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactorySetupFee;
+  callback: EventCallback<ModuleFactoryChangeFactorySetupFeeEventArgs>;
 }
 
-interface IGetChangeFactorySetupFeeLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySetupFee,
+interface GetChangeFactorySetupFeeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactorySetupFee;
 }
 
-interface IChangeFactoryUsageFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee,
-  callback: EventCallback<ModuleFactoryChangeFactoryUsageFeeEventArgs>,
+interface ChangeFactoryUsageFeeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee;
+  callback: EventCallback<ModuleFactoryChangeFactoryUsageFeeEventArgs>;
 }
 
-interface IGetChangeFactoryUsageFeeLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee,
+interface GetChangeFactoryUsageFeeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee;
 }
 
-interface IChangeFactorySubscriptionFeeSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee,
-  callback: EventCallback<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>,
+interface ChangeFactorySubscriptionFeeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee;
+  callback: EventCallback<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>;
 }
 
-interface IGetChangeFactorySubscriptionFeeLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee,
+interface GetChangeFactorySubscriptionFeeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee;
 }
 
-interface IGenerateModuleFromFactorySubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.GenerateModuleFromFactory,
-  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs>,
+interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.GenerateModuleFromFactory;
+  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs>;
 }
 
-interface IGetGenerateModuleFromFactoryLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.GenerateModuleFromFactory,
+interface GetGenerateModuleFromFactoryLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.GenerateModuleFromFactory;
 }
 
-interface IChangeSTVersionBoundSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeSTVersionBound,
-  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs>,
+interface ChangeSTVersionBoundSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeSTVersionBound;
+  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs>;
 }
 
-interface IGetChangeSTVersionBoundLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeSTVersionBound,
+interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents.ChangeSTVersionBound;
 }
 
-interface IModuleFactorySubscribeAsyncParams extends ISubscribe {
-  (params: IOwnershipRenouncedSubscribeAsyncParams): Promise<string>,
-  (params: IOwnershipTransferredSubscribeAsyncParams): Promise<string>,
-  (params: IChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>,
-  (params: IChangeFactoryUsageFeeSubscribeAsyncParams): Promise<string>,
-  (params: IChangeFactorySubscriptionFeeSubscribeAsyncParams): Promise<string>,
-  (params: IGenerateModuleFromFactorySubscribeAsyncParams): Promise<string>,
-  (params: IChangeSTVersionBoundSubscribeAsyncParams): Promise<string>,
+interface ModuleFactorySubscribeAsyncParams extends Subscribe {
+  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
+  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
+  (params: ChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>;
+  (params: ChangeFactoryUsageFeeSubscribeAsyncParams): Promise<string>;
+  (params: ChangeFactorySubscriptionFeeSubscribeAsyncParams): Promise<string>;
+  (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
+  (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
 }
 
-interface IGetModuleFactoryLogsAsyncParams extends IGetLogs {
-  (params: IGetOwnershipRenouncedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryOwnershipRenouncedEventArgs>>>,
-  (params: IGetOwnershipTransferredLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs>>>,
-  (params: IGetChangeFactorySetupFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryChangeFactorySetupFeeEventArgs>>>,
-  (params: IGetChangeFactoryUsageFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryChangeFactoryUsageFeeEventArgs>>>,
-  (params: IGetChangeFactorySubscriptionFeeLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>>>,
-  (params: IGetGenerateModuleFromFactoryLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs>>>,
-  (params: IGetChangeSTVersionBoundLogsAsyncParams): Promise<Array<LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs>>>,
+interface GetModuleFactoryLogsAsyncParams extends GetLogs {
+  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryOwnershipRenouncedEventArgs>[]
+  >;
+  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs>[]
+  >;
+  (params: GetChangeFactorySetupFeeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeFactorySetupFeeEventArgs>[]
+  >;
+  (params: GetChangeFactoryUsageFeeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeFactoryUsageFeeEventArgs>[]
+  >;
+  (params: GetChangeFactorySubscriptionFeeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>[]
+  >;
+  (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs>[]
+  >;
+  (params: GetChangeSTVersionBoundLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs>[]
+  >;
 }
 
 /**
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
-export class ModuleFactoryWrapper extends ContractWrapper {
+export default class ModuleFactoryWrapper extends ContractWrapper {
   public abi: ContractAbi = ModuleFactory.abi;
-  protected _contract: Promise<ModuleFactoryContract>;
+
+  protected contract: Promise<ModuleFactoryContract>;
 
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleFactoryContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleFactoryContract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   /**
    * Get the name of the Module
    */
   public getName = async (): Promise<string> => {
-    return await (await this._contract).name.callAsync();
-  }
+    return (await this.contract).name.callAsync();
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IModuleFactorySubscribeAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: ModuleFactorySubscribeAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        ModuleFactory.abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      ModuleFactory.abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetModuleFactoryLogsAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: GetModuleFactoryLogsAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.blockRange,
-        params.indexFilterValues,
-        ModuleFactory.abi,
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+      ModuleFactory.abi,
     );
     return logs;
-  }
+  };
 }

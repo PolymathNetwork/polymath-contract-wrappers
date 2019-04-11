@@ -9,102 +9,97 @@ import { DetailedERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
-import {
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
-  EventCallback,
-  ISubscribe,
-  IGetLogs
-} from '../../types';
-import { assert } from '../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { ERC20TokenWrapper } from './erc20_wrapper';
+import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import assert from '../../utils/assert';
+import ERC20TokenWrapper from './erc20_wrapper';
 
-interface IApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: DetailedERC20Events.Approval,
-  callback: EventCallback<DetailedERC20ApprovalEventArgs>,
+interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: DetailedERC20Events.Approval;
+  callback: EventCallback<DetailedERC20ApprovalEventArgs>;
 }
 
-interface IGetApprovalLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: DetailedERC20Events.Approval,
+interface GetApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: DetailedERC20Events.Approval;
 }
 
-interface ITransferSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: DetailedERC20Events.Transfer,
-  callback: EventCallback<DetailedERC20TransferEventArgs>,
+interface TransferSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: DetailedERC20Events.Transfer;
+  callback: EventCallback<DetailedERC20TransferEventArgs>;
 }
 
-interface IGetTransferLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: DetailedERC20Events.Transfer,
+interface GetTransferLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: DetailedERC20Events.Transfer;
 }
 
-interface IDetailedERC20TokenSubscribeAsyncParams extends ISubscribe {
-  (params: IApprovalSubscribeAsyncParams): Promise<string>,
-  (params: ITransferSubscribeAsyncParams): Promise<string>,
+interface DetailedERC20TokenSubscribeAsyncParams extends Subscribe {
+  (params: ApprovalSubscribeAsyncParams): Promise<string>;
+  (params: TransferSubscribeAsyncParams): Promise<string>;
 }
 
-interface IDetailedGetERC20TokenLogsAsyncParams extends IGetLogs {
-  (params: IGetApprovalLogsAsyncParams): Promise<Array<LogWithDecodedArgs<DetailedERC20ApprovalEventArgs>>>,
-  (params: IGetTransferLogsAsyncParams): Promise<Array<LogWithDecodedArgs<DetailedERC20TransferEventArgs>>>,
+interface DetailedGetERC20TokenLogsAsyncParams extends GetLogs {
+  (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<DetailedERC20ApprovalEventArgs>[]>;
+  (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<DetailedERC20TransferEventArgs>[]>;
 }
 
 /**
  * This class includes the functionality related to interacting with the DetailedERC20 contract.
  */
-export class DetailedERC20TokenWrapper extends ERC20TokenWrapper {
+export default class DetailedERC20TokenWrapper extends ERC20TokenWrapper {
   public abi: ContractAbi = DetailedERC20.abi;
-  protected _contract: Promise<DetailedERC20Contract>;
+
+  protected contract: Promise<DetailedERC20Contract>;
 
   /**
    * Instantiate DetailedERC20Wrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<DetailedERC20Contract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<DetailedERC20Contract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IDetailedERC20TokenSubscribeAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: DetailedERC20TokenSubscribeAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        DetailedERC20.abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      DetailedERC20.abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IDetailedGetERC20TokenLogsAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: DetailedGetERC20TokenLogsAsyncParams = async <ArgsType extends DetailedERC20EventArgs>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, DetailedERC20Events);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.blockRange,
-        params.indexFilterValues,
-        DetailedERC20.abi,
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+      DetailedERC20.abi,
     );
     return logs;
-  }
+  };
 }
