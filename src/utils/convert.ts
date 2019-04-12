@@ -38,3 +38,9 @@ export function numberArrayToBigNumberArray(value: number[]) {
     return numberToBigNumber(x);
   });
 }
+
+export function stringArrayToBytes32Array(value: string[]) {
+  return value.map<string>((x) => {
+    return stringToBytes32(x);
+  });
+}

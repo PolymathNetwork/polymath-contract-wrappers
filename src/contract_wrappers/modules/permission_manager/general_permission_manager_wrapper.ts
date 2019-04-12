@@ -8,11 +8,7 @@ import {
 import { GeneralPermissionManager } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
-import {
-  numberToBigNumber,
-  bigNumberToNumber,
-} from '../../../utils/convert';
+import {numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array} from '../../../utils/convert';
 
 import * as _ from 'lodash';
 import {
@@ -26,8 +22,7 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-import { stringToBytes32, bytes32ToString } from '../../../utils/convert';
-  
+
 interface IChangePermissionSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission,
   callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs>,
@@ -122,7 +117,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Instantiate GeneralPermissionManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
-   * @param address The contract instance address
+   * @param contract
    */
   constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract>) {
     super(web3Wrapper, contract);
@@ -133,7 +128,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     return await (await this._contract).perms.callAsync(
       params.module,
       params.delegate,
-      params.permission,
+      stringToBytes32(params.permission),
     );
   }
 
@@ -160,7 +155,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public addDelegate = async (params: AddDelegateParams) => {
     return (await this._contract).addDelegate.sendTransactionAsync(
       params.delegate,
-      params.details,
+      stringToBytes32(params.details),
       params.txData,
       params.safetyFactor
     );
@@ -184,7 +179,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     return (await this._contract).changePermission.sendTransactionAsync(
       params.delegate,
       params.module,
-      params.perm,
+      stringToBytes32(params.perm),
       params.valid,
       params.txData,
       params.safetyFactor
@@ -195,7 +190,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
     return (await this._contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,
-      params.perms,
+      stringArrayToBytes32Array(params.perms),
       params.valids,
       params.txData,
       params.safetyFactor
@@ -205,7 +200,7 @@ export class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams) => {
     return await (await this._contract).getAllDelegatesWithPerm.callAsync(
       params.module,
-      params.perm,
+      stringToBytes32(params.perm),
     );
   }
 

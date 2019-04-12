@@ -28,7 +28,6 @@ import {
 import { assert } from '../../utils/assert';
 import { bytes32ToString } from '../../utils/convert';
 import { schemas } from '@0x/json-schemas';
-import { BigNumber } from '@0x/utils';
 
 interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause,

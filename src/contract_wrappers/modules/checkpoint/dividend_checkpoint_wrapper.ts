@@ -8,7 +8,7 @@ import {
 import {
   numberToBigNumber,
   dateToBigNumber,
-  bigNumberToDate,
+  bigNumberToDate, bytes32ToString,
 } from '../../../utils/convert';
 import { ModuleWrapper } from '../module_wrapper';
 
@@ -350,7 +350,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
         expiry: bigNumberToDate(result[2][i]),
         amount: result[3][i],
         claimedAmount: result[4][i],
-        name: result[5][i]
+        name: bytes32ToString(result[5][i])
       }
       typedResult.push(dividendData);
     }
@@ -367,7 +367,7 @@ export abstract class DividendCheckpointWrapper extends ModuleWrapper {
       expiry: bigNumberToDate(result[2]),
       amount: result[3],
       claimedAmount: result[4],
-      name: result[5]
+      name: bytes32ToString(result[5])
     }
     return typedResult;
   }

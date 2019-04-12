@@ -24,7 +24,13 @@ import {
 import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
 import { ModuleWrapper } from '../module_wrapper';
-import {bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
+import {
+  bigNumberToDate, bytes32ToString,
+  dateArrayToBigNumberArray,
+  dateToBigNumber,
+  numberToBigNumber, stringArrayToBytes32Array,
+  stringToBytes32
+} from '../../../utils/convert';
 
 interface IAddManualApprovalSubscribeAsyncParams extends ISubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents.AddManualApproval,
@@ -238,7 +244,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.to,
       params.allowance,
       dateToBigNumber(params.expiryTime),
-      params.description,
+      stringToBytes32(params.description),
       params.txData,
       params.safetyFactor
     );
@@ -250,7 +256,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.to,
       params.allowances,
       dateArrayToBigNumberArray(params.expiryTimes),
-      params.descriptions,
+      stringArrayToBytes32Array(params.descriptions),
       params.txData,
       params.safetyFactor
     );
@@ -262,7 +268,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.to,
       dateToBigNumber(params.expiryTime),
       params.changeInAllowance,
-      params.description,
+      stringToBytes32(params.description),
       params.increase,
       params.txData,
       params.safetyFactor
@@ -275,7 +281,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       params.to,
       dateArrayToBigNumberArray(params.expiryTimes),
       params.changedAllowances,
-      params.descriptions,
+      stringArrayToBytes32Array(params.descriptions),
       params.increase,
       params.txData,
       params.safetyFactor
@@ -311,8 +317,8 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
         to: result[1][i],
         allowance: result[2][i],
         expiryTime: bigNumberToDate(result[3][i]),
-        description: result[4][i]
-      }; 
+        description: bytes32ToString(result[4][i]),
+      };
       typedResult.push(approval);
     }
     return typedResult;
@@ -328,7 +334,7 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
       to: params.to,
       allowance: result[0],
       expiryTime: bigNumberToDate(result[1]),
-      description: result[2]
+      description: bytes32ToString(result[2])
     }
     return typedResult;
   }
@@ -346,8 +352,8 @@ export class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
         to: result[1][i],
         allowance: result[2][i],
         expiryTime: bigNumberToDate(result[3][i]),
-        description: result[4][i]
-      }; 
+        description: bytes32ToString(result[4][i]),
+      };
       typedResult.push(approval);
     }
     return typedResult;

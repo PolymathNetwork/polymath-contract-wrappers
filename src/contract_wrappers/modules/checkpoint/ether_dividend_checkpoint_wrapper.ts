@@ -31,8 +31,8 @@ import {
   } from '../../../types';
   import {
     numberToBigNumber,
-    dateToBigNumber,
-  } from '../../../utils/convert';
+    dateToBigNumber, stringToBytes32,
+} from '../../../utils/convert';
   import { assert } from '../../../utils/assert';
   import { schemas } from '@0x/json-schemas';
   import { DividendCheckpointWrapper } from './dividend_checkpoint_wrapper';
@@ -428,7 +428,7 @@ import {
         return (await this._contract).createDividend.sendTransactionAsync(
             dateToBigNumber(params.maturity),
             dateToBigNumber(params.expiry),
-            params.name,
+            stringToBytes32(params.name),
             params.txData,
             params.safetyFactor
         );
@@ -439,7 +439,7 @@ import {
             dateToBigNumber(params.maturity),
             dateToBigNumber(params.expiry),
             numberToBigNumber(params.checkpointId),
-            params.name,
+            stringToBytes32(params.name),
             params.txData,
             params.safetyFactor
         );
@@ -450,7 +450,7 @@ import {
             dateToBigNumber(params.maturity),
             dateToBigNumber(params.expiry),
             params.excluded,
-            params.name,
+            stringToBytes32(params.name),
             params.txData,
             params.safetyFactor
         );
@@ -462,7 +462,7 @@ import {
             dateToBigNumber(params.expiry),
             numberToBigNumber(params.checkpointId),
             params.excluded,
-            params.name,
+            stringToBytes32(params.name),
             params.txData,
             params.safetyFactor
         );
