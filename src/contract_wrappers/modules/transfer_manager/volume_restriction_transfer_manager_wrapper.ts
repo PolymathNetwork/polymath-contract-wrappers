@@ -394,7 +394,7 @@ interface IndividualRestriction {
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.
  */
 export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = (VolumeRestrictionTransferManager as any).abi;
+  public abi: ContractAbi = VolumeRestrictionTransferManager.abi;
 
   protected contract: Promise<VolumeRestrictionTMContract>;
 
@@ -749,7 +749,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      (VolumeRestrictionTransferManager as any).abi,
+      VolumeRestrictionTransferManager.abi,
       params.callback,
       !_.isUndefined(params.isVerbose),
     );
@@ -774,7 +774,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      (VolumeRestrictionTransferManager as any).abi,
+      VolumeRestrictionTransferManager.abi,
     );
     return logs;
   };

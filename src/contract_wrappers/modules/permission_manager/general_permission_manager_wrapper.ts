@@ -14,7 +14,7 @@ import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import { stringToBytes32, bytes32ToString } from '../../../utils/convert';
+import { bytes32ToString } from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission;
