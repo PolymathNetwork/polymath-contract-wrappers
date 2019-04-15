@@ -1,0 +1,4 @@
+lib/*
+docs/*
+scripts/*
+sandbox.ts

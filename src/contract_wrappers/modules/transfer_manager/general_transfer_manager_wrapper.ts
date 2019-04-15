@@ -11,418 +11,415 @@ import {
   GeneralTransferManagerChangeDefaultsEventArgs,
   GeneralTransferManagerModifyWhitelistEventArgs,
   GeneralTransferManagerPauseEventArgs,
-  GeneralTransferManagerUnpauseEventArgs
+  GeneralTransferManagerUnpauseEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { GeneralTransferManager } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
-import {
-  TxParams,
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
-  EventCallback,
-  ISubscribe,
-  IGetLogs
-} from '../../../types';
-import { assert } from '../../../utils/assert';
 import { schemas } from '@0x/json-schemas';
-import { ModuleWrapper } from '../module_wrapper';
-import {bigNumberToDate, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import assert from '../../../utils/assert';
+import ModuleWrapper from '../module_wrapper';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
-interface IChangeIssuanceAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress,
-  callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs>,
+interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
+  callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs>;
 }
 
-interface IGetChangeIssuanceAddressLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress,
+interface GetChangeIssuanceAddressLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
 }
 
-interface IAllowAllTransfersSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllTransfers,
-  callback: EventCallback<GeneralTransferManagerAllowAllTransfersEventArgs>,
+interface AllowAllTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllTransfers;
+  callback: EventCallback<GeneralTransferManagerAllowAllTransfersEventArgs>;
 }
 
-interface IGetAllowAllTransfersLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllTransfers,
+interface GetAllowAllTransfersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllTransfers;
 }
 
-interface IAllowAllWhitelistTransfersSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers,
-  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>,
+interface AllowAllWhitelistTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers;
+  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>;
 }
 
-interface IGetAllowAllWhitelistTransfersLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers,
+interface GetAllowAllWhitelistTransfersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers;
 }
 
-interface IAllowAllWhitelistIssuancesSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances,
-  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>,
+interface AllowAllWhitelistIssuancesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances;
+  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>;
 }
 
-interface IGetAllowAllWhitelistIssuancesLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances,
+interface GetAllowAllWhitelistIssuancesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances;
 }
 
-interface IAllowAllBurnTransfersSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers,
-  callback: EventCallback<GeneralTransferManagerAllowAllBurnTransfersEventArgs>,
+interface AllowAllBurnTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers;
+  callback: EventCallback<GeneralTransferManagerAllowAllBurnTransfersEventArgs>;
 }
 
-interface IGetAllowAllBurnTransfersLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers,
+interface GetAllowAllBurnTransfersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers;
 }
 
-interface IChangeSigningAddressSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeSigningAddress,
-  callback: EventCallback<GeneralTransferManagerChangeSigningAddressEventArgs>,
+interface ChangeSigningAddressSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeSigningAddress;
+  callback: EventCallback<GeneralTransferManagerChangeSigningAddressEventArgs>;
 }
 
-interface IGetChangeSigningAddressLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeSigningAddress,
+interface GetChangeSigningAddressLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeSigningAddress;
 }
 
-interface IChangeDefaultsSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeDefaults,
-  callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs>,
+interface ChangeDefaultsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeDefaults;
+  callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs>;
 }
 
-interface IGetChangeDefaultsLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeDefaults,
+interface GetChangeDefaultsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ChangeDefaults;
 }
 
-interface IModifyWhitelistSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyWhitelist,
-  callback: EventCallback<GeneralTransferManagerModifyWhitelistEventArgs>,
+interface ModifyWhitelistSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyWhitelist;
+  callback: EventCallback<GeneralTransferManagerModifyWhitelistEventArgs>;
 }
 
-interface IGetModifyWhitelistLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyWhitelist,
+interface GetModifyWhitelistLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyWhitelist;
 }
 
-interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.Pause,
-  callback: EventCallback<GeneralTransferManagerPauseEventArgs>,
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.Pause;
+  callback: EventCallback<GeneralTransferManagerPauseEventArgs>;
 }
 
-interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.Pause,
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.Pause;
 }
 
-interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.Unpause,
-  callback: EventCallback<GeneralTransferManagerUnpauseEventArgs>,
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.Unpause;
+  callback: EventCallback<GeneralTransferManagerUnpauseEventArgs>;
 }
 
-interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.Unpause,
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.Unpause;
 }
 
-interface IGeneralTransferManagerSubscribeAsyncParams extends ISubscribe {
-  (params: IChangeIssuanceAddressSubscribeAsyncParams): Promise<string>,
-  (params: IAllowAllTransfersSubscribeAsyncParams): Promise<string>,
-  (params: IAllowAllWhitelistTransfersSubscribeAsyncParams): Promise<string>,
-  (params: IAllowAllWhitelistIssuancesSubscribeAsyncParams): Promise<string>,
-  (params: IAllowAllBurnTransfersSubscribeAsyncParams): Promise<string>,
-  (params: IChangeSigningAddressSubscribeAsyncParams): Promise<string>,
-  (params: IChangeDefaultsSubscribeAsyncParams): Promise<string>,
-  (params: IModifyWhitelistSubscribeAsyncParams): Promise<string>,
-  (params: IPauseSubscribeAsyncParams): Promise<string>,
-  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+interface GeneralTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: ChangeIssuanceAddressSubscribeAsyncParams): Promise<string>;
+  (params: AllowAllTransfersSubscribeAsyncParams): Promise<string>;
+  (params: AllowAllWhitelistTransfersSubscribeAsyncParams): Promise<string>;
+  (params: AllowAllWhitelistIssuancesSubscribeAsyncParams): Promise<string>;
+  (params: AllowAllBurnTransfersSubscribeAsyncParams): Promise<string>;
+  (params: ChangeSigningAddressSubscribeAsyncParams): Promise<string>;
+  (params: ChangeDefaultsSubscribeAsyncParams): Promise<string>;
+  (params: ModifyWhitelistSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
 }
 
-interface IGetGeneralTransferManagerLogsAsyncParams extends IGetLogs {
-  (params: IGetChangeIssuanceAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs>>>,
-  (params: IGetAllowAllTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllTransfersEventArgs>>>,
-  (params: IGetAllowAllWhitelistTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>>>,
-  (params: IGetAllowAllWhitelistIssuancesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>>>,
-  (params: IGetAllowAllBurnTransfersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerAllowAllBurnTransfersEventArgs>>>,
-  (params: IGetChangeSigningAddressLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerChangeSigningAddressEventArgs>>>,
-  (params: IGetChangeDefaultsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs>>>,
-  (params: IGetModifyWhitelistLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerModifyWhitelistEventArgs>>>,
-  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs>>>,
-  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>>>,
+interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetChangeIssuanceAddressLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs>[]
+  >;
+  (params: GetAllowAllTransfersLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerAllowAllTransfersEventArgs>[]
+  >;
+  (params: GetAllowAllWhitelistTransfersLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>[]
+  >;
+  (params: GetAllowAllWhitelistIssuancesLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>[]
+  >;
+  (params: GetAllowAllBurnTransfersLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerAllowAllBurnTransfersEventArgs>[]
+  >;
+  (params: GetChangeSigningAddressLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerChangeSigningAddressEventArgs>[]
+  >;
+  (params: GetChangeDefaultsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs>[]
+  >;
+  (params: GetModifyWhitelistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyWhitelistEventArgs>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>[]>;
 }
 
 interface InvestorIndexParams {
-  investorIndex: number,
+  investorIndex: number;
 }
 
 interface InvestorAddressParams {
-  investorAddress: string,
+  investorAddress: string;
 }
 
 interface NonceMapParams {
-  address: string,
-  nonce: number,
+  address: string;
+  nonce: number;
 }
 
 interface ChangeDefaultsParams extends TxParams {
-  defaultFromTime: Date,
-  defaultToTime: Date,
+  defaultFromTime: Date;
+  defaultToTime: Date;
 }
 
 interface ChangeIssuanceAddressParams extends TxParams {
-  issuanceAddress: string,
+  issuanceAddress: string;
 }
 
 interface ChangeSigningAddressParams extends TxParams {
-  signingAddress: string,
+  signingAddress: string;
 }
 
 interface ChangeAllowAllTransfersParams extends TxParams {
-  allowAllTransfers: boolean,
+  allowAllTransfers: boolean;
 }
 
 interface ChangeAllowAllWhitelistTransfersParams extends TxParams {
-  allowAllWhitelistTransfers: boolean,
+  allowAllWhitelistTransfers: boolean;
 }
 
 interface ChangeAllowAllWhitelistIssuancesParams extends TxParams {
-  allowAllWhitelistIssuances: boolean,
+  allowAllWhitelistIssuances: boolean;
 }
 
 interface ChangeAllowAllBurnTransfersParams extends TxParams {
-  allowAllBurnTransfers: boolean,
+  allowAllBurnTransfers: boolean;
 }
 
 interface VerifyTransferParams extends TxParams {
-  from: string,
-  to: string,
-  amount: BigNumber,
-  data: string,
-  isTransfer: boolean,
+  from: string;
+  to: string;
+  amount: BigNumber;
+  data: string;
+  isTransfer: boolean;
 }
 
 interface ModifyWhitelistParams extends TxParams {
-  investor: string,
-  fromTime: Date,
-  toTime: Date,
-  expiryTime: Date,
-  canBuyFromSTO: boolean,
+  investor: string;
+  fromTime: Date;
+  toTime: Date;
+  expiryTime: Date;
+  canBuyFromSTO: boolean;
 }
 
 interface ModifyWhitelistSignedParams extends TxParams {
-  investor: string,
-  fromTime: Date,
-  toTime: Date,
-  expiryTime: Date,
-  canBuyFromSTO: boolean,
-  validFrom: Date,
-  validTo: Date,
-  nonce: number,
-  v: number|BigNumber,
-  r: string,
-  s: string,
+  investor: string;
+  fromTime: Date;
+  toTime: Date;
+  expiryTime: Date;
+  canBuyFromSTO: boolean;
+  validFrom: Date;
+  validTo: Date;
+  nonce: number;
+  v: number | BigNumber;
+  r: string;
+  s: string;
 }
 
 interface GetInvestorsDataParams {
-  investors: string[],
+  investors: string[];
 }
 
-//// Return types ////
+// // Return types ////
 interface TimeRestriction {
   /** The moment when the sale lockup period ends and the investor can freely sell or transfer away their tokens */
-  canSendAfter: Date,
+  canSendAfter: Date;
   /** The moment when the purchase lockup period ends and the investor can freely purchase or receive from others */
-  canReceiveAfter: Date,
+  canReceiveAfter: Date;
   /** The moment till investors KYC will be validated. After that investor need to do re-KYC */
-  expiryTime: Date,
+  expiryTime: Date;
   /** Used to know whether the investor is restricted investor or not */
-  canBuyFromSTO: boolean,
+  canBuyFromSTO: boolean;
 }
 
 interface Defaults {
-  canSendAfter: Date,
+  canSendAfter: Date;
   canReceiveAfter: Date;
 }
 
 interface WhitelistData {
-  investor: string,
-  timeRestriction: TimeRestriction
+  investor: string;
+  timeRestriction: TimeRestriction;
 }
-//// End of return types ////
+// // End of return types ////
 
 /**
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
-export class GeneralTransferManagerWrapper extends ModuleWrapper {
+export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public abi: ContractAbi = GeneralTransferManager.abi;
-  protected _contract: Promise<GeneralTransferManagerContract>;
+
+  protected contract: Promise<GeneralTransferManagerContract>;
 
   /**
    * Instantiate GeneralTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   public allowAllBurnTransfers = async () => {
-    return await (await this._contract).allowAllBurnTransfers.callAsync();
-  }
+    return (await this.contract).allowAllBurnTransfers.callAsync();
+  };
 
   public allowAllWhitelistTransfers = async () => {
-    return await (await this._contract).allowAllWhitelistTransfers.callAsync();
-  }
+    return (await this.contract).allowAllWhitelistTransfers.callAsync();
+  };
 
   public unpause = async (params: TxParams) => {
-    return (await this._contract).unpause.sendTransactionAsync(
-      params.txData,
-      params.safetyFactor
-    );
-  }
+    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
 
   public investors = async (params: InvestorIndexParams) => {
-    return await (await this._contract).investors.callAsync(
-      numberToBigNumber(params.investorIndex),
-    );
-  }
+    return (await this.contract).investors.callAsync(numberToBigNumber(params.investorIndex));
+  };
 
   public paused = async (): Promise<boolean> => {
-    return await (await this._contract).paused.callAsync();
-  }
+    return (await this.contract).paused.callAsync();
+  };
 
   public pause = async (params: TxParams) => {
-    return (await this._contract).pause.sendTransactionAsync(
-      params.txData,
-      params.safetyFactor
-    );
-  } 
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
 
   public whitelist = async (params: InvestorAddressParams) => {
-    const result = await (await this._contract).whitelist.callAsync(
-      params.investorAddress,
-    );
+    const result = await (await this.contract).whitelist.callAsync(params.investorAddress);
     const typedResult: TimeRestriction = {
       canSendAfter: bigNumberToDate(result[0]),
       canReceiveAfter: bigNumberToDate(result[1]),
       expiryTime: bigNumberToDate(result[2]),
-      canBuyFromSTO: result[3].toNumber() === 1
-    }
+      canBuyFromSTO: result[3].toNumber() === 1,
+    };
     return typedResult;
-  }
+  };
 
   public nonceMap = async (params: NonceMapParams) => {
-    return await (await this._contract).nonceMap.callAsync(
-      params.address,
-      numberToBigNumber(params.nonce),
-    );
-  }
+    return (await this.contract).nonceMap.callAsync(params.address, numberToBigNumber(params.nonce));
+  };
 
   public allowAllTransfers = async () => {
-    return await (await this._contract).allowAllTransfers.callAsync();
-  }
+    return (await this.contract).allowAllTransfers.callAsync();
+  };
 
   public signingAddress = async () => {
-    return await (await this._contract).signingAddress.callAsync();
-  }
+    return (await this.contract).signingAddress.callAsync();
+  };
 
   public issuanceAddress = async () => {
-    return await (await this._contract).issuanceAddress.callAsync();
-  }
+    return (await this.contract).issuanceAddress.callAsync();
+  };
 
   public allowAllWhitelistIssuances = async () => {
-    return await (await this._contract).allowAllWhitelistIssuances.callAsync();
-  }
+    return (await this.contract).allowAllWhitelistIssuances.callAsync();
+  };
 
   public defaults = async () => {
-    const result = await (await this._contract).defaults.callAsync();
+    const result = await (await this.contract).defaults.callAsync();
     const typedResult: Defaults = {
       canSendAfter: bigNumberToDate(result[0]),
       canReceiveAfter: bigNumberToDate(result[1]),
-    }
+    };
     return typedResult;
-  }
+  };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    return (await this._contract).changeDefaults.sendTransactionAsync(
+    return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
-    return (await this._contract).changeIssuanceAddress.sendTransactionAsync(
+    return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
-    return (await this._contract).changeSigningAddress.sendTransactionAsync(
+    return (await this.contract).changeSigningAddress.sendTransactionAsync(
       params.signingAddress,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
-    return (await this._contract).changeAllowAllTransfers.sendTransactionAsync(
+    return (await this.contract).changeAllowAllTransfers.sendTransactionAsync(
       params.allowAllTransfers,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
-    return (await this._contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
+    return (await this.contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
       params.allowAllWhitelistTransfers,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
-    return (await this._contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
+    return (await this.contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
       params.allowAllWhitelistIssuances,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
-    return (await this._contract).changeAllowAllBurnTransfers.sendTransactionAsync(
+    return (await this.contract).changeAllowAllBurnTransfers.sendTransactionAsync(
       params.allowAllBurnTransfers,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
-    return (await this._contract).verifyTransfer.sendTransactionAsync(
+    return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
       params.amount,
       params.data,
       params.isTransfer,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    return (await this._contract).modifyWhitelist.sendTransactionAsync(
+    return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.fromTime),
       dateToBigNumber(params.toTime),
       dateToBigNumber(params.expiryTime),
       params.canBuyFromSTO,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
-    return (await this._contract).modifyWhitelistSigned.sendTransactionAsync(
+    return (await this.contract).modifyWhitelistSigned.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.fromTime),
       dateToBigNumber(params.toTime),
@@ -437,16 +434,16 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.txData,
       params.safetyFactor,
     );
-  }
+  };
 
   public getInvestors = async () => {
-    return await (await this._contract).getInvestors.callAsync();
-  }
+    return (await this.contract).getInvestors.callAsync();
+  };
 
   public getAllInvestorsData = async () => {
-    const result = await (await this._contract).getAllInvestorsData.callAsync();
+    const result = await (await this.contract).getAllInvestorsData.callAsync();
     const typedResult: WhitelistData[] = [];
-    for (let i = 0; i < result[0].length; i++) {
+    for (let i = 0; i < result[0].length; i += 1) {
       const whitelistData: WhitelistData = {
         investor: result[0][i],
         timeRestriction: {
@@ -454,19 +451,17 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
           canReceiveAfter: bigNumberToDate(result[2][i]),
           expiryTime: bigNumberToDate(result[3][i]),
           canBuyFromSTO: result[4][i],
-        }
-      }
+        },
+      };
       typedResult.push(whitelistData);
     }
     return typedResult;
-  }
+  };
 
   public getInvestorsData = async (params: GetInvestorsDataParams) => {
-    const result = await (await this._contract).getInvestorsData.callAsync(
-        params.investors,
-    );
+    const result = await (await this.contract).getInvestorsData.callAsync(params.investors);
     const typedResult: WhitelistData[] = [];
-    for (let i = 0; i < params.investors.length; i++) {
+    for (let i = 0; i < params.investors.length; i += 1) {
       const whitelistData: WhitelistData = {
         investor: params.investors[i],
         timeRestriction: {
@@ -474,47 +469,51 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
           canReceiveAfter: bigNumberToDate(result[1][i]),
           expiryTime: bigNumberToDate(result[2][i]),
           canBuyFromSTO: result[3][i],
-        }
-      }
+        },
+      };
       typedResult.push(whitelistData);
     }
     return typedResult;
-  }
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IGeneralTransferManagerSubscribeAsyncParams = async <ArgsType extends GeneralTransferManagerEventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: GeneralTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs
+  >(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        GeneralTransferManager.abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      GeneralTransferManager.abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetGeneralTransferManagerLogsAsyncParams = async <ArgsType extends GeneralTransferManagerEventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: GetGeneralTransferManagerLogsAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
@@ -522,5 +521,5 @@ export class GeneralTransferManagerWrapper extends ModuleWrapper {
       GeneralTransferManager.abi,
     );
     return logs;
-  }
+  };
 }

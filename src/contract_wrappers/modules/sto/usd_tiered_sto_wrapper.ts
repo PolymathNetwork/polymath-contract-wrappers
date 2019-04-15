@@ -21,167 +21,172 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
+import { schemas } from '@0x/json-schemas';
 import {
   TxParams,
-  IGetLogsAsyncParams,
-  ISubscribeAsyncParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
   EventCallback,
   TxPayableParams,
-  ISubscribe,
-  IGetLogs, FundRaiseType
+  Subscribe,
+  GetLogs,
+  FundRaiseType,
 } from '../../../types';
-import { assert } from '../../../utils/assert';
-import { schemas } from '@0x/json-schemas';
-import { STOWrapper } from './sto_wrapper';
-import {bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
+import assert from '../../../utils/assert';
+import STOWrapper from './sto_wrapper';
+import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
-interface ISetAllowBeneficialInvestmentsSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments,
-  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>,
+interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
+  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>;
 }
 
-interface IGetSetAllowBeneficialInvestmentsLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments,
+interface GetSetAllowBeneficialInvestmentsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
 }
 
-interface ISetNonAccreditedLimitSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetNonAccreditedLimit,
-  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs>,
+interface SetNonAccreditedLimitSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetNonAccreditedLimit;
+  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs>;
 }
 
-interface IGetSetNonAccreditedLimitLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetNonAccreditedLimit,
+interface GetSetNonAccreditedLimitLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetNonAccreditedLimit;
 }
 
-interface ISetAccreditedSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAccredited,
-  callback: EventCallback<USDTieredSTOSetAccreditedEventArgs>,
+interface SetAccreditedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAccredited;
+  callback: EventCallback<USDTieredSTOSetAccreditedEventArgs>;
 }
 
-interface IGetSetAccreditedLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAccredited,
+interface GetSetAccreditedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAccredited;
 }
 
-interface ITokenPurchaseSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.TokenPurchase,
-  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs>,
+interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.TokenPurchase;
+  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs>;
 }
 
-interface IGetTokenPurchaseLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.TokenPurchase,
+interface GetTokenPurchaseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.TokenPurchase;
 }
 
-interface IFundsReceivedSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.FundsReceived,
-  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs>,
+interface FundsReceivedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.FundsReceived;
+  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs>;
 }
 
-interface IGetFundsReceivedLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.FundsReceived,
+interface GetFundsReceivedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.FundsReceived;
 }
 
-interface IReserveTokenMintSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.ReserveTokenMint,
-  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs>,
+interface ReserveTokenMintSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.ReserveTokenMint;
+  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs>;
 }
 
-interface IGetReserveTokenMintLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.ReserveTokenMint,
+interface GetReserveTokenMintLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.ReserveTokenMint;
 }
 
-interface ISetAddressesSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAddresses,
-  callback: EventCallback<USDTieredSTOSetAddressesEventArgs>,
+interface SetAddressesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetAddresses;
+  callback: EventCallback<USDTieredSTOSetAddressesEventArgs>;
 }
 
-interface IGetSetAddressesLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAddresses,
+interface GetSetAddressesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetAddresses;
 }
 
-interface ISetLimitsSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetLimits,
-  callback: EventCallback<USDTieredSTOSetLimitsEventArgs>,
+interface SetLimitsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetLimits;
+  callback: EventCallback<USDTieredSTOSetLimitsEventArgs>;
 }
 
-interface IGetSetLimitsLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetLimits,
+interface GetSetLimitsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetLimits;
 }
 
-interface ISetTimesSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetTimes,
-  callback: EventCallback<USDTieredSTOSetTimesEventArgs>,
+interface SetTimesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetTimes;
+  callback: EventCallback<USDTieredSTOSetTimesEventArgs>;
 }
 
-interface IGetSetTimesLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetTimes,
+interface GetSetTimesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetTimes;
 }
 
-interface ISetTiersSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetTiers,
-  callback: EventCallback<USDTieredSTOSetTiersEventArgs>,
+interface SetTiersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetTiers;
+  callback: EventCallback<USDTieredSTOSetTiersEventArgs>;
 }
 
-interface IGetSetTiersLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetTiers,
+interface GetSetTiersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetTiers;
 }
 
-interface ISetFundRaiseTypesSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetFundRaiseTypes,
-  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs>,
+interface SetFundRaiseTypesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetFundRaiseTypes;
+  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs>;
 }
 
-interface IGetSetFundRaiseTypesLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetFundRaiseTypes,
+interface GetSetFundRaiseTypesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetFundRaiseTypes;
 }
 
-interface IPauseSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.Pause,
-  callback: EventCallback<USDTieredSTOPauseEventArgs>,
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.Pause;
+  callback: EventCallback<USDTieredSTOPauseEventArgs>;
 }
 
-interface IGetPauseLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.Pause,
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.Pause;
 }
 
-interface IUnpauseSubscribeAsyncParams extends ISubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.Unpause,
-  callback: EventCallback<USDTieredSTOUnpauseEventArgs>,
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.Unpause;
+  callback: EventCallback<USDTieredSTOUnpauseEventArgs>;
 }
 
-interface IGetUnpauseLogsAsyncParams extends IGetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.Unpause,
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.Unpause;
 }
 
-interface IUSDTieredSTOSubscribeAsyncParams extends ISubscribe {
-  (params: ISetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>,
-  (params: ISetNonAccreditedLimitSubscribeAsyncParams): Promise<string>,
-  (params: ISetAccreditedSubscribeAsyncParams): Promise<string>,
-  (params: ITokenPurchaseSubscribeAsyncParams): Promise<string>,
-  (params: IFundsReceivedSubscribeAsyncParams): Promise<string>,
-  (params: IReserveTokenMintSubscribeAsyncParams): Promise<string>,
-  (params: ISetAddressesSubscribeAsyncParams): Promise<string>,
-  (params: ISetLimitsSubscribeAsyncParams): Promise<string>,
-  (params: ISetTimesSubscribeAsyncParams): Promise<string>,
-  (params: ISetTiersSubscribeAsyncParams): Promise<string>,
-  (params: ISetFundRaiseTypesSubscribeAsyncParams): Promise<string>,
-  (params: IPauseSubscribeAsyncParams): Promise<string>,
-  (params: IUnpauseSubscribeAsyncParams): Promise<string>,
+interface USDTieredSTOSubscribeAsyncParams extends Subscribe {
+  (params: SetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>;
+  (params: SetNonAccreditedLimitSubscribeAsyncParams): Promise<string>;
+  (params: SetAccreditedSubscribeAsyncParams): Promise<string>;
+  (params: TokenPurchaseSubscribeAsyncParams): Promise<string>;
+  (params: FundsReceivedSubscribeAsyncParams): Promise<string>;
+  (params: ReserveTokenMintSubscribeAsyncParams): Promise<string>;
+  (params: SetAddressesSubscribeAsyncParams): Promise<string>;
+  (params: SetLimitsSubscribeAsyncParams): Promise<string>;
+  (params: SetTimesSubscribeAsyncParams): Promise<string>;
+  (params: SetTiersSubscribeAsyncParams): Promise<string>;
+  (params: SetFundRaiseTypesSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
 }
 
-interface IGetUSDTieredSTOLogsAsyncParams extends IGetLogs {
-  (params: IGetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>>>,
-  (params: IGetSetNonAccreditedLimitLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>>>,
-  (params: IGetSetAccreditedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAccreditedEventArgs>>>,
-  (params: IGetTokenPurchaseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs>>>,
-  (params: IGetFundsReceivedLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs>>>,
-  (params: IGetReserveTokenMintLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs>>>,
-  (params: IGetSetAddressesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs>>>,
-  (params: IGetSetLimitsLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs>>>,
-  (params: IGetSetTimesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs>>>,
-  (params: IGetSetTiersLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs>>>,
-  (params: IGetSetFundRaiseTypesLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs>>>,
-  (params: IGetPauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOPauseEventArgs>>>,
-  (params: IGetUnpauseLogsAsyncParams): Promise<Array<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>>>,
+interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
+  (params: GetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>[]
+  >;
+  (params: GetSetNonAccreditedLimitLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>[]
+  >;
+  (params: GetSetAccreditedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAccreditedEventArgs>[]>;
+  (params: GetTokenPurchaseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs>[]>;
+  (params: GetFundsReceivedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs>[]>;
+  (params: GetReserveTokenMintLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs>[]>;
+  (params: GetSetAddressesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs>[]>;
+  (params: GetSetLimitsLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs>[]>;
+  (params: GetSetTimesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs>[]>;
+  (params: GetSetTiersLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs>[]>;
+  (params: GetSetFundRaiseTypesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOPauseEventArgs>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>[]>;
 }
 
 interface TierIndexParams {
@@ -202,76 +207,76 @@ interface StableCoinParams {
 }
 
 interface InvestorIndexParams {
-  investorIndex: number,
+  investorIndex: number;
 }
 
 interface InvestorAddressParams {
-  investorAddress: string,
+  investorAddress: string;
 }
 
 interface InvestorInvestedParams {
-  investorAddress: string,
-  fundRaiseType: FundRaiseType,
+  investorAddress: string;
+  fundRaiseType: FundRaiseType;
 }
 
 interface UsdTokenIndexParams {
-  usdTokenIndex: number,
+  usdTokenIndex: number;
 }
 
 interface BuyTokensViewParams {
-  beneficiary: string,
-  investmentValue: BigNumber,
-  fundRaiseType: FundRaiseType,
+  beneficiary: string;
+  investmentValue: BigNumber;
+  fundRaiseType: FundRaiseType;
 }
 
 /**
-* @param investors Array of investor addresses to modify
-* @param accredited Array of bools specifying accreditation status
-*/
+ * @param investors Array of investor addresses to modify
+ * @param accredited Array of bools specifying accreditation status
+ */
 interface ChangeAccreditedParams extends TxParams {
   investors: string[];
   accredited: boolean[];
 }
 
 /**
-* @param investors Array of investor addresses to modify
-* @param nonAccreditedLimit Array of uints specifying non-accredited limits
-*/
+ * @param investors Array of investor addresses to modify
+ * @param nonAccreditedLimit Array of uints specifying non-accredited limits
+ */
 interface ChangeNonAccreditedLimitParams extends TxParams {
   investors: string[];
   nonAccreditedLimit: BigNumber[];
 }
 
 /**
-* @param startTime start time of sto
-* @param endTime end time of sto
-*/
+ * @param startTime start time of sto
+ * @param endTime end time of sto
+ */
 interface ModifyTimesParams extends TxParams {
   startTime: Date;
   endTime: Date;
 }
 
 /**
-* @param nonAccreditedLimitUSD max non accredited invets limit
-* @param minimumInvestmentUSD overall minimum investment limit
-*/
+ * @param nonAccreditedLimitUSD max non accredited invets limit
+ * @param minimumInvestmentUSD overall minimum investment limit
+ */
 interface ModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
 
 /**
-* @param fundRaiseTypes Array of fund raise types to allow
-*/
+ * @param fundRaiseTypes Array of fund raise types to allow
+ */
 interface ModifyFundingParams extends TxParams {
   fundRaiseTypes: FundRaiseType[];
 }
 
 /**
-* @param wallet Address of wallet where funds are sent
-* @param reserveWallet Address of wallet where unsold tokens are sent
-* @param usdTokens Address of usd tokens
-*/
+ * @param wallet Address of wallet where funds are sent
+ * @param reserveWallet Address of wallet where unsold tokens are sent
+ * @param usdTokens Address of usd tokens
+ */
 interface ModifyAddressesParams extends TxParams {
   wallet: string;
   reserveWallet: string;
@@ -279,11 +284,11 @@ interface ModifyAddressesParams extends TxParams {
 }
 
 /**
-* @param ratePerTier Array of rates per tier
-* @param ratePerTierDiscountPoly Array of discounted poly rates per tier
-* @param tokensPerTierTotal Array of total tokens per tier
-* @param tokensPerTierDiscountPoly Array of discounted tokens per tier
-*/
+ * @param ratePerTier Array of rates per tier
+ * @param ratePerTierDiscountPoly Array of discounted poly rates per tier
+ * @param tokensPerTierTotal Array of total tokens per tier
+ * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
+ */
 interface ModifyTiersParams extends TxParams {
   ratePerTier: BigNumber[];
   ratePerTierDiscountPoly: BigNumber[];
@@ -292,243 +297,231 @@ interface ModifyTiersParams extends TxParams {
 }
 
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
-  allowBeneficialInvestments: boolean,
+  allowBeneficialInvestments: boolean;
 }
 
 interface BuyWithETHParams extends TxPayableParams {
-  beneficiary: string,
+  beneficiary: string;
 }
 
 interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
-  minTokens: BigNumber,
+  minTokens: BigNumber;
 }
 
 interface BuyWithPOLYParams extends TxParams {
-  beneficiary: string,
-  investedPOLY: BigNumber,
+  beneficiary: string;
+  investedPOLY: BigNumber;
 }
 
 interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
-  minTokens: BigNumber,
+  minTokens: BigNumber;
 }
 
 interface BuyWithUSDParams extends TxParams {
-  beneficiary: string,
-  investedSC: BigNumber,
-  usdToken: string,
+  beneficiary: string;
+  investedSC: BigNumber;
+  usdToken: string;
 }
 
 interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
-  minTokens: BigNumber,
+  minTokens: BigNumber;
 }
 
-//// Return types ////
+// Return types //
 interface AccreditedData {
   /** Investor address */
-  investor: string,
-  accreditedData: InvestorData
+  investor: string;
+  accreditedData: InvestorData;
 }
 
 interface InvestorData {
   /** Whether investor is accredited */
-  accredited: boolean,
+  accredited: boolean;
   /** Overrides for default limit in USD for non-accredited investors multiplied by 10**18 (0 = no override) */
-  nonAccreditedLimitUSDOverride: BigNumber
+  nonAccreditedLimitUSDOverride: BigNumber;
 }
 
 interface BuyTokensViewData {
   /** USD amount spent */
-  spentUSD: BigNumber,
-  spentValue: BigNumber,
+  spentUSD: BigNumber;
+  spentValue: BigNumber;
   /** Minted tokens amount */
-  tokensMinted: BigNumber
+  tokensMinted: BigNumber;
 }
 
 interface Tier {
-  /** How many token units a buyer gets per USD in this tier*/
-  rate: BigNumber,
+  /** How many token units a buyer gets per USD in this tier */
+  rate: BigNumber;
   /** How many token units a buyer gets per USD in this tier (multiplied by 10**18) when investing in POLY up to tokensDiscountPoly */
-  rateDiscountPoly: BigNumber
+  rateDiscountPoly: BigNumber;
   /** How many tokens are available in this tier (relative to totalSupply) */
-  tokenTotal: BigNumber
+  tokenTotal: BigNumber;
   /** How many token units are available in this tier (relative to totalSupply) at the ratePerTierDiscountPoly rate */
-  tokensDiscountPoly: BigNumber
+  tokensDiscountPoly: BigNumber;
   /** How many tokens have been minted in this tier (relative to totalSupply) */
-  mintedTotal: BigNumber
+  mintedTotal: BigNumber;
   /** How many tokens have been minted in this tier (relative to totalSupply) at discounted POLY rate */
-  mintedDiscountPoly: BigNumber
+  mintedDiscountPoly: BigNumber;
 }
 
 interface USDTieredSTOData {
   /** Timestamp at which offering gets start. */
-  startTime: Date,
+  startTime: Date;
   /** Timestamp at which offering ends. */
-  endTime: Date,
+  endTime: Date;
   /** Currently active tier */
-  currentTier: number,
+  currentTier: number;
   /** Array of Number of tokens this STO will be allowed to sell at different tiers. */
-  capPerTier: BigNumber[],
+  capPerTier: BigNumber[];
   /** Array Rate at which tokens are sold at different tiers */
-  ratePerTier: BigNumber[],
+  ratePerTier: BigNumber[];
   /** Amount of funds raised */
-  fundsRaised: BigNumber,
+  fundsRaised: BigNumber;
   /** Number of individual investors this STO has. */
-  investorCount: number,
+  investorCount: number;
   /** Amount of tokens sold. */
-  tokensSold: BigNumber,
+  tokensSold: BigNumber;
   /** Whether the STO accepts ETH */
-  isRaisedInETH: boolean,
+  isRaisedInETH: boolean;
   /** Whether the STO accepts POLY */
-  isRaisedInPOLY: boolean,
+  isRaisedInPOLY: boolean;
   /** Whether the STO accepts SableCoins */
-  isRaisedInSC: boolean,
+  isRaisedInSC: boolean;
 }
 
 interface MintedByTier {
-  mintedInETH: BigNumber,
-  mintedInPOLY: BigNumber,
-  mintedInSC: BigNumber
+  mintedInETH: BigNumber;
+  mintedInPOLY: BigNumber;
+  mintedInSC: BigNumber;
 }
-//// End of return types ////
+// End of return types //
 
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
-export class USDTieredSTOWrapper extends STOWrapper {
+export default class USDTieredSTOWrapper extends STOWrapper {
   public abi: ContractAbi = (USDTieredSTO as any).abi;
-  protected _contract: Promise<USDTieredSTOContract>;
+
+  protected contract: Promise<USDTieredSTOContract>;
 
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOContract>) {
     super(web3Wrapper, contract);
-    this._contract = contract;
+    this.contract = contract;
   }
 
   public investorsList = async (params: InvestorIndexParams) => {
-    return await (await this._contract).investorsList.callAsync(
-      numberToBigNumber(params.investorIndex),
-    );
-  }
+    return (await this.contract).investorsList.callAsync(numberToBigNumber(params.investorIndex));
+  };
 
   public allowBeneficialInvestments = async () => {
-    return await (await this._contract).allowBeneficialInvestments.callAsync();
-  }
+    return (await this.contract).allowBeneficialInvestments.callAsync();
+  };
 
   public paused = async () => {
-    return await (await this._contract).paused.callAsync();
-  }
+    return (await this.contract).paused.callAsync();
+  };
 
   public finalAmountReturned = async () => {
-    return await (await this._contract).finalAmountReturned.callAsync();
-  }
+    return (await this.contract).finalAmountReturned.callAsync();
+  };
 
   public investors = async (params: InvestorAddressParams) => {
-    const result = await (await this._contract).investors.callAsync(
-      params.investorAddress,
-    );
+    const result = await (await this.contract).investors.callAsync(params.investorAddress);
     const typedResult: InvestorData = {
       accredited: !result[0].isZero(),
-      nonAccreditedLimitUSDOverride: result[2]
+      nonAccreditedLimitUSDOverride: result[2],
     };
     return typedResult;
-  }
+  };
 
   public investorInvested = async (params: InvestorInvestedParams) => {
-    return await (await this._contract).investorInvested.callAsync(
-      params.investorAddress,
-      params.fundRaiseType,
-    );
-  }
+    return (await this.contract).investorInvested.callAsync(params.investorAddress, params.fundRaiseType);
+  };
 
   public usdTokenEnabled = async (params: StableCoinParams) => {
-    return await (await this._contract).usdTokenEnabled.callAsync(
-      params.stableCoinAddress,
-    );
-  }
+    return (await this.contract).usdTokenEnabled.callAsync(params.stableCoinAddress);
+  };
 
   public usdTokens = async (params: UsdTokenIndexParams) => {
-    return await (await this._contract).usdTokens.callAsync(
-      numberToBigNumber(params.usdTokenIndex),
-    );
-  }
+    return (await this.contract).usdTokens.callAsync(numberToBigNumber(params.usdTokenIndex));
+  };
 
   public investorInvestedUSD = async (params: InvestorAddressParams) => {
-    return await (await this._contract).investorInvestedUSD.callAsync(
-      params.investorAddress,
-    );
-  }
+    return (await this.contract).investorInvestedUSD.callAsync(params.investorAddress);
+  };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
-    return (await this._contract).changeAllowBeneficialInvestments.sendTransactionAsync(
+    return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(
       params.allowBeneficialInvestments,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithETH = async (params: BuyWithETHParams) => {
-    return (await this._contract).buyWithETH.sendTransactionAsync(
+    return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
-    return (await this._contract).buyWithPOLY.sendTransactionAsync(
+    return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithUSD = async (params: BuyWithUSDParams) => {
-    return (await this._contract).buyWithUSD.sendTransactionAsync(
+    return (await this.contract).buyWithUSD.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
       params.usdToken,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
-    return (await this._contract).buyWithETHRateLimited.sendTransactionAsync(
+    return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
-    return (await this._contract).buyWithPOLYRateLimited.sendTransactionAsync(
+    return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
       params.minTokens,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
-    return (await this._contract).buyWithUSDRateLimited.sendTransactionAsync(
+    return (await this.contract).buyWithUSDRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
       params.minTokens,
       params.usdToken,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   public buyTokensView = async (params: BuyTokensViewParams) => {
-    const result = await (await this._contract).buyTokensView.callAsync(
+    const result = await (await this.contract).buyTokensView.callAsync(
       params.beneficiary,
       params.investmentValue,
       params.fundRaiseType,
@@ -537,43 +530,36 @@ export class USDTieredSTOWrapper extends STOWrapper {
       spentUSD: result[0],
       spentValue: result[1],
       tokensMinted: result[2],
-    }
+    };
     return typedResult;
-  }
+  };
 
   public isOpen = async () => {
-    return await (await this._contract).isOpen.callAsync();
-  }
+    return (await this.contract).isOpen.callAsync();
+  };
 
   public capReached = async () => {
-    return await (await this._contract).capReached.callAsync();
-  }
+    return (await this.contract).capReached.callAsync();
+  };
 
   public getRate = async (params: FundRaiseTypeParams) => {
-    return await (await this._contract).getRate.callAsync(
-      params.fundRaiseType,
-    );
-  }
+    return (await this.contract).getRate.callAsync(params.fundRaiseType);
+  };
 
   public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
-    return await (await this._contract).convertFromUSD.callAsync(
-      params.fundRaiseType,
-      params.amount,
-    );
-  }
+    return (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, params.amount);
+  };
 
   public getTokensMinted = async () => {
-    return await (await this._contract).getTokensMinted.callAsync();
-  }
+    return (await this.contract).getTokensMinted.callAsync();
+  };
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
-    return await (await this._contract).getTokensSoldByTier.callAsync(
-      numberToBigNumber(params.tier),
-    );
-  }
+    return (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
+  };
 
   public getSTODetails = async () => {
-    const result = await (await this._contract).getSTODetails.callAsync();
+    const result = await (await this.contract).getSTODetails.callAsync();
     const typedResult: USDTieredSTOData = {
       startTime: bigNumberToDate(result[0]),
       endTime: bigNumberToDate(result[1]),
@@ -586,78 +572,78 @@ export class USDTieredSTOWrapper extends STOWrapper {
       isRaisedInETH: result[8][0],
       isRaisedInPOLY: result[8][1],
       isRaisedInSC: result[8][2],
-    }
+    };
     return typedResult;
-  }
+  };
 
   /**
    * Current tier
    */
   public currentTier = async () => {
-    return await (await this._contract).currentTier.callAsync();
-  }
+    return (await this.contract).currentTier.callAsync();
+  };
 
   /**
    * Get the limit in USD for non-accredited investors
    */
   public nonAccreditedLimitUSD = async () => {
-    return await (await this._contract).nonAccreditedLimitUSD.callAsync();
-  }
+    return (await this.contract).nonAccreditedLimitUSD.callAsync();
+  };
 
   /**
    * Get the minimun investment in USD
    */
   public minimumInvestmentUSD = async () => {
-    return await (await this._contract).minimumInvestmentUSD.callAsync();
-  }
+    return (await this.contract).minimumInvestmentUSD.callAsync();
+  };
 
   /**
    * Ethereum account address to receive unsold tokens
    */
   public reserveWallet = async () => {
-    return await (await this._contract).reserveWallet.callAsync();
-  }
+    return (await this.contract).reserveWallet.callAsync();
+  };
 
   /**
    * Return the total no. of tokens sold
    */
   public getTokensSold = async () => {
-    return await (await this._contract).getTokensSold.callAsync();
-  }
+    return (await this.contract).getTokensSold.callAsync();
+  };
 
   /**
    * Whether or not the STO has been finalized
    */
   public isFinalized = async () => {
-    return await (await this._contract).isFinalized.callAsync();
-  }
+    return (await this.contract).isFinalized.callAsync();
+  };
 
   /**
    * Return the total no. of tiers
    */
   public getNumberOfTiers = async () => {
-    return await (await this._contract).getNumberOfTiers.callAsync();
-  }
+    return (await this.contract).getNumberOfTiers.callAsync();
+  };
 
   /**
    * Return the usd tokens accepted by the STO
    */
   public getUsdTokens = async () => {
-    return await (await this._contract).getUsdTokens.callAsync();
-  }
+    return (await this.contract).getUsdTokens.callAsync();
+  };
 
   /**
    * Amount of USD funds raised
    */
   public fundsRaisedUSD = async () => {
-    return await (await this._contract).fundsRaisedUSD.callAsync();
-  }
+    return (await this.contract).fundsRaisedUSD.callAsync();
+  };
 
   /**
    * Get specific tier
    */
   public tiers = async (params: TierIndexParams) => {
-    const result = await (await this._contract).tiers.callAsync(numberToBigNumber(params.tier));
+    const result = await (await this.contract).tiers.callAsync(numberToBigNumber(params.tier));
     const typedResult: Tier = {
       rate: result[0],
       rateDiscountPoly: result[1],
@@ -665,205 +651,199 @@ export class USDTieredSTOWrapper extends STOWrapper {
       tokensDiscountPoly: result[3],
       mintedTotal: result[4],
       mintedDiscountPoly: result[5],
-    }
+    };
     return typedResult;
-  }
+  };
 
   /**
    * Return array of minted tokens in each fund raise type for given tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
-    const result = await (await this._contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
+    const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: result[0],
       mintedInPOLY: result[1],
       mintedInSC: result[2],
-    }
+    };
     return typedResult;
-  }
+  };
 
   /**
    * This function converts from ETH or POLY to USD
    * @return Value in USD
    */
   public convertToUSD = async (params: ConvertToOrFromUSDParams) => {
-    return await (await this._contract).convertToUSD.callAsync(
-      params.fundRaiseType,
-      params.amount,
-    );
-  }
+    return (await this.contract).convertToUSD.callAsync(params.fundRaiseType, params.amount);
+  };
 
   /**
    * Return the total no. of tokens sold for the given fund raise type
    * @return Total number of tokens sold for ETH
    */
   public getTokensSoldFor = async (params: FundRaiseTypeParams) => {
-    return await (await this._contract).getTokensSoldFor.callAsync(params.fundRaiseType);
-  }
+    return (await this.contract).getTokensSoldFor.callAsync(params.fundRaiseType);
+  };
 
   /**
    * Amount of stable coins raised
    */
   public stableCoinsRaised = async (params: StableCoinParams) => {
-    return await (await this._contract).stableCoinsRaised.callAsync(params.stableCoinAddress);
-  }
+    return (await this.contract).stableCoinsRaised.callAsync(params.stableCoinAddress);
+  };
 
   /**
    * Finalizes the STO and mint remaining tokens to reserve address
    * Reserve address must be whitelisted to successfully finalize
    */
   public finalize = async (params: TxParams) => {
-    return (await this._contract).finalize.sendTransactionAsync(
-      params.txData,
-      params.safetyFactor
-    );
-  }
+    return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
 
   /**
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
-    return (await this._contract).changeAccredited.sendTransactionAsync(
+    return (await this.contract).changeAccredited.sendTransactionAsync(
       params.investors,
       params.accredited,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
-    return (await this._contract).changeNonAccreditedLimit.sendTransactionAsync(
+    return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
       params.investors,
       params.nonAccreditedLimit,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifies STO start and end times
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
-    return (await this._contract).modifyTimes.sendTransactionAsync(
+    return (await this.contract).modifyTimes.sendTransactionAsync(
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
       params.txData,
       params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
-    return (await this._contract).modifyLimits.sendTransactionAsync(
+    return (await this.contract).modifyLimits.sendTransactionAsync(
       params.nonAccreditedLimitUSD,
       params.minimumInvestmentUSD,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifies fund raise types
    */
   public modifyFunding = async (params: ModifyFundingParams) => {
-    return (await this._contract).modifyFunding.sendTransactionAsync(
+    return (await this.contract).modifyFunding.sendTransactionAsync(
       params.fundRaiseTypes,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
-    return (await this._contract).modifyAddresses.sendTransactionAsync(
+    return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.reserveWallet,
       params.usdToken,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public modifyTiers = async (params: ModifyTiersParams) => {
-    return (await this._contract).modifyTiers.sendTransactionAsync(
+    return (await this.contract).modifyTiers.sendTransactionAsync(
       params.ratePerTier,
       params.ratePerTierDiscountPoly,
       params.tokensPerTierTotal,
       params.tokensPerTierDiscountPoly,
       params.txData,
-      params.safetyFactor
+      params.safetyFactor,
     );
-  }
+  };
 
   /**
    * Returns investor accredited & non-accredited override informatiomn
    */
   public getAccreditedData = async () => {
-    const result = await (await this._contract).getAccreditedData.callAsync();
+    const result = await (await this.contract).getAccreditedData.callAsync();
     const typedResult: AccreditedData[] = [];
-    for (let i = 0; i < result[0].length; i++) {
+    for (let i = 0; i < result[0].length; i += 1) {
       const accreditedData: AccreditedData = {
         investor: result[0][i],
         accreditedData: {
           accredited: result[1][i],
-          nonAccreditedLimitUSDOverride: result[2][i]
-        }
-      }
+          nonAccreditedLimitUSDOverride: result[2][i],
+        },
+      };
       typedResult.push(accreditedData);
     }
     return typedResult;
-  }
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: IUSDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
-    params: ISubscribeAsyncParams
+  public subscribeAsync: USDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const subscriptionToken = this._subscribe<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        (USDTieredSTO as any).abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      (USDTieredSTO as any).abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
-  }
+  };
 
   /**
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: IGetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
-    params: IGetLogsAsyncParams
-  ): Promise<Array<LogWithDecodedArgs<ArgsType>>> => {
+  public getLogsAsync: GetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this._contract).address.toLowerCase();
-    const logs = await this._getLogsAsync<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.blockRange,
-        params.indexFilterValues,
-        (USDTieredSTO as any).abi,
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+      (USDTieredSTO as any).abi,
     );
     return logs;
-  }
+  };
 }
