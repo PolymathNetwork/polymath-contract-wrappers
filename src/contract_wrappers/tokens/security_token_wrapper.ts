@@ -496,7 +496,7 @@ interface ModuleData {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = (SecurityToken as any).abi;
+  public abi: ContractAbi = SecurityToken.abi;
 
   protected contract: Promise<SecurityTokenContract>;
 
@@ -900,7 +900,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addUSDTieredSTO = async (params: AddUSDTieredSTOParams) => {
-    const iface = new ethers.utils.Interface((USDTieredSTO as any).abi);
+    const iface = new ethers.utils.Interface(USDTieredSTO.abi);
     const data = iface.functions.configure.encode([
       params.startTime,
       params.endTime,
@@ -998,7 +998,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      (SecurityToken as any).abi,
+      SecurityToken.abi,
       params.callback,
       !_.isUndefined(params.isVerbose),
     );
@@ -1021,7 +1021,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      (SecurityToken as any).abi,
+      SecurityToken.abi,
     );
     return logs;
   };

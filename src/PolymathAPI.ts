@@ -153,7 +153,7 @@ export class PolymathAPI {
 
     artifactsArray.forEach(
       (artifact): void => {
-        this.web3Wrapper.abiDecoder.addABI((artifact as any).abi);
+        this.web3Wrapper.abiDecoder.addABI(artifact.abi);
       },
     );
 

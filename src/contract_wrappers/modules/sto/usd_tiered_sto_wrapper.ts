@@ -400,7 +400,7 @@ interface MintedByTier {
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
 export default class USDTieredSTOWrapper extends STOWrapper {
-  public abi: ContractAbi = (USDTieredSTO as any).abi;
+  public abi: ContractAbi = USDTieredSTO.abi;
 
   protected contract: Promise<USDTieredSTOContract>;
 
@@ -819,7 +819,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      (USDTieredSTO as any).abi,
+      USDTieredSTO.abi,
       params.callback,
       !_.isUndefined(params.isVerbose),
     );
@@ -842,7 +842,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      (USDTieredSTO as any).abi,
+      USDTieredSTO.abi,
     );
     return logs;
   };

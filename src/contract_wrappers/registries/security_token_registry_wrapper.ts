@@ -317,7 +317,7 @@ interface TickerDetails {
  * This class includes the functionality related to interacting with the SecurityTokenRegistry contract.
  */
 export default class SecurityTokenRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = (SecurityTokenRegistry as any).abi;
+  public abi: ContractAbi = SecurityTokenRegistry.abi;
 
   protected contract: Promise<SecurityTokenRegistryContract>;
 
@@ -666,7 +666,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      (SecurityTokenRegistry as any).abi,
+      SecurityTokenRegistry.abi,
       params.callback,
       !_.isUndefined(params.isVerbose),
     );
@@ -691,7 +691,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      (SecurityTokenRegistry as any).abi,
+      SecurityTokenRegistry.abi,
     );
     return logs;
   };
