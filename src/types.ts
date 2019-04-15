@@ -83,6 +83,20 @@ export enum NetworkId {
   Local = 15,
 }
 
+export enum ModuleType {
+    PermissionManager = 1,
+    TransferManager = 2,
+    STO = 3,
+    Dividends = 4,
+    Burn = 5,
+}
+
+export enum FundRaiseType {
+    ETH = 0,
+    POLY = 1,
+    StableCoin = 2,
+}
+
 export enum Features {
   CustomModulesAllowed = 'CustomModulesAllowed',
   FreezeMintingAllowed = 'FreezeMintingAllowed',

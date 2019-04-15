@@ -30,6 +30,7 @@ import {
   GetLogs,
   TxPayableParams,
 } from '../../../types';
+import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
 
@@ -194,37 +195,33 @@ interface SetWithholdingFixedParams extends TxParams {
   withholding: BigNumber;
 }
 
-interface GetDividendDataParams extends TxParams {
-  dividendIndex: BigNumber;
-}
-
 interface PullDividendPaymentParams extends TxParams {
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 interface PushDividendPaymentToAddressesParams extends TxParams {
-  dividendIndex: BigNumber;
+  dividendIndex: number;
   payees: string[];
 }
 
 interface IsClaimedParams {
   investor: string;
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 interface GetDividendIndexParams {
-  checkpointId: BigNumber;
+  checkpointId: number;
 }
 
 interface UpdateDividendDatesParams extends TxParams {
-  dividendIndex: BigNumber;
-  maturity: BigNumber;
-  expiry: BigNumber;
+  dividendIndex: number;
+  maturity: Date;
+  expiry: Date;
 }
 
 interface IsExcludedParams {
   investor: string;
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 interface SetWithholdingParams extends TxParams {
@@ -245,45 +242,45 @@ interface SetDefaultExcludedParams extends TxParams {
 }
 
 interface PushDividendPaymentParams extends TxParams {
-  dividendIndex: BigNumber;
-  start: BigNumber;
-  iterations: BigNumber;
+  dividendIndex: number;
+  start: Date;
+  iterations: number;
 }
 
 interface CreateDividendParams extends TxPayableParams {
-  maturity: BigNumber;
-  expiry: BigNumber;
+  maturity: Date;
+  expiry: Date;
   name: string;
 }
 
 interface CreateDividendWithCheckpointParams extends TxPayableParams {
-  maturity: BigNumber;
-  expiry: BigNumber;
-  checkpointId: BigNumber;
+  maturity: Date;
+  expiry: Date;
+  checkpointId: number;
   name: string;
 }
 
 interface CreateDividendWithExclusionsParams extends TxPayableParams {
-  maturity: BigNumber;
-  expiry: BigNumber;
+  maturity: Date;
+  expiry: Date;
   excluded: string[];
   name: string;
 }
 
 interface CreateDividendWithCheckpointAndExclusionsParams extends TxPayableParams {
-  maturity: BigNumber;
-  expiry: BigNumber;
-  checkpointId: BigNumber;
+  maturity: Date;
+  expiry: Date;
+  checkpointId: number;
   excluded: string[];
   name: string;
 }
 
 interface ReclaimDividendParams extends TxParams {
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 interface WithdrawWithholdingParams extends TxParams {
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 /**
@@ -319,7 +316,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public pullDividendPayment = async (params: PullDividendPaymentParams) => {
     return (await this.contract).pullDividendPayment.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.txData,
       params.safetyFactor,
     );
@@ -331,7 +328,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
-      params.dividendIndex,
+      numberToBigNumber(params.dividendIndex),
       params.payees,
       params.txData,
       params.safetyFactor,
@@ -343,7 +340,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public isClaimed = async (params: IsClaimedParams): Promise<boolean> => {
-    return (await this.contract).isClaimed.callAsync(params.investor, params.dividendIndex);
+    return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
   public paused = async (): Promise<boolean> => {
@@ -351,21 +348,21 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public getDividendIndex = async (params: GetDividendIndexParams): Promise<BigNumber[]> => {
-    return (await this.contract).getDividendIndex.callAsync(params.checkpointId);
+    return (await this.contract).getDividendIndex.callAsync(numberToBigNumber(params.checkpointId));
   };
 
   public updateDividendDates = async (params: UpdateDividendDatesParams) => {
     return (await this.contract).updateDividendDates.sendTransactionAsync(
-      params.dividendIndex,
-      params.maturity,
-      params.expiry,
+      numberToBigNumber(params.dividendIndex),
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.txData,
       params.safetyFactor,
     );
   };
 
   public isExcluded = async (params: IsExcludedParams): Promise<boolean> => {
-    return (await this.contract).isExcluded.callAsync(params.investor, params.dividendIndex);
+    return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
   public pause = async (params: TxParams) => {
@@ -403,9 +400,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
     return (await this.contract).pushDividendPayment.sendTransactionAsync(
-      params.dividendIndex,
-      params.start,
-      params.iterations,
+      numberToBigNumber(params.dividendIndex),
+      dateToBigNumber(params.start),
+      numberToBigNumber(params.iterations),
       params.txData,
       params.safetyFactor,
     );
@@ -421,9 +418,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividend = async (params: CreateDividendParams) => {
     return (await this.contract).createDividend.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
-      params.name,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -431,10 +428,10 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
-      params.checkpointId,
-      params.name,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
+      numberToBigNumber(params.checkpointId),
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -442,10 +439,10 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -455,22 +452,22 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
-      params.checkpointId,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
+      numberToBigNumber(params.checkpointId),
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
   };
 
   public reclaimDividend = async (params: ReclaimDividendParams) => {
-    return (await this.contract).reclaimDividend.sendTransactionAsync(params.dividendIndex);
+    return (await this.contract).reclaimDividend.sendTransactionAsync(numberToBigNumber(params.dividendIndex));
   };
 
   public withdrawWithholding = async (params: WithdrawWithholdingParams) => {
-    return (await this.contract).withdrawWithholding.sendTransactionAsync(params.dividendIndex);
+    return (await this.contract).withdrawWithholding.sendTransactionAsync(numberToBigNumber(params.dividendIndex));
   };
 
   /**

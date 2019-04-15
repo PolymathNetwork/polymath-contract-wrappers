@@ -30,9 +30,11 @@ import {
   TxPayableParams,
   Subscribe,
   GetLogs,
+  FundRaiseType,
 } from '../../../types';
 import assert from '../../../utils/assert';
 import STOWrapper from './sto_wrapper';
+import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
@@ -188,16 +190,16 @@ interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
 }
 
 interface TierIndexParams {
-  tier: BigNumber;
+  tier: number;
 }
 
 interface ConvertToOrFromUSDParams {
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
   amount: BigNumber;
 }
 
 interface FundRaiseTypeParams {
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
 }
 
 interface StableCoinParams {
@@ -205,7 +207,7 @@ interface StableCoinParams {
 }
 
 interface InvestorIndexParams {
-  investorIndex: BigNumber;
+  investorIndex: number;
 }
 
 interface InvestorAddressParams {
@@ -214,17 +216,17 @@ interface InvestorAddressParams {
 
 interface InvestorInvestedParams {
   investorAddress: string;
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
 }
 
 interface UsdTokenIndexParams {
-  usdTokenIndex: BigNumber;
+  usdTokenIndex: number;
 }
 
 interface BuyTokensViewParams {
   beneficiary: string;
   investmentValue: BigNumber;
-  fundRaiseType: number;
+  fundRaiseType: FundRaiseType;
 }
 
 /**
@@ -250,8 +252,8 @@ interface ChangeNonAccreditedLimitParams extends TxParams {
  * @param endTime end time of sto
  */
 interface ModifyTimesParams extends TxParams {
-  startTime: BigNumber;
-  endTime: BigNumber;
+  startTime: Date;
+  endTime: Date;
 }
 
 /**
@@ -267,7 +269,7 @@ interface ModifyLimitsParams extends TxParams {
  * @param fundRaiseTypes Array of fund raise types to allow
  */
 interface ModifyFundingParams extends TxParams {
-  fundRaiseTypes: number[];
+  fundRaiseTypes: FundRaiseType[];
 }
 
 /**
@@ -364,9 +366,9 @@ interface Tier {
 
 interface USDTieredSTOData {
   /** Timestamp at which offering gets start. */
-  startTime: BigNumber;
+  startTime: Date;
   /** Timestamp at which offering ends. */
-  endTime: BigNumber;
+  endTime: Date;
   /** Currently active tier */
   currentTier: number;
   /** Array of Number of tokens this STO will be allowed to sell at different tiers. */
@@ -375,8 +377,8 @@ interface USDTieredSTOData {
   ratePerTier: BigNumber[];
   /** Amount of funds raised */
   fundsRaised: BigNumber;
-  /** Number of individual investors this STO have. */
-  investorCount: BigNumber;
+  /** Number of individual investors this STO has. */
+  investorCount: number;
   /** Amount of tokens sold. */
   tokensSold: BigNumber;
   /** Whether the STO accepts ETH */
@@ -413,7 +415,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   }
 
   public investorsList = async (params: InvestorIndexParams) => {
-    return (await this.contract).investorsList.callAsync(params.investorIndex);
+    return (await this.contract).investorsList.callAsync(numberToBigNumber(params.investorIndex));
   };
 
   public allowBeneficialInvestments = async () => {
@@ -446,7 +448,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public usdTokens = async (params: UsdTokenIndexParams) => {
-    return (await this.contract).usdTokens.callAsync(params.usdTokenIndex);
+    return (await this.contract).usdTokens.callAsync(numberToBigNumber(params.usdTokenIndex));
   };
 
   public investorInvestedUSD = async (params: InvestorAddressParams) => {
@@ -553,19 +555,19 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
-    return (await this.contract).getTokensSoldByTier.callAsync(params.tier);
+    return (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
   };
 
   public getSTODetails = async () => {
     const result = await (await this.contract).getSTODetails.callAsync();
     const typedResult: USDTieredSTOData = {
-      startTime: result[0],
-      endTime: result[1],
+      startTime: bigNumberToDate(result[0]),
+      endTime: bigNumberToDate(result[1]),
       currentTier: result[2].toNumber(),
       capPerTier: result[3],
       ratePerTier: result[4],
       fundsRaised: result[5],
-      investorCount: result[6],
+      investorCount: bigNumberToNumber(result[6]),
       tokensSold: result[7],
       isRaisedInETH: result[8][0],
       isRaisedInPOLY: result[8][1],
@@ -641,7 +643,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Get specific tier
    */
   public tiers = async (params: TierIndexParams) => {
-    const result = await (await this.contract).tiers.callAsync(params.tier);
+    const result = await (await this.contract).tiers.callAsync(numberToBigNumber(params.tier));
     const typedResult: Tier = {
       rate: result[0],
       rateDiscountPoly: result[1],
@@ -657,7 +659,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
-    const result = await (await this.contract).getTokensMintedByTier.callAsync(params.tier);
+    const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: result[0],
       mintedInPOLY: result[1],
@@ -726,8 +728,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
     return (await this.contract).modifyTimes.sendTransactionAsync(
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.txData,
       params.safetyFactor,
     );

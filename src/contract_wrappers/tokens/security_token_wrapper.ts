@@ -38,10 +38,19 @@ import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  GetLogs,
+  Subscribe,
+  ModuleType,
+  FundRaiseType,
+} from '../../types';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
-import { stringToBytes32 } from '../../utils/convert';
+import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 
@@ -285,7 +294,7 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
  * @param type type of the module
  */
 interface ModuleTypeParams {
-  type: number;
+  type: ModuleType;
 }
 
 interface ModuleAddressParams {
@@ -345,12 +354,12 @@ interface ChangeGranularityParams extends TxParams {
 }
 
 interface CheckpointIdParams {
-  checkpointId: BigNumber;
+  checkpointId: number;
 }
 
 interface IterateInvestorsParams {
-  start: BigNumber;
-  end: BigNumber;
+  start: Date;
+  end: Date;
 }
 
 interface TransferWithDataParams extends TxParams {
@@ -399,7 +408,7 @@ interface BurnFromWithDataParams extends TxParams {
 
 interface BalanceOfAtParams {
   investor: string;
-  checkpointId: BigNumber;
+  checkpointId: number;
 }
 
 interface SetControllerParams extends TxParams {
@@ -445,7 +454,7 @@ interface AddCappedSTOParams extends AddModuleParams {
   endTime: number;
   cap: BigNumber;
   rate: BigNumber;
-  fundRaiseTypes: BigNumber[];
+  fundRaiseTypes: FundRaiseType[];
   fundsReceiver: string;
 }
 
@@ -458,7 +467,7 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
   tokensPerTierDiscountPoly: number[];
   nonAccreditedLimitUSD: number;
   minimumInvestmentUSD: number;
-  fundRaiseTypes: number[];
+  fundRaiseTypes: FundRaiseType[];
   wallet: string;
   reserveWallet: string;
   usdTokens: string[];
@@ -658,11 +667,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public getInvestorsAt = async (params: CheckpointIdParams) => {
-    return (await this.contract).getInvestorsAt.callAsync(params.checkpointId);
+    return (await this.contract).getInvestorsAt.callAsync(numberToBigNumber(params.checkpointId));
   };
 
   public iterateInvestors = async (params: IterateInvestorsParams) => {
-    return (await this.contract).iterateInvestors.callAsync(params.start, params.end);
+    return (await this.contract).iterateInvestors.callAsync(dateToBigNumber(params.start), dateToBigNumber(params.end));
   };
 
   public getInvestorCount = async () => {
@@ -734,7 +743,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).checkPermission.callAsync(
       params.delegateAddress,
       params.moduleAddress,
-      params.permission,
+      stringToBytes32(params.permission),
     );
   };
 
@@ -766,11 +775,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
-    return (await this.contract).totalSupplyAt.callAsync(params.checkpointId);
+    return (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId));
   };
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
-    return (await this.contract).balanceOfAt.callAsync(params.investor, params.checkpointId);
+    return (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId));
   };
 
   public setController = async (params: SetControllerParams) => {
@@ -957,7 +966,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public getModule = async (params: ModuleAddressParams) => {
     const result = await (await this.contract).getModule.callAsync(params.moduleAddress);
     const typedResult: ModuleData = {
-      name: result[0],
+      name: bytes32ToString(result[0]),
       address: result[1],
       factoryAddress: result[2],
       archived: result[3],
