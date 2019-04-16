@@ -105,6 +105,8 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
