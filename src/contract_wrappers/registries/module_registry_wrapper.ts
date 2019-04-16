@@ -219,6 +219,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public initialize = async (params: InitializeParams) => {
+    assert.isETHAddressHex('polymathRegistry', params.polymathRegistry);
+    assert.isETHAddressHex('owner', params.owner);
     return (await this.contract).initialize.sendTransactionAsync(
       params.polymathRegistry,
       params.owner,
@@ -228,6 +230,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public useModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).useModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -236,6 +239,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public registerModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -244,6 +248,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public removeModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -252,6 +257,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public verifyModule = async (params: VerifyModuleParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
       params.verified,
@@ -261,6 +267,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
+    assert.isETHAddressHex('securityToken', params.securityToken);
     const result = await (await this.contract).getTagsByTypeAndToken.callAsync(params.moduleType, params.securityToken);
     // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
     const zippedResult = _.zip(result[0], result[1]); // [[tag1, module1], [tag2, module1], [tag3, module1] ...]
@@ -303,6 +310,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public getReputationByFactory = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).getReputationByFactory.callAsync(params.moduleFactory);
   };
 
@@ -315,10 +323,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * @return address array that contains the list of available addresses of module factory contracts.
    */
   public getModulesByTypeAndToken = async (params: TypeAndTokenParams) => {
+    assert.isETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).getModulesByTypeAndToken.callAsync(params.moduleType, params.securityToken);
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -339,6 +349,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
