@@ -697,7 +697,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   private isTickerAvailableInternal = (registrationDate: Date, expiryDate: Date, isDeployed: boolean) => {
-    if (registrationDate === new Date(0)) {
+    if (registrationDate.getTime() === new Date(0).getTime()) {
       return true;
     }
     if (!isDeployed && dateToBigNumber(expiryDate).toNumber() > Date.now()) {
