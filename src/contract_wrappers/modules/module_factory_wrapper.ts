@@ -137,7 +137,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Get the name of the Module
    */
-  public getName = async (): Promise<string> => {
+  public name = async (): Promise<string> => {
     return (await this.contract).name.callAsync();
   };
 

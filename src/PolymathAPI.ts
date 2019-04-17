@@ -29,7 +29,7 @@ import SecurityTokenRegistryWrapper from './contract_wrappers/registries/securit
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
 import ModuleRegistryWrapper from './contract_wrappers/registries/module_registry_wrapper';
 import TokenWrapperFactory from './factories/tokenWrapperFactory';
-import ModuleWrapperFactory from './factories/moduleWrapperFactory';
+import ModuleWrapperFactory from './factories/ModuleWrapperFactory';
 import FeatureRegistryWrapper from './contract_wrappers/registries/feature_registry_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
@@ -120,6 +120,10 @@ export class PolymathAPI {
   public constructor(params: ApiConstructorParams) {
     assert.isWeb3Provider('provider', params.provider);
 
+    if (!_.isUndefined(params.polymathRegistryAddress)) {
+      assert.isETHAddressHex('polymathRegistryAddress', params.polymathRegistryAddress);
+    }
+
     this.web3Wrapper = new Web3Wrapper(params.provider, {
       gasPrice: params.defaultGasPrice,
     });
@@ -149,7 +153,7 @@ export class PolymathAPI {
 
     artifactsArray.forEach(
       (artifact): void => {
-        this.web3Wrapper.abiDecoder.addABI((artifact as any).abi);
+        this.web3Wrapper.abiDecoder.addABI(artifact.abi);
       },
     );
 
@@ -211,6 +215,7 @@ export class PolymathAPI {
    */
   public getBalance = async (params: GetBalanceParams): Promise<BigNumber> => {
     const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    assert.isETHAddressHex('address', addr);
     return this.web3Wrapper.getBalanceInWeiAsync(addr);
   };
 

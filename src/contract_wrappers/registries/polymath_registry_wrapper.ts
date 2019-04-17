@@ -160,6 +160,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Changes the contract address
    */
   public changeAddress = async (params: ChangeAddressParams) => {
+    assert.isETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).changeAddress.sendTransactionAsync(
       params.nameKey,
       params.newAddress,

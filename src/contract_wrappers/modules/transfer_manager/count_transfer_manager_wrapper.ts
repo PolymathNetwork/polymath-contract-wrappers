@@ -15,6 +15,7 @@ import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
+import { numberToBigNumber } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CountTransferManagerEvents.ModifyHolderCount;
@@ -66,7 +67,7 @@ interface VerifyTransferParams extends TxParams {
 }
 
 interface ChangeHolderCountParams extends TxParams {
-  maxHolderCount: BigNumber;
+  maxHolderCount: number;
 }
 
 /**
@@ -117,7 +118,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
     return (await this.contract).changeHolderCount.sendTransactionAsync(
-      params.maxHolderCount,
+      numberToBigNumber(params.maxHolderCount),
       params.txData,
       params.safetyFactor,
     );

@@ -17,6 +17,15 @@ import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
+import {
+  bigNumberToDate,
+  bytes32ToString,
+  dateArrayToBigNumberArray,
+  dateToBigNumber,
+  numberToBigNumber,
+  stringArrayToBytes32Array,
+  stringToBytes32,
+} from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents.AddManualApproval;
@@ -86,7 +95,7 @@ interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
 }
 
 interface ApprovalsParams {
-  index: BigNumber;
+  index: number;
 }
 
 interface VerifyTransferParams extends TxParams {
@@ -101,7 +110,7 @@ interface AddManualApprovalParams extends TxParams {
   from: string;
   to: string;
   allowance: BigNumber;
-  expiryTime: BigNumber;
+  expiryTime: Date;
   description: string;
 }
 
@@ -109,14 +118,14 @@ interface AddManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
   allowances: BigNumber[];
-  expiryTimes: BigNumber[];
+  expiryTimes: Date[];
   descriptions: string[];
 }
 
 interface ModifyManualApprovalParams extends TxParams {
   from: string;
   to: string;
-  expiryTime: BigNumber;
+  expiryTime: Date;
   changeInAllowance: BigNumber;
   description: string;
   increase: boolean;
@@ -125,7 +134,7 @@ interface ModifyManualApprovalParams extends TxParams {
 interface ModifyManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
-  expiryTimes: BigNumber[];
+  expiryTimes: Date[];
   changedAllowances: BigNumber[];
   descriptions: string[];
   increase: boolean[];
@@ -159,7 +168,7 @@ interface Approval {
   /**  */
   allowance: BigNumber;
   /**  */
-  expiryTime: BigNumber;
+  expiryTime: Date;
   /**  */
   description: string;
 }
@@ -192,12 +201,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public approvals = async (params: ApprovalsParams) => {
-    const result = await (await this.contract).approvals.callAsync(params.index);
+    const result = await (await this.contract).approvals.callAsync(numberToBigNumber(params.index));
     const typedResult: Approval = {
       from: result[0],
       to: result[1],
       allowance: result[2],
-      expiryTime: result[3],
+      expiryTime: bigNumberToDate(result[3]),
       description: result[4],
     };
     return typedResult;
@@ -228,8 +237,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.from,
       params.to,
       params.allowance,
-      params.expiryTime,
-      params.description,
+      dateToBigNumber(params.expiryTime),
+      stringToBytes32(params.description),
       params.txData,
       params.safetyFactor,
     );
@@ -240,8 +249,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.from,
       params.to,
       params.allowances,
-      params.expiryTimes,
-      params.descriptions,
+      dateArrayToBigNumberArray(params.expiryTimes),
+      stringArrayToBytes32Array(params.descriptions),
       params.txData,
       params.safetyFactor,
     );
@@ -251,9 +260,9 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
-      params.expiryTime,
+      dateToBigNumber(params.expiryTime),
       params.changeInAllowance,
-      params.description,
+      stringToBytes32(params.description),
       params.increase,
       params.txData,
       params.safetyFactor,
@@ -264,9 +273,9 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
-      params.expiryTimes,
+      dateArrayToBigNumberArray(params.expiryTimes),
       params.changedAllowances,
-      params.descriptions,
+      stringArrayToBytes32Array(params.descriptions),
       params.increase,
       params.txData,
       params.safetyFactor,
@@ -299,8 +308,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         from: result[0][i],
         to: result[1][i],
         allowance: result[2][i],
-        expiryTime: result[3][i],
-        description: result[4][i],
+        expiryTime: bigNumberToDate(result[3][i]),
+        description: bytes32ToString(result[4][i]),
       };
       typedResult.push(approval);
     }
@@ -313,8 +322,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       from: params.from,
       to: params.to,
       allowance: result[0],
-      expiryTime: result[1],
-      description: result[2],
+      expiryTime: bigNumberToDate(result[1]),
+      description: bytes32ToString(result[2]),
     };
     return typedResult;
   };
@@ -331,8 +340,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         from: result[0][i],
         to: result[1][i],
         allowance: result[2][i],
-        expiryTime: result[3][i],
-        description: result[4][i],
+        expiryTime: bigNumberToDate(result[3][i]),
+        description: bytes32ToString(result[4][i]),
       };
       typedResult.push(approval);
     }

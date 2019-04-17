@@ -1,8 +1,8 @@
-import { TxParams, STOBaseContract } from '../../../types';
+import { TxParams, STOBaseContract, FundRaiseType } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 
 interface FundRaiseTypesParams {
-  type: number;
+  type: FundRaiseType;
 }
 
 interface ReclaimERC20Params extends TxParams {

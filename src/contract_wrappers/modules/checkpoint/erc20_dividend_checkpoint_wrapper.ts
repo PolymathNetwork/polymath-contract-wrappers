@@ -18,6 +18,7 @@ import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import assert from '../../../utils/assert';
+import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
 
 interface ERC20DividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -118,19 +119,19 @@ interface GetERC20DividendCheckpointLogsAsyncParams extends GetLogs {
 }
 
 interface DividendIndexParams {
-  dividendIndex: BigNumber;
+  dividendIndex: number;
 }
 
 interface CreateDividendParams extends TxParams {
-  maturity: BigNumber;
-  expiry: BigNumber;
+  maturity: Date;
+  expiry: Date;
   token: string;
   amount: BigNumber;
   name: string;
 }
 
 interface CreateDividendWithCheckpointParams extends CreateDividendParams {
-  checkpointId: BigNumber;
+  checkpointId: number;
 }
 
 interface CreateDividendWithExclusionsParams extends CreateDividendParams {
@@ -138,7 +139,7 @@ interface CreateDividendWithExclusionsParams extends CreateDividendParams {
 }
 
 interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividendParams {
-  checkpointId: BigNumber;
+  checkpointId: number;
   excluded: string[];
 }
 
@@ -161,16 +162,16 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   }
 
   public dividendTokens = async (params: DividendIndexParams) => {
-    return (await this.contract).dividendTokens.callAsync(params.dividendIndex);
+    return (await this.contract).dividendTokens.callAsync(numberToBigNumber(params.dividendIndex));
   };
 
   public createDividend = async (params: CreateDividendParams) => {
     return (await this.contract).createDividend.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.token,
       params.amount,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -178,12 +179,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.token,
       params.amount,
-      params.checkpointId,
-      params.name,
+      numberToBigNumber(params.checkpointId),
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -191,12 +192,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.token,
       params.amount,
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
@@ -206,13 +207,13 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
-      params.maturity,
-      params.expiry,
+      dateToBigNumber(params.maturity),
+      dateToBigNumber(params.expiry),
       params.token,
       params.amount,
-      params.checkpointId,
+      numberToBigNumber(params.checkpointId),
       params.excluded,
-      params.name,
+      stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );

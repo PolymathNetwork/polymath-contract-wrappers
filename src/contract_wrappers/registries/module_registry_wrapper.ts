@@ -15,7 +15,6 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { BigNumber } from '@0x/utils';
 import ContractWrapper from '../contract_wrapper';
 import {
   GetLogsAsyncParams,
@@ -25,6 +24,7 @@ import {
   TxParams,
   Subscribe,
   GetLogs,
+  ModuleType,
 } from '../../types';
 import assert from '../../utils/assert';
 import { bytes32ToString } from '../../utils/convert';
@@ -136,22 +136,17 @@ interface VerifyModuleParams extends TxParams {
   verified: boolean;
 }
 
-interface GetTagsByTypeAndTokenParams {
-  moduleType: number | BigNumber;
-  securityToken: string;
-}
-
-interface ModuleTypeParams {
-  moduleType: number;
-}
-
 /**
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
  */
-interface GetModulesByTypeAndTokenParams {
-  moduleType: number | BigNumber;
+interface TypeAndTokenParams {
+  moduleType: ModuleType;
   securityToken: string;
+}
+
+interface ModuleTypeParams {
+  moduleType: ModuleType;
 }
 
 interface ReclaimERC20Params extends TxParams {
@@ -265,7 +260,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public getTagsByTypeAndToken = async (params: GetTagsByTypeAndTokenParams) => {
+  public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
     const result = await (await this.contract).getTagsByTypeAndToken.callAsync(params.moduleType, params.securityToken);
     // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
     const zippedResult = _.zip(result[0], result[1]); // [[tag1, module1], [tag2, module1], [tag3, module1] ...]
@@ -319,7 +314,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: GetModulesByTypeAndTokenParams) => {
+  public getModulesByTypeAndToken = async (params: TypeAndTokenParams) => {
     return (await this.contract).getModulesByTypeAndToken.callAsync(params.moduleType, params.securityToken);
   };
 

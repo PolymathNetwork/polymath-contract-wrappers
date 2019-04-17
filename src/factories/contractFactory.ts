@@ -93,7 +93,7 @@ export default class ContractFactory {
   }
 
   public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {
-    return new SecurityTokenContract((SecurityToken as any).abi, address, this.provider, this.contractDefaults);
+    return new SecurityTokenContract(SecurityToken.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
@@ -143,7 +143,7 @@ export default class ContractFactory {
   }
 
   public async getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract> {
-    return new USDTieredSTOContract((USDTieredSTO as any).abi, address, this.provider, this.contractDefaults);
+    return new USDTieredSTOContract(USDTieredSTO.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getCountTransferManagerContract(address: string): Promise<CountTransferManagerContract> {
@@ -181,7 +181,7 @@ export default class ContractFactory {
 
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
     return new VolumeRestrictionTMContract(
-      (VolumeRestrictionTransferManager as any).abi,
+      VolumeRestrictionTransferManager.abi,
       address,
       this.provider,
       this.contractDefaults,
@@ -208,7 +208,7 @@ export default class ContractFactory {
 
   public async getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
     return new SecurityTokenRegistryContract(
-      (SecurityTokenRegistry as any).abi,
+      SecurityTokenRegistry.abi,
       await this.polymathRegistry.getSecurityTokenRegistryAddress(),
       this.provider,
       this.contractDefaults,
