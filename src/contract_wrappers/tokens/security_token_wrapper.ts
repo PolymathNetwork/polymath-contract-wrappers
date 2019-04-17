@@ -839,8 +839,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public getVersion = async (): Promise<BigNumber> => {
-    return (await this.contract).totalSupply.callAsync();
+  public getVersion = async (): Promise<BigNumber[]> => {
+    return (await this.contract).getVersion.callAsync();
   };
 
   /**

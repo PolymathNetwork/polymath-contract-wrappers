@@ -105,9 +105,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getAddress = async (params: GetAddressParams) => {
-    assert.isString('contractName', params.contractName);
-    const address = await (await this.contract).getAddress.callAsync(params.contractName);
-    return address;
+    return this.getAddressInternal(params.contractName);
   };
 
   /**
@@ -115,9 +113,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyTokenAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.PolyToken,
-    });
+    return this.getAddressInternal(Contracts.PolyToken);
   };
 
   /**
@@ -125,9 +121,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getModuleRegistryAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.ModuleRegistry,
-    });
+    return this.getAddressInternal(Contracts.ModuleRegistry);
   };
 
   /**
@@ -135,9 +129,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getFeatureRegistryAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.FeatureRegistry,
-    });
+    return this.getAddressInternal(Contracts.FeatureRegistry);
   };
 
   /**
@@ -145,9 +137,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getSecurityTokenRegistryAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.SecurityTokenRegistry,
-    });
+    return this.getAddressInternal(Contracts.SecurityTokenRegistry);
   };
 
   /**
@@ -155,9 +145,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyUsdOracleAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.PolyUsdOracle,
-    });
+    return this.getAddressInternal(Contracts.PolyUsdOracle);
   };
 
   /**
@@ -165,9 +153,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getEthUsdOracleAddress = async () => {
-    return this.getAddress({
-      contractName: Contracts.EthUsdOracle,
-    });
+    return this.getAddressInternal(Contracts.EthUsdOracle);
   };
 
   /**
@@ -225,4 +211,8 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     );
     return logs;
   };
+
+  private async getAddressInternal(contractName: string) {
+    return (await this.contract).getAddress.callAsync(contractName);
+  }
 }
