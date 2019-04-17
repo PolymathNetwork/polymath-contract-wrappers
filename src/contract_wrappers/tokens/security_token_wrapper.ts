@@ -459,14 +459,14 @@ interface AddCappedSTOParams extends AddModuleParams {
 }
 
 interface AddUSDTieredSTOParams extends AddModuleParams {
-  startTime: number;
-  endTime: number;
-  ratePerTier: number[];
-  ratePerTierDiscountPoly: number[];
-  tokensPerTierTotal: number[];
-  tokensPerTierDiscountPoly: number[];
-  nonAccreditedLimitUSD: number;
-  minimumInvestmentUSD: number;
+  startTime: Date;
+  endTime: Date;
+  ratePerTier: BigNumber[];
+  ratePerTierDiscountPoly: BigNumber[];
+  tokensPerTierTotal: BigNumber[];
+  tokensPerTierDiscountPoly: BigNumber[];
+  nonAccreditedLimitUSD: BigNumber;
+  minimumInvestmentUSD: BigNumber;
   fundRaiseTypes: FundRaiseType[];
   wallet: string;
   reserveWallet: string;
@@ -935,8 +935,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHexArray('usdTokens', params.usdTokens);
     const iface = new ethers.utils.Interface(USDTieredSTO.abi);
     const data = iface.functions.configure.encode([
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.ratePerTier,
       params.ratePerTierDiscountPoly,
       params.tokensPerTierTotal,
