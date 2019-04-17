@@ -7,6 +7,9 @@ const assert = {
     const isValid = uuidRegex.test(subscriptionToken);
     sharedAssert.assert(isValid, `Expected ${variableName} to be a valid subscription token`);
   },
+  isTrue(variableName: string, value: boolean): void {
+    sharedAssert.assert(value === true, variableName);
+  },
 };
 
 export default assert;
