@@ -81,6 +81,14 @@ yarn clean
 yarn lint
 ```
 
+### Testing
+
+This project uses Jest to do unit testing on the contract wrappers.
+
+```bash
+yarn jest
+```
+
 ## Deployment
 
 ** Pending, should run a prepublish script on CI or use Semantic Releases**

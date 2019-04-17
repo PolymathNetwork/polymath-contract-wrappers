@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'jest'],
   parserOptions: {
     project: './tsconfig.json',
   },
@@ -10,6 +10,7 @@ module.exports = {
     'airbnb-base',
     'prettier',
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    'plugin:jest/recommended',
     'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
   ],
   parserOptions: {
@@ -20,6 +21,9 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
     '@typescript-eslint/explicit-function-return-type': 'off',
+    'jest/expect-expect': 'error',
+    'jest/no-empty-title': 'warn',
+    'jest/no-truthy-falsy': 'warn',
   },
   settings: {
     'import/resolver': {
@@ -28,5 +32,8 @@ module.exports = {
         paths: [path.resolve(__dirname, 'src')],
       },
     },
+  },
+  env: {
+    'jest/globals': true,
   },
 };
