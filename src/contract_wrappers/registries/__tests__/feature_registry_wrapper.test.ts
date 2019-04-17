@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { FeatureRegistryContract, PolyTokenEvents, FeatureRegistryEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import {Contracts, Features} from '../../../types';
+import {Features} from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import FeatureRegistryWrapper from '../feature_registry_wrapper';
 
