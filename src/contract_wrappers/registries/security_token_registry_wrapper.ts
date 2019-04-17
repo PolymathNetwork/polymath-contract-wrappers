@@ -389,14 +389,13 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerTicker = async (params: RegisterTickerParams) => {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
-    assert.isETHAddressHex('Owner must to be a valid address', owner);
+    assert.isETHAddressHex('owner', owner);
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
-    assert.assert(params.tokenName.length > 0, 'Token name is empty');
-    assert.isTrue(
-      'Ticker is not available',
+    assert.assert(
       await this.isTickerAvailable({
         tokenName: params.ticker,
       }),
+      'Ticker is not available',
     );
     return (await this.contract).registerTicker.sendTransactionAsync(
       owner,
