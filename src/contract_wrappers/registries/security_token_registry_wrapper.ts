@@ -398,6 +398,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       }),
       'Ticker is not available',
     );
+    // TODO: Verify allowance
     return (await this.contract).registerTicker.sendTransactionAsync(
       owner,
       params.ticker,
@@ -424,6 +425,15 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: GenerateSecurityTokenParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.name.length > 0, 'Name is empty');
+    const tickerDetails = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    assert.assert(!tickerDetails.status, 'Ticker already deployed');
+    const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    assert.assert(tickerDetails.expiryDate.getTime() >= Date.now(), 'Ticker gets expired');
     return (await this.contract).generateSecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -708,7 +718,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     if (registrationDate.getTime() === new Date(0).getTime()) {
       return true;
     }
-    if (!isDeployed && dateToBigNumber(expiryDate).toNumber() > Date.now()) {
+    if (!isDeployed && expiryDate.getTime() > Date.now()) {
       return true;
     }
     return false;
