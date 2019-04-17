@@ -391,6 +391,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const owner = !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
     assert.assert(
       await this.isTickerAvailable({
         tokenName: params.ticker,
