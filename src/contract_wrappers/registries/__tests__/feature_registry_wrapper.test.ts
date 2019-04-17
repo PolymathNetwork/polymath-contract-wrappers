@@ -71,7 +71,7 @@ describe('FeatureRegistryWrapper', () => {
             // Result expectation
             expect(result).toBe(expectedResult);
             // Verifications
-            verify(mockedContract.getFeatureStatus).never();
+            verify(mockedContract.getFeatureStatus).once();
             verify(mockedMethod.callAsync(featureName)).once();
         });
 
@@ -136,7 +136,7 @@ describe('FeatureRegistryWrapper', () => {
                         mockedParams.txData,
                         mockedParams.safetyFactor,
                     ),
-                ).never();
+                ).once();
             });
         });
     });
