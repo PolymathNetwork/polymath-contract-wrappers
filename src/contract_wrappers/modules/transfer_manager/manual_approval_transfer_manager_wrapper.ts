@@ -221,6 +221,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -233,6 +235,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).addManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -245,6 +249,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
+    assert.isETHAddressHexArray('from', params.from);
+    assert.isETHAddressHexArray('to', params.to);
     return (await this.contract).addManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -257,6 +263,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -270,6 +278,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
+    assert.isETHAddressHexArray('from', params.from);
+    assert.isETHAddressHexArray('to', params.to);
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -283,6 +293,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).revokeManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -292,6 +304,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
+    assert.isETHAddressHexArray('from', params.from);
+    assert.isETHAddressHexArray('to', params.to);
     return (await this.contract).revokeManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -301,6 +315,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public getActiveApprovalsToUser = async (params: GetActiveApprovalsToUserParams) => {
+    assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getActiveApprovalsToUser.callAsync(params.user);
     const typedResult: Approval[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
@@ -317,6 +332,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public getApprovalDetails = async (params: GetApprovalDetailsParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).getApprovalDetails.callAsync(params.from, params.to);
     const typedResult: Approval = {
       from: params.from,

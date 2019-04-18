@@ -459,14 +459,14 @@ interface AddCappedSTOParams extends AddModuleParams {
 }
 
 interface AddUSDTieredSTOParams extends AddModuleParams {
-  startTime: number;
-  endTime: number;
-  ratePerTier: number[];
-  ratePerTierDiscountPoly: number[];
-  tokensPerTierTotal: number[];
-  tokensPerTierDiscountPoly: number[];
-  nonAccreditedLimitUSD: number;
-  minimumInvestmentUSD: number;
+  startTime: Date;
+  endTime: Date;
+  ratePerTier: BigNumber[];
+  ratePerTierDiscountPoly: BigNumber[];
+  tokensPerTierTotal: BigNumber[];
+  tokensPerTierDiscountPoly: BigNumber[];
+  nonAccreditedLimitUSD: BigNumber;
+  minimumInvestmentUSD: BigNumber;
   fundRaiseTypes: FundRaiseType[];
   wallet: string;
   reserveWallet: string;
@@ -525,6 +525,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public decreaseApproval = async (params: ChangeApprovalParams) => {
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,
       params.value,
@@ -574,6 +575,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public increaseApproval = async (params: ChangeApprovalParams) => {
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
       params.value,
@@ -587,6 +589,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -599,6 +602,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public archiveModule = async (params: ModuleAddressTxParams) => {
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).archiveModule.sendTransactionAsync(
       params.moduleAddress,
       params.txData,
@@ -607,6 +611,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public unarchiveModule = async (params: ModuleAddressTxParams) => {
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).unarchiveModule.sendTransactionAsync(
       params.moduleAddress,
       params.txData,
@@ -615,6 +620,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public removeModule = async (params: ModuleAddressTxParams) => {
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleAddress,
       params.txData,
@@ -628,6 +634,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public withdrawERC20 = async (params: WithdrawERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).withdrawERC20.sendTransactionAsync(
       params.tokenContract,
       params.value,
@@ -637,6 +644,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public changeModuleBudget = async (params: ChangeModuleBudgetParams) => {
+    assert.isETHAddressHex('module', params.module);
     return (await this.contract).changeModuleBudget.sendTransactionAsync(
       params.module,
       params.change,
@@ -687,6 +695,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public transferWithData = async (params: TransferWithDataParams) => {
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
       params.value,
@@ -697,6 +706,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public transferFromWithData = async (params: TransferFromWithDataParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
@@ -712,6 +723,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public mint = async (params: MintParams) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).mint.sendTransactionAsync(
       params.investor,
       params.value,
@@ -721,6 +733,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public mintWithData = async (params: MintWithDataParams) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).mintWithData.sendTransactionAsync(
       params.investor,
       params.value,
@@ -731,6 +744,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public mintMulti = async (params: MintMultiParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
       params.values,
@@ -740,6 +754,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public checkPermission = async (params: CheckPermissionParams): Promise<boolean> => {
+    assert.isETHAddressHex('delegateAddress', params.delegateAddress);
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).checkPermission.callAsync(
       params.delegateAddress,
       params.moduleAddress,
@@ -757,6 +773,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public burnFromWithData = async (params: BurnFromWithDataParams) => {
+    assert.isETHAddressHex('from', params.from);
     return (await this.contract).burnFromWithData.sendTransactionAsync(
       params.from,
       params.value,
@@ -779,10 +796,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId));
   };
 
   public setController = async (params: SetControllerParams) => {
+    assert.isETHAddressHex('controller', params.controller);
     return (await this.contract).setController.sendTransactionAsync(
       params.controller,
       params.txData,
@@ -795,6 +814,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public forceTransfer = async (params: ForceTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).forceTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -807,6 +828,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public forceBurn = async (params: ForceBurnParams) => {
+    assert.isETHAddressHex('from', params.from);
     return (await this.contract).forceBurn.sendTransactionAsync(
       params.from,
       params.value,
@@ -830,6 +852,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addCountTransferManager = async (params: AddCountTransferManagerParams) => {
+    assert.isETHAddressHex('address', params.address);
     const iface = new ethers.utils.Interface(CountTransferManager.abi);
     const data = iface.functions.configure.encode([params.maxHolderCount]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -843,6 +866,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addPercentageTransferManager = async (params: AddPercentageTransferManagerParams) => {
+    assert.isETHAddressHex('address', params.address);
     const iface = new ethers.utils.Interface(PercentageTransferManager.abi);
     const data = iface.functions.configure.encode([params.maxHolderPercentage, params.allowPrimaryIssuance]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -856,6 +880,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addErc20DividendCheckpoint = async (params: AddErc20DividendCheckpointParams) => {
+    assert.isETHAddressHex('address', params.address);
+    assert.isETHAddressHex('address', params.wallet);
     const iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
     const data = iface.functions.configure.encode([params.wallet]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -869,6 +895,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addGeneralPermissionManager = async (params: AddModuleParams) => {
+    assert.isETHAddressHex('address', params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -880,6 +907,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addCappedSTO = async (params: AddCappedSTOParams) => {
+    assert.isETHAddressHex('fundsReceiver', params.fundsReceiver);
+    assert.isETHAddressHex('address', params.address);
     const iface = new ethers.utils.Interface(CappedSTO.abi);
     const data = iface.functions.configure.encode([
       params.startTime,
@@ -900,10 +929,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addUSDTieredSTO = async (params: AddUSDTieredSTOParams) => {
+    assert.isETHAddressHex('address', params.address);
+    assert.isETHAddressHex('wallet', params.wallet);
+    assert.isETHAddressHex('reserveWallet', params.reserveWallet);
+    assert.isETHAddressHexArray('usdTokens', params.usdTokens);
     const iface = new ethers.utils.Interface(USDTieredSTO.abi);
     const data = iface.functions.configure.encode([
-      params.startTime,
-      params.endTime,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
       params.ratePerTier,
       params.ratePerTierDiscountPoly,
       params.tokensPerTierTotal,
@@ -926,6 +959,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addEtherDividendCheckpoint = async (params: AddEtherDividendCheckpointParams) => {
+    assert.isETHAddressHex('address', params.address);
+    assert.isETHAddressHex('wallet', params.wallet);
     const iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
     const data = iface.functions.configure.encode([params.wallet]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -939,6 +974,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addManualApprovalTransferManager = async (params: AddModuleParams) => {
+    assert.isETHAddressHex('address', params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -950,6 +986,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addGeneralTransferManager = async (params: AddModuleParams) => {
+    assert.isETHAddressHex('address', params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -964,6 +1001,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * @return Returns the data associated to a module
    */
   public getModule = async (params: ModuleAddressParams) => {
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     const result = await (await this.contract).getModule.callAsync(params.moduleAddress);
     const typedResult: ModuleData = {
       name: bytes32ToString(result[0]),
@@ -980,6 +1018,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * @return bool
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
   };
 

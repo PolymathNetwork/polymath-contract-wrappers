@@ -120,6 +120,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   }
 
   public perms = async (params: PermsParams) => {
+    assert.isETHAddressHex('module', params.module);
+    assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).perms.callAsync(params.module, params.delegate, stringToBytes32(params.permission));
   };
 
@@ -128,14 +130,18 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public delegateDetails = async (params: DelegateParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).delegateDetails.callAsync(params.delegate);
   };
 
   public checkPermission = async (params: PermsParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
+    assert.isETHAddressHex('module', params.module);
     return (await this.contract).checkPermission.callAsync(params.delegate, params.module, params.permission);
   };
 
   public addDelegate = async (params: AddDelegateParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -145,6 +151,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public deleteDelegate = async (params: DelegateTxParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).deleteDelegate.sendTransactionAsync(
       params.delegate,
       params.txData,
@@ -153,10 +160,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public checkDelegate = async (params: DelegateParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).checkDelegate.callAsync(params.delegate);
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
+    assert.isETHAddressHex('module', params.module);
     return (await this.contract).changePermission.sendTransactionAsync(
       params.delegate,
       params.module,
@@ -168,6 +178,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
+    assert.isETHAddressHexArray('module', params.modules);
     return (await this.contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,
@@ -179,10 +191,12 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams) => {
+    assert.isETHAddressHex('module', params.module);
     return (await this.contract).getAllDelegatesWithPerm.callAsync(params.module, stringToBytes32(params.perm));
   };
 
   public getAllModulesAndPermsFromTypes = async (params: GetAllModulesAndPermsFromTypesParams) => {
+    assert.isETHAddressHex('delegate', params.delegate);
     const result = await (await this.contract).getAllModulesAndPermsFromTypes.callAsync(params.delegate, params.types);
     // [module1, module1, module2, module3, module3], [perm1, perm2, perm1, perm2, perm3]
     const zippedResult = _.zip(result[0], result[1]); // [[module1, perm1], [module1, perm2], [module2, perm1] ...]
