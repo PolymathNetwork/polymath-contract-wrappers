@@ -429,6 +429,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -493,6 +495,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
+    assert.isETHAddressHex('wallet', params.wallet);
     return (await this.contract).changeExemptWalletList.sendTransactionAsync(
       params.wallet,
       params.change,
@@ -502,6 +505,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestriction = async (params: AddIndividualRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).addIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -515,6 +519,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestriction = async (params: AddIndividualDailyRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -527,6 +532,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestrictionMulti = async (params: AddIndividualDailyRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).addIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -539,6 +545,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestrictionMulti = async (params: AddIndividualRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).addIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -575,6 +582,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.txData,
@@ -583,6 +591,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.txData,
@@ -591,6 +600,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.txData,
@@ -599,6 +609,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.txData,
@@ -615,6 +626,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualRestriction = async (params: ModifyIndividualRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).modifyIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -628,6 +640,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestriction = async (params: ModifyIndividualDailyRestrictionParams) => {
+    assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).modifyIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -640,6 +653,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestrictionMulti = async (params: ModifyIndividualDailyRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).modifyIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -652,6 +666,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualRestrictionMulti = async (params: ModifyIndividualRestrictionMultiParams) => {
+    assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).modifyIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -688,6 +703,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public getIndividualBucketDetailsToUser = async (params: GetIndividualBucketDetailsToUserParams) => {
+    assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getIndividualBucketDetailsToUser.callAsync(params.user);
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),
@@ -700,6 +716,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public getDefaultBucketDetailsToUser = async (params: GetIndividualBucketDetailsToUserParams) => {
+    assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getDefaultBucketDetailsToUser.callAsync(params.user);
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),

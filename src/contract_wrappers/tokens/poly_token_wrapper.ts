@@ -72,6 +72,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   }
 
   public increaseApproval = async (params: ChangeApprovalParams) => {
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
       params.value,
@@ -81,6 +82,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   };
 
   public decreaseApproval = async (params: ChangeApprovalParams) => {
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,
       params.value,

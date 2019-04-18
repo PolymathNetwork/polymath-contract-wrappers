@@ -431,6 +431,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public investors = async (params: InvestorAddressParams) => {
+    assert.isETHAddressHex('investorAddress', params.investorAddress);
     const result = await (await this.contract).investors.callAsync(params.investorAddress);
     const typedResult: InvestorData = {
       accredited: !result[0].isZero(),
@@ -440,10 +441,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public investorInvested = async (params: InvestorInvestedParams) => {
+    assert.isETHAddressHex('investorAddress', params.investorAddress);
     return (await this.contract).investorInvested.callAsync(params.investorAddress, params.fundRaiseType);
   };
 
   public usdTokenEnabled = async (params: StableCoinParams) => {
+    assert.isETHAddressHex('stableCoinAddress', params.stableCoinAddress);
     return (await this.contract).usdTokenEnabled.callAsync(params.stableCoinAddress);
   };
 
@@ -452,6 +455,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public investorInvestedUSD = async (params: InvestorAddressParams) => {
+    assert.isETHAddressHex('investorAddress', params.investorAddress);
     return (await this.contract).investorInvestedUSD.callAsync(params.investorAddress);
   };
 
@@ -464,6 +468,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETH = async (params: BuyWithETHParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
       params.txData,
@@ -472,6 +477,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -481,6 +487,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSD = async (params: BuyWithUSDParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
+    assert.isETHAddressHex('usdToken', params.usdToken);
     return (await this.contract).buyWithUSD.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -491,6 +499,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
@@ -500,6 +509,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -521,6 +531,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyTokensView = async (params: BuyTokensViewParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     const result = await (await this.contract).buyTokensView.callAsync(
       params.beneficiary,
       params.investmentValue,
@@ -688,6 +699,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Amount of stable coins raised
    */
   public stableCoinsRaised = async (params: StableCoinParams) => {
+    assert.isETHAddressHex('stableCoinAddress', params.stableCoinAddress);
     return (await this.contract).stableCoinsRaised.callAsync(params.stableCoinAddress);
   };
 
@@ -703,6 +715,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).changeAccredited.sendTransactionAsync(
       params.investors,
       params.accredited,
@@ -715,6 +728,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
       params.investors,
       params.nonAccreditedLimit,
@@ -762,6 +776,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
+    assert.isETHAddressHexArray('usdToken', params.usdToken);
+    assert.isETHAddressHex('wallet', params.wallet);
+    assert.isETHAddressHex('reserveWallet', params.reserveWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.reserveWallet,
