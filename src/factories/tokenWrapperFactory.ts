@@ -4,6 +4,7 @@ import SecurityTokenWrapper from '../contract_wrappers/tokens/security_token_wra
 import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
 import DetailedERC20TokenWrapper from '../contract_wrappers/tokens/detailed_erc20_wrapper';
 import ContractFactory from './contractFactory';
+import assert from '../utils/assert';
 
 /**
  * The SecurityTokenFactory class is a factory to generate new SecurityTokenWrappers.
@@ -39,6 +40,7 @@ export default class TokenWrapperFactory {
    * @memberof SecurityTokenWrapperFactory
    */
   public getERC20TokenInstanceFromAddress = async (address: string): Promise<ERC20TokenWrapper> => {
+    assert.isETHAddressHex('address', address);
     const token = new DetailedERC20TokenWrapper(
       this.web3Wrapper,
       this.contractFactory.getDetailedERC20Contract(address),
@@ -56,6 +58,7 @@ export default class TokenWrapperFactory {
    * @memberof SecurityTokenWrapperFactory
    */
   public getSecurityTokenInstanceFromAddress = async (address: string): Promise<SecurityTokenWrapper> => {
+    assert.isETHAddressHex('address', address);
     if (await this.securityTokenRegistry.isSecurityToken({ securityTokenAddress: address })) {
       return new SecurityTokenWrapper(this.web3Wrapper, this.contractFactory.getSecurityTokenContract(address));
     }

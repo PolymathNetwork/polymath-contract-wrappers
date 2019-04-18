@@ -302,6 +302,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   }
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -327,6 +328,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
+    assert.isETHAddressHexArray('payees', params.payees);
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.payees,
@@ -340,6 +342,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public isClaimed = async (params: IsClaimedParams): Promise<boolean> => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
@@ -362,6 +365,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public isExcluded = async (params: IsExcludedParams): Promise<boolean> => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
@@ -370,6 +374,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public setWithholding = async (params: SetWithholdingParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -379,6 +384,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -387,10 +393,12 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public changeWallet = async (params: ChangeWalletParams) => {
+    assert.isETHAddressHex('wallet', params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
+    assert.isETHAddressHexArray('excluded', params.excluded);
     return (await this.contract).setDefaultExcluded.sendTransactionAsync(
       params.excluded,
       params.txData,
@@ -438,6 +446,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
+    assert.isETHAddressHexArray('excluded', params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -451,6 +460,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
+    assert.isETHAddressHexArray('excluded', params.excluded);
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),

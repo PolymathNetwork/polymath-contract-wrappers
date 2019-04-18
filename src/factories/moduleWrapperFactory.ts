@@ -4,6 +4,7 @@ import USDTieredSTOWrapper from '../contract_wrappers/modules/sto/usd_tiered_sto
 import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ContractFactory from './contractFactory';
+import assert from '../utils/assert';
 
 interface GetModuleParams {
   address: string;
@@ -47,6 +48,7 @@ export default class ModuleWrapperFactory {
   }
 
   public getModuleInstance: GetModuleInstance = async (params: GetModuleParams): Promise<any> => {
+    assert.isETHAddressHex('address', params.address);
     switch (params.name) {
       // Permission
       case 'GeneralPermissionManager':

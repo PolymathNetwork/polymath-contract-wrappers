@@ -1,5 +1,6 @@
 import { TxParams, STOBaseContract, FundRaiseType } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
+import assert from '../../../utils/assert';
 
 interface FundRaiseTypesParams {
   type: FundRaiseType;
@@ -81,6 +82,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,

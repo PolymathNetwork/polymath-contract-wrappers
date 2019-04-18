@@ -154,10 +154,13 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public whitelist = async (params: InvestorAddressParams) => {
+    assert.isETHAddressHex('investorAddress', params.investorAddress);
     return (await this.contract).whitelist.callAsync(params.investorAddress);
   };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -178,6 +181,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
       params.valid,
@@ -187,6 +191,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
+    assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
       params.valids,

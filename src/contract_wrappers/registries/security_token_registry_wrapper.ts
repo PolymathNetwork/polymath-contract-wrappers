@@ -530,6 +530,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
+    assert.isETHAddressHex('owner', params.owner);
+    assert.isETHAddressHex('tokenDetails', params.tokenDetails);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.owner,
       params.ticker,
@@ -546,6 +548,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Checks that Security Token is registered
    */
   public isSecurityToken = async (params: SecurityTokenAddressParams) => {
+    assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     return (await this.contract).isSecurityToken.callAsync(params.securityTokenAddress);
   };
 
@@ -553,6 +556,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -600,6 +604,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Reclaims all ERC20Basic compatible tokens
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -611,6 +616,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the protocol version and the SecurityToken contract
    */
   public setProtocolVersion = async (params: SetProtocolVersionParams) => {
+    assert.isETHAddressHex('STFactoryAddress', params.STFactoryAddress);
     return (await this.contract).setProtocolVersion.sendTransactionAsync(
       params.STFactoryAddress,
       params.major,
@@ -639,6 +645,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the PolyToken address. Only Polymath.
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
+    assert.isETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).updatePolyTokenAddress.sendTransactionAsync(
       params.newAddress,
       params.txData,

@@ -2,6 +2,7 @@ import { BigNumber } from '@0x/utils';
 import { TxParams, DividendCheckpointBaseContract } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 import ModuleWrapper from '../module_wrapper';
+import assert from '../../../utils/assert';
 
 interface DividendIndexParams {
   dividendIndex: number;
@@ -180,6 +181,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public withholdingTax = async (params: InvestorParams) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).withholdingTax.callAsync(params.investor);
   };
 
@@ -372,10 +374,12 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public isClaimed = async (params: InvestorStatus) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
   public isExcluded = async (params: InvestorStatus) => {
+    assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 }

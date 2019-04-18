@@ -48,6 +48,7 @@ import {
   SecurityTokenRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import PolymathRegistryWrapper from '../contract_wrappers/registries/polymath_registry_wrapper';
+import assert from '../utils/assert';
 
 export default class ContractFactory {
   private provider: Provider;
@@ -63,10 +64,12 @@ export default class ContractFactory {
   }
 
   public async getModuleContract(address: string): Promise<ModuleContract> {
+    assert.isETHAddressHex('address', address);
     return new ModuleContract(Module.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getERC20DividendCheckpointContract(address: string): Promise<ERC20DividendCheckpointContract> {
+    assert.isETHAddressHex('address', address);
     return new ERC20DividendCheckpointContract(
       ERC20DividendCheckpoint.abi,
       address,
@@ -76,10 +79,12 @@ export default class ContractFactory {
   }
 
   public async getModuleFactoryContract(address: string): Promise<ModuleFactoryContract> {
+    assert.isETHAddressHex('address', address);
     return new ModuleFactoryContract(ModuleFactory.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getEtherDividendCheckpointContract(address: string): Promise<EtherDividendCheckpointContract> {
+    assert.isETHAddressHex('address', address);
     return new EtherDividendCheckpointContract(
       EtherDividendCheckpoint.abi,
       address,
@@ -89,10 +94,12 @@ export default class ContractFactory {
   }
 
   public async getDetailedERC20Contract(address: string): Promise<DetailedERC20Contract> {
+    assert.isETHAddressHex('address', address);
     return new DetailedERC20Contract(DetailedERC20.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {
+    assert.isETHAddressHex('address', address);
     return new SecurityTokenContract(SecurityToken.abi, address, this.provider, this.contractDefaults);
   }
 
@@ -115,6 +122,7 @@ export default class ContractFactory {
   }
 
   public async getGeneralPermissionManagerContract(address: string): Promise<GeneralPermissionManagerContract> {
+    assert.isETHAddressHex('address', address);
     return new GeneralPermissionManagerContract(
       GeneralPermissionManager.abi,
       address,
@@ -135,22 +143,27 @@ export default class ContractFactory {
   }
 
   public async getCappedSTOContract(address: string): Promise<CappedSTOContract> {
+    assert.isETHAddressHex('address', address);
     return new CappedSTOContract(CappedSTO.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getUSDTieredSTOFactoryContract(address: string): Promise<USDTieredSTOFactoryContract> {
+    assert.isETHAddressHex('address', address);
     return new USDTieredSTOFactoryContract(USDTieredSTOFactory.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract> {
+    assert.isETHAddressHex('address', address);
     return new USDTieredSTOContract(USDTieredSTO.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getCountTransferManagerContract(address: string): Promise<CountTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
     return new CountTransferManagerContract(CountTransferManager.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getGeneralTransferManagerContract(address: string): Promise<GeneralTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
     return new GeneralTransferManagerContract(
       GeneralTransferManager.abi,
       address,
@@ -162,6 +175,7 @@ export default class ContractFactory {
   public async getManualApprovalTransferManagerContract(
     address: string,
   ): Promise<ManualApprovalTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
     return new ManualApprovalTransferManagerContract(
       ManualApprovalTransferManager.abi,
       address,
@@ -171,6 +185,7 @@ export default class ContractFactory {
   }
 
   public async getPercentageTransferManagerContract(address: string): Promise<PercentageTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
     return new PercentageTransferManagerContract(
       PercentageTransferManager.abi,
       address,
@@ -180,6 +195,7 @@ export default class ContractFactory {
   }
 
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
+    assert.isETHAddressHex('address', address);
     return new VolumeRestrictionTMContract(
       VolumeRestrictionTransferManager.abi,
       address,

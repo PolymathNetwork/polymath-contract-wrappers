@@ -180,6 +180,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public buyTokens = async (params: BuyTokensParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, params.txData, params.safetyFactor);
   };
 

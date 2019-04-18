@@ -3,6 +3,7 @@ import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
+import assert from '../../utils/assert';
 
 /**
  * @param spender The address which will spend the funds
@@ -76,6 +77,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: ApproveParams) => {
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).approve.sendTransactionAsync(
       params.spender,
       params.value,
@@ -95,6 +97,8 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Send tokens amount of tokens from address from to address to
    */
   public transferFrom = async (params: TransferFromParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).transferFrom.sendTransactionAsync(
       params.from,
       params.to,
@@ -118,6 +122,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   public balanceOf = async (params?: GetBalanceOfParams) => {
     const address =
       !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
+    assert.isETHAddressHex('owner', address);
     return (await this.contract).balanceOf.callAsync(address);
   };
 
@@ -132,6 +137,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Transfer the balance from token owner's account to 'to' account
    */
   public transfer = async (params: TransferParams) => {
+    assert.isETHAddressHex('to', params.to);
     return (await this.contract).transfer.sendTransactionAsync(
       params.to,
       params.value,
@@ -145,6 +151,8 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
   public allowance = async (params: AllowanceParams) => {
+    assert.isETHAddressHex('owner', params.owner);
+    assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).allowance.callAsync(params.owner, params.spender);
   };
 
