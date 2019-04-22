@@ -24,6 +24,8 @@ import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subs
 import ContractWrapper from '../contract_wrapper';
 import assert from '../../utils/assert';
 
+const ZERO = '0x0000000000000000000000000000000000000000';
+
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit;
   callback: EventCallback<SecurityTokenRegistryChangeExpiryLimitEventArgs>;
@@ -238,7 +240,7 @@ interface RemoveTickerParams extends TxParams {
  * @param newExpiry is the new expiry for newly generated tickers
  */
 interface ChangeExpiryLimitParams extends TxParams {
-  newExpiry: Date;
+  newExpiry: BigNumber;
 }
 
 /**
@@ -413,6 +415,13 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
     assert.isETHAddressHex('newOwner', params.newOwner);
+    assert.assert(params.newOwner !== ZERO, 'Invalid address');
+    const tickerDetails = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    // TODO verify new owner match with token owner
     return (await this.contract).transferTickerOwnership.sendTransactionAsync(
       params.newOwner,
       params.ticker,
@@ -495,7 +504,17 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
   public modifyTicker = async (params: ModifyTickerParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    assert.assert(
+      params.registrationDate.getTime() <= params.expiryDate.getTime(),
+      'Registration date should < expiry date',
+    );
     assert.isETHAddressHex('owner', params.owner);
+    if (params.status) {
+      const address = await this.getSecurityTokenAddress(params.ticker);
+      assert.assert(address !== ZERO, 'Token not registered');
+    }
     return (await this.contract).modifyTicker.sendTransactionAsync(
       params.owner,
       params.ticker,
@@ -512,6 +531,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Removes the ticker details, associated ownership & security token mapping
    */
   public removeTicker = async (params: RemoveTickerParams) => {
+    const ticker = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    assert.assert(ticker.owner !== ZERO, "Ticker doesn't exist");
     return (await this.contract).removeTicker.sendTransactionAsync(params.ticker, params.txData, params.safetyFactor);
   };
 
@@ -519,8 +542,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the expiry time for the token ticker. Only available to Polymath.
    */
   public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
+    assert.assert(params.newExpiry.toNumber() >= 86400, 'Expiry should >= 1 day');
     return (await this.contract).changeExpiryLimit.sendTransactionAsync(
-      dateToBigNumber(params.newExpiry),
+      params.newExpiry,
       params.txData,
       params.safetyFactor,
     );
@@ -530,6 +554,13 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.name.length > 0, 'Name is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    assert.isETHAddressHex('owner', params.owner);
+    assert.assert(params.owner !== ZERO, '0 value params not allowed');
+    assert.isETHAddressHex('securityToken', params.securityToken);
+    assert.assert(params.securityToken !== ZERO, 'ST address is 0x');
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.owner,
       params.ticker,
@@ -553,6 +584,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isETHAddressHex('newOwner', params.newOwner);
+    assert.assert(params.newOwner !== ZERO, 'Invalid address');
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -578,6 +611,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
+    const actualFee = await this.getTickerRegistrationFee();
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeTickerRegistrationFee.sendTransactionAsync(
       params.newFee,
       params.txData,
@@ -589,6 +624,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
+    const actualFee = await this.getSecurityTokenLaunchFee();
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeSecurityLaunchFee.sendTransactionAsync(
       params.newFee,
       params.txData,
@@ -600,6 +637,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Reclaims all ERC20Basic compatible tokens
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
+    assert.assert(params.tokenContract !== ZERO, 'Invalid address');
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -611,6 +650,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the protocol version and the SecurityToken contract
    */
   public setProtocolVersion = async (params: SetProtocolVersionParams) => {
+    assert.isETHAddressHex('STFactoryAddress', params.STFactoryAddress);
+    assert.assert(params.STFactoryAddress !== ZERO, '0x address is not allowed');
     return (await this.contract).setProtocolVersion.sendTransactionAsync(
       params.STFactoryAddress,
       params.major,
@@ -639,6 +680,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the PolyToken address. Only Polymath.
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
+    assert.isETHAddressHex('newAddress', params.newAddress);
+    assert.assert(params.newAddress !== ZERO, 'Invalid address');
     return (await this.contract).updatePolyTokenAddress.sendTransactionAsync(
       params.newAddress,
       params.txData,
