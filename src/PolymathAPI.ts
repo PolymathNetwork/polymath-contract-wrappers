@@ -29,7 +29,7 @@ import SecurityTokenRegistryWrapper from './contract_wrappers/registries/securit
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
 import ModuleRegistryWrapper from './contract_wrappers/registries/module_registry_wrapper';
 import TokenWrapperFactory from './factories/tokenWrapperFactory';
-import ModuleWrapperFactory from './factories/ModuleWrapperFactory';
+import ModuleWrapperFactory from './factories/moduleWrapperFactory';
 import FeatureRegistryWrapper from './contract_wrappers/registries/feature_registry_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
