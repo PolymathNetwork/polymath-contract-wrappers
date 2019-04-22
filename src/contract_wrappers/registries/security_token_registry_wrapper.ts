@@ -577,6 +577,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Checks that Security Token is registered
    */
   public isSecurityToken = async (params: SecurityTokenAddressParams) => {
+    assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     return (await this.contract).isSecurityToken.callAsync(params.securityTokenAddress);
   };
 

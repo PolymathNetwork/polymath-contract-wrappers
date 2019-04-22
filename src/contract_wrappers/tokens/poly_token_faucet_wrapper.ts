@@ -5,6 +5,7 @@ import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams } from '../../types';
+import assert from '../../utils/assert';
 
 interface GetTokensParams extends TxParams {
   amount: BigNumber;
@@ -30,6 +31,7 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
   }
 
   public getTokens = async (params: GetTokensParams) => {
+    assert.isETHAddressHex('recipient', params.recipient);
     return (await this.contract).getTokens.sendTransactionAsync(
       params.amount,
       params.recipient,

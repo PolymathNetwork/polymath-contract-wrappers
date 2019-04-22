@@ -2,3 +2,4 @@ lib/*
 docs/*
 scripts/*
 sandbox.ts
+test_utils/*
