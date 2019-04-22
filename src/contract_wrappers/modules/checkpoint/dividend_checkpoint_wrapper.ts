@@ -194,6 +194,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.isETHAddressHex('tokenContract', params.tokenContract);
+    assert.isAddressNotZero(params.tokenContract);
+    // TODO check user balance before transfer
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -206,6 +209,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public changeWallet = async (params: ChangeWalletParams) => {
+    assert.isETHAddressHex('wallet', params.wallet);
+    assert.isAddressNotZero(params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
@@ -218,6 +223,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
+    // TODO get EXCLUDED_ADDRESS_LIMIT from contract
+    assert.assert(params.excluded.length <= 150, 'Too many excluded addresses');
+    assert.isETHAddressHexArray('excluded', params.excluded);
+    assert.isAddressArrayNotZero(params.excluded);
+    assert.checkDuplicateAddresses(params.excluded);
     return (await this.contract).setDefaultExcluded.sendTransactionAsync(
       params.excluded,
       params.txData,
@@ -226,6 +236,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setWithholding = async (params: SetWithholdingParams) => {
+    assert.assert(params.investors.length == params.withholding.length, 'Mismatched input lengths');
+    assert.checkWithholdingArrayTax(params.withholding);
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -235,6 +247,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
+    assert.checkWithholdingTax(params.withholding);
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
       params.withholding,
