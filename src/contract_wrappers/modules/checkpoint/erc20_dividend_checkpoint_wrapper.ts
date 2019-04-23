@@ -166,7 +166,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividend = async (params: CreateDividendParams) => {
-    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
+    await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -179,7 +179,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
+    await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -193,7 +193,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
+    await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -209,7 +209,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
+    await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
