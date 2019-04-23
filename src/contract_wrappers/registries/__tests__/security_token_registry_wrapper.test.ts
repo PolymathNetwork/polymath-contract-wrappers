@@ -292,6 +292,74 @@ describe('SecurityTokenRegistryWrapper', () => {
     });
   });
 
+  describe('GetTickerRegistrationFee', () => {
+    test('should call getTickerRegistrationFee', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerRegistrationFee).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTickerRegistrationFee();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerRegistrationFee).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('RegisterTicker', () => {
+    test('should call to Register Ticker', async () => {
+      const owner = '0x0123456789012345678901234567890123456789';
+      const ticker = 'TICK';
+      const tokenName = 'TICKER';
+      const mockedParams = {
+        owner,
+        ticker,
+        tokenName,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.registerTicker).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.tokenName,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.registerTicker(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.registerTicker).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.tokenName,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
