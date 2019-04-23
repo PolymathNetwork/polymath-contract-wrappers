@@ -547,6 +547,122 @@ describe('SecurityTokenRegistryWrapper', () => {
     });
   });
 
+  describe('IsTickerRegisteredByCurrentIssuer', () => {
+    test('should call to getTickerDetails and check current user', async () => {
+      const expectedResult = true;
+
+      const expectedSCResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1),
+        new BigNumber(1),
+        'tokenName',
+        true,
+      ];
+
+      const tokenName = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      const expectedAddrResult = ['0x0123456789012345678901234567890123456789'];
+
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve(expectedAddrResult);
+
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(tokenName)).thenResolve(expectedSCResult);
+      // Real call
+      const result = await target.isTickerRegisteredByCurrentIssuer({ tokenName });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(tokenName)).once();
+    });
+  });
+
+  describe('IsTokenLaunched', () => {
+    test('should call check if token launched', async () => {
+      const expectedResult = true;
+
+      const expectedSCResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1),
+        new BigNumber(1),
+        'tokenName',
+        true,
+      ];
+
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
+
+      // Real call
+      const result = await target.isTokenLaunched({ tokenName: ticker });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(ticker)).once();
+    });
+
+    test('should call to getTickerDetails for available ticker', async () => {
+      const expectedResult = true;
+
+      const expectedSCResult = ['', new BigNumber(0), new BigNumber(0), '', false];
+
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
+
+      // Real call
+      const result = await target.isTickerAvailable({ tokenName: ticker });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(ticker)).once();
+    });
+  });
+
+  describe('RemoveTicker', () => {
+    test('should call to remove ticker', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        ticker: 'TICK',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.removeTicker).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.ticker, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.removeTicker(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.removeTicker).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.ticker, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
