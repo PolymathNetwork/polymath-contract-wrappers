@@ -166,7 +166,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividend = async (params: CreateDividendParams) => {
-    assert.isETHAddressHex('token', params.token);
+    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -179,7 +179,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    assert.isETHAddressHex('token', params.token);
+    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -193,8 +193,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.isETHAddressHex('token', params.token);
-    assert.isETHAddressHexArray('excluded', params.excluded);
+    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -210,8 +209,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.isETHAddressHex('token', params.token);
-    assert.isETHAddressHexArray('excluded', params.excluded);
+    this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -223,6 +221,32 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  private sharedAsserts = async (
+    expiry: Date,
+    maturity: Date,
+    amount: BigNumber,
+    token: string,
+    name: string,
+    excluded?: string[],
+  ) => {
+    // TODO get EXCLUDED_ADDRESS_LIMIT from contract
+    let _excluded = excluded;
+    if (_.isUndefined(_excluded)) {
+      _excluded = await this.getDefaultExcluded();
+      assert.isETHAddressHexArray('excluded', _excluded);
+      assert.isAddressArrayNotZero(_excluded);
+      // TODO duped exclude address
+    }
+    assert.assert(_excluded!.length <= 150, 'Too many addresses excluded');
+    assert.assert(expiry > maturity, 'Expiry before maturity');
+    assert.assert(expiry > new Date(), 'Expiry in past');
+    assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
+    assert.isETHAddressHex('token', token);
+    assert.isAddressNotZero(token);
+    // TODO check allowance
+    assert.assert(name.length > 0, 'The name can not be empty');
   };
 
   /**
