@@ -495,6 +495,58 @@ describe('SecurityTokenRegistryWrapper', () => {
     });
   });
 
+  describe('IsTickerAvailable', () => {
+    test('should call to getTickerDetails for unavailable ticker', async () => {
+      const expectedResult = false;
+
+      const expectedSCResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1),
+        new BigNumber(1),
+        'tokenName',
+        true,
+      ];
+
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
+
+      // Real call
+      const result = await target.isTickerAvailable({ tokenName: ticker });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(ticker)).once();
+    });
+
+    test('should call to getTickerDetails for available ticker', async () => {
+      const expectedResult = true;
+
+      const expectedSCResult = ['', new BigNumber(0), new BigNumber(0), '', false];
+
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
+
+      // Real call
+      const result = await target.isTickerAvailable({ tokenName: ticker });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(ticker)).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
