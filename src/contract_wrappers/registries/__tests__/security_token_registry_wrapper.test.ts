@@ -360,6 +360,141 @@ describe('SecurityTokenRegistryWrapper', () => {
     });
   });
 
+  describe('TransferTickerOwnership', () => {
+    test('should call to TransferTickerOwnership', async () => {
+      const newOwner = '0x0123456789012345678901234567890123456789';
+      const ticker = 'TICK';
+      const mockedParams = {
+        newOwner,
+        ticker,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.transferTickerOwnership).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.newOwner,
+          mockedParams.ticker,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.transferTickerOwnership(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.transferTickerOwnership).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.newOwner,
+          mockedParams.ticker,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('GenerateSecurityToken', () => {
+    test('should call to GenerateSecurityToken', async () => {
+      const ticker = 'TICK';
+      const name = 'Security';
+      const details = 'Token Details';
+      const divisible = true;
+      const mockedParams = {
+        name,
+        ticker,
+        details,
+        divisible,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.generateSecurityToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          mockedParams.ticker,
+          mockedParams.details,
+          mockedParams.divisible,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.generateSecurityToken(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.generateSecurityToken).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          mockedParams.ticker,
+          mockedParams.details,
+          mockedParams.divisible,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('Get Security Token Information', () => {
+    test('should call to getSecurityTokenAddress', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getSecurityTokenLaunchFee();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getSecurityTokenLaunchFee).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+
+    test('should call to getSecurityTokenAddress', async () => {
+      // Expected
+      const expectedResult = '0x0123456789012345678901234567890123456789';
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getSecurityTokenAddress(ticker);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedMethod.callAsync(ticker)).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
