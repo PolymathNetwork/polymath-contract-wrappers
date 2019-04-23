@@ -5,7 +5,7 @@ import { BigNumber } from '@0x/utils';
 import { SecurityTokenRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import ContractWrapper from '../../contract_wrapper';
-import { stringToBytes32 } from '../../../utils/convert';
+import { dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
 
 describe('SecurityTokenRegistryWrapper', () => {
@@ -743,6 +743,187 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.changeSecurityLaunchFee).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+  describe('ChangeExpiryLimit', () => {
+    test('should call to ChangeExpiryLimit', async () => {
+      const newExpiry = new Date(2025, 1);
+      const date1 = dateToBigNumber(newExpiry);
+      const mockedParams = {
+        newExpiry: date1,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const realParams = {
+        newExpiry,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeExpiryLimit).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.newExpiry, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeExpiryLimit(realParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeExpiryLimit).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.newExpiry, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+
+  describe('ModifyTicker', () => {
+    test('should call to ModifyTicker', async () => {
+      const owner = '0x0123456789012345678901234567890123456789';
+      const ticker = 'TICK';
+      const tokenName = 'Security';
+      const registrationDate = new Date(2020, 1);
+      const expiryDate = new Date(2025, 1);
+      const status = false;
+      const date1 = dateToBigNumber(registrationDate);
+      const date2 = dateToBigNumber(expiryDate);
+      const mockedParams = {
+        owner,
+        ticker,
+        tokenName,
+        registrationDate: date1,
+        expiryDate: date2,
+        status,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const realParams = {
+        owner,
+        ticker,
+        tokenName,
+        registrationDate,
+        expiryDate,
+        status,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyTicker).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.tokenName,
+          mockedParams.registrationDate,
+          mockedParams.expiryDate,
+          mockedParams.status,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyTicker(realParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyTicker).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.tokenName,
+          mockedParams.registrationDate,
+          mockedParams.expiryDate,
+          mockedParams.status,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('ModifySecurityToken', () => {
+    test('should call to ModifySecurityToken', async () => {
+      const name = 'Security';
+      const ticker = 'TICK';
+      const owner = '0x0123456789012345678901234567890123456789';
+      const securityToken = '0x0123456789012345678901234567890123456789';
+      const tokenDetails = 'Token Details';
+      const deployedAt = new Date(2020, 1);
+
+      const date1 = dateToBigNumber(deployedAt);
+      const mockedParams = {
+        name,
+        ticker,
+        owner,
+        securityToken,
+        tokenDetails,
+        deployedAt: date1,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const realParams = {
+        name,
+        ticker,
+        owner,
+        securityToken,
+        tokenDetails,
+        deployedAt,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = Promise.resolve;
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifySecurityToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.owner,
+          mockedParams.securityToken,
+          mockedParams.tokenDetails,
+          mockedParams.deployedAt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifySecurityToken(realParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifySecurityToken).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.owner,
+          mockedParams.ticker,
+          mockedParams.owner,
+          mockedParams.securityToken,
+          mockedParams.tokenDetails,
+          mockedParams.deployedAt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
     });
   });

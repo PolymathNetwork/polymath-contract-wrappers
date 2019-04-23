@@ -513,7 +513,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
     assert.isETHAddressHex('owner', params.owner);
-    assert.isETHAddressHex('tokenDetails', params.tokenDetails);
+    assert.isETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.owner,
       params.ticker,
