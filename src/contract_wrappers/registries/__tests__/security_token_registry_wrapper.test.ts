@@ -203,7 +203,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getTickersByOwner).once();
       verify(mockedMethod.callAsync(ownerAddress)).once();
     });
+  });
 
+  describe('GetSecurityTokenData', () => {
     test('should call getSecurityTokenData', async () => {
       const expectedResult = {
         ticker: 'TICK',
@@ -229,6 +231,64 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getSecurityTokenData).once();
       verify(mockedMethod.callAsync(securityTokenAddress)).once();
+    });
+  });
+
+  describe('GetTokensByOwner', () => {
+    test('should call getTokensByOwner', async () => {
+      // Address expected
+      const expectedResult = ['0x0123456789012345678901234567890123456789'];
+      const ownerAddress = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensByOwner).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ownerAddress)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTokensByOwner({ owner: ownerAddress });
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTokensByOwner).once();
+      verify(mockedMethod.callAsync(ownerAddress)).once();
+    });
+  });
+
+  describe('GetTickerDetails', () => {
+    test('should call getTickerDetails', async () => {
+      const expectedResult = {
+        owner: '0x0123456789012345678901234567890123456789',
+        registrationDate: new Date(0),
+        expiryDate: new Date(0),
+        tokenName: 'tokenName',
+        status: true,
+      };
+
+      const expectedSCResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(0),
+        new BigNumber(0),
+        'tokenName',
+        true,
+      ];
+
+      const ticker = 'TICK';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
+
+      // Real call
+      const result = await target.getTickerDetails({ tokenName: ticker });
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedMethod.callAsync(ticker)).once();
     });
   });
 
