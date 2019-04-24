@@ -176,53 +176,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
-  public getBytes32Value = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBytes32Value.callAsync(params.variable);
-  };
-
-  public getBytesValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBytesValue.callAsync(params.variable);
-  };
-
-  public getAddressValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getAddressValue.callAsync(params.variable);
-  };
-
-  public getArrayAddress = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayAddress.callAsync(params.key);
-  };
-
-  public getBoolValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBoolValue.callAsync(params.variable);
-  };
-
-  public getStringValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getStringValue.callAsync(params.variable);
-  };
-
-  public getArrayBytes32 = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayBytes32.callAsync(params.key);
-  };
-
-  public getUintValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getUintValue.callAsync(params.variable);
-  };
-
-  public getArrayUint = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayUint.callAsync(params.key);
-  };
-
-  public useModule = async (params: ModuleFactoryParams) => {
-    // TODO Check ModuleFactory is verified or SecurityToken owner must be ModuleFactory owner"
-    // TODO Check ModuleFactory Contract version is compatible
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    return (await this.contract).useModule.sendTransactionAsync(
-      params.moduleFactory,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public registerModule = async (params: ModuleFactoryParams) => {
     // TODO Check if msg.sender is module factory owner or registry curator
 
