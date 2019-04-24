@@ -232,14 +232,14 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     excluded?: string[],
   ) => {
     // TODO get EXCLUDED_ADDRESS_LIMIT from contract
-    let _excluded = excluded;
-    if (_.isUndefined(_excluded)) {
-      _excluded = await this.getDefaultExcluded();
-      assert.isETHAddressHexArray('excluded', _excluded);
-      assert.isAddressArrayNotZero(_excluded);
+    let auxExcluded = excluded;
+    if (_.isUndefined(auxExcluded)) {
+      auxExcluded = await this.getDefaultExcluded();
+      assert.isETHAddressHexArray('excluded', auxExcluded);
+      assert.isAddressArrayNotZero(auxExcluded);
       // TODO duped exclude address
     }
-    assert.assert(_excluded!.length <= 150, 'Too many addresses excluded');
+    assert.assert(auxExcluded.length <= 150, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');
     assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');

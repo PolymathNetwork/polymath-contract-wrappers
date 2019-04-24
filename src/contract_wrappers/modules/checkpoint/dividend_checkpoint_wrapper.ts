@@ -236,7 +236,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setWithholding = async (params: SetWithholdingParams) => {
-    assert.assert(params.investors.length == params.withholding.length, 'Mismatched input lengths');
+    assert.assert(params.investors.length === params.withholding.length, 'Mismatched input lengths');
     assert.checkWithholdingArrayTax(params.withholding);
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,

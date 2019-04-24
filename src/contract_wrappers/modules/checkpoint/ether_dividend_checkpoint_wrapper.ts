@@ -21,14 +21,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import {
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
-  EventCallback,
-  Subscribe,
-  GetLogs,
-  TxPayableParams,
-} from '../../../types';
+import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs, TxParams } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
@@ -189,32 +182,36 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
-interface CreateDividendParams extends TxPayableParams {
+interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointParams extends TxPayableParams {
+interface CreateDividendWithCheckpointParams extends TxParams {
   maturity: Date;
   expiry: Date;
   checkpointId: number;
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithExclusionsParams extends TxPayableParams {
+interface CreateDividendWithExclusionsParams extends TxParams {
   maturity: Date;
   expiry: Date;
   excluded: string[];
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointAndExclusionsParams extends TxPayableParams {
+interface CreateDividendWithCheckpointAndExclusionsParams extends TxParams {
   maturity: Date;
   expiry: Date;
   checkpointId: number;
   excluded: string[];
   name: string;
+  value: BigNumber;
 }
 
 /**
@@ -240,43 +237,48 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividend = async (params: CreateDividendParams) => {
-    await this.sharedAsserts(params.txData!.value, params.expiry, params.maturity, params.name);
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    await this.sharedAsserts(params.txData!.value, params.expiry, params.maturity, params.name, params.checkpointId);
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       numberToBigNumber(params.checkpointId),
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    await this.sharedAsserts(
-      params.txData!.value,
-      params.expiry,
-      params.maturity,
-      params.name,
-      undefined,
-      params.excluded,
-    );
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name, undefined, params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.excluded,
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
@@ -284,8 +286,12 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
     await this.sharedAsserts(
-      params.txData!.value,
+      params.value,
       params.expiry,
       params.maturity,
       params.name,
@@ -298,7 +304,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       numberToBigNumber(params.checkpointId),
       params.excluded,
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
@@ -312,18 +318,18 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     excluded?: string[],
   ) => {
     // TODO get EXCLUDED_ADDRESS_LIMIT from contract
-    let _excluded = excluded;
-    if (_.isUndefined(_excluded)) {
-      _excluded = await this.getDefaultExcluded();
-      assert.isETHAddressHexArray('excluded', _excluded);
-      assert.isAddressArrayNotZero(_excluded);
+    let auxExcluded = excluded;
+    if (_.isUndefined(auxExcluded)) {
+      auxExcluded = await this.getDefaultExcluded();
+      assert.isETHAddressHexArray('excluded', auxExcluded);
+      assert.isAddressArrayNotZero(auxExcluded);
       // TODO duped exclude address
     }
-    const _value = _.isUndefined(value) ? new BigNumber(0) : value;
-    assert.assert(_excluded!.length <= 150, 'Too many addresses excluded');
+    const auxValue = _.isUndefined(value) ? new BigNumber(0) : value;
+    assert.assert(auxExcluded.length <= 150, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');
-    assert.assert(_value.gt(new BigNumber(0)), 'No dividend sent');
+    assert.assert(auxValue.gt(new BigNumber(0)), 'No dividend sent');
     // TODO check allowance
     assert.assert(name.length > 0, 'The name can not be empty');
   };

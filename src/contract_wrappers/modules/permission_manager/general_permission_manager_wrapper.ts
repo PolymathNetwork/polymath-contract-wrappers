@@ -195,8 +195,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.isETHAddressHexArray('module', params.modules);
     assert.isAddressNotZero(params.delegate);
     assert.assert(params.modules.length > 0, '0 length is not allowed');
-    assert.assert(params.modules.length == params.perms.length, 'Array length mismatch');
-    assert.assert(params.valids.length == params.perms.length, 'Array length mismatch');
+    assert.assert(params.modules.length === params.perms.length, 'Array length mismatch');
+    assert.assert(params.valids.length === params.perms.length, 'Array length mismatch');
     return (await this.contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,
