@@ -2,13 +2,13 @@ import {
   ModuleRegistryContract,
   ModuleRegistryEventArgs,
   ModuleRegistryEvents,
+  ModuleRegistryModuleRegisteredEventArgs,
+  ModuleRegistryModuleRemovedEventArgs,
+  ModuleRegistryModuleUsedEventArgs,
+  ModuleRegistryModuleVerifiedEventArgs,
+  ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
-  ModuleRegistryModuleUsedEventArgs,
-  ModuleRegistryModuleRegisteredEventArgs,
-  ModuleRegistryModuleVerifiedEventArgs,
-  ModuleRegistryModuleRemovedEventArgs,
-  ModuleRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -17,14 +17,13 @@ import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
 import {
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
   EventCallback,
-  TxPayableParams,
-  TxParams,
-  Subscribe,
   GetLogs,
+  GetLogsAsyncParams,
   ModuleType,
+  Subscribe,
+  SubscribeAsyncParams,
+  TxParams,
 } from '../../types';
 import assert from '../../utils/assert';
 import { bytes32ToString } from '../../utils/convert';
@@ -122,11 +121,6 @@ interface GetValueByKeyParams {
   key: string;
 }
 
-interface InitializeParams extends TxPayableParams {
-  polymathRegistry: string;
-  owner: string;
-}
-
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -218,18 +212,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return (await this.contract).getArrayUint.callAsync(params.key);
   };
 
-  public initialize = async (params: InitializeParams) => {
-    assert.isETHAddressHex('polymathRegistry', params.polymathRegistry);
-    assert.isETHAddressHex('owner', params.owner);
-    return (await this.contract).initialize.sendTransactionAsync(
-      params.polymathRegistry,
-      params.owner,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public useModule = async (params: ModuleFactoryParams) => {
+    // TODO Check ModuleFactory is verified or SecurityToken owner must be ModuleFactory owner"
+    // TODO Check ModuleFactory Contract version is compatible
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).useModule.sendTransactionAsync(
       params.moduleFactory,
@@ -239,6 +224,17 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public registerModule = async (params: ModuleFactoryParams) => {
+    //TODO Check if msg.sender is module factory owner or registry curator
+
+    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
+    assert.assert(
+      (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+    assert.assert(!(await this.checkForRegisteredModule(params.moduleFactory)), 'Module has already been registered');
+
+    // TODO Factory must have a module type
+
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
@@ -248,6 +244,15 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public removeModule = async (params: ModuleFactoryParams) => {
+    //TODO Check if msg.sender is module factory owner or registry curator
+
+    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
+    assert.assert(
+      (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+    assert.assert(await this.checkForRegisteredModule(params.moduleFactory), 'Module is not registered');
+
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleFactory,
@@ -257,6 +262,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public verifyModule = async (params: VerifyModuleParams) => {
+    assert.assert(
+        (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+        'Msg sender must be owner',
+    );
+    assert.assert(await this.checkForRegisteredModule(params.moduleFactory), 'Module is not registered');
+
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
@@ -328,6 +339,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    // TODO Perhaps check that the transfer of erc20 tokens is possible on its contract
+    assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
@@ -349,6 +362,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isAddressNotZero(params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
@@ -406,5 +420,25 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       ModuleRegistry.abi,
     );
     return logs;
+  };
+
+  private checkForRegisteredModule = async (moduleAddress: string) => {
+    const allModulesTypes = [
+      ModuleType.PermissionManager,
+      ModuleType.STO,
+      ModuleType.Burn,
+      ModuleType.Dividends,
+      ModuleType.TransferManager,
+    ];
+    let isRegistered = false;
+    allModulesTypes.map(async type => {
+      const registeredAddresses = await this.getModulesByType({ moduleType: type });
+      registeredAddresses.map(address => {
+        if (address == moduleAddress) {
+          isRegistered = true;
+        }
+      });
+    });
+    return isRegistered;
   };
 }
