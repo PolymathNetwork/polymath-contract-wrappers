@@ -20,16 +20,16 @@ import {
   VolumeRestrictionTransferManager,
   PolyTokenFaucet,
 } from '@polymathnetwork/contract-artifacts';
-import { PolymathRegistryContract, PolyResponse } from '@polymathnetwork/abi-wrappers';
-import { Web3Wrapper, Provider } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
+import { PolyResponse } from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { BigNumber, providerUtils } from '@0x/utils';
+import { Provider } from 'ethereum-types';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
 import ModuleRegistryWrapper from './contract_wrappers/registries/module_registry_wrapper';
 import TokenWrapperFactory from './factories/tokenWrapperFactory';
-import ModuleWrapperFactory from './factories/ModuleWrapperFactory';
+import ModuleWrapperFactory from './factories/moduleWrapperFactory';
 import FeatureRegistryWrapper from './contract_wrappers/registries/feature_registry_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
@@ -41,7 +41,7 @@ import ContractFactory from './factories/contractFactory';
  */
 export interface ApiConstructorParams {
   provider: Provider;
-  polymathRegistryAddress: string;
+  polymathRegistryAddress?: string;
   defaultGasPrice?: BigNumber;
 }
 
@@ -118,9 +118,8 @@ export class PolymathAPI {
    * @return  An instance of the PolymathAPI class.
    */
   public constructor(params: ApiConstructorParams) {
-    assert.isWeb3Provider('provider', params.provider);
-
-    if (!_.isUndefined(params.polymathRegistryAddress)) {
+    providerUtils.standardizeOrThrow(params.provider);
+    if (params.polymathRegistryAddress !== undefined) {
       assert.isETHAddressHex('polymathRegistryAddress', params.polymathRegistryAddress);
     }
 
@@ -157,15 +156,11 @@ export class PolymathAPI {
       },
     );
 
+    this.contractFactory = new ContractFactory(this.web3Wrapper, params.polymathRegistryAddress);
+
     this.polymathRegistry = new PolymathRegistryWrapper(
       this.web3Wrapper,
-      this.getPolymathRegistryContract(params.polymathRegistryAddress),
-    );
-
-    this.contractFactory = new ContractFactory(
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
-      this.polymathRegistry,
+      this.contractFactory.getPolymathRegistryContract(),
     );
 
     this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
@@ -186,15 +181,15 @@ export class PolymathAPI {
     );
   }
 
-  public getTokens = async (params: GetTokensParams): Promise<PolyResponse> => {
-    assert.isNumber('amount', params.amount);
-    const address = !_.isUndefined(params.address) ? params.address : await this.getAccount();
-    assert.isETHAddressHex('address', address);
-
+  public getPolyTokens = async (params: GetTokensParams): Promise<PolyResponse> => {
     const networkId = await this.web3Wrapper.getNetworkIdAsync();
     if (networkId === 1) {
       throw new Error('Only for testnet');
     }
+    assert.isNumber('amount', params.amount);
+    const address = params.address !== undefined ? params.address : await this.getAccount();
+    assert.isETHAddressHex('address', address);
+
     return this.polyTokenFaucet.getTokens({
       amount: new BigNumber(params.amount),
       recipient: address,
@@ -214,7 +209,7 @@ export class PolymathAPI {
    * @return Balance BigNumber
    */
   public getBalance = async (params: GetBalanceParams): Promise<BigNumber> => {
-    const addr = !_.isUndefined(params.address) ? params.address : await this.getAccount();
+    const addr = params.address !== undefined ? params.address : await this.getAccount();
     assert.isETHAddressHex('address', addr);
     return this.web3Wrapper.getBalanceInWeiAsync(addr);
   };
@@ -225,21 +220,4 @@ export class PolymathAPI {
   public isTestnet = async (): Promise<boolean> => {
     return (await this.web3Wrapper.getNetworkIdAsync()) !== 1;
   };
-
-  public async getPolymathRegistryContract(address: string): Promise<PolymathRegistryContract> {
-    return new PolymathRegistryContract(
-      PolymathRegistry.abi,
-      // (address) ? address : await this._getDefaultPolymathRegistryAddress(), //for optional address
-      address,
-      this.web3Wrapper.getProvider(),
-      this.web3Wrapper.getContractDefaults(),
-    );
-  }
-  /*
-//_getDefaultPolymathRegistryAddress - can be used in a case where the polymath registry address is unknown
-  private async _getDefaultPolymathRegistryAddress(): Promise<string> {
-    const networkId: NetworkId = await this._web3Wrapper.getNetworkIdAsync() as NetworkId;
-    return AddressesUtils.getDefaultContractAddresses(networkId);
-  }
- */
 }
