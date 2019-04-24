@@ -224,14 +224,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    //TODO Check if msg.sender is module factory owner or registry curator
+    // TODO Check if msg.sender is module factory owner or registry curator
 
-    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
-    assert.assert(
-      (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      'Msg sender must be owner',
-    );
-    assert.assert(!(await this.checkForRegisteredModule(params.moduleFactory)), 'Module has already been registered');
+    await this.checkModuleNotPaused();
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleNotRegistered(params.moduleFactory);
 
     // TODO Factory must have a module type
 
@@ -244,14 +241,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public removeModule = async (params: ModuleFactoryParams) => {
-    //TODO Check if msg.sender is module factory owner or registry curator
+    // TODO Check if msg.sender is module factory owner or registry curator
 
-    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
-    assert.assert(
-      (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      'Msg sender must be owner',
-    );
-    assert.assert(await this.checkForRegisteredModule(params.moduleFactory), 'Module is not registered');
+    await this.checkModuleNotPaused();
+    await this.checkMsgSenderIsOwner;
+    await this.checkModuleRegistered(params.moduleFactory);
 
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
@@ -262,11 +256,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public verifyModule = async (params: VerifyModuleParams) => {
-    assert.assert(
-        (await this.owner()) == (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-        'Msg sender must be owner',
-    );
-    assert.assert(await this.checkForRegisteredModule(params.moduleFactory), 'Module is not registered');
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
 
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
@@ -434,11 +425,31 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     allModulesTypes.map(async type => {
       const registeredAddresses = await this.getModulesByType({ moduleType: type });
       registeredAddresses.map(address => {
-        if (address == moduleAddress) {
+        if (address === moduleAddress) {
           isRegistered = true;
         }
+        return registeredAddresses;
       });
     });
     return isRegistered;
+  };
+
+  private checkMsgSenderIsOwner = async () => {
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+  };
+
+  private checkModuleRegistered = async (moduleFactory: string) => {
+    assert.assert(await this.checkForRegisteredModule(moduleFactory), 'Module is not registered');
+  };
+
+  private checkModuleNotRegistered = async (moduleFactory: string) => {
+    assert.assert(!(await this.checkForRegisteredModule(moduleFactory)), 'Module is already registered');
+  };
+
+  private checkModuleNotPaused = async () => {
+    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
   };
 }
