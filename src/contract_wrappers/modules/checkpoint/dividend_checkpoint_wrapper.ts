@@ -257,6 +257,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
+    assert.isETHAddressHexArray('payees', params.payees);
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.payees,
@@ -295,6 +296,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public reclaimDividend = async (params: DividendIndexTxParams) => {
+    const dividends = await (await this.contract).getDividendsData.callAsync();
+    assert.assert(params.dividendIndex < dividends[0].length, 'Incorrect dividend index');
+    const dividend = await this.dividends(params);
+    assert.assert(new Date() >= dividend.expiry, 'Dividend expiry is in the future');
+    assert.assert(!dividend.reclaimed, 'Dividend is already claimed');
     return (await this.contract).reclaimDividend.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.txData,
@@ -321,6 +327,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
+    const dividends = await (await this.contract).getDividendsData.callAsync();
+    assert.assert(params.dividendIndex < dividends[0].length, 'Incorrect dividend index');
     return (await this.contract).reclaimDividend.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.txData,
