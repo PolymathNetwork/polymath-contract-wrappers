@@ -2,7 +2,7 @@
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { PolymathRegistryContract, PolyTokenEvents, PolymathRegistryEvents } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import { Contracts } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import PolymathRegistryWrapper from '../polymath_registry_wrapper';
@@ -197,7 +197,7 @@ describe('PolyMathRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
