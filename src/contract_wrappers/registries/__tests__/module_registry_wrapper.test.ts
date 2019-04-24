@@ -2,11 +2,16 @@
 import { instance, mock, reset, verify, when } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ModuleRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import { ModuleType } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import ModuleRegistryWrapper from '../module_registry_wrapper';
-import { stringToBytes32 } from '../../../utils/convert';
+import {
+  stringToBytes32,
+  stringArrayToBytes32Array,
+  bytes32ArrayToStringArray,
+  bytes32ToString,
+} from '../../../utils/convert';
 
 interface TagsByModule {
   module: string;
@@ -32,86 +37,13 @@ describe('ModuleRegistryWrapper', () => {
     reset(mockedContract);
   });
 
-  test.todo('should test Eternal Storage methods');
-
   describe('Types', () => {
     test('should extend ContractWrapper', async () => {
       expect(target instanceof ContractWrapper).toBe(true);
     });
   });
 
-  describe('Initialize', () => {
-    test('should call to initialize the module registry', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        polymathRegistry: '0x0123456789012345678901234567890123456789',
-        owner: '0x0123456789012345678901234567890123456789',
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = Promise.resolve;
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.initialize).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.polymathRegistry,
-          mockedParams.owner,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.initialize(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.initialize).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.polymathRegistry,
-          mockedParams.owner,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
-    });
-  });
-
   describe('Modules', () => {
-    test('should call to use a module', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        moduleFactory: '0x0123456789012345678901234567890123456789',
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = Promise.resolve;
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.useModule).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.useModule(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.useModule).once();
-      verify(
-        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
-      ).once();
-    });
-
     test('should call to register a module', async () => {
       // Mocked parameters
       const mockedParams = {
@@ -119,7 +51,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -148,7 +80,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -178,7 +110,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -211,18 +143,42 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('GetTags', () => {
-    test('should call to getTagsByTypeAndToken', async () => {
+  describe('Tags', () => {
+    test('should call to getTagsByTypeAndToken (single module, multiple tags)', async () => {
       // Address expected
-      const expectedResult = [[stringToBytes32('1')], [stringToBytes32('1')]];
-      const expectedReturn = [
-        {
-          module: '0x3100000000000000000000000000000000000000000000000000000000000000',
-          tags: [
-            '1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000',
-          ],
-        },
-      ];
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const tags = stringArrayToBytes32Array(['Tag1', 'Tag2', 'Tag3']);
+      const modules = [moduleAddress1, moduleAddress1, moduleAddress1];
+      const expectedResult = [tags, modules];
+      const securityTokenAddress = '0x0123456789012345678901234567890123456789';
+      const params = { moduleType: ModuleType.PermissionManager, securityToken: securityTokenAddress };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTagsByTypeAndToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleType, params.securityToken)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTagsByTypeAndToken(params);
+      // Result expectation
+      expect(result.length).toBe(1);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags).toEqual(bytes32ArrayToStringArray(tags));
+      // Verifications
+      verify(mockedContract.getTagsByTypeAndToken).once();
+      verify(mockedMethod.callAsync(params.moduleType, params.securityToken)).once();
+    });
+
+    test('should call to getTagsByTypeAndToken (multiple module, single tag)', async () => {
+      // Address expected
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const moduleAddress2 = '0x2222222222222222222222222222222222222222';
+      const moduleAddress3 = '0x3333333333333333333333333333333333333333';
+      const tag1 = stringToBytes32('Tag1');
+      const tags = [tag1, tag1, tag1];
+      const modules = [moduleAddress1, moduleAddress2, moduleAddress3];
+      const expectedResult = [tags, modules];
       const securityTokenAddress = '0x0123456789012345678901234567890123456789';
       const params = { moduleType: ModuleType.PermissionManager, securityToken: securityTokenAddress };
       // Mocked method
@@ -235,45 +191,168 @@ describe('ModuleRegistryWrapper', () => {
       // Real call
       const result = await target.getTagsByTypeAndToken(params);
       // Result expectation
-      expect(result).toEqual(expectedReturn);
+      expect(result.length).toBe(3);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags.length).toBe(1);
+      expect(result[0].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[1].module).toEqual(moduleAddress2);
+      expect(result[1].tags.length).toBe(1);
+      expect(result[1].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[2].module).toEqual(moduleAddress3);
+      expect(result[2].tags.length).toBe(1);
+      expect(result[2].tags[0]).toEqual(bytes32ToString(tag1));
       // Verifications
       verify(mockedContract.getTagsByTypeAndToken).once();
       verify(mockedMethod.callAsync(ModuleType.PermissionManager, securityTokenAddress)).once();
     });
 
-    test('should call to getTagsByType', async () => {
+    test('should call to getTagsByTypeAndToken (multiple module, multiple tags)', async () => {
       // Address expected
-      const expectedResult = [[stringToBytes32('1')], [stringToBytes32('1')]];
-      const expectedReturn = [
-        {
-          module: '0x3100000000000000000000000000000000000000000000000000000000000000',
-          tags: [
-            '1\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000',
-          ],
-        },
-      ];
-      const params = { moduleType: ModuleType.PermissionManager };
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const moduleAddress2 = '0x2222222222222222222222222222222222222222';
+      const moduleAddress3 = '0x3333333333333333333333333333333333333333';
+      const tag1 = stringToBytes32('Tag1');
+      const tag2 = stringToBytes32('Tag2');
+      const tag3 = stringToBytes32('Tag3');
+      const tags = [tag1, tag3, tag2, tag3, tag2];
+      const modules = [moduleAddress1, moduleAddress1, moduleAddress2, moduleAddress2, moduleAddress3];
+      const expectedResult = [tags, modules];
+      const securityTokenAddress = '0x0123456789012345678901234567890123456789';
+      const params = { moduleType: ModuleType.PermissionManager, securityToken: securityTokenAddress };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTagsByTypeAndToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(ModuleType.PermissionManager, securityTokenAddress)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTagsByTypeAndToken(params);
+      // Result expectation
+      expect(result.length).toBe(3);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags.length).toBe(2);
+      expect(result[0].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[0].tags[1]).toEqual(bytes32ToString(tag3));
+      expect(result[1].module).toEqual(moduleAddress2);
+      expect(result[1].tags.length).toBe(2);
+      expect(result[1].tags[0]).toEqual(bytes32ToString(tag2));
+      expect(result[1].tags[1]).toEqual(bytes32ToString(tag3));
+      expect(result[2].module).toEqual(moduleAddress3);
+      expect(result[2].tags.length).toBe(1);
+      expect(result[2].tags[0]).toEqual(bytes32ToString(tag2));
+      // Verifications
+      verify(mockedContract.getTagsByTypeAndToken).once();
+      verify(mockedMethod.callAsync(ModuleType.PermissionManager, securityTokenAddress)).once();
+    });
+
+    test('should call to getTagsByType (single module, multiple tags)', async () => {
+      // Address expected
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const tags = stringArrayToBytes32Array(['Tag1', 'Tag2', 'Tag3']);
+      const modules = [moduleAddress1, moduleAddress1, moduleAddress1];
+      const expectedResult = [tags, modules];
+      const params = { moduleType: ModuleType.Burn };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getTagsByType).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getTagsByType(params);
       // Result expectation
-      expect(result).toEqual(expectedReturn);
+      expect(result.length).toBe(1);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags).toEqual(bytes32ArrayToStringArray(tags));
       // Verifications
       verify(mockedContract.getTagsByType).once();
-      verify(mockedMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
+    });
+
+    test('should call to getTagsByType (multiple module, single tag)', async () => {
+      // Address expected
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const moduleAddress2 = '0x2222222222222222222222222222222222222222';
+      const moduleAddress3 = '0x3333333333333333333333333333333333333333';
+      const tag1 = stringToBytes32('Tag1');
+      const tags = [tag1, tag1, tag1];
+      const modules = [moduleAddress1, moduleAddress2, moduleAddress3];
+      const expectedResult = [tags, modules];
+      const params = { moduleType: ModuleType.STO };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTagsByType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTagsByType(params);
+      // Result expectation
+      expect(result.length).toBe(3);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags.length).toBe(1);
+      expect(result[0].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[1].module).toEqual(moduleAddress2);
+      expect(result[1].tags.length).toBe(1);
+      expect(result[1].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[2].module).toEqual(moduleAddress3);
+      expect(result[2].tags.length).toBe(1);
+      expect(result[2].tags[0]).toEqual(bytes32ToString(tag1));
+      // Verifications
+      verify(mockedContract.getTagsByType).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
+    });
+
+    test('should call to getTagsByType (multiple module, multiple tags)', async () => {
+      // Address expected
+      const moduleAddress1 = '0x1111111111111111111111111111111111111111';
+      const moduleAddress2 = '0x2222222222222222222222222222222222222222';
+      const moduleAddress3 = '0x3333333333333333333333333333333333333333';
+      const tag1 = stringToBytes32('Tag1');
+      const tag2 = stringToBytes32('Tag2');
+      const tag3 = stringToBytes32('Tag3');
+      const tags = [tag1, tag3, tag2, tag3, tag2];
+      const modules = [moduleAddress1, moduleAddress1, moduleAddress2, moduleAddress2, moduleAddress3];
+      const expectedResult = [tags, modules];
+      const params = { moduleType: ModuleType.Dividends };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTagsByType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTagsByType(params);
+      // Result expectation
+      expect(result.length).toBe(3);
+      expect(result[0].module).toEqual(moduleAddress1);
+      expect(result[0].tags.length).toBe(2);
+      expect(result[0].tags[0]).toEqual(bytes32ToString(tag1));
+      expect(result[0].tags[1]).toEqual(bytes32ToString(tag3));
+      expect(result[1].module).toEqual(moduleAddress2);
+      expect(result[1].tags.length).toBe(2);
+      expect(result[1].tags[0]).toEqual(bytes32ToString(tag2));
+      expect(result[1].tags[1]).toEqual(bytes32ToString(tag3));
+      expect(result[2].module).toEqual(moduleAddress3);
+      expect(result[2].tags.length).toBe(1);
+      expect(result[2].tags[0]).toEqual(bytes32ToString(tag2));
+      // Verifications
+      verify(mockedContract.getTagsByType).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
     });
   });
 
   describe('GetReputationByFactory', () => {
     test('should call to get reputation by factory', async () => {
       // Address expected
-      const expectedResult = ['0x0123456789012345678901234567890123456789'];
+      const expectedResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
       const factory = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -293,46 +372,48 @@ describe('ModuleRegistryWrapper', () => {
   });
 
   describe('GetModules', () => {
-    test('should call to get Modules by type', async () => {
+    test('should call to getModulesByType', async () => {
       // Address expected
-      const expectedResult = ['0x0123456789012345678901234567890123456789'];
+      const expectedResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const params = { moduleType: ModuleType.PermissionManager };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getModulesByType).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getModulesByType({ moduleType: ModuleType.PermissionManager });
+      const result = await target.getModulesByType(params);
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getModulesByType).once();
-      verify(mockedMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
     });
 
-    test('should call to get Modules by type and token', async () => {
+    test('should call to getModulesByTypeAndToken', async () => {
       // Address expected
       const expectedResult = ['0x0123456789012345678901234567890123456789'];
       const securityToken = '0x0123456789012345678901234567890123456789';
+      const params = { moduleType: ModuleType.Dividends, securityToken };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getModulesByTypeAndToken).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(ModuleType.PermissionManager, securityToken)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.moduleType, params.securityToken)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getModulesByTypeAndToken({
-        moduleType: ModuleType.PermissionManager,
-        securityToken,
-      });
+      const result = await target.getModulesByTypeAndToken(params);
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getModulesByTypeAndToken).once();
-      verify(mockedMethod.callAsync(ModuleType.PermissionManager, securityToken)).once();
+      verify(mockedMethod.callAsync(params.moduleType, params.securityToken)).once();
     });
   });
 
@@ -344,7 +425,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -367,13 +448,13 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('Pause Unpause', () => {
+  describe('Pause/Unpause', () => {
     test('should call to pause', async () => {
       const mockedParams = {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -398,7 +479,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -438,13 +519,13 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('Update from Registry', () => {
-    test('should call to update from registry', async () => {
+  describe('UpdateFromRegistry', () => {
+    test('should call to updateFromRegistry', async () => {
       const mockedParams = {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -473,7 +554,7 @@ describe('ModuleRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = Promise.resolve;
+      const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method

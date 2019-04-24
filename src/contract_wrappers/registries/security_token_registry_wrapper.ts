@@ -19,7 +19,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { bigNumberToDate, dateToBigNumber } from '../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import ContractWrapper from '../contract_wrapper';
 import assert from '../../utils/assert';
@@ -339,7 +339,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
     const tickers = await (await this.contract).getTickersByOwner.callAsync(owner);
-    return tickers;
+    return bytes32ArrayToStringArray(tickers);
   };
 
   /**
@@ -515,7 +515,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('owner', params.owner);
     assert.isETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
-      params.owner,
+      params.name,
       params.ticker,
       params.owner,
       params.securityToken,
