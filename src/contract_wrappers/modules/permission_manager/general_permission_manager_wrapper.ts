@@ -142,6 +142,12 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public addDelegate = async (params: AddDelegateParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
+    assert.isAddressNotZero(params.delegate);
+    assert.assert(params.details.length > 0, '0 value not allowed');
+    const delegate = await this.checkDelegate({
+      delegate: params.delegate,
+    });
+    assert.assert(!delegate, 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -152,6 +158,11 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public deleteDelegate = async (params: DelegateTxParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
+    assert.isAddressNotZero(params.delegate);
+    const delegate = await this.checkDelegate({
+      delegate: params.delegate,
+    });
+    assert.assert(delegate, 'Delegate does not exist');
     return (await this.contract).deleteDelegate.sendTransactionAsync(
       params.delegate,
       params.txData,
@@ -161,11 +172,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public checkDelegate = async (params: DelegateParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
+    assert.isAddressNotZero(params.delegate);
     return (await this.contract).checkDelegate.callAsync(params.delegate);
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
+    assert.isAddressNotZero(params.delegate);
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).changePermission.sendTransactionAsync(
       params.delegate,
@@ -180,6 +193,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHexArray('module', params.modules);
+    assert.isAddressNotZero(params.delegate);
+    assert.assert(params.modules.length > 0, '0 length is not allowed');
+    assert.assert(params.modules.length == params.perms.length, 'Array length mismatch');
+    assert.assert(params.valids.length == params.perms.length, 'Array length mismatch');
     return (await this.contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,
