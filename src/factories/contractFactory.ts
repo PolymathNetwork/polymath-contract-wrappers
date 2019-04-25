@@ -1,5 +1,4 @@
-import { Provider, TxData } from 'ethereum-types';
-
+import { TxData, Provider } from 'ethereum-types';
 import {
   ERC20DividendCheckpointContract,
   ModuleContract,
@@ -22,8 +21,8 @@ import {
   FeatureRegistryContract,
   ModuleRegistryContract,
   SecurityTokenRegistryContract,
+  PolymathRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
-
 import {
   ERC20DividendCheckpoint,
   Module,
@@ -46,21 +45,36 @@ import {
   FeatureRegistry,
   ModuleRegistry,
   SecurityTokenRegistry,
+  PolymathRegistry,
 } from '@polymathnetwork/contract-artifacts';
-import PolymathRegistryWrapper from '../contract_wrappers/registries/polymath_registry_wrapper';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Contracts, NetworkId } from '../types';
 import assert from '../utils/assert';
+import getDefaultContractAddresses from '../utils/addresses';
+
+async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: string) {
+  return new PolymathRegistryContract(
+    PolymathRegistry.abi,
+    address || (await getDefaultContractAddresses((await web3Wrapper.getNetworkIdAsync()) as NetworkId)), // for optional address
+    web3Wrapper.getProvider(),
+    web3Wrapper.getContractDefaults(),
+  );
+}
 
 export default class ContractFactory {
+  private web3Wrapper: Web3Wrapper;
+
   private provider: Provider;
 
-  private polymathRegistry: PolymathRegistryWrapper;
+  private polymathRegistry: Promise<PolymathRegistryContract>;
 
   private contractDefaults: Partial<TxData>;
 
-  public constructor(provider: Provider, contractDefaults: Partial<TxData>, polymathRegistry: PolymathRegistryWrapper) {
-    this.provider = provider;
-    this.polymathRegistry = polymathRegistry;
-    this.contractDefaults = contractDefaults;
+  public constructor(web3Wrapper: Web3Wrapper, polymathRegistryAddress?: string) {
+    this.web3Wrapper = web3Wrapper;
+    this.provider = web3Wrapper.getProvider() as Provider;
+    this.contractDefaults = this.web3Wrapper.getContractDefaults();
+    this.polymathRegistry = getPolymathRegistryContract(web3Wrapper, polymathRegistryAddress);
   }
 
   public async getModuleContract(address: string): Promise<ModuleContract> {
@@ -76,6 +90,10 @@ export default class ContractFactory {
       this.provider,
       this.contractDefaults,
     );
+  }
+
+  public async getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
+    return this.polymathRegistry;
   }
 
   public async getModuleFactoryContract(address: string): Promise<ModuleFactoryContract> {
@@ -106,7 +124,7 @@ export default class ContractFactory {
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
     return new PolyTokenFaucetContract(
       PolyTokenFaucet.abi,
-      await this.polymathRegistry.getPolyTokenAddress(),
+      await (await this.polymathRegistry).getAddress.callAsync(Contracts.PolyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -115,7 +133,7 @@ export default class ContractFactory {
   public async getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       PolyToken.abi,
-      await this.polymathRegistry.getPolyTokenAddress(),
+      await (await this.polymathRegistry).getAddress.callAsync(Contracts.PolyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -131,15 +149,8 @@ export default class ContractFactory {
     );
   }
 
-  public async getCappedSTOFactoryContract(): Promise<CappedSTOFactoryContract> {
-    return new CappedSTOFactoryContract(
-      CappedSTOFactory.abi,
-      await this.polymathRegistry.getAddress({
-        contractName: 'CappedSTOFactory',
-      }),
-      this.provider,
-      this.contractDefaults,
-    );
+  public async getCappedSTOFactoryContract(address: string): Promise<CappedSTOFactoryContract> {
+    return new CappedSTOFactoryContract(CappedSTOFactory.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getCappedSTOContract(address: string): Promise<CappedSTOContract> {
@@ -207,7 +218,7 @@ export default class ContractFactory {
   public async getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       FeatureRegistry.abi,
-      await this.polymathRegistry.getFeatureRegistryAddress(),
+      await (await this.polymathRegistry).getAddress.callAsync(Contracts.FeatureRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -216,7 +227,7 @@ export default class ContractFactory {
   public async getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       ModuleRegistry.abi,
-      await this.polymathRegistry.getModuleRegistryAddress(),
+      await (await this.polymathRegistry).getAddress.callAsync(Contracts.ModuleRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -225,7 +236,7 @@ export default class ContractFactory {
   public async getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
     return new SecurityTokenRegistryContract(
       SecurityTokenRegistry.abi,
-      await this.polymathRegistry.getSecurityTokenRegistryAddress(),
+      await (await this.polymathRegistry).getAddress.callAsync(Contracts.SecurityTokenRegistry),
       this.provider,
       this.contractDefaults,
     );
