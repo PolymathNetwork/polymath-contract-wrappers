@@ -189,6 +189,8 @@ describe('PolyMathRegistryWrapper', () => {
   });
 
   describe('ChangeAddress', () => {
+    test.todo('should fail as newAddress is not an Eth address');
+
     test('should send the transaction to change the address for given params', async () => {
       // Mocked parameters
       const mockedParams = {

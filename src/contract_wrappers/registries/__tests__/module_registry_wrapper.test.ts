@@ -43,8 +43,10 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('Modules', () => {
-    test('should call to register a module', async () => {
+  describe('RegisterModule', () => {
+    test.todo('should fail as moduleFactory is not an Eth address');
+
+    test('should successfully call to registerModule', async () => {
       // Mocked parameters
       const mockedParams = {
         moduleFactory: '0x0123456789012345678901234567890123456789',
@@ -72,8 +74,12 @@ describe('ModuleRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
     });
+  });
 
-    test('should call to remove a module', async () => {
+  describe('RemoveModule', () => {
+    test.todo('should fail as moduleFactory is not an Eth address');
+
+    test('should successfully call to removeModule', async () => {
       // Mocked parameters
       const mockedParams = {
         moduleFactory: '0x0123456789012345678901234567890123456789',
@@ -101,8 +107,12 @@ describe('ModuleRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
     });
+  });
 
-    test('should call to verify a module', async () => {
+  describe('VerifyModule', () => {
+    test.todo('should fail as moduleFactory is not an Eth address');
+
+    test('should successfully call to verifyModule', async () => {
       // Mocked parameters
       const mockedParams = {
         moduleFactory: '0x0123456789012345678901234567890123456789',
@@ -143,7 +153,9 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('Tags', () => {
+  describe('GetTagsByTypeAndToken', () => {
+    test.todo('should fail as securityToken is not an Eth address');
+
     test('should call to getTagsByTypeAndToken (single module, multiple tags)', async () => {
       // Address expected
       const moduleAddress1 = '0x1111111111111111111111111111111111111111';
@@ -245,7 +257,9 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContract.getTagsByTypeAndToken).once();
       verify(mockedMethod.callAsync(ModuleType.PermissionManager, securityTokenAddress)).once();
     });
+  });
 
+  describe('GetTagsByType', () => {
     test('should call to getTagsByType (single module, multiple tags)', async () => {
       // Address expected
       const moduleAddress1 = '0x1111111111111111111111111111111111111111';
@@ -347,6 +361,8 @@ describe('ModuleRegistryWrapper', () => {
   });
 
   describe('GetReputationByFactory', () => {
+    test.todo('should fail as moduleFactory is not an Eth address');
+
     test('should call to get reputation by factory', async () => {
       // Address expected
       const expectedResult = [
@@ -371,7 +387,7 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-  describe('GetModules', () => {
+  describe('GetModulesByType', () => {
     test('should call to getModulesByType', async () => {
       // Address expected
       const expectedResult = [
@@ -394,6 +410,10 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContract.getModulesByType).once();
       verify(mockedMethod.callAsync(params.moduleType)).once();
     });
+  });
+
+  describe('GetModulesByTypeAndToken', () => {
+    test.todo('should fail as securityToken is not an Eth address');
 
     test('should call to getModulesByTypeAndToken', async () => {
       // Address expected
@@ -418,6 +438,8 @@ describe('ModuleRegistryWrapper', () => {
   });
 
   describe('ReclaimERC20', () => {
+    test.todo('should fail as tokenContract is not an Eth address');
+
     test('should call to reclaim ERC20 tokens', async () => {
       const tokenContract = '0x0123456789012345678901234567890123456789';
       const mockedParams = {
@@ -547,6 +569,8 @@ describe('ModuleRegistryWrapper', () => {
   });
 
   describe('Ownership', () => {
+    test.todo('should fail as newOwner is not an Eth address');
+
     test('should call to transfer ownership', async () => {
       const newOwner = '0x0123456789012345678901234567890123456789';
       const mockedParams = {

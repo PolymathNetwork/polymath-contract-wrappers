@@ -105,6 +105,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('Ownership', () => {
+    test.todo('should fail as newOwner is not an Eth address');
+
     test('should call to transfer ownership', async () => {
       const newOwner = '0x0123456789012345678901234567890123456789';
       const mockedParams = {
@@ -153,6 +155,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('ReclaimERC20', () => {
+    test.todo('should fail as tokenContract is not an Eth address');
+
     test('should call to reclaim ERC20 tokens', async () => {
       // Params and result expected
       const tokenContract = '0x0123456789012345678901234567890123456789';
@@ -185,7 +189,9 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('GetTickersByOwner', () => {
-    test('should call getTickersByOwner', async () => {
+    test.todo('should call getTickersByOwner with default owner address');
+
+    test('should call getTickersByOwner with given owner address', async () => {
       // Params and result expected
       const expectedTickers = ['TICK1', 'TICK2'];
       const expectedResult = stringArrayToBytes32Array(expectedTickers);
@@ -208,6 +214,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('GetSecurityTokenData', () => {
+    test.todo('should fail as securityTokenAddress is not an Eth address');
+
     test('should call getSecurityTokenData', async () => {
       // Params and result expected
       const expectedDeployedDate = new Date(2019, 1);
@@ -239,6 +247,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('GetTokensByOwner', () => {
+    test.todo('should call getTokensByOwner with default owner address');
+
     test('should call getTokensByOwner', async () => {
       // Address expected
       const expectedResult = [
@@ -319,7 +329,13 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('RegisterTicker', () => {
-    test('should call to Register Ticker', async () => {
+    test.todo('should fail as given owner is not an Eth address');
+
+    test.todo('should fail as default owner is not an Eth address');
+
+    test.todo('should call to registerTicker with default owner');
+
+    test('should call to registerTicker with given owner', async () => {
       const owner = '0x0123456789012345678901234567890123456789';
       const ticker = 'TICK';
       const tokenName = 'TICKER';
@@ -366,7 +382,9 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('TransferTickerOwnership', () => {
-    test('should call to TransferTickerOwnership', async () => {
+    test.todo('should fail as newOwner is not an Eth address');
+
+    test('should call to transferTickerOwnership', async () => {
       const newOwner = '0x0123456789012345678901234567890123456789';
       const ticker = 'TICK';
       const mockedParams = {
@@ -503,7 +521,7 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('IsTickerAvailable', () => {
-    test('should call to getTickerDetails for unavailable ticker', async () => {
+    test('should return false as ticker is registered and deployed', async () => {
       const expectedResult = [
         '0x0123456789012345678901234567890123456789',
         new BigNumber(1),
@@ -528,7 +546,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedMethod.callAsync(ticker)).once();
     });
 
-    test('should call to getTickerDetails for available ticker', async () => {
+    test.todo('should return false as ticker is registered and not expired');
+
+    test('should return true as ticker is not registered', async () => {
       const expectedResult = ['', new BigNumber(0), new BigNumber(0), '', false];
       const ticker = 'TICK';
       // Mocked method
@@ -546,6 +566,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getTickerDetails).once();
       verify(mockedMethod.callAsync(ticker)).once();
     });
+
+    test.todo('should return true as ticker is registered and not deployed but it is expired');
   });
 
   describe('IsTickerRegisteredByCurrentIssuer', () => {
@@ -572,7 +594,13 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedMethod.callAsync(tokenName)).once();
     });
 
-    test('should call to getTickerDetails and return false', async () => {
+    test.todo('should return false as ticker is not registered');
+
+    test.todo('should return false as ticker is registered and not deployed but it is expired');
+
+    test.todo('should return false as ticker is registered and deployed');
+
+    test('should return false as ticker is registered by a different owner', async () => {
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       const expectedResult = [ownerAddress, new BigNumber(1), new BigNumber(1), 'tokenName', true];
       const tokenName = 'TICK';
@@ -597,7 +625,7 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('IsTokenLaunched', () => {
-    test('should call to getTickerDetails and return true as token is launched', async () => {
+    test('should call to getTickerDetails and return true as token is deployed', async () => {
       const expectedSCResult = [
         '0x0123456789012345678901234567890123456789',
         new BigNumber(1),
@@ -622,7 +650,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedMethod.callAsync(ticker)).once();
     });
 
-    test('should call to getTickerDetails and return false as token is not launched', async () => {
+    test('should call to getTickerDetails and return false as token is not deployed', async () => {
       const expectedSCResult = [
         '0x0123456789012345678901234567890123456789',
         new BigNumber(1),
@@ -680,6 +708,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('IsSecurityToken', () => {
+    test.todo('should fail as securityTokenAddress is not an Eth address');
+
     test('should call to isSecurityToken', async () => {
       // Address expected
       const securityTokenAddress = '0x0123456789012345678901234567890123456789';
@@ -803,6 +833,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('ModifyTicker', () => {
+    test.todo('should fail as owner is not an Eth address');
+
     test('should call to ModifyTicker', async () => {
       const owner = '0x0123456789012345678901234567890123456789';
       const ticker = 'TICK';
@@ -863,6 +895,10 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('ModifySecurityToken', () => {
+    test.todo('should fail as owner is not an Eth address');
+
+    test.todo('should fail as securityToken is not an Eth address');
+
     test('should call to ModifySecurityToken', async () => {
       const name = 'Security';
       const ticker = 'TICK';
@@ -925,6 +961,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('SetProtocolVersion', () => {
+    test.todo('should fail as STFactoryAddress is not an Eth address');
+
     test('should send transaction to set protocol version', async () => {
       // Mocked parameters
       const mockedParams = {
@@ -1036,6 +1074,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   });
 
   describe('UpdatePolyTokenAddress', () => {
+    test.todo('should fail as newAddress is not an Eth address');
+
     test('should call to updatePolyTokenAddress', async () => {
       const mockedParams = {
         newAddress: '0x0123456789012345678901234567890123456789',
