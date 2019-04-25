@@ -672,7 +672,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public changeGranularity = async (params: ChangeGranularityParams) => {
-    assert.assert(params.granularity.greaterThan(new BigNumber(0)), 'Granularity must be greater than 0');
+    assert.assert(params.granularity.isGreaterThan(new BigNumber(0)), 'Granularity must be greater than 0');
     return (await this.contract).changeGranularity.sendTransactionAsync(
       params.granularity,
       params.txData,
@@ -801,7 +801,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       (await this.allowance({
         owner: params.from,
         spender: (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      })).greaterThanOrEqualTo(params.value),
+      })).isGreaterThanOrEqualTo(params.value),
       'Insufficient allowance for inputted burn value',
     );
     assert.isETHAddressHex('from', params.from);
@@ -816,7 +816,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public createCheckpoint = async (params: TxParams) => {
     assert.assert(
-      (await this.currentCheckpointId()).lessThan(new BigNumber(2 ** 256 - 1)),
+      (await this.currentCheckpointId()).isLessThan(new BigNumber(2 ** 256 - 1)),
       'Reached maximum checkpoint number',
     );
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1153,7 +1153,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
     assert.assert(
-      (await this.balanceOf({ owner: from })).greaterThanOrEqualTo(value),
+      (await this.balanceOf({ owner: from })).isGreaterThanOrEqualTo(value),
       'Insufficient balance for inputted value',
     );
   };

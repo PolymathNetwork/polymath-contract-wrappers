@@ -33,7 +33,7 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
   public getTokens = async (params: GetTokensParams) => {
     assert.isETHAddressHex('recipient', params.recipient);
     assert.isAddressNotZero(params.recipient);
-    assert.assert(params.amount.lessThanOrEqualTo(new BigNumber(1000000e+18)), 'Amount cannot exceed 1 million tokens');
+    assert.assert(params.amount.isLessThanOrEqualTo(new BigNumber(1000000e+18)), 'Amount cannot exceed 1 million tokens');
     return (await this.contract).getTokens.sendTransactionAsync(
       params.amount,
       params.recipient,
