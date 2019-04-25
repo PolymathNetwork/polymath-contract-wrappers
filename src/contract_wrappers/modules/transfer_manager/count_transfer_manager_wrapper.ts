@@ -89,6 +89,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   }
 
   public unpause = async (params: TxParams) => {
+    await this.checkIsPaused();
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -97,6 +98,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    await this.checkIsNotPaused();
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -119,6 +121,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,
@@ -169,5 +172,13 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
       CountTransferManager.abi,
     );
     return logs;
+  };
+
+  private checkIsNotPaused = async () => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
+  };
+
+  private checkIsPaused = async () => {
+    assert.assert(await this.paused(), 'Controller not currently paused');
   };
 }
