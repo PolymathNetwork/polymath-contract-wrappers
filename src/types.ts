@@ -72,11 +72,6 @@ export interface TxParams {
   safetyFactor?: number;
 }
 
-export interface TxPayableParams {
-  txData?: Partial<TxDataPayable>;
-  safetyFactor?: number;
-}
-
 export enum NetworkId {
   Mainnet = 1,
   Kovan = 42,
@@ -84,17 +79,17 @@ export enum NetworkId {
 }
 
 export enum ModuleType {
-    PermissionManager = 1,
-    TransferManager = 2,
-    STO = 3,
-    Dividends = 4,
-    Burn = 5,
+  PermissionManager = 1,
+  TransferManager = 2,
+  STO = 3,
+  Dividends = 4,
+  Burn = 5,
 }
 
 export enum FundRaiseType {
-    ETH = 0,
-    POLY = 1,
-    StableCoin = 2,
+  ETH = 0,
+  POLY = 1,
+  StableCoin = 2,
 }
 
 export enum Features {

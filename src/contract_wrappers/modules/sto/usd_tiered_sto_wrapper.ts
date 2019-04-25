@@ -27,7 +27,6 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  TxPayableParams,
   Subscribe,
   GetLogs,
   FundRaiseType,
@@ -300,8 +299,10 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
-interface BuyWithETHParams extends TxPayableParams {
+interface BuyWithETHParams extends TxParams {
   beneficiary: string;
+  value: BigNumber;
+  from: string;
 }
 
 interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
@@ -468,10 +469,15 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETH = async (params: BuyWithETHParams) => {
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+      from: params.from,
+    };
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
@@ -499,11 +505,16 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+      from: params.from,
+    };
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };

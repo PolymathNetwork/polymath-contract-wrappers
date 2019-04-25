@@ -20,7 +20,6 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  TxPayableParams,
   TxParams,
   Subscribe,
   GetLogs,
@@ -122,11 +121,6 @@ interface GetValueByKeyParams {
   key: string;
 }
 
-interface InitializeParams extends TxPayableParams {
-  polymathRegistry: string;
-  owner: string;
-}
-
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -216,17 +210,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public getArrayUint = async (params: GetValueByKeyParams) => {
     return (await this.contract).getArrayUint.callAsync(params.key);
-  };
-
-  public initialize = async (params: InitializeParams) => {
-    assert.isETHAddressHex('polymathRegistry', params.polymathRegistry);
-    assert.isETHAddressHex('owner', params.owner);
-    return (await this.contract).initialize.sendTransactionAsync(
-      params.polymathRegistry,
-      params.owner,
-      params.txData,
-      params.safetyFactor,
-    );
   };
 
   public useModule = async (params: ModuleFactoryParams) => {
