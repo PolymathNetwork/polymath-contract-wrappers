@@ -103,7 +103,6 @@ interface VerifyTransferParams extends TxParams {
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface AddManualApprovalParams extends TxParams {
@@ -225,20 +224,25 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    // SC: require(_isTransfer == false || msg.sender == securityToken,...
+    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
       params.amount,
       params.data,
-      params.isTransfer,
+      false,
       params.txData,
       params.safetyFactor,
     );
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    assert.checkAddManualApprovalConditions(params.to, params.expiryTime, params.allowance);
+    await this.checkApprovalDoesNotExist(params.from, params.to);
     return (await this.contract).addManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -251,8 +255,21 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
+    assert.checkAddManualApprovalMultiConditions(
+      params.from,
+      params.to,
+      params.allowances,
+      params.expiryTimes,
+      params.descriptions,
+    );
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.to.length; i + 1) {
+      await this.checkApprovalDoesNotExist(params.from[i], params.to[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     return (await this.contract).addManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -265,8 +282,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    assert.checkModifyManualApprovalConditions(params.to, params.expiryTime);
+    await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -280,8 +300,21 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
+    assert.checkModifyManualApprovalMultiConditions(
+      params.from,
+      params.to,
+      params.changedAllowances,
+      params.expiryTimes,
+      params.descriptions,
+    );
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.to.length; i + 1) {
+      await this.checkApprovalDoesExist(params.from[i], params.to[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -295,8 +328,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).revokeManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -306,8 +341,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
+    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
+    assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.to.length; i + 1) {
+      await this.checkApprovalDoesExist(params.from[i], params.to[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     return (await this.contract).revokeManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -420,5 +462,27 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   private checkIsPaused = async () => {
     assert.assert(await this.paused(), 'Controller not currently paused');
+  };
+
+  // TODO Extra Review- Verify necessity for following CheckApprovalDoes(Not)Exist Functions
+
+  private checkApprovalDoesNotExist = async (from: string, to: string) => {
+    const approval = await this.getApprovalDetails({ from, to });
+    const hasAllowance = approval.allowance.isGreaterThan(new BigNumber(0));
+    const hasValidFutureExpiry = approval.expiryTime >= new Date();
+    assert.assert(
+      !hasAllowance || !hasValidFutureExpiry,
+      'Approval already exists with allowance and/or valid future expiry date',
+    );
+  };
+
+  private checkApprovalDoesExist = async (from: string, to: string) => {
+    const approval = await this.getApprovalDetails({ from, to });
+    const hasAllowance = approval.allowance.isGreaterThan(new BigNumber(0));
+    const hasValidFutureExpiry = approval.expiryTime >= new Date();
+    assert.assert(
+      hasAllowance && hasValidFutureExpiry,
+      'Approval does not exist with valid allowance and valid future expiry date',
+    );
   };
 }
