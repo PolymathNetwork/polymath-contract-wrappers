@@ -27,7 +27,7 @@ import {
   ModuleType,
 } from '../../types';
 import assert from '../../utils/assert';
-import { bytes32ToString } from '../../utils/convert';
+import { bytes32ArrayToStringArray } from '../../utils/convert';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause;
@@ -278,9 +278,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     _.forEach(
       groupedResult,
       (value, key): void => {
+        const tags = _.unzip(value as string[][])[0];
         const tagsByModule: TagsByModule = {
           module: key,
-          tags: value.map(pair => bytes32ToString(pair[1] as string)),
+          tags: bytes32ArrayToStringArray(tags),
         };
         typedResult.push(tagsByModule);
       },
@@ -299,9 +300,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     _.forEach(
       groupedResult,
       (value, key): void => {
+        const tags = _.unzip(value as string[][])[0];
         const tagsByModule: TagsByModule = {
           module: key,
-          tags: value.map(pair => bytes32ToString(pair[1] as string)),
+          tags: bytes32ArrayToStringArray(tags),
         };
         typedResult.push(tagsByModule);
       },
