@@ -23,7 +23,7 @@ import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
-import { bigNumberToDate, dateToBigNumber } from '../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
 
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit;
@@ -351,7 +351,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       params !== undefined && params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
     const tickers = await (await this.contract).getTickersByOwner.callAsync(owner);
-    return tickers;
+    return bytes32ArrayToStringArray(tickers);
   };
 
   /**
@@ -525,9 +525,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
     assert.isETHAddressHex('owner', params.owner);
-    assert.isETHAddressHex('tokenDetails', params.tokenDetails);
+    assert.isETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
-      params.owner,
+      params.name,
       params.ticker,
       params.owner,
       params.securityToken,
