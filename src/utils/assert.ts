@@ -136,8 +136,8 @@ const assert = {
   ): void {
     assert.assert(startTime > new Date(), 'Start time must be in the future');
     assert.assert(allowedTokens.isGreaterThan(new BigNumber(0)), 'Allowed Tokens must be greater than 0');
-    assert.assert(restrictionType == 0 || restrictionType == 1, 'Invalid Restriction Type');
-    if (restrictionType == 0) {
+    assert.assert(restrictionType === 0 || restrictionType === 1, 'Invalid Restriction Type');
+    if (restrictionType === 0) {
       assert.assert(
         allowedTokens.isLessThan(new BigNumber(100 * 10 ** 16)),
         'Allowed tokens exceeds limit for restriction type',
@@ -213,38 +213,7 @@ const assert = {
           1,
       );
     }
-  },  checkIndividualDailyRestrictionMultiConditions(
-      holders: string[],
-      startTime: Date[],
-      allowedTokens: BigNumber[],
-      restrictionType: (number | BigNumber)[],
-      endTime: Date[],
-  ): void {
-    sharedAssert.assert(
-        startTime.length === allowedTokens.length,
-        'Array lengths for startTime and allowedTokens passed in are not the same',
-    );
-    sharedAssert.assert(
-        startTime.length === restrictionType.length,
-        'Array lengths for startTime and restrictionType passed in are not the same',
-    );
-    sharedAssert.assert(
-        startTime.length === holders.length,
-        'Array lengths for startTime and holders passed in are not the same',
-    );
-    sharedAssert.assert(
-        startTime.length === endTime.length,
-        'Array lengths for startTime and endTime passed in are not the same',
-    );
-    for (let i = 0; i < startTime.length; i + 1) {
-      this.checkRestrictionInputParams(
-          startTime[i],
-          allowedTokens[i],
-          restrictionType[i],
-          1,
-      );
-    }
-  },
+  },  
 };
 
 export default assert;
