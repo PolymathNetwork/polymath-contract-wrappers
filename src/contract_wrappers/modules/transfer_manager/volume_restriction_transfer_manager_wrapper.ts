@@ -238,7 +238,6 @@ interface VerifyTransferParams extends TxParams {
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface IndividualRestrictionParams {
@@ -433,12 +432,14 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    // SC: require(_isTransfer == false || msg.sender == securityToken,...
+    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
       params.amount,
       params.data,
-      params.isTransfer,
+      false,
       params.txData,
       params.safetyFactor,
     );
@@ -498,6 +499,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
     assert.isETHAddressHex('wallet', params.wallet);
+    assert.isAddressNotZero(params.wallet);
+    const isWalletExempt = (await this.getExemptAddress()).includes(params.wallet);
+    assert.assert(!isWalletExempt === params.change, 'There will be no change to exempt list');
     return (await this.contract).changeExemptWalletList.sendTransactionAsync(
       params.wallet,
       params.change,
@@ -508,6 +512,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public addIndividualRestriction = async (params: AddIndividualRestrictionParams) => {
     assert.isETHAddressHex('holder', params.holder);
+    assert.isAddressNotZero(params.holder);
+    assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
+    assert.checkIndividualRestrictionConditions(params.startTime, params.allowedTokens, params.restrictionType, params.rollingPeriodInDays);
     return (await this.contract).addIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -548,6 +555,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public addIndividualRestrictionMulti = async (params: AddIndividualRestrictionMultiParams) => {
     assert.isETHAddressHexArray('holders', params.holders);
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      assert.assert((await this.getExemptAddress()).includes(params.holders[i]), 'Holder is exempt from restriction');
+    }
+    /* eslint-enable no-await-in-loop */
     return (await this.contract).addIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,

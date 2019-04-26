@@ -89,7 +89,29 @@ const assert = {
       this.checkModifyManualApprovalConditions(to[i], expiryTimes[i]);
     }
   },
-
+  checkIndividualRestrictionConditions(startTime : Date, allowedTokens: BigNumber, restrictionType: number| BigNumber, rollingPeriodInDays: number): void {
+    assert.assert(startTime > new Date(), 'Start time must be in the future');
+    assert.assert(allowedTokens.isGreaterThan(new BigNumber(0)), 'Allowed Tokens must be greater than 0');
+    assert.assert(restrictionType == 0 || restrictionType == 1, 'Invalid Restriction Type');
+    if (restrictionType == 0 ){
+      assert.assert(allowedTokens.isLessThan(new BigNumber(100*10**16)), 'Allowed tokens exceeds limit for restriction type');
+    }
+    assert.assert(
+        rollingPeriodInDays <= 365 && rollingPeriodInDays >= 1,
+        'Invalid number of days in rolling period',
+    );
+  },
+  checkIndividualRestrictionMultiConditions(startTime : Date[], allowedTokens: BigNumber[], restrictionType: number[], rollingPeriodInDays: number[]): void {
+    sharedAssert.assert(startTime.length === allowedTokens.length,
+        'Array lengths for from address and to address passed in are not the same');
+    sharedAssert.assert(startTime.length === restrictionType.length,
+        'Array lengths for from address and allowances passed in are not the same');
+    sharedAssert.assert(startTime.length === rollingPeriodInDays.length,
+        'Array lengths for from address and expiryTimes passed in are not the same');
+    for(let i=0; i < startTime.length; i+1){
+      this.checkIndividualRestrictionConditions(startTime[i], allowedTokens[i], restrictionType[i], rollingPeriodInDays[i]);
+    }
+  }
 };
 
 export default assert;
