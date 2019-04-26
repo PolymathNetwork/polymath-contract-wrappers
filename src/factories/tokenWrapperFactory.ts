@@ -60,7 +60,11 @@ export default class TokenWrapperFactory {
   public getSecurityTokenInstanceFromAddress = async (address: string): Promise<SecurityTokenWrapper> => {
     assert.isETHAddressHex('address', address);
     if (await this.securityTokenRegistry.isSecurityToken({ securityTokenAddress: address })) {
-      return new SecurityTokenWrapper(this.web3Wrapper, this.contractFactory.getSecurityTokenContract(address));
+      return new SecurityTokenWrapper(
+        this.web3Wrapper,
+        this.contractFactory.getSecurityTokenContract(address),
+        this.contractFactory,
+      );
     }
     // TODO: Replace this for a typed Error
     throw new Error();
@@ -73,6 +77,10 @@ export default class TokenWrapperFactory {
    */
   public getSecurityTokenInstanceFromTicker = async (ticker: string): Promise<SecurityTokenWrapper> => {
     const address = await this.securityTokenRegistry.getSecurityTokenAddress(ticker);
-    return new SecurityTokenWrapper(this.web3Wrapper, this.contractFactory.getSecurityTokenContract(address));
+    return new SecurityTokenWrapper(
+      this.web3Wrapper,
+      this.contractFactory.getSecurityTokenContract(address),
+      this.contractFactory,
+    );
   };
 }

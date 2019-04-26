@@ -13,11 +13,10 @@ import {
 import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
 import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
-import assert from '../../utils/assert';
 
 interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipRenounced;
@@ -158,7 +157,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
       params.indexFilterValues,
       ModuleFactory.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

@@ -9,13 +9,18 @@ import {
   ModuleRegistryModuleVerifiedEventArgs,
   ModuleRegistryModuleRemovedEventArgs,
   ModuleRegistryOwnershipTransferredEventArgs,
+  SecurityTokenRegistryContract,
+  FeatureRegistryContract,
+  ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
+import ContractFactory from '../../factories/contractFactory';
 import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
@@ -26,7 +31,6 @@ import {
   GetLogs,
   ModuleType,
 } from '../../types';
-import assert from '../../utils/assert';
 import { bytes32ToString } from '../../utils/convert';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -172,14 +176,33 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   protected contract: Promise<ModuleRegistryContract>;
 
+  protected contractFactory: ContractFactory;
+
+  protected securityTokenRegistryContract = async (): Promise<SecurityTokenRegistryContract> => {
+    return this.contractFactory.getSecurityTokenRegistryContract();
+  };
+
+  protected featureRegistryContract = async (): Promise<FeatureRegistryContract> => {
+    return this.contractFactory.getFeatureRegistryContract();
+  };
+
+  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract> => {
+    return this.contractFactory.getModuleFactoryContract(address);
+  };
+
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleRegistryContract>) {
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<ModuleRegistryContract>,
+    contractFactory: ContractFactory,
+  ) {
     super(web3Wrapper, contract);
     this.contract = contract;
+    this.contractFactory = contractFactory;
   }
 
   public getBytes32Value = async (params: GetValueByVariableParams) => {

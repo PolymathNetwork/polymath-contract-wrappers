@@ -10,10 +10,11 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
+import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission;
@@ -114,8 +115,12 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract>) {
-    super(web3Wrapper, contract);
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<GeneralPermissionManagerContract>,
+    contractFactory: ContractFactory,
+  ) {
+    super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
 
@@ -240,7 +245,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       params.indexFilterValues,
       GeneralPermissionManager.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

@@ -166,15 +166,26 @@ export class PolymathAPI {
     this.securityTokenRegistry = new SecurityTokenRegistryWrapper(
       this.web3Wrapper,
       this.contractFactory.getSecurityTokenRegistryContract(),
+      this.contractFactory,
     );
+
     this.polyToken = new PolyTokenWrapper(this.web3Wrapper, this.contractFactory.getPolyTokenContract());
-    this.moduleRegistry = new ModuleRegistryWrapper(this.web3Wrapper, this.contractFactory.getModuleRegistryContract());
+
+    this.moduleRegistry = new ModuleRegistryWrapper(
+      this.web3Wrapper,
+      this.contractFactory.getModuleRegistryContract(),
+      this.contractFactory,
+    );
+
     this.featureRegistry = new FeatureRegistryWrapper(
       this.web3Wrapper,
       this.contractFactory.getFeatureRegistryContract(),
     );
+
     this.tokenFactory = new TokenWrapperFactory(this.web3Wrapper, this.securityTokenRegistry, this.contractFactory);
+
     this.moduleFactory = new ModuleWrapperFactory(this.web3Wrapper, this.contractFactory);
+
     this.polyTokenFaucet = new PolyTokenFaucetWrapper(
       this.web3Wrapper,
       this.contractFactory.getPolyTokenFaucetContract(),

@@ -2,7 +2,9 @@ import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
+import { SecurityTokenContract, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
+import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
 
 interface TakeFeeParams extends TxParams {
@@ -17,6 +19,18 @@ export default class ModuleWrapper extends ContractWrapper {
 
   protected contract: Promise<GenericModuleContract>;
 
+  protected contractFactory: ContractFactory;
+
+  protected securityTokenContract = async (): Promise<SecurityTokenContract> => {
+    const address = await (await this.contract).securityToken.callAsync();
+    return this.contractFactory.getSecurityTokenContract(address);
+  };
+
+  protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
+    const address = await (await this.contract).factory.callAsync();
+    return this.contractFactory.getModuleFactoryContract(address);
+  };
+
   public getLogsAsync: GetLogs | undefined;
 
   public subscribeAsync: Subscribe | undefined;
@@ -26,9 +40,14 @@ export default class ModuleWrapper extends ContractWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GenericModuleContract>) {
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<GenericModuleContract>,
+    contractFactory: ContractFactory,
+  ) {
     super(web3Wrapper, contract);
     this.contract = contract;
+    this.contractFactory = contractFactory;
   }
 
   public getInitFunction = async () => {
