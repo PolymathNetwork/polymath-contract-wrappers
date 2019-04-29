@@ -12,17 +12,18 @@ import {
   SecurityTokenRegistryRegisterTickerEventArgs,
   SecurityTokenRegistryTickerRemovedEventArgs,
   SecurityTokenRegistryChangeTickerOwnershipEventArgs,
+  DetailedERC20Contract,
 } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
-import ContractWrapper from '../contract_wrapper';
 import assert from '../../utils/assert';
+import ContractWrapper from '../contract_wrapper';
+import ContractFactory from '../../factories/contractFactory';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
 
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit;
@@ -321,14 +322,25 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   protected contract: Promise<SecurityTokenRegistryContract>;
 
+  protected contractFactory: ContractFactory;
+
+  protected erc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
+    return this.contractFactory.getDetailedERC20Contract(address);
+  };
+
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<SecurityTokenRegistryContract>) {
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<SecurityTokenRegistryContract>,
+    contractFactory: ContractFactory,
+  ) {
     super(web3Wrapper, contract);
     this.contract = contract;
+    this.contractFactory = contractFactory;
   }
 
   /**
@@ -336,7 +348,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public getTickersByOwner = async (params?: OwnerParams) => {
     const owner =
-      !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
+      params !== undefined && params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
     const tickers = await (await this.contract).getTickersByOwner.callAsync(owner);
     return bytes32ArrayToStringArray(tickers);
@@ -362,7 +374,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public getTokensByOwner = async (params?: OwnerParams) => {
     const owner =
-      !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
+      params !== undefined && params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('ownerAddress', owner);
     const tokens = await (await this.contract).getTokensByOwner.callAsync(owner);
     return tokens;
@@ -388,7 +400,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
   public registerTicker = async (params: RegisterTickerParams) => {
-    const owner = !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
+    const owner = params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
     return (await this.contract).registerTicker.sendTransactionAsync(
       owner,
@@ -675,7 +687,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.indexFilterValues,
       SecurityTokenRegistry.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

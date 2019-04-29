@@ -3,23 +3,30 @@ import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockit
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { SecurityTokenRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import ContractWrapper from '../../contract_wrapper';
-import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array } from '../../../utils/convert';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
+import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array } from '../../../utils/convert';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 
 describe('SecurityTokenRegistryWrapper', () => {
   // Declare PolyMathRegistryWrapper object
   let target: SecurityTokenRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: SecurityTokenRegistryContract;
+  let mockedContractFactory: ContractFactory;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(SecurityTokenRegistryContract);
+    mockedContractFactory = mock(ContractFactory);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new SecurityTokenRegistryWrapper(instance(mockedWrapper), myContractPromise);
+    target = new SecurityTokenRegistryWrapper(
+      instance(mockedWrapper),
+      myContractPromise,
+      instance(mockedContractFactory),
+    );
   });
 
   afterEach(() => {

@@ -84,17 +84,17 @@ export enum NetworkId {
 }
 
 export enum ModuleType {
-    PermissionManager = 1,
-    TransferManager = 2,
-    STO = 3,
-    Dividends = 4,
-    Burn = 5,
+  PermissionManager = 1,
+  TransferManager = 2,
+  STO = 3,
+  Dividends = 4,
+  Burn = 5,
 }
 
 export enum FundRaiseType {
-    ETH = 0,
-    POLY = 1,
-    StableCoin = 2,
+  ETH = 0,
+  POLY = 1,
+  StableCoin = 2,
 }
 
 export enum Features {
@@ -102,13 +102,26 @@ export enum Features {
   FreezeMintingAllowed = 'FreezeMintingAllowed',
 }
 
-export enum Contracts {
+export enum PolymathContracts {
   PolyToken = 'PolyToken',
   ModuleRegistry = 'ModuleRegistry',
   FeatureRegistry = 'FeatureRegistry',
   SecurityTokenRegistry = 'SecurityTokenRegistry',
   PolyUsdOracle = 'PolyUsdOracle',
   EthUsdOracle = 'EthUsdOracle',
+}
+
+export enum ModuleName {
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  USDTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {

@@ -6,6 +6,7 @@ import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../..
 import { ModuleType } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import ModuleRegistryWrapper from '../module_registry_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
 import {
   stringToBytes32,
   stringArrayToBytes32Array,
@@ -13,23 +14,20 @@ import {
   bytes32ToString,
 } from '../../../utils/convert';
 
-interface TagsByModule {
-  module: string;
-  tags: string[];
-}
-
 describe('ModuleRegistryWrapper', () => {
   // Declare PolyMathRegistryWrapper object
   let target: ModuleRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleRegistryContract;
+  let mockedContractFactory: ContractFactory;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(ModuleRegistryContract);
+    mockedContractFactory = mock(ContractFactory);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ModuleRegistryWrapper(instance(mockedWrapper), myContractPromise);
+    target = new ModuleRegistryWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {

@@ -17,11 +17,11 @@ import { GeneralTransferManager } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -268,8 +268,12 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract>) {
-    super(web3Wrapper, contract);
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<GeneralTransferManagerContract>,
+    contractFactory: ContractFactory,
+  ) {
+    super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
 
@@ -504,7 +508,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.indexFilterValues,
       GeneralTransferManager.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

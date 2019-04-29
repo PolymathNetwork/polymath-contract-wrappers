@@ -1,8 +1,8 @@
 import { BigNumber } from '@0x/utils';
-import { TxParams, DividendCheckpointBaseContract } from '../../../types';
-import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
+import { TxParams, DividendCheckpointBaseContract } from '../../../types';
+import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 
 interface DividendIndexParams {
   dividendIndex: number;

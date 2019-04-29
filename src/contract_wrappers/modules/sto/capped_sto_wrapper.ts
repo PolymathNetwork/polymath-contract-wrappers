@@ -12,8 +12,10 @@ import { CappedSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../../utils/assert';
+import STOWrapper from './sto_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
 import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
@@ -23,8 +25,6 @@ import {
   Subscribe,
   GetLogs,
 } from '../../../types';
-import assert from '../../../utils/assert';
-import STOWrapper from './sto_wrapper';
 import { bigNumberToDate, bigNumberToNumber } from '../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -140,8 +140,8 @@ export default class CappedSTOWrapper extends STOWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract>) {
-    super(web3Wrapper, contract);
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract>, contractFactory: ContractFactory) {
+    super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
 
@@ -232,7 +232,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       params.indexFilterValues,
       CappedSTO.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

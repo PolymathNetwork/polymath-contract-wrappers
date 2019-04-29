@@ -14,12 +14,12 @@ import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import assert from '../../../utils/assert';
-import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 
 interface ERC20DividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ERC20DividendCheckpointEvents.ERC20DividendDeposited;
@@ -156,8 +156,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DividendCheckpointContract>) {
-    super(web3Wrapper, contract);
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<ERC20DividendCheckpointContract>,
+    contractFactory: ContractFactory,
+  ) {
+    super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
 
@@ -244,7 +248,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.indexFilterValues,
       ERC20DividendCheckpoint.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
