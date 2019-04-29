@@ -23,14 +23,7 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
-  EventCallback,
-  Subscribe,
-  GetLogs,
-} from '../../../types';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 
 interface EtherDividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -330,13 +323,13 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   ) => {
     // TODO get EXCLUDED_ADDRESS_LIMIT from contract
     let auxExcluded = excluded;
-    if (_.isUndefined(auxExcluded)) {
+    if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
       assert.isAddressArrayNotZero(auxExcluded);
       // TODO duped exclude address
     }
-    const auxValue = _.isUndefined(value) ? new BigNumber(0) : value;
+    const auxValue = value === undefined ? new BigNumber(0) : value;
     assert.assert(auxExcluded.length <= 150, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');

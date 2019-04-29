@@ -237,7 +237,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   ) => {
     // TODO get EXCLUDED_ADDRESS_LIMIT from contract
     let auxExcluded = excluded;
-    if (_.isUndefined(auxExcluded)) {
+    if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
       assert.isAddressArrayNotZero(auxExcluded);

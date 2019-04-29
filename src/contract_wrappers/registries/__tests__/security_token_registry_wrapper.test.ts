@@ -802,9 +802,8 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('ChangeExpiryLimit', () => {
     test('should call to ChangeExpiryLimit', async () => {
-      const newExpiry = new Date(2025, 1);
       const mockedParams = {
-        newExpiry,
+        newExpiry: new BigNumber(15 * 60 * 60 * 24),
         txData: {},
         safetyFactor: 10,
       };
@@ -815,11 +814,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.changeExpiryLimit).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          objectContaining(dateToBigNumber(mockedParams.newExpiry)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+        mockedMethod.sendTransactionAsync(mockedParams.newExpiry, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -830,11 +825,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.changeExpiryLimit).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          objectContaining(dateToBigNumber(mockedParams.newExpiry)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+        mockedMethod.sendTransactionAsync(mockedParams.newExpiry, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
     });
   });
