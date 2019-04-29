@@ -9,6 +9,7 @@ import {
   RawLog,
   LogEntry,
   LogWithDecodedArgs,
+  TxData,
 } from 'ethereum-types';
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
 import * as _ from 'lodash';
@@ -246,5 +247,9 @@ export default abstract class ContractWrapper {
   protected getDefaultFromAddress = async (): Promise<string> => {
     const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
+  };
+
+  protected getCallerAddress = async (txData: Partial<TxData> | undefined): Promise<string> => {
+    return txData === undefined || txData.from === undefined ? this.getDefaultFromAddress() : txData.from;
   };
 }

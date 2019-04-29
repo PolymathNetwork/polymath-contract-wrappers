@@ -153,6 +153,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       delegate: params.delegate,
     });
     assert.assert(!delegate, 'Already present');
+    assert.assert(await this.isCallerAllowed(params.txData, 'CHANGE_PERMISSION'), 'Caller is not allowed');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
