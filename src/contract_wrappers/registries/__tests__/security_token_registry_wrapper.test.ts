@@ -871,8 +871,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.getSecurityTokenLaunchFee).once();
     });
-    verify(mockedContract.getSecurityTokenLaunchFee).once();
   });
 
   describe('ChangeExpiryLimit', () => {
