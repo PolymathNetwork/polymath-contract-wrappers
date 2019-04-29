@@ -44,3 +44,9 @@ export function stringArrayToBytes32Array(value: string[]) {
     return stringToBytes32(x);
   });
 }
+
+export function bytes32ArrayToStringArray(value: string[]) {
+  return value.map<string>(x => {
+    return bytes32ToString(x);
+  });
+}

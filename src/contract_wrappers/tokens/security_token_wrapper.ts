@@ -22,6 +22,8 @@ import {
   SecurityTokenDisableControllerEventArgs,
   SecurityTokenOwnershipRenouncedEventArgs,
   SecurityTokenOwnershipTransferredEventArgs,
+  FeatureRegistryContract,
+  ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
 import {
   SecurityToken,
@@ -38,6 +40,9 @@ import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../utils/assert';
+import ERC20TokenWrapper from './erc20_wrapper';
+import ContractFactory from '../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -47,9 +52,8 @@ import {
   Subscribe,
   ModuleType,
   FundRaiseType,
+  ModuleName,
 } from '../../types';
-import assert from '../../utils/assert';
-import ERC20TokenWrapper from './erc20_wrapper';
 import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
@@ -331,7 +335,7 @@ interface TransferOwnershipParams extends TxParams {
 }
 
 interface ModuleNameParams {
-  moduleName: string;
+  moduleName: ModuleName;
 }
 
 interface WithdrawERC20Params extends TxParams {
@@ -500,14 +504,29 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   protected contract: Promise<SecurityTokenContract>;
 
+  protected contractFactory: ContractFactory;
+
+  protected featureRegistryContract = async (): Promise<FeatureRegistryContract> => {
+    return this.contractFactory.getFeatureRegistryContract();
+  };
+
+  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract> => {
+    return this.contractFactory.getModuleFactoryContract(address);
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<SecurityTokenContract>) {
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<SecurityTokenContract>,
+    contractFactory: ContractFactory,
+  ) {
     super(web3Wrapper, contract);
     this.contract = contract;
+    this.contractFactory = contractFactory;
   }
 
   /**
