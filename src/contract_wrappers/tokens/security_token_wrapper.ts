@@ -608,6 +608,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isAddressNotZero(params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
@@ -621,6 +622,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public archiveModule = async (params: ModuleAddressTxParams) => {
+    await this.checkModuleExists(params.moduleAddress);
+    await this.checkIsNotArchived(params.moduleAddress);
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).archiveModule.sendTransactionAsync(
       params.moduleAddress,
@@ -630,6 +633,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public unarchiveModule = async (params: ModuleAddressTxParams) => {
+    await this.checkModuleExists(params.moduleAddress);
+    await this.checkIsArchived(params.moduleAddress);
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     return (await this.contract).unarchiveModule.sendTransactionAsync(
       params.moduleAddress,
@@ -639,7 +644,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public removeModule = async (params: ModuleAddressTxParams) => {
+    await this.checkIsArchived(params.moduleAddress);
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
+    await this.checkModuleStructAddressIsNotZero(params.moduleAddress);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleAddress,
       params.txData,
@@ -653,6 +660,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public withdrawERC20 = async (params: WithdrawERC20Params) => {
+    assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).withdrawERC20.sendTransactionAsync(
       params.tokenContract,
@@ -664,6 +672,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public changeModuleBudget = async (params: ChangeModuleBudgetParams) => {
     assert.isETHAddressHex('module', params.module);
+    await this.checkModuleStructAddressIsNotZero(params.module);
     return (await this.contract).changeModuleBudget.sendTransactionAsync(
       params.module,
       params.change,
@@ -682,6 +691,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public changeGranularity = async (params: ChangeGranularityParams) => {
+    assert.assert(params.granularity.isGreaterThan(new BigNumber(0)), 'Granularity must be greater than 0');
     return (await this.contract).changeGranularity.sendTransactionAsync(
       params.granularity,
       params.txData,
@@ -706,15 +716,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public freezeTransfers = async (params: TxParams) => {
+    assert.assert(!(await this.transfersFrozen()), 'Transfers already frozen');
     return (await this.contract).freezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unfreezeTransfers = async (params: TxParams) => {
+    assert.assert(!(await this.transfersFrozen()), 'Transfers are not frozen');
     return (await this.contract).unfreezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public transferWithData = async (params: TransferWithDataParams) => {
     assert.isETHAddressHex('to', params.to);
+    assert.isAddressNotZero(params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
       params.value,
@@ -727,6 +740,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public transferFromWithData = async (params: TransferFromWithDataParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    assert.isAddressNotZero(params.to);
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
@@ -738,11 +752,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public freezeMinting = async (params: TxParams) => {
+    assert.assert(!(await this.mintingFrozen()), 'Transfers already frozen');
     return (await this.contract).freezeMinting.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public mint = async (params: MintParams) => {
     assert.isETHAddressHex('investor', params.investor);
+    assert.isAddressNotZero(params.investor);
     return (await this.contract).mint.sendTransactionAsync(
       params.investor,
       params.value,
@@ -753,6 +769,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintWithData = async (params: MintWithDataParams) => {
     assert.isETHAddressHex('investor', params.investor);
+    assert.isAddressNotZero(params.investor);
     return (await this.contract).mintWithData.sendTransactionAsync(
       params.investor,
       params.value,
@@ -764,6 +781,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintMulti = async (params: MintMultiParams) => {
     assert.isETHAddressHexArray('investors', params.investors);
+    assert.isAddressArrayNotZero(params.investors);
+    assert.assert(
+      params.investors.length === params.values.length,
+      'Number of investors passed in must be equivalent to number of values',
+    );
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
       params.values,
@@ -783,6 +805,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public burnWithData = async (params: BurnWithDataParams) => {
+    await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).burnWithData.sendTransactionAsync(
       params.value,
       params.data,
@@ -792,6 +815,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public burnFromWithData = async (params: BurnFromWithDataParams) => {
+    await this.checkBalanceFromGreaterThanValue(params.from, params.value);
+    assert.assert(
+      (await this.allowance({
+        owner: params.from,
+        spender: (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      })).isGreaterThanOrEqualTo(params.value),
+      'Insufficient allowance for inputted burn value',
+    );
     assert.isETHAddressHex('from', params.from);
     return (await this.contract).burnFromWithData.sendTransactionAsync(
       params.from,
@@ -803,6 +834,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public createCheckpoint = async (params: TxParams) => {
+    assert.assert(
+      (await this.currentCheckpointId()).isLessThan(new BigNumber(2 ** 256 - 1)),
+      'Reached maximum checkpoint number',
+    );
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -820,6 +855,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public setController = async (params: SetControllerParams) => {
+    await this.checkControllerEnabled();
     assert.isETHAddressHex('controller', params.controller);
     return (await this.contract).setController.sendTransactionAsync(
       params.controller,
@@ -829,12 +865,15 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public disableController = async (params: TxParams) => {
+    await this.checkControllerEnabled();
     return (await this.contract).disableController.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public forceTransfer = async (params: ForceTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    await this.checkBalanceFromGreaterThanValue(params.from, params.value);
+    assert.isAddressNotZero(params.to);
     return (await this.contract).forceTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -848,6 +887,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public forceBurn = async (params: ForceBurnParams) => {
     assert.isETHAddressHex('from', params.from);
+    await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     return (await this.contract).forceBurn.sendTransactionAsync(
       params.from,
       params.value,
@@ -872,6 +912,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public addCountTransferManager = async (params: AddCountTransferManagerParams) => {
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(CountTransferManager.abi);
     const data = iface.functions.configure.encode([params.maxHolderCount]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -886,6 +928,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public addPercentageTransferManager = async (params: AddPercentageTransferManagerParams) => {
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(PercentageTransferManager.abi);
     const data = iface.functions.configure.encode([params.maxHolderPercentage, params.allowPrimaryIssuance]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -901,6 +945,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addErc20DividendCheckpoint = async (params: AddErc20DividendCheckpointParams) => {
     assert.isETHAddressHex('address', params.address);
     assert.isETHAddressHex('address', params.wallet);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
     const data = iface.functions.configure.encode([params.wallet]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -915,6 +961,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public addGeneralPermissionManager = async (params: AddModuleParams) => {
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -928,6 +976,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addCappedSTO = async (params: AddCappedSTOParams) => {
     assert.isETHAddressHex('fundsReceiver', params.fundsReceiver);
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(CappedSTO.abi);
     const data = iface.functions.configure.encode([
       params.startTime,
@@ -952,6 +1002,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('wallet', params.wallet);
     assert.isETHAddressHex('reserveWallet', params.reserveWallet);
     assert.isETHAddressHexArray('usdTokens', params.usdTokens);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(USDTieredSTO.abi);
     const data = iface.functions.configure.encode([
       dateToBigNumber(params.startTime),
@@ -980,6 +1032,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addEtherDividendCheckpoint = async (params: AddEtherDividendCheckpointParams) => {
     assert.isETHAddressHex('address', params.address);
     assert.isETHAddressHex('wallet', params.wallet);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     const iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
     const data = iface.functions.configure.encode([params.wallet]);
     return (await this.contract).addModule.sendTransactionAsync(
@@ -994,6 +1048,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public addManualApprovalTransferManager = async (params: AddModuleParams) => {
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -1006,6 +1062,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public addGeneralTransferManager = async (params: AddModuleParams) => {
     assert.isETHAddressHex('address', params.address);
+    // TODO add reference to module factory to check that maxcost >= modulecost
+    await this.checkModuleStructAddressIsEmpty(params.address);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       NO_MODULE_DATA,
@@ -1083,5 +1141,39 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       SecurityToken.abi,
     );
     return logs;
+  };
+
+  private checkModuleExists = async (moduleAddress: string) => {
+    assert.assert((await this.getModule({ moduleAddress })).name !== '', 'Module does not exist');
+  };
+
+  private checkIsArchived = async (moduleAddress: string) => {
+    assert.assert((await this.getModule({ moduleAddress })).archived, 'Module is not yet archived');
+  };
+
+  private checkIsNotArchived = async (moduleAddress: string) => {
+    assert.assert(!(await this.getModule({ moduleAddress })).archived, 'Module is archived');
+  };
+
+  private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
+    assert.isAddressNotZero((await this.getModule({ moduleAddress })).address);
+  };
+
+  private checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
+    assert.assert(
+      (await this.getModule({ moduleAddress })).address === '0x0000000000000000000000000000000000000000',
+      'Module already exists at that address',
+    );
+  };
+
+  private checkControllerEnabled = async () => {
+    assert.assert(!(await this.controllerDisabled()), 'Controller currently disabled');
+  };
+
+  private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
+    assert.assert(
+      (await this.balanceOf({ owner: from })).isGreaterThanOrEqualTo(value),
+      'Insufficient balance for inputted value',
+    );
   };
 }

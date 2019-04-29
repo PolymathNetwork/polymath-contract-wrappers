@@ -2,13 +2,13 @@ import {
   ModuleRegistryContract,
   ModuleRegistryEventArgs,
   ModuleRegistryEvents,
+  ModuleRegistryModuleRegisteredEventArgs,
+  ModuleRegistryModuleRemovedEventArgs,
+  ModuleRegistryModuleUsedEventArgs,
+  ModuleRegistryModuleVerifiedEventArgs,
+  ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
-  ModuleRegistryModuleUsedEventArgs,
-  ModuleRegistryModuleRegisteredEventArgs,
-  ModuleRegistryModuleVerifiedEventArgs,
-  ModuleRegistryModuleRemovedEventArgs,
-  ModuleRegistryOwnershipTransferredEventArgs,
   SecurityTokenRegistryContract,
   FeatureRegistryContract,
   ModuleFactoryContract,
@@ -22,13 +22,13 @@ import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import {
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
   EventCallback,
-  TxParams,
-  Subscribe,
   GetLogs,
+  GetLogsAsyncParams,
   ModuleType,
+  Subscribe,
+  SubscribeAsyncParams,
+  TxParams,
 } from '../../types';
 import { bytes32ArrayToStringArray } from '../../utils/convert';
 
@@ -199,52 +199,13 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contractFactory = contractFactory;
   }
 
-  public getBytes32Value = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBytes32Value.callAsync(params.variable);
-  };
-
-  public getBytesValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBytesValue.callAsync(params.variable);
-  };
-
-  public getAddressValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getAddressValue.callAsync(params.variable);
-  };
-
-  public getArrayAddress = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayAddress.callAsync(params.key);
-  };
-
-  public getBoolValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getBoolValue.callAsync(params.variable);
-  };
-
-  public getStringValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getStringValue.callAsync(params.variable);
-  };
-
-  public getArrayBytes32 = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayBytes32.callAsync(params.key);
-  };
-
-  public getUintValue = async (params: GetValueByVariableParams) => {
-    return (await this.contract).getUintValue.callAsync(params.variable);
-  };
-
-  public getArrayUint = async (params: GetValueByKeyParams) => {
-    return (await this.contract).getArrayUint.callAsync(params.key);
-  };
-
-  public useModule = async (params: ModuleFactoryParams) => {
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    return (await this.contract).useModule.sendTransactionAsync(
-      params.moduleFactory,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public registerModule = async (params: ModuleFactoryParams) => {
+    // TODO Check if msg.sender is module factory owner or registry curator
+
+    await this.checkModuleNotPaused();
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleNotRegistered(params.moduleFactory);
+    // TODO Factory must have a module type
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
@@ -254,6 +215,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public removeModule = async (params: ModuleFactoryParams) => {
+    // TODO Check if msg.sender is module factory owner or registry curator
+
+    await this.checkModuleNotPaused();
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleFactory,
@@ -263,6 +230,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public verifyModule = async (params: VerifyModuleParams) => {
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
@@ -336,6 +306,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    // TODO Perhaps check that the transfer of erc20 tokens is possible on its contract
+    assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
@@ -357,6 +329,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    assert.isAddressNotZero(params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
@@ -414,5 +387,45 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       ModuleRegistry.abi,
     );
     return logs;
+  };
+
+  private checkForRegisteredModule = async (moduleAddress: string) => {
+    const allModulesTypes = [
+      ModuleType.PermissionManager,
+      ModuleType.STO,
+      ModuleType.Burn,
+      ModuleType.Dividends,
+      ModuleType.TransferManager,
+    ];
+    return Promise.all(
+      allModulesTypes.map(async type => {
+        return this.callGetModulesByTypeAndReturnIfModuleExists(type, moduleAddress);
+      }),
+    ).then(values => {
+      return values.includes(true);
+    });
+  };
+
+  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+    return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
+  };
+
+  private checkMsgSenderIsOwner = async () => {
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+  };
+
+  private checkModuleRegistered = async (moduleFactory: string) => {
+    assert.assert(await this.checkForRegisteredModule(moduleFactory), 'Module is not registered');
+  };
+
+  private checkModuleNotRegistered = async (moduleFactory: string) => {
+    assert.assert(!(await this.checkForRegisteredModule(moduleFactory)), 'Module is already registered');
+  };
+
+  private checkModuleNotPaused = async () => {
+    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
   };
 }
