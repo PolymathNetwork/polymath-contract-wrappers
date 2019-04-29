@@ -9,9 +9,9 @@ import {
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
+import assert from '../../utils/assert';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -21,7 +21,6 @@ import {
   Subscribe,
   GetLogs,
 } from '../../types';
-import assert from '../../utils/assert';
 
 interface ChangeFeatureStatusSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: FeatureRegistryEvents.ChangeFeatureStatus;
@@ -157,7 +156,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
       params.indexFilterValues,
       FeatureRegistry.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

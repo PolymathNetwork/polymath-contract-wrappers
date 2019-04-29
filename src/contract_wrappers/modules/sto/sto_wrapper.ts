@@ -83,6 +83,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isETHAddressHex('tokenContract', params.tokenContract);
+    assert.isAddressNotZero(params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,

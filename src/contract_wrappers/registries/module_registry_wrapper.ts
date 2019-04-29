@@ -9,13 +9,18 @@ import {
   ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
+  SecurityTokenRegistryContract,
+  FeatureRegistryContract,
+  ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
 import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
+import ContractFactory from '../../factories/contractFactory';
 import {
   EventCallback,
   GetLogs,
@@ -25,8 +30,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../types';
-import assert from '../../utils/assert';
-import { bytes32ToString } from '../../utils/convert';
+import { bytes32ArrayToStringArray } from '../../utils/convert';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause;
@@ -166,14 +170,33 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   protected contract: Promise<ModuleRegistryContract>;
 
+  protected contractFactory: ContractFactory;
+
+  protected securityTokenRegistryContract = async (): Promise<SecurityTokenRegistryContract> => {
+    return this.contractFactory.getSecurityTokenRegistryContract();
+  };
+
+  protected featureRegistryContract = async (): Promise<FeatureRegistryContract> => {
+    return this.contractFactory.getFeatureRegistryContract();
+  };
+
+  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract> => {
+    return this.contractFactory.getModuleFactoryContract(address);
+  };
+
   /**
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleRegistryContract>) {
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<ModuleRegistryContract>,
+    contractFactory: ContractFactory,
+  ) {
     super(web3Wrapper, contract);
     this.contract = contract;
+    this.contractFactory = contractFactory;
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
@@ -182,9 +205,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     await this.checkModuleNotPaused();
     await this.checkMsgSenderIsOwner();
     await this.checkModuleNotRegistered(params.moduleFactory);
-
     // TODO Factory must have a module type
-
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
@@ -197,7 +218,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     // TODO Check if msg.sender is module factory owner or registry curator
 
     await this.checkModuleNotPaused();
-    await this.checkMsgSenderIsOwner;
+    await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
 
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
@@ -233,9 +254,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     _.forEach(
       groupedResult,
       (value, key): void => {
+        const tags = _.unzip(value as string[][])[0];
         const tagsByModule: TagsByModule = {
           module: key,
-          tags: value.map(pair => bytes32ToString(pair[1] as string)),
+          tags: bytes32ArrayToStringArray(tags),
         };
         typedResult.push(tagsByModule);
       },
@@ -254,9 +276,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     _.forEach(
       groupedResult,
       (value, key): void => {
+        const tags = _.unzip(value as string[][])[0];
         const tagsByModule: TagsByModule = {
           module: key,
-          tags: value.map(pair => bytes32ToString(pair[1] as string)),
+          tags: bytes32ArrayToStringArray(tags),
         };
         typedResult.push(tagsByModule);
       },
@@ -374,17 +397,17 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       ModuleType.Dividends,
       ModuleType.TransferManager,
     ];
-    let isRegistered = false;
-    allModulesTypes.map(async type => {
-      const registeredAddresses = await this.getModulesByType({ moduleType: type });
-      registeredAddresses.map(address => {
-        if (address === moduleAddress) {
-          isRegistered = true;
-        }
-        return registeredAddresses;
-      });
+    return Promise.all(
+      allModulesTypes.map(async type => {
+        return this.callGetModulesByTypeAndReturnIfModuleExists(type, moduleAddress);
+      }),
+    ).then(values => {
+      return values.includes(true);
     });
-    return isRegistered;
+  };
+
+  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+    return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
   };
 
   private checkMsgSenderIsOwner = async () => {
