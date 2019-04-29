@@ -13,7 +13,6 @@ import {
 import { USDTieredSTOFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import * as _ from 'lodash';
 import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../../contract_wrapper';
@@ -161,7 +160,7 @@ export default class USDTieredSTOFactoryWrapper extends ContractWrapper {
       params.indexFilterValues,
       USDTieredSTOFactory.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

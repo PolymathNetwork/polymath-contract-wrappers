@@ -20,8 +20,10 @@ import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
+import assert from '../../../utils/assert';
+import STOWrapper from './sto_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -31,8 +33,6 @@ import {
   GetLogs,
   FundRaiseType,
 } from '../../../types';
-import assert from '../../../utils/assert';
-import STOWrapper from './sto_wrapper';
 import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -410,8 +410,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOContract>) {
-    super(web3Wrapper, contract);
+  public constructor(
+    web3Wrapper: Web3Wrapper,
+    contract: Promise<USDTieredSTOContract>,
+    contractFactory: ContractFactory,
+  ) {
+    super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
 
@@ -849,7 +853,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       params.indexFilterValues,
       USDTieredSTO.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
