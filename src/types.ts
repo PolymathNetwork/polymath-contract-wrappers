@@ -1,4 +1,4 @@
-import { TxData, TxDataPayable } from '@0x/web3-wrapper';
+import { TxData } from '@0x/web3-wrapper';
 import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
