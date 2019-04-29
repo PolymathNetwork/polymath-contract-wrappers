@@ -97,13 +97,26 @@ export enum Features {
   FreezeMintingAllowed = 'FreezeMintingAllowed',
 }
 
-export enum Contracts {
+export enum PolymathContracts {
   PolyToken = 'PolyToken',
   ModuleRegistry = 'ModuleRegistry',
   FeatureRegistry = 'FeatureRegistry',
   SecurityTokenRegistry = 'SecurityTokenRegistry',
   PolyUsdOracle = 'PolyUsdOracle',
   EthUsdOracle = 'EthUsdOracle',
+}
+
+export enum ModuleName {
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  USDTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
