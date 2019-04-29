@@ -343,8 +343,16 @@ describe('SecurityTokenRegistryWrapper', () => {
     test.todo('should call to registerTicker with default owner');
 
     test('should call to registerTicker with given owner', async () => {
-      const owner = '0x0123456789012345678901234567890123456789';
       const ticker = 'TICK';
+      const expectedTickerDetailsResult = ['', new BigNumber(0), new BigNumber(0), '', false];
+      // Mocked method
+      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
+      // Stub the request
+      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+
+      const owner = '0x0123456789012345678901234567890123456789';
       const tokenName = 'TICKER';
       const mockedParams = {
         owner,
@@ -385,6 +393,7 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.getTickerDetails).once();
     });
   });
 
@@ -392,8 +401,24 @@ describe('SecurityTokenRegistryWrapper', () => {
     test.todo('should fail as newOwner is not an Eth address');
 
     test('should call to transferTickerOwnership', async () => {
-      const newOwner = '0x0123456789012345678901234567890123456789';
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
       const ticker = 'TICK';
+      const expectedTickerDetailsResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1735689600),
+        new BigNumber(1735689605),
+        'ticker',
+        true,
+      ];
+      // Mocked method
+      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
+      // Stub the request
+      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+      // Mock web3 wrapper
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      const newOwner = '0x2222222222222222222222222222222222222222';
       const mockedParams = {
         newOwner,
         ticker,
@@ -430,12 +455,28 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.getTickerDetails).once();
     });
   });
 
   describe('GenerateSecurityToken', () => {
     test('should call to GenerateSecurityToken', async () => {
       const ticker = 'TICK';
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      const expectedTickerDetailsResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1735689600),
+        new BigNumber(1735689605),
+        'ticker',
+        false,
+      ];
+      // Mocked method
+      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
+      // Stub the request
+      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const name = 'Security';
       const details = 'Token Details';
       const divisible = true;
@@ -481,6 +522,7 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.getTickerDetails).once();
     });
   });
 
@@ -685,6 +727,20 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('RemoveTicker', () => {
     test('should call to remove ticker', async () => {
+      const ticker = 'TICK';
+      const expectedTickerDetailsResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1735689600),
+        new BigNumber(1735689605),
+        'ticker',
+        false,
+      ];
+      // Mocked method
+      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
+      // Stub the request
+      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
       // Mocked parameters
       const mockedParams = {
         ticker: 'TICK',
@@ -711,6 +767,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.ticker, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.getTickerDetails).once();
     });
   });
 
@@ -740,8 +797,16 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('Change fees', () => {
     test('should send the transaction to change ticker registration fee', async () => {
+      // Address expected
+      const expectedTickerRegistrationResult = new BigNumber(1);
+      // Mocked method
+      const mockedTickerRegistrationMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTickerRegistrationFee).thenReturn(instance(mockedTickerRegistrationMethod));
+      // Stub the request
+      when(mockedTickerRegistrationMethod.callAsync()).thenResolve(expectedTickerRegistrationResult);
       // Mocked parameters
-      const fee = new BigNumber(1);
+      const fee = new BigNumber(2);
       const mockedParams = {
         newFee: fee,
         txData: {},
@@ -767,11 +832,20 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.getTickerRegistrationFee).once();
     });
 
     test('should send the transaction to change security token launch fee', async () => {
+      // Address expected
+      const expectedSecurityTokenResult = new BigNumber(1);
+      // Mocked method
+      const mockedSecurityTokenMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedSecurityTokenMethod));
+      // Stub the request
+      when(mockedSecurityTokenMethod.callAsync()).thenResolve(expectedSecurityTokenResult);
       // Mocked parameters
-      const fee = new BigNumber(1);
+      const fee = new BigNumber(2);
       const mockedParams = {
         newFee: fee,
         txData: {},
@@ -798,6 +872,7 @@ describe('SecurityTokenRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
     });
+    verify(mockedContract.getSecurityTokenLaunchFee).once();
   });
 
   describe('ChangeExpiryLimit', () => {
