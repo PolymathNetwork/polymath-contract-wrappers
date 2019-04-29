@@ -560,7 +560,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     const rate = await this.getRate({
       fundRaiseType: params.fundRaiseType,
     });
-    const investedUSD = rate.mul(params.investmentValue);
+    const investedUSD = rate.multipliedBy(params.investmentValue);
     const investorInvestedUSD = await this.investorInvestedUSD({
       investorAddress: params.beneficiary,
     });

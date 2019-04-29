@@ -16,7 +16,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -242,7 +250,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     assert.checkAddManualApprovalConditions(params.to, params.expiryTime, params.allowance);
@@ -259,7 +267,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
     assert.checkAddManualApprovalMultiConditions(
@@ -286,7 +294,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     assert.checkModifyManualApprovalConditions(params.to, params.expiryTime);
@@ -304,7 +312,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
     assert.checkModifyManualApprovalMultiConditions(
@@ -332,7 +340,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     await this.checkApprovalDoesExist(params.from, params.to);
@@ -345,7 +353,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm TRANSFER_APPROVAL) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
     assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
@@ -467,8 +475,6 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   private checkIsPaused = async () => {
     assert.assert(await this.paused(), 'Controller not currently paused');
   };
-
-  // TODO Extra Review- Verify necessity for following CheckApprovalDoes(Not)Exist Functions
 
   private checkApprovalDoesNotExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });

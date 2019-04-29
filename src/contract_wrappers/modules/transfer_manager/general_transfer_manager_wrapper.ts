@@ -20,10 +20,17 @@ import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import {bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber} from '../../../utils/convert';
+import { bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
-
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
@@ -276,6 +283,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Instantiate GeneralTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -355,7 +363,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -366,7 +374,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -376,7 +384,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
     assert.isETHAddressHex('signingAddress', params.signingAddress);
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeSigningAddress.sendTransactionAsync(
       params.signingAddress,
       params.txData,
@@ -385,7 +393,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllTransfers.sendTransactionAsync(
       params.allowAllTransfers,
       params.txData,
@@ -394,7 +402,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
       params.allowAllWhitelistTransfers,
       params.txData,
@@ -403,7 +411,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
       params.allowAllWhitelistIssuances,
       params.txData,
@@ -412,7 +420,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllBurnTransfers.sendTransactionAsync(
       params.allowAllBurnTransfers,
       params.txData,
@@ -436,39 +444,44 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Whitelist) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isAddressNotZero(params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
-        params.investor,
-        dateToBigNumber(params.canSendAfter),
-        dateToBigNumber(params.canReceiveAfter),
-        dateToBigNumber(params.expiryTime),
-        params.canBuyFromSTO,
-        params.txData,
-        params.safetyFactor,
+      params.investor,
+      dateToBigNumber(params.canSendAfter),
+      dateToBigNumber(params.canReceiveAfter),
+      dateToBigNumber(params.expiryTime),
+      params.canBuyFromSTO,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
     assert.isETHAddressHexArray('investors', params.investors);
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Whitelist) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isAddressArrayNotZero(params.investors);
-    assert.checkValidWhitelist64ByteArrayDatesAndLengths(params.canSendAfters, params.canReceiveAfters, params.expiryTimes, params.canBuyFromSTO);
+    assert.checkValidWhitelist64ByteArrayDatesAndLengths(
+      params.canSendAfters,
+      params.canReceiveAfters,
+      params.expiryTimes,
+      params.canBuyFromSTO,
+    );
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
-        params.investors,
-        dateArrayToBigNumberArray(params.canSendAfters),
-        dateArrayToBigNumberArray(params.canReceiveAfters),
-        dateArrayToBigNumberArray(params.expiryTimes),
-        params.canBuyFromSTO,
-        params.txData,
-        params.safetyFactor,
+      params.investors,
+      dateArrayToBigNumberArray(params.canSendAfters),
+      dateArrayToBigNumberArray(params.canReceiveAfters),
+      dateArrayToBigNumberArray(params.expiryTimes),
+      params.canBuyFromSTO,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Whitelist) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isAddressNotZero(params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');

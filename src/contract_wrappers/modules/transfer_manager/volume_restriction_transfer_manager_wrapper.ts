@@ -34,7 +34,15 @@ import {
   numberArrayToBigNumberArray,
   numberToBigNumber,
 } from '../../../utils/convert';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList;
@@ -515,7 +523,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestriction = async (params: AddIndividualRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
     assert.isAddressNotZero(params.holder);
     assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
@@ -538,7 +546,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestriction = async (params: AddIndividualDailyRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
     assert.isAddressNotZero(params.holder);
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
@@ -554,7 +562,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestrictionMulti = async (params: AddIndividualDailyRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHexArray('holders', params.holders);
     assert.isAddressArrayNotZero(params.holders);
     assert.checkIndividualDailyRestrictionMultiConditions(
@@ -576,7 +584,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestrictionMulti = async (params: AddIndividualRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHexArray('holders', params.holders);
     assert.isAddressArrayNotZero(params.holders);
     /* eslint-disable no-await-in-loop */
@@ -606,7 +614,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addDefaultRestriction = async (params: AddDefaultRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.checkRestrictionInputParams(
       params.startTime,
       params.allowedTokens,
@@ -625,7 +633,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addDefaultDailyRestriction = async (params: AddDefaultDailyRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).addDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,
@@ -638,7 +646,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkIndividualRestriction(params.holder);
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
@@ -650,7 +658,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isAddressArrayNotZero(params.holders);
     /* eslint-disable no-await-in-loop */
     for (let i = 0; i < params.holders.length; i + 1) {
@@ -666,7 +674,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkIndividualDailyRestriction(params.holder);
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
@@ -678,7 +686,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     /* eslint-disable no-await-in-loop */
     for (let i = 0; i < params.holders.length; i + 1) {
       await this.checkIndividualDailyRestriction(params.holders[i]);
@@ -694,19 +702,19 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeDefaultRestriction = async (params: TxParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkDefaultRestriction();
     return (await this.contract).removeDefaultRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public removeDefaultDailyRestriction = async (params: TxParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkDefaultDailyRestriction();
     return (await this.contract).removeDefaultDailyRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public modifyIndividualRestriction = async (params: ModifyIndividualRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     assert.checkRestrictionInputParams(
@@ -728,7 +736,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestriction = async (params: ModifyIndividualDailyRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
@@ -744,7 +752,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestrictionMulti = async (params: ModifyIndividualDailyRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
     assert.checkIndividualDailyRestrictionMultiConditions(
@@ -766,7 +774,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualRestrictionMulti = async (params: ModifyIndividualRestrictionMultiParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
     assert.checkIndividualRestrictionMultiConditions(
@@ -790,7 +798,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyDefaultRestriction = async (params: ModifyDefaultRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.checkRestrictionInputParams(
       params.startTime,
       params.allowedTokens,
@@ -809,7 +817,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyDefaultDailyRestriction = async (params: ModifyDefaultDailyRestrictionParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).modifyDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,

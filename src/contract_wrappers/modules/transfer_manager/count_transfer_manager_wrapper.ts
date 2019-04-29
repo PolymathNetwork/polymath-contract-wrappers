@@ -14,7 +14,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms
+} from '../../../types';
 import { numberToBigNumber } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -82,6 +90,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Instantiate CountTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -125,7 +134,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
-    // TODO Check that the msg.sender has appropriate permisssions (With Perm) Requires ISecurityToken and Ownable
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,
