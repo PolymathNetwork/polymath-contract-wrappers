@@ -639,7 +639,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // TODO Check require(individualRestriction[_holder].endTime != 0);
+    await this.checkIndividualRestriction(params.holder);
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualRestriction.sendTransactionAsync(
@@ -651,8 +651,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // TODO Check require(individualRestriction[_holder].endTime != 0);
     assert.isAddressArrayNotZero(params.holders);
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      await this.checkIndividualRestriction(params.holders[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
@@ -663,7 +667,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // Todo Check require(individualDailyRestriction[_holder].endTime != 0);
+    await this.checkIndividualDailyRestriction(params.holder);
     assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualDailyRestriction.sendTransactionAsync(
@@ -675,7 +679,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // Todo Check require(individualDailyRestriction[_holder].endTime != 0);
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      await this.checkIndividualDailyRestriction(params.holders[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualDailyRestrictionMulti.sendTransactionAsync(
@@ -687,13 +695,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeDefaultRestriction = async (params: TxParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // TODO check require(defaultRestriction.endTime != 0);
+    await this.checkDefaultRestriction();
     return (await this.contract).removeDefaultRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public removeDefaultDailyRestriction = async (params: TxParams) => {
     // TODO Check that the msg.sender has appropriate permisssions (With Perm Admin) Requires ISecurityToken and Ownable
-    // TODO check require(defaultRestriction.endTime != 0);
+    await this.checkDefaultDailyRestriction();
     return (await this.contract).removeDefaultDailyRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -921,5 +929,33 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   private checkIsPaused = async () => {
     assert.assert(await this.paused(), 'Controller not currently paused');
+  };
+
+  private checkDefaultRestriction = async () => {
+    assert.assert(
+      (await this.defaultRestriction()).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkDefaultDailyRestriction = async () => {
+    assert.assert(
+      (await this.defaultDailyRestriction()).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkIndividualRestriction = async (index: string) => {
+    assert.assert(
+      (await this.individualRestriction({ index })).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkIndividualDailyRestriction = async (index: string) => {
+    assert.assert(
+      (await this.individualDailyRestriction({ index })).endTime !== new Date(0),
+      'Individual Daily Restriction not set with end time',
+    );
   };
 }
