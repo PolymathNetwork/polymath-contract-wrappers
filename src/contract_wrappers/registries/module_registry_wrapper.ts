@@ -218,7 +218,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     // TODO Check if msg.sender is module factory owner or registry curator
 
     await this.checkModuleNotPaused();
-    await this.checkMsgSenderIsOwner;
+    await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
 
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
@@ -397,17 +397,17 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       ModuleType.Dividends,
       ModuleType.TransferManager,
     ];
-    let isRegistered = false;
-    allModulesTypes.map(async type => {
-      const registeredAddresses = await this.getModulesByType({ moduleType: type });
-      registeredAddresses.map(address => {
-        if (address === moduleAddress) {
-          isRegistered = true;
-        }
-        return registeredAddresses;
-      });
+    return Promise.all(
+      allModulesTypes.map(async type => {
+        return this.callGetModulesByTypeAndReturnIfModuleExists(type, moduleAddress);
+      }),
+    ).then(values => {
+      return values.includes(true);
     });
-    return isRegistered;
+  };
+
+  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+    return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
   };
 
   private checkMsgSenderIsOwner = async () => {

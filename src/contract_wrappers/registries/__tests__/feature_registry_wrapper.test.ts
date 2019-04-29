@@ -98,6 +98,17 @@ describe('FeatureRegistryWrapper', () => {
 
     describe('SetFeatureStatus', () => {
       test('should send the transaction to set the feature status', async () => {
+        // Address expected
+        const currentFeatureStatus = false;
+        // Feature name requested
+        const featureName = Features.CustomModulesAllowed.toString();
+        // Mocked Get method
+        const mockedGetMethod = mock(MockedCallMethod);
+        // Stub the get method
+        when(mockedContract.getFeatureStatus).thenReturn(instance(mockedGetMethod));
+        // Stub the get request
+        when(mockedGetMethod.callAsync(featureName)).thenResolve(currentFeatureStatus);
+
         // Mocked parameters
         const mockedParams = {
           nameKey: Features.CustomModulesAllowed,
@@ -135,6 +146,7 @@ describe('FeatureRegistryWrapper', () => {
             mockedParams.safetyFactor,
           ),
         ).once();
+        verify(mockedContract.getFeatureStatus).once();
       });
     });
   });
