@@ -1,7 +1,6 @@
 import { assert as sharedAssert } from '@0x/assert';
 import * as _ from 'lodash';
 import { BigNumber } from '@0x/utils';
-import { bigNumberToDate } from './convert';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
 
