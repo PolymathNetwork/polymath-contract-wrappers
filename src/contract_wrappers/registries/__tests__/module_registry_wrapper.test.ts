@@ -1,9 +1,16 @@
 // PolymathRegistryWrapper test
 import { instance, mock, reset, verify, when } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ModuleRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber } from '@0x/utils';
+import {
+  ModuleRegistryContract,
+  PolyTokenEvents,
+  FeatureRegistryContract,
+  ModuleFactoryContract,
+  PolymathRegistryContract,
+} from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { ModuleType } from '../../../types';
+import { Features, ModuleType, PolymathContracts } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import ModuleRegistryWrapper from '../module_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -20,11 +27,17 @@ describe('ModuleRegistryWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleRegistryContract;
   let mockedContractFactory: ContractFactory;
+  let mockedModuleFactoryContract: ModuleFactoryContract;
+  let mockedFeatureRegistryContract: FeatureRegistryContract;
+  let mockedPolymathRegistryContract: PolymathRegistryContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(ModuleRegistryContract);
     mockedContractFactory = mock(ContractFactory);
+    mockedModuleFactoryContract = mock(ModuleFactoryContract);
+    mockedFeatureRegistryContract = mock(FeatureRegistryContract);
+    mockedPolymathRegistryContract = mock(PolymathRegistryContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new ModuleRegistryWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -45,6 +58,46 @@ describe('ModuleRegistryWrapper', () => {
     test.todo('should fail as moduleFactory is not an Eth address');
 
     test('should successfully call to registerModule', async () => {
+      // Make sure there is something coming back for getAddress of polymathregistry in contract factory
+      const mockedGetPolymathRegistryContractAddressMethod = mock(MockedCallMethod);
+      when(mockedGetPolymathRegistryContractAddressMethod.callAsync(PolymathContracts.FeatureRegistry)).thenResolve(
+        '0x4444444444444444444444444444444444444444',
+      );
+      when(mockedPolymathRegistryContract.getAddress).thenReturn(
+        instance(mockedGetPolymathRegistryContractAddressMethod),
+      );
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      // Setup mocked contract factory
+      const moduleFactoryAddress = '0x3333333333333333333333333333333333333333 ';
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(mockedFeatureRegistryContract);
+      when(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).thenResolve(
+        mockedModuleFactoryContract,
+      );
+
+      // Stub the feature registry request
+      // Mocked Get method
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      // Stub the get method
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      // Stub the get request
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Stub the module factory request
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the get types
+      const mockedGetTypesMethod = mock(MockedCallMethod);
+      const types = [new BigNumber(1)];
+      when(mockedModuleFactoryContract.getTypes).thenReturn(instance(mockedGetTypesMethod));
+      when(mockedGetTypesMethod.callAsync()).thenResolve(types);
+
       // Pause Result expected
       const expectedPausedResult = false;
       // Mocked method
@@ -54,14 +107,9 @@ describe('ModuleRegistryWrapper', () => {
       // Stub the request
       when(mockedPausedMethod.callAsync()).thenResolve(expectedPausedResult);
 
-      // Owner Address expected
-      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
-      // Mocked method
-      const mockedOwnerMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
-      // Stub the request
-      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
       // Mock web3 wrapper
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       // Module not already registered - the new Module factory is at '0x0123456789012345678901234567890123456789'

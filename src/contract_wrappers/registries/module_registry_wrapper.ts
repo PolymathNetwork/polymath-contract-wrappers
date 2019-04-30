@@ -23,6 +23,7 @@ import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import {
   EventCallback,
+  Features,
   GetLogs,
   GetLogsAsyncParams,
   ModuleType,
@@ -192,20 +193,36 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   public constructor(
     web3Wrapper: Web3Wrapper,
     contract: Promise<ModuleRegistryContract>,
-    contractFactory: ContractFactory,
+    myContractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
     this.contract = contract;
-    this.contractFactory = contractFactory;
+    this.contractFactory = myContractFactory;
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    // TODO Check if msg.sender is module factory owner or registry curator
+    const callerAddress = await this.getCallerAddress(undefined);
+    const owner = await this.owner();
+    if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+      const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
+      assert.assert(
+        callerAddress === owner || callerAddress === factoryOwner,
+        'Calling address must be owner or factory owner with custom modules allowed feature status',
+      );
+    } else {
+      assert.assert(
+        callerAddress === owner,
+        'Calling address must be owner without custom modules allowed feature status',
+      );
+    }
 
     await this.checkModuleNotPaused();
     await this.checkMsgSenderIsOwner();
     await this.checkModuleNotRegistered(params.moduleFactory);
-    // TODO Factory must have a module type
+    assert.assert(
+      (await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync()).length > 0,
+      'Factory must have type',
+    );
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
