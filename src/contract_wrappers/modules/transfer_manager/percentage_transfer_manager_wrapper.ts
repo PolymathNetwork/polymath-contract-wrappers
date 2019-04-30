@@ -16,7 +16,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -146,6 +154,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.paused(), 'Controller not currently paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -154,6 +163,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -177,6 +187,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       params.maxHolderPercentage,
       params.txData,
@@ -185,6 +196,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -195,6 +207,11 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(
+      params.investors.length === params.valids.length,
+      'Array lengths are not equal for investors and valids',
+    );
     assert.isETHAddressHexArray('investors', params.investors);
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
@@ -205,6 +222,11 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(
+      (await this.allowPrimaryIssuance()) !== params.allowPrimaryIssuance,
+      'AllowPrimaryIssuance value must change ',
+    );
     return (await this.contract).setAllowPrimaryIssuance.sendTransactionAsync(
       params.allowPrimaryIssuance,
       params.txData,

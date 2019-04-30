@@ -37,6 +37,7 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
       params.amount.isLessThanOrEqualTo(new BigNumber(1000000e18)),
       'Amount cannot exceed 1 million tokens',
     );
+
     return (await this.contract).getTokens.sendTransactionAsync(
       params.amount,
       params.recipient,

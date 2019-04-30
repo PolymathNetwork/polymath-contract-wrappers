@@ -34,7 +34,15 @@ import {
   numberArrayToBigNumberArray,
   numberToBigNumber,
 } from '../../../utils/convert';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList;
@@ -238,7 +246,6 @@ interface VerifyTransferParams extends TxParams {
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface IndividualRestrictionParams {
@@ -421,6 +428,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   }
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.paused(), 'Controller not currently paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -429,18 +437,21 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    // SC: require(_isTransfer == false || msg.sender == securityToken,...
+    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
       params.amount,
       params.data,
-      params.isTransfer,
+      false,
       params.txData,
       params.safetyFactor,
     );
@@ -500,6 +511,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
     assert.isETHAddressHex('wallet', params.wallet);
+    assert.isAddressNotZero(params.wallet);
+    const isWalletExempt = (await this.getExemptAddress()).includes(params.wallet);
+    assert.assert(!isWalletExempt === params.change, 'There will be no change to exempt list');
     return (await this.contract).changeExemptWalletList.sendTransactionAsync(
       params.wallet,
       params.change,
@@ -509,7 +523,16 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestriction = async (params: AddIndividualRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
+    assert.isAddressNotZero(params.holder);
+    assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
+    assert.checkRestrictionInputParams(
+      params.startTime,
+      params.allowedTokens,
+      params.restrictionType,
+      params.rollingPeriodInDays,
+    );
     return (await this.contract).addIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -523,7 +546,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestriction = async (params: AddIndividualDailyRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
+    assert.isAddressNotZero(params.holder);
+    assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -536,7 +562,16 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualDailyRestrictionMulti = async (params: AddIndividualDailyRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHexArray('holders', params.holders);
+    assert.isAddressArrayNotZero(params.holders);
+    assert.checkIndividualDailyRestrictionMultiConditions(
+      params.holders,
+      params.startTimes,
+      params.allowedTokens,
+      params.restrictionTypes,
+      params.endTimes,
+    );
     return (await this.contract).addIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -549,7 +584,23 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addIndividualRestrictionMulti = async (params: AddIndividualRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHexArray('holders', params.holders);
+    assert.isAddressArrayNotZero(params.holders);
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      assert.assert((await this.getExemptAddress()).includes(params.holders[i]), 'Holder is exempt from restriction');
+    }
+    /* eslint-enable no-await-in-loop */
+    assert.checkIndividualRestrictionMultiConditions(
+      params.holders,
+      params.startTimes,
+      params.allowedTokens,
+      params.restrictionTypes,
+      params.rollingPeriodInDays,
+      params.endTimes,
+    );
+
     return (await this.contract).addIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -563,6 +614,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addDefaultRestriction = async (params: AddDefaultRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.checkRestrictionInputParams(
+      params.startTime,
+      params.allowedTokens,
+      params.restrictionType,
+      params.rollingPeriodInDays,
+    );
     return (await this.contract).addDefaultRestriction.sendTransactionAsync(
       params.allowedTokens,
       dateToBigNumber(params.startTime),
@@ -575,6 +633,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public addDefaultDailyRestriction = async (params: AddDefaultDailyRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).addDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,
       dateToBigNumber(params.startTime),
@@ -586,6 +646,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    await this.checkIndividualRestriction(params.holder);
+    assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualRestriction.sendTransactionAsync(
       params.holder,
@@ -595,6 +658,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isAddressArrayNotZero(params.holders);
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      await this.checkIndividualRestriction(params.holders[i]);
+    }
+    /* eslint-enable no-await-in-loop */
     assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
@@ -604,6 +674,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    await this.checkIndividualDailyRestriction(params.holder);
+    assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
@@ -613,6 +686,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    /* eslint-disable no-await-in-loop */
+    for (let i = 0; i < params.holders.length; i + 1) {
+      await this.checkIndividualDailyRestriction(params.holders[i]);
+    }
+    /* eslint-enable no-await-in-loop */
+    assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
     return (await this.contract).removeIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
@@ -622,15 +702,27 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public removeDefaultRestriction = async (params: TxParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    await this.checkDefaultRestriction();
     return (await this.contract).removeDefaultRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public removeDefaultDailyRestriction = async (params: TxParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    await this.checkDefaultDailyRestriction();
     return (await this.contract).removeDefaultDailyRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public modifyIndividualRestriction = async (params: ModifyIndividualRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
+    assert.checkRestrictionInputParams(
+      params.startTime,
+      params.allowedTokens,
+      params.restrictionType,
+      params.rollingPeriodInDays,
+    );
     return (await this.contract).modifyIndividualRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -644,7 +736,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestriction = async (params: ModifyIndividualDailyRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isAddressNotZero(params.holder);
     assert.isETHAddressHex('holder', params.holder);
+    assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).modifyIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
       params.allowedTokens,
@@ -657,7 +752,16 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualDailyRestrictionMulti = async (params: ModifyIndividualDailyRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
+    assert.checkIndividualDailyRestrictionMultiConditions(
+      params.holders,
+      params.startTimes,
+      params.allowedTokens,
+      params.restrictionTypes,
+      params.endTimes,
+    );
     return (await this.contract).modifyIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -670,7 +774,17 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyIndividualRestrictionMulti = async (params: ModifyIndividualRestrictionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isAddressArrayNotZero(params.holders);
     assert.isETHAddressHexArray('holders', params.holders);
+    assert.checkIndividualRestrictionMultiConditions(
+      params.holders,
+      params.startTimes,
+      params.allowedTokens,
+      params.restrictionTypes,
+      params.rollingPeriodInDays,
+      params.endTimes,
+    );
     return (await this.contract).modifyIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
       params.allowedTokens,
@@ -684,6 +798,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyDefaultRestriction = async (params: ModifyDefaultRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.checkRestrictionInputParams(
+      params.startTime,
+      params.allowedTokens,
+      params.restrictionType,
+      params.rollingPeriodInDays,
+    );
     return (await this.contract).modifyDefaultRestriction.sendTransactionAsync(
       params.allowedTokens,
       dateToBigNumber(params.startTime),
@@ -696,6 +817,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public modifyDefaultDailyRestriction = async (params: ModifyDefaultDailyRestrictionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).modifyDefaultDailyRestriction.sendTransactionAsync(
       params.allowedTokens,
       dateToBigNumber(params.startTime),
@@ -806,5 +929,33 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       VolumeRestrictionTransferManager.abi,
     );
     return logs;
+  };
+
+  private checkDefaultRestriction = async () => {
+    assert.assert(
+      (await this.defaultRestriction()).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkDefaultDailyRestriction = async () => {
+    assert.assert(
+      (await this.defaultDailyRestriction()).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkIndividualRestriction = async (index: string) => {
+    assert.assert(
+      (await this.individualRestriction({ index })).endTime !== new Date(0),
+      'Individual Restriction not set with end time',
+    );
+  };
+
+  private checkIndividualDailyRestriction = async (index: string) => {
+    assert.assert(
+      (await this.individualDailyRestriction({ index })).endTime !== new Date(0),
+      'Individual Daily Restriction not set with end time',
+    );
   };
 }

@@ -13,7 +13,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  GetLogs,
+  Subscribe,
+  Perms
+} from '../../../types';
 import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -153,7 +161,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       delegate: params.delegate,
     });
     assert.assert(!delegate, 'Already present');
-    assert.assert(await this.isCallerAllowed(params.txData, 'CHANGE_PERMISSION'), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),

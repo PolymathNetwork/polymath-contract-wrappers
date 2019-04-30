@@ -119,6 +119,14 @@ export enum ModuleName {
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
+export enum Perms {
+  ChangePermission = 'CHANGE_PERMISSION',
+  Admin = 'ADMIN',
+  Flags = 'FLAGS',
+  Whitelist = 'WHITELIST',
+  TransferApproval = 'TRANSFER_APPROVAL',
+}
+
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
   isRemoved: boolean;
   log: LogWithDecodedArgs<ArgsType>;
