@@ -189,15 +189,16 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
     contract: Promise<ModuleRegistryContract>,
-    myContractFactory: ContractFactory,
+    contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
     this.contract = contract;
-    this.contractFactory = myContractFactory;
+    this.contractFactory = contractFactory;
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
@@ -327,7 +328,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
-    // TODO Perhaps check that the transfer of erc20 tokens is possible on its contract
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,

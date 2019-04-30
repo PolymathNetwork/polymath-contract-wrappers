@@ -2,7 +2,7 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenRegistryContract, PolyTokenEvents, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -15,11 +15,13 @@ describe('SecurityTokenRegistryWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: SecurityTokenRegistryContract;
   let mockedContractFactory: ContractFactory;
+  let mockedSecurityTokenContract: SecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(SecurityTokenRegistryContract);
     mockedContractFactory = mock(ContractFactory);
+    mockedSecurityTokenContract = mock(SecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenRegistryWrapper(
@@ -402,7 +404,23 @@ describe('SecurityTokenRegistryWrapper', () => {
 
     test('should call to transferTickerOwnership', async () => {
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      const securityTokenAddress = '0x5555555555555555555555555555555555555555';
+      const newOwner = '0x2222222222222222222222222222222222222222';
       const ticker = 'TICK';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync(ticker)).thenResolve(securityTokenAddress);
+
+      // Setup mocked owner from security token registry with expectedTickerDetailsResult status = true
+      when(mockedContractFactory.getSecurityTokenContract(securityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(newOwner);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
       const expectedTickerDetailsResult = [
         '0x0123456789012345678901234567890123456789',
         new BigNumber(1735689600),
@@ -418,7 +436,6 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
       // Mock web3 wrapper
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-      const newOwner = '0x2222222222222222222222222222222222222222';
       const mockedParams = {
         newOwner,
         ticker,

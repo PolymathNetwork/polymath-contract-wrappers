@@ -12,6 +12,7 @@ import {
   SecurityTokenRegistryRegisterTickerEventArgs,
   SecurityTokenRegistryTickerRemovedEventArgs,
   SecurityTokenRegistryChangeTickerOwnershipEventArgs,
+  SecurityTokenContract,
   DetailedERC20Contract,
 } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
@@ -328,10 +329,15 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return this.contractFactory.getDetailedERC20Contract(address);
   };
 
+  protected securityTokenContract = async (address: string): Promise<SecurityTokenContract> => {
+    return this.contractFactory.getSecurityTokenContract(address);
+  };
+
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -410,7 +416,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       }),
       'Ticker is not available',
     );
-    // TODO: Verify allowance
+
+    // Check poly token allowance
+    const tickerRegistrationFee = await this.getTickerRegistrationFee();
+    const securityTokenAddress = await this.getSecurityTokenAddress(params.ticker);
+    if (tickerRegistrationFee.isGreaterThan(new BigNumber(0))) {
+      const allowance = await (await this.erc20TokenContract(securityTokenAddress)).allowance.callAsync(
+        await this.getCallerAddress(undefined),
+        securityTokenAddress,
+      );
+      assert.assert(allowance.isGreaterThanOrEqualTo(tickerRegistrationFee), 'Insufficient Erc20 token allowance');
+    }
+
     return (await this.contract).registerTicker.sendTransactionAsync(
       owner,
       params.ticker,
@@ -431,7 +448,12 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     });
     const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
     assert.assert(address === tickerDetails.owner, 'Not authorised');
-    // TODO verify new owner match with token owner
+    if (tickerDetails.status) {
+      const securityTokenOwner = await (await this.securityTokenContract(
+        await this.getSecurityTokenAddress(params.ticker),
+      )).owner.callAsync();
+      assert.assert(securityTokenOwner === params.newOwner, 'New owner does not match token owner');
+    }
     return (await this.contract).transferTickerOwnership.sendTransactionAsync(
       params.newOwner,
       params.ticker,
@@ -453,6 +475,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
     assert.assert(address === tickerDetails.owner, 'Not authorised');
     assert.assert(tickerDetails.expiryDate.getTime() >= Date.now(), 'Ticker gets expired');
+
+    // Check PolyToken allowance
+    const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
+    const securityTokenAddress = await this.getSecurityTokenAddress(params.ticker);
+    if (securityTokenLaunchFee.isGreaterThan(new BigNumber(0))) {
+      const allowance = await (await this.erc20TokenContract(securityTokenAddress)).allowance.callAsync(
+          await this.getCallerAddress(undefined),
+          securityTokenAddress,
+      );
+      assert.assert(allowance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Erc20 token allowance');
+    }
+
     return (await this.contract).generateSecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -650,7 +684,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     assert.isAddressNotZero(params.tokenContract);
-    // TODO check user balance before transfer
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
