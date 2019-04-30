@@ -428,7 +428,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   }
 
   public unpause = async (params: TxParams) => {
-    await this.checkIsPaused();
+    assert.assert(await this.paused(), 'Controller not currently paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -437,7 +437,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   public pause = async (params: TxParams) => {
-    await this.checkIsNotPaused();
+    assert.assert(!(await this.paused()), 'Controller currently paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -929,14 +929,6 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       VolumeRestrictionTransferManager.abi,
     );
     return logs;
-  };
-
-  private checkIsNotPaused = async () => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-  };
-
-  private checkIsPaused = async () => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
   };
 
   private checkDefaultRestriction = async () => {
