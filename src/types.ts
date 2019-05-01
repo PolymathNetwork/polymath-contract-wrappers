@@ -1,258 +1,244 @@
-import { BigNumber } from '@0x/utils';
-import { Provider } from 'ethereum-types';
+import { TxData, TxDataPayable } from '@0x/web3-wrapper';
+import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
+import {
+  PolyTokenEventArgs,
+  PolyTokenEvents,
+  CappedSTOFactoryEventArgs,
+  CappedSTOEventArgs,
+  DetailedERC20EventArgs,
+  DetailedERC20Events,
+  ERC20DividendCheckpointEventArgs,
+  EtherDividendCheckpointEventArgs,
+  FeatureRegistryEventArgs,
+  GeneralTransferManagerEventArgs,
+  ManualApprovalTransferManagerEventArgs,
+  ModuleFactoryEventArgs,
+  ModuleRegistryEventArgs,
+  PolyTokenFaucetEventArgs,
+  PolymathRegistryEventArgs,
+  SecurityTokenRegistryEventArgs,
+  SecurityTokenEventArgs,
+  USDTieredSTOFactoryEventArgs,
+  USDTieredSTOEventArgs,
+  CappedSTOFactoryEvents,
+  CappedSTOEvents,
+  ERC20DividendCheckpointEvents,
+  EtherDividendCheckpointEvents,
+  FeatureRegistryEvents,
+  GeneralTransferManagerEvents,
+  ManualApprovalTransferManagerEvents,
+  ModuleFactoryEvents,
+  ModuleRegistryEvents,
+  PolyTokenFaucetEvents,
+  PolymathRegistryEvents,
+  SecurityTokenRegistryEvents,
+  SecurityTokenEvents,
+  USDTieredSTOFactoryEvents,
+  USDTieredSTOEvents,
+  GeneralPermissionManagerEventArgs,
+  GeneralPermissionManagerEvents,
+  ModuleContract,
+  GeneralPermissionManagerContract,
+  GeneralTransferManagerContract,
+  CappedSTOContract,
+  USDTieredSTOContract,
+  ERC20DividendCheckpointContract,
+  STOContract,
+  STOEvents,
+  STOEventArgs,
+  DetailedERC20Contract,
+  PolyTokenContract,
+  SecurityTokenContract,
+  EtherDividendCheckpointContract,
+  ManualApprovalTransferManagerContract,
+  CountTransferManagerContract,
+  CountTransferManagerEventArgs,
+  CountTransferManagerEvents,
+  PercentageTransferManagerContract,
+  PercentageTransferManagerEventArgs,
+  PercentageTransferManagerEvents,
+  VolumeRestrictionTMContract,
+  VolumeRestrictionTMEvents,
+  VolumeRestrictionTMEventArgs,
+  PolyTokenFaucetContract,
+} from '@polymathnetwork/abi-wrappers';
 
 /**
- * @param provider The web3 provider 
- * @param polymathRegistry The PolymathRegistry contract address '0x...'
+ * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
+ * @param safetyFactor Factor to use for gas limit estimation
  */
-export interface IApiConstructor {
-    provider: Provider,
-    polymathRegistryAddress?: string
+export interface TxParams {
+  txData?: Partial<TxData>;
+  safetyFactor?: number;
 }
 
-export interface IFundRaiseTypes {
-    index: number;
-}
-
-export interface IFundsRaised {
-    index: number;
-}
-
-/**
- * @param moduleType is the module type to look for
- * @param securityToken is the address of SecurityToken
- */
-export interface IModulesByTypeAndToken {
-    moduleType: number;
-    securityToken: string;
-}
-
-export interface IBalanceOf {
-    address?: string;
-}
-
-/**
- * @param owner The address which owns the tokens
- */
-export interface IAllowance {
-    owner: string;
-}
-
-/**
- * @param spender The address which will spend the funds
- * @param value The amount of tokens to be spent
- */
-export interface IApprove {
-    spender: string;
-    value: BigNumber;
-}
-
-/**
- * @param contractName is the key for the contract address mapping
- */
-export interface IGetAddress {
-    contractName: string;
-}
-
-/**
- * @param securityToken is the address of the security token.
- */
-export interface ISecurityTokenData {
-    securityToken: string;
-}
-
-/**
- * @param ownerAddress is the address which owns the list of tickers
- */
-export interface ITokensByOwner {
-    ownerAddress: string;
-}
-
-/**
- * @param tokenName is the ticker symbol
- */
-export interface ITickerDetails {
-    tokenName: string;
-}
-
-/**
- * @param ticker is unique token ticker
- * @param tokenName is the name of the token
- */
-export interface IRegisterTicker {
-    ticker: string;
-    tokenName: string;
-}
-
-/**
- * @param newOwner is the address of the new owner of the ticker
- * @param ticker is the ticker symbol
- */
-export interface ITransferTickerOwnership {
-    newOwner: string;
-    ticker: string;
-}
-
-/**
- * @param name is the name of the token
- * @param ticker is the ticker symbol of the security token
- * @param details is the off-chain details of the token
- * @param divisible is whether or not the token is divisible
- */
-export interface IGenerateSecurityToken {
-    name: string;
-    ticker: string;
-    details: string;
-    divisible: boolean;
-}
-
-/**
- * @param type type of the module
- */
-export interface IModulesByType {
-    type: number;
-}
-
-export interface IAddModule {
-    moduleFactory: string;
-    data: string;
-    maxCost: BigNumber;
-    budget: BigNumber;
-}
-
-/**
- * @param module address of the module
- */
-export interface IModule {
-    module: string;
-}
-
-/**
- * @param from sender of transfer
- * @param to receiver of transfer
- * @param value value of transfer
- * @param data data to indicate validation
- */
-export interface IVerifyTransfer {
-    from: string;
-    to: string;
-    value: BigNumber;
-    data: string;
-}
-
-export interface ITiers {
-    index: BigNumber;
-}
-
-export interface ITokensMintedByTier {
-    tier: BigNumber;
-}
-
-/**
- * @param fundRaiseType Currency key
- * @param amount Value to convert to USD
- */
-export interface IConvertToUSD {
-    fundRaiseType: number;
-    amount: BigNumber;
-}
-
-/**
- * @param fundRaiseType The fund raising currency (e.g. ETH, POLY, SC) to calculate sold tokens for
- */
-export interface ITokensSoldFor {
-    fundRaiseType: number;
-}
-
-export interface IStableCoinsRaised {
-    index: string;
-}
-
-/**
- * @param investors Array of investor addresses to modify
- * @param accredited Array of bools specifying accreditation status
- */
-export interface IChangeAccredited {
-    investors: string[];
-    accredited: boolean[];
-}
-
-/**
- * @param investors Array of investor addresses to modify
- * @param nonAccreditedLimit Array of uints specifying non-accredited limits
- */
-export interface IChangeNonAccreditedLimit {
-    investors: string[];
-    nonAccreditedLimit: BigNumber[];
-}
-
-/**
- * @param startTime start time of sto
- * @param endTime end time of sto
- */
-export interface IModifyTimes {
-    startTime: BigNumber;
-    endTime: BigNumber;
-}
-
-/**
- * @param nonAccreditedLimitUSD max non accredited invets limit
- * @param minimumInvestmentUSD overall minimum investment limit
- */
-export interface IModifyLimits {
-    nonAccreditedLimitUSD: BigNumber;
-    minimumInvestmentUSD: BigNumber;
-}
-
-/**
- * @param fundRaiseTypes Array of fund raise types to allow
- */
-export interface IModifyFunding {
-    fundRaiseTypes: number[];
-}
-
-/**
- * @param wallet Address of wallet where funds are sent
- * @param reserveWallet Address of wallet where unsold tokens are sent
- * @param usdTokens Address of usd tokens
- */
-export interface IModifyAddresses {
-    wallet: string;
-    reserveWallet: string;
-    usdToken: string[];
-}
-
-/**
- * @param ratePerTier Array of rates per tier
- * @param ratePerTierDiscountPoly Array of discounted poly rates per tier
- * @param tokensPerTierTotal Array of total tokens per tier
- * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
- */
-export interface IModifyTiers {
-    ratePerTier: BigNumber[];
-    ratePerTierDiscountPoly: BigNumber[];
-    tokensPerTierTotal: BigNumber[];
-    tokensPerTierDiscountPoly: BigNumber[];
+export interface TxPayableParams {
+  txData?: Partial<TxDataPayable>;
+  safetyFactor?: number;
 }
 
 export enum NetworkId {
-    Mainnet = 1,
-    Kovan = 42,
-    Local = 15,
+  Mainnet = 1,
+  Kovan = 42,
+  Local = 15,
+}
+
+export enum ModuleType {
+  PermissionManager = 1,
+  TransferManager = 2,
+  STO = 3,
+  Dividends = 4,
+  Burn = 5,
+}
+
+export enum FundRaiseType {
+  ETH = 0,
+  POLY = 1,
+  StableCoin = 2,
+}
+
+export enum Features {
+  CustomModulesAllowed = 'CustomModulesAllowed',
+  FreezeMintingAllowed = 'FreezeMintingAllowed',
+}
+
+export enum PolymathContracts {
+  PolyToken = 'PolyToken',
+  ModuleRegistry = 'ModuleRegistry',
+  FeatureRegistry = 'FeatureRegistry',
+  SecurityTokenRegistry = 'SecurityTokenRegistry',
+  PolyUsdOracle = 'PolyUsdOracle',
+  EthUsdOracle = 'EthUsdOracle',
+}
+
+export enum ModuleName {
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  USDTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
+}
+
+export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
+  isRemoved: boolean;
+  log: LogWithDecodedArgs<ArgsType>;
+}
+
+export type EventCallback<ArgsType extends DecodedLogArgs> = (
+  err: null | Error,
+  log?: DecodedLogEvent<ArgsType>,
+) => void;
+
+export interface IndexedFilterValues {
+  [index: string]: ContractEventArg;
+}
+
+export interface BlockRange {
+  fromBlock: BlockParam;
+  toBlock: BlockParam;
+}
+
+export type ContractEventArgs =
+  | PolyTokenEventArgs
+  | CappedSTOFactoryEventArgs
+  | CappedSTOEventArgs
+  | DetailedERC20EventArgs
+  | ERC20DividendCheckpointEventArgs
+  | EtherDividendCheckpointEventArgs
+  | FeatureRegistryEventArgs
+  | GeneralPermissionManagerEventArgs
+  | GeneralTransferManagerEventArgs
+  | ManualApprovalTransferManagerEventArgs
+  | ModuleFactoryEventArgs
+  | ModuleRegistryEventArgs
+  | PolyTokenFaucetEventArgs
+  | PolymathRegistryEventArgs
+  | SecurityTokenRegistryEventArgs
+  | SecurityTokenEventArgs
+  | USDTieredSTOFactoryEventArgs
+  | USDTieredSTOEventArgs
+  | STOEventArgs
+  | CountTransferManagerEventArgs
+  | PercentageTransferManagerEventArgs
+  | VolumeRestrictionTMEventArgs;
+
+export type ContractEvents =
+  | PolyTokenEvents
+  | CappedSTOFactoryEvents
+  | CappedSTOEvents
+  | DetailedERC20Events
+  | ERC20DividendCheckpointEvents
+  | EtherDividendCheckpointEvents
+  | FeatureRegistryEvents
+  | GeneralPermissionManagerEvents
+  | GeneralTransferManagerEvents
+  | ManualApprovalTransferManagerEvents
+  | ModuleFactoryEvents
+  | ModuleRegistryEvents
+  | PolyTokenFaucetEvents
+  | PolymathRegistryEvents
+  | SecurityTokenRegistryEvents
+  | SecurityTokenEvents
+  | USDTieredSTOFactoryEvents
+  | USDTieredSTOEvents
+  | STOEvents
+  | CountTransferManagerEvents
+  | PercentageTransferManagerEvents
+  | VolumeRestrictionTMEvents;
+
+/**
+ * @param eventName           The contract event you would like to subscribe to.
+ * @param blockRange          Block range to get logs from.
+ * @param indexFilterValues   An object where the keys are indexed args returned by the event and
+ *                            the value is the value you are interested in.
+ */
+export interface GetLogsAsyncParams {
+  eventName: ContractEvents;
+  blockRange: BlockRange;
+  indexFilterValues: IndexedFilterValues;
 }
 
 /**
- * @param nameKey is the key for the feature status mapping
+ * @param contractAddress     The hex encoded address where the contract is deployed.
+ * @param eventName           The contract event you would like to subscribe to.
+ * @param indexFilterValues   An object where the keys are indexed args returned by the event and
+ *                            the value is the value you are interested in.
+ * @param callback            Callback that gets called when a log is added/removed
+ * @param isVerbose           Enable verbose subscription warnings (e.g recoverable network issues encountered)
  */
-export interface IGetFeatureStatus {
-    nameKey: string;
+export interface SubscribeAsyncParams {
+  eventName: ContractEvents;
+  indexFilterValues: IndexedFilterValues;
+  callback: EventCallback<ContractEventArg>;
+  isVerbose?: boolean;
 }
 
-/**
- * @param nameKey is the key for the feature status mapping
- * @param newStatus is the new feature status
- */
-export interface ISetFeatureStatus {
-    nameKey: string;
-    newStatus: boolean;
+export interface GetLogs {
+  (params: GetLogsAsyncParams): Promise<LogWithDecodedArgs<ContractEventArgs>[]>;
 }
+
+export interface Subscribe {
+  (params: SubscribeAsyncParams): Promise<string>;
+}
+
+export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+
+export type GenericModuleContract =
+  | ModuleContract
+  | GeneralPermissionManagerContract
+  | GeneralTransferManagerContract
+  | STOBaseContract
+  | DividendCheckpointBaseContract
+  | ManualApprovalTransferManagerContract
+  | CountTransferManagerContract
+  | PercentageTransferManagerContract
+  | VolumeRestrictionTMContract;
+
+export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
+
+export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | EtherDividendCheckpointContract;

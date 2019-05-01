@@ -12,7 +12,8 @@
     "start": "webpack-dev-server --config=webpack.config.dev.js",
     "build": "webpack",
     "build:ci": "yarn build",
-    "lint": "tslint --format stylish --project . --exclude **/lib/**/*",
+    "lint": "./node_modules/.bin/eslint ./src --ext .js,.ts",
+    "lint:fix": "./node_modules/.bin/eslint ./src --ext .js,.ts --fix",
     "clean": "shx rm -rf lib docs",
     "docs": "typedoc --excludePrivate --excludeExternals --exclude node_modules/ --name 'Polymath API' --target ES5 --module commonjs --tsconfig typedoc-tsconfig.json --out docs/ src/"
   },
@@ -29,37 +30,68 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
+    "@types/ethereumjs-util": "^5.2.0",
+    "@types/jest": "^24.0.11",
     "@types/lodash": "4.14.104",
     "@types/node": "*",
+    "@types/uuid": "^3.4.4",
     "@types/web3": "^1.0.14",
     "@types/web3-provider-engine": "^14.0.0",
+    "@typescript-eslint/eslint-plugin": "^1.6.0",
+    "@typescript-eslint/parser": "^1.6.0",
     "awesome-typescript-loader": "^5.2.1",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^22.4.1",
+    "eslint-plugin-prettier": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
+    "husky": ">=1",
+    "jest": "^24.7.1",
+    "lint-staged": ">=8",
+    "prettier": "^1.16.4",
     "shx": "^0.3.2",
+    "ts-jest": "^24.0.1",
+    "ts-mockito": "^2.3.1",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
-    "tslint": "5.11.0",
     "typedoc": "0.13.0",
     "typescript": "3.2.2",
+    "web3-provider-engine": "14.0.6",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
     "webpack-dev-server": "^3.1.14",
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
-    "@0x/assert": "^1.0.21",
-    "@0x/json-schemas": "^2.1.5",
-    "@0x/subproviders": "^2.1.11",
-    "@0x/types": "^1.5.0",
-    "@0x/typescript-typings": "^3.0.6",
-    "@0x/utils": "^2.1.1",
-    "@0x/web3-wrapper": "^3.2.2",
-    "ethereum-types": "^1.1.4",
+    "@0x/assert": "^2.0.9",
+    "@0x/json-schemas": "^3.0.9",
+    "@0x/subproviders": "^4.0.5",
+    "@0x/types": "^2.2.2",
+    "@0x/typescript-typings": "^4.2.2",
+    "@0x/utils": "^4.3.1",
+    "@0x/web3-wrapper": "^6.0.5",
+    "@polymathnetwork/abi-wrappers": "2.1.0-beta.12",
+    "@polymathnetwork/contract-artifacts": "2.1.0-beta.8",
+    "ethereum-types": "^2.1.2",
+    "ethereumjs-blockstream": "6.0.0",
+    "ethereumjs-util": "^6.1.0",
+    "ethers": "^4.0.27",
+    "js-sha3": "^0.8.0",
     "lodash": "^4.17.5",
-    "@polymathnetwork/abi-wrappers": "2.1.0-beta",
-    "@polymathnetwork/contract-artifacts": "2.1.0-beta.1"
+    "moment": "^2.24.0",
+    "uuid": "^3.3.2"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint"
   }
 }
