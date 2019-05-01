@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { PolyResponse } from '@polymathnetwork/abi-wrappers';
 
 export class MockedCallMethod {
