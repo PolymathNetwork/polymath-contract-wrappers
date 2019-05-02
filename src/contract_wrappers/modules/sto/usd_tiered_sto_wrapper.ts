@@ -312,6 +312,7 @@ interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
 interface BuyWithPOLYParams extends TxParams {
   beneficiary: string;
   investedPOLY: BigNumber;
+  from: string;
 }
 
 interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
@@ -322,6 +323,7 @@ interface BuyWithUSDParams extends TxParams {
   beneficiary: string;
   investedSC: BigNumber;
   usdToken: string;
+  from: string;
 }
 
 interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
@@ -516,8 +518,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       value: params.value,
       from: params.from,
     };
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
-    // TODO we cannot verify the buyTokens method previous status
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
     return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
@@ -527,9 +528,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
-    // TODO we cannot verify the buyTokens method previous status
-    // TODO transferFrom
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
     return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -540,8 +539,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
-    // TODO we cannot verify the buyTokens method previous status
-    // TODO transferFrom
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
     return (await this.contract).buyWithUSDRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -565,7 +563,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       investorAddress: params.beneficiary,
     });
     const minimumInvestmentUSD = await this.minimumInvestmentUSD();
-    assert.assert(investedUSD.add(investorInvestedUSD).gte(minimumInvestmentUSD), 'investment < minimumInvestmentUSD');
+    assert.assert(investedUSD.plus(investorInvestedUSD).gte(minimumInvestmentUSD), 'investment < minimumInvestmentUSD');
     const investor = await this.investors({
       investorAddress: params.beneficiary,
     });
@@ -758,7 +756,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   public finalize = async (params: TxParams) => {
     const isFinalized = await this.isFinalized();
     assert.assert(!isFinalized, 'STO is finalized');
-    // TODO minting assert
+    // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -900,6 +898,16 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       typedResult.push(accreditedData);
     }
     return typedResult;
+  };
+
+  private buyWithTokens = async (beneficiary: string, from: string, minTokens: BigNumber) => {
+    assert.isETHAddressHex('beneficiary', beneficiary);
+    const allowBeneficialInvestments = await this.allowBeneficialInvestments();
+    if (!allowBeneficialInvestments) {
+      assert.assert(beneficiary === from, 'Beneficiary != funder');
+    }
+    const getTokensMinted = await this.getTokensMinted();
+    assert.assert((await this.getTokensMinted()).minus(getTokensMinted).gte(minTokens), 'Insufficient minted');
   };
 
   /**
