@@ -2,7 +2,12 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenRegistryContract, PolyTokenEvents, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
+import {
+  SecurityTokenRegistryContract,
+  PolyTokenEvents,
+  SecurityTokenContract,
+  DetailedERC20Contract,
+} from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -16,12 +21,14 @@ describe('SecurityTokenRegistryWrapper', () => {
   let mockedContract: SecurityTokenRegistryContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedDetailedERC20Contract: DetailedERC20Contract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(SecurityTokenRegistryContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedDetailedERC20Contract = mock(DetailedERC20Contract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenRegistryWrapper(
@@ -346,13 +353,38 @@ describe('SecurityTokenRegistryWrapper', () => {
 
     test('should call to registerTicker with given owner', async () => {
       const ticker = 'TICK';
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+
+      // Get Ticker Details
       const expectedTickerDetailsResult = ['', new BigNumber(0), new BigNumber(0), '', false];
-      // Mocked method
       const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
-      // Stub the method
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
-      // Stub the request
       when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get ticker registration fee
+      const expectedTickerRegistrationFeeResult = new BigNumber(10);
+      const mockedTickerRegistrationFeeMethod = mock(MockedCallMethod);
+      when(mockedContract.getTickerRegistrationFee).thenReturn(instance(mockedTickerRegistrationFeeMethod));
+      when(mockedTickerRegistrationFeeMethod.callAsync()).thenResolve(expectedTickerRegistrationFeeResult);
+
+      // Get Security Token Address
+      const expectedSTAddressResult = '0x2222222222222222222222222222222222222222';
+      const mockedSTAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedSTAddressMethod));
+      when(mockedSTAddressMethod.callAsync(ticker)).thenResolve(expectedSTAddressResult);
+
+      // Get ERC20 Allowance
+      const erc20Allowance = new BigNumber(100);
+      when(mockedContractFactory.getDetailedERC20Contract(expectedSTAddressResult)).thenResolve(
+        instance(mockedDetailedERC20Contract),
+      );
+      const mockedERC20AllowanceMethod = mock(MockedCallMethod);
+      when(mockedERC20AllowanceMethod.callAsync(expectedOwnerResult, expectedSTAddressResult)).thenResolve(
+        erc20Allowance,
+      );
+      when(mockedDetailedERC20Contract.allowance).thenReturn(instance(mockedERC20AllowanceMethod));
 
       const owner = '0x0123456789012345678901234567890123456789';
       const tokenName = 'TICKER';
@@ -364,11 +396,9 @@ describe('SecurityTokenRegistryWrapper', () => {
         safetyFactor: 10,
       };
       const expectedResult = getMockedPolyResponse();
-      // Mocked method
       const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
       when(mockedContract.registerTicker).thenReturn(instance(mockedMethod));
-      // Stub the request
+
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.owner,
@@ -396,6 +426,9 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.getTickerRegistrationFee).once();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedDetailedERC20Contract.allowance).once();
     });
   });
 
@@ -415,7 +448,7 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       // Setup mocked owner from security token registry with expectedTickerDetailsResult status = true
       when(mockedContractFactory.getSecurityTokenContract(securityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(newOwner);
@@ -487,13 +520,36 @@ describe('SecurityTokenRegistryWrapper', () => {
         'ticker',
         false,
       ];
-      // Mocked method
+
       const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
-      // Stub the method
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
-      // Stub the request
       when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get Security token launch fee
+      const expectedLaunchFeeResult = new BigNumber(10);
+      const mockedLaunchFeeMethod = mock(MockedCallMethod);
+      when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedLaunchFeeMethod));
+      when(mockedLaunchFeeMethod.callAsync()).thenResolve(expectedLaunchFeeResult);
+
+      // Get Security Token Address
+      const expectedSTAddressResult = '0x2222222222222222222222222222222222222222';
+      const mockedSTAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedSTAddressMethod));
+      when(mockedSTAddressMethod.callAsync(ticker)).thenResolve(expectedSTAddressResult);
+
+      // Get ERC20 Allowance
+      const erc20Allowance = new BigNumber(100);
+      when(mockedContractFactory.getDetailedERC20Contract(expectedSTAddressResult)).thenResolve(
+        instance(mockedDetailedERC20Contract),
+      );
+      const mockedERC20AllowanceMethod = mock(MockedCallMethod);
+      when(mockedERC20AllowanceMethod.callAsync(expectedOwnerResult, expectedSTAddressResult)).thenResolve(
+        erc20Allowance,
+      );
+      when(mockedDetailedERC20Contract.allowance).thenReturn(instance(mockedERC20AllowanceMethod));
+
       const name = 'Security';
       const details = 'Token Details';
       const divisible = true;
@@ -540,6 +596,9 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.getSecurityTokenLaunchFee).once();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedDetailedERC20Contract.allowance).twice();
     });
   });
 
