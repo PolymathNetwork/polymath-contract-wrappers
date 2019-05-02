@@ -12,7 +12,7 @@ import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array } from '../../../utils/convert';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
 describe('SecurityTokenRegistryWrapper', () => {
   // Declare PolyMathRegistryWrapper object

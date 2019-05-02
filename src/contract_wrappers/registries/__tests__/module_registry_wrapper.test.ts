@@ -8,7 +8,6 @@ import {
   FeatureRegistryContract,
   ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import { Features, ModuleType } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import ModuleRegistryWrapper from '../module_registry_wrapper';
@@ -19,6 +18,7 @@ import {
   bytes32ArrayToStringArray,
   bytes32ToString,
 } from '../../../utils/convert';
+import {MockedCallMethod, MockedSendMethod, getMockedPolyResponse} from '../../../test_utils/mocked_methods';
 
 describe('ModuleRegistryWrapper', () => {
   // Declare PolyMathRegistryWrapper object

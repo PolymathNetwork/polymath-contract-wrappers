@@ -26,6 +26,8 @@ import ContractFactory from '../../../factories/contractFactory';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 
+const EXCLUDED_ADDRESS_LIMIT = 150;
+
 interface EtherDividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: EtherDividendCheckpointEvents.EtherDividendDeposited;
   callback: EventCallback<EtherDividendCheckpointEtherDividendDepositedEventArgs>;
@@ -321,20 +323,23 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     checkpointId?: number,
     excluded?: string[],
   ) => {
-    // TODO get EXCLUDED_ADDRESS_LIMIT from contract
     let auxExcluded = excluded;
     if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
       assert.isAddressArrayNotZero(auxExcluded);
-      // TODO duped exclude address
+      // we need to simulate push to verify the `duped exclude address` assert
     }
     const auxValue = value === undefined ? new BigNumber(0) : value;
-    assert.assert(auxExcluded.length <= 150, 'Too many addresses excluded');
+    assert.assert(auxExcluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');
     assert.assert(auxValue.gt(new BigNumber(0)), 'No dividend sent');
-    // TODO check allowance
+    if (typeof checkpointId !== 'undefined') {
+      const st = await this.securityTokenContract();
+      const currentCheckpointId = await st.currentCheckpointId.callAsync();
+      assert.assert(new BigNumber(checkpointId).lte(currentCheckpointId), 'Invalid checkpoint');
+    }
     assert.assert(name.length > 0, 'The name can not be empty');
   };
 

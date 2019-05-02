@@ -4,6 +4,8 @@ import assert from '../../../utils/assert';
 import { TxParams, DividendCheckpointBaseContract } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 
+const EXCLUDED_ADDRESS_LIMIT = 150;
+
 interface DividendIndexParams {
   dividendIndex: number;
 }
@@ -196,7 +198,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     assert.isAddressNotZero(params.tokenContract);
-    // TODO check user balance before transfer
+    // require(token.transfer(msg.sender, balance), "Transfer failed");
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -223,8 +225,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
-    // TODO get EXCLUDED_ADDRESS_LIMIT from contract
-    assert.assert(params.excluded.length <= 150, 'Too many excluded addresses');
+    assert.assert(params.excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many excluded addresses');
     assert.isETHAddressHexArray('excluded', params.excluded);
     assert.isAddressArrayNotZero(params.excluded);
     assert.checkDuplicateAddresses(params.excluded);
@@ -399,7 +400,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public getCheckpointData = async (params: CheckpointIdParams) => {
-    // TODO verify invalid checkpoint
+    const st = await this.securityTokenContract();
+    const currentCheckpointId = await st.currentCheckpointId.callAsync();
+    assert.assert(new BigNumber(params.checkpointId).lte(currentCheckpointId), 'Invalid checkpoint');
     const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
     const typedResult: CheckpointData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {

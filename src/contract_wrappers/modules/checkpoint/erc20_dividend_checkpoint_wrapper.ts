@@ -21,6 +21,8 @@ import ContractFactory from '../../../factories/contractFactory';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 
+const EXCLUDED_ADDRESS_LIMIT = 150;
+
 interface ERC20DividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ERC20DividendCheckpointEvents.ERC20DividendDeposited;
   callback: EventCallback<ERC20DividendCheckpointERC20DividendDepositedEventArgs>;
@@ -235,21 +237,19 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     name: string,
     excluded?: string[],
   ) => {
-    // TODO get EXCLUDED_ADDRESS_LIMIT from contract
     let auxExcluded = excluded;
     if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
       assert.isAddressArrayNotZero(auxExcluded);
-      // TODO duped exclude address
+      // we need to simulate push to verify the `duped exclude address` assert
     }
-    assert.assert(auxExcluded.length <= 150, 'Too many addresses excluded');
+    assert.assert(auxExcluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');
     assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
     assert.isETHAddressHex('token', token);
     assert.isAddressNotZero(token);
-    // TODO check allowance
     assert.assert(name.length > 0, 'The name can not be empty');
   };
 
