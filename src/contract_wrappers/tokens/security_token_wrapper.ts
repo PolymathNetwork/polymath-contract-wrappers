@@ -773,7 +773,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.FreezeMintingAllowed),
       'FreezeMintingAllowed Feature Status not enabled',
     );
-    assert.assert(!(await this.mintingFrozen()), 'Transfers already frozen');
+    assert.assert(!(await this.mintingFrozen()), 'Minting already frozen');
     assert.assert(
       (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
       'Msg sender must be owner',
@@ -811,6 +811,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public mintMulti = async (params: MintMultiParams) => {
     assert.isETHAddressHexArray('investors', params.investors);
     assert.isAddressArrayNotZero(params.investors);
+    assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     await this.checkOnlyOwner();
     assert.assert(
       params.investors.length === params.values.length,
