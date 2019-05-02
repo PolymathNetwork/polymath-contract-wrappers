@@ -175,6 +175,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const allowBeneficialInvestments = await this.allowBeneficialInvestments();
     assert.assert(allowBeneficialInvestments !== params.allowBeneficialInvestments, 'Does not change value');
     return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(

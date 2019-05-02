@@ -159,6 +159,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Changes the contract address
    */
   public changeAddress = async (params: ChangeAddressParams) => {
+    await this.checkMsgSenderIsOwner();
     assert.isETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).changeAddress.sendTransactionAsync(
       params.nameKey,
@@ -166,6 +167,17 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  private checkMsgSenderIsOwner = async () => {
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+  };
+
+  public owner = async () => {
+    return (await this.contract).owner.callAsync();
   };
 
   /**
