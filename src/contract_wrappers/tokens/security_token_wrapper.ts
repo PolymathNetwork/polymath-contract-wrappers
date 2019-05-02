@@ -53,6 +53,7 @@ import {
   ModuleType,
   FundRaiseType,
   ModuleName,
+  Features,
 } from '../../types';
 import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
 
@@ -752,7 +753,15 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public freezeMinting = async (params: TxParams) => {
+    assert.assert(
+      await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.FreezeMintingAllowed),
+      'FreezeMintingAllowed Feature Status not enabled',
+    );
     assert.assert(!(await this.mintingFrozen()), 'Transfers already frozen');
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
     return (await this.contract).freezeMinting.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -1097,6 +1106,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    assert.assert(params.value.modulo(await this.granularity()).isEqualTo(new BigNumber(0)), 'Invalid granularity');
     return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
   };
 
