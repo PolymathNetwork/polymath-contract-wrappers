@@ -101,6 +101,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
+  public owner = async () => {
+    return (await this.contract).owner.callAsync();
+  };
+
   /**
    * Get the status of a feature
    * @return bool
@@ -113,7 +117,11 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
-    const currentStatus = await this.getFeatureStatus({nameKey: params.nameKey});
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+    const currentStatus = await this.getFeatureStatus({ nameKey: params.nameKey });
     assert.assert(currentStatus !== params.newStatus, 'FeatureStatus must change');
     return (await this.contract).setFeatureStatus.sendTransactionAsync(
       params.nameKey,
