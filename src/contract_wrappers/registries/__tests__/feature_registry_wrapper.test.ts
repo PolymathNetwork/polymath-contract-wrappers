@@ -98,6 +98,16 @@ describe('FeatureRegistryWrapper', () => {
 
     describe('SetFeatureStatus', () => {
       test('should send the transaction to set the feature status', async () => {
+        // Owner Address expected
+        const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+        // Mocked method
+        const mockedOwnerMethod = mock(MockedCallMethod);
+        // Stub the method
+        when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+        // Stub the request
+        when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+        // Mock web3 wrapper owner
+        when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
         // Address expected
         const currentFeatureStatus = false;
         // Feature name requested
@@ -147,6 +157,8 @@ describe('FeatureRegistryWrapper', () => {
           ),
         ).once();
         verify(mockedContract.getFeatureStatus).once();
+        verify(mockedContract.owner).once();
+        verify(mockedOwnerMethod.callAsync()).once();
       });
     });
   });
