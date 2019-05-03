@@ -427,6 +427,12 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call to registerTicker with given owner', async () => {
       const ticker = 'TICK';
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
 
       // Get Ticker Details
       const expectedTickerDetailsResult = ['', new BigNumber(0), new BigNumber(0), '', false];
@@ -502,6 +508,10 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedContract.getSecurityTokenAddress).once();
       verify(mockedDetailedERC20Contract.allowance).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      // Owner == web3wrapper default address, dont need to check isPaused here
+      verify(mockedContract.isPaused).never();
     });
   });
 
@@ -510,6 +520,13 @@ describe('SecurityTokenRegistryWrapper', () => {
 
     test('should call to transferTickerOwnership', async () => {
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
       const securityTokenAddress = '0x5555555555555555555555555555555555555555';
       const newOwner = '0x2222222222222222222222222222222222222222';
       const ticker = 'TICK';
@@ -579,6 +596,10 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      // Owner == web3wrapper default address, dont need to check isPaused here
+      verify(mockedContract.isPaused).never();
     });
   });
 
@@ -586,6 +607,13 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call to GenerateSecurityToken', async () => {
       const ticker = 'TICK';
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
       const expectedTickerDetailsResult = [
         '0x0123456789012345678901234567890123456789',
         new BigNumber(1735689600),
@@ -672,6 +700,10 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getSecurityTokenLaunchFee).once();
       verify(mockedContract.getSecurityTokenAddress).once();
       verify(mockedDetailedERC20Contract.allowance).twice();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      // Owner == web3wrapper default address, dont need to check isPaused here
+      verify(mockedContract.isPaused).never();
     });
   });
 
