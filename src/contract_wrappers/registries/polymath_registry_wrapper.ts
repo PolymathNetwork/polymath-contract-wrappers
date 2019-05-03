@@ -183,10 +183,6 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public owner = async () => {
-    return (await this.contract).owner.callAsync();
-  };
-
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
