@@ -328,6 +328,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
+    await this.checkMsgSenderIsOwner();
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -336,20 +337,26 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    await this.checkMsgSenderIsOwner();
+    assert.assert(!(await this.isPaused()), 'Contract is paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
+    await this.checkMsgSenderIsOwner();
+    assert.assert(!(await this.isPaused()), 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public updateFromRegistry = async (params: TxParams) => {
+    await this.checkMsgSenderIsOwner();
     return (await this.contract).updateFromRegistry.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
     assert.isAddressNotZero(params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
+    await this.checkMsgSenderIsOwner();
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
