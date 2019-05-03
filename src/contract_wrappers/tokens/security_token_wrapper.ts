@@ -487,7 +487,7 @@ interface CountTransferManagerData {
 }
 
 interface PercentageTransferManagerData {
-  maxHolderPercentage: number;
+  maxHolderPercentage: BigNumber;
   allowPrimaryIssuance: boolean;
 }
 
@@ -946,8 +946,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public disableController = async (params: TxParams) => {
     await this.checkOnlyOwner();
     assert.assert(
-        await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.DisableControllerAllowed),
-        'DisableControllerAllowed Feature Status not enabled',
+      await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.DisableControllerAllowed),
+      'DisableControllerAllowed Feature Status not enabled',
     );
     await this.checkControllerEnabled();
     return (await this.contract).disableController.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -998,9 +998,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
+    const maxCost = params.maxCost === undefined ? new BigNumber(0) : params.maxCost;
+    const budget = params.budget === undefined ? new BigNumber(0) : params.budget;
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
+    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
@@ -1060,8 +1062,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       data,
-      params.maxCost === undefined ? new BigNumber(0) : params.maxCost,
-      params.budget === undefined ? new BigNumber(0) : params.budget,
+      maxCost,
+      budget,
       params.txData,
       params.safetyFactor,
     );
@@ -1186,10 +1188,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkMsgSenderIsController = async() => {
+  private checkMsgSenderIsController = async () => {
     assert.assert(
-        (await this.controller()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-        'Msg sender must be controller',
+      (await this.controller()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be controller',
     );
-  }
+  };
 }
