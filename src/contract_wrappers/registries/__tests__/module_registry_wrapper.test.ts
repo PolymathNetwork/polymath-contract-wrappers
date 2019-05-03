@@ -647,6 +647,15 @@ describe('ModuleRegistryWrapper', () => {
 
   describe('Pause/Unpause', () => {
     test('should call to pause', async () => {
+      // Pause Result expected
+      const expectedPauseResult = false;
+      // Mocked method
+      const mockedPauseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isPaused).thenReturn(instance(mockedPauseMethod));
+      // Stub the request
+      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
+
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Mocked method
@@ -682,9 +691,20 @@ describe('ModuleRegistryWrapper', () => {
 
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.isPaused).once();
+      verify(mockedPauseMethod.callAsync()).once();
     });
 
     test('should call to unpause', async () => {
+      // Pause Result expected
+      const expectedPauseResult = true;
+      // Mocked method
+      const mockedPauseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isPaused).thenReturn(instance(mockedPauseMethod));
+      // Stub the request
+      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
+
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Mocked method
@@ -720,6 +740,8 @@ describe('ModuleRegistryWrapper', () => {
 
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.isPaused).once();
+      verify(mockedPauseMethod.callAsync()).once();
     });
 
     test('should call to isPaused', async () => {
