@@ -603,6 +603,17 @@ describe('ModuleRegistryWrapper', () => {
     test.todo('should fail as tokenContract is not an Eth address');
 
     test('should call to reclaim ERC20 tokens', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
       const tokenContract = '0x0123456789012345678901234567890123456789';
       const mockedParams = {
         tokenContract,
@@ -629,11 +640,23 @@ describe('ModuleRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
   });
 
   describe('Pause/Unpause', () => {
     test('should call to pause', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const mockedParams = {
         txData: {},
         safetyFactor: 10,
@@ -656,9 +679,22 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.pause).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
 
     test('should call to unpause', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const mockedParams = {
         txData: {},
         safetyFactor: 10,
@@ -681,6 +717,9 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.unpause).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
 
     test('should call to isPaused', async () => {
@@ -705,6 +744,16 @@ describe('ModuleRegistryWrapper', () => {
 
   describe('UpdateFromRegistry', () => {
     test('should call to updateFromRegistry', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const mockedParams = {
         txData: {},
         safetyFactor: 10,
@@ -727,6 +776,9 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.updateFromRegistry).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
   });
 
@@ -734,6 +786,16 @@ describe('ModuleRegistryWrapper', () => {
     test.todo('should fail as newOwner is not an Eth address');
 
     test('should call to transfer ownership', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const newOwner = '0x0123456789012345678901234567890123456789';
       const mockedParams = {
         newOwner,
@@ -758,25 +820,28 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.transferOwnership).once();
       verify(mockedMethod.sendTransactionAsync(newOwner, mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
 
     test('should call owner', async () => {
       // Owner Address expected
-      const expectedResult = '0x0123456789012345678901234567890123456789';
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedOwnerMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.owner).thenReturn(instance(mockedMethod));
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
       // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
 
       // Real call
       const result = await target.owner();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(expectedOwnerResult);
       // Verifications
       verify(mockedContract.owner).once();
-      verify(mockedMethod.callAsync()).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
   });
 
