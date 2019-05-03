@@ -24,6 +24,7 @@ import {
   SecurityTokenOwnershipTransferredEventArgs,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
   SecurityToken,
@@ -38,7 +39,6 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
@@ -436,34 +436,75 @@ interface ForceBurnParams extends TxParams {
 }
 
 interface AddModuleParams extends TxParams {
+  moduleName: ModuleName;
   address: string;
-  maxCost: BigNumber;
-  budget: BigNumber;
+  maxCost?: BigNumber;
+  budget?: BigNumber;
+  data?:
+    | CountTransferManagerData
+    | PercentageTransferManagerData
+    | DividendCheckpointData
+    | CappedSTOData
+    | USDTieredSTOData;
+}
+
+interface AddNoDataModuleParams extends AddModuleParams {
+  moduleName:
+    | ModuleName.GeneralPermissionManager
+    | ModuleName.GeneralTransferManager
+    | ModuleName.ManualApprovalTransferManager
+    | ModuleName.VolumeRestrictionTM;
+  data?: undefined;
 }
 
 interface AddCountTransferManagerParams extends AddModuleParams {
-  maxHolderCount: number;
+  moduleName: ModuleName.CountTransferManager;
+  data: CountTransferManagerData;
 }
 
 interface AddPercentageTransferManagerParams extends AddModuleParams {
+  moduleName: ModuleName.PercentageTransferManager;
+  data: PercentageTransferManagerData;
+}
+
+interface AddDividendCheckpointParams extends AddModuleParams {
+  moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
+  data: DividendCheckpointData;
+}
+
+interface AddCappedSTOParams extends AddModuleParams {
+  moduleName: ModuleName.CappedSTO;
+  data: CappedSTOData;
+}
+
+interface AddUSDTieredSTOParams extends AddModuleParams {
+  moduleName: ModuleName.USDTieredSTO;
+  data: USDTieredSTOData;
+}
+
+interface CountTransferManagerData {
+  maxHolderCount: number;
+}
+
+interface PercentageTransferManagerData {
   maxHolderPercentage: number;
   allowPrimaryIssuance: boolean;
 }
 
-interface AddErc20DividendCheckpointParams extends AddModuleParams {
+interface DividendCheckpointData {
   wallet: string;
 }
 
-interface AddCappedSTOParams extends AddModuleParams {
-  startTime: number;
-  endTime: number;
+interface CappedSTOData {
+  startTime: Date;
+  endTime: Date;
   cap: BigNumber;
   rate: BigNumber;
   fundRaiseTypes: FundRaiseType[];
   fundsReceiver: string;
 }
 
-interface AddUSDTieredSTOParams extends AddModuleParams {
+interface USDTieredSTOData {
   startTime: Date;
   endTime: Date;
   ratePerTier: BigNumber[];
@@ -478,8 +519,13 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
   usdTokens: string[];
 }
 
-interface AddEtherDividendCheckpointParams extends AddModuleParams {
-  wallet: string;
+interface AddModuleInterface {
+  (params: AddCountTransferManagerParams): Promise<PolyResponse>;
+  (params: AddPercentageTransferManagerParams): Promise<PolyResponse>;
+  (params: AddDividendCheckpointParams): Promise<PolyResponse>;
+  (params: AddCappedSTOParams): Promise<PolyResponse>;
+  (params: AddUSDTieredSTOParams): Promise<PolyResponse>;
+  (params: AddNoDataModuleParams): Promise<PolyResponse>;
 }
 
 // // Return types ////
@@ -951,174 +997,71 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).getModulesByType.callAsync(params.type);
   };
 
-  public addCountTransferManager = async (params: AddCountTransferManagerParams) => {
+  public addModule: AddModuleInterface = async (params: AddModuleParams) => {
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner();
     await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(CountTransferManager.abi);
-    const data = iface.functions.configure.encode([params.maxHolderCount]);
+    let iface: ethers.utils.Interface;
+    let data: string;
+    switch (params.moduleName) {
+      case ModuleName.CountTransferManager:
+        iface = new ethers.utils.Interface(CountTransferManager.abi);
+        data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
+        break;
+      case ModuleName.PercentageTransferManager:
+        iface = new ethers.utils.Interface(PercentageTransferManager.abi);
+        data = iface.functions.configure.encode([
+          (params.data as PercentageTransferManagerData).maxHolderPercentage,
+          (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
+        ]);
+        break;
+      case ModuleName.CappedSTO:
+        iface = new ethers.utils.Interface(CappedSTO.abi);
+        data = iface.functions.configure.encode([
+          dateToBigNumber((params.data as CappedSTOData).startTime),
+          dateToBigNumber((params.data as CappedSTOData).endTime),
+          (params.data as CappedSTOData).cap,
+          (params.data as CappedSTOData).rate,
+          (params.data as CappedSTOData).fundRaiseTypes,
+          (params.data as CappedSTOData).fundsReceiver,
+        ]);
+        break;
+      case ModuleName.USDTieredSTO:
+        iface = new ethers.utils.Interface(USDTieredSTO.abi);
+        data = iface.functions.configure.encode([
+          dateToBigNumber((params.data as USDTieredSTOData).startTime),
+          dateToBigNumber((params.data as USDTieredSTOData).endTime),
+          (params.data as USDTieredSTOData).ratePerTier,
+          (params.data as USDTieredSTOData).ratePerTierDiscountPoly,
+          (params.data as USDTieredSTOData).tokensPerTierTotal,
+          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly,
+          (params.data as USDTieredSTOData).nonAccreditedLimitUSD,
+          (params.data as USDTieredSTOData).minimumInvestmentUSD,
+          (params.data as USDTieredSTOData).fundRaiseTypes,
+          (params.data as USDTieredSTOData).wallet,
+          (params.data as USDTieredSTOData).reserveWallet,
+          (params.data as USDTieredSTOData).usdTokens,
+        ]);
+        break;
+      case ModuleName.ERC20DividendCheckpoint:
+        iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
+        break;
+      case ModuleName.EtherDividendCheckpoint:
+        iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
+        break;
+      default:
+        data = NO_MODULE_DATA;
+        break;
+    }
+
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
       data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addPercentageTransferManager = async (params: AddPercentageTransferManagerParams) => {
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(PercentageTransferManager.abi);
-    const data = iface.functions.configure.encode([params.maxHolderPercentage, params.allowPrimaryIssuance]);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addErc20DividendCheckpoint = async (params: AddErc20DividendCheckpointParams) => {
-    assert.isETHAddressHex('address', params.address);
-    assert.isETHAddressHex('address', params.wallet);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
-    const data = iface.functions.configure.encode([params.wallet]);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addGeneralPermissionManager = async (params: AddModuleParams) => {
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      NO_MODULE_DATA,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addCappedSTO = async (params: AddCappedSTOParams) => {
-    assert.isETHAddressHex('fundsReceiver', params.fundsReceiver);
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(CappedSTO.abi);
-    const data = iface.functions.configure.encode([
-      params.startTime,
-      params.endTime,
-      params.cap,
-      params.rate,
-      params.fundRaiseTypes,
-      params.fundsReceiver,
-    ]);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addUSDTieredSTO = async (params: AddUSDTieredSTOParams) => {
-    assert.isETHAddressHex('address', params.address);
-    assert.isETHAddressHex('wallet', params.wallet);
-    assert.isETHAddressHex('reserveWallet', params.reserveWallet);
-    assert.isETHAddressHexArray('usdTokens', params.usdTokens);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(USDTieredSTO.abi);
-    const data = iface.functions.configure.encode([
-      dateToBigNumber(params.startTime),
-      dateToBigNumber(params.endTime),
-      params.ratePerTier,
-      params.ratePerTierDiscountPoly,
-      params.tokensPerTierTotal,
-      params.tokensPerTierDiscountPoly,
-      params.nonAccreditedLimitUSD,
-      params.minimumInvestmentUSD,
-      params.fundRaiseTypes,
-      params.wallet,
-      params.reserveWallet,
-      params.usdTokens,
-    ]);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addEtherDividendCheckpoint = async (params: AddEtherDividendCheckpointParams) => {
-    assert.isETHAddressHex('address', params.address);
-    assert.isETHAddressHex('wallet', params.wallet);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    const iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
-    const data = iface.functions.configure.encode([params.wallet]);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      data,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addManualApprovalTransferManager = async (params: AddModuleParams) => {
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      NO_MODULE_DATA,
-      params.maxCost,
-      params.budget,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public addGeneralTransferManager = async (params: AddModuleParams) => {
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner();
-    await this.checkModuleCostBelowMaxCost(params.address, params.maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    return (await this.contract).addModule.sendTransactionAsync(
-      params.address,
-      NO_MODULE_DATA,
-      params.maxCost,
-      params.budget,
+      params.maxCost === undefined ? new BigNumber(0) : params.maxCost,
+      params.budget === undefined ? new BigNumber(0) : params.budget,
       params.txData,
       params.safetyFactor,
     );
@@ -1168,7 +1111,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.indexFilterValues,
       SecurityToken.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
