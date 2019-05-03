@@ -467,6 +467,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const allowBeneficialInvestments = await this.allowBeneficialInvestments();
     assert.assert(params.allowBeneficialInvestments !== allowBeneficialInvestments, 'The value must be different');
     return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(
@@ -754,6 +755,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Reserve address must be whitelisted to successfully finalize
    */
   public finalize = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const isFinalized = await this.isFinalized();
     assert.assert(!isFinalized, 'STO is finalized');
     // we can't execute mint to validate the method
@@ -764,6 +766,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies the list of accredited addresses
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHexArray('investors', params.investors);
     assert.assert(params.investors.length === params.accredited.length, 'Array mismatch');
     return (await this.contract).changeAccredited.sendTransactionAsync(
@@ -778,6 +781,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies the list of overrides for non-accredited limits in USD
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHexArray('investors', params.investors);
     assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array mismatch');
     return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
@@ -792,6 +796,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies STO start and end times
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const startTime = await this.startTime();
     const now = new Date();
     assert.assert(now < bigNumberToDate(startTime), 'STO already started');
@@ -808,6 +813,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies max non accredited invets limit and overall minimum investment limit
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const startTime = await this.startTime();
     assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
     return (await this.contract).modifyLimits.sendTransactionAsync(
@@ -822,6 +828,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies fund raise types
    */
   public modifyFunding = async (params: ModifyFundingParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const startTime = await this.startTime();
     assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
     return (await this.contract).modifyFunding.sendTransactionAsync(
@@ -835,6 +842,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHexArray('usdToken', params.usdTokens);
     assert.isETHAddressHex('wallet', params.wallet);
     assert.isETHAddressHex('reserveWallet', params.reserveWallet);
@@ -853,6 +861,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
   public modifyTiers = async (params: ModifyTiersParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const startTime = await this.startTime();
     assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
     assert.assert(params.tokensPerTierTotal.length > 0, 'No tiers provided');

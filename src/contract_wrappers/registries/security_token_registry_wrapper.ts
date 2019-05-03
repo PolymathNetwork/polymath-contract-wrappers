@@ -604,6 +604,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
+    await this.checkOnlyOwner();
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
     assert.assert(params.name.length > 0, 'Name is empty');
     assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
@@ -636,6 +637,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
+    await this.checkOnlyOwner();
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isAddressNotZero(params.newOwner);
     await this.checkOnlyOwner();
@@ -696,6 +698,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Reclaims all ERC20Basic compatible tokens
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    await this.checkOnlyOwner();
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     assert.isAddressNotZero(params.tokenContract);
     await this.checkOnlyOwner();
@@ -741,6 +744,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the PolyToken address. Only Polymath.
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
+    await this.checkOnlyOwner();
     assert.isETHAddressHex('newAddress', params.newAddress);
     assert.isAddressNotZero(params.newAddress);
     await this.checkOnlyOwner();

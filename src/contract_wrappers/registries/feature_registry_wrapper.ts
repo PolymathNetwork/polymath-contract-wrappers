@@ -147,6 +147,17 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     return (await this.contract).getFeatureStatus.callAsync(Features.FreezeMintingAllowed);
   };
 
+  private checkMsgSenderIsOwner = async () => {
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
+  };
+
+  public owner = async () => {
+    return (await this.contract).owner.callAsync();
+  };
+
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe

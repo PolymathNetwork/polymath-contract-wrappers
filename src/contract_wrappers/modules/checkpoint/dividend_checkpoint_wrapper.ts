@@ -188,14 +188,17 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     assert.isAddressNotZero(params.tokenContract);
     // require(token.transfer(msg.sender, balance), "Transfer failed");
@@ -207,10 +210,12 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public reclaimETH = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public changeWallet = async (params: ChangeWalletParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('wallet', params.wallet);
     assert.isAddressNotZero(params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
@@ -338,6 +343,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public updateDividendDates = async (params: UpdateDividendDatesParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     const dividendsData = await (await this.contract).getDividendsData.callAsync();
     assert.assert(params.dividendIndex < dividendsData[0].length, 'Invalid dividend');
     assert.assert(params.expiry > params.maturity, 'Expiry before maturity');
