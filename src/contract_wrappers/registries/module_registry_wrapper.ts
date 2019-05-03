@@ -23,6 +23,7 @@ import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import {
   EventCallback,
+  Features,
   GetLogs,
   GetLogsAsyncParams,
   ModuleType,
@@ -188,6 +189,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Instantiate ModuleRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -200,13 +202,29 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public registerModule = async (params: ModuleFactoryParams) => {
-    // TODO Check if msg.sender is module factory owner or registry curator
-
-    await this.checkModuleNotPaused();
-    await this.checkMsgSenderIsOwner();
-    await this.checkModuleNotRegistered(params.moduleFactory);
-    // TODO Factory must have a module type
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
+    await this.checkModuleNotPausedOrOwner();
+    await this.checkModuleNotRegistered(params.moduleFactory);
+    const callerAddress = await this.getCallerAddress(undefined);
+    const owner = await this.owner();
+    if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+      const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
+      assert.assert(
+        callerAddress === owner || callerAddress === factoryOwner,
+        'Calling address must be owner or factory owner with custom modules allowed feature status',
+      );
+    } else {
+      assert.assert(
+        callerAddress === owner,
+        'Calling address must be owner without custom modules allowed feature status',
+      );
+    }
+    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync();
+    // Check for duplicates
+    if (getTypesResult.length > 1) {
+      assert.assert(getTypesResult.length === new Set(getTypesResult).size, 'Type mismatch');
+    }
+    assert.assert(getTypesResult.length > 0, 'Factory must have type');
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -215,13 +233,16 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public removeModule = async (params: ModuleFactoryParams) => {
-    // TODO Check if msg.sender is module factory owner or registry curator
-
-    await this.checkModuleNotPaused();
-    await this.checkMsgSenderIsOwner();
-    await this.checkModuleRegistered(params.moduleFactory);
-
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
+    await this.checkModuleNotPausedOrOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+    const callerAddress = await this.getCallerAddress(undefined);
+    const owner = await this.owner();
+    const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
+    assert.assert(
+      callerAddress === owner || callerAddress === factoryOwner,
+      'Calling address must be owner or factory owner ',
+    );
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -230,10 +251,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public verifyModule = async (params: VerifyModuleParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
-
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
       params.verified,
@@ -306,7 +326,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    // TODO Perhaps check that the transfer of erc20 tokens is possible on its contract
     assert.isAddressNotZero(params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -425,7 +444,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     assert.assert(!(await this.checkForRegisteredModule(moduleFactory)), 'Module is already registered');
   };
 
-  private checkModuleNotPaused = async () => {
-    assert.assert(!(await this.isPaused()), 'Contract should not be Paused');
+  private checkModuleNotPausedOrOwner = async () => {
+    assert.assert(
+      !(await this.isPaused()) || (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Contract should not be Paused',
+    );
   };
 }
