@@ -18,7 +18,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
@@ -172,6 +180,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividend = async (params: CreateDividendParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -185,6 +194,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -199,6 +209,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -215,6 +226,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     await this.sharedAsserts(params.expiry, params.maturity, params.amount, params.token, params.name, params.excluded);
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
