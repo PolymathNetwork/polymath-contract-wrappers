@@ -41,6 +41,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedSecurityTokenContract);
+    reset(mockedDetailedERC20Contract);
   });
 
   describe('Types', () => {
@@ -699,7 +701,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getTickerDetails).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
       verify(mockedContract.getSecurityTokenAddress).once();
-      verify(mockedDetailedERC20Contract.allowance).twice();
+      verify(mockedDetailedERC20Contract.allowance).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       // Owner == web3wrapper default address, dont need to check isPaused here

@@ -43,6 +43,8 @@ describe('ModuleRegistryWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedModuleFactoryContract);
+    reset(mockedFeatureRegistryContract);
   });
 
   describe('Types', () => {
@@ -218,7 +220,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.owner).once();
       verify(mockedContract.removeModule).once();
-      verify(mockedModuleFactoryContract.owner).twice();
+      verify(mockedModuleFactoryContract.owner).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
