@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// FeatureRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';

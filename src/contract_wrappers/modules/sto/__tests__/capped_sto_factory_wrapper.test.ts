@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// CappedSTOFactoryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -7,7 +7,7 @@ import { MockedCallMethod } from '../../../../test_utils/mocked_methods';
 import ContractWrapper from '../../../contract_wrapper';
 import CappedSTOFactoryWrapper from '../capped_sto_factory_wrapper';
 
-describe('FeatureRegistryWrapper', () => {
+describe('CappedSTOFactoryWrapper', () => {
   // Declare PolyMathRegistryWrapper object
   let target: CappedSTOFactoryWrapper;
   let mockedWrapper: Web3Wrapper;

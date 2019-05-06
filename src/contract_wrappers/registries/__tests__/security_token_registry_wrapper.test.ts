@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// SecurityTokenRegistryWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
