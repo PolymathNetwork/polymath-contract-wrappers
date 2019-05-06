@@ -95,7 +95,7 @@ export enum FundRaiseType {
 export enum Features {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
-  DisableControllerAllowed = 'disableControllerAllowed'
+  DisableControllerAllowed = 'disableControllerAllowed',
 }
 
 export enum PolymathContracts {
@@ -126,6 +126,11 @@ export enum Perms {
   Flags = 'FLAGS',
   Whitelist = 'WHITELIST',
   TransferApproval = 'TRANSFER_APPROVAL',
+  Checkpoint = 'CHECKPOINT',
+  Manage = 'MANAGE',
+  Distribute = 'DISTRIBUTE',
+  FeeAdmin = 'FEE_ADMIN',
+  PreSaleAdmin = 'PRE_SALE_ADMIN',
 }
 
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {

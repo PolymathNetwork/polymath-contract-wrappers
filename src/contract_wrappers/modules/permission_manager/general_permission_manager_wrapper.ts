@@ -20,7 +20,7 @@ import {
   EventCallback,
   GetLogs,
   Subscribe,
-  Perms
+  Perms,
 } from '../../../types';
 import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
 
@@ -154,6 +154,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public addDelegate = async (params: AddDelegateParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isAddressNotZero(params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
@@ -171,6 +172,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public deleteDelegate = async (params: DelegateTxParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isAddressNotZero(params.delegate);
     const delegate = await this.checkDelegate({
@@ -191,6 +193,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isAddressNotZero(params.delegate);
     assert.isETHAddressHex('module', params.module);
@@ -205,6 +208,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHexArray('module', params.modules);
     assert.isAddressNotZero(params.delegate);
