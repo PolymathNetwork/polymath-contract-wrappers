@@ -2,18 +2,18 @@ import {
   USDTieredSTOContract,
   USDTieredSTOEventArgs,
   USDTieredSTOEvents,
-  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
-  USDTieredSTOSetNonAccreditedLimitEventArgs,
-  USDTieredSTOSetAccreditedEventArgs,
-  USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOFundsReceivedEventArgs,
-  USDTieredSTOReserveTokenMintEventArgs,
-  USDTieredSTOSetAddressesEventArgs,
-  USDTieredSTOSetLimitsEventArgs,
-  USDTieredSTOSetTimesEventArgs,
-  USDTieredSTOSetTiersEventArgs,
-  USDTieredSTOSetFundRaiseTypesEventArgs,
   USDTieredSTOPauseEventArgs,
+  USDTieredSTOReserveTokenMintEventArgs,
+  USDTieredSTOSetAccreditedEventArgs,
+  USDTieredSTOSetAddressesEventArgs,
+  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
+  USDTieredSTOSetFundRaiseTypesEventArgs,
+  USDTieredSTOSetLimitsEventArgs,
+  USDTieredSTOSetNonAccreditedLimitEventArgs,
+  USDTieredSTOSetTiersEventArgs,
+  USDTieredSTOSetTimesEventArgs,
+  USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
@@ -25,13 +25,13 @@ import assert from '../../../utils/assert';
 import STOWrapper from './sto_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
   EventCallback,
-  Subscribe,
-  GetLogs,
   FundRaiseType,
+  GetLogs,
+  GetLogsAsyncParams,
+  Subscribe,
+  SubscribeAsyncParams,
+  TxParams,
 } from '../../../types';
 import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
@@ -484,6 +484,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       from: params.from,
     };
     assert.isETHAddressHex('beneficiary', params.beneficiary);
+    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.ETH);
     return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
       txPayableData,
@@ -493,6 +494,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
+    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.POLY);
     return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -504,6 +506,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   public buyWithUSD = async (params: BuyWithUSDParams) => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
+    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.StableCoin);
     return (await this.contract).buyWithUSD.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -519,7 +522,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       value: params.value,
       from: params.from,
     };
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.ETH);
     return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
@@ -529,7 +532,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.POLY);
     return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -540,7 +543,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens);
+    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.StableCoin);
     return (await this.contract).buyWithUSDRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -909,8 +912,33 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     return typedResult;
   };
 
-  private buyWithTokens = async (beneficiary: string, from: string, minTokens: BigNumber) => {
+  private buyWithTokens = async (
+    beneficiary: string,
+    from: string,
+    minTokens: BigNumber,
+    fundRaiseType: FundRaiseType,
+  ) => {
     assert.isETHAddressHex('beneficiary', beneficiary);
+    assert.assert(!(await this.paused()), 'Contract is Paused');
+    const stoDetails = await this.getSTODetails();
+    switch (fundRaiseType) {
+      case FundRaiseType.ETH: {
+        assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
+        break;
+      }
+      case FundRaiseType.POLY: {
+        assert.assert(stoDetails.isRaisedInETH, 'POLY Not Allowed');
+        break;
+      }
+      case FundRaiseType.StableCoin: {
+        assert.assert(stoDetails.isRaisedInETH, 'USD Not Allowed');
+        break;
+      }
+      default: {
+        assert.assert(false, 'Missing fundraise type');
+        break;
+      }
+    }
     const allowBeneficialInvestments = await this.allowBeneficialInvestments();
     if (!allowBeneficialInvestments) {
       assert.assert(beneficiary === from, 'Beneficiary != funder');

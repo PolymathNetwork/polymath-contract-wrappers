@@ -344,7 +344,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public unpause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
-    assert.assert(!(await this.isPaused()), 'Contract is already not paused');
+    assert.assert((await this.isPaused()), 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 

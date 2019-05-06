@@ -160,6 +160,10 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).wallet.callAsync();
   };
 
+  public paused = async () => {
+    return (await this.contract).paused.callAsync();
+  };
+
   public dividends = async (params: DividendIndexParams) => {
     const result = await (await this.contract).dividends.callAsync(numberToBigNumber(params.dividendIndex));
     const typedResult: Dividend = {
@@ -188,11 +192,13 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Contract currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert((await this.paused()), 'Contract currently not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -264,6 +270,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     assert.isETHAddressHexArray('payees', params.payees);
+    await this.checkValidDividendIndex(params.dividendIndex);
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.payees,
@@ -273,6 +280,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
+    await this.checkValidDividendIndex(params.dividendIndex);
     return (await this.contract).pushDividendPayment.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       dateToBigNumber(params.start),
@@ -283,6 +291,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pullDividendPayment = async (params: DividendIndexTxParams) => {
+    await this.checkValidDividendIndex(params.dividendIndex);
+    assert.assert(!(await this.paused()), 'Contract currently paused');
     const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
     const isClaimed = await this.isClaimed({
       investor: address,
@@ -435,4 +445,14 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.assert(params.dividendIndex < dividendsData[0].length, 'Invalid dividend');
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
+
+  private checkValidDividendIndex = async(dividendIndex: number) => {
+    const dividends = await this.getDividendsData();
+    assert.assert(dividends.length > dividendIndex, 'Invalid dividend');
+    const dividend = await this.getDividendData({dividendIndex});
+    // Reclaimed
+    assert.assert(!dividend.claimedAmount.isGreaterThan(0), 'Dividend claimed amount greater than 0, dividend reclaimed');
+    assert.assert(dividend.maturity <= new Date(), 'Dividend maturity in future');
+    assert.assert(dividend.expiry > new Date(), 'Dividend expiry in past');
+  }
 }

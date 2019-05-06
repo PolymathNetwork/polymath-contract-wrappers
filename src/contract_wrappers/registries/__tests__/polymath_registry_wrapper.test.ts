@@ -192,6 +192,16 @@ describe('PolyMathRegistryWrapper', () => {
     test.todo('should fail as newAddress is not an Eth address');
 
     test('should send the transaction to change the address for given params', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       // Mocked parameters
       const mockedParams = {
         nameKey: 'CustomName',
@@ -229,6 +239,9 @@ describe('PolyMathRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
     });
   });
 
