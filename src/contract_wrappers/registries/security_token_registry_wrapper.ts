@@ -612,7 +612,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isAddressNotZero(params.owner);
     assert.isETHAddressHex('securityToken', params.securityToken);
     assert.isAddressNotZero(params.securityToken);
-    await this.checkOnlyOwner();
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -640,7 +639,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     await this.checkOnlyOwner();
     assert.isETHAddressHex('newOwner', params.newOwner);
     assert.isAddressNotZero(params.newOwner);
-    await this.checkOnlyOwner();
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -701,7 +699,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     await this.checkOnlyOwner();
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     assert.isAddressNotZero(params.tokenContract);
-    await this.checkOnlyOwner();
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -747,7 +744,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     await this.checkOnlyOwner();
     assert.isETHAddressHex('newAddress', params.newAddress);
     assert.isAddressNotZero(params.newAddress);
-    await this.checkOnlyOwner();
     return (await this.contract).updatePolyTokenAddress.sendTransactionAsync(
       params.newAddress,
       params.txData,
