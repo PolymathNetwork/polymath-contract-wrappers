@@ -21,7 +21,6 @@ import {
 import {MockedCallMethod, MockedSendMethod, getMockedPolyResponse} from '../../../test_utils/mocked_methods';
 
 describe('ModuleRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: ModuleRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleRegistryContract;

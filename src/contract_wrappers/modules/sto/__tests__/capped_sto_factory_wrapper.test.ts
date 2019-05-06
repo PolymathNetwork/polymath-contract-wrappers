@@ -8,7 +8,6 @@ import ContractWrapper from '../../../contract_wrapper';
 import CappedSTOFactoryWrapper from '../capped_sto_factory_wrapper';
 
 describe('CappedSTOFactoryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: CappedSTOFactoryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOFactoryContract;

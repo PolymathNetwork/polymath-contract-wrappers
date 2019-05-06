@@ -15,7 +15,6 @@ import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array }
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
 describe('SecurityTokenRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: SecurityTokenRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: SecurityTokenRegistryContract;

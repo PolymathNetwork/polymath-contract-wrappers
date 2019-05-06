@@ -8,7 +8,6 @@ import ContractWrapper from '../../contract_wrapper';
 import FeatureRegistryWrapper from '../feature_registry_wrapper';
 
 describe('FeatureRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: FeatureRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: FeatureRegistryContract;
