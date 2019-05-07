@@ -1,5 +1,5 @@
 // STOWrapper test
-import { mock, instance, reset, when, verify } from 'ts-mockito';
+import {mock, instance, reset, when, verify} from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
@@ -246,8 +246,6 @@ describe('CappedSTOWrapper', () => {
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
         true,
       ];
       // Mocked method
@@ -260,7 +258,15 @@ describe('CappedSTOWrapper', () => {
       // Real call
       const result = await target.getSTODetails();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result.startTime).toEqual(expectedStartTime);
+      expect(result.endTime).toEqual(expectedEndTime);
+      expect(result.cap).toBe(expectedResult[2]);
+      expect(result.rate).toBe(expectedResult[3]);
+      expect(result.fundsRaised).toBe(expectedResult[4]);
+      expect(result.investorCount).toEqual(1);
+      expect(result.totalTokensSold).toBe(expectedResult[6]);
+      expect(result.isRaisedInPoly).toBe(expectedResult[7]);
+
       // Verifications
       verify(mockedContract.getSTODetails).once();
       verify(mockedMethod.callAsync()).once();
