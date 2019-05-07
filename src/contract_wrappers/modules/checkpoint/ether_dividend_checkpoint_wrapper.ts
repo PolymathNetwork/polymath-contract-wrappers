@@ -256,7 +256,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name);
+    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -272,7 +272,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
+    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -289,7 +289,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.sharedAsserts(params.value, params.expiry, params.maturity, params.name, undefined, params.excluded);
+    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name, undefined, params.excluded);
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -308,7 +308,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.sharedAsserts(
+    await this.isDividendValid(
       params.value,
       params.expiry,
       params.maturity,
@@ -327,7 +327,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
-  private sharedAsserts = async (
+  private isDividendValid = async (
     value: BigNumber | undefined,
     expiry: Date,
     maturity: Date,

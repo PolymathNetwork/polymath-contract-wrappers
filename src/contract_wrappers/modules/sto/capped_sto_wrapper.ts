@@ -101,12 +101,12 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
 interface BuyTokensParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
-  from: string;
+  from?: string;
 }
 
 interface BuyTokensWithPolyParams extends TxParams {
   investedPOLY: BigNumber;
-  from: string;
+  from?: string;
 }
 
 // // Return types ////
@@ -193,8 +193,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     };
     const allowBeneficialInvestments = await this.allowBeneficialInvestments();
     assert.isETHAddressHex('beneficiary', params.beneficiary);
-    assert.isAddressNotZero(params.beneficiary);
-    assert.isBigNumber('value', params.value);
+    assert.isAddressNotZero('beneficiary', params.beneficiary);
     assert.assert(!params.value.eq(new BigNumber(0)), 'Amount invested should not be equal to 0');
     if (allowBeneficialInvestments) {
       assert.assert(params.beneficiary === params.from, 'Beneficiary address does not match msg.sender');
@@ -207,11 +206,9 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.assert(raiseType, 'Mode of investment is not ETH');
     const startTime = await this.startTime();
     const endTime = await this.endTime();
-    const date = new Date();
-    assert.assert(
-      bigNumberToDate(startTime) >= date && date <= bigNumberToDate(endTime),
-      'Offering is closed/Not yet started',
-    );
+    const now = new Date();
+    assert.assert(bigNumberToDate(startTime) >= now, 'Offering is not yet started');
+    assert.assert(now <= bigNumberToDate(endTime), 'Offering is closed');
     return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, txPayableData, params.safetyFactor);
   };
 
@@ -220,8 +217,10 @@ export default class CappedSTOWrapper extends STOWrapper {
       ...params.txData,
       from: params.from,
     };
-    assert.isETHAddressHex('beneficiary', params.from);
-    assert.isAddressNotZero(params.from);
+    if (params.from !== undefined) {
+      assert.isETHAddressHex('beneficiary', params.from);
+      assert.isAddressNotZero('beneficiary', params.from);
+    }
     assert.assert(!params.investedPOLY.eq(new BigNumber(0)), 'Amount invested should not be equal to 0');
     const pause = await this.paused();
     assert.assert(!pause, 'Should not be paused');

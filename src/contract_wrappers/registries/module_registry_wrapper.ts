@@ -205,7 +205,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkModuleNotPausedOrOwner();
     await this.checkModuleNotRegistered(params.moduleFactory);
-    const callerAddress = await this.getCallerAddress(undefined);
+    const callerAddress = await this.getCallerAddress(params.txData);
     const owner = await this.owner();
     if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
       const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
@@ -326,7 +326,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isAddressNotZero(params.tokenContract);
+    assert.isAddressNotZero('tokenContract', params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -344,7 +344,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public unpause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
-    assert.assert((await this.isPaused()), 'Contract is already not paused');
+    assert.assert(await this.isPaused(), 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -354,7 +354,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    assert.isAddressNotZero(params.newOwner);
+    assert.isAddressNotZero('newOwner', params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).transferOwnership.sendTransactionAsync(
@@ -423,13 +423,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       ModuleType.Dividends,
       ModuleType.TransferManager,
     ];
-    return Promise.all(
+    const allModules = await Promise.all(
       allModulesTypes.map(async type => {
         return this.callGetModulesByTypeAndReturnIfModuleExists(type, moduleAddress);
       }),
-    ).then(values => {
-      return values.includes(true);
-    });
+    );
+    return allModules.includes(true);
   };
 
   private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
@@ -453,7 +452,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
-      !(await this.isPaused()) || (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      !(await this.isPaused()) || (await this.owner()) === (await this.getCallerAddress(undefined)),
       'Contract should not be Paused',
     );
   };

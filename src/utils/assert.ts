@@ -16,12 +16,12 @@ const assert = {
       assert.isETHAddressHex(variableName, address);
     });
   },
-  isAddressNotZero(address: string): void {
-    sharedAssert.assert(address !== ZERO, `Invalid address ${address}`);
+  isAddressNotZero(variableName: string, address: string): void {
+    sharedAssert.assert(address !== ZERO, `'${variableName}' is not expected to be 0x0`);
   },
   isAddressArrayNotZero(addresses: string[]): void {
     _.map(addresses, address => {
-      this.isAddressNotZero(address);
+      this.isAddressNotZero('address', address);
     });
   },
   checkDuplicateAddresses(addresses: string[]): void {
@@ -66,7 +66,7 @@ const assert = {
     }
   },
   checkAddManualApprovalConditions(to: string, expiryTime: Date, allowance: BigNumber): void {
-    assert.isAddressNotZero(to);
+    assert.isAddressNotZero('to', to);
     assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');
     assert.assert(allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0');
   },
@@ -98,7 +98,7 @@ const assert = {
     }
   },
   checkModifyManualApprovalConditions(to: string, expiryTime: Date): void {
-    assert.isAddressNotZero(to);
+    assert.isAddressNotZero('to', to);
     assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');
   },
   checkModifyManualApprovalMultiConditions(
@@ -146,74 +146,64 @@ const assert = {
     assert.assert(rollingPeriodInDays <= 365 && rollingPeriodInDays >= 1, 'Invalid number of days in rolling period');
   },
   checkIndividualRestrictionMultiConditions(
-      holders: string[],
-      startTime: Date[],
-      allowedTokens: BigNumber[],
-      restrictionType: (number | BigNumber)[],
-      rollingPeriodInDays: number[],
-      endTime: Date[],
+    holders: string[],
+    startTime: Date[],
+    allowedTokens: BigNumber[],
+    restrictionType: (number | BigNumber)[],
+    rollingPeriodInDays: number[],
+    endTime: Date[],
   ): void {
     sharedAssert.assert(
-        startTime.length === allowedTokens.length,
-        'Array lengths for startTime and allowedTokens passed in are not the same',
+      startTime.length === allowedTokens.length,
+      'Array lengths for startTime and allowedTokens passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === restrictionType.length,
-        'Array lengths for startTime and restrictionType passed in are not the same',
+      startTime.length === restrictionType.length,
+      'Array lengths for startTime and restrictionType passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === rollingPeriodInDays.length,
-        'Array lengths for startTime and rollingPeriodInDays passed in are not the same',
+      startTime.length === rollingPeriodInDays.length,
+      'Array lengths for startTime and rollingPeriodInDays passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === holders.length,
-        'Array lengths for startTime and holders passed in are not the same',
+      startTime.length === holders.length,
+      'Array lengths for startTime and holders passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === endTime.length,
-        'Array lengths for startTime and endTime passed in are not the same',
+      startTime.length === endTime.length,
+      'Array lengths for startTime and endTime passed in are not the same',
     );
     for (let i = 0; i < startTime.length; i + 1) {
-      this.checkRestrictionInputParams(
-          startTime[i],
-          allowedTokens[i],
-          restrictionType[i],
-          rollingPeriodInDays[i],
-      );
+      this.checkRestrictionInputParams(startTime[i], allowedTokens[i], restrictionType[i], rollingPeriodInDays[i]);
     }
   },
   checkIndividualDailyRestrictionMultiConditions(
-      holders: string[],
-      startTime: Date[],
-      allowedTokens: BigNumber[],
-      restrictionType: (number | BigNumber)[],
-      endTime: Date[],
+    holders: string[],
+    startTime: Date[],
+    allowedTokens: BigNumber[],
+    restrictionType: (number | BigNumber)[],
+    endTime: Date[],
   ): void {
     sharedAssert.assert(
-        startTime.length === allowedTokens.length,
-        'Array lengths for startTime and allowedTokens passed in are not the same',
+      startTime.length === allowedTokens.length,
+      'Array lengths for startTime and allowedTokens passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === restrictionType.length,
-        'Array lengths for startTime and restrictionType passed in are not the same',
+      startTime.length === restrictionType.length,
+      'Array lengths for startTime and restrictionType passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === holders.length,
-        'Array lengths for startTime and holders passed in are not the same',
+      startTime.length === holders.length,
+      'Array lengths for startTime and holders passed in are not the same',
     );
     sharedAssert.assert(
-        startTime.length === endTime.length,
-        'Array lengths for startTime and endTime passed in are not the same',
+      startTime.length === endTime.length,
+      'Array lengths for startTime and endTime passed in are not the same',
     );
     for (let i = 0; i < startTime.length; i + 1) {
-      this.checkRestrictionInputParams(
-          startTime[i],
-          allowedTokens[i],
-          restrictionType[i],
-          1,
-      );
+      this.checkRestrictionInputParams(startTime[i], allowedTokens[i], restrictionType[i], 1);
     }
-  },  
+  },
 };
 
 export default assert;

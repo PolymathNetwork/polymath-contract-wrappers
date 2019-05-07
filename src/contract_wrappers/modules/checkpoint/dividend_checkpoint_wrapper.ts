@@ -198,7 +198,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public unpause = async (params: TxParams) => {
-    assert.assert((await this.paused()), 'Contract currently not paused');
+    assert.assert(await this.paused(), 'Contract currently not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -206,7 +206,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('tokenContract', params.tokenContract);
-    assert.isAddressNotZero(params.tokenContract);
+    assert.isAddressNotZero('tokenContract', params.tokenContract);
     // require(token.transfer(msg.sender, balance), "Transfer failed");
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
@@ -223,7 +223,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public changeWallet = async (params: ChangeWalletParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('wallet', params.wallet);
-    assert.isAddressNotZero(params.wallet);
+    assert.isAddressNotZero('wallet', params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
@@ -321,7 +321,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     const dividends = await (await this.contract).getDividendsData.callAsync();
     assert.assert(params.dividendIndex < dividends[0].length, 'Incorrect dividend index');
     const dividend = await this.dividends(params);
-    assert.assert(new Date() >= dividend.expiry, 'Dividend expiry is in the future');
+    assert.assert(dividend.expiry <= new Date(), 'Dividend expiry is in the future');
     assert.assert(!dividend.reclaimed, 'Dividend is already claimed');
     return (await this.contract).reclaimDividend.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
@@ -424,7 +424,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public getCheckpointData = async (params: CheckpointIdParams) => {
     const st = await this.securityTokenContract();
     const currentCheckpointId = await st.currentCheckpointId.callAsync();
-    assert.assert(new BigNumber(params.checkpointId).lte(currentCheckpointId), 'Invalid checkpoint');
+    assert.assert(params.checkpointId <= currentCheckpointId.toNumber(), 'Invalid checkpoint');
     const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
     const typedResult: CheckpointData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
@@ -452,13 +452,16 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
-  private checkValidDividendIndex = async(dividendIndex: number) => {
+  private checkValidDividendIndex = async (dividendIndex: number) => {
     const dividends = await this.getDividendsData();
     assert.assert(dividends.length > dividendIndex, 'Invalid dividend');
-    const dividend = await this.getDividendData({dividendIndex});
+    const dividend = await this.getDividendData({ dividendIndex });
     // Reclaimed
-    assert.assert(!dividend.claimedAmount.isGreaterThan(0), 'Dividend claimed amount greater than 0, dividend reclaimed');
+    assert.assert(
+      !dividend.claimedAmount.isGreaterThan(0),
+      'Dividend claimed amount greater than 0, dividend reclaimed',
+    );
     assert.assert(dividend.maturity <= new Date(), 'Dividend maturity in future');
     assert.assert(dividend.expiry > new Date(), 'Dividend expiry in past');
-  }
+  };
 }

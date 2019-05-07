@@ -117,10 +117,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
-    assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      'Msg sender must be owner',
-    );
+    assert.assert((await this.owner()) === (await this.getCallerAddress(params.txData)), 'From sender must be owner');
     const currentStatus = await this.getFeatureStatus({ nameKey: params.nameKey });
     assert.assert(currentStatus !== params.newStatus, 'FeatureStatus must change');
     return (await this.contract).setFeatureStatus.sendTransactionAsync(
@@ -145,13 +142,6 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    */
   public getFreezeMintingAllowedStatus = async () => {
     return (await this.contract).getFeatureStatus.callAsync(Features.FreezeMintingAllowed);
-  };
-
-  private checkMsgSenderIsOwner = async () => {
-    assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      'Msg sender must be owner',
-    );
   };
 
   /**
