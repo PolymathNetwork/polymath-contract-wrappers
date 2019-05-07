@@ -20,6 +20,10 @@ export default abstract class STOWrapper extends ModuleWrapper {
     return (await this.contract).paused.callAsync();
   };
 
+  public securityToken = async () => {
+    return (await this.contract).securityToken.callAsync();
+  };
+
   /**
    * Type of currency used to collect the funds
    */

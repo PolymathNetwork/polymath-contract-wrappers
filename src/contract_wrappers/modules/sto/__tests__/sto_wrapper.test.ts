@@ -2,8 +2,8 @@
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CappedSTOContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod } from '../../../../test_utils/mocked_methods';
+import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../../test_utils/mocked_methods';
 import ContractWrapper from '../../../contract_wrapper';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -15,11 +15,13 @@ describe('STOWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract;
   let mockedContractFactory: ContractFactory;
+  let mockedSecurityTokenContract: SecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(CappedSTOContract);
     mockedContractFactory = mock(ContractFactory);
+    mockedSecurityTokenContract = mock(SecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -28,6 +30,7 @@ describe('STOWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedSecurityTokenContract);
   });
 
   describe('Types', () => {
@@ -243,6 +246,126 @@ describe('STOWrapper', () => {
       // Verifications
       verify(mockedContract.getRaised).once();
       verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();
+    });
+  });
+
+  describe('Pause/Unpause', () => {
+    test('should call to pause', async () => {
+      // Pause Result expected
+      const expectedPauseResult = false;
+      // Mocked method
+      const mockedPauseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.paused).thenReturn(instance(mockedPauseMethod));
+      // Stub the request
+      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x5555555555555555555555555555555555555555';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.pause).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.pause(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.pause).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.paused).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedPauseMethod.callAsync()).once();
+    });
+
+    test('should call to unpause', async () => {
+      // Pause Result expected
+      const expectedPauseResult = true;
+      // Mocked method
+      const mockedPauseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.paused).thenReturn(instance(mockedPauseMethod));
+      // Stub the request
+      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x5555555555555555555555555555555555555555';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.unpause).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.unpause(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.unpause).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+
+      verify(mockedContract.paused).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedPauseMethod.callAsync()).once();
     });
   });
 
