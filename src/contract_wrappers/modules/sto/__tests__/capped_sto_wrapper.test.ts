@@ -7,6 +7,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import STOWrapper from '../sto_wrapper';
+import { dateToBigNumber } from '../../../../utils/convert';
 
 describe('CappedSTOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -143,7 +144,7 @@ describe('CappedSTOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -164,11 +165,11 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.changeAllowBeneficialInvestments).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.allowBeneficialInvestments,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -179,15 +180,90 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.changeAllowBeneficialInvestments).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.allowBeneficialInvestments,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+    });
+  });
+
+  describe('CapReached', () => {
+    test('should get boolean of capReached', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.capReached).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.capReached();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.capReached).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetTokensSold', () => {
+    test('should get the tokens sold', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensSold).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTokensSold();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTokensSold).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetSTODetails', () => {
+    test('should call getSTODetails', async () => {
+      const expectedStartTime = new Date(2025, 1);
+      const expectedEndTime = new Date(2026, 1);
+      const expectedResult = [
+        dateToBigNumber(expectedStartTime),
+        dateToBigNumber(expectedEndTime),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        true,
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSTODetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getSTODetails();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getSTODetails).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
