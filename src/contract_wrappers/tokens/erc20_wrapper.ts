@@ -77,7 +77,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Approves the passed address to spend the specified amount of tokens
    */
   public approve = async (params: ApproveParams) => {
-    assert.isAddressNotZero(params.spender);
+    assert.isAddressNotZero('spender', params.spender);
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).approve.sendTransactionAsync(
       params.spender,
@@ -100,7 +100,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   public transferFrom = async (params: TransferFromParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    assert.isAddressNotZero(params.to);
+    assert.isAddressNotZero('to', params.to);
     return (await this.contract).transferFrom.sendTransactionAsync(
       params.from,
       params.to,
@@ -140,7 +140,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    */
   public transfer = async (params: TransferParams) => {
     assert.isETHAddressHex('to', params.to);
-    assert.isAddressNotZero(params.to);
+    assert.isAddressNotZero('to', params.to);
     return (await this.contract).transfer.sendTransactionAsync(
       params.to,
       params.value,

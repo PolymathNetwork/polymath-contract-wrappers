@@ -277,11 +277,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.expiryTimes,
       params.descriptions,
     );
-    /* eslint-disable no-await-in-loop */
+    const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
-      await this.checkApprovalDoesNotExist(params.from[i], params.to[i]);
+      approvals.push(this.checkApprovalDoesNotExist(params.from[i], params.to[i]));
     }
-    /* eslint-enable no-await-in-loop */
+    await Promise.all(approvals);
     return (await this.contract).addManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -322,11 +322,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.expiryTimes,
       params.descriptions,
     );
-    /* eslint-disable no-await-in-loop */
+    const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
-      await this.checkApprovalDoesExist(params.from[i], params.to[i]);
+      approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
     }
-    /* eslint-enable no-await-in-loop */
+    await Promise.all(approvals);
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -357,11 +357,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isETHAddressHexArray('from', params.from);
     assert.isETHAddressHexArray('to', params.to);
     assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
-    /* eslint-disable no-await-in-loop */
+    const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
-      await this.checkApprovalDoesExist(params.from[i], params.to[i]);
+      approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
     }
-    /* eslint-enable no-await-in-loop */
+    await Promise.all(approvals);
     return (await this.contract).revokeManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,

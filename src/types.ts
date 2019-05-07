@@ -95,7 +95,6 @@ export enum FundRaiseType {
 export enum Features {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
-  DisableControllerAllowed = 'disableControllerAllowed',
 }
 
 export enum PolymathContracts {

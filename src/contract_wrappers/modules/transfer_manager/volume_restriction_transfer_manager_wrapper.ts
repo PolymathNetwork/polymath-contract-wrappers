@@ -511,7 +511,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
     assert.isETHAddressHex('wallet', params.wallet);
-    assert.isAddressNotZero(params.wallet);
+    assert.isAddressNotZero('wallet', params.wallet);
     const isWalletExempt = (await this.getExemptAddress()).includes(params.wallet);
     assert.assert(!isWalletExempt === params.change, 'There will be no change to exempt list');
     return (await this.contract).changeExemptWalletList.sendTransactionAsync(
@@ -525,7 +525,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addIndividualRestriction = async (params: AddIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
     assert.checkRestrictionInputParams(
       params.startTime,
@@ -548,7 +548,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addIndividualDailyRestriction = async (params: AddIndividualDailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('holder', params.holder);
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
@@ -587,11 +587,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isETHAddressHexArray('holders', params.holders);
     assert.isAddressArrayNotZero(params.holders);
-    /* eslint-disable no-await-in-loop */
+    const exemptAddress = await this.getExemptAddress();
     for (let i = 0; i < params.holders.length; i + 1) {
-      assert.assert((await this.getExemptAddress()).includes(params.holders[i]), 'Holder is exempt from restriction');
+      assert.assert(exemptAddress.includes(params.holders[i]), 'Holder is exempt from restriction');
     }
-    /* eslint-enable no-await-in-loop */
     assert.checkIndividualRestrictionMultiConditions(
       params.holders,
       params.startTimes,
@@ -648,7 +647,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkIndividualRestriction(params.holder);
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualRestriction.sendTransactionAsync(
       params.holder,
@@ -676,7 +675,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     await this.checkIndividualDailyRestriction(params.holder);
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.isETHAddressHex('holder', params.holder);
     return (await this.contract).removeIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
@@ -715,7 +714,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public modifyIndividualRestriction = async (params: ModifyIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.isETHAddressHex('holder', params.holder);
     assert.checkRestrictionInputParams(
       params.startTime,
@@ -737,7 +736,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public modifyIndividualDailyRestriction = async (params: ModifyIndividualDailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
-    assert.isAddressNotZero(params.holder);
+    assert.isAddressNotZero('holder', params.holder);
     assert.isETHAddressHex('holder', params.holder);
     assert.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
     return (await this.contract).modifyIndividualDailyRestriction.sendTransactionAsync(

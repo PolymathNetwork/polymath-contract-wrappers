@@ -845,8 +845,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.isETHAddressHexArray('usdToken', params.usdTokens);
     assert.isETHAddressHex('wallet', params.wallet);
     assert.isETHAddressHex('reserveWallet', params.reserveWallet);
-    assert.isAddressNotZero(params.wallet);
-    assert.isAddressNotZero(params.reserveWallet);
+    assert.isAddressNotZero('wallet', params.wallet);
+    assert.isAddressNotZero('reserveWallet', params.reserveWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.reserveWallet,
