@@ -40,6 +40,48 @@ describe('CappedSTOWrapper', () => {
     });
   });
 
+  describe('Rate', () => {
+    test('should get the rate', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.rate).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.rate();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.rate).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Cap', () => {
+    test('should get the cap', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.cap).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.cap();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.cap).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
