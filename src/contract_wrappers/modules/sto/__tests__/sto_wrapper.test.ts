@@ -468,23 +468,4 @@ describe('STOWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
     });
   });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'SetFundRaiseTypes', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
-    });
-  });
 });
