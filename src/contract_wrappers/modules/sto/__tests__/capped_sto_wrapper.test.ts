@@ -8,6 +8,7 @@ import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import STOWrapper from '../sto_wrapper';
 import { dateToBigNumber } from '../../../../utils/convert';
+import { FundRaiseType } from '../../../../types';
 
 describe('CappedSTOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -270,6 +271,188 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.getSTODetails).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+  describe('BuyTokens', () => {
+    test('should buy tokens', async () => {
+      // Address expected
+      const expectedAllowBeneficialInvestmentResult = true;
+      // Mocked method
+      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
+      // Stub the request
+      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Pause Address expected
+      const expectedPausedResult = false;
+      // Mocked method
+      const mockedPausedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.paused).thenReturn(instance(mockedPausedMethod));
+      // Stub the request
+      when(mockedPausedMethod.callAsync()).thenResolve(expectedPausedResult);
+
+      // Address expected
+      const expectedFundRaiseTypeResult = true;
+      // Mocked method
+      const mockedFundRaiseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.fundRaiseTypes).thenReturn(instance(mockedFundRaiseMethod));
+      // Stub the request
+      when(mockedFundRaiseMethod.callAsync(FundRaiseType.ETH)).thenResolve(expectedFundRaiseTypeResult);
+
+      const expectedStartTimeResult = new BigNumber(1735689000);
+      // Mocked method
+      const mockedStartTimeMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.startTime).thenReturn(instance(mockedStartTimeMethod));
+      // Stub the request
+      when(mockedStartTimeMethod.callAsync()).thenResolve(expectedStartTimeResult);
+
+      const expectedEndTimeResult = new BigNumber(1735689600);
+      // Mocked method
+      const mockedEndTimeMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.endTime).thenReturn(instance(mockedEndTimeMethod));
+      // Stub the request
+      when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
+
+      // ****** Real method setup and call *****
+      const txPayableData = {
+        ...{},
+        from: expectedOwnerResult,
+        value: new BigNumber(1),
+      };
+      const mockedParams = {
+        beneficiary: expectedOwnerResult,
+        value: new BigNumber(1),
+        txData: txPayableData,
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.buyTokens).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.beneficiary, txPayableData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.buyTokens(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      
+      // Verifications
+      verify(mockedContract.buyTokens).once();
+      verify(mockedContract.paused).once();
+      verify(mockedContract.fundRaiseTypes).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.beneficiary, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedAllowBeneficialInvestmentMethod).once();
+      verify(mockedContract.allowBeneficialInvestments.callAsync()).once();
+      verify(mockedPausedMethod).once();
+      verify(mockedContract.paused.callAsync()).once();
+      verify(mockedFundRaiseMethod).once();
+      verify(mockedContract.fundRaiseTypes.callAsync(FundRaiseType.ETH));
+      verify(mockedStartTimeMethod).once();
+      verify(mockedContract.startTime.callAsync()).once();
+      verify(mockedEndTimeMethod).once();
+      verify(mockedContract.endTime.callAsync()).once();
+    });
+  });
+
+  describe('BuyTokensWithPoly', () => {
+    test('should buy tokens with poly', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Pause Address expected
+      const expectedPausedResult = false;
+      // Mocked method
+      const mockedPausedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.paused).thenReturn(instance(mockedPausedMethod));
+      // Stub the request
+      when(mockedPausedMethod.callAsync()).thenResolve(expectedPausedResult);
+
+      // Address expected
+      const expectedFundRaiseTypeResult = true;
+      // Mocked method
+      const mockedFundRaiseMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.fundRaiseTypes).thenReturn(instance(mockedFundRaiseMethod));
+      // Stub the request
+      when(mockedFundRaiseMethod.callAsync(FundRaiseType.POLY)).thenResolve(expectedFundRaiseTypeResult);
+
+      const expectedStartTimeResult = new BigNumber(1735689000);
+      // Mocked method
+      const mockedStartTimeMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.startTime).thenReturn(instance(mockedStartTimeMethod));
+      // Stub the request
+      when(mockedStartTimeMethod.callAsync()).thenResolve(expectedStartTimeResult);
+
+      const expectedEndTimeResult = new BigNumber(1735689600);
+      // Mocked method
+      const mockedEndTimeMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.endTime).thenReturn(instance(mockedEndTimeMethod));
+      // Stub the request
+      when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
+
+      // ****** Real method setup and call *****
+      const txPayableData = {
+        ...{},
+        from: expectedOwnerResult,
+      };
+      const mockedParams = {
+        investedPOLY: new BigNumber(1),
+        txData: txPayableData,
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.buyTokensWithPoly).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.investedPOLY, txPayableData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.buyTokensWithPoly(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.buyTokensWithPoly).once();
+      verify(mockedContract.paused).once();
+      verify(mockedContract.fundRaiseTypes).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.investedPOLY, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedPausedMethod).once();
+      verify(mockedContract.paused.callAsync()).once();
+      verify(mockedFundRaiseMethod).once();
+      verify(mockedContract.fundRaiseTypes.callAsync(FundRaiseType.POLY));
+      verify(mockedStartTimeMethod).once();
+      verify(mockedContract.startTime.callAsync()).once();
+      verify(mockedEndTimeMethod).once();
+      verify(mockedContract.endTime.callAsync()).once();
     });
   });
 
