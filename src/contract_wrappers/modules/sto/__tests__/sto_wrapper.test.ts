@@ -263,7 +263,7 @@ describe('STOWrapper', () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x5555555555555555555555555555555555555555';
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
 
       // Setup get Security Token Address
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
@@ -322,7 +322,7 @@ describe('STOWrapper', () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x5555555555555555555555555555555555555555';
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
 
       // Setup get Security Token Address
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
