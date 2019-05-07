@@ -6,7 +6,7 @@ import {
   SecurityTokenRegistryContract,
   PolyTokenEvents,
   SecurityTokenContract,
-  DetailedERC20Contract,
+  PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
@@ -21,14 +21,14 @@ describe('SecurityTokenRegistryWrapper', () => {
   let mockedContract: SecurityTokenRegistryContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
-  let mockedDetailedERC20Contract: DetailedERC20Contract;
+  let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(SecurityTokenRegistryContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
-    mockedDetailedERC20Contract = mock(DetailedERC20Contract);
+    mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenRegistryWrapper(
@@ -42,7 +42,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     reset(mockedWrapper);
     reset(mockedContract);
     reset(mockedSecurityTokenContract);
-    reset(mockedDetailedERC20Contract);
+    reset(mockedPolyTokenContract);
   });
 
   describe('Types', () => {
@@ -450,22 +450,16 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.getTickerRegistrationFee).thenReturn(instance(mockedTickerRegistrationFeeMethod));
       when(mockedTickerRegistrationFeeMethod.callAsync()).thenResolve(expectedTickerRegistrationFeeResult);
 
-      // Get Security Token Address
-      const expectedSTAddressResult = '0x2222222222222222222222222222222222222222';
-      const mockedSTAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedSTAddressMethod));
-      when(mockedSTAddressMethod.callAsync(ticker)).thenResolve(expectedSTAddressResult);
-
-      // Get ERC20 Allowance
-      const erc20Allowance = new BigNumber(100);
-      when(mockedContractFactory.getDetailedERC20Contract(expectedSTAddressResult)).thenResolve(
-        instance(mockedDetailedERC20Contract),
+      // Get Poly Balance
+      const polyBalance = new BigNumber(100);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(
+        instance(mockedPolyTokenContract),
       );
-      const mockedERC20AllowanceMethod = mock(MockedCallMethod);
-      when(mockedERC20AllowanceMethod.callAsync(expectedOwnerResult, expectedSTAddressResult)).thenResolve(
-        erc20Allowance,
+      const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(
+        polyBalance,
       );
-      when(mockedDetailedERC20Contract.allowance).thenReturn(instance(mockedERC20AllowanceMethod));
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
 
       const owner = '0x0123456789012345678901234567890123456789';
       const tokenName = 'TICKER';
@@ -508,8 +502,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       ).once();
       verify(mockedContract.getTickerDetails).once();
       verify(mockedContract.getTickerRegistrationFee).once();
-      verify(mockedContract.getSecurityTokenAddress).once();
-      verify(mockedDetailedERC20Contract.allowance).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       // Owner == web3wrapper default address, dont need to check isPaused here
@@ -636,22 +630,16 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedLaunchFeeMethod));
       when(mockedLaunchFeeMethod.callAsync()).thenResolve(expectedLaunchFeeResult);
 
-      // Get Security Token Address
-      const expectedSTAddressResult = '0x2222222222222222222222222222222222222222';
-      const mockedSTAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedSTAddressMethod));
-      when(mockedSTAddressMethod.callAsync(ticker)).thenResolve(expectedSTAddressResult);
-
       // Get ERC20 Allowance
       const erc20Allowance = new BigNumber(100);
-      when(mockedContractFactory.getDetailedERC20Contract(expectedSTAddressResult)).thenResolve(
-        instance(mockedDetailedERC20Contract),
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(
+        instance(mockedPolyTokenContract),
       );
-      const mockedERC20AllowanceMethod = mock(MockedCallMethod);
-      when(mockedERC20AllowanceMethod.callAsync(expectedOwnerResult, expectedSTAddressResult)).thenResolve(
+      const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(
         erc20Allowance,
       );
-      when(mockedDetailedERC20Contract.allowance).thenReturn(instance(mockedERC20AllowanceMethod));
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
 
       const name = 'Security';
       const details = 'Token Details';
@@ -700,8 +688,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       ).once();
       verify(mockedContract.getTickerDetails).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
-      verify(mockedContract.getSecurityTokenAddress).once();
-      verify(mockedDetailedERC20Contract.allowance).once();
+      verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       // Owner == web3wrapper default address, dont need to check isPaused here

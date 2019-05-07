@@ -13,7 +13,6 @@ import {
   SecurityTokenRegistryTickerRemovedEventArgs,
   SecurityTokenRegistryChangeTickerOwnershipEventArgs,
   SecurityTokenContract,
-  DetailedERC20Contract,
   PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
@@ -325,10 +324,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   protected contract: Promise<SecurityTokenRegistryContract>;
 
   protected contractFactory: ContractFactory;
-
-  protected erc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
-  };
 
   protected securityTokenContract = async (address: string): Promise<SecurityTokenContract> => {
     return this.contractFactory.getSecurityTokenContract(address);
