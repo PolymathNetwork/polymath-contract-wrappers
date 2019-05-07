@@ -166,10 +166,6 @@ export default class CappedSTOWrapper extends STOWrapper {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
 
-  public paused = async () => {
-    return (await this.contract).paused.callAsync();
-  };
-
   public investors = async (params: InvestorsParams) => {
     return (await this.contract).investors.callAsync(params.amount);
   };

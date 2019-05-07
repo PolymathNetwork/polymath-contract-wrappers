@@ -429,10 +429,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
 
-  public paused = async () => {
-    return (await this.contract).paused.callAsync();
-  };
-
   public finalAmountReturned = async () => {
     return (await this.contract).finalAmountReturned.callAsync();
   };
