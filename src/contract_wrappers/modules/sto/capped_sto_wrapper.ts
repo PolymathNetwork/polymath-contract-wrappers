@@ -192,7 +192,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.isAddressNotZero('beneficiary', params.beneficiary);
     assert.assert(!params.value.eq(new BigNumber(0)), 'Amount invested should not be equal to 0');
     if (allowBeneficialInvestments) {
-      assert.assert(params.beneficiary === params.from, 'Beneficiary address does not match msg.sender');
+      assert.assert(params.beneficiary === await this.getCallerAddress(undefined), 'Beneficiary address does not match msg.sender');
     }
     const pause = await this.paused();
     assert.assert(!pause, 'Should not be paused');
