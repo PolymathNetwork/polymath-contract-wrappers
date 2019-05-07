@@ -82,6 +82,49 @@ describe('CappedSTOWrapper', () => {
     });
   });
 
+  describe('AllowBeneficialInvestments', () => {
+    test('should get boolean of allowBeneficialInvestments', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.allowBeneficialInvestments();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+
+  describe('Investors', () => {
+    test('should get bigNumber for given investor', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.allowBeneficialInvestments();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
