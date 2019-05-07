@@ -3,11 +3,9 @@ import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
-import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../../test_utils/mocked_methods';
-import ContractWrapper from '../../../contract_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import {FundRaiseType} from '../../../../types';
 import STOWrapper from '../sto_wrapper';
 
 describe('CappedSTOWrapper', () => {
@@ -103,7 +101,6 @@ describe('CappedSTOWrapper', () => {
     });
   });
 
-
   describe('Investors', () => {
     test('should get bigNumber for given investor', async () => {
       // Address expected
@@ -122,6 +119,75 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.allowBeneficialInvestments).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Change AllowBeneficialInvestments', () => {
+    test('should change allowBeneficialInvestments', async () => {
+      // Address expected
+      const expectedAllowBeneficialInvestmentResult = true;
+      // Mocked method
+      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
+      // Stub the request
+      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        allowBeneficialInvestments: false,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeAllowBeneficialInvestments).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeAllowBeneficialInvestments(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeAllowBeneficialInvestments).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
     });
   });
 

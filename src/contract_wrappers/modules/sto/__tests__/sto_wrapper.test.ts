@@ -2,7 +2,7 @@
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { CappedSTOContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
 import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../../test_utils/mocked_methods';
 import ContractWrapper from '../../../contract_wrapper';
 import CappedSTOWrapper from '../capped_sto_wrapper';
