@@ -143,7 +143,7 @@ describe('CappedSTOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
+          instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -164,11 +164,11 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.changeAllowBeneficialInvestments).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.allowBeneficialInvestments,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.allowBeneficialInvestments,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -179,11 +179,11 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.changeAllowBeneficialInvestments).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.allowBeneficialInvestments,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.allowBeneficialInvestments,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
