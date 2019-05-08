@@ -1,5 +1,5 @@
 // CappedSTOWrapper test
-import {mock, instance, reset, when, verify} from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
@@ -324,18 +324,19 @@ describe('CappedSTOWrapper', () => {
       // Stub the request
       when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
 
-      // ****** Real method setup and call *****
+      const mockedParams = {
+        beneficiary: expectedOwnerResult,
+        from: expectedOwnerResult,
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
       const txPayableData = {
         ...{},
         from: expectedOwnerResult,
-        value: new BigNumber(1),
+        value: mockedParams.value,
       };
-      const mockedParams = {
-        beneficiary: expectedOwnerResult,
-        value: new BigNumber(1),
-        txData: txPayableData,
-        safetyFactor: 10,
-      };
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -343,31 +344,39 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.buyTokens).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.beneficiary, txPayableData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
       const result = await target.buyTokens(mockedParams);
       // Result expectation
-      expect(result).toBe(expectedResult);
-      
+      expect(result).toEqual(expectedResult);
+
       // Verifications
       verify(mockedContract.buyTokens).once();
-      verify(mockedContract.paused).once();
-      verify(mockedContract.fundRaiseTypes).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.beneficiary, mockedParams.txData, mockedParams.safetyFactor),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.beneficiary,
+              objectContaining(txPayableData),
+              mockedParams.safetyFactor,
+          ),
       ).once();
-      verify(mockedAllowBeneficialInvestmentMethod).once();
-      verify(mockedContract.allowBeneficialInvestments.callAsync()).once();
-      verify(mockedPausedMethod).once();
-      verify(mockedContract.paused.callAsync()).once();
-      verify(mockedFundRaiseMethod).once();
-      verify(mockedContract.fundRaiseTypes.callAsync(FundRaiseType.ETH));
-      verify(mockedStartTimeMethod).once();
-      verify(mockedContract.startTime.callAsync()).once();
-      verify(mockedEndTimeMethod).once();
-      verify(mockedContract.endTime.callAsync()).once();
+      verify(mockedContract.paused).once();
+      verify(mockedPausedMethod.callAsync()).once();
+      verify(mockedContract.fundRaiseTypes).once();
+      verify(mockedFundRaiseMethod.callAsync(FundRaiseType.ETH));
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+      verify(mockedStartTimeMethod.callAsync()).once();
+      verify(mockedContract.startTime).once();
+      verify(mockedEndTimeMethod.callAsync()).once();
+      verify(mockedContract.endTime).once();
+
+
     });
   });
 
@@ -375,7 +384,6 @@ describe('CappedSTOWrapper', () => {
     test('should buy tokens with poly', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -413,16 +421,17 @@ describe('CappedSTOWrapper', () => {
       // Stub the request
       when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
 
-      // ****** Real method setup and call *****
-      const txPayableData = {
-        ...{},
-        from: expectedOwnerResult,
-      };
       const mockedParams = {
+        from: expectedOwnerResult,
         investedPOLY: new BigNumber(1),
-        txData: txPayableData,
+        txData: {},
         safetyFactor: 10,
       };
+      const txPayableData = {
+        ...{},
+        from: expectedOwnerResult
+      };
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -430,7 +439,7 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.buyTokensWithPoly).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.investedPOLY, txPayableData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(objectContaining(mockedParams.investedPOLY), objectContaining(txPayableData), mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -440,19 +449,17 @@ describe('CappedSTOWrapper', () => {
 
       // Verifications
       verify(mockedContract.buyTokensWithPoly).once();
-      verify(mockedContract.paused).once();
-      verify(mockedContract.fundRaiseTypes).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.investedPOLY, mockedParams.txData, mockedParams.safetyFactor),
+          mockedMethod.sendTransactionAsync(objectContaining(mockedParams.investedPOLY), objectContaining(txPayableData), mockedParams.safetyFactor),
       ).once();
-      verify(mockedPausedMethod).once();
-      verify(mockedContract.paused.callAsync()).once();
-      verify(mockedFundRaiseMethod).once();
-      verify(mockedContract.fundRaiseTypes.callAsync(FundRaiseType.POLY));
-      verify(mockedStartTimeMethod).once();
-      verify(mockedContract.startTime.callAsync()).once();
-      verify(mockedEndTimeMethod).once();
-      verify(mockedContract.endTime.callAsync()).once();
+      verify(mockedContract.paused).once();
+      verify(mockedPausedMethod.callAsync()).once();
+      verify(mockedContract.fundRaiseTypes).once();
+      verify(mockedFundRaiseMethod.callAsync(FundRaiseType.POLY)).once();
+      verify(mockedStartTimeMethod.callAsync()).once();
+      verify(mockedContract.startTime).once();
+      verify(mockedEndTimeMethod.callAsync()).once();
+      verify(mockedContract.endTime).once();
     });
   });
 
