@@ -7,7 +7,8 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import STOWrapper from '../sto_wrapper';
-import {dateToBigNumber, numberToBigNumber} from '../../../../utils/convert';
+import { dateToBigNumber, numberToBigNumber } from '../../../../utils/convert';
+import { FundRaiseType } from '../../../../types';
 
 describe('USDTieredSTOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -56,7 +57,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       const result = await target.investorsList(params);
       // Result expectation
-      expect(result).toEqual(expectedResult);
+      expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.investorsList).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.investorIndex)))).once();
@@ -108,11 +109,7 @@ describe('USDTieredSTOWrapper', () => {
   describe('Investors', () => {
     test('should get investor info', async () => {
       const investorAddress = '0x1111111111111111111111111111111111111111';
-      const expectedResult = [
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-      ];
+      const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(1)];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -121,7 +118,7 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedMethod.callAsync(investorAddress)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.investors({investorAddress});
+      const result = await target.investors({ investorAddress });
       // Result expectation
       expect(result.accredited).toEqual(!expectedResult[0].isZero());
       expect(result.nonAccreditedLimitUSDOverride).toBe(expectedResult[2]);
@@ -129,6 +126,31 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.investors).once();
       verify(mockedMethod.callAsync(investorAddress)).once();
+    });
+  });
+
+  describe('InvestorInvested', () => {
+    test('should get amount of investorInvested', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      const params = {
+        investorAddress: '0x1111111111111111111111111111111111111111',
+        fundRaiseType: FundRaiseType.ETH,
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investorInvested).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.investorAddress, params.fundRaiseType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.investorInvested(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.investorInvested).once();
+      verify(mockedMethod.callAsync(params.investorAddress, params.fundRaiseType)).once();
     });
   });
 
