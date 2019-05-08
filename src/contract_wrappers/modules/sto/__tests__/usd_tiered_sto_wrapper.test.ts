@@ -7,7 +7,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import STOWrapper from '../sto_wrapper';
-import { numberToBigNumber } from '../../../../utils/convert';
+import {dateToBigNumber, numberToBigNumber} from '../../../../utils/convert';
 
 describe('USDTieredSTOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -81,6 +81,54 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.allowBeneficialInvestments).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('FinalAmountReturned', () => {
+    test('should get bigNumber of finalAmountReturned', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.finalAmountReturned).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.finalAmountReturned();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.finalAmountReturned).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Investors', () => {
+    test('should get investor info', async () => {
+      const investorAddress = '0x1111111111111111111111111111111111111111';
+      const expectedResult = [
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investors).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(investorAddress)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.investors({investorAddress});
+      // Result expectation
+      expect(result.accredited).toEqual(!expectedResult[0].isZero());
+      expect(result.nonAccreditedLimitUSDOverride).toBe(expectedResult[2]);
+
+      // Verifications
+      verify(mockedContract.investors).once();
+      verify(mockedMethod.callAsync(investorAddress)).once();
     });
   });
 
