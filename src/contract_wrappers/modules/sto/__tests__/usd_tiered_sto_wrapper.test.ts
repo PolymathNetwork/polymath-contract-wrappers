@@ -295,6 +295,72 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
   
+  describe('GetSTODetails', () => {
+    test('should call getSTODetails', async () => {
+      const expectedStartTime = new Date(2025, 1);
+      const expectedEndTime = new Date(2026, 1);
+      const expectedResult = [
+        dateToBigNumber(expectedStartTime),
+        dateToBigNumber(expectedEndTime),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        [true, false, false],
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSTODetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getSTODetails();
+      // Result expectation
+      expect(result.startTime).toEqual(expectedStartTime);
+      expect(result.endTime).toEqual(expectedEndTime);
+      expect(result.currentTier).toEqual(1);
+      expect(result.capPerTier).toBe(expectedResult[3]);
+      expect(result.ratePerTier).toBe(expectedResult[4]);
+      expect(result.fundsRaised).toBe(expectedResult[5]);
+      expect(result.investorCount).toEqual(1);
+      expect(result.tokensSold).toBe(expectedResult[7]);
+      expect(result.isRaisedInETH).toBe(true);
+      expect(result.isRaisedInPOLY).toBe(false);
+      expect(result.isRaisedInSC).toBe(false);
+
+      // Verifications
+      verify(mockedContract.getSTODetails).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetTokensMinted', () => {
+    test('should get amount from getTokensMinted', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(100);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensMinted).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.getTokensMinted();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTokensMinted).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
