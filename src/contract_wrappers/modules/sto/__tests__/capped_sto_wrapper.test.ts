@@ -1,4 +1,4 @@
-// STOWrapper test
+// CappedSTOWrapper test
 import {mock, instance, reset, when, verify} from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
