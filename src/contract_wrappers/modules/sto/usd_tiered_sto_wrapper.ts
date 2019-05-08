@@ -479,7 +479,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       value: params.value,
       from: params.from,
     };
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
     await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.ETH);
     return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
@@ -489,7 +488,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
     await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.POLY);
     return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
@@ -500,7 +498,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSD = async (params: BuyWithUSDParams) => {
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
     await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.StableCoin);
     return (await this.contract).buyWithUSD.sendTransactionAsync(
