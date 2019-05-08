@@ -154,6 +154,147 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
+  describe('USDTokenEnabled', () => {
+    test('should get boolean of usdTokenEnabled', async () => {
+      // Result expected
+      const expectedResult = true;
+      const params = {
+        stableCoinAddress: '0x1111111111111111111111111111111111111111'
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.usdTokenEnabled).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.stableCoinAddress)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.usdTokenEnabled(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.usdTokenEnabled).once();
+      verify(mockedMethod.callAsync(params.stableCoinAddress)).once();
+    });
+  });
+
+  describe('USDTokens', () => {
+    test('should get address in USDTokens', async () => {
+      // Address expected
+      const expectedResult = '0x1111111111111111111111111111111111111111';
+      const params = { usdTokenIndex: 1 };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.usdTokens).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.usdTokens(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.usdTokens).once();
+      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).once();
+    });
+  });
+
+  describe('InvestorInvestedUSD', () => {
+    test('should get address in USDTokens', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      const params = { investorAddress: '0x1111111111111111111111111111111111111111' };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investorInvestedUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.investorAddress)).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.investorInvestedUSD(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.investorInvestedUSD).once();
+      verify(mockedMethod.callAsync(params.investorAddress)).once();
+    });
+  });
+
+  describe('Change AllowBeneficialInvestments', () => {
+    test('should change allowBeneficialInvestments', async () => {
+      // Address expected
+      const expectedAllowBeneficialInvestmentResult = true;
+      // Mocked method
+      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
+      // Stub the request
+      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        allowBeneficialInvestments: false,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeAllowBeneficialInvestments).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.allowBeneficialInvestments,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeAllowBeneficialInvestments(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeAllowBeneficialInvestments).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.allowBeneficialInvestments,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+    });
+  });
+  
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
