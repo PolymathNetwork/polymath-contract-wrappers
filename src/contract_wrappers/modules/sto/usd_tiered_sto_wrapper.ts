@@ -920,11 +920,11 @@ export default class USDTieredSTOWrapper extends STOWrapper {
         break;
       }
       case FundRaiseType.POLY: {
-        assert.assert(stoDetails.isRaisedInETH, 'POLY Not Allowed');
+        assert.assert(stoDetails.isRaisedInPOLY, 'POLY Not Allowed');
         break;
       }
       case FundRaiseType.StableCoin: {
-        assert.assert(stoDetails.isRaisedInETH, 'USD Not Allowed');
+        assert.assert(stoDetails.isRaisedInSC, 'USD Not Allowed');
         break;
       }
       default: {

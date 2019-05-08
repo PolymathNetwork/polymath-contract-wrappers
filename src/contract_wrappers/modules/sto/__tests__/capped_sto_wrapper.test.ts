@@ -273,6 +273,7 @@ describe('CappedSTOWrapper', () => {
       verify(mockedMethod.callAsync()).once();
     });
   });
+
   describe('BuyTokens', () => {
     test('should buy tokens', async () => {
       // Address expected
@@ -359,11 +360,11 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.buyTokens).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.beneficiary,
-              objectContaining(txPayableData),
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.paused).once();
       verify(mockedPausedMethod.callAsync()).once();
@@ -375,8 +376,6 @@ describe('CappedSTOWrapper', () => {
       verify(mockedContract.startTime).once();
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
-
-
     });
   });
 
@@ -429,7 +428,7 @@ describe('CappedSTOWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        from: expectedOwnerResult
+        from: expectedOwnerResult,
       };
 
       const expectedResult = getMockedPolyResponse();
@@ -439,7 +438,11 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.buyTokensWithPoly).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(objectContaining(mockedParams.investedPOLY), objectContaining(txPayableData), mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.investedPOLY),
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -450,7 +453,11 @@ describe('CappedSTOWrapper', () => {
       // Verifications
       verify(mockedContract.buyTokensWithPoly).once();
       verify(
-          mockedMethod.sendTransactionAsync(objectContaining(mockedParams.investedPOLY), objectContaining(txPayableData), mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.investedPOLY),
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.paused).once();
       verify(mockedPausedMethod.callAsync()).once();
