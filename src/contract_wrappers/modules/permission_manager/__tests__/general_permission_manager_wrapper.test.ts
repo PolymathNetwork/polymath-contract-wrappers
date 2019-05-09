@@ -270,4 +270,21 @@ describe('GeneralPermissionManagerWrapper', () => {
       verify(mockedMethod.callAsync(params.delegate, params.types)).once();
     });
   });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to GeneralPermissionManagerEvents', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(`Expected eventName to be one of: 'ChangePermission', 'AddDelegate', encountered: Transfer`),
+      );
+    });
+  });
 });
