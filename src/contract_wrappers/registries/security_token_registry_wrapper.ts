@@ -815,7 +815,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     if (registrationDate.getTime() === new Date(0).getTime()) {
       return true;
     }
-    if (!isDeployed && expiryDate.getTime() > Date.now()) {
+    if (!isDeployed && expiryDate.getTime() < Date.now()) {
       return true;
     }
     return false;
