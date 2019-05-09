@@ -770,7 +770,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     assert.assert(params.investors.length === params.accredited.length, 'Array mismatch');
     return (await this.contract).changeAccredited.sendTransactionAsync(
       params.investors,
@@ -785,7 +785,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array mismatch');
     return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
       params.investors,
@@ -846,11 +846,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('usdToken', params.usdTokens);
-    assert.isETHAddressHex('wallet', params.wallet);
-    assert.isETHAddressHex('reserveWallet', params.reserveWallet);
-    assert.isNotZeroAddress('wallet', params.wallet);
-    assert.isNotZeroAddress('reserveWallet', params.reserveWallet);
+    params.usdTokens.forEach(address => assert.isETHAddressHex('usdTokens', address));
+    assert.isNonZeroETHAddressHex('wallet', params.wallet);
+    assert.isNonZeroETHAddressHex('reserveWallet', params.reserveWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.reserveWallet,

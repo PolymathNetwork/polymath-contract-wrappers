@@ -336,8 +336,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     excluded?: string[],
   ) => {
     if (excluded !== undefined) {
-      assert.isETHAddressHexArray('excluded', excluded);
-      assert.isNotZeroAddressArray('excluded', excluded);
+      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
       assert.areThereDuplicatedStrings('excluded', excluded);
       assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     }

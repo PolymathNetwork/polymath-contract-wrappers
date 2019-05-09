@@ -5,6 +5,7 @@ import { TxParams, DividendCheckpointBaseContract, Perms } from '../../../types'
 import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
+const MAX_PERCENTAGE = new BigNumber(10).pow(18);
 
 interface DividendIndexParams {
   dividendIndex: number;
@@ -205,8 +206,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHex('tokenContract', params.tokenContract);
-    assert.isNotZeroAddress('tokenContract', params.tokenContract);
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     // require(token.transfer(msg.sender, balance), "Transfer failed");
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
@@ -222,8 +222,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public changeWallet = async (params: ChangeWalletParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHex('wallet', params.wallet);
-    assert.isNotZeroAddress('wallet', params.wallet);
+    assert.isNonZeroETHAddressHex('wallet', params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
@@ -239,8 +238,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     assert.assert(params.excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many excluded addresses');
-    assert.isETHAddressHexArray('excluded', params.excluded);
-    assert.isNotZeroAddressArray('excluded', params.excluded);
+    params.excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
     assert.areThereDuplicatedStrings('excluded', params.excluded);
     return (await this.contract).setDefaultExcluded.sendTransactionAsync(
       params.excluded,
@@ -252,7 +250,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public setWithholding = async (params: SetWithholdingParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     assert.assert(params.investors.length === params.withholding.length, 'Mismatched input lengths');
-    assert.checkWithholdingArrayTax(params.withholding);
+    params.withholding.forEach(withholding => assert.assert(withholding < MAX_PERCENTAGE, 'Incorrect withholding tax'));
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -263,7 +261,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    assert.checkWithholdingTax(params.withholding);
+    assert.assert(params.withholding < MAX_PERCENTAGE, 'Incorrect withholding tax');
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -274,7 +272,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Distribute), 'Caller is not allowed');
-    assert.isETHAddressHexArray('payees', params.payees);
+    params.payees.forEach(address => assert.isNonZeroETHAddressHex('payees', address));
     await this.checkValidDividendIndex(params.dividendIndex);
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),

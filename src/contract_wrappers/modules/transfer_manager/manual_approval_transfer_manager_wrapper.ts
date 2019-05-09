@@ -268,8 +268,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.checkAddManualApprovalMultiConditions(
       params.from,
       params.to,
@@ -313,8 +313,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.checkModifyManualApprovalMultiConditions(
       params.from,
       params.to,
@@ -354,8 +354,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
     const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {

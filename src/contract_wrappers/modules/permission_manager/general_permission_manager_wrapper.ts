@@ -155,8 +155,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public addDelegate = async (params: AddDelegateParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isNotZeroAddress('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
     const delegate = await this.checkDelegate({
       delegate: params.delegate,
@@ -172,8 +171,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public deleteDelegate = async (params: DelegateTxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isNotZeroAddress('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     const delegate = await this.checkDelegate({
       delegate: params.delegate,
     });
@@ -186,15 +184,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public checkDelegate = async (params: DelegateParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isNotZeroAddress('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     return (await this.contract).checkDelegate.callAsync(params.delegate);
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isNotZeroAddress('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).changePermission.sendTransactionAsync(
       params.delegate,
@@ -208,9 +204,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isETHAddressHexArray('module', params.modules);
-    assert.isNotZeroAddress('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
+    params.modules.forEach(address => assert.isETHAddressHex('modules', address));
     assert.assert(params.modules.length > 0, '0 length is not allowed');
     assert.assert(params.modules.length === params.perms.length, 'Array length mismatch');
     assert.assert(params.valids.length === params.perms.length, 'Array length mismatch');

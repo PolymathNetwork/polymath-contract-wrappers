@@ -443,9 +443,8 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isNotZeroAddress('investor', params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -460,8 +459,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isETHAddressHexArray('investors', params.investors);
-    assert.isNotZeroAddressArray('investors', params.investors);
+    params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.checkValidWhitelist64ByteArrayDatesAndLengths(
       params.canSendAfters,
       params.canReceiveAfters,
@@ -480,9 +478,8 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isNotZeroAddress('investor', params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');
     assert.assert(params.validTo >= new Date(), 'ValidTo date must be in the future');
@@ -530,7 +527,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public getInvestorsData = async (params: GetInvestorsDataParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     const result = await (await this.contract).getInvestorsData.callAsync(params.investors);
     const typedResult: WhitelistData[] = [];
     for (let i = 0; i < params.investors.length; i += 1) {

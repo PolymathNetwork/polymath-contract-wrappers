@@ -192,8 +192,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       from: params.from,
     };
     const allowBeneficialInvestments = await this.allowBeneficialInvestments();
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
-    assert.isNotZeroAddress('beneficiary', params.beneficiary);
+    assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!params.value.eq(new BigNumber(0)), 'Amount invested should not be equal to 0');
     if (allowBeneficialInvestments) {
       assert.assert(params.beneficiary === params.from, 'Beneficiary address does not match msg.sender');
@@ -218,8 +217,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       from: params.from,
     };
     if (params.from !== undefined) {
-      assert.isETHAddressHex('beneficiary', params.from);
-      assert.isNotZeroAddress('beneficiary', params.from);
+      assert.isNonZeroETHAddressHex('beneficiary', params.from);
     }
     assert.assert(!params.investedPOLY.eq(new BigNumber(0)), 'Amount invested should not be equal to 0');
     const pause = await this.paused();

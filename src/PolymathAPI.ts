@@ -120,8 +120,7 @@ export class PolymathAPI {
   public constructor(params: ApiConstructorParams) {
     providerUtils.standardizeOrThrow(params.provider);
     if (params.polymathRegistryAddress !== undefined) {
-      assert.isETHAddressHex('polymathRegistryAddress', params.polymathRegistryAddress);
-      assert.isNotZeroAddress('polymathRegistryAddress', params.polymathRegistryAddress);
+      assert.isNonZeroETHAddressHex('polymathRegistryAddress', params.polymathRegistryAddress);
     }
 
     this.web3Wrapper = new Web3Wrapper(params.provider, {

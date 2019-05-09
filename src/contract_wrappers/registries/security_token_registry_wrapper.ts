@@ -438,8 +438,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Transfers the ownership of the ticker
    */
   public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
-    assert.isETHAddressHex('newOwner', params.newOwner);
-    assert.isNotZeroAddress('newOwner', params.newOwner);
+    assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     await this.checkWhenNotPausedOrOwner();
     const tickerDetails = await this.getTickerDetails({
       tokenName: params.ticker,
@@ -553,7 +552,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('owner', params.owner);
     if (params.status) {
       const address = await this.getSecurityTokenAddress(params.ticker);
-      assert.isNotZeroAddress('address', address);
+      assert.isNonZeroETHAddressHex('address', address);
     }
     return (await this.contract).modifyTicker.sendTransactionAsync(
       params.owner,
@@ -575,7 +574,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const ticker = await this.getTickerDetails({
       tokenName: params.ticker,
     });
-    assert.isNotZeroAddress('owner', ticker.owner);
+    assert.isNonZeroETHAddressHex('owner', ticker.owner);
     return (await this.contract).removeTicker.sendTransactionAsync(params.ticker, params.txData, params.safetyFactor);
   };
 
@@ -600,10 +599,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
     assert.assert(params.name.length > 0, 'Name is empty');
     assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
-    assert.isETHAddressHex('owner', params.owner);
-    assert.isNotZeroAddress('owner', params.owner);
-    assert.isETHAddressHex('securityToken', params.securityToken);
-    assert.isNotZeroAddress('securityToken', params.securityToken);
+    assert.isNonZeroETHAddressHex('owner', params.owner);
+    assert.isNonZeroETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -629,8 +626,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
     await this.checkOnlyOwner();
-    assert.isETHAddressHex('newOwner', params.newOwner);
-    assert.isNotZeroAddress('newOwner', params.newOwner);
+    assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -689,8 +685,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     await this.checkOnlyOwner();
-    assert.isETHAddressHex('tokenContract', params.tokenContract);
-    assert.isNotZeroAddress('tokenContract', params.tokenContract);
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -703,8 +698,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public setProtocolVersion = async (params: SetProtocolVersionParams) => {
     await this.checkOnlyOwner();
-    assert.isETHAddressHex('STFactoryAddress', params.STFactoryAddress);
-    assert.isNotZeroAddress('STFactoryAddress', params.STFactoryAddress);
+    assert.isNonZeroETHAddressHex('STFactoryAddress', params.STFactoryAddress);
     return (await this.contract).setProtocolVersion.sendTransactionAsync(
       params.STFactoryAddress,
       params.major,
@@ -734,8 +728,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
     await this.checkOnlyOwner();
-    assert.isETHAddressHex('newAddress', params.newAddress);
-    assert.isNotZeroAddress('newAddress', params.newAddress);
+    assert.isNonZeroETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).updatePolyTokenAddress.sendTransactionAsync(
       params.newAddress,
       params.txData,

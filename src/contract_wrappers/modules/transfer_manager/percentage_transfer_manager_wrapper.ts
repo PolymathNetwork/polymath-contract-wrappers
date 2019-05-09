@@ -212,7 +212,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
       params.investors.length === params.valids.length,
       'Array lengths are not equal for investors and valids',
     );
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
       params.valids,
