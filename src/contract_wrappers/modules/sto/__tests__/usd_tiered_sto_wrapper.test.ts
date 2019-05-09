@@ -1,8 +1,8 @@
 // USDTieredSTOWrapper test
-import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
+import { instance, mock, objectContaining, reset, verify, when } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { USDTieredSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenEvents, SecurityTokenContract, USDTieredSTOContract } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -450,6 +450,69 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getTokensMinted).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('IsOpen', () => {
+    test('should get boolean of isOpen', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isOpen).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isOpen();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isOpen).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetRate', () => {
+    test('should get value of getRate', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getRate).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(FundRaiseType.ETH)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getRate({ fundRaiseType: FundRaiseType.ETH });
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getRate).once();
+      verify(mockedMethod.callAsync(FundRaiseType.ETH)).once();
+    });
+  });
+
+  describe('MinimumInvestmentUSD', () => {
+    test('should get value of minimumInvestmentUSD', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.minimumInvestmentUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.minimumInvestmentUSD();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.minimumInvestmentUSD).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
