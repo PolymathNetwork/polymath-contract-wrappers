@@ -159,7 +159,7 @@ describe('USDTieredSTOWrapper', () => {
       // Result expected
       const expectedResult = true;
       const params = {
-        stableCoinAddress: '0x1111111111111111111111111111111111111111'
+        stableCoinAddress: '0x1111111111111111111111111111111111111111',
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -189,7 +189,7 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.usdTokens).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -212,9 +212,7 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the method
       when(mockedContract.investorInvestedUSD).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(params.investorAddress)).thenResolve(
-          expectedResult,
-      );
+      when(mockedMethod.callAsync(params.investorAddress)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.investorInvestedUSD(params);
@@ -247,7 +245,7 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -268,11 +266,11 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.changeAllowBeneficialInvestments).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.allowBeneficialInvestments,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -283,18 +281,115 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.changeAllowBeneficialInvestments).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.allowBeneficialInvestments,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowBeneficialInvestments,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
     });
   });
-  
+
+  describe('BuyWithETH', () => {
+    test('should buy with ETH', async () => {
+      // Address expected
+      const expectedAllowBeneficialInvestmentResult = false;
+      // Mocked method
+      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
+      // Stub the request
+      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Pause Address expected
+      const expectedPausedResult = false;
+      // Mocked method
+      const mockedPausedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.paused).thenReturn(instance(mockedPausedMethod));
+      // Stub the request
+      when(mockedPausedMethod.callAsync()).thenResolve(expectedPausedResult);
+
+      // Mock STO Details
+      const expectedStartTime = new Date(2025, 1);
+      const expectedEndTime = new Date(2026, 1);
+      const expectedSTODetailsResult = [
+        dateToBigNumber(expectedStartTime),
+        dateToBigNumber(expectedEndTime),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        [true, false, false],
+      ];
+      // Mocked method
+      const mockedSTODetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
+      // Stub the request
+      when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      const mockedParams = {
+        beneficiary: expectedOwnerResult,
+        from: expectedOwnerResult,
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const txPayableData = {
+        ...{},
+        from: expectedOwnerResult,
+        value: mockedParams.value,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.buyWithETH).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.buyWithETH(mockedParams);
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+
+      // Verifications
+      verify(mockedContract.buyWithETH).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          objectContaining(txPayableData),
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.paused).once();
+      verify(mockedPausedMethod.callAsync()).once();
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+      verify(mockedContract.getSTODetails).once();
+      verify(mockedSTODetailsMethod.callAsync()).once();
+    });
+  });
+
   describe('GetSTODetails', () => {
     test('should call getSTODetails', async () => {
       const expectedStartTime = new Date(2025, 1);
@@ -347,9 +442,7 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the method
       when(mockedContract.getTokensMinted).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(
-          expectedResult,
-      );
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getTokensMinted();

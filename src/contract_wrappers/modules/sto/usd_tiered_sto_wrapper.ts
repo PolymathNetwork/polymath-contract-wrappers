@@ -936,8 +936,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     if (!allowBeneficialInvestments) {
       assert.assert(beneficiary === from, 'Beneficiary != funder');
     }
-    const getTokensMinted = await this.getTokensMinted();
-    assert.assert((await this.getTokensMinted()).minus(getTokensMinted).gte(minTokens), 'Insufficient minted');
   };
 
   /**
