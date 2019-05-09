@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { BigNumber } from '@0x/utils';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
+const MAX_64_BYTES_DATE = new Date(18446744073709);
 
 const assert = {
   ...sharedAssert,
@@ -22,11 +23,8 @@ const assert = {
       `There are duplicates in ${variableName} array. Duplicates: ${result.toString}`,
     );
   },
-  checkValidWhitelist64ByteDates(canSendAfter: Date, canReceiveAfter: Date, expiryTime: Date): void {
-    const max64BitTime = new Date(18446744073709);
-    sharedAssert.assert(max64BitTime >= canSendAfter, 'From: time too far in the future');
-    sharedAssert.assert(max64BitTime >= canReceiveAfter, 'To: time too far in the future');
-    sharedAssert.assert(max64BitTime >= expiryTime, 'Expiry: time too far in the future');
+  isLessThanMax64BytesDate(variableName: string, value: Date): void {
+    sharedAssert.assert(value <= MAX_64_BYTES_DATE, `${variableName} date is too far in the future`);
   },
   checkValidWhitelist64ByteArrayDatesAndLengths(
     canSendAfters: Date[],
@@ -47,7 +45,9 @@ const assert = {
       'Array lengths for canSendAfters and canBuyFromSTO passed in are not the same',
     );
     for (let i = 0; i < canSendAfters.length; i + 1) {
-      this.checkValidWhitelist64ByteDates(canSendAfters[i], canReceiveAfters[i], expiryTimes[i]);
+      assert.isLessThanMax64BytesDate('canSendAfter', canSendAfters[i]);
+      assert.isLessThanMax64BytesDate('canReceiveAfter', canReceiveAfters[i]);
+      assert.isLessThanMax64BytesDate('expiryTime', expiryTimes[i]);
     }
   },
   checkAddManualApprovalConditions(to: string, expiryTime: Date, allowance: BigNumber): void {

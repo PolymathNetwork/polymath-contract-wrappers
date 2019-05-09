@@ -445,7 +445,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.canSendAfter),
@@ -480,7 +482,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
     assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');
     assert.assert(params.validTo >= new Date(), 'ValidTo date must be in the future');
     assert.assert(
