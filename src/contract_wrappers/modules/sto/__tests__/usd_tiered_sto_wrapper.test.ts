@@ -638,6 +638,27 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
+  describe('CurrentTier', () => {
+    test('should get amount from currentTier', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentTier).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.currentTier();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.currentTier).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('IsOpen', () => {
     test('should get boolean of isOpen', async () => {
       // Address expected
@@ -719,6 +740,190 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.minimumInvestmentUSD).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('ReserveWallet', () => {
+    test('should get address from reserveWallet', async () => {
+      // Address expected
+      const expectedResult = '0x1111111111111111111111111111111111111111';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.reserveWallet).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.reserveWallet();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.reserveWallet).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetTokensSold', () => {
+    test('should get amount from getTokensSold', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensSold).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTokensSold();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTokensSold).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('IsFinalized', () => {
+    test('should get boolean of isFinalized', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isFinalized).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isFinalized();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isFinalized).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetUSDTokens', () => {
+    test('should get amount of getUSDTokens', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getUsdTokens).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getUsdTokens();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getUsdTokens).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('FundsRaisedUSD', () => {
+    test('should get amount from fundsRaisedUSD', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.fundsRaisedUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.fundsRaisedUSD();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.fundsRaisedUSD).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Tiers', () => {
+    test('should get tiers information', async () => {
+      const params = {
+        tier: 2,
+      };
+
+      const expectedResult = [
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.tiers).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(params.tier))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.tiers(params);
+      // Result expectation
+      expect(result.rate).toEqual(expectedResult[0]);
+      expect(result.rateDiscountPoly).toEqual(expectedResult[1]);
+      expect(result.tokenTotal).toEqual(expectedResult[2]);
+      expect(result.tokensDiscountPoly).toEqual(expectedResult[3]);
+      expect(result.mintedTotal).toEqual(expectedResult[4]);
+      expect(result.mintedDiscountPoly).toEqual(expectedResult[5]);
+
+      verify(mockedContract.tiers).once();
+      verify(mockedMethod.callAsync(objectContaining(params.tier))).once();
+    });
+  });
+
+  describe('GetTokensMintedByTier', () => {
+    test('should get value of getTokensMintedByTier', async () => {
+      // TokensSoldByTier value expected
+      const expectedAmount = [ new BigNumber(100),new BigNumber(200),new BigNumber(300)];
+      // Params
+      const params = {
+        tier: 2,
+      };
+
+      // GetNumberOfTiers Result expected
+      const expectedGetNumberOfTiersAmount = new BigNumber(3);
+
+      // Mocked getNumberOfTiers method
+      const mockedGetNumberOfTiersMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getNumberOfTiers).thenReturn(instance(mockedGetNumberOfTiersMethod));
+      // Stub the request
+      when(mockedGetNumberOfTiersMethod.callAsync()).thenResolve(expectedGetNumberOfTiersAmount);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensMintedByTier).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(params.tier))).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.getTokensMintedByTier(params);
+      // Result expectation
+      expect(result.mintedInETH).toBe(expectedAmount[0]);
+      expect(result.mintedInPOLY).toBe(expectedAmount[1]);
+      expect(result.mintedInSC).toBe(expectedAmount[2]);
+      // Verifications
+      verify(mockedContract.getNumberOfTiers).once();
+      verify(mockedGetNumberOfTiersMethod.callAsync()).once();
+      verify(mockedContract.getTokensMintedByTier).once();
+      verify(mockedMethod.callAsync(objectContaining(params.tier))).once();
     });
   });
 
