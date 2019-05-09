@@ -489,6 +489,53 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
+  describe('CapReached', () => {
+    test('should get boolean of capReached', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.capReached).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.capReached();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.capReached).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('ConvertFromUSD', () => {
+    test('should get value of convertFromUSD', async () => {
+      // Result expected
+      const expectedAmount = new BigNumber(1);
+      // Params
+      const params = {
+        fundRaiseType: FundRaiseType.ETH,
+        amount: new BigNumber(2),
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.convertFromUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.convertFromUSD(params);
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.convertFromUSD).once();
+      verify(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).once();
+    });
+  });
+
   describe('GetSTODetails', () => {
     test('should call getSTODetails', async () => {
       const expectedStartTime = new Date(2025, 1);
@@ -550,6 +597,44 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.getTokensMinted).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetTokensSoldByTier', () => {
+    test('should get value of getTokensSoldByTier', async () => {
+      // TokensSoldByTier value expected
+      const expectedAmount = new BigNumber(100);
+      // Params
+      const params = {
+        tier: 2,
+      };
+
+      // GetNumberOfTiers Result expected
+      const expectedGetNumberOfTiersAmount = new BigNumber(3);
+
+      // Mocked getNumberOfTiers method
+      const mockedGetNumberOfTiersMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getNumberOfTiers).thenReturn(instance(mockedGetNumberOfTiersMethod));
+      // Stub the request
+      when(mockedGetNumberOfTiersMethod.callAsync()).thenResolve(expectedGetNumberOfTiersAmount);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensSoldByTier).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(params.tier))).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.getTokensSoldByTier(params);
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.getNumberOfTiers).once();
+      verify(mockedGetNumberOfTiersMethod.callAsync()).once();
+      verify(mockedContract.getTokensSoldByTier).once();
+      verify(mockedMethod.callAsync(objectContaining(params.tier))).once();
     });
   });
 
@@ -633,6 +718,28 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.minimumInvestmentUSD).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetNumberOfTiers', () => {
+    test('should get value of getNumberOfTiers', async () => {
+      // Result expected
+      const expectedAmount = new BigNumber(1);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getNumberOfTiers).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.getNumberOfTiers();
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.getNumberOfTiers).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
