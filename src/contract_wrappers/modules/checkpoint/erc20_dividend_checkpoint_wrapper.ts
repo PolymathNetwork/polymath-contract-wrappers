@@ -267,7 +267,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
-      assert.isAddressArrayNotZero(auxExcluded);
+      assert.isNotZeroAddressArray('excluded', auxExcluded);
       // we need to simulate push to verify the `duped exclude address` assert
     }
     assert.assert(auxExcluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
@@ -275,7 +275,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(expiry > new Date(), 'Expiry in past');
     assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
     assert.isETHAddressHex('token', token);
-    assert.isAddressNotZero('token', token);
+    assert.isNotZeroAddress('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
   };
 

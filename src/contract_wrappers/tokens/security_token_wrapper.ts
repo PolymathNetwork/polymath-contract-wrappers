@@ -662,7 +662,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    assert.isAddressNotZero('newOwner', params.newOwner);
+    assert.isNotZeroAddress('newOwner', params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
@@ -717,7 +717,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public withdrawERC20 = async (params: WithdrawERC20Params) => {
-    assert.isAddressNotZero('tokenContract', params.tokenContract);
+    assert.isNotZeroAddress('tokenContract', params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     await this.checkOnlyOwner();
     return (await this.contract).withdrawERC20.sendTransactionAsync(
@@ -790,7 +790,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public transferWithData = async (params: TransferWithDataParams) => {
     assert.isETHAddressHex('to', params.to);
-    assert.isAddressNotZero('to', params.to);
+    assert.isNotZeroAddress('to', params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
       params.value,
@@ -803,7 +803,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public transferFromWithData = async (params: TransferFromWithDataParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    assert.isAddressNotZero('to', params.to);
+    assert.isNotZeroAddress('to', params.to);
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
@@ -829,7 +829,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mint = async (params: MintParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    assert.isAddressNotZero('investor', params.investor);
+    assert.isNotZeroAddress('investor', params.investor);
     await this.checkOnlyOwner();
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mint.sendTransactionAsync(
@@ -842,7 +842,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintWithData = async (params: MintWithDataParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    assert.isAddressNotZero('investor', params.investor);
+    assert.isNotZeroAddress('investor', params.investor);
     await this.checkOnlyOwner();
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mintWithData.sendTransactionAsync(
@@ -856,7 +856,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintMulti = async (params: MintMultiParams) => {
     assert.isETHAddressHexArray('investors', params.investors);
-    assert.isAddressArrayNotZero(params.investors);
+    assert.isNotZeroAddressArray('investors', params.investors);
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     await this.checkOnlyOwner();
     assert.assert(
@@ -954,7 +954,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('to', params.to);
     await this.checkMsgSenderIsController();
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
-    assert.isAddressNotZero('to', params.to);
+    assert.isNotZeroAddress('to', params.to);
 
     return (await this.contract).forceTransfer.sendTransactionAsync(
       params.from,
@@ -1148,7 +1148,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
-    assert.isAddressNotZero('address', (await this.getModule({ moduleAddress })).address);
+    assert.isNotZeroAddress('address', (await this.getModule({ moduleAddress })).address);
   };
 
   private checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {

@@ -206,7 +206,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('tokenContract', params.tokenContract);
-    assert.isAddressNotZero('tokenContract', params.tokenContract);
+    assert.isNotZeroAddress('tokenContract', params.tokenContract);
     // require(token.transfer(msg.sender, balance), "Transfer failed");
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
@@ -223,7 +223,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public changeWallet = async (params: ChangeWalletParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.isETHAddressHex('wallet', params.wallet);
-    assert.isAddressNotZero('wallet', params.wallet);
+    assert.isNotZeroAddress('wallet', params.wallet);
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
@@ -240,8 +240,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     assert.assert(params.excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many excluded addresses');
     assert.isETHAddressHexArray('excluded', params.excluded);
-    assert.isAddressArrayNotZero(params.excluded);
-    assert.checkDuplicateAddresses(params.excluded);
+    assert.isNotZeroAddressArray('excluded', params.excluded);
+    assert.areThereDuplicatedStrings(params.excluded);
     return (await this.contract).setDefaultExcluded.sendTransactionAsync(
       params.excluded,
       params.txData,

@@ -445,7 +445,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressNotZero('investor', params.investor);
+    assert.isNotZeroAddress('investor', params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -459,9 +459,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressArrayNotZero(params.investors);
+    assert.isETHAddressHexArray('investors', params.investors);
+    assert.isNotZeroAddressArray('investors', params.investors);
     assert.checkValidWhitelist64ByteArrayDatesAndLengths(
       params.canSendAfters,
       params.canReceiveAfters,
@@ -482,7 +482,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressNotZero('investor', params.investor);
+    assert.isNotZeroAddress('investor', params.investor);
     assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
     assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');
     assert.assert(params.validTo >= new Date(), 'ValidTo date must be in the future');

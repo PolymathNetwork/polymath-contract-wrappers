@@ -12,19 +12,19 @@ const assert = {
     sharedAssert.assert(isValid, `Expected ${variableName} to be a valid subscription token`);
   },
   isETHAddressHexArray(variableName: string, arr: string[]): void {
-    _.map(arr, address => {
+    arr.forEach(address => {
       assert.isETHAddressHex(variableName, address);
     });
   },
-  isAddressNotZero(variableName: string, address: string): void {
+  isNotZeroAddress(variableName: string, address: string): void {
     sharedAssert.assert(address !== ZERO, `'${variableName}' is not expected to be 0x0`);
   },
-  isAddressArrayNotZero(addresses: string[]): void {
-    _.map(addresses, address => {
-      this.isAddressNotZero('address', address);
+  isNotZeroAddressArray(variableName: string, addresses: string[]): void {
+    addresses.forEach(address => {
+      this.isNotZeroAddress(variableName, address);
     });
   },
-  checkDuplicateAddresses(addresses: string[]): void {
+  areThereDuplicatedStrings(addresses: string[]): void {
     const result = _.filter(addresses, (val, i, iteratee) => _.includes(iteratee, val, i + 1));
     sharedAssert.assert(result.length > 0, `Duplicate exclude address ${result.toString}`);
   },
@@ -33,7 +33,7 @@ const assert = {
     sharedAssert.assert(withholding <= bn, 'Incorrect withholding tax');
   },
   checkWithholdingArrayTax(withholdings: BigNumber[]): void {
-    _.map(withholdings, withholding => {
+    withholdings.forEach(withholding => {
       this.checkWithholdingTax(withholding);
     });
   },
@@ -66,7 +66,7 @@ const assert = {
     }
   },
   checkAddManualApprovalConditions(to: string, expiryTime: Date, allowance: BigNumber): void {
-    assert.isAddressNotZero('to', to);
+    assert.isNotZeroAddress('to', to);
     assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');
     assert.assert(allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0');
   },
@@ -98,7 +98,7 @@ const assert = {
     }
   },
   checkModifyManualApprovalConditions(to: string, expiryTime: Date): void {
-    assert.isAddressNotZero('to', to);
+    assert.isNotZeroAddress('to', to);
     assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');
   },
   checkModifyManualApprovalMultiConditions(

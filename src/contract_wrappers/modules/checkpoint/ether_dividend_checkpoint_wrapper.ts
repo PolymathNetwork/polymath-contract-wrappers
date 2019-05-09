@@ -339,7 +339,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     if (auxExcluded === undefined) {
       auxExcluded = await this.getDefaultExcluded();
       assert.isETHAddressHexArray('excluded', auxExcluded);
-      assert.isAddressArrayNotZero(auxExcluded);
+      assert.isNotZeroAddressArray('excluded', auxExcluded);
       // we need to simulate push to verify the `duped exclude address` assert
     }
     const auxValue = value === undefined ? new BigNumber(0) : value;

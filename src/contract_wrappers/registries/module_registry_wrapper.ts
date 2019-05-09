@@ -326,7 +326,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isAddressNotZero('tokenContract', params.tokenContract);
+    assert.isNotZeroAddress('tokenContract', params.tokenContract);
     assert.isETHAddressHex('tokenContract', params.tokenContract);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -354,7 +354,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    assert.isAddressNotZero('newOwner', params.newOwner);
+    assert.isNotZeroAddress('newOwner', params.newOwner);
     assert.isETHAddressHex('newOwner', params.newOwner);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).transferOwnership.sendTransactionAsync(
