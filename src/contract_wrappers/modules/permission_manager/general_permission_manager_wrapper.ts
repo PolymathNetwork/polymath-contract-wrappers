@@ -150,7 +150,11 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public checkPermission = async (params: PermsParams) => {
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHex('module', params.module);
-    return (await this.contract).checkPermission.callAsync(params.delegate, params.module, params.permission);
+    return (await this.contract).checkPermission.callAsync(
+      params.delegate,
+      params.module,
+      stringToBytes32(params.permission),
+    );
   };
 
   public addDelegate = async (params: AddDelegateParams) => {
