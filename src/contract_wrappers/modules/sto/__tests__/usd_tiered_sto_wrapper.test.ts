@@ -390,6 +390,105 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
+  describe('BuyTokensView', () => {
+    test('should get buyTokensView values', async () => {
+      const investorAddress = '0x1111111111111111111111111111111111111111';
+
+      // Mock isOpen
+      const expectedIsOpenResult = true;
+      // Mocked method
+      const mockedIsOpenMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isOpen).thenReturn(instance(mockedIsOpenMethod));
+      // Stub the request
+      when(mockedIsOpenMethod.callAsync()).thenResolve(expectedIsOpenResult);
+
+      // Mock getRate
+      const expectedGetRateResult = new BigNumber(1);
+      // Mocked method
+      const mockedGetRateMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
+      // Stub the request
+      when(mockedGetRateMethod.callAsync(FundRaiseType.POLY)).thenResolve(expectedGetRateResult);
+
+      // Mock investorInvestedUSD
+      const expectedInvestorInvestedUSDResult = new BigNumber(1);
+      // Mocked method
+      const mockedInvestorInvestedUSDMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investorInvestedUSD).thenReturn(instance(mockedInvestorInvestedUSDMethod));
+      // Stub the request
+      when(mockedInvestorInvestedUSDMethod.callAsync(investorAddress)).thenResolve(expectedInvestorInvestedUSDResult);
+
+      // Mock minimumInvestmentUSD
+      const expectedMinimumInvestmentUSDResult = new BigNumber(1);
+      // Mocked method
+      const mockedMinimumInvestmentUSDMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.minimumInvestmentUSD).thenReturn(instance(mockedMinimumInvestmentUSDMethod));
+      // Stub the request
+      when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
+
+      // Mock investors
+      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
+      // Mocked method
+      const mockedInvestorsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
+      // Stub the request
+      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+
+      // Mock nonAccreditedLimitUSD
+      const expectedNonAccreditedLimitUSDResult = new BigNumber(10);
+      // Mocked method
+      const mockedNonAccreditedLimitUSDMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.nonAccreditedLimitUSD).thenReturn(instance(mockedNonAccreditedLimitUSDMethod));
+      // Stub the request
+      when(mockedNonAccreditedLimitUSDMethod.callAsync()).thenResolve(expectedNonAccreditedLimitUSDResult);
+
+      // Mock buyTokensView
+      const params = {
+        beneficiary: investorAddress,
+        investmentValue: new BigNumber(2),
+        fundRaiseType: FundRaiseType.POLY,
+      };
+      const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(1)];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.buyTokensView).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.beneficiary, params.investmentValue, params.fundRaiseType)).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.buyTokensView(params);
+      // Result expectation
+      expect(result.spentUSD).toEqual(expectedResult[0]);
+      expect(result.spentValue).toEqual(expectedResult[1]);
+      expect(result.tokensMinted).toEqual(expectedResult[2]);
+
+      // Verifications
+      verify(mockedContract.isOpen).once();
+      verify(mockedIsOpenMethod.callAsync()).once();
+      verify(mockedContract.getRate).once();
+      verify(mockedGetRateMethod.callAsync(FundRaiseType.POLY)).once();
+      verify(mockedContract.investorInvestedUSD).once();
+      verify(mockedInvestorInvestedUSDMethod.callAsync(investorAddress)).once();
+      verify(mockedContract.minimumInvestmentUSD).once();
+      verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
+      verify(mockedContract.nonAccreditedLimitUSD).once();
+      verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
+      verify(mockedContract.investors).once();
+      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedContract.buyTokensView).once();
+      verify(mockedMethod.callAsync(params.beneficiary, params.investmentValue, params.fundRaiseType)).once();
+    });
+  });
+
   describe('GetSTODetails', () => {
     test('should call getSTODetails', async () => {
       const expectedStartTime = new Date(2025, 1);
@@ -477,7 +576,7 @@ describe('USDTieredSTOWrapper', () => {
 
   describe('GetRate', () => {
     test('should get value of getRate', async () => {
-      // Address expected
+      // Result expected
       const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -493,6 +592,27 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.getRate).once();
       verify(mockedMethod.callAsync(FundRaiseType.ETH)).once();
+    });
+  });
+
+  describe('NonAccreditedLimitUSD', () => {
+    test('should get value of nonAccreditedLimitUSD', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.nonAccreditedLimitUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.nonAccreditedLimitUSD();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.nonAccreditedLimitUSD).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
