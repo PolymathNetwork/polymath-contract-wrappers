@@ -310,8 +310,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
-    assert.checkModifyManualApprovalConditions(params.to, params.expiryTime);
+    assert.isNonZeroETHAddressHex('to', params.to);
+    assert.assert(params.expiryTime > new Date(), 'ExpiryTime must be in the future');
     await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
@@ -328,14 +328,24 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     params.from.forEach(address => assert.isETHAddressHex('from', address));
-    params.to.forEach(address => assert.isETHAddressHex('to', address));
-    assert.checkModifyManualApprovalMultiConditions(
-      params.from,
-      params.to,
-      params.changedAllowances,
-      params.expiryTimes,
-      params.descriptions,
+    params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
+    assert.assert(
+      params.from.length === params.to.length,
+      'Array lengths for from address and to address passed in are not the same',
     );
+    assert.assert(
+      params.from.length === params.changedAllowances.length,
+      'Array lengths for from address and allowances passed in are not the same',
+    );
+    assert.assert(
+      params.from.length === params.expiryTimes.length,
+      'Array lengths for from address and expiryTimes passed in are not the same',
+    );
+    assert.assert(
+      params.from.length === params.descriptions.length,
+      'Array lengths for from address and descriptions passed in are not the same',
+    );
+    params.expiryTimes.forEach(expiry => assert.assert(expiry > new Date(), 'ExpiryTime must be in the future'));
     const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));

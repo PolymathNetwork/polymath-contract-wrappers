@@ -26,37 +26,6 @@ const assert = {
   isLessThanMax64BytesDate(variableName: string, value: Date): void {
     sharedAssert.assert(value <= MAX_64_BYTES_DATE, `${variableName} date is too far in the future`);
   },
-  checkModifyManualApprovalConditions(to: string, expiryTime: Date): void {
-    assert.isNonZeroETHAddressHex('to', to);
-    assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');
-  },
-  checkModifyManualApprovalMultiConditions(
-    from: string[],
-    to: string[],
-    changeAllowances: BigNumber[],
-    expiryTimes: Date[],
-    descriptions: string[],
-  ): void {
-    sharedAssert.assert(
-      from.length === to.length,
-      'Array lengths for from address and to address passed in are not the same',
-    );
-    sharedAssert.assert(
-      from.length === changeAllowances.length,
-      'Array lengths for from address and allowances passed in are not the same',
-    );
-    sharedAssert.assert(
-      from.length === expiryTimes.length,
-      'Array lengths for from address and expiryTimes passed in are not the same',
-    );
-    sharedAssert.assert(
-      from.length === descriptions.length,
-      'Array lengths for from address and descriptions passed in are not the same',
-    );
-    for (let i = 0; i < to.length; i + 1) {
-      this.checkModifyManualApprovalConditions(to[i], expiryTimes[i]);
-    }
-  },
   checkRestrictionInputParams(
     startTime: Date,
     allowedTokens: BigNumber,
