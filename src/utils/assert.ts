@@ -26,30 +26,6 @@ const assert = {
   isLessThanMax64BytesDate(variableName: string, value: Date): void {
     sharedAssert.assert(value <= MAX_64_BYTES_DATE, `${variableName} date is too far in the future`);
   },
-  checkValidWhitelist64ByteArrayDatesAndLengths(
-    canSendAfters: Date[],
-    canReceiveAfters: Date[],
-    expiryTimes: Date[],
-    canBuyFromSTO: boolean[],
-  ): void {
-    sharedAssert.assert(
-      canSendAfters.length === canReceiveAfters.length,
-      'Array lengths for canSendAfters and canReceiveAfters passed in are not the same',
-    );
-    sharedAssert.assert(
-      canSendAfters.length === expiryTimes.length,
-      'Array lengths for canSendAfters and expiryTimes passed in are not the same',
-    );
-    sharedAssert.assert(
-      canSendAfters.length === canBuyFromSTO.length,
-      'Array lengths for canSendAfters and canBuyFromSTO passed in are not the same',
-    );
-    for (let i = 0; i < canSendAfters.length; i + 1) {
-      assert.isLessThanMax64BytesDate('canSendAfter', canSendAfters[i]);
-      assert.isLessThanMax64BytesDate('canReceiveAfter', canReceiveAfters[i]);
-      assert.isLessThanMax64BytesDate('expiryTime', expiryTimes[i]);
-    }
-  },
   checkAddManualApprovalConditions(to: string, expiryTime: Date, allowance: BigNumber): void {
     assert.isNonZeroETHAddressHex('to', to);
     assert.assert(expiryTime > new Date(), 'ExpiryTime must be in the future');

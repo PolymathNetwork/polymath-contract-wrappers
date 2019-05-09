@@ -462,12 +462,21 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
-    assert.checkValidWhitelist64ByteArrayDatesAndLengths(
-      params.canSendAfters,
-      params.canReceiveAfters,
-      params.expiryTimes,
-      params.canBuyFromSTO,
+    assert.assert(
+      params.canSendAfters.length === params.canReceiveAfters.length,
+      'Array lengths for canSendAfters and canReceiveAfters passed in are not the same',
     );
+    assert.assert(
+      params.canSendAfters.length === params.expiryTimes.length,
+      'Array lengths for canSendAfters and expiryTimes passed in are not the same',
+    );
+    assert.assert(
+      params.canSendAfters.length === params.canBuyFromSTO.length,
+      'Array lengths for canSendAfters and canBuyFromSTO passed in are not the same',
+    );
+    params.canSendAfters.forEach(date => assert.isLessThanMax64BytesDate('canSendAfter', date));
+    params.canReceiveAfters.forEach(date => assert.isLessThanMax64BytesDate('canReceiveAfter', date));
+    params.expiryTimes.forEach(date => assert.isLessThanMax64BytesDate('expiryTime', date));
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
       dateArrayToBigNumberArray(params.canSendAfters),
