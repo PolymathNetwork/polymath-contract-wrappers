@@ -24,9 +24,12 @@ const assert = {
       this.isNotZeroAddress(variableName, address);
     });
   },
-  areThereDuplicatedStrings(addresses: string[]): void {
+  areThereDuplicatedStrings(variableName: string, addresses: string[]): void {
     const result = _.filter(addresses, (val, i, iteratee) => _.includes(iteratee, val, i + 1));
-    sharedAssert.assert(result.length > 0, `Duplicate exclude address ${result.toString}`);
+    sharedAssert.assert(
+      result.length > 0,
+      `There are duplicates in ${variableName} array. Duplicates: ${result.toString}`,
+    );
   },
   checkWithholdingTax(withholding: BigNumber): void {
     const bn = new BigNumber(10 ** 18);

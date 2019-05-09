@@ -241,7 +241,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.assert(params.excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many excluded addresses');
     assert.isETHAddressHexArray('excluded', params.excluded);
     assert.isNotZeroAddressArray('excluded', params.excluded);
-    assert.areThereDuplicatedStrings(params.excluded);
+    assert.areThereDuplicatedStrings('excluded', params.excluded);
     return (await this.contract).setDefaultExcluded.sendTransactionAsync(
       params.excluded,
       params.txData,

@@ -328,29 +328,26 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   private isDividendValid = async (
-    value: BigNumber | undefined,
+    value: BigNumber,
     expiry: Date,
     maturity: Date,
     name: string,
     checkpointId?: number,
     excluded?: string[],
   ) => {
-    let auxExcluded = excluded;
-    if (auxExcluded === undefined) {
-      auxExcluded = await this.getDefaultExcluded();
-      assert.isETHAddressHexArray('excluded', auxExcluded);
-      assert.isNotZeroAddressArray('excluded', auxExcluded);
-      // we need to simulate push to verify the `duped exclude address` assert
+    if (excluded !== undefined) {
+      assert.isETHAddressHexArray('excluded', excluded);
+      assert.isNotZeroAddressArray('excluded', excluded);
+      assert.areThereDuplicatedStrings('excluded', excluded);
+      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     }
-    const auxValue = value === undefined ? new BigNumber(0) : value;
-    assert.assert(auxExcluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.assert(expiry > new Date(), 'Expiry in past');
-    assert.assert(auxValue.gt(new BigNumber(0)), 'No dividend sent');
+    assert.assert(value.isGreaterThan(new BigNumber(0)), 'No dividend sent');
     if (typeof checkpointId !== 'undefined') {
       const st = await this.securityTokenContract();
       const currentCheckpointId = await st.currentCheckpointId.callAsync();
-      assert.assert(new BigNumber(checkpointId).lte(currentCheckpointId), 'Invalid checkpoint');
+      assert.assert(new BigNumber(checkpointId).isLessThanOrEqualTo(currentCheckpointId), 'Invalid checkpoint');
     }
     assert.assert(name.length > 0, 'The name can not be empty');
   };
