@@ -309,7 +309,7 @@ describe('CappedSTOWrapper', () => {
       // Stub the request
       when(mockedFundRaiseMethod.callAsync(FundRaiseType.ETH)).thenResolve(expectedFundRaiseTypeResult);
 
-      const expectedStartTimeResult = new BigNumber(1735689000);
+      const expectedStartTimeResult = new BigNumber(100);
       // Mocked method
       const mockedStartTimeMethod = mock(MockedCallMethod);
       // Stub the method
@@ -334,7 +334,6 @@ describe('CappedSTOWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        from: expectedOwnerResult,
         value: mockedParams.value,
       };
 
@@ -347,7 +346,7 @@ describe('CappedSTOWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-          objectContaining(txPayableData),
+            objectContaining(txPayableData),
           mockedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
@@ -404,7 +403,7 @@ describe('CappedSTOWrapper', () => {
       // Stub the request
       when(mockedFundRaiseMethod.callAsync(FundRaiseType.POLY)).thenResolve(expectedFundRaiseTypeResult);
 
-      const expectedStartTimeResult = new BigNumber(1735689000);
+      const expectedStartTimeResult = new BigNumber(100);
       // Mocked method
       const mockedStartTimeMethod = mock(MockedCallMethod);
       // Stub the method
@@ -440,7 +439,7 @@ describe('CappedSTOWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           objectContaining(mockedParams.investedPOLY),
-          objectContaining(txPayableData),
+          mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
@@ -455,7 +454,7 @@ describe('CappedSTOWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           objectContaining(mockedParams.investedPOLY),
-          objectContaining(txPayableData),
+          mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
