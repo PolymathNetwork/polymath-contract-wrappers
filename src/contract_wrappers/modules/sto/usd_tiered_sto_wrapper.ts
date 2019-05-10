@@ -33,7 +33,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../../types';
-import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
@@ -623,7 +623,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
-    assert.assert(params.tier < bigNumberToNumber(tiers), 'Invalid tier');
+    assert.assert(params.tier < tiers.toNumber(), 'Invalid tier');
     return (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
   };
 
@@ -636,7 +636,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       capPerTier: result[3],
       ratePerTier: result[4],
       fundsRaised: result[5],
-      investorCount: bigNumberToNumber(result[6]),
+      investorCount: result[6].toNumber(),
       tokensSold: result[7],
       isRaisedInETH: result[8][0],
       isRaisedInPOLY: result[8][1],
@@ -728,7 +728,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
-    assert.assert(params.tier < bigNumberToNumber(await this.getNumberOfTiers()), 'Invalid tier');
+    assert.assert(params.tier < (await this.getNumberOfTiers()).toNumber(), 'Invalid tier');
     const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: result[0],

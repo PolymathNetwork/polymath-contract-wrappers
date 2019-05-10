@@ -25,7 +25,7 @@ import {
   GetLogs,
   FundRaiseType,
 } from '../../../types';
-import { bigNumberToDate, bigNumberToNumber } from '../../../utils/convert';
+import { bigNumberToDate } from '../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase;
@@ -244,7 +244,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       cap: result[2],
       rate: result[3],
       fundsRaised: result[4],
-      investorCount: bigNumberToNumber(result[5]),
+      investorCount: result[5].toNumber(),
       totalTokensSold: result[6],
       isRaisedInPoly: result[7],
     };

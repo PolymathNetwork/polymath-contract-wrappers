@@ -28,7 +28,6 @@ import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   bigNumberToDate,
-  bigNumberToNumber,
   dateArrayToBigNumberArray,
   dateToBigNumber,
   numberArrayToBigNumberArray,
@@ -396,7 +395,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType: result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage,
     };
@@ -408,7 +407,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType: result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage,
     };
@@ -420,7 +419,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType: result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage,
     };
@@ -436,7 +435,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: IndividualRestriction = {
       allowedTokens: result[0],
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: bigNumberToNumber(result[2]),
+      rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType: result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage,
     };
@@ -774,7 +773,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: result[1],
-      daysCovered: bigNumberToNumber(result[2]),
+      daysCovered: result[2].toNumber(),
       dailyLastTradedDayTime: bigNumberToDate(result[3]),
       lastTradedTimestamp: bigNumberToDate(result[4]),
     };
@@ -787,7 +786,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: result[1],
-      daysCovered: bigNumberToNumber(result[2]),
+      daysCovered: result[2].toNumber(),
       dailyLastTradedDayTime: bigNumberToDate(result[3]),
       lastTradedTimestamp: bigNumberToDate(result[4]),
     };
@@ -814,7 +813,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         allAddresses: result[0][i],
         allowedTokens: result[1][i],
         startTime: bigNumberToDate(result[2][i]),
-        rollingPeriodInDays: bigNumberToNumber(result[3][i]),
+        rollingPeriodInDays: result[3][i].toNumber(),
         endTime: bigNumberToDate(result[4][i]),
         typeOfRestriction: result[5][i],
       };
