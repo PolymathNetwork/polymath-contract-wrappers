@@ -927,6 +927,82 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
+  describe('ConvertToUSD', () => {
+    test('should get value of convertToUSD', async () => {
+      // Result expected
+      const expectedAmount = new BigNumber(1);
+      // Params
+      const params = {
+        fundRaiseType: FundRaiseType.ETH,
+        amount: new BigNumber(2),
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.convertToUSD).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.convertToUSD(params);
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.convertToUSD).once();
+      verify(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).once();
+    });
+  });
+
+  describe('GetTokensSoldFor', () => {
+    test('should get value of getTokensSoldFor', async () => {
+      // Result expected
+      const expectedAmount = new BigNumber(1);
+      // Params
+      const params = {
+        fundRaiseType: FundRaiseType.ETH
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensSoldFor).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.fundRaiseType)).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.getTokensSoldFor(params);
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.getTokensSoldFor).once();
+      verify(mockedMethod.callAsync(params.fundRaiseType)).once();
+    });
+  });
+
+  describe('StableCoinsRaised', () => {
+    test('should get value of stableCoinsRaised', async () => {
+      // Result expected
+      const expectedAmount = new BigNumber(1);
+      // Params
+      const params = {
+        stableCoinAddress: '0x1111111111111111111111111111111111111111'
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.stableCoinsRaised).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.stableCoinAddress)).thenResolve(expectedAmount);
+
+      // Real call
+      const result = await target.stableCoinsRaised(params);
+      // Result expectation
+      expect(result).toBe(expectedAmount);
+      // Verifications
+      verify(mockedContract.stableCoinsRaised).once();
+      verify(mockedMethod.callAsync(params.stableCoinAddress)).once();
+    });
+  });
+
   describe('GetNumberOfTiers', () => {
     test('should get value of getNumberOfTiers', async () => {
       // Result expected
