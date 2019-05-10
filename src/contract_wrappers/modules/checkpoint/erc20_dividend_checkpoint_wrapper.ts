@@ -181,7 +181,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividend = async (params: CreateDividendParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    await this.isDividendValid(params.expiry, params.maturity, params.amount, params.token, params.name);
+    await this.checkIfDividendIsValid(params.expiry, params.maturity, params.amount, params.token, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -195,7 +195,14 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    await this.isDividendValid(params.expiry, params.maturity, params.amount, params.token, params.name);
+    await this.checkIfDividendIsValid(
+      params.expiry,
+      params.maturity,
+      params.amount,
+      params.token,
+      params.name,
+      params.checkpointId,
+    );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -210,12 +217,13 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    await this.isDividendValid(
+    await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
       params.amount,
       params.token,
       params.name,
+      undefined,
       params.excluded,
     );
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
@@ -234,12 +242,13 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    await this.isDividendValid(
+    await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
       params.amount,
       params.token,
       params.name,
+      params.checkpointId,
       params.excluded,
     );
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
@@ -253,26 +262,6 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.txData,
       params.safetyFactor,
     );
-  };
-
-  private isDividendValid = async (
-    expiry: Date,
-    maturity: Date,
-    amount: BigNumber,
-    token: string,
-    name: string,
-    excluded?: string[],
-  ) => {
-    if (excluded !== undefined) {
-      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
-      assert.areThereDuplicatedStrings('excluded', excluded);
-      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
-    }
-    assert.assert(expiry > maturity, 'Expiry before maturity');
-    assert.isFutureDate(expiry, 'Expiry in past');
-    assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
-    assert.isNonZeroETHAddressHex('token', token);
-    assert.assert(name.length > 0, 'The name can not be empty');
   };
 
   /**
@@ -320,5 +309,30 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       ERC20DividendCheckpoint.abi,
     );
     return logs;
+  };
+
+  private checkIfDividendIsValid = async (
+    expiry: Date,
+    maturity: Date,
+    amount: BigNumber,
+    token: string,
+    name: string,
+    checkpointId?: number,
+    excluded?: string[],
+  ) => {
+    if (excluded !== undefined) {
+      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
+      assert.areThereDuplicatedStrings('excluded', excluded);
+      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
+    }
+    assert.assert(expiry > maturity, 'Expiry before maturity');
+    assert.isFutureDate(expiry, 'Expiry in past');
+    assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
+    if (checkpointId !== undefined) {
+      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
+      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    }
+    assert.isNonZeroETHAddressHex('token', token);
+    assert.assert(name.length > 0, 'The name can not be empty');
   };
 }
