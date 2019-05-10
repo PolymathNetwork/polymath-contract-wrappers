@@ -217,4 +217,137 @@ describe('ERC20TokenWrapper', () => {
       verify(mockedSymbolMethod.callAsync()).once();
     });
   });
+
+  describe('approve', () => {
+    test.todo('should fail as spender is not an Eth address');
+    test('should send the transaction to approve', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        spender: '0x1111111111111111111111111111111111111111',
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.approve).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.approve(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.approve).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('transferFrom', () => {
+    test.todo('should fail as from is not an Eth address');
+    test.todo('should fail as to is not an Eth address');
+    test('should send the transaction to transferFrom', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.transferFrom).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.transferFrom(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.transferFrom).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('transfer', () => {
+    test.todo('should fail as to is not an Eth address');
+    test('should send the transaction to transfer', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.transfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.transfer(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.transfer).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
 });
