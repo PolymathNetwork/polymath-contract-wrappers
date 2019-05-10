@@ -33,7 +33,9 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../../types';
-import { bigNumberToDate, bigNumberToNumber, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+
+const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
@@ -302,7 +304,6 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
 interface BuyWithETHParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
-  from: string;
 }
 
 interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
@@ -312,7 +313,6 @@ interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
 interface BuyWithPOLYParams extends TxParams {
   beneficiary: string;
   investedPOLY: BigNumber;
-  from: string;
 }
 
 interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
@@ -323,7 +323,6 @@ interface BuyWithUSDParams extends TxParams {
   beneficiary: string;
   investedSC: BigNumber;
   usdToken: string;
-  from: string;
 }
 
 interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
@@ -429,6 +428,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
 
+  public paused = async () => {
+    return (await this.contract).paused.callAsync();
+  };
+
   public finalAmountReturned = async () => {
     return (await this.contract).finalAmountReturned.callAsync();
   };
@@ -464,8 +467,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const allowBeneficialInvestments = await this.allowBeneficialInvestments();
-    assert.assert(params.allowBeneficialInvestments !== allowBeneficialInvestments, 'The value must be different');
+    assert.assert(
+      params.allowBeneficialInvestments !== (await this.allowBeneficialInvestments()),
+      'The value must be different',
+    );
     return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(
       params.allowBeneficialInvestments,
       params.txData,
@@ -474,12 +479,17 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETH = async (params: BuyWithETHParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.value,
+      FundRaiseType.ETH,
+    );
     const txPayableData = {
       ...params.txData,
       value: params.value,
-      from: params.from,
     };
-    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.ETH);
     return (await this.contract).buyWithETH.sendTransactionAsync(
       params.beneficiary,
       txPayableData,
@@ -488,7 +498,13 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
-    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.POLY);
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.investedPOLY,
+      FundRaiseType.POLY,
+    );
     return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -498,8 +514,14 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSD = async (params: BuyWithUSDParams) => {
+    assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
-    await this.buyWithTokens(params.beneficiary, params.from, new BigNumber(0), FundRaiseType.StableCoin);
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.investedSC,
+      FundRaiseType.StableCoin,
+    );
     return (await this.contract).buyWithUSD.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -510,12 +532,16 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.value,
+      FundRaiseType.ETH,
+    );
     const txPayableData = {
       ...params.txData,
       value: params.value,
-      from: params.from,
     };
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.ETH);
     return (await this.contract).buyWithETHRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.minTokens,
@@ -525,7 +551,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.POLY);
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.investedPOLY,
+      FundRaiseType.POLY,
+    );
     return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedPOLY,
@@ -536,7 +567,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
-    await this.buyWithTokens(params.beneficiary, params.from, params.minTokens, FundRaiseType.StableCoin);
+    await this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(params.txData),
+      params.investedSC,
+      FundRaiseType.StableCoin,
+    );
     return (await this.contract).buyWithUSDRateLimited.sendTransactionAsync(
       params.beneficiary,
       params.investedSC,
@@ -548,29 +584,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyTokensView = async (params: BuyTokensViewParams) => {
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
-    const isOpen = await this.isOpen();
-    assert.assert(isOpen, 'STO not open');
-    assert.assert(params.investmentValue.gt(new BigNumber(0)), 'No funds were sent');
-    const rate = await this.getRate({
-      fundRaiseType: params.fundRaiseType,
-    });
-    const investedUSD = rate.multipliedBy(params.investmentValue);
-    const investorInvestedUSD = await this.investorInvestedUSD({
-      investorAddress: params.beneficiary,
-    });
-    const minimumInvestmentUSD = await this.minimumInvestmentUSD();
-    assert.assert(investedUSD.plus(investorInvestedUSD).gte(minimumInvestmentUSD), 'investment < minimumInvestmentUSD');
-    const investor = await this.investors({
-      investorAddress: params.beneficiary,
-    });
-    if (investor.accredited) {
-      const nonAccreditedLimitUSD = investor.nonAccreditedLimitUSDOverride.eq(new BigNumber(0))
-        ? await this.nonAccreditedLimitUSD()
-        : investor.nonAccreditedLimitUSDOverride;
-      assert.assert(investorInvestedUSD.lt(nonAccreditedLimitUSD), 'Over investor limit');
-    }
-
+    this.checkIfBuyIsValid(
+      params.beneficiary,
+      await this.getCallerAddress(undefined),
+      params.investmentValue,
+      params.fundRaiseType,
+    );
     const result = await (await this.contract).buyTokensView.callAsync(
       params.beneficiary,
       params.investmentValue,
@@ -606,7 +625,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
-    assert.assert(params.tier < bigNumberToNumber(tiers), 'Invalid tier');
+    assert.assert(params.tier < tiers.toNumber(), 'Invalid tier');
     return (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
   };
 
@@ -619,7 +638,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       capPerTier: result[3],
       ratePerTier: result[4],
       fundsRaised: result[5],
-      investorCount: bigNumberToNumber(result[6]),
+      investorCount: result[6].toNumber(),
       tokensSold: result[7],
       isRaisedInETH: result[8][0],
       isRaisedInPOLY: result[8][1],
@@ -711,8 +730,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
-    const tiers = await this.getNumberOfTiers();
-    assert.assert(params.tier < bigNumberToNumber(tiers), 'Invalid tier');
+    assert.assert(params.tier < (await this.getNumberOfTiers()).toNumber(), 'Invalid tier');
     const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: result[0],
@@ -752,8 +770,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public finalize = async (params: TxParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const isFinalized = await this.isFinalized();
-    assert.assert(!isFinalized, 'STO is finalized');
+    assert.assert(!(await this.isFinalized()), 'STO is finalized');
     // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -763,8 +780,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public changeAccredited = async (params: ChangeAccreditedParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('investors', params.investors);
-    assert.assert(params.investors.length === params.accredited.length, 'Array mismatch');
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
+    assert.assert(params.investors.length === params.accredited.length, 'Array lengths mismatch');
     return (await this.contract).changeAccredited.sendTransactionAsync(
       params.investors,
       params.accredited,
@@ -778,8 +795,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('investors', params.investors);
-    assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array mismatch');
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
+    assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array length mismatch');
     return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
       params.investors,
       params.nonAccreditedLimit,
@@ -793,10 +810,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const startTime = await this.startTime();
-    const now = new Date();
-    assert.assert(now < bigNumberToDate(startTime), 'STO already started');
-    assert.assert(params.endTime > params.startTime && params.startTime > now, 'Invalid times');
+    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
+    assert.assert(params.endTime > params.startTime, 'Start date must be greater than end time');
+    assert.isFutureDate(params.startTime, 'Start date must be in the future');
     return (await this.contract).modifyTimes.sendTransactionAsync(
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
@@ -810,8 +826,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const startTime = await this.startTime();
-    assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
+    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
     return (await this.contract).modifyLimits.sendTransactionAsync(
       params.nonAccreditedLimitUSD,
       params.minimumInvestmentUSD,
@@ -825,8 +840,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyFunding = async (params: ModifyFundingParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const startTime = await this.startTime();
-    assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
+    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
     return (await this.contract).modifyFunding.sendTransactionAsync(
       params.fundRaiseTypes,
       params.txData,
@@ -839,11 +853,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyAddresses = async (params: ModifyAddressesParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isETHAddressHexArray('usdToken', params.usdTokens);
-    assert.isETHAddressHex('wallet', params.wallet);
-    assert.isETHAddressHex('reserveWallet', params.reserveWallet);
-    assert.isAddressNotZero('wallet', params.wallet);
-    assert.isAddressNotZero('reserveWallet', params.reserveWallet);
+    params.usdTokens.forEach(address => assert.isETHAddressHex('usdTokens', address));
+    assert.isNonZeroETHAddressHex('wallet', params.wallet);
+    assert.isNonZeroETHAddressHex('reserveWallet', params.reserveWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.reserveWallet,
@@ -858,23 +870,22 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyTiers = async (params: ModifyTiersParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    const startTime = await this.startTime();
-    assert.assert(new Date() < bigNumberToDate(startTime), 'STO already started');
+    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
     assert.assert(params.tokensPerTierTotal.length > 0, 'No tiers provided');
     assert.assert(
       params.ratePerTier.length === params.tokensPerTierTotal.length &&
         params.ratePerTierDiscountPoly.length === params.tokensPerTierTotal.length &&
         params.tokensPerTierDiscountPoly.length === params.tokensPerTierTotal.length,
-      'Tier data length mismatch',
+      'Tier data arrays length mismatch',
     );
     for (let i = 0; i < params.tokensPerTierTotal.length; i += 1) {
-      assert.assert(params.ratePerTier[i].gt(new BigNumber(0)), 'Invalid rate');
-      assert.assert(params.tokensPerTierTotal[i].gt(new BigNumber(0)), 'Invalid token amount');
+      assert.isBigNumberGreaterThanZero(params.ratePerTier[i], 'Invalid rate');
+      assert.isBigNumberGreaterThanZero(params.tokensPerTierTotal[i], 'Invalid token amount');
       assert.assert(
-        params.tokensPerTierDiscountPoly[i].lte(params.tokensPerTierTotal[i]),
+        params.tokensPerTierDiscountPoly[i].isLessThanOrEqualTo(params.tokensPerTierTotal[i]),
         'Too many discounted tokens',
       );
-      assert.assert(params.ratePerTierDiscountPoly[i].lte(params.ratePerTier[i]), 'Invalid discount');
+      assert.assert(params.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(params.ratePerTier[i]), 'Invalid discount');
     }
     return (await this.contract).modifyTiers.sendTransactionAsync(
       params.ratePerTier,
@@ -903,39 +914,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       typedResult.push(accreditedData);
     }
     return typedResult;
-  };
-
-  private buyWithTokens = async (
-    beneficiary: string,
-    from: string,
-    minTokens: BigNumber,
-    fundRaiseType: FundRaiseType,
-  ) => {
-    assert.isETHAddressHex('beneficiary', beneficiary);
-    assert.assert(!(await this.paused()), 'Contract is Paused');
-    const stoDetails = await this.getSTODetails();
-    switch (fundRaiseType) {
-      case FundRaiseType.ETH: {
-        assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
-        break;
-      }
-      case FundRaiseType.POLY: {
-        assert.assert(stoDetails.isRaisedInPOLY, 'POLY Not Allowed');
-        break;
-      }
-      case FundRaiseType.StableCoin: {
-        assert.assert(stoDetails.isRaisedInSC, 'USD Not Allowed');
-        break;
-      }
-      default: {
-        assert.assert(false, 'Missing fundraise type');
-        break;
-      }
-    }
-    const allowBeneficialInvestments = await this.allowBeneficialInvestments();
-    if (!allowBeneficialInvestments) {
-      assert.assert(beneficiary === from, 'Beneficiary != funder');
-    }
   };
 
   /**
@@ -979,5 +957,60 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       USDTieredSTO.abi,
     );
     return logs;
+  };
+
+  private checkIfBuyIsValid = async (
+    beneficiary: string,
+    from: string,
+    investmentValue: BigNumber,
+    fundRaiseType: FundRaiseType,
+  ) => {
+    assert.isETHAddressHex('beneficiary', beneficiary);
+    assert.assert(!(await this.paused()), 'Contract is Paused');
+    assert.assert(await this.isOpen(), 'STO not open');
+    assert.isBigNumberGreaterThanZero(investmentValue, 'No funds were sent');
+    const stoDetails = await this.getSTODetails();
+    switch (fundRaiseType) {
+      case FundRaiseType.ETH: {
+        assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
+        break;
+      }
+      case FundRaiseType.POLY: {
+        assert.assert(stoDetails.isRaisedInPOLY, 'POLY Not Allowed');
+        break;
+      }
+      case FundRaiseType.StableCoin: {
+        assert.assert(stoDetails.isRaisedInSC, 'USD Not Allowed');
+        break;
+      }
+      default: {
+        assert.assert(false, 'Missing fundraise type');
+        break;
+      }
+    }
+    if (!(await this.allowBeneficialInvestments())) {
+      assert.assert(beneficiary === from, 'Beneficiary != funder');
+    }
+    const rate = await this.getRate({
+      fundRaiseType,
+    });
+    const investedUSD = rate.multipliedBy(investmentValue);
+    const investorInvestedUSD = await this.investorInvestedUSD({
+      investorAddress: beneficiary,
+    });
+    const minimumInvestmentUSD = await this.minimumInvestmentUSD();
+    assert.assert(
+      investedUSD.plus(investorInvestedUSD).isGreaterThan(minimumInvestmentUSD),
+      'investment < minimumInvestmentUSD',
+    );
+    const investor = await this.investors({
+      investorAddress: beneficiary,
+    });
+    if (investor.accredited) {
+      const nonAccreditedLimitUSD = investor.nonAccreditedLimitUSDOverride.isEqualTo(BIG_NUMBER_ZERO)
+        ? await this.nonAccreditedLimitUSD()
+        : investor.nonAccreditedLimitUSDOverride;
+      assert.assert(investorInvestedUSD.isLessThan(nonAccreditedLimitUSD), 'Over investor limit');
+    }
   };
 }

@@ -23,10 +23,6 @@ export function numberToBigNumber(value: number) {
   return new BigNumber(value);
 }
 
-export function bigNumberToNumber(value: BigNumber) {
-  return value.toNumber();
-}
-
 export function dateArrayToBigNumberArray(value: Date[]) {
   return value.map<BigNumber>(x => {
     return dateToBigNumber(x);
