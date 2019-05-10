@@ -157,10 +157,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
-    const delegate = await this.checkDelegate({
-      delegate: params.delegate,
-    });
-    assert.assert(!delegate, 'Already present');
+    assert.assert(!(await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -172,10 +169,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   public deleteDelegate = async (params: DelegateTxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
-    const delegate = await this.checkDelegate({
-      delegate: params.delegate,
-    });
-    assert.assert(delegate, 'Delegate does not exist');
+    assert.assert(await (await this.contract).checkDelegate.callAsync(params.delegate), 'Delegate does not exist');
     return (await this.contract).deleteDelegate.sendTransactionAsync(
       params.delegate,
       params.txData,
