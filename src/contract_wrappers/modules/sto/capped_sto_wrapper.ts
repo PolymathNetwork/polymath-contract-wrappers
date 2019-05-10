@@ -188,7 +188,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   public buyTokens = async (params: BuyTokensParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!(await this.paused()), 'Should not be paused');
-    assert.assert(!params.value.isEqualTo(new BigNumber(0)), 'Amount invested should not be equal to 0');
+    assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.ETH,
@@ -211,7 +211,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
-    assert.assert(!params.investedPOLY.isEqualTo(new BigNumber(0)), 'Amount invested should not be equal to 0');
+    assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
     assert.assert(!(await this.paused()), 'Should not be paused');
     assert.assert(
       await this.fundRaiseTypes({

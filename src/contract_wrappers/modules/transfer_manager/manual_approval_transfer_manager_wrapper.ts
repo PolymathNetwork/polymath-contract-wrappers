@@ -254,7 +254,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
-    assert.assert(params.allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0');
+    assert.isBigNumberGreaterThanZero(params.allowance, 'Allowance must be greater than 0');
     await this.checkApprovalDoesNotExist(params.from, params.to);
     return (await this.contract).addManualApproval.sendTransactionAsync(
       params.from,
@@ -280,7 +280,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     params.allowances.forEach(allowance =>
-      assert.assert(allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0'),
+      assert.isBigNumberGreaterThanZero(allowance, 'Allowance must be greater than 0'),
     );
     const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
@@ -476,21 +476,13 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   private checkApprovalDoesNotExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
-    const hasAllowance = approval.allowance.isGreaterThan(new BigNumber(0));
-    const hasValidFutureExpiry = approval.expiryTime >= new Date();
-    assert.assert(
-      !hasAllowance || !hasValidFutureExpiry,
-      'Approval already exists with allowance and/or valid future expiry date',
-    );
+    assert.isBigNumberZero(approval.allowance, 'Approval already exists with allowance');
+    assert.isPastDate(approval.expiryTime, 'Approval already exists with valid future expiry date');
   };
 
   private checkApprovalDoesExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
-    const hasAllowance = approval.allowance.isGreaterThan(new BigNumber(0));
-    const hasValidFutureExpiry = approval.expiryTime >= new Date();
-    assert.assert(
-      hasAllowance && hasValidFutureExpiry,
-      'Approval does not exist with valid allowance and valid future expiry date',
-    );
+    assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
+    assert.isFutureDate(approval.expiryTime, 'Approval does not exist');
   };
 }

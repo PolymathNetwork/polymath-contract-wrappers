@@ -26,6 +26,8 @@ import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
 
+const BIG_NUMBER_ZERO = new BigNumber(0);
+
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit;
   callback: EventCallback<SecurityTokenRegistryChangeExpiryLimitEventArgs>;
@@ -420,7 +422,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
     // Check poly token allowance
     const tickerRegistrationFee = await this.getTickerRegistrationFee();
-    if (tickerRegistrationFee.isGreaterThan(new BigNumber(0))) {
+    if (tickerRegistrationFee.isGreaterThan(BIG_NUMBER_ZERO)) {
       const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(owner);
       assert.assert(polyBalance.isGreaterThanOrEqualTo(tickerRegistrationFee), 'Insufficient Poly token allowance');
     }
@@ -476,7 +478,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
     // Check PolyToken allowance
     const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
-    if (securityTokenLaunchFee.isGreaterThan(new BigNumber(0))) {
+    if (securityTokenLaunchFee.isGreaterThan(BIG_NUMBER_ZERO)) {
       const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(address);
       assert.assert(polyBalance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Poly token allowance');
     }

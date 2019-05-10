@@ -327,7 +327,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.isFutureDate(expiry, 'Expiry in past');
-    assert.assert(amount.gt(new BigNumber(0)), 'No dividend sent');
+    assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
     if (checkpointId !== undefined) {
       const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
       assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');

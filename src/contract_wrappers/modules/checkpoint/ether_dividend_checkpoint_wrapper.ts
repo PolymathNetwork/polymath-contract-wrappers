@@ -396,7 +396,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.isFutureDate(expiry, 'Expiry in past');
-    assert.assert(value.isGreaterThan(new BigNumber(0)), 'No dividend sent');
+    assert.isBigNumberGreaterThanZero(value, 'No dividend sent');
     if (checkpointId !== undefined) {
       const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
       assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');

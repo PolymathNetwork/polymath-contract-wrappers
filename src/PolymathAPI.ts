@@ -53,7 +53,7 @@ export interface GetBalanceParams {
 }
 
 export interface GetTokensParams {
-  amount: number;
+  amount: BigNumber;
   address?: string;
 }
 
@@ -197,12 +197,11 @@ export class PolymathAPI {
     if (networkId === 1) {
       throw new Error('Only for testnet');
     }
-    assert.isNumber('amount', params.amount);
     const address = params.address !== undefined ? params.address : await this.getAccount();
     assert.isETHAddressHex('address', address);
 
     return this.polyTokenFaucet.getTokens({
-      amount: new BigNumber(params.amount),
+      amount: params.amount,
       recipient: address,
     });
   };

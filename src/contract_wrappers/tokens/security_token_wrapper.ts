@@ -58,6 +58,8 @@ import {
 import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
+const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
+const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.Approval;
@@ -750,7 +752,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public changeGranularity = async (params: ChangeGranularityParams) => {
     await this.checkOnlyOwner();
-    assert.assert(params.granularity.isGreaterThan(new BigNumber(0)), 'Granularity must not be 0');
+    assert.isBigNumberGreaterThanZero(params.granularity, 'Granularity must not be 0');
     return (await this.contract).changeGranularity.sendTransactionAsync(
       params.granularity,
       params.txData,
@@ -906,7 +908,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public createCheckpoint = async (params: TxParams) => {
     await this.checkOnlyOwner();
     assert.assert(
-      (await this.currentCheckpointId()).isLessThan(new BigNumber(2 ** 256 - 1)),
+      (await this.currentCheckpointId()).isLessThan(MAX_CHECKPOINT_NUMBER),
       'Reached maximum checkpoint number',
     );
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -986,8 +988,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const maxCost = params.maxCost === undefined ? new BigNumber(0) : params.maxCost;
-    const budget = params.budget === undefined ? new BigNumber(0) : params.budget;
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : params.maxCost;
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : params.budget;
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner();
     await this.checkModuleCostBelowMaxCost(params.address, maxCost);
@@ -1080,7 +1082,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    assert.assert(params.value.modulo(await this.granularity()).isEqualTo(new BigNumber(0)), 'Invalid granularity');
+    assert.isBigNumberZero(params.value.modulo(await this.granularity()), 'Invalid granularity');
     return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
   };
 

@@ -35,6 +35,8 @@ import {
 } from '../../../types';
 import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 
+const BIG_NUMBER_ZERO = new BigNumber(0);
+
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
   callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>;
@@ -877,8 +879,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       'Tier data arrays length mismatch',
     );
     for (let i = 0; i < params.tokensPerTierTotal.length; i += 1) {
-      assert.assert(params.ratePerTier[i].isGreaterThan(new BigNumber(0)), 'Invalid rate');
-      assert.assert(params.tokensPerTierTotal[i].isGreaterThan(new BigNumber(0)), 'Invalid token amount');
+      assert.isBigNumberGreaterThanZero(params.ratePerTier[i], 'Invalid rate');
+      assert.isBigNumberGreaterThanZero(params.tokensPerTierTotal[i], 'Invalid token amount');
       assert.assert(
         params.tokensPerTierDiscountPoly[i].isLessThanOrEqualTo(params.tokensPerTierTotal[i]),
         'Too many discounted tokens',
@@ -966,7 +968,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.isETHAddressHex('beneficiary', beneficiary);
     assert.assert(!(await this.paused()), 'Contract is Paused');
     assert.assert(await this.isOpen(), 'STO not open');
-    assert.assert(investmentValue.isGreaterThan(new BigNumber(0)), 'No funds were sent');
+    assert.isBigNumberGreaterThanZero(investmentValue, 'No funds were sent');
     const stoDetails = await this.getSTODetails();
     switch (fundRaiseType) {
       case FundRaiseType.ETH: {
@@ -1005,7 +1007,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       investorAddress: beneficiary,
     });
     if (investor.accredited) {
-      const nonAccreditedLimitUSD = investor.nonAccreditedLimitUSDOverride.isEqualTo(new BigNumber(0))
+      const nonAccreditedLimitUSD = investor.nonAccreditedLimitUSDOverride.isEqualTo(BIG_NUMBER_ZERO)
         ? await this.nonAccreditedLimitUSD()
         : investor.nonAccreditedLimitUSDOverride;
       assert.assert(investorInvestedUSD.isLessThan(nonAccreditedLimitUSD), 'Over investor limit');
