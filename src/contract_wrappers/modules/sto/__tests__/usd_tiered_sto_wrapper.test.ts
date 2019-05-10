@@ -890,7 +890,7 @@ describe('USDTieredSTOWrapper', () => {
   describe('GetTokensMintedByTier', () => {
     test('should get value of getTokensMintedByTier', async () => {
       // TokensSoldByTier value expected
-      const expectedAmount = [ new BigNumber(100),new BigNumber(200),new BigNumber(300)];
+      const expectedAmount = [new BigNumber(100), new BigNumber(200), new BigNumber(300)];
       // Params
       const params = {
         tier: 2,
@@ -959,7 +959,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedAmount = new BigNumber(1);
       // Params
       const params = {
-        fundRaiseType: FundRaiseType.ETH
+        fundRaiseType: FundRaiseType.ETH,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -984,7 +984,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedAmount = new BigNumber(1);
       // Params
       const params = {
-        stableCoinAddress: '0x1111111111111111111111111111111111111111'
+        stableCoinAddress: '0x1111111111111111111111111111111111111111',
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -1000,6 +1000,64 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.stableCoinsRaised).once();
       verify(mockedMethod.callAsync(params.stableCoinAddress)).once();
+    });
+  });
+
+  describe('Finalize', () => {
+    test('should finalize STO', async () => {
+      // Address expected
+      const expectedIsFinalizedResult = false;
+      // Mocked method
+      const mockedIsFinalizedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isFinalized).thenReturn(instance(mockedIsFinalizedMethod));
+      // Stub the request
+      when(mockedIsFinalizedMethod.callAsync()).thenResolve(expectedIsFinalizedResult);
+
+      // Mock Only Owner and Security Token
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.finalize).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.finalize(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.finalize).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.isFinalized).once();
+      verify(mockedIsFinalizedMethod.callAsync()).once();
     });
   });
 
