@@ -104,7 +104,7 @@ describe('STOWrapper', () => {
 
   describe('StartTime', () => {
     test('should get the start time', async () => {
-      // Address expected
+      // Value expected
       const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
