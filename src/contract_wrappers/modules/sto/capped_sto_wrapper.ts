@@ -187,20 +187,20 @@ export default class CappedSTOWrapper extends STOWrapper {
 
   public buyTokens = async (params: BuyTokensParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
-    assert.assert(!params.value.isEqualTo(new BigNumber(0)), 'Amount invested should not be equal to 0');
-    if (await this.allowBeneficialInvestments()) {
-      assert.assert(
-        params.beneficiary === (await this.getCallerAddress(params.txData)),
-        'Beneficiary address does not match msg.sender',
-      );
-    }
     assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.assert(!params.value.isEqualTo(new BigNumber(0)), 'Amount invested should not be equal to 0');
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.ETH,
       }),
       'Mode of investment is not ETH',
     );
+    if (await this.allowBeneficialInvestments()) {
+      assert.assert(
+        params.beneficiary === (await this.getCallerAddress(params.txData)),
+        'Beneficiary address does not match msg.sender',
+      );
+    }
     assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
     assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     const txPayableData = {
@@ -211,21 +211,19 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
-    const txPayableData = {
-      ...params.txData,
-    };
     assert.assert(!params.investedPOLY.isEqualTo(new BigNumber(0)), 'Amount invested should not be equal to 0');
-    const pause = await this.paused();
-    assert.assert(!pause, 'Should not be paused');
-    const raiseType = await this.fundRaiseTypes({
-      type: FundRaiseType.POLY,
-    });
-    assert.assert(raiseType, 'Mode of investment is not POLY');
+    assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.assert(
+      await this.fundRaiseTypes({
+        type: FundRaiseType.POLY,
+      }),
+      'Mode of investment is not POLY',
+    );
     assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
     assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
       params.investedPOLY,
-      txPayableData,
+      params.txData,
       params.safetyFactor,
     );
   };
