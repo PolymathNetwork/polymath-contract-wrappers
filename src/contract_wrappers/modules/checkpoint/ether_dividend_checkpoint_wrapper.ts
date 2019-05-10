@@ -341,7 +341,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     }
     assert.assert(expiry > maturity, 'Expiry before maturity');
-    assert.assert(expiry > new Date(), 'Expiry in past');
+    assert.isFutureDate(expiry, 'Expiry in past');
     assert.assert(value.isGreaterThan(new BigNumber(0)), 'No dividend sent');
     if (typeof checkpointId !== 'undefined') {
       const st = await this.securityTokenContract();

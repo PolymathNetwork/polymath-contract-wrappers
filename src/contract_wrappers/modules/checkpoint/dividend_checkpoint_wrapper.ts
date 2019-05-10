@@ -5,7 +5,6 @@ import { TxParams, DividendCheckpointBaseContract, Perms } from '../../../types'
 import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
-const MAX_PERCENTAGE = new BigNumber(10).pow(18);
 
 interface DividendIndexParams {
   dividendIndex: number;
@@ -250,7 +249,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public setWithholding = async (params: SetWithholdingParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     assert.assert(params.investors.length === params.withholding.length, 'Mismatched input lengths');
-    params.withholding.forEach(withholding => assert.assert(withholding < MAX_PERCENTAGE, 'Incorrect withholding tax'));
+    params.withholding.forEach(withholding => assert.isPercentage('withholding tax', withholding));
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -261,7 +260,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    assert.assert(params.withholding < MAX_PERCENTAGE, 'Incorrect withholding tax');
+    assert.isPercentage('withholding tax', params.withholding);
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
       params.withholding,
@@ -319,7 +318,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     const dividends = await (await this.contract).getDividendsData.callAsync();
     assert.assert(params.dividendIndex < dividends[0].length, 'Incorrect dividend index');
     const dividend = await this.dividends(params);
-    assert.assert(dividend.expiry <= new Date(), 'Dividend expiry is in the future');
+    assert.isPastDate(dividend.expiry, 'Dividend expiry is in the future');
     assert.assert(!dividend.reclaimed, 'Dividend is already claimed');
     return (await this.contract).reclaimDividend.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
@@ -459,7 +458,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       !dividend.claimedAmount.isGreaterThan(0),
       'Dividend claimed amount greater than 0, dividend reclaimed',
     );
-    assert.assert(dividend.maturity <= new Date(), 'Dividend maturity in future');
-    assert.assert(dividend.expiry > new Date(), 'Dividend expiry in past');
+    assert.isPastDate(dividend.maturity, 'Dividend maturity in future');
+    assert.isFutureDate(dividend.expiry, 'Dividend expiry in past');
   };
 }

@@ -4,6 +4,7 @@ import { BigNumber } from '@0x/utils';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
 const MAX_64_BYTES_DATE = new Date(18446744073709);
+const MAX_PERCENTAGE = new BigNumber(10).pow(18);
 
 const assert = {
   ...sharedAssert,
@@ -25,6 +26,15 @@ const assert = {
   },
   isLessThanMax64BytesDate(variableName: string, value: Date): void {
     sharedAssert.assert(value <= MAX_64_BYTES_DATE, `${variableName} date is too far in the future`);
+  },
+  isPercentage(variableName: string, value: BigNumber): void {
+    sharedAssert.assert(value <= MAX_PERCENTAGE, `${variableName} is not expected to be greater than 100%`);
+  },
+  isFutureDate(value: Date, message: string): void {
+    sharedAssert.assert(value >= new Date(), message);
+  },
+  isPastDate(value: Date, message: string): void {
+    sharedAssert.assert(value <= new Date(), message);
   },
 };
 

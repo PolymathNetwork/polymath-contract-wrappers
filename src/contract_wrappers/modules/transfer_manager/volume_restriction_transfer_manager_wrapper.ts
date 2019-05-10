@@ -946,13 +946,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     restrictionType: RestrictionTypes,
     rollingPeriodInDays: number,
   ): void => {
-    assert.assert(startTime > new Date(), 'Start time must be in the future');
+    assert.isFutureDate(startTime, 'Start time must be in the future');
     assert.assert(allowedTokens.isGreaterThan(new BigNumber(0)), 'Allowed Tokens must be greater than 0');
-    if (restrictionType === RestrictionTypes.Fixed) {
-      assert.assert(
-        allowedTokens.isLessThan(new BigNumber(100 * 10 ** 16)),
-        'Allowed tokens exceeds limit for restriction type',
-      );
+    if (restrictionType === RestrictionTypes.Percentage) {
+      assert.isPercentage('allowed tokens', allowedTokens);
     }
     assert.assert(rollingPeriodInDays <= 365 && rollingPeriodInDays >= 1, 'Invalid number of days in rolling period');
   };

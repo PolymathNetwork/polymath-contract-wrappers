@@ -494,8 +494,8 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
-    assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');
-    assert.assert(params.validTo >= new Date(), 'ValidTo date must be in the future');
+    assert.isPastDate(params.validFrom, 'ValidFrom date must be in the past');
+    assert.isFutureDate(params.validTo, 'ValidTo date must be in the future');
     assert.assert(
       !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
       'Already used signature of investor address and nonce',

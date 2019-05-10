@@ -253,7 +253,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
-    assert.assert(params.expiryTime > new Date(), 'ExpiryTime must be in the future');
+    assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
     assert.assert(params.allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0');
     await this.checkApprovalDoesNotExist(params.from, params.to);
     return (await this.contract).addManualApproval.sendTransactionAsync(
@@ -287,7 +287,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.from.length === params.descriptions.length,
       'Array lengths for from address and descriptions passed in are not the same',
     );
-    params.expiryTimes.forEach(expiry => assert.assert(expiry > new Date(), 'ExpiryTime must be in the future'));
+    params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     params.allowances.forEach(allowance =>
       assert.assert(allowance.isGreaterThan(new BigNumber(0)), 'Allowance must be greater than 0'),
     );
@@ -311,7 +311,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
-    assert.assert(params.expiryTime > new Date(), 'ExpiryTime must be in the future');
+    assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
     await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
@@ -345,7 +345,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       params.from.length === params.descriptions.length,
       'Array lengths for from address and descriptions passed in are not the same',
     );
-    params.expiryTimes.forEach(expiry => assert.assert(expiry > new Date(), 'ExpiryTime must be in the future'));
+    params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     const approvals = [];
     for (let i = 0; i < params.to.length; i + 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
