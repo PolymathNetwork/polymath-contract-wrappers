@@ -37,6 +37,9 @@ const assert = {
   isPastDate(value: Date, message: string): void {
     sharedAssert.assert(value <= new Date(), message);
   },
+  isNotDateZero(value: Date, message: string): void {
+    sharedAssert.assert(value !== new Date(0), message);
+  },
   isBigNumberZero(value: BigNumber, message: string): void {
     sharedAssert.assert(value === BIG_NUMBER_ZERO, message);
   },
