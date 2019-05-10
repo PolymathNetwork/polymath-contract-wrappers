@@ -272,20 +272,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
-      params.from.length === params.to.length,
-      'Array lengths for from address and to address passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.allowances.length,
-      'Array lengths for from address and allowances passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.expiryTimes.length,
-      'Array lengths for from address and expiryTimes passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.descriptions.length,
-      'Array lengths for from address and descriptions passed in are not the same',
+      params.from.length === params.to.length &&
+        params.from.length === params.allowances.length &&
+        params.from.length === params.expiryTimes.length &&
+        params.from.length === params.descriptions.length,
+      'Array lengths missmatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     params.allowances.forEach(allowance =>
@@ -330,20 +321,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
-      params.from.length === params.to.length,
-      'Array lengths for from address and to address passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.changedAllowances.length,
-      'Array lengths for from address and allowances passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.expiryTimes.length,
-      'Array lengths for from address and expiryTimes passed in are not the same',
-    );
-    assert.assert(
-      params.from.length === params.descriptions.length,
-      'Array lengths for from address and descriptions passed in are not the same',
+      params.from.length === params.to.length &&
+        params.from.length === params.changedAllowances.length &&
+        params.from.length === params.expiryTimes.length &&
+        params.from.length === params.descriptions.length,
+      'Array lengths missmatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     const approvals = [];

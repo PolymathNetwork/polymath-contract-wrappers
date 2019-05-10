@@ -496,20 +496,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     assert.assert(
-      params.startTimes.length === params.allowedTokens.length,
-      'Array lengths for startTime and allowedTokens passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.restrictionTypes.length,
-      'Array lengths for startTime and restrictionType passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.holders.length,
-      'Array lengths for startTime and holders passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.endTimes.length,
-      'Array lengths for startTime and endTime passed in are not the same',
+      params.startTimes.length === params.allowedTokens.length &&
+        params.startTimes.length === params.restrictionTypes.length &&
+        params.startTimes.length === params.holders.length &&
+        params.startTimes.length === params.endTimes.length,
+      'Array lengths missmatch',
     );
     for (let i = 0; i < params.startTimes.length; i + 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
@@ -531,24 +522,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const exemptAddress = await this.getExemptAddress();
     assert.assert(exemptAddress.some(address => params.holders.includes(address)), 'Holder is exempt from restriction');
     assert.assert(
-      params.startTimes.length === params.allowedTokens.length,
-      'Array lengths for startTime and allowedTokens passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.restrictionTypes.length,
-      'Array lengths for startTime and restrictionType passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.rollingPeriodInDays.length,
-      'Array lengths for startTime and rollingPeriodInDays passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.holders.length,
-      'Array lengths for startTime and holders passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.endTimes.length,
-      'Array lengths for startTime and endTime passed in are not the same',
+      params.startTimes.length === params.allowedTokens.length &&
+        params.startTimes.length === params.restrictionTypes.length &&
+        params.startTimes.length === params.rollingPeriodInDays.length &&
+        params.startTimes.length === params.holders.length &&
+        params.startTimes.length === params.endTimes.length,
+      'Array lengths missmatch',
     );
     for (let i = 0; i < params.startTimes.length; i + 1) {
       this.checkRestrictionInputParams(
@@ -706,20 +685,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     assert.assert(
-      params.startTimes.length === params.allowedTokens.length,
-      'Array lengths for startTime and allowedTokens passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.restrictionTypes.length,
-      'Array lengths for startTime and restrictionType passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.holders.length,
-      'Array lengths for startTime and holders passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.endTimes.length,
-      'Array lengths for startTime and endTime passed in are not the same',
+      params.startTimes.length === params.allowedTokens.length &&
+        params.startTimes.length === params.restrictionTypes.length &&
+        params.startTimes.length === params.holders.length &&
+        params.startTimes.length === params.endTimes.length,
+      'Array lengths missmatch',
     );
     for (let i = 0; i < params.startTimes.length; i + 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
@@ -739,24 +709,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     assert.assert(
-      params.startTimes.length === params.allowedTokens.length,
-      'Array lengths for startTime and allowedTokens passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.restrictionTypes.length,
-      'Array lengths for startTime and restrictionType passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.rollingPeriodInDays.length,
-      'Array lengths for startTime and rollingPeriodInDays passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.holders.length,
-      'Array lengths for startTime and holders passed in are not the same',
-    );
-    assert.assert(
-      params.startTimes.length === params.endTimes.length,
-      'Array lengths for startTime and endTime passed in are not the same',
+      params.startTimes.length === params.allowedTokens.length &&
+        params.startTimes.length === params.restrictionTypes.length &&
+        params.startTimes.length === params.rollingPeriodInDays.length &&
+        params.startTimes.length === params.holders.length &&
+        params.startTimes.length === params.endTimes.length,
+      'Array lengths missmatch',
     );
     for (let i = 0; i < params.startTimes.length; i + 1) {
       this.checkRestrictionInputParams(

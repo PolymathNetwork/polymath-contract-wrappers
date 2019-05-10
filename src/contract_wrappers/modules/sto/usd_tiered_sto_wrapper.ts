@@ -771,7 +771,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   public changeAccredited = async (params: ChangeAccreditedParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     params.investors.forEach(address => assert.isETHAddressHex('investors', address));
-    assert.assert(params.investors.length === params.accredited.length, 'Array mismatch');
+    assert.assert(params.investors.length === params.accredited.length, 'Array lengths mismatch');
     return (await this.contract).changeAccredited.sendTransactionAsync(
       params.investors,
       params.accredited,
@@ -786,7 +786,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     params.investors.forEach(address => assert.isETHAddressHex('investors', address));
-    assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array mismatch');
+    assert.assert(params.investors.length === params.nonAccreditedLimit.length, 'Array length mismatch');
     return (await this.contract).changeNonAccreditedLimit.sendTransactionAsync(
       params.investors,
       params.nonAccreditedLimit,
@@ -866,7 +866,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       params.ratePerTier.length === params.tokensPerTierTotal.length &&
         params.ratePerTierDiscountPoly.length === params.tokensPerTierTotal.length &&
         params.tokensPerTierDiscountPoly.length === params.tokensPerTierTotal.length,
-      'Tier data length mismatch',
+      'Tier data arrays length mismatch',
     );
     for (let i = 0; i < params.tokensPerTierTotal.length; i += 1) {
       assert.assert(params.ratePerTier[i].gt(new BigNumber(0)), 'Invalid rate');

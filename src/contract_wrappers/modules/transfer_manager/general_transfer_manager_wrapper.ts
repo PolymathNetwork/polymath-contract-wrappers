@@ -463,16 +463,10 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
-      params.canSendAfters.length === params.canReceiveAfters.length,
-      'Array lengths for canSendAfters and canReceiveAfters passed in are not the same',
-    );
-    assert.assert(
-      params.canSendAfters.length === params.expiryTimes.length,
-      'Array lengths for canSendAfters and expiryTimes passed in are not the same',
-    );
-    assert.assert(
-      params.canSendAfters.length === params.canBuyFromSTO.length,
-      'Array lengths for canSendAfters and canBuyFromSTO passed in are not the same',
+      params.canSendAfters.length === params.canReceiveAfters.length &&
+        params.canSendAfters.length === params.expiryTimes.length &&
+        params.canSendAfters.length === params.canBuyFromSTO.length,
+      'Array lengths missmatch',
     );
     params.canSendAfters.forEach(date => assert.isLessThanMax64BytesDate('canSendAfter', date));
     params.canReceiveAfters.forEach(date => assert.isLessThanMax64BytesDate('canReceiveAfter', date));
