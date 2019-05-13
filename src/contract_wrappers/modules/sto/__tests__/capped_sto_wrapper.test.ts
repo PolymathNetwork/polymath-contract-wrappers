@@ -425,10 +425,6 @@ describe('CappedSTOWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
-      const txPayableData = {
-        ...{},
-        from: expectedOwnerResult,
-      };
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
