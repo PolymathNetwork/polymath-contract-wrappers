@@ -625,4 +625,36 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.callAsync(mockedParams.moduleAddress)).once();
     });
   });
+
+  describe('verifyTransfer', () => {
+    test.todo('should fail as from is not an Eth address');
+    test.todo('should fail as to is not an Eth address');
+    test.todo('should fail as granularity is a zero big number');
+
+    test('should call to verifyTransfer', async () => {
+      const expectedResult = false;
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        data: 'string',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.verifyTransfer(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.verifyTransfer).once();
+      verify(mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data)).once();
+    });
+  });
 });
