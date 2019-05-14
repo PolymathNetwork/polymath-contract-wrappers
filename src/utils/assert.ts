@@ -25,7 +25,7 @@ const assert = {
     sharedAssert.assert(value <= MAX_64_BYTES_DATE, `${variableName} date is too far in the future`);
   },
   isPercentage(variableName: string, value: BigNumber): void {
-    sharedAssert.assert(value <= MAX_PERCENTAGE, `${variableName} is not expected to be greater than 100%`);
+    sharedAssert.assert(value.isLessThanOrEqualTo(MAX_PERCENTAGE), `${variableName} is not expected to be greater than 100%`);
   },
   isFutureDate(value: Date, message: string): void {
     sharedAssert.assert(value >= new Date(), message);
