@@ -593,14 +593,14 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as moduleAddress is not an Eth address');
 
     test('should call to getModule', async () => {
-      const expectedString = '0x123';
-      const expectedNumber = [1, 2];
+      const expectedString = 'Name';
+      const expectedNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedResult = [
-        bytes32ToString(expectedString),
+        stringToBytes32(expectedString),
         'stringstringstring',
         'stringstringstring',
         true,
-        expectedNumber,
+        expectedNumbers,
       ];
       const mockedParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -615,11 +615,11 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       const result = await target.getModule(mockedParams);
       // Result expectation
-      expect(result.name).toEqual(expectedString);
+      expect(result.name).toBe(bytes32ToString(stringToBytes32(expectedString)));
       expect(result.address).toBe(expectedResult[1]);
       expect(result.factoryAddress).toBe(expectedResult[2]);
       expect(result.archived).toBe(expectedResult[3]);
-      expect(result.types).toEqual(expectedNumber);
+      expect(result.types).toEqual(expectedNumbers.map(x => x.toNumber()));
       // Verifications
       verify(mockedContract.getModule).once();
       verify(mockedMethod.callAsync(mockedParams.moduleAddress)).once();
