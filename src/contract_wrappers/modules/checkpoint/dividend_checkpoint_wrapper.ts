@@ -345,7 +345,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
-    return (await this.contract).reclaimDividend.sendTransactionAsync(
+    return (await this.contract).withdrawWithholding.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
       params.txData,
       params.safetyFactor,
