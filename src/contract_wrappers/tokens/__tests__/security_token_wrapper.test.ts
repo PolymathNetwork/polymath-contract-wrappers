@@ -626,7 +626,7 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('verifyTransfer', () => {
+  /* describe('verifyTransfer', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
     test.todo('should fail as granularity is a zero big number');
@@ -655,6 +655,197 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.verifyTransfer).once();
       verify(mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data)).once();
+    });
+  }); */
+
+  describe('decreaseApproval', () => {
+    test.todo('should fail as spender is not an Eth address');
+    test('should send the transaction to decreaseApproval', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        spender: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(2),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.decreaseApproval).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.decreaseApproval(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.decreaseApproval).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('renounceOwnership', () => {
+    test('should send the transaction to renounceOwnership', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.renounceOwnership).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.renounceOwnership(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.renounceOwnership).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+    });
+  });
+
+  describe('increaseApproval', () => {
+    test.todo('should fail as spender is not an Eth address');
+    test('should send the transaction to increaseApproval', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        spender: '0x1111111111111111111111111111111111111111',
+        value: new BigNumber(1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.increaseApproval).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.increaseApproval(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.increaseApproval).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.spender,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('transferOwnership', () => {
+    test.todo('should fail as newOwner is not a zero Eth address');
+    test('should send the transaction to transferOwnership', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        newOwner: '0x1111111111111111111111111111111111111111',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.transferOwnership).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.newOwner, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.transferOwnership(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.transferOwnership).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.newOwner, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+
+  describe('archiveModule', () => {
+    test.todo('should fail as moduleAddress is not an Eth address');
+    test('should send the transaction to archiveModule', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        moduleAddress: '0x1111111111111111111111111111111111111111',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.archiveModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.archiveModule(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.archiveModule).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
     });
   });
 });
