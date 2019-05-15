@@ -640,7 +640,7 @@ describe('SecurityTokenWrapper', () => {
         data: 'string',
       };
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
