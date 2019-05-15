@@ -2,24 +2,12 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import {
-  SecurityTokenContract,
-  PolyTokenEvents,
-  FeatureRegistryContract,
-  ModuleFactoryContract,
-} from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { Features, ModuleType, ModuleName } from '../../../types';
+import { ModuleType, ModuleName } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import {
-  stringToBytes32,
-  stringArrayToBytes32Array,
-  bytes32ArrayToStringArray,
-  bytes32ToString,
-  numberToBigNumber,
-  dateToBigNumber,
-} from '../../../utils/convert';
+import { stringToBytes32, bytes32ToString, numberToBigNumber, dateToBigNumber } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
 describe('SecurityTokenWrapper', () => {
@@ -834,6 +822,26 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
+      // getModuleArchiveModule  expected
+      const expectedGetModuleString = 'Name';
+      const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
+      const expectedGetModuleResult = [
+        stringToBytes32(expectedGetModuleString),
+        'stringstringstring',
+        'stringstringstring',
+        false,
+        expectedGetModuleNumbers,
+      ];
+      const mockedGetModuleParams = {
+        moduleAddress: '0x1111111111111111111111111111111111111111',
+      };
+      // Mocked method
+      const mockedGetModuleMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getModule).thenReturn(instance(mockedGetModuleMethod));
+      // Stub the request
+      when(mockedGetModuleMethod.callAsync(mockedGetModuleParams.moduleAddress)).thenResolve(expectedGetModuleResult);
+
       // Real call
       const result = await target.archiveModule(mockedParams);
 
@@ -846,6 +854,8 @@ describe('SecurityTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.getModule).twice();
+      verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).twice();
     });
   });
 });
