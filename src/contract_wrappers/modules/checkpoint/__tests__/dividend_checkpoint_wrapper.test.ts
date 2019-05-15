@@ -983,4 +983,102 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
     });
   });
+
+  describe('isClaimed', () => {
+    test('should get isClaimed', async () => {
+      // Mock getDividendsData
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedDividendsDataResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedDividendsDataMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedDividendsDataMethod));
+      // Stub the request
+      when(mockedDividendsDataMethod.callAsync()).thenResolve(expectedDividendsDataResult);
+
+      const mockedParams = {
+        investor: '0x6666666666666666666666666666666666666666',
+        dividendIndex: 2,
+      };
+      const expectedResult = false;
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isClaimed).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.callAsync(mockedParams.investor, objectContaining(new BigNumber(mockedParams.dividendIndex))),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isClaimed(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedDividendsDataMethod.callAsync()).once();
+      verify(mockedContract.isClaimed).once();
+      verify(
+          mockedMethod.callAsync(mockedParams.investor, objectContaining(new BigNumber(mockedParams.dividendIndex))),
+      ).once();
+    });
+  });
+
+  describe('isExcluded', () => {
+    test('should get isExcluded', async () => {
+      // Mock getDividendsData
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedDividendsDataResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedDividendsDataMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedDividendsDataMethod));
+      // Stub the request
+      when(mockedDividendsDataMethod.callAsync()).thenResolve(expectedDividendsDataResult);
+
+      const mockedParams = {
+        investor: '0x6666666666666666666666666666666666666666',
+        dividendIndex: 2,
+      };
+      const expectedResult = false;
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isExcluded).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.callAsync(mockedParams.investor, objectContaining(new BigNumber(mockedParams.dividendIndex))),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isExcluded(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedDividendsDataMethod.callAsync()).once();
+      verify(mockedContract.isExcluded).once();
+      verify(
+          mockedMethod.callAsync(mockedParams.investor, objectContaining(new BigNumber(mockedParams.dividendIndex))),
+      ).once();
+    });
+  });
 });
