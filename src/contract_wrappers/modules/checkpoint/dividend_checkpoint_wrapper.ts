@@ -128,7 +128,7 @@ interface DividendProgress {
   /** Investor address */
   investor: string;
   /** Whether investor has claimed */
-  claimend: boolean;
+  claimed: boolean;
   /** Whether investor is excluded */
   excluded: boolean;
   /** Amount of withheld tax (estimate if not claimed) */
@@ -402,7 +402,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     for (let i = 0; i < result[0].length; i += 1) {
       const dividendProgress: DividendProgress = {
         investor: result[0][i],
-        claimend: result[1][i],
+        claimed: result[1][i],
         excluded: result[2][i],
         withheld: result[3][i],
         amount: result[4][i],
