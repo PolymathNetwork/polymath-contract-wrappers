@@ -852,12 +852,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintMulti = async (params: MintMultiParams) => {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
-    assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
-    await this.checkOnlyOwner();
     assert.assert(
       params.investors.length === params.values.length,
       'Number of investors passed in must be equivalent to number of values',
     );
+    assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
+    await this.checkOnlyOwner();
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
       params.values,
