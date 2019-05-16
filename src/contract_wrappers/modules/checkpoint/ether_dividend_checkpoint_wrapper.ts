@@ -246,10 +246,6 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     this.contract = contract;
   }
 
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
   public createDividend = async (params: CreateDividendParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     const txPayableData = {
