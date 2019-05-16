@@ -1685,7 +1685,7 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  /* describe('burnWithData', () => {
+  describe('burnWithData', () => {
     test('should send the transaction to burnWithData', async () => {
       // Mocked parameters
       const mockedParams = {
@@ -1710,13 +1710,13 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const owner = '0x5555555555555555555555555555555555555555';
       // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
 
-      const expectedBalanceResult = new BigNumber(0);
+      const expectedBalanceResult = new BigNumber(100);
       const params = {
-        owner: '0x1111111111111111111111111111111111111111',
+        owner
       };
       // Mocked method
       const mockedBalanceMethod = mock(MockedCallMethod);
@@ -1743,7 +1743,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
     });
-  }); */
+  });
 
   /* describe('burnFromWithData', () => {
     // fix burnWithData first to implement this.
