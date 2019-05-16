@@ -1684,4 +1684,68 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.mintingFrozen).once();
     });
   });
+
+  /* describe('burnWithData', () => {
+    test('should send the transaction to burnWithData', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        value: new BigNumber(1),
+        data: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.burnWithData).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedBalanceResult = new BigNumber(0);
+      const params = {
+        owner: '0x1111111111111111111111111111111111111111',
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      // Real call
+      const result = await target.burnWithData(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.burnWithData).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+    });
+  }); */
+
+  /* describe('burnFromWithData', () => {
+    // fix burnWithData first to implement this.
+  }); */
 });
