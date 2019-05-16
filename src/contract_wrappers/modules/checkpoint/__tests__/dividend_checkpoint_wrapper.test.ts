@@ -1036,7 +1036,312 @@ describe('DividendCheckpointWrapper', () => {
     });
   });
 
-  describe('getDividendsData', () => {
+  describe('Reclaim Dividend', () => {
+    test('should reclaimDividend', async () => {
+      // getDividendsData mock
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+
+      const expectedGetDividendsResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedGetDividendsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedGetDividendsMethod));
+      // Stub the request
+      when(mockedGetDividendsMethod.callAsync()).thenResolve(expectedGetDividendsResult);
+
+      const dividendIndex = 2;
+      const expectedDividendsResult = [
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        dateToBigNumber(pastDate),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        false,
+        new BigNumber(1),
+        new BigNumber(1),
+        stringToBytes32('name'),
+      ];
+      // Mocked method
+      const mockedDividendsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.dividends).thenReturn(instance(mockedDividendsMethod));
+      // Stub the request
+      when(mockedDividendsMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).thenResolve(
+        expectedDividendsResult,
+      );
+
+      const mockedParams = {
+        dividendIndex: 2,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.reclaimDividend).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.reclaimDividend(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.reclaimDividend).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.dividends).once();
+      verify(mockedDividendsMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedGetDividendsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Calculate Dividend', () => {
+    test('should calculateDividend', async () => {
+      // Mock getDividendsData
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedDividendsDataResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedDividendsDataMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedDividendsDataMethod));
+      // Stub the request
+      when(mockedDividendsDataMethod.callAsync()).thenResolve(expectedDividendsDataResult);
+
+      const mockedParams = {
+        dividendIndex: 2,
+        payee: '0x6666666666666666666666666666666666666666',
+      };
+      const expectedResult = [new BigNumber(3), new BigNumber(2)];
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.calculateDividend).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)), mockedParams.payee),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.calculateDividend(mockedParams);
+
+      // Result expectation
+      expect(result.claim).toBe(expectedResult[0]);
+      expect(result.withheld).toBe(expectedResult[1]);
+
+      // Verifications
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedDividendsDataMethod.callAsync()).once();
+      verify(mockedContract.calculateDividend).once();
+      verify(
+        mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)), mockedParams.payee),
+      ).once();
+    });
+  });
+
+  describe('Get Dividend Index', () => {
+    test('should getDividendIndex', async () => {
+      const mockedParams = {
+        checkpointId: 2,
+      };
+      const expectedResult = [new BigNumber(3), new BigNumber(2)];
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendIndex).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.checkpointId)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getDividendIndex(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getDividendIndex).once();
+      verify(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.checkpointId)))).once();
+    });
+  });
+
+  describe('Withdraw Withholding', () => {
+    test('should withdrawWithholding', async () => {
+      // getDividendsData mock
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedGetDividendsResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedGetDividendsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedGetDividendsMethod));
+      // Stub the request
+      when(mockedGetDividendsMethod.callAsync()).thenResolve(expectedGetDividendsResult);
+
+      const dividendIndex = 2;
+
+      const mockedParams = {
+        dividendIndex,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.withdrawWithholding).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.withdrawWithholding(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.withdrawWithholding).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedGetDividendsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Update Dividend Dates', () => {
+    test('should updateDividendDates', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // getDividendsData mock
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedGetDividendsResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedGetDividendsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedGetDividendsMethod));
+      // Stub the request
+      when(mockedGetDividendsMethod.callAsync()).thenResolve(expectedGetDividendsResult);
+
+      const mockedParams = {
+        dividendIndex: 2,
+        maturity: new Date(2030, 1),
+        expiry: new Date(2035, 1),
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.updateDividendDates).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.updateDividendDates(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.updateDividendDates).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(new BigNumber(mockedParams.dividendIndex)),
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedGetDividendsMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetDividendsData', () => {
     test('should getDividendsData', async () => {
       const pastDate = new Date(2010, 1);
       const futureDate = new Date(2030, 1);
