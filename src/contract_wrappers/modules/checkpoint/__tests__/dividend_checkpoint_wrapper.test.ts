@@ -1418,6 +1418,118 @@ describe('DividendCheckpointWrapper', () => {
     });
   });
 
+  describe('Get Dividend Progress', () => {
+    test('should getDividendProgress', async () => {
+      // Mock getDividendsData
+      const pastDate = new Date(2010, 1);
+      const futureDate = new Date(2030, 1);
+      const name = 'Name';
+      const expectedDividendsDataResult = [
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(pastDate), dateToBigNumber(pastDate), dateToBigNumber(pastDate)],
+        [dateToBigNumber(futureDate), dateToBigNumber(futureDate), dateToBigNumber(futureDate)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(3), new BigNumber(4), new BigNumber(5)],
+        [stringToBytes32(name), stringToBytes32(name), stringToBytes32(name)],
+      ];
+      const mockedDividendsDataMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendsData).thenReturn(instance(mockedDividendsDataMethod));
+      // Stub the request
+      when(mockedDividendsDataMethod.callAsync()).thenResolve(expectedDividendsDataResult);
+
+      const mockedParams = {
+        dividendIndex: 2,
+      };
+      const expectedResult = [
+        ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+        [true, true],
+        [true, true],
+        [new BigNumber(1), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDividendProgress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getDividendProgress(mockedParams);
+
+      // Result expectation
+      expect(result[0].investor).toBe(expectedResult[0][0]);
+      expect(result[0].claimed).toBe(expectedResult[1][0]);
+      expect(result[0].excluded).toBe(expectedResult[2][0]);
+      expect(result[0].withheld).toBe(expectedResult[3][0]);
+      expect(result[0].amount).toBe(expectedResult[4][0]);
+      expect(result[0].balance).toBe(expectedResult[5][0]);
+
+      // Verifications
+      verify(mockedContract.getDividendsData).once();
+      verify(mockedDividendsDataMethod.callAsync()).once();
+      verify(mockedContract.getDividendProgress).once();
+      verify(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)))).once();
+    });
+  });
+
+  describe('Get Checkpoint Data', () => {
+    test('should getCheckpointData', async () => {
+      const checkpointId = 2;
+
+      // Mock security token
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+
+      // Mock security token currentCheckpointId
+      const expectedCurrentCheckpointResult = new BigNumber(checkpointId);
+      // Mocked method
+      const mockedCurrentCheckpointMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedSecurityTokenContract.currentCheckpointId).thenReturn(instance(mockedCurrentCheckpointMethod));
+      // Stub the request
+      when(mockedCurrentCheckpointMethod.callAsync()).thenResolve(expectedCurrentCheckpointResult);
+
+      const mockedParams = {
+        checkpointId: 2,
+      };
+      const expectedResult = [
+        ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+        [new BigNumber(1), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getCheckpointData).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.checkpointId)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getCheckpointData(mockedParams);
+
+      // Result expectation
+      expect(result[0].investor).toBe(expectedResult[0][0]);
+      expect(result[0].balance).toBe(expectedResult[1][0]);
+      expect(result[0].withheld).toBe(expectedResult[2][0]);
+
+      // Verifications
+      verify(mockedContract.getCheckpointData).once();
+      verify(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.checkpointId)))).once();
+      verify(mockedSecurityTokenContract.currentCheckpointId).once();
+      verify(mockedCurrentCheckpointMethod.callAsync()).once();
+    });
+  });
+
   describe('isClaimed', () => {
     test('should get isClaimed', async () => {
       // Mock getDividendsData
