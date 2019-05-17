@@ -880,7 +880,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).burnWithData.sendTransactionAsync(
       params.value,
-      params.data,
+      stringToBytes32(params.data),
       params.txData,
       params.safetyFactor,
     );

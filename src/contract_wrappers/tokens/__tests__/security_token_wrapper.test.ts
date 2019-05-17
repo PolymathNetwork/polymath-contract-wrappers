@@ -2,7 +2,7 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, FeatureRegistryContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenContract, FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import { ModuleType, ModuleName, Features } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
@@ -617,6 +617,7 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  // TODO figure it out why fails `Invalid granularity`
   /* describe('verifyTransfer', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
@@ -1703,7 +1704,7 @@ describe('SecurityTokenWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.value,
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1716,7 +1717,7 @@ describe('SecurityTokenWrapper', () => {
 
       const expectedBalanceResult = new BigNumber(100);
       const params = {
-        owner
+        owner,
       };
       // Mocked method
       const mockedBalanceMethod = mock(MockedCallMethod);
@@ -1735,7 +1736,7 @@ describe('SecurityTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.value,
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1745,7 +1746,457 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  /* describe('burnFromWithData', () => {
-    // fix burnWithData first to implement this.
+  describe('burnFromWithData', () => {
+    test('should send the transaction to burnFromWithData', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        from: '0x5555555555555555555555555555555555555555',
+        value: new BigNumber(1),
+        data: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.burnFromWithData).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const owner = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
+
+      const expectedBalanceResult = new BigNumber(100);
+      const params = {
+        owner,
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      const expectedAllowanceResult = new BigNumber(10);
+      // Mocked method
+      const mockedAllowanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
+      // Stub the request
+      when(mockedAllowanceMethod.callAsync(mockedParams.from, params.owner)).thenResolve(expectedAllowanceResult);
+
+      // Real call
+      const result = await target.burnFromWithData(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.burnFromWithData).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedContract.allowance).once();
+      verify(mockedAllowanceMethod.callAsync(mockedParams.from, params.owner)).once();
+    });
+  });
+
+  describe('createCheckpoint', () => {
+    test('should send the transaction to createCheckpoint', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCheckpoint).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedCurrentResult = new BigNumber(10);
+      // Mocked method
+      const mockedCurrentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentCheckpointId).thenReturn(instance(mockedCurrentMethod));
+      // Stub the request
+      when(mockedCurrentMethod.callAsync()).thenResolve(expectedCurrentResult);
+
+      // Real call
+      const result = await target.createCheckpoint(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCheckpoint).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.currentCheckpointId).once();
+    });
+  });
+
+  describe('setController', () => {
+    test.todo('should fail as controller is not an Eth address');
+    test('should send the transaction to setController', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        controller: '0x5555555555555555555555555555555555555555',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.setController).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.controller, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedControllerResult = false;
+      // Mocked method
+      const mockedControllerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.controllerDisabled).thenReturn(instance(mockedControllerMethod));
+      // Stub the request
+      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+
+      // Real call
+      const result = await target.setController(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.setController).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.controller, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.controllerDisabled).once();
+    });
+  });
+
+  describe('disableController', () => {
+    test('should send the transaction to disableController', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.disableController).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedControllerResult = false;
+      // Mocked method
+      const mockedControllerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.controllerDisabled).thenReturn(instance(mockedControllerMethod));
+      // Stub the request
+      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+
+      // Real call
+      const result = await target.disableController(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.disableController).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.controllerDisabled).once();
+    });
+  });
+
+  describe('forceTransfer', () => {
+    test.todo('should fail as from is not an Eth address');
+    test.todo('should fail as to is not a zero Eth address');
+    test('should send the transaction to forceTransfer', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        data: 'string',
+        log: 'log',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.forceTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.log,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedBalanceResult = new BigNumber(100);
+      const params = {
+        owner: '0x1111111111111111111111111111111111111111',
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      const expectedControllerResult = '0x5555555555555555555555555555555555555555';
+      const mockedControllerMethod = mock(MockedCallMethod);
+      when(mockedContract.controller).thenReturn(instance(mockedControllerMethod));
+      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+
+      // Real call
+      const result = await target.forceTransfer(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.forceTransfer).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.log,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedContract.controller).once();
+      verify(mockedControllerMethod.callAsync()).once();
+    });
+  });
+
+  describe('forceBurn', () => {
+    test.todo('should fail as from is not an Eth address');
+    test('should send the transaction to forceBurn', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        value: new BigNumber(1),
+        data: 'string',
+        log: 'log',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.forceBurn).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.log,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedBalanceResult = new BigNumber(100);
+      const params = {
+        owner: '0x1111111111111111111111111111111111111111',
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      const expectedControllerResult = '0x5555555555555555555555555555555555555555';
+      const mockedControllerMethod = mock(MockedCallMethod);
+      when(mockedContract.controller).thenReturn(instance(mockedControllerMethod));
+      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+
+      // Real call
+      const result = await target.forceBurn(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.forceBurn).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.value,
+          mockedParams.data,
+          mockedParams.log,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedContract.controller).once();
+      verify(mockedControllerMethod.callAsync()).once();
+    });
+  });
+
+  // TODO figure it out why types of property 'moduleName' are incompatible.
+  /* describe('addModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      // Mocked parameters
+      const cappedParams = {
+        startTime: new Date(),
+        endTime: new Date(),
+        cap: new BigNumber(1),
+        rate: new BigNumber(1),
+        fundRaiseTypes: [0],
+        fundsReceiver: '0x2222222222222222222222222222222222222222',
+      };
+      const mockedParams = {
+        moduleName: ModuleName.CappedSTO,
+        address: '0x1111111111111111111111111111111111111111',
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: cappedParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.address,
+          mockedParams.data,
+          mockedParams.maxCost,
+          mockedParams.budget,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.addModule(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addModule).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.address,
+          mockedParams.data,
+          mockedParams.maxCost,
+          mockedParams.budget,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  }); */
+
+  // TODO figure it out why toLowerCase is undefined
+  /* describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: true,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(`Expected eventName to be one of: 'ModuleAdded', 'UpdateTokenDetails', etc, encountered: Transfer`),
+      );
+    });
   }); */
 });
