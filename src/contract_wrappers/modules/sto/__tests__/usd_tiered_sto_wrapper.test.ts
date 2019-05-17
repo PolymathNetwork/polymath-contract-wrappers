@@ -288,9 +288,14 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -454,6 +459,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -537,7 +543,6 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedIsOpenMethod.callAsync()).thenResolve(expectedIsOpenResult);
 
-
       // Mock STO Details
       const expectedStartTime = new Date(2025, 1);
       const expectedEndTime = new Date(2026, 1);
@@ -618,6 +623,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -739,14 +745,14 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.buyWithUSDRateLimited).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.beneficiary,
-              mockedParams.investedSC,
-              objectContaining(mockedParams.minTokens),
-              mockedParams.usdToken,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          mockedParams.investedSC,
+          objectContaining(mockedParams.minTokens),
+          mockedParams.usdToken,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -757,14 +763,14 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.buyWithUSDRateLimited).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.beneficiary,
-              mockedParams.investedSC,
-              objectContaining(mockedParams.minTokens),
-              mockedParams.usdToken,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          mockedParams.investedSC,
+          objectContaining(mockedParams.minTokens),
+          mockedParams.usdToken,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.paused).once();
       verify(mockedPausedMethod.callAsync()).once();
@@ -784,6 +790,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -945,6 +952,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1028,7 +1036,6 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedIsOpenMethod.callAsync()).thenResolve(expectedIsOpenResult);
 
-
       // Mock STO Details
       const expectedStartTime = new Date(2025, 1);
       const expectedEndTime = new Date(2026, 1);
@@ -1065,12 +1072,12 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.buyWithPOLY).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.beneficiary,
-              mockedParams.investedPOLY,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          mockedParams.investedPOLY,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1081,12 +1088,12 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.buyWithPOLY).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.beneficiary,
-              mockedParams.investedPOLY,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.beneficiary,
+          mockedParams.investedPOLY,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.paused).once();
       verify(mockedPausedMethod.callAsync()).once();
@@ -1106,6 +1113,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1269,12 +1277,16 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
   describe('BuyTokensView', () => {
     test('should get buyTokensView values', async () => {
       const investorAddress = '0x1111111111111111111111111111111111111111';
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([investorAddress]);
 
       // Pause Address expected
       const expectedPausedResult = false;
@@ -1376,9 +1388,6 @@ describe('USDTieredSTOWrapper', () => {
         expectedResult,
       );
 
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([investorAddress]);
-
       // Real call
       const result = await target.buyTokensView(params);
       // Result expectation
@@ -1405,6 +1414,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedContract.buyTokensView).once();
       verify(mockedMethod.callAsync(params.beneficiary, params.investmentValue, params.fundRaiseType)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1973,10 +1983,14 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.finalize).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.isFinalized).once();
       verify(mockedIsFinalizedMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2036,8 +2050,12 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2097,8 +2115,12 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2167,10 +2189,14 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.startTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2239,10 +2265,14 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.startTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2308,10 +2338,14 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.startTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2374,8 +2408,12 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2450,10 +2488,14 @@ describe('USDTieredSTOWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.startTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 

@@ -108,7 +108,7 @@ describe('CappedSTOWrapper', () => {
     test('should get bigNumber for given investor', async () => {
       const investorAddress = '0x5555555555555555555555555555555555555555';
       const params = {
-        investorAddress
+        investorAddress,
       };
       // Address expected
       const expectedResult = true;
@@ -195,6 +195,11 @@ describe('CappedSTOWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+      verify(mockedContract.allowBeneficialInvestments).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -351,7 +356,7 @@ describe('CappedSTOWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-            objectContaining(txPayableData),
+          objectContaining(txPayableData),
           mockedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
@@ -380,6 +385,7 @@ describe('CappedSTOWrapper', () => {
       verify(mockedContract.startTime).once();
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -387,8 +393,6 @@ describe('CappedSTOWrapper', () => {
     test('should buy tokens with poly', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // Pause Address expected
       const expectedPausedResult = false;

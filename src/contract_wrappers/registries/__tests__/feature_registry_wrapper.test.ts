@@ -156,8 +156,10 @@ describe('FeatureRegistryWrapper', () => {
           ),
         ).once();
         verify(mockedContract.getFeatureStatus).once();
+        verify(mockedGetMethod.callAsync(featureName)).once();
         verify(mockedContract.owner).once();
         verify(mockedOwnerMethod.callAsync()).once();
+        verify(mockedWrapper.getAvailableAddressesAsync()).once();
       });
     });
   });
