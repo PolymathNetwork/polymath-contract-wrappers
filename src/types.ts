@@ -132,6 +132,11 @@ export enum Perms {
   PreSaleAdmin = 'PRE_SALE_ADMIN',
 }
 
+export enum RestrictionTypes {
+  Fixed = 0,
+  Percentage = 1,
+}
+
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {
   isRemoved: boolean;
   log: LogWithDecodedArgs<ArgsType>;
