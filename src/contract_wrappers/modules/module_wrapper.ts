@@ -1,11 +1,12 @@
 import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { SecurityTokenContract, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
+import { stringToBytes32 } from '../../utils/convert';
 
 interface TakeFeeParams extends TxParams {
   amount: BigNumber;
@@ -72,5 +73,27 @@ export default class ModuleWrapper extends ContractWrapper {
 
   public takeFee = async (params: TakeFeeParams) => {
     return (await this.contract).takeFee.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
+  };
+
+  protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
+    const from = await this.getCallerAddress(txData);
+    return from === (await (await this.securityTokenContract()).owner.callAsync());
+  };
+
+  protected isCallerAllowed = async (txData: Partial<TxData> | undefined, perm: string): Promise<boolean> => {
+    if (await this.isCallerTheSecurityTokenOwner(txData)) {
+      return true;
+    }
+    const from = await this.getCallerAddress(txData);
+    if (
+      await (await this.securityTokenContract()).checkPermission.callAsync(
+        from,
+        (await this.contract).address,
+        stringToBytes32(perm),
+      )
+    ) {
+      return true;
+    }
+    return false;
   };
 }

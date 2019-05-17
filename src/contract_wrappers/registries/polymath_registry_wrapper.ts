@@ -99,6 +99,10 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
+  public owner = async () => {
+    return (await this.contract).owner.callAsync();
+  };
+
   /**
    * Gets the contract address
    * @return address string
@@ -159,6 +163,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Changes the contract address
    */
   public changeAddress = async (params: ChangeAddressParams) => {
+    assert.assert((await this.owner()) === (await this.getCallerAddress(params.txData)), 'Form sender must be owner');
     assert.isETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).changeAddress.sendTransactionAsync(
       params.nameKey,

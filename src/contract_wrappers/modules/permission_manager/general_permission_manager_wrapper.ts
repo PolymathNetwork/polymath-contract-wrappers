@@ -13,7 +13,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, GetLogs, Subscribe } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  GetLogs,
+  Subscribe,
+  Perms,
+} from '../../../types';
 import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -146,7 +154,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public addDelegate = async (params: AddDelegateParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
+    assert.assert(params.details.length > 0, '0 value not allowed');
+    assert.assert(!(await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -156,7 +167,9 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public deleteDelegate = async (params: DelegateTxParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
+    assert.assert(await (await this.contract).checkDelegate.callAsync(params.delegate), 'Delegate does not exist');
     return (await this.contract).deleteDelegate.sendTransactionAsync(
       params.delegate,
       params.txData,
@@ -165,12 +178,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public checkDelegate = async (params: DelegateParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     return (await this.contract).checkDelegate.callAsync(params.delegate);
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).changePermission.sendTransactionAsync(
       params.delegate,
@@ -183,8 +197,12 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
-    assert.isETHAddressHex('delegate', params.delegate);
-    assert.isETHAddressHexArray('module', params.modules);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.ChangePermission), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('delegate', params.delegate);
+    params.modules.forEach(address => assert.isETHAddressHex('modules', address));
+    assert.assert(params.modules.length > 0, '0 length is not allowed');
+    assert.assert(params.modules.length === params.perms.length, 'Array length mismatch');
+    assert.assert(params.valids.length === params.perms.length, 'Array length mismatch');
     return (await this.contract).changePermissionMulti.sendTransactionAsync(
       params.delegate,
       params.modules,

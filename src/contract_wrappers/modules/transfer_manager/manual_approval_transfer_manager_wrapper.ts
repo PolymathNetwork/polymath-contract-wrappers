@@ -16,7 +16,15 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -103,7 +111,6 @@ interface VerifyTransferParams extends TxParams {
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface AddManualApprovalParams extends TxParams {
@@ -197,11 +204,17 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   }
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.paused(), 'Controller not currently paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public paused = async () => {
     return (await this.contract).paused.callAsync();
+  };
+
+  public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public approvals = async (params: ApprovalsParams) => {
@@ -216,10 +229,6 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return typedResult;
   };
 
-  public pause = async (params: TxParams) => {
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
   public getInitFunction = async () => {
     return (await this.contract).getInitFunction.callAsync();
   };
@@ -227,20 +236,26 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    // SC: require(_isTransfer == false || msg.sender == securityToken,...
+    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
       params.amount,
       params.data,
-      params.isTransfer,
+      false,
       params.txData,
       params.safetyFactor,
     );
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
+    assert.isNonZeroETHAddressHex('to', params.to);
+    assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
+    assert.isBigNumberGreaterThanZero(params.allowance, 'Allowance must be greater than 0');
+    await this.checkApprovalDoesNotExist(params.from, params.to);
     return (await this.contract).addManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -253,8 +268,25 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
+    assert.assert(
+      params.from.length === params.to.length &&
+        params.from.length === params.allowances.length &&
+        params.from.length === params.expiryTimes.length &&
+        params.from.length === params.descriptions.length,
+      'Array lengths missmatch',
+    );
+    params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
+    params.allowances.forEach(allowance =>
+      assert.isBigNumberGreaterThanZero(allowance, 'Allowance must be greater than 0'),
+    );
+    const approvals = [];
+    for (let i = 0; i < params.to.length; i + 1) {
+      approvals.push(this.checkApprovalDoesNotExist(params.from[i], params.to[i]));
+    }
+    await Promise.all(approvals);
     return (await this.contract).addManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -267,8 +299,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
+    assert.isNonZeroETHAddressHex('to', params.to);
+    assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
+    await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -282,8 +317,22 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
+    assert.assert(
+      params.from.length === params.to.length &&
+        params.from.length === params.changedAllowances.length &&
+        params.from.length === params.expiryTimes.length &&
+        params.from.length === params.descriptions.length,
+      'Array lengths missmatch',
+    );
+    params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
+    const approvals = [];
+    for (let i = 0; i < params.to.length; i + 1) {
+      approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
+    }
+    await Promise.all(approvals);
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -297,8 +346,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    await this.checkApprovalDoesExist(params.from, params.to);
     return (await this.contract).revokeManualApproval.sendTransactionAsync(
       params.from,
       params.to,
@@ -308,8 +359,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
-    assert.isETHAddressHexArray('from', params.from);
-    assert.isETHAddressHexArray('to', params.to);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    params.from.forEach(address => assert.isETHAddressHex('from', address));
+    params.to.forEach(address => assert.isETHAddressHex('to', address));
+    assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
+    const approvals = [];
+    for (let i = 0; i < params.to.length; i + 1) {
+      approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
+    }
+    await Promise.all(approvals);
     return (await this.contract).revokeManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
@@ -414,5 +472,17 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       ManualApprovalTransferManager.abi,
     );
     return logs;
+  };
+
+  private checkApprovalDoesNotExist = async (from: string, to: string) => {
+    const approval = await this.getApprovalDetails({ from, to });
+    assert.isBigNumberZero(approval.allowance, 'Approval already exists with allowance');
+    assert.isPastDate(approval.expiryTime, 'Approval already exists with valid future expiry date');
+  };
+
+  private checkApprovalDoesExist = async (from: string, to: string) => {
+    const approval = await this.getApprovalDetails({ from, to });
+    assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
+    assert.isFutureDate(approval.expiryTime, 'Approval does not exist');
   };
 }

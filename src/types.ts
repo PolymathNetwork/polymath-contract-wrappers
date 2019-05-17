@@ -1,4 +1,4 @@
-import { TxData, TxDataPayable } from '@0x/web3-wrapper';
+import { TxData } from '@0x/web3-wrapper';
 import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
@@ -72,11 +72,6 @@ export interface TxParams {
   safetyFactor?: number;
 }
 
-export interface TxPayableParams {
-  txData?: Partial<TxDataPayable>;
-  safetyFactor?: number;
-}
-
 export enum NetworkId {
   Mainnet = 1,
   Kovan = 42,
@@ -98,8 +93,8 @@ export enum FundRaiseType {
 }
 
 export enum Features {
-  CustomModulesAllowed = 'CustomModulesAllowed',
-  FreezeMintingAllowed = 'FreezeMintingAllowed',
+  CustomModulesAllowed = 'customModulesAllowed',
+  FreezeMintingAllowed = 'freezeMintingAllowed',
 }
 
 export enum PolymathContracts {
@@ -122,6 +117,24 @@ export enum ModuleName {
   USDTieredSTO = 'USDTieredSTO',
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
+}
+
+export enum Perms {
+  ChangePermission = 'CHANGE_PERMISSION',
+  Admin = 'ADMIN',
+  Flags = 'FLAGS',
+  Whitelist = 'WHITELIST',
+  TransferApproval = 'TRANSFER_APPROVAL',
+  Checkpoint = 'CHECKPOINT',
+  Manage = 'MANAGE',
+  Distribute = 'DISTRIBUTE',
+  FeeAdmin = 'FEE_ADMIN',
+  PreSaleAdmin = 'PRE_SALE_ADMIN',
+}
+
+export enum RestrictionTypes {
+  Fixed = 0,
+  Percentage = 1,
 }
 
 export interface DecodedLogEvent<ArgsType extends DecodedLogArgs> {

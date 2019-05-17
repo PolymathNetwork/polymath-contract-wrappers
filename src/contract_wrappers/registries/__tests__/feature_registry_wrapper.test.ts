@@ -98,6 +98,27 @@ describe('FeatureRegistryWrapper', () => {
 
     describe('SetFeatureStatus', () => {
       test('should send the transaction to set the feature status', async () => {
+        // Owner Address expected
+        const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+        // Mocked method
+        const mockedOwnerMethod = mock(MockedCallMethod);
+        // Stub the method
+        when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+        // Stub the request
+        when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+        // Mock web3 wrapper owner
+        when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+        // Address expected
+        const currentFeatureStatus = false;
+        // Feature name requested
+        const featureName = Features.CustomModulesAllowed.toString();
+        // Mocked Get method
+        const mockedGetMethod = mock(MockedCallMethod);
+        // Stub the get method
+        when(mockedContract.getFeatureStatus).thenReturn(instance(mockedGetMethod));
+        // Stub the get request
+        when(mockedGetMethod.callAsync(featureName)).thenResolve(currentFeatureStatus);
+
         // Mocked parameters
         const mockedParams = {
           nameKey: Features.CustomModulesAllowed,
@@ -135,6 +156,9 @@ describe('FeatureRegistryWrapper', () => {
             mockedParams.safetyFactor,
           ),
         ).once();
+        verify(mockedContract.getFeatureStatus).once();
+        verify(mockedContract.owner).once();
+        verify(mockedOwnerMethod.callAsync()).once();
       });
     });
   });

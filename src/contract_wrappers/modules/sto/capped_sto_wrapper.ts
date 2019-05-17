@@ -21,11 +21,11 @@ import {
   SubscribeAsyncParams,
   EventCallback,
   TxParams,
-  TxPayableParams,
   Subscribe,
   GetLogs,
+  FundRaiseType,
 } from '../../../types';
-import { bigNumberToDate, bigNumberToNumber } from '../../../utils/convert';
+import { bigNumberToDate } from '../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase;
@@ -98,8 +98,9 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
-interface BuyTokensParams extends TxPayableParams {
+interface BuyTokensParams extends TxParams {
   beneficiary: string;
+  value: BigNumber;
 }
 
 interface BuyTokensWithPolyParams extends TxParams {
@@ -172,6 +173,11 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      (await this.allowBeneficialInvestments()) !== params.allowBeneficialInvestments,
+      'Does not change value',
+    );
     return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(
       params.allowBeneficialInvestments,
       params.txData,
@@ -180,11 +186,41 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public buyTokens = async (params: BuyTokensParams) => {
-    assert.isETHAddressHex('beneficiary', params.beneficiary);
-    return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, params.txData, params.safetyFactor);
+    assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
+    assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
+    assert.assert(
+      await this.fundRaiseTypes({
+        type: FundRaiseType.ETH,
+      }),
+      'Mode of investment is not ETH',
+    );
+    if (await this.allowBeneficialInvestments()) {
+      assert.assert(
+        params.beneficiary === (await this.getCallerAddress(params.txData)),
+        'Beneficiary address does not match msg.sender',
+      );
+    }
+    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
+    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, txPayableData, params.safetyFactor);
   };
 
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
+    assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
+    assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.assert(
+      await this.fundRaiseTypes({
+        type: FundRaiseType.POLY,
+      }),
+      'Mode of investment is not POLY',
+    );
+    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
+    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
       params.investedPOLY,
       params.txData,
@@ -208,7 +244,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       cap: result[2],
       rate: result[3],
       fundsRaised: result[4],
-      investorCount: bigNumberToNumber(result[5]),
+      investorCount: result[5].toNumber(),
       totalTokensSold: result[6],
       isRaisedInPoly: result[7],
     };

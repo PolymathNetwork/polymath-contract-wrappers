@@ -20,9 +20,17 @@ import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
+import { bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../../types';
-import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  Perms,
+} from '../../../types';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
@@ -208,16 +216,24 @@ interface VerifyTransferParams extends TxParams {
 
 interface ModifyWhitelistParams extends TxParams {
   investor: string;
-  fromTime: Date;
-  toTime: Date;
+  canSendAfter: Date;
+  canReceiveAfter: Date;
   expiryTime: Date;
   canBuyFromSTO: boolean;
 }
 
+interface ModifyWhitelistMultiParams extends TxParams {
+  investors: string[];
+  canSendAfters: Date[];
+  canReceiveAfters: Date[];
+  expiryTimes: Date[];
+  canBuyFromSTO: boolean[];
+}
+
 interface ModifyWhitelistSignedParams extends TxParams {
   investor: string;
-  fromTime: Date;
-  toTime: Date;
+  canSendAfter: Date;
+  canReceiveAfter: Date;
   expiryTime: Date;
   canBuyFromSTO: boolean;
   validFrom: Date;
@@ -267,6 +283,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Instantiate GeneralTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -286,6 +303,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.paused(), 'Controller not currently paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -298,6 +316,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -344,6 +363,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -354,6 +374,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -363,6 +384,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
     assert.isETHAddressHex('signingAddress', params.signingAddress);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeSigningAddress.sendTransactionAsync(
       params.signingAddress,
       params.txData,
@@ -371,6 +393,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllTransfers.sendTransactionAsync(
       params.allowAllTransfers,
       params.txData,
@@ -379,6 +402,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
       params.allowAllWhitelistTransfers,
       params.txData,
@@ -387,6 +411,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
       params.allowAllWhitelistIssuances,
       params.txData,
@@ -395,6 +420,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllBurnTransfers.sendTransactionAsync(
       params.allowAllBurnTransfers,
       params.txData,
@@ -417,11 +443,15 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
-      dateToBigNumber(params.fromTime),
-      dateToBigNumber(params.toTime),
+      dateToBigNumber(params.canSendAfter),
+      dateToBigNumber(params.canReceiveAfter),
       dateToBigNumber(params.expiryTime),
       params.canBuyFromSTO,
       params.txData,
@@ -429,12 +459,45 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
+    assert.assert(
+      params.canSendAfters.length === params.canReceiveAfters.length &&
+        params.canSendAfters.length === params.expiryTimes.length &&
+        params.canSendAfters.length === params.canBuyFromSTO.length,
+      'Array lengths missmatch',
+    );
+    params.canSendAfters.forEach(date => assert.isLessThanMax64BytesDate('canSendAfter', date));
+    params.canReceiveAfters.forEach(date => assert.isLessThanMax64BytesDate('canReceiveAfter', date));
+    params.expiryTimes.forEach(date => assert.isLessThanMax64BytesDate('expiryTime', date));
+    return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
+      params.investors,
+      dateArrayToBigNumberArray(params.canSendAfters),
+      dateArrayToBigNumberArray(params.canReceiveAfters),
+      dateArrayToBigNumberArray(params.expiryTimes),
+      params.canBuyFromSTO,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
+    assert.isPastDate(params.validFrom, 'ValidFrom date must be in the past');
+    assert.isFutureDate(params.validTo, 'ValidTo date must be in the future');
+    assert.assert(
+      !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
+      'Already used signature of investor address and nonce',
+    );
     return (await this.contract).modifyWhitelistSigned.sendTransactionAsync(
       params.investor,
-      dateToBigNumber(params.fromTime),
-      dateToBigNumber(params.toTime),
+      dateToBigNumber(params.canSendAfter),
+      dateToBigNumber(params.canReceiveAfter),
       dateToBigNumber(params.expiryTime),
       params.canBuyFromSTO,
       dateToBigNumber(params.validFrom),
@@ -471,7 +534,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public getInvestorsData = async (params: GetInvestorsDataParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     const result = await (await this.contract).getInvestorsData.callAsync(params.investors);
     const typedResult: WhitelistData[] = [];
     for (let i = 0; i < params.investors.length; i += 1) {
