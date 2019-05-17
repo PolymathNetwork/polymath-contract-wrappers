@@ -857,7 +857,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       'Number of investors passed in must be equivalent to number of values',
     );
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
-    await this.checkOnlyOwner();
+    await this.checkOnlyOwner(params.txData);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
       params.values,
