@@ -44,6 +44,7 @@ describe('GeneralPermissionManagerWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedContractFactory);
   });
 
   describe('Types', () => {
