@@ -188,6 +188,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       params.maxHolderPercentage,
       params.txData,
@@ -212,7 +213,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
       params.investors.length === params.valids.length,
       'Array lengths are not equal for investors and valids',
     );
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
       params.valids,

@@ -443,10 +443,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressNotZero('investor', params.investor);
-    assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.canSendAfter),
@@ -459,15 +460,17 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressArrayNotZero(params.investors);
-    assert.checkValidWhitelist64ByteArrayDatesAndLengths(
-      params.canSendAfters,
-      params.canReceiveAfters,
-      params.expiryTimes,
-      params.canBuyFromSTO,
+    params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
+    assert.assert(
+      params.canSendAfters.length === params.canReceiveAfters.length &&
+        params.canSendAfters.length === params.expiryTimes.length &&
+        params.canSendAfters.length === params.canBuyFromSTO.length,
+      'Array lengths missmatch',
     );
+    params.canSendAfters.forEach(date => assert.isLessThanMax64BytesDate('canSendAfter', date));
+    params.canReceiveAfters.forEach(date => assert.isLessThanMax64BytesDate('canReceiveAfter', date));
+    params.expiryTimes.forEach(date => assert.isLessThanMax64BytesDate('expiryTime', date));
     return (await this.contract).modifyWhitelistMulti.sendTransactionAsync(
       params.investors,
       dateArrayToBigNumberArray(params.canSendAfters),
@@ -480,12 +483,13 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
-    assert.isETHAddressHex('investor', params.investor);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
-    assert.isAddressNotZero('investor', params.investor);
-    assert.checkValidWhitelist64ByteDates(params.canSendAfter, params.canReceiveAfter, params.expiryTime);
-    assert.assert(params.validFrom <= new Date(), 'ValidFrom date must be in the past');
-    assert.assert(params.validTo >= new Date(), 'ValidTo date must be in the future');
+    assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
+    assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
+    assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
+    assert.isPastDate(params.validFrom, 'ValidFrom date must be in the past');
+    assert.isFutureDate(params.validTo, 'ValidTo date must be in the future');
     assert.assert(
       !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
       'Already used signature of investor address and nonce',
@@ -530,7 +534,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public getInvestorsData = async (params: GetInvestorsDataParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
+    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
     const result = await (await this.contract).getInvestorsData.callAsync(params.investors);
     const typedResult: WhitelistData[] = [];
     for (let i = 0; i < params.investors.length; i += 1) {
