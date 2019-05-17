@@ -256,7 +256,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name);
+    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -272,7 +272,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
+    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -289,7 +289,14 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.isDividendValid(params.value, params.expiry, params.maturity, params.name, undefined, params.excluded);
+    await this.checkIfDividendIsValid(
+      params.value,
+      params.expiry,
+      params.maturity,
+      params.name,
+      undefined,
+      params.excluded,
+    );
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -308,7 +315,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: params.value,
     };
-    await this.isDividendValid(
+    await this.checkIfDividendIsValid(
       params.value,
       params.expiry,
       params.maturity,
@@ -325,34 +332,6 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       txPayableData,
       params.safetyFactor,
     );
-  };
-
-  private isDividendValid = async (
-    value: BigNumber | undefined,
-    expiry: Date,
-    maturity: Date,
-    name: string,
-    checkpointId?: number,
-    excluded?: string[],
-  ) => {
-    let auxExcluded = excluded;
-    if (auxExcluded === undefined) {
-      auxExcluded = await this.getDefaultExcluded();
-      assert.isETHAddressHexArray('excluded', auxExcluded);
-      assert.isAddressArrayNotZero(auxExcluded);
-      // we need to simulate push to verify the `duped exclude address` assert
-    }
-    const auxValue = value === undefined ? new BigNumber(0) : value;
-    assert.assert(auxExcluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
-    assert.assert(expiry > maturity, 'Expiry before maturity');
-    assert.assert(expiry > new Date(), 'Expiry in past');
-    assert.assert(auxValue.gt(new BigNumber(0)), 'No dividend sent');
-    if (typeof checkpointId !== 'undefined') {
-      const st = await this.securityTokenContract();
-      const currentCheckpointId = await st.currentCheckpointId.callAsync();
-      assert.assert(new BigNumber(checkpointId).lte(currentCheckpointId), 'Invalid checkpoint');
-    }
-    assert.assert(name.length > 0, 'The name can not be empty');
   };
 
   /**
@@ -400,5 +379,28 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       EtherDividendCheckpoint.abi,
     );
     return logs;
+  };
+
+  private checkIfDividendIsValid = async (
+    value: BigNumber,
+    expiry: Date,
+    maturity: Date,
+    name: string,
+    checkpointId?: number,
+    excluded?: string[],
+  ) => {
+    if (excluded !== undefined) {
+      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
+      assert.areThereDuplicatedStrings('excluded', excluded);
+      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
+    }
+    assert.assert(expiry > maturity, 'Expiry before maturity');
+    assert.isFutureDate(expiry, 'Expiry in past');
+    assert.isBigNumberGreaterThanZero(value, 'No dividend sent');
+    if (checkpointId !== undefined) {
+      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
+      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    }
+    assert.assert(name.length > 0, 'The name can not be empty');
   };
 }
