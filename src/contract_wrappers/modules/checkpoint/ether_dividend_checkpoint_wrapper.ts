@@ -30,9 +30,11 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  TxPayableParams,
+  Perms,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
+
+const EXCLUDED_ADDRESS_LIMIT = 150;
 
 interface EtherDividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: EtherDividendCheckpointEvents.EtherDividendDeposited;
@@ -190,97 +192,36 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
-interface SetWithholdingFixedParams extends TxParams {
-  investors: string[];
-  withholding: BigNumber;
-}
-
-interface PullDividendPaymentParams extends TxParams {
-  dividendIndex: number;
-}
-
-interface PushDividendPaymentToAddressesParams extends TxParams {
-  dividendIndex: number;
-  payees: string[];
-}
-
-interface IsClaimedParams {
-  investor: string;
-  dividendIndex: number;
-}
-
-interface GetDividendIndexParams {
-  checkpointId: number;
-}
-
-interface UpdateDividendDatesParams extends TxParams {
-  dividendIndex: number;
-  maturity: Date;
-  expiry: Date;
-}
-
-interface IsExcludedParams {
-  investor: string;
-  dividendIndex: number;
-}
-
-interface SetWithholdingParams extends TxParams {
-  investors: string[];
-  withholding: BigNumber[];
-}
-
-interface ReclaimERC20Params extends TxParams {
-  tokenContract: string;
-}
-
-interface ChangeWalletParams extends TxParams {
-  wallet: string;
-}
-
-interface SetDefaultExcludedParams extends TxParams {
-  excluded: string[];
-}
-
-interface PushDividendPaymentParams extends TxParams {
-  dividendIndex: number;
-  start: Date;
-  iterations: number;
-}
-
-interface CreateDividendParams extends TxPayableParams {
+interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointParams extends TxPayableParams {
+interface CreateDividendWithCheckpointParams extends TxParams {
   maturity: Date;
   expiry: Date;
   checkpointId: number;
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithExclusionsParams extends TxPayableParams {
+interface CreateDividendWithExclusionsParams extends TxParams {
   maturity: Date;
   expiry: Date;
   excluded: string[];
   name: string;
+  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointAndExclusionsParams extends TxPayableParams {
+interface CreateDividendWithCheckpointAndExclusionsParams extends TxParams {
   maturity: Date;
   expiry: Date;
   checkpointId: number;
   excluded: string[];
   name: string;
-}
-
-interface ReclaimDividendParams extends TxParams {
-  dividendIndex: number;
-}
-
-interface WithdrawWithholdingParams extends TxParams {
-  dividendIndex: number;
+  value: BigNumber;
 }
 
 /**
@@ -305,158 +246,63 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     this.contract = contract;
   }
 
-  public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
-    return (await this.contract).setWithholdingFixed.sendTransactionAsync(
-      params.investors,
-      params.withholding,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public reclaimETH = async (params: TxParams) => {
-    return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public pullDividendPayment = async (params: PullDividendPaymentParams) => {
-    return (await this.contract).pullDividendPayment.sendTransactionAsync(
-      numberToBigNumber(params.dividendIndex),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public unpause = async (params: TxParams) => {
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
-    assert.isETHAddressHexArray('payees', params.payees);
-    return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
-      numberToBigNumber(params.dividendIndex),
-      params.payees,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public wallet = async (): Promise<string> => {
-    return (await this.contract).wallet.callAsync();
-  };
-
-  public isClaimed = async (params: IsClaimedParams): Promise<boolean> => {
-    assert.isETHAddressHex('investor', params.investor);
-    return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
-  };
-
   public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
-  public getDividendIndex = async (params: GetDividendIndexParams): Promise<BigNumber[]> => {
-    return (await this.contract).getDividendIndex.callAsync(numberToBigNumber(params.checkpointId));
-  };
-
-  public updateDividendDates = async (params: UpdateDividendDatesParams) => {
-    return (await this.contract).updateDividendDates.sendTransactionAsync(
-      numberToBigNumber(params.dividendIndex),
-      dateToBigNumber(params.maturity),
-      dateToBigNumber(params.expiry),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public isExcluded = async (params: IsExcludedParams): Promise<boolean> => {
-    assert.isETHAddressHex('investor', params.investor);
-    return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
-  };
-
-  public pause = async (params: TxParams) => {
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public setWithholding = async (params: SetWithholdingParams) => {
-    assert.isETHAddressHexArray('investors', params.investors);
-    return (await this.contract).setWithholding.sendTransactionAsync(
-      params.investors,
-      params.withholding,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isETHAddressHex('tokenContract', params.tokenContract);
-    return (await this.contract).reclaimERC20.sendTransactionAsync(
-      params.tokenContract,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public changeWallet = async (params: ChangeWalletParams) => {
-    assert.isETHAddressHex('wallet', params.wallet);
-    return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
-  };
-
-  public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
-    assert.isETHAddressHexArray('excluded', params.excluded);
-    return (await this.contract).setDefaultExcluded.sendTransactionAsync(
-      params.excluded,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public pushDividendPayment = async (params: PushDividendPaymentParams) => {
-    return (await this.contract).pushDividendPayment.sendTransactionAsync(
-      numberToBigNumber(params.dividendIndex),
-      dateToBigNumber(params.start),
-      numberToBigNumber(params.iterations),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public getDefaultExcluded = async (): Promise<string[]> => {
-    return (await this.contract).getDefaultExcluded.callAsync();
-  };
-
-  public createCheckpoint = async (params: TxParams) => {
-    return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
   public createDividend = async (params: CreateDividendParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       numberToBigNumber(params.checkpointId),
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.isETHAddressHexArray('excluded', params.excluded);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.checkIfDividendIsValid(
+      params.value,
+      params.expiry,
+      params.maturity,
+      params.name,
+      undefined,
+      params.excluded,
+    );
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.excluded,
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
   };
@@ -464,24 +310,28 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.isETHAddressHexArray('excluded', params.excluded);
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    const txPayableData = {
+      ...params.txData,
+      value: params.value,
+    };
+    await this.checkIfDividendIsValid(
+      params.value,
+      params.expiry,
+      params.maturity,
+      params.name,
+      params.checkpointId,
+      params.excluded,
+    );
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       numberToBigNumber(params.checkpointId),
       params.excluded,
       stringToBytes32(params.name),
-      params.txData,
+      txPayableData,
       params.safetyFactor,
     );
-  };
-
-  public reclaimDividend = async (params: ReclaimDividendParams) => {
-    return (await this.contract).reclaimDividend.sendTransactionAsync(numberToBigNumber(params.dividendIndex));
-  };
-
-  public withdrawWithholding = async (params: WithdrawWithholdingParams) => {
-    return (await this.contract).withdrawWithholding.sendTransactionAsync(numberToBigNumber(params.dividendIndex));
   };
 
   /**
@@ -529,5 +379,28 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       EtherDividendCheckpoint.abi,
     );
     return logs;
+  };
+
+  private checkIfDividendIsValid = async (
+    value: BigNumber,
+    expiry: Date,
+    maturity: Date,
+    name: string,
+    checkpointId?: number,
+    excluded?: string[],
+  ) => {
+    if (excluded !== undefined) {
+      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
+      assert.areThereDuplicatedStrings('excluded', excluded);
+      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
+    }
+    assert.assert(expiry > maturity, 'Expiry before maturity');
+    assert.isFutureDate(expiry, 'Expiry in past');
+    assert.isBigNumberGreaterThanZero(value, 'No dividend sent');
+    if (checkpointId !== undefined) {
+      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
+      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    }
+    assert.assert(name.length > 0, 'The name can not be empty');
   };
 }
