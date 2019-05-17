@@ -4,10 +4,10 @@ import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ERC20DividendCheckpointContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import ContractWrapper from '../../../contract_wrapper';
 import ERC20DividendCheckpointWrapper from '../erc20_dividend_checkpoint_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { bytes32ToString, dateToBigNumber, numberToBigNumber, stringToBytes32 } from '../../../../utils/convert';
+import ModuleWrapper from '../../module_wrapper';
 
 describe('DividendCheckpointWrapper', () => {
   // ERC20 Dividend Wrapper is used as contract target here as DividendCheckpoint is abstract
@@ -38,8 +38,8 @@ describe('DividendCheckpointWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ContractWrapper', async () => {
-      expect(target instanceof ContractWrapper).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 
