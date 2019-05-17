@@ -4,10 +4,10 @@ import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CappedSTOContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
 import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../../test_utils/mocked_methods';
-import ContractWrapper from '../../../contract_wrapper';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {FundRaiseType} from '../../../../types';
+import ModuleWrapper from '../../module_wrapper';
 
 describe('STOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -34,8 +34,8 @@ describe('STOWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ContractWrapper', async () => {
-      expect(target instanceof ContractWrapper).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 
