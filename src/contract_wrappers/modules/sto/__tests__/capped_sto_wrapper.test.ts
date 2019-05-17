@@ -106,22 +106,26 @@ describe('CappedSTOWrapper', () => {
 
   describe('Investors', () => {
     test('should get bigNumber for given investor', async () => {
+      const investorAddress = '0x5555555555555555555555555555555555555555';
+      const params = {
+        investorAddress
+      };
       // Address expected
       const expectedResult = true;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedMethod));
+      when(mockedContract.investors).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.investorAddress)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.allowBeneficialInvestments();
+      const result = await target.investors(params);
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.allowBeneficialInvestments).once();
-      verify(mockedMethod.callAsync()).once();
+      verify(mockedContract.investors).once();
+      verify(mockedMethod.callAsync(params.investorAddress)).once();
     });
   });
 
