@@ -212,6 +212,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return (await this.contract).paused.callAsync();
   };
 
+  public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Controller currently paused');
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
   public approvals = async (params: ApprovalsParams) => {
     const result = await (await this.contract).approvals.callAsync(numberToBigNumber(params.index));
     const typedResult: Approval = {
@@ -222,11 +227,6 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       description: result[4],
     };
     return typedResult;
-  };
-
-  public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public getInitFunction = async () => {
