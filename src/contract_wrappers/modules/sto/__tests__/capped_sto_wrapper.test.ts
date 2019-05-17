@@ -31,6 +31,7 @@ describe('CappedSTOWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedContractFactory);
     reset(mockedSecurityTokenContract);
   });
 
