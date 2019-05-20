@@ -208,7 +208,6 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.transferOwnership).once();
       verify(mockedMethod.sendTransactionAsync(newOwner, mockedParams.txData, mockedParams.safetyFactor)).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
@@ -275,7 +274,6 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
@@ -689,9 +687,12 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
+      verify(mockedLaunchFeeMethod.callAsync()).once();
       verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
@@ -952,6 +953,7 @@ describe('SecurityTokenRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.ticker, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
