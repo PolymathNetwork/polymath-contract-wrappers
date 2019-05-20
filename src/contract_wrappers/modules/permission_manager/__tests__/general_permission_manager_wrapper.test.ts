@@ -1,23 +1,18 @@
 // GeneralPermissionManagerWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
 import {
   GeneralPermissionManagerContract,
   PolyTokenEvents,
-  FeatureRegistryContract,
-  ModuleFactoryContract,
   SecurityTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../../module_wrapper';
-import { Features, ModuleType } from '../../../../types';
 import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
   stringToBytes32,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
-  bytes32ToString,
   numberToBigNumber,
 } from '../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
@@ -48,6 +43,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     reset(mockedWrapper);
     reset(mockedContract);
     reset(mockedSecurityTokenContract);
+    reset(mockedContractFactory);
   });
 
   describe('Types', () => {
@@ -355,7 +351,7 @@ describe('GeneralPermissionManagerWrapper', () => {
   describe('deleteDelegate', () => {
     test.todo('should fail as delegate is not an Eth address');
     test.todo('should fail as delegate is not a zero Eth address');
-    test('should send the transaction to addDelegate', async () => {
+    test('should send the transaction to deleteDelegate', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected

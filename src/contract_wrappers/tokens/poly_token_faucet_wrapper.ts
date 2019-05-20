@@ -7,6 +7,8 @@ import ContractWrapper from '../contract_wrapper';
 import { TxParams } from '../../types';
 import assert from '../../utils/assert';
 
+const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
+
 interface GetTokensParams extends TxParams {
   amount: BigNumber;
   recipient: string;
@@ -31,12 +33,8 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
   }
 
   public getTokens = async (params: GetTokensParams) => {
-    assert.isETHAddressHex('recipient', params.recipient);
-    assert.isAddressNotZero('recipient', params.recipient);
-    assert.assert(
-      params.amount.isLessThanOrEqualTo(new BigNumber(1000000e18)),
-      'Amount cannot exceed 1 million tokens',
-    );
+    assert.isNonZeroETHAddressHex('recipient', params.recipient);
+    assert.assert(params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT), 'Amount cannot exceed 1 million tokens');
 
     return (await this.contract).getTokens.sendTransactionAsync(
       params.amount,
