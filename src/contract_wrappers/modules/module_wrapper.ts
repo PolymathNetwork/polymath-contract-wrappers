@@ -2,11 +2,12 @@ import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenContract, ModuleFactoryContract, PolyTokenContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
 import { stringToBytes32 } from '../../utils/convert';
+import assert from '../../utils/assert';
 
 interface TakeFeeParams extends TxParams {
   amount: BigNumber;
@@ -25,6 +26,10 @@ export default class ModuleWrapper extends ContractWrapper {
   protected securityTokenContract = async (): Promise<SecurityTokenContract> => {
     const address = await (await this.contract).securityToken.callAsync();
     return this.contractFactory.getSecurityTokenContract(address);
+  };
+
+  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+    return this.contractFactory.getPolyTokenContract();
   };
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
@@ -72,6 +77,11 @@ export default class ModuleWrapper extends ContractWrapper {
   };
 
   public takeFee = async (params: TakeFeeParams) => {
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.securityToken());
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(params.amount),
+      'Allowance less than amount unable to take fee',
+    );
     return (await this.contract).takeFee.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
   };
 
