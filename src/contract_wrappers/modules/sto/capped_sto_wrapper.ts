@@ -219,6 +219,13 @@ export default class CappedSTOWrapper extends STOWrapper {
       }),
       'Mode of investment is not POLY',
     );
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
+      await this.getCallerAddress(params.txData),
+    );
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(params.investedPOLY),
+      'Budget less than amount unable to transfer fee',
+    );
     assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
     assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
