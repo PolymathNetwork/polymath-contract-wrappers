@@ -34,6 +34,7 @@ describe('DividendCheckpointWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedContractFactory);
     reset(mockedSecurityTokenContract);
   });
 
@@ -138,11 +139,14 @@ describe('DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.pause).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-
       verify(mockedContract.paused).once();
+      verify(mockedPauseMethod.callAsync()).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call to unpause', async () => {
@@ -197,11 +201,14 @@ describe('DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.unpause).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-
+      verify(mockedPauseMethod.callAsync()).once();
       verify(mockedContract.paused).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -344,6 +351,10 @@ describe('DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -393,6 +404,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -444,6 +459,10 @@ describe('DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -518,6 +537,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -569,6 +592,10 @@ describe('DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -631,6 +658,10 @@ describe('DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -693,6 +724,10 @@ describe('DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -797,6 +832,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsMethod.callAsync()).once();
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -904,6 +943,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsMethod.callAsync()).once();
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1022,17 +1065,18 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedContract.paused).once();
       verify(mockedPausedMethod.callAsync()).once();
       verify(mockedContract.isExcluded).once();
-      when(
+      verify(
         mockedIsExcludedMethod.callAsync(expectedOwnerResult, objectContaining(new BigNumber(dividendIndex))),
-      ).thenResolve(expectedIsExcludedResult);
+      ).once();
       verify(mockedContract.isClaimed).once();
-      when(
+      verify(
         mockedIsClaimedMethod.callAsync(expectedOwnerResult, objectContaining(new BigNumber(dividendIndex))),
-      ).thenResolve(expectedIsClaimedResult);
+      ).once();
       verify(mockedContract.getDividendsData).once();
       verify(mockedDividendsMethod.callAsync()).once();
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1338,6 +1382,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.getDividendsData).once();
       verify(mockedGetDividendsMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1527,6 +1575,9 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.checkpointId)))).once();
       verify(mockedSecurityTokenContract.currentCheckpointId).once();
       verify(mockedCurrentCheckpointMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
     });
   });
 
