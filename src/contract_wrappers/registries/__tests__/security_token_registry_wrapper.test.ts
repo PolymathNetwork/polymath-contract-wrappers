@@ -692,7 +692,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedLaunchFeeMethod.callAsync()).once();
       verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedContractFactory.getPolyTokenContract()).twice();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
