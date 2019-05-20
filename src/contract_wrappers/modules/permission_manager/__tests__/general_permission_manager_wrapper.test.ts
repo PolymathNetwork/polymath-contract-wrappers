@@ -271,7 +271,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     });
   });
 
-  /* describe('addDelegate', () => {
+   describe('addDelegate', () => {
     test.todo('should fail as delegate is not an Eth address');
     test.todo('should fail as delegate is not a zero Eth address');
     test.todo('should fail as details is zero lenght');
@@ -346,7 +346,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
     });
-  }); */
+  });
 
   describe('deleteDelegate', () => {
     test.todo('should fail as delegate is not an Eth address');
