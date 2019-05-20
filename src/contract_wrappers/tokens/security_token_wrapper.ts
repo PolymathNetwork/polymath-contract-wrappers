@@ -24,6 +24,7 @@ import {
   SecurityTokenOwnershipTransferredEventArgs,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  PolyTokenContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -563,6 +564,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
+  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+    return this.contractFactory.getPolyTokenContract();
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -994,6 +999,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
+    if(params.budget) {
+      const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.getCallerAddress(params.txData));
+      assert.assert(
+          polyTokenBalance.isGreaterThanOrEqualTo(params.budget),
+          'Budget less than amount unable to transfer fee',
+      );
+    }
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
