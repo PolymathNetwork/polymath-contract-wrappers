@@ -34,6 +34,7 @@ describe('ERC20DividendCheckpointWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedContractFactory);
     reset(mockedSecurityTokenContract);
   });
 
@@ -91,15 +92,6 @@ describe('ERC20DividendCheckpointWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      // Mock security token currentCheckpointId
-      const expectedCurrentCheckpointResult = new BigNumber(checkpointId);
-      // Mocked method
-      const mockedCurrentCheckpointMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedSecurityTokenContract.currentCheckpointId).thenReturn(instance(mockedCurrentCheckpointMethod));
-      // Stub the request
-      when(mockedCurrentCheckpointMethod.callAsync()).thenResolve(expectedCurrentCheckpointResult);
-
       const mockedParams = {
         maturity: new Date(2030, 1),
         expiry: new Date(2035, 1),
@@ -147,8 +139,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedCurrentCheckpointMethod.callAsync()).never();
-      verify(mockedSecurityTokenContract.currentCheckpointId).never();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -235,6 +229,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedCurrentCheckpointMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.currentCheckpointId).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -251,7 +249,7 @@ describe('ERC20DividendCheckpointWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -287,17 +285,17 @@ describe('ERC20DividendCheckpointWrapper', () => {
       when(mockedContract.createDividendWithCheckpointAndExclusions).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.maturity)),
-              objectContaining(dateToBigNumber(mockedParams.expiry)),
-              mockedParams.token,
-              objectContaining(new BigNumber(mockedParams.amount)),
-              objectContaining(new BigNumber(checkpointId)),
-              mockedParams.excluded,
-              objectContaining(stringToBytes32(mockedParams.name)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.token,
+          objectContaining(new BigNumber(mockedParams.amount)),
+          objectContaining(new BigNumber(checkpointId)),
+          mockedParams.excluded,
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -308,22 +306,26 @@ describe('ERC20DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.createDividendWithCheckpointAndExclusions).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.maturity)),
-              objectContaining(dateToBigNumber(mockedParams.expiry)),
-              mockedParams.token,
-              objectContaining(new BigNumber(mockedParams.amount)),
-              objectContaining(new BigNumber(checkpointId)),
-              mockedParams.excluded,
-              objectContaining(stringToBytes32(mockedParams.name)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.token,
+          objectContaining(new BigNumber(mockedParams.amount)),
+          objectContaining(new BigNumber(checkpointId)),
+          mockedParams.excluded,
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedCurrentCheckpointMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.currentCheckpointId).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -339,7 +341,7 @@ describe('ERC20DividendCheckpointWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -347,7 +349,6 @@ describe('ERC20DividendCheckpointWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
 
       const mockedParams = {
         maturity: new Date(2030, 1),
@@ -367,16 +368,16 @@ describe('ERC20DividendCheckpointWrapper', () => {
       when(mockedContract.createDividendWithExclusions).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.maturity)),
-              objectContaining(dateToBigNumber(mockedParams.expiry)),
-              mockedParams.token,
-              objectContaining(new BigNumber(mockedParams.amount)),
-              mockedParams.excluded,
-              objectContaining(stringToBytes32(mockedParams.name)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.token,
+          objectContaining(new BigNumber(mockedParams.amount)),
+          mockedParams.excluded,
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -387,19 +388,23 @@ describe('ERC20DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.createDividendWithExclusions).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.maturity)),
-              objectContaining(dateToBigNumber(mockedParams.expiry)),
-              mockedParams.token,
-              objectContaining(new BigNumber(mockedParams.amount)),
-              mockedParams.excluded,
-              objectContaining(stringToBytes32(mockedParams.name)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.maturity)),
+          objectContaining(dateToBigNumber(mockedParams.expiry)),
+          mockedParams.token,
+          objectContaining(new BigNumber(mockedParams.amount)),
+          mockedParams.excluded,
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
