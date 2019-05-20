@@ -271,7 +271,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     });
   });
 
-   describe('addDelegate', () => {
+  describe('addDelegate', () => {
     test.todo('should fail as delegate is not an Eth address');
     test.todo('should fail as delegate is not a zero Eth address');
     test.todo('should fail as details is zero lenght');
@@ -481,13 +481,13 @@ describe('GeneralPermissionManagerWrapper', () => {
     });
   });
 
-  /* describe('changePermissionMulti', () => {
+  describe('changePermissionMulti', () => {
     test.todo('should fail as delegate is not an Eth address');
     test.todo('should fail as delegate is not a zero Eth address');
     test.todo('should fail as module is not an Eth address');
-    test.todo('should fail as modules is zero lenght');
-    test.todo('should fail as modules lenght is not equals to perms lenght');
-    test.todo('should fail as valids lenght is not equals to perms lenght');
+    test.todo('should fail as modules is zero length');
+    test.todo('should fail as modules length is not equals to perms length');
+    test.todo('should fail as valids length is not equals to perms length');
     test('should send the transaction to changePermissionMulti', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -526,7 +526,7 @@ describe('GeneralPermissionManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.delegate,
           mockedParams.modules,
-          stringArrayToBytes32Array(mockedParams.perms),
+          objectContaining(stringArrayToBytes32Array(mockedParams.perms)),
           mockedParams.valids,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -544,7 +544,7 @@ describe('GeneralPermissionManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.delegate,
           mockedParams.modules,
-          stringArrayToBytes32Array(mockedParams.perms),
+          objectContaining(stringArrayToBytes32Array(mockedParams.perms)),
           mockedParams.valids,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -553,7 +553,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
     });
-  }); */
+  });
 
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to GeneralPermissionManagerEvents', async () => {
