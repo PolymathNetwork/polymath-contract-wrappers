@@ -2,7 +2,7 @@ import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, ModuleFactoryContract, PolyTokenContract } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenContract, ModuleFactoryContract, PolyTokenContract, DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
@@ -31,6 +31,11 @@ export default class ModuleWrapper extends ContractWrapper {
   protected polyTokenContract = async (): Promise<PolyTokenContract> => {
     return this.contractFactory.getPolyTokenContract();
   };
+
+  protected detailedErc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
+    return this.contractFactory.getDetailedERC20Contract(address);
+  };
+
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
     const address = await (await this.contract).factory.callAsync();
