@@ -12,7 +12,7 @@ import {
   DetailedERC20Contract,
 } from '@polymathnetwork/abi-wrappers';
 import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import {TxData, Web3Wrapper} from '@0x/web3-wrapper';
+import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
@@ -154,6 +154,21 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
   excluded: string[];
 }
 
+interface PushDividendPaymentToAddressesParams extends TxParams {
+  dividendIndex: number;
+  payees: string[];
+}
+
+interface PushDividendPaymentParams extends TxParams {
+  dividendIndex: number;
+  start: Date;
+  iterations: number;
+}
+
+interface DividendIndexTxParams extends TxParams {
+  dividendIndex: number;
+}
+
 /**
  * This class includes the functionality related to interacting with the ERC20DividendCheckpoint contract.
  */
@@ -193,6 +208,8 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      undefined,
+      undefined,
       params.txData,
     );
     return (await this.contract).createDividend.sendTransactionAsync(
@@ -215,6 +232,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.token,
       params.name,
       params.checkpointId,
+      undefined,
       params.txData,
     );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
@@ -355,10 +373,79 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     if (txData) {
       txDataPackage = txData;
     }
-    const polyTokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(await this.getCallerAddress(txDataPackage));
+    const polyTokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(
+      await this.getCallerAddress(txDataPackage),
+    );
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(amount),
       'Amount less than dividend unable to transfer tokens',
     );
+  };
+
+  public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Distribute), 'Caller is not allowed');
+    params.payees.forEach(address => assert.isNonZeroETHAddressHex('payees', address));
+    await this.checkValidDividendAndTokenBalance(params.dividendIndex, params.txData);
+    return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
+      numberToBigNumber(params.dividendIndex),
+      params.payees,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public pushDividendPayment = async (params: PushDividendPaymentParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perms.Distribute), 'Caller is not allowed');
+    await this.checkValidDividendAndTokenBalance(params.dividendIndex, params.txData);
+    return (await this.contract).pushDividendPayment.sendTransactionAsync(
+      numberToBigNumber(params.dividendIndex),
+      dateToBigNumber(params.start),
+      numberToBigNumber(params.iterations),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public pullDividendPayment = async (params: DividendIndexTxParams) => {
+    await this.checkValidDividendAndTokenBalance(params.dividendIndex, params.txData);
+    assert.assert(!(await this.paused()), 'Contract currently paused');
+    const investor = await this.getCallerAddress(params.txData);
+    const isClaimed = await (await this.contract).isClaimed.callAsync(
+      investor,
+      numberToBigNumber(params.dividendIndex),
+    );
+    assert.assert(!isClaimed, `${investor} has already claimed this dividend`);
+    const isExcluded = await (await this.contract).isExcluded.callAsync(
+      investor,
+      numberToBigNumber(params.dividendIndex),
+    );
+    assert.assert(!isExcluded, `${investor} is excluded from dividend`);
+    return (await this.contract).pullDividendPayment.sendTransactionAsync(
+      numberToBigNumber(params.dividendIndex),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  private checkValidDividendAndTokenBalance = async (dividendIndex: number, txData?: Partial<TxData>) => {
+    assert.assert(await this.isValidDividendIndex(dividendIndex), 'Invalid dividend index');
+    const dividend = await this.getDividendData({ dividendIndex });
+    assert.assert(
+      !dividend.claimedAmount.isGreaterThan(0),
+      'Dividend claimed amount greater than 0, dividend reclaimed',
+    );
+    assert.isPastDate(dividend.maturity, 'Dividend maturity in future');
+    assert.isFutureDate(dividend.expiry, 'Dividend expiry in past');
+    const payee = await this.getCallerAddress(txData);
+    const calcDividend = await this.calculateDividend({ dividendIndex, payee });
+    const claimAfterWithheld = calcDividend.claim.minus(calcDividend.withheld);
+    const dividendToken = await this.dividendTokens({ dividendIndex });
+    if (claimAfterWithheld.isGreaterThan(0)) {
+      const polyTokenBalance = await (await this.detailedERC20Contract(dividendToken)).balanceOf.callAsync(payee);
+      assert.assert(
+        polyTokenBalance.isGreaterThanOrEqualTo(claimAfterWithheld),
+        'Token Balance less than Claim after withheld dividend amount, unable to transfer tokens',
+      );
+    }
   };
 }
