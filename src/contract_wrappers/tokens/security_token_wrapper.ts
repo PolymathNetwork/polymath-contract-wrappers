@@ -40,6 +40,7 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
 import { schemas } from '@0x/json-schemas';
+import * as _ from 'lodash';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import ContractFactory from '../../factories/contractFactory';
@@ -1102,7 +1103,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.indexFilterValues,
       SecurityToken.abi,
       params.callback,
-      params.isVerbose,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
   };

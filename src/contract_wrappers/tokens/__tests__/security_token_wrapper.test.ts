@@ -2,7 +2,7 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { SecurityTokenContract, FeatureRegistryContract, FeatureRegistryEvents } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import { ModuleType, ModuleName, Features } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
@@ -2172,20 +2172,22 @@ describe('SecurityTokenWrapper', () => {
   }); */
 
   // TODO figure it out why toLowerCase is undefined
-  /* describe('SubscribeAsync', () => {
+  describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: FeatureRegistryEvents.ChangeFeatureStatus,
         indexFilterValues: {},
         callback: () => {},
-        isVerbose: true,
+        isVerbose: false,
       };
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'ModuleAdded', 'UpdateTokenDetails', etc, encountered: Transfer`),
+        new Error(
+          `Expected eventName to be one of: 'ModuleAdded', 'UpdateTokenDetails', 'GranularityChanged', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'FreezeTransfers', 'CheckpointCreated', 'FreezeMinting', 'Minted', 'Burnt', 'SetController', 'ForceTransfer', 'ForceBurn', 'DisableController', 'OwnershipRenounced', 'OwnershipTransferred', 'Approval', 'Transfer', encountered: ChangeFeatureStatus`,
+        ),
       );
     });
-  }); */
+  });
 });
