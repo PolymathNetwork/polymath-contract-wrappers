@@ -618,26 +618,17 @@ describe('SecurityTokenWrapper', () => {
   });
 
   // TODO figure it out why fails `Invalid granularity`
-  /* describe('verifyTransfer', () => {
+  describe('verifyTransfer', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to verifyTransfer', async () => {
-      // Granurality
-      const expectedGranularityResult = new BigNumber(10);
-      // Mocked method
-      const mockedGranularityMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.granularity).thenReturn(instance(mockedGranularityMethod));
-      // Stub the request
-      when(mockedGranularityMethod.callAsync()).thenResolve(expectedGranularityResult);
-
-      const expectedResult = true;
+      const expectedResult = false;
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
-        value: new BigNumber(100),
+        value: new BigNumber(0.9),
         data: 'string',
       };
       // Mocked method
@@ -654,12 +645,10 @@ describe('SecurityTokenWrapper', () => {
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.granularity).once();
-      verify(mockedGranularityMethod.callAsync()).once();
       verify(mockedContract.verifyTransfer).once();
       verify(mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data)).once();
     });
-  }); */
+  });
 
   describe('decreaseApproval', () => {
     test.todo('should fail as spender is not an Eth address');
