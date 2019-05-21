@@ -981,6 +981,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     switch (fundRaiseType) {
       case FundRaiseType.ETH: {
         assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
+        const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(from);
+        assert.assert(weiBalance.isGreaterThan(investmentValue), 'Insufficient ETH funds')
         break;
       }
       case FundRaiseType.POLY: {

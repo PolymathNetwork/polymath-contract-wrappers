@@ -189,6 +189,8 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!(await this.paused()), 'Should not be paused');
     assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
+    const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(await this.getCallerAddress(params.txData));
+    assert.assert(weiBalance.isGreaterThan(params.value), 'Insufficient ETH funds');
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.ETH,
