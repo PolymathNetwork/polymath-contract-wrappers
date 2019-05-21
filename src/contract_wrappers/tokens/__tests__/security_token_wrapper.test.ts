@@ -304,7 +304,7 @@ describe('SecurityTokenWrapper', () => {
     test('should call to getModulesByName', async () => {
       const expectedResult = true;
       const mockedParams = {
-        moduleName: ModuleName.GeneralPermissionManager,
+        moduleName: ModuleName.generalPermissionManager,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -2113,7 +2113,7 @@ describe('SecurityTokenWrapper', () => {
   });
 
   // TODO figure it out why types of property 'moduleName' are incompatible.
-  /* describe('addModule', () => {
+  describe('addModule', () => {
     test.todo('should fail as address is not an Eth address');
     test('should send the transaction to addModule', async () => {
       // Mocked parameters
@@ -2126,7 +2126,7 @@ describe('SecurityTokenWrapper', () => {
         fundsReceiver: '0x2222222222222222222222222222222222222222',
       };
       const mockedParams = {
-        moduleName: ModuleName.CappedSTO,
+        moduleName: ModuleName.cappedSTO,
         address: '0x1111111111111111111111111111111111111111',
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2169,7 +2169,7 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
     });
-  }); */
+  });
 
   // TODO figure it out why toLowerCase is undefined
   describe('SubscribeAsync', () => {
