@@ -116,7 +116,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyTokenAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.PolyToken);
+    return this.getAddressInternal(PolymathContracts.polyToken);
   };
 
   /**
@@ -124,7 +124,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getModuleRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.ModuleRegistry);
+    return this.getAddressInternal(PolymathContracts.moduleRegistry);
   };
 
   /**
@@ -132,7 +132,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getFeatureRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.FeatureRegistry);
+    return this.getAddressInternal(PolymathContracts.featureRegistry);
   };
 
   /**
@@ -140,7 +140,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getSecurityTokenRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.SecurityTokenRegistry);
+    return this.getAddressInternal(PolymathContracts.securityTokenRegistry);
   };
 
   /**
@@ -148,7 +148,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.PolyUsdOracle);
+    return this.getAddressInternal(PolymathContracts.polyUsdOracle);
   };
 
   /**
@@ -156,7 +156,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getEthUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.EthUsdOracle);
+    return this.getAddressInternal(PolymathContracts.ethUsdOracle);
   };
 
   /**
