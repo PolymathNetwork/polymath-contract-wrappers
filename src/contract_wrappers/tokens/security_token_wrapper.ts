@@ -58,6 +58,7 @@ import {
   Features,
 } from '../../types';
 import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
+import { CappedSTOAddModule } from './addModules/capped_sto_add_module';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -1019,17 +1020,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
-      case ModuleName.CappedSTO:
-        iface = new ethers.utils.Interface(CappedSTO.abi);
-        data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as CappedSTOData).startTime),
-          dateToBigNumber((params.data as CappedSTOData).endTime),
-          (params.data as CappedSTOData).cap,
-          (params.data as CappedSTOData).rate,
-          (params.data as CappedSTOData).fundRaiseTypes,
-          (params.data as CappedSTOData).fundsReceiver,
-        ]);
+      case ModuleName.CappedSTO: {
+        const cappedSTOAddModule = new CappedSTOAddModule(params);
+        cappedSTOAddModule.callAssertions();
+        data = cappedSTOAddModule.getData();
         break;
+      }
       case ModuleName.USDTieredSTO:
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
@@ -1189,7 +1185,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
-    assert.assert(polyTokenBalance.isGreaterThanOrEqualTo(moduleCost), 'Insufficient poly token balance for module cost');
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
+      'Insufficient poly token balance for module cost',
+    );
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
