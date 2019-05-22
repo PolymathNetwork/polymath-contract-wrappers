@@ -485,7 +485,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.value,
       FundRaiseType.ETH,
-      undefined,
     );
     const txPayableData = {
       ...params.txData,
@@ -505,7 +504,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.investedPOLY,
       FundRaiseType.POLY,
-      undefined,
     );
     return (await this.contract).buyWithPOLY.sendTransactionAsync(
       params.beneficiary,
@@ -540,7 +538,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.value,
       FundRaiseType.ETH,
-      undefined,
     );
     const txPayableData = {
       ...params.txData,
@@ -560,7 +557,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.investedPOLY,
       FundRaiseType.POLY,
-      undefined,
     );
     return (await this.contract).buyWithPOLYRateLimited.sendTransactionAsync(
       params.beneficiary,
@@ -595,7 +591,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(undefined),
       params.investmentValue,
       params.fundRaiseType,
-      undefined,
     );
     const result = await (await this.contract).buyTokensView.callAsync(
       params.beneficiary,
@@ -971,7 +966,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     from: string,
     investmentValue: BigNumber,
     fundRaiseType: FundRaiseType,
-    usdToken: string | undefined,
+    usdToken?: string,
   ) => {
     assert.isETHAddressHex('beneficiary', beneficiary);
     assert.assert(!(await this.paused()), 'Contract is Paused');
@@ -982,15 +977,15 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       case FundRaiseType.ETH: {
         assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
         const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(from);
-        assert.assert(weiBalance.isGreaterThan(investmentValue), 'Insufficient ETH funds')
+        assert.assert(weiBalance.isGreaterThan(investmentValue), 'Insufficient ETH funds');
         break;
       }
       case FundRaiseType.POLY: {
         assert.assert(stoDetails.isRaisedInPOLY, 'POLY Not Allowed');
         const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(from);
         assert.assert(
-            polyTokenBalance.isGreaterThanOrEqualTo(investmentValue),
-            'Budget less than amount unable to transfer fee',
+          polyTokenBalance.isGreaterThanOrEqualTo(investmentValue),
+          'Budget less than amount unable to transfer fee',
         );
         break;
       }
@@ -1000,8 +995,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
         if (usdToken) {
           const scTokenBalance = await (await this.detailedErc20TokenContract(usdToken)).balanceOf.callAsync(from);
           assert.assert(
-              scTokenBalance.isGreaterThanOrEqualTo(investmentValue),
-              'Budget less than amount unable to transfer fee',
+            scTokenBalance.isGreaterThanOrEqualTo(investmentValue),
+            'Budget less than amount unable to transfer fee',
           );
         }
         break;
