@@ -25,6 +25,7 @@ import {
   FeatureRegistryContract,
   ModuleFactoryContract,
   PolyTokenContract,
+  ModuleRegistryContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -568,6 +569,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getPolyTokenContract();
   };
 
+  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract> => {
+    return this.contractFactory.getModuleRegistryContract();
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -999,6 +1004,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
+    await this.checkUseModuleVerified(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1192,5 +1198,48 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
     assert.assert((await this.controller()) === (await this.getCallerAddress(txData)), 'Msg sender must be controller');
+  };
+
+  private checkUseModuleVerified = async (address: string) => {
+    if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+      const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
+      assert.assert(
+        (await this.checkForRegisteredModule(address)) || isOwner,
+        'ModuleFactory must be verified or SecurityToken owner must be ModuleFactory owner',
+      );
+    } else {
+      assert.assert(await this.checkForRegisteredModule(address), 'ModuleFactory must be verified');
+    }
+    assert.assert(await this.isCompatibleModule(address), 'Version should within the compatible range of ST');
+  };
+
+  private checkForRegisteredModule = async (moduleAddress: string) => {
+    const allModulesTypes = [
+      ModuleType.PermissionManager,
+      ModuleType.STO,
+      ModuleType.Burn,
+      ModuleType.Dividends,
+      ModuleType.TransferManager,
+    ];
+    const allModules = await Promise.all(
+      allModulesTypes.map(async type => {
+        return (await (await this.moduleRegistryContract()).getModulesByType.callAsync(type)).includes(moduleAddress);
+      }),
+    );
+    return allModules.includes(true);
+  };
+
+  private isCompatibleModule = async (address: string) => {
+    const versions = await this.getVersion();
+    const upperSTVersionBounds = await (await this.moduleFactoryContract(address)).getUpperSTVersionBounds.callAsync();
+    const lowerSTVersionBounds = await (await this.moduleFactoryContract(address)).getLowerSTVersionBounds.callAsync();
+    let isCompatible = true;
+    for (let i = 0; i < 3; i + 1) {
+      isCompatible =
+        isCompatible &&
+        lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i]) &&
+        upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]);
+    }
+    return isCompatible;
   };
 }
