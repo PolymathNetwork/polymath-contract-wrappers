@@ -997,15 +997,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const budget = params.budget === undefined ? BIG_NUMBER_ZERO : params.budget;
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
+    await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
-    if(params.budget) {
-      const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.getCallerAddress(params.txData));
-      assert.assert(
-          polyTokenBalance.isGreaterThanOrEqualTo(params.budget),
-          'Budget less than amount unable to transfer fee',
-      );
-    }
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1175,12 +1168,22 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
+  private checkModuleCostBelowMaxCost = async (
+    moduleFactory: string,
+    txData?: Partial<TxData>,
+    maxCost?: BigNumber,
+  ) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
-    assert.assert(
-      maxCost.isGreaterThanOrEqualTo(moduleCost),
-      'Insufficient max cost to cover module factory setup cost',
+    if (maxCost) {
+      assert.assert(
+        maxCost.isGreaterThanOrEqualTo(moduleCost),
+        'Insufficient max cost to cover module factory setup cost',
+      );
+    }
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
+      await this.getCallerAddress(txData),
     );
+    assert.assert(polyTokenBalance.isGreaterThanOrEqualTo(moduleCost), 'Insufficient poly token balance for module cost');
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
