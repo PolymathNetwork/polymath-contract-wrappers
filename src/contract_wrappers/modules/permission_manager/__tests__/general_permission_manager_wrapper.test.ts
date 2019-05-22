@@ -265,6 +265,10 @@ describe('GeneralPermissionManagerWrapper', () => {
       expect(result.length).toBe(3);
       expect(result[0].module).toEqual(modules[0]);
       expect(result[0].permissions).toEqual([bytes32ArrayToStringArray(perms)[0]]);
+      expect(result[1].module).toEqual(modules[1]);
+      expect(result[1].permissions).toEqual([bytes32ArrayToStringArray(perms)[1]]);
+      expect(result[2].module).toEqual(modules[2]);
+      expect(result[2].permissions).toEqual([bytes32ArrayToStringArray(perms)[2]]);
       // Verifications
       verify(mockedContract.getAllModulesAndPermsFromTypes).once();
       verify(mockedMethod.callAsync(params.delegate, params.types)).once();
@@ -341,10 +345,14 @@ describe('GeneralPermissionManagerWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedContract.checkDelegate).once();
       verify(mockedDelegateMethod.callAsync(mockedParams.delegate)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -404,10 +412,14 @@ describe('GeneralPermissionManagerWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.delegate, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedContract.checkDelegate).once();
       verify(mockedDelegateMethod.callAsync(mockedParams.delegate)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -465,6 +477,9 @@ describe('GeneralPermissionManagerWrapper', () => {
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedContract.changePermission).once();
       verify(
         mockedMethod.sendTransactionAsync(
@@ -478,6 +493,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -540,6 +556,9 @@ describe('GeneralPermissionManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.changePermissionMulti).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.delegate,
@@ -552,6 +571,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
