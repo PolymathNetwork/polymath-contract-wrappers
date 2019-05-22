@@ -12,7 +12,7 @@ import {
   DetailedERC20Contract,
 } from '@polymathnetwork/abi-wrappers';
 import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import {TxData, Web3Wrapper} from '@0x/web3-wrapper';
+import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
@@ -193,8 +193,6 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
-      undefined,
-      undefined,
       params.txData,
     );
     return (await this.contract).createDividend.sendTransactionAsync(
@@ -216,9 +214,8 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
-      params.checkpointId,
-      undefined,
       params.txData,
+      params.checkpointId,
     );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -240,9 +237,9 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      params.txData,
       undefined,
       params.excluded,
-      params.txData,
     );
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -266,9 +263,9 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      params.txData,
       params.checkpointId,
       params.excluded,
-      params.txData,
     );
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
@@ -336,9 +333,9 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     amount: BigNumber,
     token: string,
     name: string,
+    txData?: Partial<TxData>,
     checkpointId?: number,
     excluded?: string[],
-    txData?: Partial<TxData>,
   ) => {
     if (excluded !== undefined) {
       excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
@@ -354,14 +351,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
-    let txDataPackage;
-    if (txData) {
-      txDataPackage = txData;
-    }
-    const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(await this.getCallerAddress(txDataPackage));
+    const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(
+      await this.getCallerAddress(txData),
+    );
     assert.assert(
       erc20TokenBalance.isGreaterThanOrEqualTo(amount),
-      'Amount less than dividend unable to transfer tokens',
+      'Your balance is less than dividend amount',
     );
   };
 }
