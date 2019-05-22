@@ -2,7 +2,7 @@
 import { BigNumber } from '@0x/utils';
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { DetailedERC20Contract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import DetailedERC20Wrapper from '../detailed_erc20_wrapper';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
@@ -192,29 +192,14 @@ describe('ERC20TokenWrapper', () => {
       when(mockedContract.symbol).thenReturn(instance(mockedSymbolMethod));
       when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
 
-      const totalSupplyResult = await target.totalSupply();
-      expect(totalSupplyResult).toBe(expectedBNResult);
-
-      const balanceOfResult = await target.balanceOf(balanceOfParams);
-      expect(balanceOfResult).toBe(expectedBNResult);
-
-      const allowanceResult = await target.allowance(allowanceParams);
-      expect(allowanceResult).toBe(expectedBNResult);
-
-      const symbolResult = await target.symbol();
-      expect(symbolResult).toBe(symbolResult);
+      const expectedIsValidResult = true;
+      const result = await target.isValidContract();
+      expect(result).toBe(expectedIsValidResult);
 
       verify(mockedContract.totalSupply).once();
-      verify(mockedTotalSupplyMethod.callAsync()).once();
-
       verify(mockedContract.balanceOf).once();
-      verify(mockedBalanceOfMethod.callAsync(balanceOfParams.owner)).once();
-
       verify(mockedContract.allowance).once();
-      verify(mockedAllowanceMethod.callAsync(allowanceParams.owner, allowanceParams.spender)).once();
-
       verify(mockedContract.symbol).once();
-      verify(mockedSymbolMethod.callAsync()).once();
     });
   });
 
