@@ -193,6 +193,8 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      undefined,
+      undefined,
       params.txData,
     );
     return (await this.contract).createDividend.sendTransactionAsync(
@@ -215,6 +217,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.token,
       params.name,
       params.checkpointId,
+      undefined,
       params.txData,
     );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
@@ -355,9 +358,9 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     if (txData) {
       txDataPackage = txData;
     }
-    const polyTokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(await this.getCallerAddress(txDataPackage));
+    const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(await this.getCallerAddress(txDataPackage));
     assert.assert(
-      polyTokenBalance.isGreaterThanOrEqualTo(amount),
+      erc20TokenBalance.isGreaterThanOrEqualTo(amount),
       'Amount less than dividend unable to transfer tokens',
     );
   };
