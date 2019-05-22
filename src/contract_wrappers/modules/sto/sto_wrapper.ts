@@ -74,15 +74,18 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isETHAddressHex('tokenContract', params.tokenContract);
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -91,6 +94,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public reclaimETH = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 }

@@ -12,7 +12,8 @@ import {
   SecurityTokenRegistryRegisterTickerEventArgs,
   SecurityTokenRegistryTickerRemovedEventArgs,
   SecurityTokenRegistryChangeTickerOwnershipEventArgs,
-  DetailedERC20Contract,
+  SecurityTokenContract,
+  PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import { SecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -24,6 +25,8 @@ import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
+
+const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit;
@@ -239,7 +242,7 @@ interface RemoveTickerParams extends TxParams {
  * @param newExpiry is the new expiry for newly generated tickers
  */
 interface ChangeExpiryLimitParams extends TxParams {
-  newExpiry: Date;
+  newExpiry: BigNumber;
 }
 
 /**
@@ -324,14 +327,19 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   protected contractFactory: ContractFactory;
 
-  protected erc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
+  protected securityTokenContract = async (address: string): Promise<SecurityTokenContract> => {
+    return this.contractFactory.getSecurityTokenContract(address);
+  };
+
+  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+    return this.contractFactory.getPolyTokenContract();
   };
 
   /**
    * Instantiate SecurityTokenRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -402,6 +410,23 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   public registerTicker = async (params: RegisterTickerParams) => {
     const owner = params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
+    await this.checkWhenNotPausedOrOwner();
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    assert.assert(
+      await this.isTickerAvailable({
+        tokenName: params.ticker,
+      }),
+      'Ticker is not available',
+    );
+
+    // Check poly token allowance
+    const tickerRegistrationFee = await this.getTickerRegistrationFee();
+    if (tickerRegistrationFee.isGreaterThan(BIG_NUMBER_ZERO)) {
+      const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(owner);
+      assert.assert(polyBalance.isGreaterThanOrEqualTo(tickerRegistrationFee), 'Insufficient Poly token allowance');
+    }
+
     return (await this.contract).registerTicker.sendTransactionAsync(
       owner,
       params.ticker,
@@ -415,7 +440,19 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Transfers the ownership of the ticker
    */
   public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
-    assert.isETHAddressHex('newOwner', params.newOwner);
+    assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
+    await this.checkWhenNotPausedOrOwner();
+    const tickerDetails = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    const address = await this.getCallerAddress(params.txData);
+    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    if (tickerDetails.status) {
+      const securityTokenOwner = await (await this.securityTokenContract(
+        await this.getSecurityTokenAddress(params.ticker),
+      )).owner.callAsync();
+      assert.assert(securityTokenOwner === params.newOwner, 'New owner does not match token owner');
+    }
     return (await this.contract).transferTickerOwnership.sendTransactionAsync(
       params.newOwner,
       params.ticker,
@@ -428,6 +465,24 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Deploys an instance of a new Security Token and records it to the registry
    */
   public generateSecurityToken = async (params: GenerateSecurityTokenParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.name.length > 0, 'Name is empty');
+    await this.checkWhenNotPausedOrOwner();
+    const tickerDetails = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    assert.assert(!tickerDetails.status, 'Ticker already deployed');
+    const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    assert.assert(tickerDetails.expiryDate.getTime() >= Date.now(), 'Ticker gets expired');
+
+    // Check PolyToken allowance
+    const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
+    if (securityTokenLaunchFee.isGreaterThan(BIG_NUMBER_ZERO)) {
+      const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(address);
+      assert.assert(polyBalance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Poly token allowance');
+    }
+
     return (await this.contract).generateSecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -489,7 +544,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
   public modifyTicker = async (params: ModifyTickerParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    await this.checkOnlyOwner();
+    assert.assert(
+      params.registrationDate.getTime() <= params.expiryDate.getTime(),
+      'Registration date should < expiry date',
+    );
     assert.isETHAddressHex('owner', params.owner);
+    if (params.status) {
+      const address = await this.getSecurityTokenAddress(params.ticker);
+      assert.isNonZeroETHAddressHex('address', address);
+    }
     return (await this.contract).modifyTicker.sendTransactionAsync(
       params.owner,
       params.ticker,
@@ -506,6 +572,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Removes the ticker details, associated ownership & security token mapping
    */
   public removeTicker = async (params: RemoveTickerParams) => {
+    await this.checkOnlyOwner();
+    const ticker = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    assert.isNonZeroETHAddressHex('owner', ticker.owner);
     return (await this.contract).removeTicker.sendTransactionAsync(params.ticker, params.txData, params.safetyFactor);
   };
 
@@ -513,8 +584,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the expiry time for the token ticker. Only available to Polymath.
    */
   public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
+    await this.checkOnlyOwner();
+    assert.assert(params.newExpiry.toNumber() >= 86400, 'Expiry should >= 1 day');
     return (await this.contract).changeExpiryLimit.sendTransactionAsync(
-      dateToBigNumber(params.newExpiry),
+      params.newExpiry,
       params.txData,
       params.safetyFactor,
     );
@@ -524,8 +597,12 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
   public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
-    assert.isETHAddressHex('owner', params.owner);
-    assert.isETHAddressHex('securityToken', params.securityToken);
+    await this.checkOnlyOwner();
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.name.length > 0, 'Name is empty');
+    assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    assert.isNonZeroETHAddressHex('owner', params.owner);
+    assert.isNonZeroETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -550,7 +627,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
   public transferOwnership = async (params: TransferOwnershipParams) => {
-    assert.isETHAddressHex('newOwner', params.newOwner);
+    await this.checkOnlyOwner();
+    assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
       params.txData,
@@ -562,6 +640,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Called by the owner to pause, triggers stopped state
    */
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.isPaused()), 'Contract is paused');
+    await this.checkOnlyOwner();
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -569,6 +649,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Called by the owner to unpause, returns to normal state
    */
   public unpause = async (params: TxParams) => {
+    assert.assert(await this.isPaused(), 'Contract is already not paused');
+    await this.checkOnlyOwner();
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -576,6 +658,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
+    await this.checkOnlyOwner();
+    const actualFee = await this.getTickerRegistrationFee();
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeTickerRegistrationFee.sendTransactionAsync(
       params.newFee,
       params.txData,
@@ -587,6 +672,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
+    await this.checkOnlyOwner();
+    const actualFee = await this.getSecurityTokenLaunchFee();
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeSecurityLaunchFee.sendTransactionAsync(
       params.newFee,
       params.txData,
@@ -598,7 +686,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Reclaims all ERC20Basic compatible tokens
    */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isETHAddressHex('tokenContract', params.tokenContract);
+    await this.checkOnlyOwner();
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
       params.txData,
@@ -610,7 +699,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the protocol version and the SecurityToken contract
    */
   public setProtocolVersion = async (params: SetProtocolVersionParams) => {
-    assert.isETHAddressHex('STFactoryAddress', params.STFactoryAddress);
+    await this.checkOnlyOwner();
+    assert.isNonZeroETHAddressHex('STFactoryAddress', params.STFactoryAddress);
     return (await this.contract).setProtocolVersion.sendTransactionAsync(
       params.STFactoryAddress,
       params.major,
@@ -639,7 +729,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changes the PolyToken address. Only Polymath.
    */
   public updatePolyTokenAddress = async (params: UpdatePolyTokenAddressParams) => {
-    assert.isETHAddressHex('newAddress', params.newAddress);
+    await this.checkOnlyOwner();
+    assert.isNonZeroETHAddressHex('newAddress', params.newAddress);
     return (await this.contract).updatePolyTokenAddress.sendTransactionAsync(
       params.newAddress,
       params.txData,
@@ -719,7 +810,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     if (registrationDate.getTime() === new Date(0).getTime()) {
       return true;
     }
-    if (!isDeployed && dateToBigNumber(expiryDate).toNumber() > Date.now()) {
+    if (!isDeployed && expiryDate.getTime() > Date.now()) {
       return true;
     }
     return false;
@@ -735,5 +826,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       status: result[4],
     };
     return typedResult;
+  };
+
+  private checkWhenNotPausedOrOwner = async () => {
+    if (!((await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0])) {
+      assert.assert(!(await this.isPaused()), 'Msg sender is not owner and the contract is paused');
+    }
+  };
+
+  private checkOnlyOwner = async () => {
+    assert.assert(
+      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      'Msg sender must be owner',
+    );
   };
 }
