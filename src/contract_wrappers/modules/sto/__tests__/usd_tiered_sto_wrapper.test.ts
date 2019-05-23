@@ -2,7 +2,7 @@
 import { instance, mock, objectContaining, reset, verify, when } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolyTokenEvents, SecurityTokenContract, USDTieredSTOContract } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenEvents, SecurityTokenContract, DetailedERC20Contract, USDTieredSTOContract } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -17,12 +17,14 @@ describe('USDTieredSTOWrapper', () => {
   let mockedContract: USDTieredSTOContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedDetailedERC20Contract: DetailedERC20Contract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(USDTieredSTOContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedDetailedERC20Contract = mock(DetailedERC20Contract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new USDTieredSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -33,6 +35,7 @@ describe('USDTieredSTOWrapper', () => {
     reset(mockedContract);
     reset(mockedSecurityTokenContract);
     reset(mockedContractFactory);
+    reset(mockedDetailedERC20Contract);
   });
 
   describe('Types', () => {
@@ -731,6 +734,15 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
 
+      // Security Token Address expected
+      const expectedBalanceOfResult = new BigNumber(100);
+      const usdToken = '0x0123456789012345678901234567890123456789';
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+
       const mockedParams = {
         beneficiary: investorAddress,
         investedSC: new BigNumber(1),
@@ -794,6 +806,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
+      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
     });
   });
 
@@ -1224,10 +1239,19 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
 
+      // Security Token Address expected
+      const expectedBalanceOfResult = new BigNumber(100);
+      const usdToken = '0x0123456789012345678901234567890123456789';
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+
       const mockedParams = {
         beneficiary: investorAddress,
         investedSC: new BigNumber(1),
-        usdToken: '0x0123456789012345678901234567890123456789',
+        usdToken,
         value: new BigNumber(1),
         txData: {},
         safetyFactor: 10,
@@ -1284,6 +1308,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
+      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
     });
   });
 
