@@ -314,6 +314,8 @@ describe('USDTieredSTOWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([investorAddress]);
+      const expectedETHBalanceResult = new BigNumber(100);
+      when(mockedWrapper.getBalanceInWeiAsync(investorAddress)).thenResolve(expectedETHBalanceResult);
 
       // Pause Address expected
       const expectedPausedResult = false;
@@ -460,6 +462,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
     });
   });
 
@@ -810,6 +813,8 @@ describe('USDTieredSTOWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([investorAddress]);
+      const expectedETHBalanceResult = new BigNumber(100);
+      when(mockedWrapper.getBalanceInWeiAsync(investorAddress)).thenResolve(expectedETHBalanceResult);
 
       // Pause Address expected
       const expectedPausedResult = false;
@@ -953,6 +958,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
     });
   });
 
