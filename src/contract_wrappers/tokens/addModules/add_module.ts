@@ -51,6 +51,7 @@ export interface USDTieredSTOData {
   usdTokens: string[];
 }
 export abstract class AddModule {
+  // Maybe we can pass in CappedSTO.abi and CappedSTOData here
   abstract getData(): string;
 
   abstract callAssertions(): void;
