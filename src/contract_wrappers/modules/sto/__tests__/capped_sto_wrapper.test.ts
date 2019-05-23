@@ -2,7 +2,12 @@
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CappedSTOContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  CappedSTOContract,
+  SecurityTokenContract,
+  PolyTokenContract,
+  PolyTokenEvents,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -17,12 +22,14 @@ describe('CappedSTOWrapper', () => {
   let mockedContract: CappedSTOContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(CappedSTOContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -33,6 +40,7 @@ describe('CappedSTOWrapper', () => {
     reset(mockedContract);
     reset(mockedContractFactory);
     reset(mockedSecurityTokenContract);
+    reset(mockedPolyTokenContract);
   });
 
   describe('Types', () => {
@@ -297,9 +305,11 @@ describe('CappedSTOWrapper', () => {
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedETHBalanceResult = new BigNumber(100);
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(expectedETHBalanceResult);
 
       // Pause Address expected
       const expectedPausedResult = false;
@@ -385,7 +395,8 @@ describe('CappedSTOWrapper', () => {
       verify(mockedContract.startTime).once();
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
     });
   });
 
@@ -427,6 +438,16 @@ describe('CappedSTOWrapper', () => {
       when(mockedContract.endTime).thenReturn(instance(mockedEndTimeMethod));
       // Stub the request
       when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
+
+      // Security Token Address expected
+      const expectedBalanceOfResult = new BigNumber(100);
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const mockedParams = {
         from: expectedOwnerResult,
