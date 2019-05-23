@@ -24,6 +24,7 @@ import {
   SecurityTokenOwnershipTransferredEventArgs,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  PolyTokenContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -564,6 +565,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
+  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+    return this.contractFactory.getPolyTokenContract();
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -993,7 +998,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const budget = params.budget === undefined ? BIG_NUMBER_ZERO : params.budget;
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
+    await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
@@ -1163,12 +1168,22 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
+  private checkModuleCostBelowMaxCost = async (
+    moduleFactory: string,
+    txData?: Partial<TxData>,
+    maxCost?: BigNumber,
+  ) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
-    assert.assert(
-      maxCost.isGreaterThanOrEqualTo(moduleCost),
-      'Insufficient max cost to cover module factory setup cost',
+    if (maxCost) {
+      assert.assert(
+        maxCost.isGreaterThanOrEqualTo(moduleCost),
+        'Insufficient max cost to cover module factory setup cost',
+      );
+    }
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
+      await this.getCallerAddress(txData),
     );
+    assert.assert(polyTokenBalance.isGreaterThanOrEqualTo(moduleCost), 'Insufficient poly token balance for module cost');
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
