@@ -2,7 +2,12 @@
 import { instance, mock, objectContaining, reset, verify, when } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolyTokenEvents, SecurityTokenContract, DetailedERC20Contract, USDTieredSTOContract } from '@polymathnetwork/abi-wrappers';
+import {
+  PolyTokenEvents,
+  SecurityTokenContract,
+  DetailedERC20Contract,
+  USDTieredSTOContract,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
