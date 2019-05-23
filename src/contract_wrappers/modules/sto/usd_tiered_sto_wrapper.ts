@@ -521,6 +521,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.investedSC,
       FundRaiseType.StableCoin,
+      params.usdToken,
     );
     return (await this.contract).buyWithUSD.sendTransactionAsync(
       params.beneficiary,
@@ -572,6 +573,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
       params.investedSC,
       FundRaiseType.StableCoin,
+      params.usdToken,
     );
     return (await this.contract).buyWithUSDRateLimited.sendTransactionAsync(
       params.beneficiary,
@@ -964,6 +966,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     from: string,
     investmentValue: BigNumber,
     fundRaiseType: FundRaiseType,
+    usdToken?: string,
   ) => {
     assert.isETHAddressHex('beneficiary', beneficiary);
     assert.assert(!(await this.paused()), 'Contract is Paused');
@@ -973,14 +976,29 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     switch (fundRaiseType) {
       case FundRaiseType.ETH: {
         assert.assert(stoDetails.isRaisedInETH, 'ETH Not Allowed');
+        const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(from);
+        assert.assert(weiBalance.isGreaterThan(investmentValue), 'Insufficient ETH funds');
         break;
       }
       case FundRaiseType.POLY: {
         assert.assert(stoDetails.isRaisedInPOLY, 'POLY Not Allowed');
+        const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(from);
+        assert.assert(
+          polyTokenBalance.isGreaterThanOrEqualTo(investmentValue),
+          'Budget less than amount unable to transfer fee',
+        );
         break;
       }
       case FundRaiseType.StableCoin: {
         assert.assert(stoDetails.isRaisedInSC, 'USD Not Allowed');
+        assert.assert(usdToken !== null, 'USD Token Address must exist');
+        if (usdToken) {
+          const scTokenBalance = await (await this.detailedErc20TokenContract(usdToken)).balanceOf.callAsync(from);
+          assert.assert(
+            scTokenBalance.isGreaterThanOrEqualTo(investmentValue),
+            'Budget less than amount unable to transfer fee',
+          );
+        }
         break;
       }
       default: {
