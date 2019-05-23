@@ -7,6 +7,7 @@ import {
   SecurityTokenContract,
   DetailedERC20Contract,
   USDTieredSTOContract,
+  PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
@@ -23,6 +24,7 @@ describe('USDTieredSTOWrapper', () => {
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
   let mockedDetailedERC20Contract: DetailedERC20Contract;
+  let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
@@ -30,6 +32,7 @@ describe('USDTieredSTOWrapper', () => {
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
     mockedDetailedERC20Contract = mock(DetailedERC20Contract);
+    mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new USDTieredSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -41,6 +44,7 @@ describe('USDTieredSTOWrapper', () => {
     reset(mockedSecurityTokenContract);
     reset(mockedContractFactory);
     reset(mockedDetailedERC20Contract);
+    reset(mockedPolyTokenContract);
   });
 
   describe('Types', () => {
@@ -575,6 +579,13 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
 
+      const expectedBalanceOfResult = new BigNumber(100);
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+
       const mockedParams = {
         beneficiary: investorAddress,
         investedPOLY: new BigNumber(1),
@@ -635,6 +646,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
   });
 
@@ -1083,6 +1097,14 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
 
+      // Balance expected
+      const expectedBalanceOfResult = new BigNumber(100);
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+
       const mockedParams = {
         beneficiary: investorAddress,
         investedPOLY: new BigNumber(1),
@@ -1140,6 +1162,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.investors).once();
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
   });
 
@@ -1244,7 +1269,7 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
 
-      // Security Token Address expected
+      // Balance expected
       const expectedBalanceOfResult = new BigNumber(100);
       const usdToken = '0x0123456789012345678901234567890123456789';
       // Setup get Security Token Address
@@ -1410,6 +1435,23 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedNonAccreditedLimitUSDMethod.callAsync()).thenResolve(expectedNonAccreditedLimitUSDResult);
 
+      // Balance expected
+      const expectedBalanceOfResult = new BigNumber(100);
+      // Setup get Security Token Address
+      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+
+      // Result expected
+      const expectedAllowBeneficialInvestmentResult = false;
+      // Mocked method
+      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
+      // Stub the request
+      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
+
       // Mock buyTokensView
       const params = {
         beneficiary: investorAddress,
@@ -1453,6 +1495,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContract.buyTokensView).once();
       verify(mockedMethod.callAsync(params.beneficiary, params.investmentValue, params.fundRaiseType)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
   });
 

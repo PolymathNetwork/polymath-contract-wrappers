@@ -47,7 +47,6 @@ describe('EtherDividendCheckpointWrapper', () => {
     test('should createDividend', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      const checkpointId = 2;
 
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
