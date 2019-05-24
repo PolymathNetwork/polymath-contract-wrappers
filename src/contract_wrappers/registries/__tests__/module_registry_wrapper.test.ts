@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// ModuleRegistryWrapper test
 import { instance, mock, reset, verify, when } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -21,7 +21,6 @@ import {
 import {MockedCallMethod, MockedSendMethod, getMockedPolyResponse} from '../../../test_utils/mocked_methods';
 
 describe('ModuleRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: ModuleRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleRegistryContract;
@@ -43,6 +42,7 @@ describe('ModuleRegistryWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedContractFactory);
     reset(mockedModuleFactoryContract);
     reset(mockedFeatureRegistryContract);
   });
@@ -139,11 +139,22 @@ describe('ModuleRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
+      allModulesTypes.map(async type => {
+        verify(mockedGetModulesMethod.callAsync(type)).once();
+      });
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).twice();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryContract.getTypes).once();
+      verify(mockedGetTypesMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedContractOwnerMethod.callAsync()).once();
       verify(mockedContract.owner).once();
       verify(mockedContract.isPaused).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedPausedMethod.callAsync()).once();
     });
   });
 
@@ -218,14 +229,21 @@ describe('ModuleRegistryWrapper', () => {
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
+      verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContract.owner).once();
-      verify(mockedContract.removeModule).once();
       verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedContract.removeModule).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
+      allModulesTypes.map(async type => {
+        verify(mockedGetModulesMethod.callAsync(type)).once();
+      });
       verify(mockedContract.isPaused).once();
+      verify(mockedPausedMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -314,6 +332,7 @@ describe('ModuleRegistryWrapper', () => {
       ).once();
       verify(mockedContract.getModulesByType).times(5);
       verify(mockedContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -644,6 +663,7 @@ describe('ModuleRegistryWrapper', () => {
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -695,6 +715,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isPaused).once();
       verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call to unpause', async () => {
@@ -744,6 +765,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isPaused).once();
       verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call to isPaused', async () => {
@@ -803,6 +825,7 @@ describe('ModuleRegistryWrapper', () => {
 
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -847,6 +870,7 @@ describe('ModuleRegistryWrapper', () => {
 
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call owner', async () => {

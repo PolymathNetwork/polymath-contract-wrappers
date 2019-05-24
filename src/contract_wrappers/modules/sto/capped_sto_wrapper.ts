@@ -91,7 +91,7 @@ interface GetCappedSTOLogsAsyncParams extends GetLogs {
 }
 
 interface InvestorsParams extends TxParams {
-  amount: string;
+  investorAddress: string;
 }
 
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
@@ -169,7 +169,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public investors = async (params: InvestorsParams) => {
-    return (await this.contract).investors.callAsync(params.amount);
+    return (await this.contract).investors.callAsync(params.investorAddress);
   };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
