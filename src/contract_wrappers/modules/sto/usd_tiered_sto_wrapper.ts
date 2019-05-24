@@ -586,7 +586,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public buyTokensView = async (params: BuyTokensViewParams) => {
-    this.checkIfBuyIsValid(
+    await this.checkIfBuyIsValid(
       params.beneficiary,
       await this.getCallerAddress(undefined),
       params.investmentValue,
