@@ -41,7 +41,6 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
 import { schemas } from '@0x/json-schemas';
-import * as _ from 'lodash';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import ContractFactory from '../../factories/contractFactory';
@@ -367,8 +366,8 @@ interface CheckpointIdParams {
 }
 
 interface IterateInvestorsParams {
-  start: Date;
-  end: Date;
+  start: number;
+  end: number;
 }
 
 interface TransferWithDataParams extends TxParams {
@@ -775,7 +774,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public iterateInvestors = async (params: IterateInvestorsParams) => {
-    return (await this.contract).iterateInvestors.callAsync(dateToBigNumber(params.start), dateToBigNumber(params.end));
+    return (await this.contract).iterateInvestors.callAsync(
+      numberToBigNumber(params.start),
+      numberToBigNumber(params.end),
+    );
   };
 
   public getInvestorCount = async () => {
@@ -1116,7 +1118,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.indexFilterValues,
       SecurityToken.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };

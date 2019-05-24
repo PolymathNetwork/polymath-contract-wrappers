@@ -51,7 +51,6 @@ describe('SecurityTokenWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
-    reset(mockedFeatureRegistryContract);
     reset(mockedModuleFactoryContract);
     reset(mockedPolyTokenContract);
   });
@@ -324,7 +323,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getModulesByName', () => {
     test('should call to getModulesByName', async () => {
-      const expectedResult = true;
+      const expectedResult = ['string', 'string'];
       const mockedParams = {
         moduleName: ModuleName.generalPermissionManager,
       };
@@ -394,8 +393,8 @@ describe('SecurityTokenWrapper', () => {
     test('should call to iterateInvestors', async () => {
       const expectedResult = ['string', 'string'];
       const mockedParams = {
-        start: new Date(),
-        end: new Date(),
+        start: 1,
+        end: 5,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -404,8 +403,8 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(
         mockedMethod.callAsync(
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(dateToBigNumber(mockedParams.end)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
         ),
       ).thenResolve(expectedResult);
 
@@ -417,8 +416,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.iterateInvestors).once();
       verify(
         mockedMethod.callAsync(
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(dateToBigNumber(mockedParams.end)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
         ),
       ).once();
     });
@@ -486,7 +485,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getCheckpointTimes', () => {
     test('should call to getCheckpointTimes', async () => {
-      const expectedResult = new BigNumber(0);
+      const expectedResult = [new BigNumber(0), new BigNumber(1)];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -561,7 +560,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getVersion', () => {
     test('should call to getVersion', async () => {
-      const expectedResult = new BigNumber(1);
+      const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -639,7 +638,6 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  // TODO figure it out why fails `Invalid granularity`
   describe('verifyTransfer', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
@@ -2134,9 +2132,10 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('CountTransferManagerAddModule', () => {
+  describe('addModule', () => {
     test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+
+    test('should send the transaction to addModule for CountTransferManager', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2239,11 +2238,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
     });
-  });
 
-  describe('PercentageTransferManagerAddModule', () => {
-    test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+    test('should send the transaction to addModule for PercentageTransferManager', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2351,11 +2347,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
     });
-  });
 
-  describe('CappedSTOAddModule', () => {
-    test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+    test('should send the transaction to addModule for CappedSTO', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2475,11 +2468,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
     });
-  });
 
-  describe('USDTieredSTOAddModule', () => {
-    test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+    test('should send the transaction to addModule for USDTieredSTO', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2613,7 +2603,7 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
       // === End USDTieredSTO test ===
-      
+
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
@@ -2624,12 +2614,9 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
-        });
-  });
+    });
 
-  describe('ERC20DividendCheckpointAddModule', () => {
-    test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+    test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2732,11 +2719,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
     });
-  });
 
-  describe('EtherDividendCheckpointAddModule', () => {
-    test.todo('should fail as address is not an Eth address');
-    test('should send the transaction to addModule', async () => {
+    test('should send the transaction to addModule for EtherDividendCheckpoint', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
       const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
@@ -2804,7 +2788,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const etherDividendResult = await target.addModule({
-        moduleName: ModuleName.erc20DividendCheckpoint,
+        moduleName: ModuleName.etherDividendCheckpoint,
         address: mockedEtherDividendParams.address,
         maxCost: mockedEtherDividendParams.maxCost,
         budget: mockedEtherDividendParams.budget,
