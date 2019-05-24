@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// SecurityTokenRegistryWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
@@ -15,7 +15,6 @@ import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array }
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
 describe('SecurityTokenRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: SecurityTokenRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: SecurityTokenRegistryContract;
@@ -94,11 +93,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.pause).once();
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isPaused).once();
       verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call to unpause', async () => {
@@ -148,6 +147,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isPaused).once();
       verify(mockedPauseMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call to isPaused', async () => {
@@ -208,9 +208,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.transferOwnership).once();
       verify(mockedMethod.sendTransactionAsync(newOwner, mockedParams.txData, mockedParams.safetyFactor)).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should call owner', async () => {
@@ -236,7 +236,8 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('ReclaimERC20', () => {
     test.todo('should fail as tokenContract is not an Eth address');
 
-    test('should call to reclaim ERC20 tokens', async () => {      // Owner Address expected
+    test('should call to reclaim ERC20 tokens', async () => {
+      // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Mocked method
       const mockedOwnerMethod = mock(MockedCallMethod);
@@ -273,9 +274,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -452,13 +453,9 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       // Get Poly Balance
       const polyBalance = new BigNumber(100);
-      when(mockedContractFactory.getPolyTokenContract()).thenResolve(
-        instance(mockedPolyTokenContract),
-      );
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
-      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(
-        polyBalance,
-      );
+      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(polyBalance);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
 
       const owner = '0x0123456789012345678901234567890123456789';
@@ -501,13 +498,15 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
       verify(mockedContract.getTickerRegistrationFee).once();
+      verify(mockedTickerRegistrationFeeMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
-      // Owner == web3wrapper default address, dont need to check isPaused here
-      verify(mockedContract.isPaused).never();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
   });
 
@@ -592,10 +591,15 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
-      // Owner == web3wrapper default address, dont need to check isPaused here
-      verify(mockedContract.isPaused).never();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync(ticker)).once();
+      verify(mockedContractFactory.getSecurityTokenContract(securityTokenAddress)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
     });
   });
 
@@ -632,13 +636,9 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       // Get ERC20 Allowance
       const erc20Allowance = new BigNumber(100);
-      when(mockedContractFactory.getPolyTokenContract()).thenResolve(
-        instance(mockedPolyTokenContract),
-      );
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
-      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(
-        erc20Allowance,
-      );
+      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(erc20Allowance);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
 
       const name = 'Security';
@@ -687,13 +687,15 @@ describe('SecurityTokenRegistryWrapper', () => {
         ),
       ).once();
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
+      verify(mockedLaunchFeeMethod.callAsync()).once();
       verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedContractFactory.getPolyTokenContract()).twice();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
-      // Owner == web3wrapper default address, dont need to check isPaused here
-      verify(mockedContract.isPaused).never();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
     });
   });
 
@@ -812,6 +814,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getTickerDetails).once();
       verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test.todo('should return false as ticker is not registered');
@@ -841,6 +844,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getTickerDetails).once();
       verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -898,16 +902,16 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('RemoveTicker', () => {
     test('should call to remove ticker', async () => {
-        // Owner Address expected
-        const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-        // Mocked method
-        const mockedOwnerMethod = mock(MockedCallMethod);
-        // Stub the method
-        when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
-        // Stub the request
-        when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-        // Mock web3 wrapper owner
-        when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       const ticker = 'TICK';
       const expectedTickerDetailsResult = [
         '0x0123456789012345678901234567890123456789',
@@ -949,9 +953,10 @@ describe('SecurityTokenRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.ticker, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getTickerDetails).once();
-
-        verify(mockedContract.owner).once();
-        verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1027,9 +1032,10 @@ describe('SecurityTokenRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getTickerRegistrationFee).once();
-
+      verify(mockedTickerRegistrationMethod.callAsync()).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
     test('should send the transaction to change security token launch fee', async () => {
@@ -1079,9 +1085,10 @@ describe('SecurityTokenRegistryWrapper', () => {
         mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
-
+      verify(mockedSecurityTokenMethod.callAsync()).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1122,9 +1129,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newExpiry, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1197,9 +1204,9 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1208,7 +1215,8 @@ describe('SecurityTokenRegistryWrapper', () => {
 
     test.todo('should fail as securityToken is not an Eth address');
 
-    test('should call to ModifySecurityToken', async () => {      // Owner Address expected
+    test('should call to ModifySecurityToken', async () => {
+      // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Mocked method
       const mockedOwnerMethod = mock(MockedCallMethod);
@@ -1275,9 +1283,9 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1338,9 +1346,9 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1446,9 +1454,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 

@@ -9,9 +9,10 @@ import {
   ERC20DividendCheckpointSetDefaultExcludedAddressesEventArgs,
   ERC20DividendCheckpointSetWithholdingEventArgs,
   ERC20DividendCheckpointSetWithholdingFixedEventArgs,
+  DetailedERC20Contract,
 } from '@polymathnetwork/abi-wrappers';
 import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
@@ -161,10 +162,15 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   protected contract: Promise<ERC20DividendCheckpointContract>;
 
+  protected detailedERC20Contract = async (address: string): Promise<DetailedERC20Contract> => {
+    return this.contractFactory.getDetailedERC20Contract(address);
+  };
+
   /**
    * Instantiate ERC20DividendCheckpointWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
@@ -181,7 +187,14 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   public createDividend = async (params: CreateDividendParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
-    await this.checkIfDividendIsValid(params.expiry, params.maturity, params.amount, params.token, params.name);
+    await this.checkIfDividendIsValid(
+      params.expiry,
+      params.maturity,
+      params.amount,
+      params.token,
+      params.name,
+      params.txData,
+    );
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -201,6 +214,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      params.txData,
       params.checkpointId,
     );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
@@ -223,6 +237,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      params.txData,
       undefined,
       params.excluded,
     );
@@ -248,6 +263,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.amount,
       params.token,
       params.name,
+      params.txData,
       params.checkpointId,
       params.excluded,
     );
@@ -317,6 +333,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     amount: BigNumber,
     token: string,
     name: string,
+    txData?: Partial<TxData>,
     checkpointId?: number,
     excluded?: string[],
   ) => {
@@ -334,5 +351,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
+    const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(
+      await this.getCallerAddress(txData),
+    );
+    assert.assert(
+      erc20TokenBalance.isGreaterThanOrEqualTo(amount),
+      'Your balance is less than dividend amount',
+    );
   };
 }

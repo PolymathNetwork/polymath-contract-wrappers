@@ -16,6 +16,14 @@ interface ReclaimERC20Params extends TxParams {
 export default abstract class STOWrapper extends ModuleWrapper {
   protected abstract contract: Promise<STOBaseContract>;
 
+  public paused = async () => {
+    return (await this.contract).paused.callAsync();
+  };
+
+  public securityToken = async () => {
+    return (await this.contract).securityToken.callAsync();
+  };
+
   /**
    * Type of currency used to collect the funds
    */
@@ -74,11 +82,13 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Contract already paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
+    assert.assert((await this.paused()), 'Contract is not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
