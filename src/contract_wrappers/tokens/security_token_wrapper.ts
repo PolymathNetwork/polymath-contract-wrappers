@@ -574,10 +574,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getModuleRegistryContract();
   };
 
-  protected cappedSTOContract = async (address: string): Promise<CappedSTOContract> => {
-    return this.contractFactory.getCappedSTOContract(address);
-  };
-
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -1025,7 +1021,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.CappedSTO:
-        await this.cappedSTOAssertions(params.address, params.data);
+        await this.cappedSTOAssertions(params.data as CappedSTOData);
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime),
@@ -1252,30 +1248,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return isCompatible;
   };
 
-  private cappedSTOAssertions = async (
-    address: string,
-    data?:
-      | CountTransferManagerData
-      | PercentageTransferManagerData
-      | DividendCheckpointData
-      | CappedSTOData
-      | USDTieredSTOData,
-  ) => {
-    assert.assert(
-      (await (await this.cappedSTOContract(address)).endTime.callAsync()).isZero(),
-      'End time already configured',
-    );
-    assert.assert(
-      (data as CappedSTOData).rate.isGreaterThan(new BigNumber(0)),
-      'Rate of token should be greater than 0',
-    );
-    assert.isNonZeroETHAddressHex('Funds Receiver', (data as CappedSTOData).fundsReceiver);
-    assert.assert(
-      (data as CappedSTOData).startTime >= new Date() &&
-        (data as CappedSTOData).endTime > (data as CappedSTOData).startTime,
-      'Date parameters are not valid',
-    );
-    assert.assert((data as CappedSTOData).cap.isGreaterThan(new BigNumber(0)), 'Cap should be greater than 0');
-    assert.assert((data as CappedSTOData).fundRaiseTypes.length === 1, 'It only selects single fund raise type');
+  private cappedSTOAssertions = async (data: CappedSTOData) => {
+    assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
+    assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
+    assert.isFutureDate(data.startTime, 'Start time date not valid');
+    assert.assert(data.endTime > data.startTime, 'End time not valid');
+    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
+    assert.assert(data.fundRaiseTypes.length === 1, 'It only selects single fund raise type');
   };
 }
