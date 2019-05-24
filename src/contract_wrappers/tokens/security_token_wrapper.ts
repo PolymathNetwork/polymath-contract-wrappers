@@ -1050,10 +1050,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.ERC20DividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
