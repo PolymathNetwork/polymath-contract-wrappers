@@ -51,6 +51,8 @@ describe('SecurityTokenWrapper', () => {
   afterEach(() => {
     reset(mockedWrapper);
     reset(mockedContract);
+    reset(mockedFeatureRegistryContract);
+    reset(mockedContractFactory);
     reset(mockedModuleFactoryContract);
     reset(mockedPolyTokenContract);
   });
