@@ -26,7 +26,6 @@ import {
   ModuleFactoryContract,
   PolyTokenContract,
   ModuleRegistryContract,
-  CappedSTOContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -1033,6 +1032,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.USDTieredSTO:
+        await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime),
@@ -1255,5 +1255,27 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(data.endTime > data.startTime, 'End time not valid');
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
     assert.assert(data.fundRaiseTypes.length === 1, 'It only selects single fund raise type');
+  };
+
+  private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
+    assert.isFutureDate(data.startTime, 'Start time date not valid');
+    assert.assert(data.endTime > data.startTime, 'End time not valid');
+    assert.assert(data.tokensPerTierTotal.length > 0, 'No tiers provided');
+    assert.areValidArrayLengths(
+      [data.ratePerTier, data.tokensPerTierTotal, data.ratePerTierDiscountPoly, data.tokensPerTierDiscountPoly],
+      'Tier data length mismatch',
+    );
+    for (let i = 0; i < data.ratePerTier.length; i+1) {
+      assert.isBigNumberGreaterThanZero(data.ratePerTier[i], 'Rate per tier should be greater than 0');
+      assert.isBigNumberGreaterThanZero(data.tokensPerTierTotal[i], 'Invalid token amount');
+      assert.assert(
+        data.tokensPerTierDiscountPoly[i].isLessThanOrEqualTo(data.tokensPerTierTotal[i]),
+        'Too many discounted tokens',
+      );
+      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), 'Invalid discount');
+    }
+    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, 'Raise type is not specified');
+    assert.isNonZeroETHAddressHex('Wallet', data.wallet);
+    assert.isNonZeroETHAddressHex('ReserveWallet', data.reserveWallet);
   };
 }
