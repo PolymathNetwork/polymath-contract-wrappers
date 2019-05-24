@@ -1,10 +1,25 @@
 // SecurityTokenWrapper test
-import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
+import { instance, mock, reset, verify, when, objectContaining, anything } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, FeatureRegistryContract, FeatureRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { ethers } from 'ethers';
+import {
+  SecurityToken,
+  CountTransferManager,
+  ERC20DividendCheckpoint,
+  CappedSTO,
+  USDTieredSTO,
+  PercentageTransferManager,
+  EtherDividendCheckpoint,
+} from '@polymathnetwork/contract-artifacts';
+import {
+  SecurityTokenContract,
+  FeatureRegistryContract,
+  FeatureRegistryEvents,
+  ModuleFactoryContract,
+} from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { ModuleType, ModuleName, Features } from '../../../types';
+import { ModuleType, ModuleName, Features, FundRaiseType } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import { stringToBytes32, bytes32ToString, numberToBigNumber, dateToBigNumber } from '../../../utils/convert';
@@ -17,12 +32,14 @@ describe('SecurityTokenWrapper', () => {
   let mockedContract: SecurityTokenContract;
   let mockedContractFactory: ContractFactory;
   let mockedFeatureRegistryContract: FeatureRegistryContract;
+  let mockedModuleFactoryContract: ModuleFactoryContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(SecurityTokenContract);
     mockedContractFactory = mock(ContractFactory);
     mockedFeatureRegistryContract = mock(FeatureRegistryContract);
+    mockedModuleFactoryContract = mock(ModuleFactoryContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -32,6 +49,7 @@ describe('SecurityTokenWrapper', () => {
     reset(mockedWrapper);
     reset(mockedContract);
     reset(mockedFeatureRegistryContract);
+    reset(mockedModuleFactoryContract);
   });
 
   describe('Types', () => {
@@ -2113,65 +2131,437 @@ describe('SecurityTokenWrapper', () => {
   });
 
   // TODO figure it out why types of property 'moduleName' are incompatible.
-  /* describe('addModule', () => {
+  describe('addModule', () => {
     test.todo('should fail as address is not an Eth address');
     test('should send the transaction to addModule', async () => {
-      // Mocked parameters
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleStructAddressIsEmpty
+      /* const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x4444444444444444444444444444444444444444',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleParams = {
+        moduleAddress: '0x4444444444444444444444444444444444444444',
+      };
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(mockedModuleParams.moduleAddress)).thenResolve(expectedModuleResult); */
+
+      // === Start CountTransferManager test ===
+      const ctmParams = {
+        maxHolderCount: 10,
+      };
+      const mockedCtmParams = {
+        moduleName: ModuleName.countTransferManager,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: ctmParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iCtmFace = new ethers.utils.Interface(CountTransferManager.abi);
+      const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedCtmParams.address,
+          objectContaining(ctmData),
+          objectContaining(mockedCtmParams.maxCost),
+          objectContaining(mockedCtmParams.budget),
+          mockedCtmParams.txData,
+          mockedCtmParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const ctmResult = await target.addModule({
+        moduleName: ModuleName.countTransferManager,
+        address: mockedCtmParams.address,
+        maxCost: mockedCtmParams.maxCost,
+        budget: mockedCtmParams.budget,
+        data: {
+          maxHolderCount: ctmParams.maxHolderCount,
+        },
+        txData: mockedCtmParams.txData,
+        safetyFactor: mockedCtmParams.safetyFactor,
+      });
+
+      expect(ctmResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedCtmParams.address,
+          objectContaining(ctmData),
+          objectContaining(mockedCtmParams.maxCost),
+          objectContaining(mockedCtmParams.budget),
+          mockedCtmParams.txData,
+          mockedCtmParams.safetyFactor,
+        ),
+      ).once();
+      // === End CountTransferManager test ===
+
+      // === Start PercentageTransferManager test ===
+      const ptmParams = {
+        maxHolderPercentage: new BigNumber(1),
+        allowPrimaryIssuance: true,
+      };
+      const mockedPtmParams = {
+        moduleName: ModuleName.percentageTransferManager,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: ptmParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iPtmFace = new ethers.utils.Interface(PercentageTransferManager.abi);
+      const ptmData = iPtmFace.functions.configure.encode([
+        mockedPtmParams.data.maxHolderPercentage.toNumber(),
+        mockedPtmParams.data.allowPrimaryIssuance,
+      ]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedPtmParams.address,
+          objectContaining(ptmData),
+          objectContaining(mockedPtmParams.maxCost),
+          objectContaining(mockedPtmParams.budget),
+          mockedPtmParams.txData,
+          mockedPtmParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const ptmResult = await target.addModule({
+        moduleName: ModuleName.percentageTransferManager,
+        address: mockedPtmParams.address,
+        maxCost: mockedPtmParams.maxCost,
+        budget: mockedPtmParams.budget,
+        data: {
+          maxHolderPercentage: ptmParams.maxHolderPercentage,
+          allowPrimaryIssuance: ptmParams.allowPrimaryIssuance,
+        },
+        txData: mockedPtmParams.txData,
+        safetyFactor: mockedPtmParams.safetyFactor,
+      });
+
+      expect(ptmResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedPtmParams.address,
+          objectContaining(ptmData),
+          objectContaining(mockedPtmParams.maxCost),
+          objectContaining(mockedPtmParams.budget),
+          mockedPtmParams.txData,
+          mockedPtmParams.safetyFactor,
+        ),
+      ).once();
+      // === End CappedSTO test ===
+
+      // === Start CappedSTO test ===
       const cappedParams = {
-        startTime: new Date(),
-        endTime: new Date(),
+        startTime: new Date(2019, 1),
+        endTime: new Date(2020, 1),
         cap: new BigNumber(1),
         rate: new BigNumber(1),
-        fundRaiseTypes: [0],
+        fundRaiseTypes: [FundRaiseType.ETH],
         fundsReceiver: '0x2222222222222222222222222222222222222222',
       };
-      const mockedParams = {
+      const mockedCappedParams = {
         moduleName: ModuleName.cappedSTO,
-        address: '0x1111111111111111111111111111111111111111',
+        address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
         data: cappedParams,
         txData: {},
         safetyFactor: 10,
       };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
-      // Stub the request
+
+      const iCappedFace = new ethers.utils.Interface(CappedSTO.abi);
+      const cappedData = iCappedFace.functions.configure.encode([
+        dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
+        dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
+        mockedCappedParams.data.cap.toNumber(),
+        mockedCappedParams.data.rate.toNumber(),
+        mockedCappedParams.data.fundRaiseTypes,
+        mockedCappedParams.data.fundsReceiver,
+      ]);
+
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.address,
-          mockedParams.data,
-          mockedParams.maxCost,
-          mockedParams.budget,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
+          mockedCappedParams.address,
+          objectContaining(cappedData),
+          objectContaining(mockedCappedParams.maxCost),
+          objectContaining(mockedCappedParams.budget),
+          mockedCappedParams.txData,
+          mockedCappedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
 
-      // Real call
-      const result = await target.addModule(mockedParams);
+      const cappedResult = await target.addModule({
+        moduleName: ModuleName.cappedSTO,
+        address: mockedCappedParams.address,
+        maxCost: mockedCappedParams.maxCost,
+        budget: mockedCappedParams.budget,
+        data: {
+          startTime: cappedParams.startTime,
+          endTime: cappedParams.endTime,
+          cap: cappedParams.cap,
+          rate: cappedParams.rate,
+          fundRaiseTypes: cappedParams.fundRaiseTypes,
+          fundsReceiver: cappedParams.fundsReceiver,
+        },
+        txData: mockedCappedParams.txData,
+        safetyFactor: mockedCappedParams.safetyFactor,
+      });
 
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.addModule).once();
+      expect(cappedResult).toBe(expectedResult);
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.address,
-          mockedParams.data,
-          mockedParams.maxCost,
-          mockedParams.budget,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
+          mockedCappedParams.address,
+          objectContaining(cappedData),
+          objectContaining(mockedCappedParams.maxCost),
+          objectContaining(mockedCappedParams.budget),
+          mockedCappedParams.txData,
+          mockedCappedParams.safetyFactor,
         ),
       ).once();
-    });
-  }); */
+      // === End CappedSTO test ===
 
-  // TODO figure it out why toLowerCase is undefined
+      // === Start USDTieredSTO test ===
+      const usdTieredStoParams = {
+        startTime: new Date(2019, 1),
+        endTime: new Date(2020, 1),
+        ratePerTier: [new BigNumber(1), new BigNumber(2)],
+        ratePerTierDiscountPoly: [new BigNumber(10), new BigNumber(20)],
+        tokensPerTierTotal: [new BigNumber(1), new BigNumber(2)],
+        tokensPerTierDiscountPoly: [new BigNumber(1), new BigNumber(2)],
+        nonAccreditedLimitUSD: new BigNumber(1),
+        minimumInvestmentUSD: new BigNumber(1),
+        fundRaiseTypes: [FundRaiseType.StableCoin],
+        wallet: '0x1111111111111111111111111111111111111111',
+        reserveWallet: '0x2222222222222222222222222222222222222222',
+        usdTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+      };
+      const mockedUsdTieredStoParams = {
+        moduleName: ModuleName.usdTieredSTO,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: usdTieredStoParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iUsdTieredStoFace = new ethers.utils.Interface(USDTieredSTO.abi);
+      const usdTieredStoData = iUsdTieredStoFace.functions.configure.encode([
+        dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
+        dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
+        mockedUsdTieredStoParams.data.ratePerTier.map(e => {
+          return e.toNumber();
+        }),
+        mockedUsdTieredStoParams.data.ratePerTierDiscountPoly.map(e => {
+          return e.toNumber();
+        }),
+        mockedUsdTieredStoParams.data.tokensPerTierTotal.map(e => {
+          return e.toNumber();
+        }),
+        mockedUsdTieredStoParams.data.tokensPerTierDiscountPoly.map(e => {
+          return e.toNumber();
+        }),
+        mockedUsdTieredStoParams.data.nonAccreditedLimitUSD.toNumber(),
+        mockedUsdTieredStoParams.data.minimumInvestmentUSD.toNumber(),
+        mockedUsdTieredStoParams.data.fundRaiseTypes,
+        mockedUsdTieredStoParams.data.wallet,
+        mockedUsdTieredStoParams.data.reserveWallet,
+        mockedUsdTieredStoParams.data.usdTokens,
+      ]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedUsdTieredStoParams.address,
+          objectContaining(usdTieredStoData),
+          objectContaining(mockedUsdTieredStoParams.maxCost),
+          objectContaining(mockedUsdTieredStoParams.budget),
+          mockedUsdTieredStoParams.txData,
+          mockedUsdTieredStoParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const usdTieredStoResult = await target.addModule({
+        moduleName: ModuleName.usdTieredSTO,
+        address: mockedUsdTieredStoParams.address,
+        maxCost: mockedUsdTieredStoParams.maxCost,
+        budget: mockedUsdTieredStoParams.budget,
+        data: {
+          startTime: usdTieredStoParams.startTime,
+          endTime: usdTieredStoParams.endTime,
+          ratePerTier: usdTieredStoParams.ratePerTier,
+          ratePerTierDiscountPoly: usdTieredStoParams.ratePerTierDiscountPoly,
+          tokensPerTierTotal: usdTieredStoParams.tokensPerTierTotal,
+          tokensPerTierDiscountPoly: usdTieredStoParams.tokensPerTierDiscountPoly,
+          nonAccreditedLimitUSD: usdTieredStoParams.nonAccreditedLimitUSD,
+          minimumInvestmentUSD: usdTieredStoParams.minimumInvestmentUSD,
+          fundRaiseTypes: usdTieredStoParams.fundRaiseTypes,
+          wallet: usdTieredStoParams.wallet,
+          reserveWallet: usdTieredStoParams.reserveWallet,
+          usdTokens: usdTieredStoParams.usdTokens,
+        },
+        txData: mockedUsdTieredStoParams.txData,
+        safetyFactor: mockedUsdTieredStoParams.safetyFactor,
+      });
+
+      expect(usdTieredStoResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedUsdTieredStoParams.address,
+          objectContaining(usdTieredStoData),
+          objectContaining(mockedUsdTieredStoParams.maxCost),
+          objectContaining(mockedUsdTieredStoParams.budget),
+          mockedUsdTieredStoParams.txData,
+          mockedUsdTieredStoParams.safetyFactor,
+        ),
+      ).once();
+      // === End USDTieredSTO test ===
+
+      // === Start ERC20DividendCheckpoint test ===
+      const erc20DividendParams = {
+        wallet: '0x1111111111111111111111111111111111111111',
+      };
+      const mockedErc20DividendParams = {
+        moduleName: ModuleName.erc20DividendCheckpoint,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: erc20DividendParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iErc20DividendFace = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+      const erc20DividendData = iErc20DividendFace.functions.configure.encode([mockedErc20DividendParams.data.wallet]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedErc20DividendParams.address,
+          objectContaining(erc20DividendData),
+          objectContaining(mockedErc20DividendParams.maxCost),
+          objectContaining(mockedErc20DividendParams.budget),
+          mockedErc20DividendParams.txData,
+          mockedErc20DividendParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const erc20DividendResult = await target.addModule({
+        moduleName: ModuleName.erc20DividendCheckpoint,
+        address: mockedErc20DividendParams.address,
+        maxCost: mockedErc20DividendParams.maxCost,
+        budget: mockedErc20DividendParams.budget,
+        data: {
+          wallet: erc20DividendParams.wallet,
+        },
+        txData: mockedErc20DividendParams.txData,
+        safetyFactor: mockedErc20DividendParams.safetyFactor,
+      });
+
+      expect(erc20DividendResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedErc20DividendParams.address,
+          objectContaining(erc20DividendData),
+          objectContaining(mockedErc20DividendParams.maxCost),
+          objectContaining(mockedErc20DividendParams.budget),
+          mockedErc20DividendParams.txData,
+          mockedErc20DividendParams.safetyFactor,
+        ),
+      ).once();
+      // === End ERC20DividendCheckpoint test ===
+
+      // === Start EtherDividendCheckpoint test ===
+      const etherDividendParams = {
+        wallet: '0x1111111111111111111111111111111111111111',
+      };
+      const mockedEtherDividendParams = {
+        moduleName: ModuleName.etherDividendCheckpoint,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        data: etherDividendParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iEtherDividendFace = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+      const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedEtherDividendParams.address,
+          objectContaining(etherDividendData),
+          objectContaining(mockedEtherDividendParams.maxCost),
+          objectContaining(mockedEtherDividendParams.budget),
+          mockedEtherDividendParams.txData,
+          mockedEtherDividendParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const etherDividendResult = await target.addModule({
+        moduleName: ModuleName.erc20DividendCheckpoint,
+        address: mockedEtherDividendParams.address,
+        maxCost: mockedEtherDividendParams.maxCost,
+        budget: mockedEtherDividendParams.budget,
+        data: {
+          wallet: etherDividendParams.wallet,
+        },
+        txData: mockedEtherDividendParams.txData,
+        safetyFactor: mockedEtherDividendParams.safetyFactor,
+      });
+
+      expect(etherDividendResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedEtherDividendParams.address,
+          objectContaining(etherDividendData),
+          objectContaining(mockedEtherDividendParams.maxCost),
+          objectContaining(mockedEtherDividendParams.budget),
+          mockedEtherDividendParams.txData,
+          mockedEtherDividendParams.safetyFactor,
+        ),
+      ).once();
+      // === End EtherDividendCheckpoint test ===
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      verify(mockedContract.addModule).times(6);
+      verify(mockedContract.owner).times(6);
+      verify(mockedOwnerMethod.callAsync()).times(6);
+      verify(mockedWrapper.getAvailableAddressesAsync()).times(6);
+      verify(mockedModuleFactoryContract.getSetupCost).times(6);
+      verify(mockedGetModuleStatusMethod.callAsync()).times(6);
+      // verify(mockedContract.getModule).times(6);
+      // verify(mockedModuleMethod.callAsync(mockedModuleParams.moduleAddress)).times(6);
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters

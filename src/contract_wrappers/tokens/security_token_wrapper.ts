@@ -994,7 +994,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
+    // await this.checkModuleStructAddressIsEmpty(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1005,17 +1005,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          (params.data as PercentageTransferManagerData).maxHolderPercentage,
+          (params.data as PercentageTransferManagerData).maxHolderPercentage.toNumber(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
       case ModuleName.cappedSTO:
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as CappedSTOData).startTime),
-          dateToBigNumber((params.data as CappedSTOData).endTime),
-          (params.data as CappedSTOData).cap,
-          (params.data as CappedSTOData).rate,
+          dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
+          (params.data as CappedSTOData).cap.toNumber(),
+          (params.data as CappedSTOData).rate.toNumber(),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
@@ -1023,14 +1023,22 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.usdTieredSTO:
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as USDTieredSTOData).startTime),
-          dateToBigNumber((params.data as USDTieredSTOData).endTime),
-          (params.data as USDTieredSTOData).ratePerTier,
-          (params.data as USDTieredSTOData).ratePerTierDiscountPoly,
-          (params.data as USDTieredSTOData).tokensPerTierTotal,
-          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly,
-          (params.data as USDTieredSTOData).nonAccreditedLimitUSD,
-          (params.data as USDTieredSTOData).minimumInvestmentUSD,
+          dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
+          (params.data as USDTieredSTOData).ratePerTier.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).nonAccreditedLimitUSD.toNumber(),
+          (params.data as USDTieredSTOData).minimumInvestmentUSD.toNumber(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,
