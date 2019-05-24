@@ -366,8 +366,8 @@ interface CheckpointIdParams {
 }
 
 interface IterateInvestorsParams {
-  start: Date;
-  end: Date;
+  start: number;
+  end: number;
 }
 
 interface TransferWithDataParams extends TxParams {
@@ -453,35 +453,35 @@ interface AddModuleParams extends TxParams {
 
 interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
-    | ModuleName.GeneralPermissionManager
-    | ModuleName.GeneralTransferManager
-    | ModuleName.ManualApprovalTransferManager
-    | ModuleName.VolumeRestrictionTM;
+    | ModuleName.generalPermissionManager
+    | ModuleName.generalTransferManager
+    | ModuleName.manualApprovalTransferManager
+    | ModuleName.volumeRestrictionTM;
   data?: undefined;
 }
 
 interface AddCountTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.CountTransferManager;
+  moduleName: ModuleName.countTransferManager;
   data: CountTransferManagerData;
 }
 
 interface AddPercentageTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.PercentageTransferManager;
+  moduleName: ModuleName.percentageTransferManager;
   data: PercentageTransferManagerData;
 }
 
 interface AddDividendCheckpointParams extends AddModuleParams {
-  moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
+  moduleName: ModuleName.etherDividendCheckpoint | ModuleName.erc20DividendCheckpoint;
   data: DividendCheckpointData;
 }
 
 interface AddCappedSTOParams extends AddModuleParams {
-  moduleName: ModuleName.CappedSTO;
+  moduleName: ModuleName.cappedSTO;
   data: CappedSTOData;
 }
 
 interface AddUSDTieredSTOParams extends AddModuleParams {
-  moduleName: ModuleName.USDTieredSTO;
+  moduleName: ModuleName.usdTieredSTO;
   data: USDTieredSTOData;
 }
 
@@ -774,7 +774,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public iterateInvestors = async (params: IterateInvestorsParams) => {
-    return (await this.contract).iterateInvestors.callAsync(dateToBigNumber(params.start), dateToBigNumber(params.end));
+    return (await this.contract).iterateInvestors.callAsync(
+      numberToBigNumber(params.start),
+      numberToBigNumber(params.end),
+    );
   };
 
   public getInvestorCount = async () => {
@@ -857,12 +860,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public mintMulti = async (params: MintMultiParams) => {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
-    assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
-    await this.checkOnlyOwner(params.txData);
     assert.assert(
       params.investors.length === params.values.length,
       'Number of investors passed in must be equivalent to number of values',
     );
+    assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
+    await this.checkOnlyOwner(params.txData);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
       params.values,
@@ -885,7 +888,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).burnWithData.sendTransactionAsync(
       params.value,
-      params.data,
+      stringToBytes32(params.data),
       params.txData,
       params.safetyFactor,
     );
@@ -1002,50 +1005,58 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
-      case ModuleName.CountTransferManager:
+      case ModuleName.countTransferManager:
         iface = new ethers.utils.Interface(CountTransferManager.abi);
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
-      case ModuleName.PercentageTransferManager:
+      case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          (params.data as PercentageTransferManagerData).maxHolderPercentage,
+          (params.data as PercentageTransferManagerData).maxHolderPercentage.toNumber(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
-      case ModuleName.CappedSTO:
+      case ModuleName.cappedSTO:
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as CappedSTOData).startTime),
-          dateToBigNumber((params.data as CappedSTOData).endTime),
-          (params.data as CappedSTOData).cap,
-          (params.data as CappedSTOData).rate,
+          dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
+          (params.data as CappedSTOData).cap.toNumber(),
+          (params.data as CappedSTOData).rate.toNumber(),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
         break;
-      case ModuleName.USDTieredSTO:
+      case ModuleName.usdTieredSTO:
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as USDTieredSTOData).startTime),
-          dateToBigNumber((params.data as USDTieredSTOData).endTime),
-          (params.data as USDTieredSTOData).ratePerTier,
-          (params.data as USDTieredSTOData).ratePerTierDiscountPoly,
-          (params.data as USDTieredSTOData).tokensPerTierTotal,
-          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly,
-          (params.data as USDTieredSTOData).nonAccreditedLimitUSD,
-          (params.data as USDTieredSTOData).minimumInvestmentUSD,
+          dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
+          (params.data as USDTieredSTOData).ratePerTier.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
+            return e.toNumber();
+          }),
+          (params.data as USDTieredSTOData).nonAccreditedLimitUSD.toNumber(),
+          (params.data as USDTieredSTOData).minimumInvestmentUSD.toNumber(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,
           (params.data as USDTieredSTOData).usdTokens,
         ]);
         break;
-      case ModuleName.ERC20DividendCheckpoint:
+      case ModuleName.erc20DividendCheckpoint:
         iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
-      case ModuleName.EtherDividendCheckpoint:
+      case ModuleName.etherDividendCheckpoint:
         iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
@@ -1087,7 +1098,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    assert.isBigNumberZero(params.value.modulo(await this.granularity()), 'Invalid granularity');
     return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
   };
 
@@ -1183,7 +1193,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
-    assert.assert(polyTokenBalance.isGreaterThanOrEqualTo(moduleCost), 'Insufficient poly token balance for module cost');
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
+      'Insufficient poly token balance for module cost',
+    );
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
