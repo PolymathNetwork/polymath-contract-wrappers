@@ -1,4 +1,4 @@
-// PolymathRegistryWrapper test
+// FeatureRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
@@ -8,7 +8,6 @@ import ContractWrapper from '../../contract_wrapper';
 import FeatureRegistryWrapper from '../feature_registry_wrapper';
 
 describe('FeatureRegistryWrapper', () => {
-  // Declare PolyMathRegistryWrapper object
   let target: FeatureRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: FeatureRegistryContract;
@@ -157,8 +156,10 @@ describe('FeatureRegistryWrapper', () => {
           ),
         ).once();
         verify(mockedContract.getFeatureStatus).once();
+        verify(mockedGetMethod.callAsync(featureName)).once();
         verify(mockedContract.owner).once();
         verify(mockedOwnerMethod.callAsync()).once();
+        verify(mockedWrapper.getAvailableAddressesAsync()).once();
       });
     });
   });
