@@ -999,7 +999,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
-    // await this.checkModuleStructAddressIsEmpty(params.address);
+    await this.checkModuleStructAddressIsEmpty(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1188,13 +1188,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         'Insufficient max cost to cover module factory setup cost',
       );
     }
-    /* const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient poly token balance for module cost',
-    ); */
+    );
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {

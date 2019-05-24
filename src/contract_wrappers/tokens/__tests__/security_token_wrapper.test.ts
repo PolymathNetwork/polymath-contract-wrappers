@@ -17,6 +17,7 @@ import {
   FeatureRegistryContract,
   FeatureRegistryEvents,
   ModuleFactoryContract,
+  PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import { ModuleType, ModuleName, Features, FundRaiseType } from '../../../types';
@@ -33,6 +34,7 @@ describe('SecurityTokenWrapper', () => {
   let mockedContractFactory: ContractFactory;
   let mockedFeatureRegistryContract: FeatureRegistryContract;
   let mockedModuleFactoryContract: ModuleFactoryContract;
+  let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
@@ -40,6 +42,7 @@ describe('SecurityTokenWrapper', () => {
     mockedContractFactory = mock(ContractFactory);
     mockedFeatureRegistryContract = mock(FeatureRegistryContract);
     mockedModuleFactoryContract = mock(ModuleFactoryContract);
+    mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -50,6 +53,7 @@ describe('SecurityTokenWrapper', () => {
     reset(mockedContract);
     reset(mockedFeatureRegistryContract);
     reset(mockedModuleFactoryContract);
+    reset(mockedPolyTokenContract);
   });
 
   describe('Types', () => {
@@ -2130,36 +2134,46 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  // TODO figure it out why types of property 'moduleName' are incompatible.
-  describe('addModule', () => {
+  describe('CountTransferManagerAddModule', () => {
     test.todo('should fail as address is not an Eth address');
     test('should send the transaction to addModule', async () => {
       const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
       const expectedResult = getMockedPolyResponse();
       const mockedMethod = mock(MockedSendMethod);
       when(mockedContract.addModule).thenReturn(instance(mockedMethod));
 
       // checkOnlyOwner
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedOwnerResult = OWNER;
       const mockedOwnerMethod = mock(MockedCallMethod);
       when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
       when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
       // checkModuleStructAddressIsEmpty
-      /* const expectedModuleResult = [
+      const expectedModuleResult = [
         stringToBytes32('CountTransferManager'),
-        '0x4444444444444444444444444444444444444444',
+        '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
       ];
-      const mockedModuleParams = {
-        moduleAddress: '0x4444444444444444444444444444444444444444',
-      };
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
-      when(mockedModuleMethod.callAsync(mockedModuleParams.moduleAddress)).thenResolve(expectedModuleResult); */
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
 
       // === Start CountTransferManager test ===
       const ctmParams = {
@@ -2213,6 +2227,60 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
       // === End CountTransferManager test ===
+
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+    });
+  });
+
+  describe('PercentageTransferManagerAddModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
 
       // === Start PercentageTransferManager test ===
       const ptmParams = {
@@ -2271,6 +2339,60 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
       // === End CappedSTO test ===
+
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+    });
+  });
+
+  describe('CappedSTOAddModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
 
       // === Start CappedSTO test ===
       const cappedParams = {
@@ -2341,6 +2463,60 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
       // === End CappedSTO test ===
+
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+    });
+  });
+
+  describe('USDTieredSTOAddModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
 
       // === Start USDTieredSTO test ===
       const usdTieredStoParams = {
@@ -2437,6 +2613,60 @@ describe('SecurityTokenWrapper', () => {
         ),
       ).once();
       // === End USDTieredSTO test ===
+      
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+        });
+  });
+
+  describe('ERC20DividendCheckpointAddModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
 
       // === Start ERC20DividendCheckpoint test ===
       const erc20DividendParams = {
@@ -2491,6 +2721,60 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       // === End ERC20DividendCheckpoint test ===
 
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+    });
+  });
+
+  describe('EtherDividendCheckpointAddModule', () => {
+    test.todo('should fail as address is not an Eth address');
+    test('should send the transaction to addModule', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
+
       // === Start EtherDividendCheckpoint test ===
       const etherDividendParams = {
         wallet: '0x1111111111111111111111111111111111111111',
@@ -2544,21 +2828,16 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       // === End EtherDividendCheckpoint test ===
 
-      // checkModuleCostBelowMaxCost
-      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
-      const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
-
-      verify(mockedContract.addModule).times(6);
-      verify(mockedContract.owner).times(6);
-      verify(mockedOwnerMethod.callAsync()).times(6);
-      verify(mockedWrapper.getAvailableAddressesAsync()).times(6);
-      verify(mockedModuleFactoryContract.getSetupCost).times(6);
-      verify(mockedGetModuleStatusMethod.callAsync()).times(6);
-      // verify(mockedContract.getModule).times(6);
-      // verify(mockedModuleMethod.callAsync(mockedModuleParams.moduleAddress)).times(6);
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
     });
   });
 
