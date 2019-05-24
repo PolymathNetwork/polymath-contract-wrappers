@@ -26,6 +26,7 @@ import {
   ModuleFactoryContract,
   PolyTokenContract,
   ModuleRegistryContract,
+  CappedSTOContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -573,6 +574,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getModuleRegistryContract();
   };
 
+  protected cappedSTOContract = async (address: string): Promise<CappedSTOContract> => {
+    return this.contractFactory.getCappedSTOContract(address);
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -1020,6 +1025,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.CappedSTO:
+        await this.cappedSTOAssertions(params.address, params.data);
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime),
@@ -1189,7 +1195,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
-    assert.assert(polyTokenBalance.isGreaterThanOrEqualTo(moduleCost), 'Insufficient poly token balance for module cost');
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
+      'Insufficient poly token balance for module cost',
+    );
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
@@ -1241,5 +1250,32 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]);
     }
     return isCompatible;
+  };
+
+  private cappedSTOAssertions = async (
+    address: string,
+    data?:
+      | CountTransferManagerData
+      | PercentageTransferManagerData
+      | DividendCheckpointData
+      | CappedSTOData
+      | USDTieredSTOData,
+  ) => {
+    assert.assert(
+      (await (await this.cappedSTOContract(address)).endTime.callAsync()).isZero(),
+      'End time already configured',
+    );
+    assert.assert(
+      (data as CappedSTOData).rate.isGreaterThan(new BigNumber(0)),
+      'Rate of token should be greater than 0',
+    );
+    assert.isNonZeroETHAddressHex('Funds Receiver', (data as CappedSTOData).fundsReceiver);
+    assert.assert(
+      (data as CappedSTOData).startTime >= new Date() &&
+        (data as CappedSTOData).endTime > (data as CappedSTOData).startTime,
+      'Date parameters are not valid',
+    );
+    assert.assert((data as CappedSTOData).cap.isGreaterThan(new BigNumber(0)), 'Cap should be greater than 0');
+    assert.assert((data as CappedSTOData).fundRaiseTypes.length === 1, 'It only selects single fund raise type');
   };
 }
