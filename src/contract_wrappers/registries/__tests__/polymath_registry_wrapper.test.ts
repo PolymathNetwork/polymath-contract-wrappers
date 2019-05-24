@@ -59,7 +59,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.PolyToken;
+      const contractName = PolymathContracts.polyToken;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -81,7 +81,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.ModuleRegistry;
+      const contractName = PolymathContracts.moduleRegistry;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -103,7 +103,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.FeatureRegistry;
+      const contractName = PolymathContracts.featureRegistry;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -125,7 +125,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.SecurityTokenRegistry;
+      const contractName = PolymathContracts.securityTokenRegistry;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -147,7 +147,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.PolyUsdOracle;
+      const contractName = PolymathContracts.polyUsdOracle;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -169,7 +169,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Address expected
       const expectedResult = '0x0123456789012345678901234567890123456789';
       // Contract requested
-      const contractName = PolymathContracts.EthUsdOracle;
+      const contractName = PolymathContracts.ethUsdOracle;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method

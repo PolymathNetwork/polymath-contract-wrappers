@@ -124,7 +124,7 @@ export default class ContractFactory {
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
     return new PolyTokenFaucetContract(
       PolyTokenFaucet.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.PolyToken),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.polyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -133,7 +133,7 @@ export default class ContractFactory {
   public async getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       PolyToken.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.PolyToken),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.polyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -218,7 +218,7 @@ export default class ContractFactory {
   public async getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       FeatureRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.FeatureRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.featureRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -227,7 +227,7 @@ export default class ContractFactory {
   public async getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       ModuleRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.ModuleRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.moduleRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -236,7 +236,7 @@ export default class ContractFactory {
   public async getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
     return new SecurityTokenRegistryContract(
       SecurityTokenRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.SecurityTokenRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.securityTokenRegistry),
       this.provider,
       this.contractDefaults,
     );
