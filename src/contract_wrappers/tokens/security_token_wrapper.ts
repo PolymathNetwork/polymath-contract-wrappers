@@ -1231,18 +1231,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkForRegisteredModule = async (moduleAddress: string) => {
+    const moduleRegistry = await this.moduleRegistryContract();
     const allModulesTypes = [
-      ModuleType.PermissionManager,
-      ModuleType.STO,
-      ModuleType.Burn,
-      ModuleType.Dividends,
-      ModuleType.TransferManager,
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.PermissionManager),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.STO),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.Burn),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.Dividends),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.TransferManager),
     ];
     const allModules = await Promise.all(
-      allModulesTypes.map(async type => {
-        return (await (await this.moduleRegistryContract()).getModulesByType.callAsync(type)).includes(moduleAddress);
-      }),
-    );
+        allModulesTypes.map(myPromise => {
+          return myPromise.includes(moduleAddress)
+        }));
     return allModules.includes(true);
   };
 

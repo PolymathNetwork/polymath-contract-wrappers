@@ -2164,6 +2164,18 @@ describe('SecurityTokenWrapper', () => {
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
       when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
         stringToBytes32('CountTransferManager'),
