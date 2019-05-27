@@ -885,6 +885,7 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.getModule).twice();
       verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -951,6 +952,7 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.getModule).twice();
       verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1017,6 +1019,7 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.getModule).twice();
       verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1073,6 +1076,7 @@ describe('SecurityTokenWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1153,6 +1157,7 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.getModule).once();
       verify(mockedGetModuleMethod.callAsync(mockedParams.module)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1197,6 +1202,7 @@ describe('SecurityTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.newTokenDetails, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1241,6 +1247,7 @@ describe('SecurityTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.granularity, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1292,6 +1299,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedContract.transfersFrozen).once();
       verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1343,6 +1351,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedContract.transfersFrozen).once();
       verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1498,6 +1507,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.mintingFrozen).once();
       verify(mockedFrozenMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.FreezeMintingAllowed)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1563,6 +1574,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.mintingFrozen).once();
+      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1631,6 +1644,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.mintingFrozen).once();
+      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1697,6 +1712,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.mintingFrozen).once();
+      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1757,6 +1774,7 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1830,6 +1848,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
       verify(mockedContract.allowance).once();
       verify(mockedAllowanceMethod.callAsync(mockedParams.from, params.owner)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1880,6 +1899,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.currentCheckpointId).once();
+      verify(mockedCurrentMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -1934,6 +1955,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.controllerDisabled).once();
+      verify(mockedControllerMethod.callAsync()).once();
     });
   });
 
@@ -1984,6 +2006,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.controllerDisabled).once();
+      verify(mockedControllerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2061,6 +2085,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
       verify(mockedContract.controller).once();
       verify(mockedControllerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2134,6 +2159,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
       verify(mockedContract.controller).once();
       verify(mockedControllerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -2306,6 +2332,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
 
     test('should send the transaction to addModule for PercentageTransferManager', async () => {
@@ -2479,6 +2507,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
 
     test('should send the transaction to addModule for CappedSTO', async () => {
@@ -2664,6 +2694,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
 
     test('should send the transaction to addModule for USDTieredSTO', async () => {
@@ -2875,6 +2907,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
 
     test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
@@ -3043,6 +3077,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
 
     test('should send the transaction to addModule for EtherDividendCheckpoint', async () => {
@@ -3211,6 +3247,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
     });
   });
 
