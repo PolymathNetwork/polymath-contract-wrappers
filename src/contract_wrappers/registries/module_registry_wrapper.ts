@@ -415,15 +415,15 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkForRegisteredModule = async (moduleAddress: string) => {
     const allModulesTypes = [
-      ModuleType.PermissionManager,
-      ModuleType.STO,
-      ModuleType.Burn,
-      ModuleType.Dividends,
-      ModuleType.TransferManager,
+      await this.getModulesByType({ moduleType: ModuleType.PermissionManager }),
+      await this.getModulesByType({ moduleType: ModuleType.STO }),
+      await this.getModulesByType({ moduleType: ModuleType.Burn }),
+      await this.getModulesByType({ moduleType: ModuleType.Dividends }),
+      await this.getModulesByType({ moduleType: ModuleType.TransferManager }),
     ];
     const allModules = await Promise.all(
-      allModulesTypes.map(async type => {
-        return this.callGetModulesByTypeAndReturnIfModuleExists(type, moduleAddress);
+      allModulesTypes.map(myPromise => {
+        return myPromise.includes(moduleAddress);
       }),
     );
     return allModules.includes(true);
