@@ -220,6 +220,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractOwnerMethod.callAsync()).once();
       verify(mockedContract.owner).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedContract.removeModule).once();
