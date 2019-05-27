@@ -18,6 +18,7 @@ import {
   FeatureRegistryEvents,
   ModuleFactoryContract,
   PolyTokenContract,
+  ModuleRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import { ModuleType, ModuleName, Features, FundRaiseType } from '../../../types';
@@ -35,6 +36,7 @@ describe('SecurityTokenWrapper', () => {
   let mockedFeatureRegistryContract: FeatureRegistryContract;
   let mockedModuleFactoryContract: ModuleFactoryContract;
   let mockedPolyTokenContract: PolyTokenContract;
+  let mockedModuleRegistryContract: ModuleRegistryContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
@@ -43,6 +45,7 @@ describe('SecurityTokenWrapper', () => {
     mockedFeatureRegistryContract = mock(FeatureRegistryContract);
     mockedModuleFactoryContract = mock(ModuleFactoryContract);
     mockedPolyTokenContract = mock(PolyTokenContract);
+    mockedModuleRegistryContract = mock(ModuleRegistryContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -55,6 +58,7 @@ describe('SecurityTokenWrapper', () => {
     reset(mockedContractFactory);
     reset(mockedModuleFactoryContract);
     reset(mockedPolyTokenContract);
+    reset(mockedModuleRegistryContract);
   });
 
   describe('Types', () => {
@@ -2175,6 +2179,8 @@ describe('SecurityTokenWrapper', () => {
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
       when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
       when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
 
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
