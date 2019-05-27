@@ -2201,13 +2201,17 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -2285,6 +2289,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for PercentageTransferManager', async () => {
@@ -2314,9 +2335,56 @@ describe('SecurityTokenWrapper', () => {
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
       when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
-        stringToBytes32('CountTransferManager'),
+        stringToBytes32('PercentageTransferManager'),
         '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
@@ -2385,8 +2453,8 @@ describe('SecurityTokenWrapper', () => {
       // === End CappedSTO test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
@@ -2394,6 +2462,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for CappedSTO', async () => {
@@ -2417,6 +2502,53 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
@@ -2425,7 +2557,7 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
-        stringToBytes32('CountTransferManager'),
+        stringToBytes32('CappedSTO'),
         '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
@@ -2437,8 +2569,8 @@ describe('SecurityTokenWrapper', () => {
 
       // === Start CappedSTO test ===
       const cappedParams = {
-        startTime: new Date(2019, 1),
-        endTime: new Date(2020, 1),
+        startTime: new Date(2030, 1),
+        endTime: new Date(2031, 1),
         cap: new BigNumber(1),
         rate: new BigNumber(1),
         fundRaiseTypes: [FundRaiseType.ETH],
@@ -2506,8 +2638,8 @@ describe('SecurityTokenWrapper', () => {
       // === End CappedSTO test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
@@ -2515,6 +2647,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for USDTieredSTO', async () => {
@@ -2544,9 +2693,56 @@ describe('SecurityTokenWrapper', () => {
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
       when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
-        stringToBytes32('CountTransferManager'),
+        stringToBytes32('USDTieredSTO'),
         '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
@@ -2558,11 +2754,11 @@ describe('SecurityTokenWrapper', () => {
 
       // === Start USDTieredSTO test ===
       const usdTieredStoParams = {
-        startTime: new Date(2019, 1),
-        endTime: new Date(2020, 1),
-        ratePerTier: [new BigNumber(1), new BigNumber(2)],
-        ratePerTierDiscountPoly: [new BigNumber(10), new BigNumber(20)],
-        tokensPerTierTotal: [new BigNumber(1), new BigNumber(2)],
+        startTime: new Date(2030, 1),
+        endTime: new Date(2031, 1),
+        ratePerTier: [new BigNumber(10), new BigNumber(20)],
+        ratePerTierDiscountPoly: [new BigNumber(1), new BigNumber(2)],
+        tokensPerTierTotal: [new BigNumber(100), new BigNumber(200)],
         tokensPerTierDiscountPoly: [new BigNumber(1), new BigNumber(2)],
         nonAccreditedLimitUSD: new BigNumber(1),
         minimumInvestmentUSD: new BigNumber(1),
@@ -2653,8 +2849,8 @@ describe('SecurityTokenWrapper', () => {
       // === End USDTieredSTO test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
@@ -2662,6 +2858,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
@@ -2691,9 +2904,56 @@ describe('SecurityTokenWrapper', () => {
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
       when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
-        stringToBytes32('CountTransferManager'),
+        stringToBytes32('ERC20DividendCheckpoint'),
         '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
@@ -2757,8 +3017,8 @@ describe('SecurityTokenWrapper', () => {
       // === End ERC20DividendCheckpoint test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
@@ -2766,6 +3026,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for EtherDividendCheckpoint', async () => {
@@ -2795,9 +3072,56 @@ describe('SecurityTokenWrapper', () => {
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
       when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
 
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
-        stringToBytes32('CountTransferManager'),
+        stringToBytes32('EtherDividendCheckpoint'),
         '0x0000000000000000000000000000000000000000',
         '0x5555555555555555555555555555555555555555',
         false,
@@ -2861,8 +3185,8 @@ describe('SecurityTokenWrapper', () => {
       // === End EtherDividendCheckpoint test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
@@ -2870,6 +3194,23 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedBalanceMethod.callAsync(OWNER)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
     });
   });
 

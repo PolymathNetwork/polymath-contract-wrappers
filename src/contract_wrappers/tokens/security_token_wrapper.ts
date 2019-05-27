@@ -1278,7 +1278,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       [data.ratePerTier, data.tokensPerTierTotal, data.ratePerTierDiscountPoly, data.tokensPerTierDiscountPoly],
       'Tier data length mismatch',
     );
-    for (let i = 0; i < data.ratePerTier.length; i + 1) {
+    for (let i = 0; i < data.ratePerTier.length; i += 1) {
       assert.isBigNumberGreaterThanZero(data.ratePerTier[i], 'Rate per tier should be greater than 0');
       assert.isBigNumberGreaterThanZero(data.tokensPerTierTotal[i], 'Invalid token amount');
       assert.assert(
