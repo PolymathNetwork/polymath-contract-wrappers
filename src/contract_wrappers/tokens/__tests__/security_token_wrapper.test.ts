@@ -1,10 +1,9 @@
 // SecurityTokenWrapper test
-import { instance, mock, reset, verify, when, objectContaining, anything } from 'ts-mockito';
+import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
 import {
-  SecurityToken,
   CountTransferManager,
   ERC20DividendCheckpoint,
   CappedSTO,
@@ -2180,7 +2179,36 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
       when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
 
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
       when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
@@ -2248,8 +2276,8 @@ describe('SecurityTokenWrapper', () => {
       // === End CountTransferManager test ===
 
       verify(mockedContract.addModule).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
