@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
+import { bytes32ToString } from '../../utils/convert';
 
 /**
  * @param spender The address which will spend the funds
@@ -163,6 +164,21 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
       const symbol = await contract.symbol.callAsync();
       const name = await contract.name.callAsync();
       if (symbol === '' || name === '' || totalSupply.isZero()) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async isValidAlternativeContract() {
+    try {
+      const contract = await this.contract;
+      const totalSupply = await contract.totalSupply.callAsync();
+      const symbol = await contract.symbol.callAsync();
+      const name = await contract.name.callAsync();
+      if (bytes32ToString(symbol) === '' || bytes32ToString(name) === '' || totalSupply.isZero()) {
         return false;
       }
       return true;

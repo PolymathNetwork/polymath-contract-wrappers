@@ -118,9 +118,9 @@ export default class ContractFactory {
     return new DetailedERC20Contract(DetailedERC20.abi, address, this.provider, this.contractDefaults);
   }
 
-  public async getAlternativeERC20Contract(address: string): Promise<AlternativeERC20Contract> {
+  public async getAlternativeERC20Contract(address: string): Promise<DetailedERC20Contract> {
     assert.isETHAddressHex('address', address);
-    return new AlternativeERC20Contract(AlternativeERC20.abi, address, this.provider, this.contractDefaults);
+    return new DetailedERC20Contract(AlternativeERC20.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {

@@ -1,7 +1,11 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { AlternativeERC20Contract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  AlternativeERC20Contract,
+  DetailedERC20Contract,
+  SecurityTokenRegistryEvents,
+} from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import AlternativeERC20TokenWrapper from '../alternative_erc20_wrapper';
 import { MockedCallMethod } from '../../../test_utils/mocked_methods';
@@ -11,11 +15,11 @@ describe('AlternativeERC20TokenWrapper', () => {
   // Declare AlternativeERC20TokenWrapper object
   let target: AlternativeERC20TokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: AlternativeERC20Contract;
+  let mockedContract: DetailedERC20Contract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(AlternativeERC20Contract);
+    mockedContract = mock(DetailedERC20Contract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new AlternativeERC20TokenWrapper(instance(mockedWrapper), myContractPromise);
