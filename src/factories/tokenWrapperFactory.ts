@@ -3,6 +3,7 @@ import SecurityTokenRegistryWrapper from '../contract_wrappers/registries/securi
 import SecurityTokenWrapper from '../contract_wrappers/tokens/security_token_wrapper';
 import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
 import DetailedERC20TokenWrapper from '../contract_wrappers/tokens/detailed_erc20_wrapper';
+import AlternativeERC20TokenWrapper from '../contract_wrappers/tokens/alternative_erc20_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 
@@ -48,6 +49,14 @@ export default class TokenWrapperFactory {
     if (await token.isValidContract()) {
       return token;
     }
+    const alternartiveToken = new AlternativeERC20TokenWrapper(
+      this.web3Wrapper,
+      this.contractFactory.getAlternativeERC20Contract(address),
+    );
+    if (await alternartiveToken.isValidContract()) {
+      return alternartiveToken;
+    }
+
     // TODO: Replace this for a typed Error
     throw new Error();
   };

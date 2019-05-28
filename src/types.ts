@@ -7,6 +7,8 @@ import {
   CappedSTOEventArgs,
   DetailedERC20EventArgs,
   DetailedERC20Events,
+  AlternativeERC20EventArgs,
+  AlternativeERC20Events,
   ERC20DividendCheckpointEventArgs,
   EtherDividendCheckpointEventArgs,
   FeatureRegistryEventArgs,
@@ -161,6 +163,7 @@ export type ContractEventArgs =
   | CappedSTOFactoryEventArgs
   | CappedSTOEventArgs
   | DetailedERC20EventArgs
+  | AlternativeERC20EventArgs
   | ERC20DividendCheckpointEventArgs
   | EtherDividendCheckpointEventArgs
   | FeatureRegistryEventArgs
@@ -185,6 +188,7 @@ export type ContractEvents =
   | CappedSTOFactoryEvents
   | CappedSTOEvents
   | DetailedERC20Events
+  | AlternativeERC20Events
   | ERC20DividendCheckpointEvents
   | EtherDividendCheckpointEvents
   | FeatureRegistryEvents

@@ -455,10 +455,10 @@
     "@ledgerhq/errors" "^4.54.0"
     events "^3.0.0"
 
-"@polymathnetwork/abi-wrappers@2.1.0-beta.12":
-  version "2.1.0-beta.12"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.12.tgz#009b7c44ea98ba675c6ad84b9bc4b98a7f1401bd"
-  integrity sha512-BdmJ8T3i4rzwTrUocqRxwLkWd+JjR9RT20LEueGHH6bcR9PJPv/9d2heB5nP6PDvtzRfoW5SR5/1rteBpF/JOA==
+"@polymathnetwork/abi-wrappers@^2.1.0-beta.13":
+  version "2.1.0-beta.13"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-2.1.0-beta.13.tgz#fde454b43aae1085a008c22a2ca74772bc8c41b4"
+  integrity sha512-ouvGy1KOfMuGJ/PdlH6DQbTRw9jfjljOIgSrI1FXtrO1tZrHJ6HY+F1380fxOef1ku+1rKpyw4lz14f8mVGrnA==
   dependencies:
     "@0x/base-contract" "^5.0.5"
     "@0x/utils" "^4.3.1"
@@ -468,10 +468,10 @@
     lodash "^4.17.11"
     typescript "3.2.2"
 
-"@polymathnetwork/contract-artifacts@2.1.0-beta.8":
-  version "2.1.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/contract-artifacts/-/contract-artifacts-2.1.0-beta.8.tgz#90bd9bb90fdbc471b476a5774efa94f2f6857f55"
-  integrity sha512-+wT99FV9AUpdDMRhX96ixgHIr6AWu9VH6+TjOQC3UsLdJhDFfRhkVFon1QmhcFx5T41lssKa6+shok6isNV4AA==
+"@polymathnetwork/contract-artifacts@^2.1.0-beta.10":
+  version "2.1.0-beta.10"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/contract-artifacts/-/contract-artifacts-2.1.0-beta.10.tgz#014164a9c675feec761fc67dc9c57a1170638ae9"
+  integrity sha512-3vd92ZLGX3Jau9ltcbMLUzjDu1NGqXBPYqC3MiCaypT7/+AtC7bdnLeYBzs8UIjo7vgMRBuwjkde/rXQc2G3VA==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
