@@ -1,29 +1,29 @@
-// CountTransferManager test
+// GeneralTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CountTransferManagerContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { GeneralTransferManagerContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import CountTransferManagerWrapper from '../count_transfer_manager_wrapper';
+import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { numberToBigNumber } from '../../../../utils/convert';
+import { dateToBigNumber } from '../../../../utils/convert';
 
-describe('CountTransferManagerWrapper', () => {
-  let target: CountTransferManagerWrapper;
+describe('GeneralTransferManagerWrapper', () => {
+  let target: GeneralTransferManagerWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: CountTransferManagerContract;
+  let mockedContract: GeneralTransferManagerContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(CountTransferManagerContract);
+    mockedContract = mock(GeneralTransferManagerContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new CountTransferManagerWrapper(
+    target = new GeneralTransferManagerWrapper(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -190,23 +190,23 @@ describe('CountTransferManagerWrapper', () => {
     });
   });
 
-  describe('MaxHolderCount', () => {
-    test('should get maxHolderCount', async () => {
+  describe('AllowAllBurnTransfers', () => {
+    test('should allowAllBurnTransfers', async () => {
       // Address expected
-      const expectedResult = new BigNumber(1);
+      const expectedResult = true;
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.maxHolderCount).thenReturn(instance(mockedMethod));
+      when(mockedContract.allowAllBurnTransfers).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.maxHolderCount();
+      const result = await target.allowAllBurnTransfers();
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.maxHolderCount).once();
+      verify(mockedContract.allowAllBurnTransfers).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
@@ -261,13 +261,13 @@ describe('CountTransferManagerWrapper', () => {
     });
   });
 
-  describe('Change Holder Count', () => {
-    test('should change holder count', async () => {
+  describe('Change Defaults', () => {
+    test('should change defaults', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      
+
       // Setup get Security Token Address
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
@@ -283,7 +283,8 @@ describe('CountTransferManagerWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const mockedParams = {
-        maxHolderCount: 20,
+        defaultFromTime: new Date(2030, 1),
+        defaultToTime: new Date(2031, 1),
         txData: {},
         safetyFactor: 10,
       };
@@ -291,26 +292,28 @@ describe('CountTransferManagerWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.changeHolderCount).thenReturn(instance(mockedMethod));
+      when(mockedContract.changeDefaults).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.maxHolderCount)),
+          objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
+          objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.changeHolderCount(mockedParams);
+      const result = await target.changeDefaults(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.changeHolderCount).once();
+      verify(mockedContract.changeDefaults).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.maxHolderCount)),
+          objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
+          objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -336,7 +339,9 @@ describe('CountTransferManagerWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'ModifyHolderCount', 'Pause', 'Unpause', encountered: Transfer`),
+        new Error(
+          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'AllowAllTransfers', 'AllowAllWhitelistTransfers', 'AllowAllWhitelistIssuances', 'AllowAllBurnTransfers', 'ChangeSigningAddress', 'ChangeDefaults', 'ModifyWhitelist', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
       );
     });
   });
