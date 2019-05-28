@@ -73,8 +73,8 @@ describe('AlternativeERC20TokenWrapper', () => {
     });
   });
 
-  describe('isValidAlternativeContract', () => {
-    test('should call to isValidAlternativeContract', async () => {
+  describe('isValidContract', () => {
+    test('should call to isValidContract', async () => {
       const expectedBNResult = new BigNumber(1);
       const expectedStringResult = stringToBytes32('string');
 
@@ -91,7 +91,7 @@ describe('AlternativeERC20TokenWrapper', () => {
       when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
 
       const expectedIsValidResult = false;
-      const result = await target.isValidAlternativeContract();
+      const result = await target.isValidContract();
       expect(result).toBe(expectedIsValidResult);
 
       verify(mockedContract.totalSupply).once();

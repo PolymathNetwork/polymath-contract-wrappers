@@ -53,7 +53,7 @@ export default class TokenWrapperFactory {
       this.web3Wrapper,
       this.contractFactory.getAlternativeERC20Contract(address),
     );
-    if (await alternartiveToken.isValidAlternativeContract()) {
+    if (await alternartiveToken.isValidContract()) {
       return alternartiveToken;
     }
 
