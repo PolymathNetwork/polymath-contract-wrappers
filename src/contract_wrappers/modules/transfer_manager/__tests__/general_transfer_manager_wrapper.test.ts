@@ -7,7 +7,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { dateToBigNumber } from '../../../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../../utils/convert';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
@@ -190,6 +190,27 @@ describe('GeneralTransferManagerWrapper', () => {
     });
   });
 
+  describe('AllowAllWhitelistTransfers', () => {
+    test('should allowAllWhitelistTransfers', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowAllWhitelistTransfers).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.allowAllWhitelistTransfers();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.allowAllWhitelistTransfers).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('AllowAllBurnTransfers', () => {
     test('should allowAllBurnTransfers', async () => {
       // Address expected
@@ -208,6 +229,58 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.allowAllBurnTransfers).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Investors', () => {
+    test('should get investors', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      const investorIndex = 3;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.investors).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(investorIndex)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.investors({ investorIndex });
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.investors).once();
+
+      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(investorIndex)))).once();
+    });
+  });
+
+  describe('Whitelist', () => {
+    test('should get whitelist', async () => {
+      // Address expected
+      const expectedResult = [new BigNumber(10), new BigNumber(15), new BigNumber(20), new BigNumber(1)];
+      const investorAddress = '0x3333333333333333333333333333333333333333';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.whitelist).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(investorAddress)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.whitelist({ investorAddress });
+      // Result expectation
+      expect(result.canSendAfter).toEqual(bigNumberToDate(expectedResult[0]));
+      expect(result.canReceiveAfter).toEqual(bigNumberToDate(expectedResult[1]));
+      expect(result.expiryTime).toEqual(bigNumberToDate(expectedResult[2]));
+      expect(result.canBuyFromSTO).toBe(expectedResult[3].toNumber() === 1);
+
+      // Verifications
+      verify(mockedContract.whitelist).once();
+      verify(mockedMethod.callAsync(investorAddress)).once();
     });
   });
 
