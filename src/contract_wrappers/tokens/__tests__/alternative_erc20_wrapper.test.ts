@@ -1,11 +1,8 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {
-  AlternativeERC20Contract,
-  DetailedERC20Contract,
-  SecurityTokenRegistryEvents,
-} from '@polymathnetwork/abi-wrappers';
+import { DetailedERC20Contract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber } from '@0x/utils';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import AlternativeERC20TokenWrapper from '../alternative_erc20_wrapper';
 import { MockedCallMethod } from '../../../test_utils/mocked_methods';
@@ -73,6 +70,33 @@ describe('AlternativeERC20TokenWrapper', () => {
       // Verifications
       verify(mockedContract.symbol).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('isValidAlternativeContract', () => {
+    test('should call to isValidAlternativeContract', async () => {
+      const expectedBNResult = new BigNumber(1);
+      const expectedStringResult = stringToBytes32('string');
+
+      const mockedTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedContract.totalSupply).thenReturn(instance(mockedTotalSupplyMethod));
+      when(mockedTotalSupplyMethod.callAsync()).thenResolve(expectedBNResult);
+
+      const mockedSymbolMethod = mock(MockedCallMethod);
+      when(mockedContract.symbol).thenReturn(instance(mockedSymbolMethod));
+      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
+
+      const mockedNameMethod = mock(MockedCallMethod);
+      when(mockedContract.name).thenReturn(instance(mockedNameMethod));
+      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
+
+      const expectedIsValidResult = false;
+      const result = await target.isValidAlternativeContract();
+      expect(result).toBe(expectedIsValidResult);
+
+      verify(mockedContract.totalSupply).once();
+      verify(mockedContract.symbol).once();
+      verify(mockedContract.name).once();
     });
   });
 

@@ -5,7 +5,6 @@ import {
   ModuleFactoryContract,
   EtherDividendCheckpointContract,
   DetailedERC20Contract,
-  AlternativeERC20Contract,
   SecurityTokenContract,
   PolyTokenContract,
   GeneralPermissionManagerContract,

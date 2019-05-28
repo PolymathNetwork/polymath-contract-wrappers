@@ -190,33 +190,6 @@ describe('ERC20TokenWrapper', () => {
     });
   });
 
-  describe('isValidAlternativeContract', () => {
-    test('should call to isValidAlternativeContract', async () => {
-      const expectedBNResult = new BigNumber(1);
-      const expectedStringResult = stringToBytes32('string');
-
-      const mockedTotalSupplyMethod = mock(MockedCallMethod);
-      when(mockedContract.totalSupply).thenReturn(instance(mockedTotalSupplyMethod));
-      when(mockedTotalSupplyMethod.callAsync()).thenResolve(expectedBNResult);
-
-      const mockedSymbolMethod = mock(MockedCallMethod);
-      when(mockedContract.symbol).thenReturn(instance(mockedSymbolMethod));
-      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
-
-      const mockedNameMethod = mock(MockedCallMethod);
-      when(mockedContract.name).thenReturn(instance(mockedNameMethod));
-      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
-
-      const expectedIsValidResult = false;
-      const result = await target.isValidAlternativeContract();
-      expect(result).toBe(expectedIsValidResult);
-
-      verify(mockedContract.totalSupply).once();
-      verify(mockedContract.symbol).once();
-      verify(mockedContract.name).once();
-    });
-  });
-
   describe('approve', () => {
     test.todo('should fail as spender is not an Eth address');
     test('should send the transaction to approve', async () => {

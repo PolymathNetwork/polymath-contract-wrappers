@@ -39,4 +39,19 @@ export default class AlternativeERC20TokenWrapper extends DetailedERC20Wrapper {
     const symbol = (await this.contract).symbol.callAsync();
     return bytes32ToString(await symbol);
   };
+
+  public async isValidAlternativeContract() {
+    try {
+      const contract = await this.contract;
+      const totalSupply = await contract.totalSupply.callAsync();
+      const symbol = await contract.symbol.callAsync();
+      const name = await contract.name.callAsync();
+      if (bytes32ToString(symbol) === '' || bytes32ToString(name) === '' || totalSupply.isZero()) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

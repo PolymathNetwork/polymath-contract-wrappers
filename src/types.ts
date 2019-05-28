@@ -49,7 +49,6 @@ import {
   STOEvents,
   STOEventArgs,
   DetailedERC20Contract,
-  AlternativeERC20Contract,
   PolyTokenContract,
   SecurityTokenContract,
   EtherDividendCheckpointContract,
@@ -244,12 +243,7 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract =
-  | DetailedERC20Contract
-  | SecurityTokenContract
-  | PolyTokenContract
-  | PolyTokenFaucetContract
-  | AlternativeERC20Contract;
+export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract
