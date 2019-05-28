@@ -9,8 +9,8 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import { numberToBigNumber } from '../../../../utils/convert';
 
-describe('STOWrapper', () => {
-  // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
+describe('CountTransferManager', () => {
+  // CountTransferManager is used as contract target here as STOWrapper is abstract
   let target: CountTransferManagerWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CountTransferManagerContract;
