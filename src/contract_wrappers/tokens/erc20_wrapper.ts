@@ -159,10 +159,12 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   public async isValidContract() {
     try {
       const contract = await this.contract;
-      await contract.totalSupply.callAsync();
-      await contract.balanceOf.callAsync(contract.address);
-      await contract.allowance.callAsync(contract.address, contract.address);
-      await contract.symbol.callAsync();
+      const totalSupply = await contract.totalSupply.callAsync();
+      const symbol = await contract.symbol.callAsync();
+      const name = await contract.name.callAsync();
+      if (symbol === '' || name === '' || totalSupply.isZero()) {
+        return false;
+      }
       return true;
     } catch (error) {
       return false;

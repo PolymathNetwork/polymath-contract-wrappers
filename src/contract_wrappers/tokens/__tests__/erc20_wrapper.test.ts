@@ -3,6 +3,7 @@ import { BigNumber } from '@0x/utils';
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
+import { stringToBytes32 } from '../../../utils/convert';
 import ContractWrapper from '../../contract_wrapper';
 import DetailedERC20Wrapper from '../detailed_erc20_wrapper';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
@@ -171,25 +172,12 @@ describe('ERC20TokenWrapper', () => {
       when(mockedContract.totalSupply).thenReturn(instance(mockedTotalSupplyMethod));
       when(mockedTotalSupplyMethod.callAsync()).thenResolve(expectedBNResult);
 
-      const balanceOfParams = {
-        owner: '0x1111111111111111111111111111111111111111',
-      };
-      const mockedBalanceOfMethod = mock(MockedCallMethod);
-      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceOfMethod));
-      when(mockedBalanceOfMethod.callAsync(balanceOfParams.owner)).thenResolve(expectedBNResult);
-
-      const allowanceParams = {
-        owner: '0x1111111111111111111111111111111111111111',
-        spender: '0x2222222222222222222222222222222222222222',
-      };
-      const mockedAllowanceMethod = mock(MockedCallMethod);
-      when(mockedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
-      when(mockedAllowanceMethod.callAsync(allowanceParams.owner, allowanceParams.spender)).thenResolve(
-        expectedBNResult,
-      );
-
       const mockedSymbolMethod = mock(MockedCallMethod);
       when(mockedContract.symbol).thenReturn(instance(mockedSymbolMethod));
+      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
+
+      const mockedNameMethod = mock(MockedCallMethod);
+      when(mockedContract.name).thenReturn(instance(mockedNameMethod));
       when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
 
       const expectedIsValidResult = true;
@@ -197,9 +185,8 @@ describe('ERC20TokenWrapper', () => {
       expect(result).toBe(expectedIsValidResult);
 
       verify(mockedContract.totalSupply).once();
-      verify(mockedContract.balanceOf).once();
-      verify(mockedContract.allowance).once();
       verify(mockedContract.symbol).once();
+      verify(mockedContract.name).once();
     });
   });
 
