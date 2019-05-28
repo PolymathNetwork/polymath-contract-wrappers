@@ -5,6 +5,7 @@ import {
   ModuleFactoryContract,
   EtherDividendCheckpointContract,
   DetailedERC20Contract,
+  AlternativeERC20Contract,
   SecurityTokenContract,
   PolyTokenContract,
   GeneralPermissionManagerContract,
@@ -29,6 +30,7 @@ import {
   ModuleFactory,
   EtherDividendCheckpoint,
   DetailedERC20,
+  AlternativeERC20,
   SecurityToken,
   PolyToken,
   GeneralPermissionManager,
@@ -114,6 +116,11 @@ export default class ContractFactory {
   public async getDetailedERC20Contract(address: string): Promise<DetailedERC20Contract> {
     assert.isETHAddressHex('address', address);
     return new DetailedERC20Contract(DetailedERC20.abi, address, this.provider, this.contractDefaults);
+  }
+
+  public async getAlternativeERC20Contract(address: string): Promise<AlternativeERC20Contract> {
+    assert.isETHAddressHex('address', address);
+    return new AlternativeERC20Contract(AlternativeERC20.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {
