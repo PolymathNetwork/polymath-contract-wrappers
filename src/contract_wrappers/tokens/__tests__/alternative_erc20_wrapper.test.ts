@@ -99,21 +99,4 @@ describe('AlternativeERC20TokenWrapper', () => {
       verify(mockedContract.name).once();
     });
   });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'Approval', 'Transfer', encountered: ChangeExpiryLimit`),
-      );
-    });
-  });
 });
