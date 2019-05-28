@@ -25,6 +25,7 @@ import {
   FeatureRegistryContract,
   ModuleFactoryContract,
   PolyTokenContract,
+  ModuleRegistryContract,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -568,6 +569,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return this.contractFactory.getPolyTokenContract();
   };
 
+  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract> => {
+    return this.contractFactory.getModuleRegistryContract();
+  };
+
   /**
    * Instantiate SecurityTokenWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -1002,6 +1007,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
+    await this.checkUseModuleVerified(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1017,6 +1023,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.cappedSTO:
+        await this.cappedSTOAssertions(params.data as CappedSTOData);
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
@@ -1028,6 +1035,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.usdTieredSTO:
+        await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
@@ -1053,10 +1061,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ]);
         break;
       case ModuleName.erc20DividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.etherDividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
@@ -1205,5 +1215,80 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
     assert.assert((await this.controller()) === (await this.getCallerAddress(txData)), 'Msg sender must be controller');
+  };
+
+  private checkUseModuleVerified = async (address: string) => {
+    if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+      const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
+      assert.assert(
+        (await this.checkForRegisteredModule(address)) || isOwner,
+        'ModuleFactory must be verified or SecurityToken owner must be ModuleFactory owner',
+      );
+    } else {
+      assert.assert(await this.checkForRegisteredModule(address), 'ModuleFactory must be verified');
+    }
+    assert.assert(await this.isCompatibleModule(address), 'Version should within the compatible range of ST');
+  };
+
+  private checkForRegisteredModule = async (moduleAddress: string) => {
+    const moduleRegistry = await this.moduleRegistryContract();
+    const allModulesTypes = [
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.PermissionManager),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.STO),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.Burn),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.Dividends),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.TransferManager),
+    ];
+    const allModules = await Promise.all(
+      allModulesTypes.map(myPromise => {
+        return myPromise.includes(moduleAddress);
+      }),
+    );
+    return allModules.includes(true);
+  };
+
+  private isCompatibleModule = async (address: string) => {
+    const versions = await this.getVersion();
+    const upperSTVersionBounds = await (await this.moduleFactoryContract(address)).getUpperSTVersionBounds.callAsync();
+    const lowerSTVersionBounds = await (await this.moduleFactoryContract(address)).getLowerSTVersionBounds.callAsync();
+    let isCompatible = true;
+    for (let i = 0; i < 3; i += 1) {
+      isCompatible =
+        isCompatible &&
+        lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i]) &&
+        upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]);
+    }
+    return isCompatible;
+  };
+
+  private cappedSTOAssertions = async (data: CappedSTOData) => {
+    assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
+    assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
+    assert.isFutureDate(data.startTime, 'Start time date not valid');
+    assert.assert(data.endTime > data.startTime, 'End time not valid');
+    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
+    assert.assert(data.fundRaiseTypes.length === 1, 'It only selects single fund raise type');
+  };
+
+  private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
+    assert.isFutureDate(data.startTime, 'Start time date not valid');
+    assert.assert(data.endTime > data.startTime, 'End time not valid');
+    assert.assert(data.tokensPerTierTotal.length > 0, 'No tiers provided');
+    assert.areValidArrayLengths(
+      [data.ratePerTier, data.tokensPerTierTotal, data.ratePerTierDiscountPoly, data.tokensPerTierDiscountPoly],
+      'Tier data length mismatch',
+    );
+    for (let i = 0; i < data.ratePerTier.length; i += 1) {
+      assert.isBigNumberGreaterThanZero(data.ratePerTier[i], 'Rate per tier should be greater than 0');
+      assert.isBigNumberGreaterThanZero(data.tokensPerTierTotal[i], 'Invalid token amount');
+      assert.assert(
+        data.tokensPerTierDiscountPoly[i].isLessThanOrEqualTo(data.tokensPerTierTotal[i]),
+        'Too many discounted tokens',
+      );
+      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), 'Invalid discount');
+    }
+    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, 'Raise type is not specified');
+    assert.isNonZeroETHAddressHex('Wallet', data.wallet);
+    assert.isNonZeroETHAddressHex('ReserveWallet', data.reserveWallet);
   };
 }
