@@ -320,7 +320,7 @@ describe('GeneralTransferManagerWrapper', () => {
   });
 
   describe('AllowAllTransfers', () => {
-    test('should allowAllTransfers', async () => {
+    test('should get allowAllTransfers', async () => {
       // Address expected
       const expectedResult = true;
       // Mocked method
@@ -1161,6 +1161,109 @@ describe('GeneralTransferManagerWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.nonceMap).once();
       verify(mockedNonceMapMethod.callAsync(investor, objectContaining(numberToBigNumber(nonce)))).once();
+    });
+  });
+
+  describe('Get Investors', () => {
+    test('should getInvestors', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x3333333333333333333333333333333333333333',
+        '0x5555555555555555555555555555553333333355',
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInvestors).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInvestors();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getInvestors).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Get All Investors Data', () => {
+    test('should get all investors data', async () => {
+      // Address expected
+      const expectedResult = [
+        [
+          '0x3333333333333333333333333333333333333333',
+          '0x5555555555555555555555555555555555555555',
+          '0x6666666666666666666666666666666666666666',
+        ],
+        [new BigNumber(100), new BigNumber(101), new BigNumber(102)],
+        [new BigNumber(103), new BigNumber(104), new BigNumber(105)],
+        [new BigNumber(106), new BigNumber(107), new BigNumber(108)],
+        [false, false, true],
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllInvestorsData).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllInvestorsData();
+
+      for (let i = 0; i < 3; i += 1) {
+        expect(result[i].investor).toEqual(expectedResult[0][i]);
+        expect(dateToBigNumber(result[i].timeRestriction.canSendAfter)).toEqual(expectedResult[1][i]);
+        expect(dateToBigNumber(result[i].timeRestriction.canReceiveAfter)).toEqual(expectedResult[2][i]);
+        expect(dateToBigNumber(result[i].timeRestriction.expiryTime)).toEqual(expectedResult[3][i]);
+        expect(result[i].timeRestriction.canBuyFromSTO).toEqual(expectedResult[4][i]);
+      }
+
+      // Verifications
+      verify(mockedContract.getAllInvestorsData).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Get Investors Data', () => {
+    test('should get investors data', async () => {
+      const params = {
+        investors: [
+          '0x3333333333333333333333333333333333333333',
+          '0x5555555555555555555555555555555555555555',
+          '0x6666666666666666666666666666666666666666',
+        ],
+      };
+      // Address expected
+      const expectedResult = [
+        [new BigNumber(100), new BigNumber(101), new BigNumber(102)],
+        [new BigNumber(103), new BigNumber(104), new BigNumber(105)],
+        [new BigNumber(106), new BigNumber(107), new BigNumber(108)],
+        [false, false, true],
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInvestorsData).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.investors)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInvestorsData( params );
+
+      console.log(expectedResult);
+      for (let i = 0; i < 3; i += 1) {
+        expect(result[i].investor).toEqual(params.investors[i]);
+        expect(dateToBigNumber(result[i].timeRestriction.canSendAfter)).toEqual(expectedResult[0][i]);
+        expect(dateToBigNumber(result[i].timeRestriction.canReceiveAfter)).toEqual(expectedResult[1][i]);
+        expect(dateToBigNumber(result[i].timeRestriction.expiryTime)).toEqual(expectedResult[2][i]);
+        expect(result[i].timeRestriction.canBuyFromSTO).toEqual(expectedResult[3][i]);
+      }
+
+      // Verifications
+      verify(mockedContract.getInvestorsData).once();
+      verify(mockedMethod.callAsync(params.investors)).once();
     });
   });
 
