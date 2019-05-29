@@ -7,7 +7,12 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../../utils/convert';
+import {
+  bigNumberToDate,
+  dateArrayToBigNumberArray,
+  dateToBigNumber,
+  numberToBigNumber,
+} from '../../../../utils/convert';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
@@ -955,11 +960,11 @@ describe('GeneralTransferManagerWrapper', () => {
       verify(mockedContract.modifyWhitelist).once();
       verify(
         mockedMethod.sendTransactionAsync(
-            mockedParams.investor,
-            objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
-            objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
-            objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-            mockedParams.canBuyFromSTO,
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          mockedParams.canBuyFromSTO,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -970,6 +975,192 @@ describe('GeneralTransferManagerWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('Modify WhitelistMulti', () => {
+    test('should modifyWhitelistMulti', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        investors: [
+          '0x9999999999999999999999999999999999999999',
+          '0x4444444444444444444444444444444444444444',
+          '0x0123456789012345678901234567890123456789',
+        ],
+        canSendAfters: [new Date(2030, 1), new Date(2030, 2), new Date(2030, 3)],
+        canReceiveAfters: [new Date(2031, 1), new Date(2031, 2), new Date(2031, 3)],
+        expiryTimes: [new Date(2032, 1), new Date(2032, 2), new Date(2032, 3)],
+        canBuyFromSTO: [true, false, true],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyWhitelistMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.canSendAfters)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.canReceiveAfters)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
+          mockedParams.canBuyFromSTO,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyWhitelistMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyWhitelistMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.canSendAfters)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.canReceiveAfters)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
+          mockedParams.canBuyFromSTO,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('Modify WhitelistSigned', () => {
+    test('should modifyWhitelistSigned', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const investor = '0x5555555555555555555555555555555555555555';
+      const nonce = 4;
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedNonceMapResult = false;
+      // Mocked method
+      const mockedNonceMapMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.nonceMap).thenReturn(instance(mockedNonceMapMethod));
+      // Stub the request
+      when(mockedNonceMapMethod.callAsync(investor, objectContaining(numberToBigNumber(nonce)))).thenResolve(
+        expectedNonceMapResult,
+      );
+
+      const mockedParams = {
+        investor,
+        canSendAfter: new Date(2030, 1),
+        canReceiveAfter: new Date(2031, 1),
+        expiryTime: new Date(2032, 1),
+        canBuyFromSTO: true,
+        validFrom: new Date(2019, 1),
+        validTo: new Date(2033, 1),
+        nonce,
+        v: new BigNumber(100),
+        r: 'R',
+        s: 'S',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyWhitelistSigned).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          mockedParams.canBuyFromSTO,
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.v,
+          mockedParams.r,
+          mockedParams.s,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyWhitelistSigned(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyWhitelistSigned).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          mockedParams.canBuyFromSTO,
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.v,
+          mockedParams.r,
+          mockedParams.s,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.nonceMap).once();
+      verify(mockedNonceMapMethod.callAsync(investor, objectContaining(numberToBigNumber(nonce)))).once();
     });
   });
 
