@@ -284,6 +284,141 @@ describe('GeneralTransferManagerWrapper', () => {
     });
   });
 
+  describe('Nonce Map', () => {
+    test('should get nonceMap', async () => {
+      // Address expected
+      const expectedResult = true;
+      const mockedParams = {
+        address: '0x3333333333333333333333333333333333333333',
+        nonce: 3,
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.nonceMap).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.nonceMap(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.nonceMap).once();
+      verify(mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce)))).once();
+    });
+  });
+
+  describe('AllowAllTransfers', () => {
+    test('should allowAllTransfers', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowAllTransfers).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.allowAllTransfers();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.allowAllTransfers).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('SigningAddress', () => {
+    test('should get signingAddress', async () => {
+      // Address expected
+      const expectedResult = '0x0000000000000000000000000000000000000000';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.signingAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.signingAddress();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.signingAddress).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('IssuanceAddress', () => {
+    test('should get issuanceAddress', async () => {
+      // Address expected
+      const expectedResult = '0x1111111111111111111111111111111111111111';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.issuanceAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.issuanceAddress();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.issuanceAddress).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('AllowAllWhitelistIssuances', () => {
+    test('should allowAllWhitelistIssuances', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.allowAllWhitelistIssuances).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.allowAllWhitelistIssuances();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.allowAllWhitelistIssuances).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Defaults', () => {
+    test('should get defaults', async () => {
+      // Address expected
+      const expectedResult = [
+          new BigNumber(100),
+          new BigNumber(101),
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.defaults).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.defaults();
+      // Result expectation
+      expect(result.canSendAfter).toEqual(bigNumberToDate(expectedResult[0]));
+      expect(result.canReceiveAfter).toEqual(bigNumberToDate(expectedResult[1]));
+      // Verifications
+      verify(mockedContract.defaults).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('VerifyTransfer', () => {
     test('should verify Transfer', async () => {
       const mockedParams = {
