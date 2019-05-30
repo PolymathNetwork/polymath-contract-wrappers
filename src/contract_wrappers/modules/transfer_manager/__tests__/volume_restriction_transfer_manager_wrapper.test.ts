@@ -1307,5 +1307,29 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedContract.defaultRestriction).once();
       verify(mockedRestrictionMethod.callAsync()).once();
     });
+    });
+
+  describe('getExemptAddress', () => {
+    test('should getExemptAddress', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getExemptAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getExemptAddress();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getExemptAddress).once();
+      verify(mockedMethod.callAsync()).once();
+    });
   });
 });
