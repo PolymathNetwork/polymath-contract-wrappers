@@ -1,4 +1,4 @@
-// ManualTransferManager test
+// ManualApprovalTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -13,8 +13,6 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
   bigNumberToDate,
-  dateArrayToBigNumberArray,
-  dateToBigNumber,
   numberToBigNumber,
 } from '../../../../utils/convert';
 
@@ -196,6 +194,62 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('Approvals', () => {
+    test('should get approvals', async () => {
+      const expiryTime = new BigNumber(1893499200);
+      // Address expected
+      const expectedResult = [
+        '0x4444444444444444444444444444444444444444',
+        '0x2222222222222222222222222222222222222222',
+        new BigNumber(10),
+        expiryTime,
+        'description',
+      ];
+      const params = {
+        index: 3,
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.approvals).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.index)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.approvals(params);
+      // Result expectation
+      expect(result.from).toEqual(expectedResult[0]);
+      expect(result.to).toEqual(expectedResult[1]);
+      expect(result.allowance).toEqual(expectedResult[2]);
+      expect(result.expiryTime).toEqual(bigNumberToDate(expiryTime));
+      expect(result.description).toEqual((expectedResult[4]));
+      // Verifications
+      verify(mockedContract.approvals).once();
+      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.index)))).once();
+    });
+  });
+
+  describe('GetInitFunction', () => {
+    test('should get init function', async () => {
+      // Address expected
+      const expectedResult = 'ZERO';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInitFunction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInitFunction();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getInitFunction).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
