@@ -12,7 +12,8 @@ import VolumeRestrictionTransferManagerWrapper from '../volume_restriction_trans
 import {
   bigNumberToDate,
   numberToBigNumber,
-  dateToBigNumber, dateArrayToBigNumberArray,
+  dateToBigNumber,
+  dateArrayToBigNumberArray,
 } from '../../../../utils/convert';
 
 describe('VolumeRestrictionTransferManagerWrapper', () => {
@@ -622,7 +623,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     });
   });
 
-   describe('addIndividualDailyRestrictionMulti', () => {
+  describe('addIndividualDailyRestrictionMulti', () => {
     test('should addIndividualDailyRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(0), new BigNumber(0)];
       const startTimes = [new Date(2020, 1), new Date(2020, 2)];
@@ -925,6 +926,30 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('getExemptAddress', () => {
+    test('should getExemptAddress', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getExemptAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getExemptAddress();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getExemptAddress).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 });
