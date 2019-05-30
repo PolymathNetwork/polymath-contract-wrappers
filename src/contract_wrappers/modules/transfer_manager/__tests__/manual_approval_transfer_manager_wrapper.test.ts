@@ -13,9 +13,10 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
   bigNumberToDate,
-  bytes32ToString,
+  dateArrayToBigNumberArray,
   dateToBigNumber,
   numberToBigNumber,
+  stringArrayToBytes32Array,
   stringToBytes32,
 } from '../../../../utils/convert';
 
@@ -390,6 +391,98 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).once();
       verify(mockedGetApprovalDetailsMethod.callAsync(from, to)).once();
+    });
+  });
+
+  describe('Add Manual Approval Multi', () => {
+    test('should addManualApprovalMulti', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expiryTime = new BigNumber(1);
+      const from = ['0x4444444444444444444444444444444444444444', '0x2222222222222222222222222222222222222222'];
+      const to = ['0x3333333333333333333333333333333333333333', '0x5555555555555555555555555555555555555555'];
+      const expectedGetApprovalDetailsResult = [new BigNumber(0), expiryTime, stringToBytes32('description')];
+      // Mocked method
+      const mockedGetApprovalDetailsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getApprovalDetails).thenReturn(instance(mockedGetApprovalDetailsMethod));
+      // Stub the request
+      for (let i = 0; i < from.length; i += 1) {
+        when(mockedGetApprovalDetailsMethod.callAsync(from[i], to[i])).thenResolve(expectedGetApprovalDetailsResult);
+      }
+
+      const mockedParams = {
+        from,
+        to,
+        allowances: [new BigNumber(10), new BigNumber(20)],
+        expiryTimes: [new Date(2032, 1), new Date(2033, 1)],
+        descriptions: ['description', 'description2'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addManualApprovalMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          from,
+          to,
+          objectContaining(mockedParams.allowances),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
+          objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.addManualApprovalMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addManualApprovalMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          from,
+          to,
+          objectContaining(mockedParams.allowances),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
+          objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getApprovalDetails).times(from.length);
+      for (let i = 0; i < from.length; i += 1) {
+        verify(mockedGetApprovalDetailsMethod.callAsync(from[i], to[i])).once();
+      }
     });
   });
 

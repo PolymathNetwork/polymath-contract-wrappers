@@ -1252,7 +1252,6 @@ describe('GeneralTransferManagerWrapper', () => {
       // Real call
       const result = await target.getInvestorsData( params );
 
-      console.log(expectedResult);
       for (let i = 0; i < 3; i += 1) {
         expect(result[i].investor).toEqual(params.investors[i]);
         expect(dateToBigNumber(result[i].timeRestriction.canSendAfter)).toEqual(expectedResult[0][i]);
