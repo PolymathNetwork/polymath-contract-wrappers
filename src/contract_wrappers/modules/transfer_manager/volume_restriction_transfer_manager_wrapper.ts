@@ -261,10 +261,6 @@ interface ChangeExemptWalletListParams extends TxParams {
   change: boolean;
 }
 
-interface IndividualRestrictionMultiParams extends TxParams {
-  holders: string[];
-}
-
 interface DailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber;
   startTime: Date;
