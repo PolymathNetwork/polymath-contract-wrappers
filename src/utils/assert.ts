@@ -40,7 +40,7 @@ const assert = {
     sharedAssert.assert(value !== new Date(0), message);
   },
   isBigNumberZero(value: BigNumber, message: string): void {
-    sharedAssert.assert(value === BIG_NUMBER_ZERO, message);
+    sharedAssert.assert(value.isEqualTo(BIG_NUMBER_ZERO), message);
   },
   isBigNumberGreaterThanZero(value: BigNumber, message: string): void {
     sharedAssert.assert(value >= BIG_NUMBER_ZERO, message);
