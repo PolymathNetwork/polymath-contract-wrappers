@@ -11,10 +11,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import ManualApprovalTransferManagerWrapper from '../manual_approval_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import {
-  bigNumberToDate,
-  numberToBigNumber,
-} from '../../../../utils/convert';
+import { bigNumberToDate, numberToBigNumber } from '../../../../utils/convert';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
   let target: ManualApprovalTransferManagerWrapper;
@@ -225,7 +222,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       expect(result.to).toEqual(expectedResult[1]);
       expect(result.allowance).toEqual(expectedResult[2]);
       expect(result.expiryTime).toEqual(bigNumberToDate(expiryTime));
-      expect(result.description).toEqual((expectedResult[4]));
+      expect(result.description).toEqual(expectedResult[4]);
       // Verifications
       verify(mockedContract.approvals).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.index)))).once();
