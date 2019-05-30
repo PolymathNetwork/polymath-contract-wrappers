@@ -12,8 +12,7 @@ import VolumeRestrictionTransferManagerWrapper from '../volume_restriction_trans
 import {
   bigNumberToDate,
   numberToBigNumber,
-  dateToBigNumber,
-  dateArrayToBigNumberArray,
+  dateToBigNumber, dateArrayToBigNumberArray,
 } from '../../../../utils/convert';
 
 describe('VolumeRestrictionTransferManagerWrapper', () => {
@@ -623,7 +622,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     });
   });
 
-  /* describe('addIndividualDailyRestrictionMulti', () => {
+   describe('addIndividualDailyRestrictionMulti', () => {
     test('should addIndividualDailyRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(0), new BigNumber(0)];
       const startTimes = [new Date(2020, 1), new Date(2020, 2)];
@@ -701,7 +700,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
-  }); */
+  });
 
   describe('addDefaultRestriction', () => {
     test('should addDefaultRestriction', async () => {
