@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
+import { valueToWei, weiToValue } from '../../utils/convert';
 
 /**
  * @param spender The address which will spend the funds
@@ -80,7 +81,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     assert.isNonZeroETHAddressHex('spender', params.spender);
     return (await this.contract).approve.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -102,7 +103,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     return (await this.contract).transferFrom.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -123,7 +124,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     const address =
       !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', address);
-    return (await this.contract).balanceOf.callAsync(address);
+    return weiToValue(await (await this.contract).balanceOf.callAsync(address), await this.decimals());
   };
 
   /**
@@ -140,7 +141,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transfer.sendTransactionAsync(
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -153,7 +154,10 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   public allowance = async (params: AllowanceParams) => {
     assert.isETHAddressHex('owner', params.owner);
     assert.isETHAddressHex('spender', params.spender);
-    return (await this.contract).allowance.callAsync(params.owner, params.spender);
+    return weiToValue(
+      await (await this.contract).allowance.callAsync(params.owner, params.spender),
+      await this.decimals(),
+    );
   };
 
   public async isValidContract() {

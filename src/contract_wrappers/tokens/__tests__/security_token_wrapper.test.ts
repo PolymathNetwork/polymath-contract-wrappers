@@ -23,7 +23,13 @@ import ERC20TokenWrapper from '../erc20_wrapper';
 import { ModuleType, ModuleName, Features, FundRaiseType } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { stringToBytes32, bytes32ToString, numberToBigNumber, dateToBigNumber } from '../../../utils/convert';
+import {
+  stringToBytes32,
+  bytes32ToString,
+  numberToBigNumber,
+  dateToBigNumber,
+  valueToWei
+} from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
 describe('SecurityTokenWrapper', () => {
@@ -1727,6 +1733,12 @@ describe('SecurityTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -1747,7 +1759,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
 
-      const expectedBalanceResult = new BigNumber(100);
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
       const params = {
         owner,
       };
@@ -1776,6 +1788,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -1784,11 +1798,17 @@ describe('SecurityTokenWrapper', () => {
       // Mocked parameters
       const mockedParams = {
         from: '0x5555555555555555555555555555555555555555',
-        value: new BigNumber(1),
+        value: new BigNumber(10),
         data: 'string',
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -1810,7 +1830,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
 
-      const expectedBalanceResult = new BigNumber(100);
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
       const params = {
         owner,
       };
@@ -1821,7 +1841,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
 
-      const expectedAllowanceResult = new BigNumber(10);
+      const expectedAllowanceResult = valueToWei(new BigNumber(50), expectedDecimalsResult);
       // Mocked method
       const mockedAllowanceMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1850,6 +1870,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.allowance).once();
       verify(mockedAllowanceMethod.callAsync(mockedParams.from, params.owner)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
     });
   });
 
@@ -2027,6 +2049,12 @@ describe('SecurityTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -2049,7 +2077,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedBalanceResult = new BigNumber(100);
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
       const params = {
         owner: '0x1111111111111111111111111111111111111111',
       };
@@ -2088,6 +2116,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.controller).once();
       verify(mockedControllerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -2103,6 +2133,12 @@ describe('SecurityTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -2124,7 +2160,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedBalanceResult = new BigNumber(100);
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
       const params = {
         owner: '0x1111111111111111111111111111111111111111',
       };
@@ -2162,6 +2198,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.controller).once();
       verify(mockedControllerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 

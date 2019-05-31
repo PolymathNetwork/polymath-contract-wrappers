@@ -1,5 +1,8 @@
 import { ethers } from 'ethers';
 import { BigNumber } from '@0x/utils';
+import assert from './assert';
+
+const BASE = new BigNumber(10);
 
 export function bytes32ToString(value: string): string {
   return ethers.utils.toUtf8String(value);
@@ -44,5 +47,29 @@ export function stringArrayToBytes32Array(value: string[]) {
 export function bytes32ArrayToStringArray(value: string[]) {
   return value.map<string>(x => {
     return bytes32ToString(x);
+  });
+}
+
+export function weiToValue(value: BigNumber, decimals: BigNumber) {
+  assert.assert(decimals.isInteger(), 'Decimals must be an integer number');
+  assert.assert(decimals.isLessThanOrEqualTo(18), 'Decimals must be less than or equal to 18');
+  return value.dividedBy(BASE.exponentiatedBy(decimals));
+}
+
+export function weiArrayToValueArray(value: BigNumber[], decimals: BigNumber) {
+  return value.map<BigNumber>(x => {
+    return weiToValue(x, decimals);
+  });
+}
+
+export function valueToWei(value: BigNumber, decimals: BigNumber) {
+  assert.assert(decimals.isInteger(), 'Decimals must be an integer number');
+  assert.assert(decimals.isLessThanOrEqualTo(18), 'Decimals must be less than or equal to 18');
+  return value.multipliedBy(BASE.exponentiatedBy(decimals));
+}
+
+export function valueArrayToWeiArray(value: BigNumber[], decimals: BigNumber) {
+  return value.map<BigNumber>(x => {
+    return valueToWei(x, decimals);
   });
 }

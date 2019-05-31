@@ -57,7 +57,14 @@ import {
   ModuleName,
   Features,
 } from '../../types';
-import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString } from '../../utils/convert';
+import {
+  stringToBytes32,
+  numberToBigNumber,
+  dateToBigNumber,
+  bytes32ToString,
+  weiToValue,
+  valueToWei
+} from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
