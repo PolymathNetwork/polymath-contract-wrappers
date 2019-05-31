@@ -1966,5 +1966,24 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedContract.getExemptAddress).once();
       verify(mockedMethod.callAsync()).once();
     });
+
+    describe('SubscribeAsync', () => {
+      test('should throw as eventName does not belong to VolumeRestrictionTransferManager', async () => {
+        // Mocked parameters
+        const mockedParams = {
+          eventName: PolyTokenEvents.Transfer,
+          indexFilterValues: {},
+          callback: () => {},
+          isVerbose: false,
+        };
+
+        // Real call
+        await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+            new Error(
+                `Expected eventName to be one of: 'ChangedExemptWalletList', 'AddIndividualRestriction', 'AddIndividualDailyRestriction', 'ModifyIndividualRestriction', 'ModifyIndividualDailyRestriction', 'AddDefaultRestriction', 'AddDefaultDailyRestriction', 'ModifyDefaultRestriction', 'ModifyDefaultDailyRestriction', 'IndividualRestrictionRemoved', 'IndividualDailyRestrictionRemoved', 'DefaultRestrictionRemoved', 'DefaultDailyRestrictionRemoved', 'Pause', 'Unpause', encountered: Transfer`,
+            ),
+        );
+      });
+    });
   });
 });

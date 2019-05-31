@@ -921,9 +921,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Stub the request
       when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
-      const mockedParams = {
-        user,
-      };
       // Real call
       const result = await target.getAllApprovals();
       // Result expectation
@@ -942,7 +939,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   });
 
   describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to CountTransferManager', async () => {
+    test('should throw as eventName does not belong to ManualApprovalTransferManager', async () => {
       // Mocked parameters
       const mockedParams = {
         eventName: PolyTokenEvents.Transfer,
