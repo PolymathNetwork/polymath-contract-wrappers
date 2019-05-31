@@ -2,7 +2,6 @@ import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
 import { AlternativeERC20 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
-import * as _ from 'lodash';
 import DetailedERC20Wrapper from './detailed_erc20_wrapper';
 import { bytes32ToString } from '../../utils/convert';
 

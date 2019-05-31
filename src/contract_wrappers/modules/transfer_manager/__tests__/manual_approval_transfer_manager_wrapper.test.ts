@@ -905,7 +905,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   describe('Get All Approvals', () => {
     test('should getAllApprovals', async () => {
       const expiryTimes = [new BigNumber(1925035200), new BigNumber(1925035201)];
-      const user = '0x4444444444444444444444444444444444444444';
       const descriptions = [stringToBytes32('description'), stringToBytes32('description')];
       const expectedResult = [
         ['0x4444444444444444444444444444444444444444', '0x2222222222222222222222222222222222222222'],
@@ -921,9 +920,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Stub the request
       when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
-      const mockedParams = {
-        user,
-      };
       // Real call
       const result = await target.getAllApprovals();
       // Result expectation
@@ -942,7 +938,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   });
 
   describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to CountTransferManager', async () => {
+    test('should throw as eventName does not belong to ManualApprovalTransferManager', async () => {
       // Mocked parameters
       const mockedParams = {
         eventName: PolyTokenEvents.Transfer,

@@ -261,10 +261,6 @@ interface ChangeExemptWalletListParams extends TxParams {
   change: boolean;
 }
 
-interface IndividualRestrictionMultiParams extends TxParams {
-  holders: string[];
-}
-
 interface DailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber;
   startTime: Date;
@@ -501,7 +497,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.endTimes.length,
       'Array lengths missmatch',
     );
-    for (let i = 0; i < params.startTimes.length; i + 1) {
+    for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
     }
     return (await this.contract).addIndividualDailyRestrictionMulti.sendTransactionAsync(
@@ -528,7 +524,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.endTimes.length,
       'Array lengths missmatch',
     );
-    for (let i = 0; i < params.startTimes.length; i + 1) {
+    for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(
         params.startTimes[i],
         params.allowedTokens[i],
@@ -705,7 +701,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.endTimes.length,
       'Array lengths missmatch',
     );
-    for (let i = 0; i < params.startTimes.length; i + 1) {
+    for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
     }
     return (await this.contract).modifyIndividualDailyRestrictionMulti.sendTransactionAsync(
@@ -730,7 +726,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.endTimes.length,
       'Array lengths missmatch',
     );
-    for (let i = 0; i < params.startTimes.length; i + 1) {
+    for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(
         params.startTimes[i],
         params.allowedTokens[i],

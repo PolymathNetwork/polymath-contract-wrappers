@@ -1267,7 +1267,7 @@ describe('GeneralTransferManagerWrapper', () => {
   });
 
   describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to CountTransferManager', async () => {
+    test('should throw as eventName does not belong to GeneralTransferManager', async () => {
       // Mocked parameters
       const mockedParams = {
         eventName: PolyTokenEvents.Transfer,
