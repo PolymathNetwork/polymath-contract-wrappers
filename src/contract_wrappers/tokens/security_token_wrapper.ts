@@ -732,7 +732,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).withdrawERC20.sendTransactionAsync(
       params.tokenContract,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
