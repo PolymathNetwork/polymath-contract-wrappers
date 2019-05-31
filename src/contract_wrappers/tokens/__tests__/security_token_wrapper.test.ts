@@ -858,6 +858,34 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('UpdateFromRegistry', () => {
+    test.todo('should fail as moduleAddress is not an Eth address');
+    test('should send the transaction to upgradeFromRegistry', async () => {
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      // Stub the method
+      when(mockedContract.updateFromRegistry).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.updateFromRegistry(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedContract.updateFromRegistry).once();
+    });
+  });
+
   describe('archiveModule', () => {
     test.todo('should fail as moduleAddress is not an Eth address');
     test('should send the transaction to archiveModule', async () => {
