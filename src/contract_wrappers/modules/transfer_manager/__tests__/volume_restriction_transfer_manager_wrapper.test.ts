@@ -2008,6 +2008,44 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedMethod.callAsync()).once();
     });
 
+    describe('Get Restricted Data', () => {
+      test('should getRestrictedData', async () => {
+        const startTime = [new BigNumber(1925035200), new BigNumber(1925035201)];
+        const endTime = [new BigNumber(1925035219), new BigNumber(1925035220)];
+        const rollingPeriodInDays = [new BigNumber(5), new BigNumber(6)];
+        const expectedResult = [
+          ['0x4444444444444444444444444444444444444444', '0x2222222222222222222222222222222222222222'],
+          [new BigNumber(100), new BigNumber(101)],
+          startTime,
+          rollingPeriodInDays,
+          endTime,
+          [new BigNumber(1), new BigNumber(2)],
+        ];
+        // Mocked method
+        const mockedMethod = mock(MockedCallMethod);
+        // Stub the method
+        when(mockedContract.getRestrictedData).thenReturn(instance(mockedMethod));
+        // Stub the request
+        when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+        // Real call
+        const result = await target.getRestrictedData();
+        // Result expectation
+        for (let i = 0; i < expectedResult[0].length; i += 1) {
+          expect(result[i].allAddresses).toEqual(expectedResult[0][i]);
+          expect(result[i].allowedTokens).toEqual(expectedResult[1][i]);
+          expect(result[i].startTime).toEqual(bigNumberToDate(startTime[i]));
+          expect(result[i].rollingPeriodInDays).toEqual(rollingPeriodInDays[i].toNumber());
+          expect(result[i].endTime).toEqual(bigNumberToDate(endTime[i]));
+          expect(result[i].typeOfRestriction).toEqual(expectedResult[5][i]);
+        }
+
+        // Verifications
+        verify(mockedContract.getRestrictedData).once();
+        verify(mockedMethod.callAsync()).once();
+      });
+    });
+
     describe('SubscribeAsync', () => {
       test('should throw as eventName does not belong to VolumeRestrictionTransferManager', async () => {
         // Mocked parameters
@@ -2020,9 +2058,9 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
         // Real call
         await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-            new Error(
-                `Expected eventName to be one of: 'ChangedExemptWalletList', 'AddIndividualRestriction', 'AddIndividualDailyRestriction', 'ModifyIndividualRestriction', 'ModifyIndividualDailyRestriction', 'AddDefaultRestriction', 'AddDefaultDailyRestriction', 'ModifyDefaultRestriction', 'ModifyDefaultDailyRestriction', 'IndividualRestrictionRemoved', 'IndividualDailyRestrictionRemoved', 'DefaultRestrictionRemoved', 'DefaultDailyRestrictionRemoved', 'Pause', 'Unpause', encountered: Transfer`,
-            ),
+          new Error(
+            `Expected eventName to be one of: 'ChangedExemptWalletList', 'AddIndividualRestriction', 'AddIndividualDailyRestriction', 'ModifyIndividualRestriction', 'ModifyIndividualDailyRestriction', 'AddDefaultRestriction', 'AddDefaultDailyRestriction', 'ModifyDefaultRestriction', 'ModifyDefaultDailyRestriction', 'IndividualRestrictionRemoved', 'IndividualDailyRestrictionRemoved', 'DefaultRestrictionRemoved', 'DefaultDailyRestrictionRemoved', 'Pause', 'Unpause', encountered: Transfer`,
+          ),
         );
       });
     });
