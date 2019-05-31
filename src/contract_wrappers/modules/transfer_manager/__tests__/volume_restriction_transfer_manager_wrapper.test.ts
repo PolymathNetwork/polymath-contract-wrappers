@@ -4,8 +4,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { VolumeRestrictionTMContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { Features, RestrictionTypes } from '../../../../types';
-import ContractWrapper from '../../../contract_wrapper';
+import { RestrictionTypes } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import VolumeRestrictionTransferManagerWrapper from '../volume_restriction_transfer_manager_wrapper';
@@ -1897,7 +1896,55 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     });
   });
 
-  describe('getExemptAddress', () => {
+  describe('Get Total Traded By User', () => {
+    test('Should getTotalTradedByUser', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(100);
+      const mockedParams = {
+        user: '0x4444444444444444444444444444444444444444',
+        at: new Date(2030, 1),
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTotalTradedByUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user, objectContaining(dateToBigNumber(mockedParams.at)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getTotalTradedByUser(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTotalTradedByUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user, objectContaining(dateToBigNumber(mockedParams.at)))).once();
+    });
+  });
+
+  describe('Get Init Function', () => {
+    test('Should getInitFunction', async () => {
+      // Address expected
+      const expectedResult = 'Function';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInitFunction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInitFunction();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getInitFunction).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Get Exempt Address', () => {
     test('should getExemptAddress', async () => {
       // Address expected
       const expectedResult = [

@@ -285,7 +285,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       assert.isBigNumberGreaterThanZero(allowance, 'Allowance must be greater than 0'),
     );
     const approvals = [];
-    for (let i = 0; i < params.to.length; i + 1) {
+    for (let i = 0; i < params.to.length; i += 1) {
       approvals.push(this.checkApprovalDoesNotExist(params.from[i], params.to[i]));
     }
     await Promise.all(approvals);
@@ -331,7 +331,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     const approvals = [];
-    for (let i = 0; i < params.to.length; i + 1) {
+    for (let i = 0; i < params.to.length; i += 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
     }
     await Promise.all(approvals);
@@ -366,7 +366,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
     const approvals = [];
-    for (let i = 0; i < params.to.length; i + 1) {
+    for (let i = 0; i < params.to.length; i += 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
     }
     await Promise.all(approvals);
