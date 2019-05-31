@@ -114,7 +114,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('controller', () => {
     test('should call to controller', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -134,7 +134,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('polyToken', () => {
     test('should call to polyToken', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -154,7 +154,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('polymathRegistry', () => {
     test('should call to polymathRegistry', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -194,7 +194,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('owner', () => {
     test('should call to owner', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -234,7 +234,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('moduleRegistry', () => {
     test('should call to moduleRegistry', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -254,7 +254,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('featureRegistry', () => {
     test('should call to featureRegistry', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -274,7 +274,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('securityTokenRegistry', () => {
     test('should call to securityTokenRegistry', async () => {
-      const expectedResult = 'string';
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -334,7 +334,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getModulesByName', () => {
     test('should call to getModulesByName', async () => {
-      const expectedResult = ['string', 'string'];
+      const expectedResult = ['0x0123456789012345678901234567890123456789', '0x0123456789012345678901234567890123456788'];
       const mockedParams = {
         moduleName: ModuleName.generalPermissionManager,
       };
@@ -357,7 +357,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getInvestors', () => {
     test('should call to getInvestors', async () => {
-      const expectedResult = ['string', 'string'];
+      const expectedResult = ['0x0123456789012345678901234567890123456789', '0x0123456789012345678901234567890123456789'];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -377,7 +377,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getInvestorsAt', () => {
     test('should call to getInvestorsAt', async () => {
-      const expectedResult = ['string', 'string'];
+      const expectedResult = ['0x0123456789012345678901234567890123456788', '0x0123456789012345678901234567890123456789'];
       const mockedParams = {
         checkpointId: 1,
       };
@@ -402,7 +402,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('iterateInvestors', () => {
     test('should call to iterateInvestors', async () => {
-      const expectedResult = ['string', 'string'];
+      const expectedResult = ['0x0123456789012345678901234567890123456788', '0x0123456789012345678901234567890123456789'];
       const mockedParams = {
         start: 1,
         end: 5,
@@ -591,7 +591,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getModulesByType', () => {
     test('should call to getModulesByType', async () => {
-      const expectedResult = ['string'];
+      const expectedResult = ['0x0123456789012345678901234567890123456789', '0x0123456789012345678901234567890123456788'];
       const mockedParams = {
         type: ModuleType.Burn,
       };
