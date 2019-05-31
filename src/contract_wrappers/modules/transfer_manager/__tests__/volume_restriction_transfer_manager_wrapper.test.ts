@@ -1307,7 +1307,595 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedContract.defaultRestriction).once();
       verify(mockedRestrictionMethod.callAsync()).once();
     });
+  });
+
+  describe('removeDefaultDailyRestriction', () => {
+    test('should removeDefaultDailyRestriction', async () => {
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.removeDefaultDailyRestriction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedRestrictionResult = [
+        new BigNumber(1),
+        new BigNumber(2),
+        new BigNumber(3),
+        new BigNumber(4),
+        new BigNumber(5),
+      ];
+      const mockedRestrictionMethod = mock(MockedCallMethod);
+      when(mockedContract.defaultDailyRestriction).thenReturn(instance(mockedRestrictionMethod));
+      when(mockedRestrictionMethod.callAsync()).thenResolve(expectedRestrictionResult);
+
+      // Real call
+      const result = await target.removeDefaultDailyRestriction(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.removeDefaultDailyRestriction).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.defaultDailyRestriction).once();
+      verify(mockedRestrictionMethod.callAsync()).once();
     });
+  });
+
+  describe('modifyIndividualRestriction', () => {
+    test('should modifyIndividualRestriction', async () => {
+      const allowedTokens = new BigNumber(1);
+      const startTime = new Date(2020, 1);
+      const endTime = new Date(2021, 1);
+      const restrictionType = 1;
+      const mockedParams = {
+        rollingPeriodInDays: 1,
+        holder: '0x7777777777777777777777777777777777777777',
+        allowedTokens,
+        startTime,
+        endTime,
+        restrictionType,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyIndividualRestriction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holder,
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyIndividualRestriction(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyIndividualRestriction).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holder,
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('modifyIndividualDailyRestriction', () => {
+    test('should modifyIndividualDailyRestriction', async () => {
+      const allowedTokens = new BigNumber(1);
+      const startTime = new Date(2020, 1);
+      const endTime = new Date(2021, 1);
+      const restrictionType = 1;
+      const mockedParams = {
+        holder: '0x7777777777777777777777777777777777777777',
+        allowedTokens,
+        startTime,
+        endTime,
+        restrictionType,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyIndividualDailyRestriction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holder,
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyIndividualDailyRestriction(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyIndividualDailyRestriction).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holder,
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('modifyIndividualDailyRestrictionMulti', () => {
+    test('should modifyIndividualDailyRestrictionMulti', async () => {
+      const allowedTokens = [new BigNumber(1), new BigNumber(2)];
+      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
+      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const restrictionTypes = [1, 1];
+      const mockedParams = {
+        holders: ['0x7777777777777777777777777777777777777777', '0x7777777777777777777777777777777777777777'],
+        allowedTokens,
+        startTimes,
+        endTimes,
+        restrictionTypes,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyIndividualDailyRestrictionMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holders,
+          mockedParams.allowedTokens,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.endTimes)),
+          mockedParams.restrictionTypes,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyIndividualDailyRestrictionMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyIndividualDailyRestrictionMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holders,
+          mockedParams.allowedTokens,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.endTimes)),
+          mockedParams.restrictionTypes,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('modifyIndividualRestrictionMulti', () => {
+    test('should modifyIndividualRestrictionMulti', async () => {
+      const allowedTokens = [new BigNumber(1), new BigNumber(2)];
+      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
+      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const restrictionTypes = [1, 1];
+      const mockedParams = {
+        rollingPeriodInDays: [1, 2],
+        holders: ['0x7777777777777777777777777777777777777777', '0x7777777777777777777777777777777777777777'],
+        allowedTokens,
+        startTimes,
+        endTimes,
+        restrictionTypes,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyIndividualRestrictionMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holders,
+          mockedParams.allowedTokens,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.endTimes)),
+          mockedParams.restrictionTypes,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyIndividualRestrictionMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyIndividualRestrictionMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.holders,
+          mockedParams.allowedTokens,
+          objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateArrayToBigNumberArray(mockedParams.endTimes)),
+          mockedParams.restrictionTypes,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('modifyDefaultRestriction', () => {
+    test('should modifyDefaultRestriction', async () => {
+      const allowedTokens = new BigNumber(1);
+      const startTime = new Date(2020, 1);
+      const endTime = new Date(2021, 1);
+      const restrictionType = 1;
+      const mockedParams = {
+        rollingPeriodInDays: 1,
+        allowedTokens,
+        startTime,
+        endTime,
+        restrictionType,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyDefaultRestriction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyDefaultRestriction(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyDefaultRestriction).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.rollingPeriodInDays)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('modifyDefaultDailyRestriction', () => {
+    test('should modifyDefaultDailyRestriction', async () => {
+      const allowedTokens = new BigNumber(1);
+      const startTime = new Date(2020, 1);
+      const endTime = new Date(2021, 1);
+      const restrictionType = 1;
+      const mockedParams = {
+        allowedTokens,
+        startTime,
+        endTime,
+        restrictionType,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyDefaultDailyRestriction).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyDefaultDailyRestriction(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyDefaultDailyRestriction).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.allowedTokens,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          mockedParams.restrictionType,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('getIndividualBucketDetailsToUser', () => {
+    test('should get getIndividualBucketDetailsToUser', async () => {
+      // Address expected
+      const user = '0x2222222222222222222222222222222222222222';
+      const mockedParams = {
+        user,
+      };
+      const lastTradedDayTime = new BigNumber(1);
+      const sumOfLastPeriod = new BigNumber(2);
+      const daysCovered = new BigNumber(3);
+      const dailyLastTradedDayTime = new BigNumber(4);
+      const lastTradedTimestamp = new BigNumber(5);
+      const expectedResult = [
+        lastTradedDayTime,
+        sumOfLastPeriod,
+        daysCovered,
+        dailyLastTradedDayTime,
+        lastTradedTimestamp,
+      ];
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getIndividualBucketDetailsToUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getIndividualBucketDetailsToUser(mockedParams);
+      // Result expectation
+      expect(result.lastTradedDayTime).toEqual(bigNumberToDate(lastTradedDayTime));
+      expect(result.sumOfLastPeriod).toEqual(sumOfLastPeriod);
+      expect(result.daysCovered).toEqual(daysCovered.toNumber());
+      expect(result.dailyLastTradedDayTime).toEqual(bigNumberToDate(dailyLastTradedDayTime));
+      expect(result.lastTradedTimestamp).toEqual(bigNumberToDate(lastTradedTimestamp));
+      // Verifications
+      verify(mockedContract.getIndividualBucketDetailsToUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user)).once();
+    });
+  });
 
   describe('getExemptAddress', () => {
     test('should getExemptAddress', async () => {
