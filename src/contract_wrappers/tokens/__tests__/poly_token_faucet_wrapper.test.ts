@@ -81,6 +81,8 @@ describe('PolyTokenFaucetWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 });
