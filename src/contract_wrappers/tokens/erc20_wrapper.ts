@@ -81,7 +81,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     assert.isNonZeroETHAddressHex('spender', params.spender);
     return (await this.contract).approve.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );

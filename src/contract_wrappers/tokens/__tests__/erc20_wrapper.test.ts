@@ -216,6 +216,12 @@ describe('ERC20TokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -225,7 +231,7 @@ describe('ERC20TokenWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -241,11 +247,13 @@ describe('ERC20TokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
