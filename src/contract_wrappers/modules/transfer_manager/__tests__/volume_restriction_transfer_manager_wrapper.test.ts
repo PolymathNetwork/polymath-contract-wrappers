@@ -1896,6 +1896,47 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     });
   });
 
+  describe('getDefaultBucketDetailsToUser', () => {
+    test('should get getDefaultBucketDetailsToUser', async () => {
+      // Address expected
+      const user = '0x2222222222222222222222222222222222222222';
+      const mockedParams = {
+        user,
+      };
+      const lastTradedDayTime = new BigNumber(1);
+      const sumOfLastPeriod = new BigNumber(2);
+      const daysCovered = new BigNumber(3);
+      const dailyLastTradedDayTime = new BigNumber(4);
+      const lastTradedTimestamp = new BigNumber(5);
+      const expectedResult = [
+        lastTradedDayTime,
+        sumOfLastPeriod,
+        daysCovered,
+        dailyLastTradedDayTime,
+        lastTradedTimestamp,
+      ];
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDefaultBucketDetailsToUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getDefaultBucketDetailsToUser(mockedParams);
+      // Result expectation
+      expect(result.lastTradedDayTime).toEqual(bigNumberToDate(lastTradedDayTime));
+      expect(result.sumOfLastPeriod).toEqual(sumOfLastPeriod);
+      expect(result.daysCovered).toEqual(daysCovered.toNumber());
+      expect(result.dailyLastTradedDayTime).toEqual(bigNumberToDate(dailyLastTradedDayTime));
+      expect(result.lastTradedTimestamp).toEqual(bigNumberToDate(lastTradedTimestamp));
+      // Verifications
+      verify(mockedContract.getDefaultBucketDetailsToUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user)).once();
+    });
+  });
+
   describe('Get Total Traded By User', () => {
     test('Should getTotalTradedByUser', async () => {
       // Address expected
