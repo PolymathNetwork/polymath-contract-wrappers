@@ -6,6 +6,7 @@ import { BigNumber } from '@0x/utils';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams } from '../../types';
 import assert from '../../utils/assert';
+import {valueToWei} from '../../utils/convert';
 
 const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
 
@@ -37,7 +38,7 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
     assert.assert(params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT), 'Amount cannot exceed 1 million tokens');
 
     return (await this.contract).getTokens.sendTransactionAsync(
-      params.amount,
+      valueToWei(params.amount, await (await this.contract).decimals.callAsync()),
       params.recipient,
       params.txData,
       params.safetyFactor,

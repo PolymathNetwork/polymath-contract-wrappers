@@ -1,11 +1,12 @@
 // PolymathRegistryWrapper test
 import { BigNumber } from '@0x/utils';
-import { mock, instance, reset, when, verify } from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { PolyTokenFaucetContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import PolyTokenFaucetWrapper from '../poly_token_faucet_wrapper';
-import { MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
+import { MockedSendMethod, getMockedPolyResponse, MockedCallMethod } from '../../../test_utils/mocked_methods';
+import { valueToWei } from '../../../utils/convert';
 
 describe('PolyTokenFaucetWrapper', () => {
   // Declare PolyTokenFaucetWrapper object
@@ -44,6 +45,12 @@ describe('PolyTokenFaucetWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -52,7 +59,7 @@ describe('PolyTokenFaucetWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.amount,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.recipient,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -68,7 +75,7 @@ describe('PolyTokenFaucetWrapper', () => {
       verify(mockedContract.getTokens).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.amount,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.recipient,
           mockedParams.txData,
           mockedParams.safetyFactor,
