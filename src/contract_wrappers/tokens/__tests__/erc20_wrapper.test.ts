@@ -3,7 +3,6 @@ import { BigNumber } from '@0x/utils';
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
-import { stringToBytes32 } from '../../../utils/convert';
 import ContractWrapper from '../../contract_wrapper';
 import DetailedERC20Wrapper from '../detailed_erc20_wrapper';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
