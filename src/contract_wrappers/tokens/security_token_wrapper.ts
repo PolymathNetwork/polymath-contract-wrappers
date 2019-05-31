@@ -62,8 +62,6 @@ import {
   numberToBigNumber,
   dateToBigNumber,
   bytes32ToString,
-  weiToValue,
-  valueToWei
 } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';

@@ -1,11 +1,12 @@
 // PolymathRegistryWrapper test
 import { BigNumber } from '@0x/utils';
-import { mock, instance, reset, when, verify } from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { PolyTokenContract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import PolyTokenWrapper from '../poly_token_wrapper';
 import { MockedSendMethod, getMockedPolyResponse, MockedCallMethod } from '../../../test_utils/mocked_methods';
+import { valueToWei } from '../../../utils/convert';
 
 describe('PolyTokenWrapper', () => {
   // Declare PolyTokenWrapper object
@@ -42,6 +43,12 @@ describe('PolyTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -51,7 +58,7 @@ describe('PolyTokenWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -67,11 +74,13 @@ describe('PolyTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -85,6 +94,12 @@ describe('PolyTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -94,7 +109,7 @@ describe('PolyTokenWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -110,11 +125,13 @@ describe('PolyTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
