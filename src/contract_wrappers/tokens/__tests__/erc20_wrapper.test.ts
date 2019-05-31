@@ -1,6 +1,6 @@
 // PolymathRegistryWrapper test
 import { BigNumber } from '@0x/utils';
-import {mock, instance, reset, when, verify, objectContaining} from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
@@ -261,6 +261,12 @@ describe('ERC20TokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -271,7 +277,7 @@ describe('ERC20TokenWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -288,11 +294,13 @@ describe('ERC20TokenWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          mockedParams.value,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -337,7 +345,7 @@ describe('ERC20TokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.to,
-           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),

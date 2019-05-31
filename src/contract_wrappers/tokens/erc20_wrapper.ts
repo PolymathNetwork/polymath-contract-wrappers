@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
-import {valueToWei, weiToValue} from '../../utils/convert';
+import { valueToWei, weiToValue } from '../../utils/convert';
 
 /**
  * @param spender The address which will spend the funds
@@ -103,7 +103,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
     return (await this.contract).transferFrom.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -154,7 +154,10 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   public allowance = async (params: AllowanceParams) => {
     assert.isETHAddressHex('owner', params.owner);
     assert.isETHAddressHex('spender', params.spender);
-    return weiToValue(await (await this.contract).allowance.callAsync(params.owner, params.spender), await this.decimals());
+    return weiToValue(
+      await (await this.contract).allowance.callAsync(params.owner, params.spender),
+      await this.decimals(),
+    );
   };
 
   public async isValidContract() {
