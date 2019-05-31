@@ -57,12 +57,7 @@ import {
   ModuleName,
   Features,
 } from '../../types';
-import {
-  stringToBytes32,
-  numberToBigNumber,
-  dateToBigNumber,
-  bytes32ToString,
-} from '../../utils/convert';
+import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString, valueToWei } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -618,7 +613,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -668,7 +663,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
