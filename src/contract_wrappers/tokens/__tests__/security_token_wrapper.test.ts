@@ -1164,6 +1164,12 @@ describe('SecurityTokenWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -1173,7 +1179,7 @@ describe('SecurityTokenWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.module,
-          mockedParams.change,
+          objectContaining(valueToWei(mockedParams.change, expectedDecimalsResult)),
           mockedParams.increase,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1222,7 +1228,7 @@ describe('SecurityTokenWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.module,
-          mockedParams.change,
+          objectContaining(valueToWei(mockedParams.change, expectedDecimalsResult)),
           mockedParams.increase,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1231,6 +1237,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getModule).once();
       verify(mockedGetModuleMethod.callAsync(mockedParams.module)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
