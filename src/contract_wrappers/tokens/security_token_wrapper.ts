@@ -1033,7 +1033,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          valueToWei((params.data as PercentageTransferManagerData).maxHolderPercentage, new BigNumber(16)),
+          valueToWei((params.data as PercentageTransferManagerData).maxHolderPercentage, new BigNumber(16)).toString(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
@@ -1043,8 +1043,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
-          valueToWei((params.data as CappedSTOData).cap, decimals),
-          valueToWei((params.data as CappedSTOData).rate, decimals),
+          valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
+          valueToWei((params.data as CappedSTOData).rate, decimals).toString(),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
@@ -1056,19 +1056,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
           (params.data as USDTieredSTOData).ratePerTier.map(e => {
-            return valueToWei(e, decimals);
+            return valueToWei(e, decimals).toString();
           }),
           (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
-            return valueToWei(e, decimals);
+            return valueToWei(e, decimals).toString();
           }),
           (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
-            return valueToWei(e, decimals);
+            return valueToWei(e, decimals).toString();
           }),
           (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
-            return valueToWei(e, decimals);
+            return valueToWei(e, decimals).toString();
           }),
-          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, decimals),
-          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, decimals),
+          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, decimals).toString(),
+          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, decimals).toString(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,

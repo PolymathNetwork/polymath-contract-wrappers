@@ -2646,7 +2646,7 @@ describe('SecurityTokenWrapper', () => {
 
       const iPtmFace = new ethers.utils.Interface(PercentageTransferManager.abi);
       const ptmData = iPtmFace.functions.configure.encode([
-        mockedPtmParams.data.maxHolderPercentage.toNumber(),
+        valueToWei(mockedPtmParams.data.maxHolderPercentage, new BigNumber(16)).toString(),
         mockedPtmParams.data.allowPrimaryIssuance,
       ]);
 
@@ -2685,7 +2685,7 @@ describe('SecurityTokenWrapper', () => {
           mockedPtmParams.safetyFactor,
         ),
       ).once();
-      // === End CappedSTO test ===
+      // === End PTM test ===
 
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
@@ -2717,8 +2717,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).twice();
-      verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.decimals).times(3);
+      verify(mockedDecimalsMethod.callAsync()).times(3);
     });
 
     test('should send the transaction to addModule for CappedSTO', async () => {
@@ -2835,8 +2835,8 @@ describe('SecurityTokenWrapper', () => {
       const cappedData = iCappedFace.functions.configure.encode([
         dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
-        mockedCappedParams.data.cap.toNumber(),
-        mockedCappedParams.data.rate.toNumber(),
+        valueToWei(mockedCappedParams.data.cap, expectedDecimalsResult).toString(),
+        valueToWei(mockedCappedParams.data.rate, expectedDecimalsResult).toString(),
         mockedCappedParams.data.fundRaiseTypes,
         mockedCappedParams.data.fundsReceiver,
       ]);
@@ -2912,8 +2912,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).twice();
-      verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.decimals).times(3);
+      verify(mockedDecimalsMethod.callAsync()).times(3);
     });
 
     test('should send the transaction to addModule for USDTieredSTO', async () => {
@@ -3037,19 +3037,19 @@ describe('SecurityTokenWrapper', () => {
         dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
         dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
         mockedUsdTieredStoParams.data.ratePerTier.map(e => {
-          return e.toNumber();
+          return valueToWei(e, expectedDecimalsResult).toString();
         }),
         mockedUsdTieredStoParams.data.ratePerTierDiscountPoly.map(e => {
-          return e.toNumber();
+          return valueToWei(e, expectedDecimalsResult).toString();
         }),
         mockedUsdTieredStoParams.data.tokensPerTierTotal.map(e => {
-          return e.toNumber();
+          return valueToWei(e, expectedDecimalsResult).toString();
         }),
         mockedUsdTieredStoParams.data.tokensPerTierDiscountPoly.map(e => {
-          return e.toNumber();
+          return valueToWei(e, expectedDecimalsResult).toString();
         }),
-        mockedUsdTieredStoParams.data.nonAccreditedLimitUSD.toNumber(),
-        mockedUsdTieredStoParams.data.minimumInvestmentUSD.toNumber(),
+        valueToWei(mockedUsdTieredStoParams.data.nonAccreditedLimitUSD, expectedDecimalsResult).toString(),
+        valueToWei(mockedUsdTieredStoParams.data.minimumInvestmentUSD, expectedDecimalsResult).toString(),
         mockedUsdTieredStoParams.data.fundRaiseTypes,
         mockedUsdTieredStoParams.data.wallet,
         mockedUsdTieredStoParams.data.reserveWallet,
@@ -3133,8 +3133,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).twice();
-      verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.decimals).times(3);
+      verify(mockedDecimalsMethod.callAsync()).times(3);
     });
 
     test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
