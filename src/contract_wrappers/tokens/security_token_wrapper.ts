@@ -1123,7 +1123,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
+    return (await this.contract).verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+    );
   };
 
   /**

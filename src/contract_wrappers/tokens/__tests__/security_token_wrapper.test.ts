@@ -695,13 +695,24 @@ describe('SecurityTokenWrapper', () => {
         value: new BigNumber(0.9),
         data: 'string',
       };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data),
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -710,7 +721,16 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.verifyTransfer).once();
-      verify(mockedMethod.callAsync(mockedParams.from, mockedParams.to, mockedParams.value, mockedParams.data)).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
