@@ -1015,8 +1015,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : params.maxCost;
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : params.budget;
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, await this.decimals());
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, await this.decimals());
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
@@ -1024,6 +1024,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkUseModuleVerified(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
+    const decimals = await this.decimals();
     switch (params.moduleName) {
       case ModuleName.countTransferManager:
         iface = new ethers.utils.Interface(CountTransferManager.abi);
@@ -1032,7 +1033,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          (params.data as PercentageTransferManagerData).maxHolderPercentage.toNumber(),
+          valueToWei((params.data as PercentageTransferManagerData).maxHolderPercentage, new BigNumber(16)),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
@@ -1042,8 +1043,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
-          (params.data as CappedSTOData).cap.toNumber(),
-          (params.data as CappedSTOData).rate.toNumber(),
+          valueToWei((params.data as CappedSTOData).cap, decimals),
+          valueToWei((params.data as CappedSTOData).rate, decimals),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
@@ -1055,19 +1056,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
           (params.data as USDTieredSTOData).ratePerTier.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals);
           }),
           (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals);
           }),
           (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals);
           }),
           (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals);
           }),
-          (params.data as USDTieredSTOData).nonAccreditedLimitUSD.toNumber(),
-          (params.data as USDTieredSTOData).minimumInvestmentUSD.toNumber(),
+          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, decimals),
+          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, decimals),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,
