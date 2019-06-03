@@ -57,7 +57,15 @@ import {
   ModuleName,
   Features,
 } from '../../types';
-import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString, valueToWei } from '../../utils/convert';
+import {
+  stringToBytes32,
+  numberToBigNumber,
+  dateToBigNumber,
+  bytes32ToString,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
+} from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -805,7 +813,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -818,7 +826,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -844,7 +852,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mint.sendTransactionAsync(
       params.investor,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -856,7 +864,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mintWithData.sendTransactionAsync(
       params.investor,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -873,7 +881,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
-      params.values,
+      valueArrayToWeiArray(params.values, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -892,7 +900,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public burnWithData = async (params: BurnWithDataParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).burnWithData.sendTransactionAsync(
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       stringToBytes32(params.data),
       params.txData,
       params.safetyFactor,
@@ -911,7 +919,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('from', params.from);
     return (await this.contract).burnFromWithData.sendTransactionAsync(
       params.from,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -932,12 +940,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
-    return (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId));
+    return weiToValue(
+      await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
+      await this.decimals(),
+    );
   };
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    return (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId));
+    return weiToValue(
+      await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
+      await this.decimals(),
+    );
   };
 
   public setController = async (params: SetControllerParams) => {
@@ -966,7 +980,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).forceTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.log,
       params.txData,
@@ -980,7 +994,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkMsgSenderIsController(params.txData);
     return (await this.contract).forceBurn.sendTransactionAsync(
       params.from,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.log,
       params.txData,
