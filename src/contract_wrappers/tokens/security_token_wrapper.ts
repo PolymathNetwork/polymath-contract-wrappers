@@ -1017,14 +1017,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const decimals = await this.decimals();
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, decimals);
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, decimals);
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
+    const decimals = await this.decimals();
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
