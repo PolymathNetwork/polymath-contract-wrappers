@@ -1,4 +1,5 @@
 import { TxData } from '@0x/web3-wrapper';
+import { BigNumber } from '@0x/utils';
 import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
@@ -259,3 +260,5 @@ export type GenericModuleContract =
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
 
 export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | EtherDividendCheckpointContract;
+
+export const PERCENTAGE_DECIMALS = new BigNumber(16);

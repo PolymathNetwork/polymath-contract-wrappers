@@ -166,6 +166,14 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     return this.contractFactory.getDetailedERC20Contract(address);
   };
 
+  protected getDecimals = async (dividendIndex: number): Promise<BigNumber> => {
+    const token = await this.dividendTokens({
+      dividendIndex,
+    });
+    const decimals = await (await this.detailedERC20Contract(token)).decimals.callAsync();
+    return decimals;
+  };
+
   /**
    * Instantiate ERC20DividendCheckpointWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -354,9 +362,6 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
-    assert.assert(
-      erc20TokenBalance.isGreaterThanOrEqualTo(amount),
-      'Your balance is less than dividend amount',
-    );
+    assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
   };
 }

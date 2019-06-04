@@ -232,6 +232,10 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
 
   protected contract: Promise<EtherDividendCheckpointContract>;
 
+  protected getDecimals = async (dividendIndex: number): Promise<BigNumber> => {
+    return new BigNumber(18);
+  };
+
   /**
    * Instantiate EtherDividendCheckpointWrapper
    * @param web3Wrapper Web3Wrapper instance to use
