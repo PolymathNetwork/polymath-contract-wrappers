@@ -3,11 +3,12 @@ import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CappedSTOContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
-import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../../test_utils/mocked_methods';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import {FundRaiseType} from '../../../../types';
+import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
+import { weiToValue } from '../../../../utils/convert';
 
 describe('STOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -52,7 +53,7 @@ describe('STOWrapper', () => {
       when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.fundRaiseTypes({type: FundRaiseType.StableCoin});
+      const result = await target.fundRaiseTypes({ type: FundRaiseType.StableCoin });
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
@@ -73,9 +74,9 @@ describe('STOWrapper', () => {
       when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.fundsRaised({type: FundRaiseType.StableCoin});
+      const result = await target.fundsRaised({ type: FundRaiseType.StableCoin });
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.fundsRaised).once();
       verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();
@@ -241,7 +242,7 @@ describe('STOWrapper', () => {
       when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getRaised({type: FundRaiseType.StableCoin});
+      const result = await target.getRaised({ type: FundRaiseType.StableCoin });
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
@@ -272,7 +273,7 @@ describe('STOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -292,7 +293,7 @@ describe('STOWrapper', () => {
       when(mockedContract.pause).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -334,7 +335,7 @@ describe('STOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -354,7 +355,7 @@ describe('STOWrapper', () => {
       when(mockedContract.unpause).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -368,7 +369,7 @@ describe('STOWrapper', () => {
       verify(mockedContract.paused).once();
       verify(mockedPauseMethod.callAsync()).once();
       verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once()
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
@@ -389,7 +390,7 @@ describe('STOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -410,9 +411,9 @@ describe('STOWrapper', () => {
       // Stub the method
       when(mockedContract.reclaimERC20).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
-      );
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
 
       // Real call
       const result = await target.reclaimERC20(mockedParams);
@@ -421,7 +422,9 @@ describe('STOWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.reclaimERC20).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.tokenContract, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.securityToken).once();
@@ -444,7 +447,7 @@ describe('STOWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -464,7 +467,7 @@ describe('STOWrapper', () => {
       when(mockedContract.reclaimETH).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
