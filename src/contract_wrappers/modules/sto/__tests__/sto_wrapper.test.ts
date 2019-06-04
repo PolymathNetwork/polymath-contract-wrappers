@@ -241,8 +241,11 @@ describe('STOWrapper', () => {
       // Verifications
       verify(mockedContract.totalTokensSold).once();
       verify(mockedMethod.callAsync()).once();
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
-      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
     });
   });
 
