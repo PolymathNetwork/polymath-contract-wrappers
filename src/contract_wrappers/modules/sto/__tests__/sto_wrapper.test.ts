@@ -213,6 +213,20 @@ describe('STOWrapper', () => {
     test('should get the total of tokens sold', async () => {
       // Address expected
       const expectedResult = new BigNumber(1);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -223,10 +237,12 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.totalTokensSold();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.totalTokensSold).once();
       verify(mockedMethod.callAsync()).once();
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
     });
   });
 
@@ -244,7 +260,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.getRaised({ type: FundRaiseType.StableCoin });
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.getRaised).once();
       verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();

@@ -78,11 +78,17 @@ export default abstract class STOWrapper extends ModuleWrapper {
    * Return the total no. of tokens sold
    */
   public totalTokensSold = async () => {
-    return (await this.contract).totalTokensSold.callAsync();
+    return weiToValue(
+        await (await this.contract).totalTokensSold.callAsync(),
+        await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public getRaised = async (params: FundRaiseTypesParams) => {
-    return (await this.contract).getRaised.callAsync(params.type);
+    return weiToValue(
+        await (await this.contract).getRaised.callAsync(params.type),
+        FULL_DECIMALS,
+    );
   };
 
   public pause = async (params: TxParams) => {
