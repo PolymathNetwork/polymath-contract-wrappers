@@ -20,7 +20,7 @@ import {
   ModuleRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { ModuleType, ModuleName, Features, FundRaiseType } from '../../../types';
+import { ModuleType, ModuleName, Features, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -2534,8 +2534,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for PercentageTransferManager', async () => {
@@ -2646,7 +2646,7 @@ describe('SecurityTokenWrapper', () => {
 
       const iPtmFace = new ethers.utils.Interface(PercentageTransferManager.abi);
       const ptmData = iPtmFace.functions.configure.encode([
-        valueToWei(mockedPtmParams.data.maxHolderPercentage, new BigNumber(16)).toString(),
+        valueToWei(mockedPtmParams.data.maxHolderPercentage, PERCENTAGE_DECIMALS).toString(),
         mockedPtmParams.data.allowPrimaryIssuance,
       ]);
 
@@ -2717,8 +2717,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for CappedSTO', async () => {
@@ -2836,7 +2836,7 @@ describe('SecurityTokenWrapper', () => {
         dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
         valueToWei(mockedCappedParams.data.cap, expectedDecimalsResult).toString(),
-        valueToWei(mockedCappedParams.data.rate, expectedDecimalsResult).toString(),
+        valueToWei(mockedCappedParams.data.rate, FULL_DECIMALS).toString(),
         mockedCappedParams.data.fundRaiseTypes,
         mockedCappedParams.data.fundsReceiver,
       ]);
@@ -2912,8 +2912,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for USDTieredSTO', async () => {
@@ -3037,10 +3037,10 @@ describe('SecurityTokenWrapper', () => {
         dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
         dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
         mockedUsdTieredStoParams.data.ratePerTier.map(e => {
-          return valueToWei(e, expectedDecimalsResult).toString();
+          return valueToWei(e, FULL_DECIMALS).toString();
         }),
         mockedUsdTieredStoParams.data.ratePerTierDiscountPoly.map(e => {
-          return valueToWei(e, expectedDecimalsResult).toString();
+          return valueToWei(e, FULL_DECIMALS).toString();
         }),
         mockedUsdTieredStoParams.data.tokensPerTierTotal.map(e => {
           return valueToWei(e, expectedDecimalsResult).toString();
@@ -3048,8 +3048,8 @@ describe('SecurityTokenWrapper', () => {
         mockedUsdTieredStoParams.data.tokensPerTierDiscountPoly.map(e => {
           return valueToWei(e, expectedDecimalsResult).toString();
         }),
-        valueToWei(mockedUsdTieredStoParams.data.nonAccreditedLimitUSD, expectedDecimalsResult).toString(),
-        valueToWei(mockedUsdTieredStoParams.data.minimumInvestmentUSD, expectedDecimalsResult).toString(),
+        valueToWei(mockedUsdTieredStoParams.data.nonAccreditedLimitUSD, FULL_DECIMALS).toString(),
+        valueToWei(mockedUsdTieredStoParams.data.minimumInvestmentUSD, FULL_DECIMALS).toString(),
         mockedUsdTieredStoParams.data.fundRaiseTypes,
         mockedUsdTieredStoParams.data.wallet,
         mockedUsdTieredStoParams.data.reserveWallet,
@@ -3133,8 +3133,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
@@ -3311,8 +3311,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
 
     test('should send the transaction to addModule for EtherDividendCheckpoint', async () => {
@@ -3489,8 +3489,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedContract.decimals).times(3);
-      verify(mockedDecimalsMethod.callAsync()).times(3);
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 

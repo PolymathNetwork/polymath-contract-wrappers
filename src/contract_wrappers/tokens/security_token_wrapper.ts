@@ -56,6 +56,8 @@ import {
   FundRaiseType,
   ModuleName,
   Features,
+  PERCENTAGE_DECIMALS,
+  FULL_DECIMALS,
 } from '../../types';
 import {
   stringToBytes32,
@@ -1015,8 +1017,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, await this.decimals());
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, await this.decimals());
+    const decimals = await this.decimals();
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, decimals);
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, decimals);
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
@@ -1024,7 +1027,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkUseModuleVerified(params.address);
     let iface: ethers.utils.Interface;
     let data: string;
-    const decimals = await this.decimals();
     switch (params.moduleName) {
       case ModuleName.countTransferManager:
         iface = new ethers.utils.Interface(CountTransferManager.abi);
@@ -1033,7 +1035,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          valueToWei((params.data as PercentageTransferManagerData).maxHolderPercentage, new BigNumber(16)).toString(),
+          valueToWei(
+            (params.data as PercentageTransferManagerData).maxHolderPercentage,
+            PERCENTAGE_DECIMALS,
+          ).toString(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
@@ -1044,7 +1049,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
           valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
-          valueToWei((params.data as CappedSTOData).rate, decimals).toString(),
+          valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
@@ -1056,10 +1061,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
           (params.data as USDTieredSTOData).ratePerTier.map(e => {
-            return valueToWei(e, decimals).toString();
+            return valueToWei(e, FULL_DECIMALS).toString();
           }),
           (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
-            return valueToWei(e, decimals).toString();
+            return valueToWei(e, FULL_DECIMALS).toString();
           }),
           (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
             return valueToWei(e, decimals).toString();
@@ -1067,8 +1072,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
             return valueToWei(e, decimals).toString();
           }),
-          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, decimals).toString(),
-          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, decimals).toString(),
+          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, FULL_DECIMALS).toString(),
+          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, FULL_DECIMALS).toString(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,
