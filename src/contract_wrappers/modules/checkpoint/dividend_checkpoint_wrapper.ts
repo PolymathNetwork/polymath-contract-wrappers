@@ -348,7 +348,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     const decimals = await this.getDecimals(params.dividendIndex);
     const typedResult: CalculateDividendResult = {
       claim: weiToValue(result[0], decimals),
-      withheld: weiToValue(result[1], decimals),
+      withheld: weiToValue(result[1], PERCENTAGE_DECIMALS),
     };
     return typedResult;
   };
@@ -437,7 +437,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       investor: result[0][i],
       claimed: result[1][i],
       excluded: result[2][i],
-      withheld: weiToValue(result[3][i], decimals),
+      withheld: weiToValue(result[3][i], PERCENTAGE_DECIMALS),
       amount: weiToValue(result[4][i], decimals),
       balance: result[5][i],
     };
