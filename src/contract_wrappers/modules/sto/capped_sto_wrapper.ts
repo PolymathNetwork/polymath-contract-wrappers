@@ -24,8 +24,9 @@ import {
   Subscribe,
   GetLogs,
   FundRaiseType,
+  FULL_DECIMALS,
 } from '../../../types';
-import { bigNumberToDate } from '../../../utils/convert';
+import { bigNumberToDate, weiToValue } from '../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase;
@@ -150,14 +151,17 @@ export default class CappedSTOWrapper extends STOWrapper {
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
   public rate = async () => {
-    return (await this.contract).rate.callAsync();
+    return weiToValue(await (await this.contract).rate.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * How many token base units this STO will be allowed to sell to investors
    */
   public cap = async () => {
-    return (await this.contract).cap.callAsync();
+    return weiToValue(
+      await (await this.contract).cap.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public allowBeneficialInvestments = async () => {
