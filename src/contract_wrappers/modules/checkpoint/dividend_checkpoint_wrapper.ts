@@ -1,8 +1,16 @@
 import { BigNumber } from '@0x/utils';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
-import { TxParams, DividendCheckpointBaseContract, Perms } from '../../../types';
-import { numberToBigNumber, dateToBigNumber, bigNumberToDate, bytes32ToString } from '../../../utils/convert';
+import { TxParams, DividendCheckpointBaseContract, Perms, PERCENTAGE_DECIMALS } from '../../../types';
+import {
+  numberToBigNumber,
+  dateToBigNumber,
+  bigNumberToDate,
+  bytes32ToString,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
+} from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
@@ -156,6 +164,8 @@ interface CheckpointData {
 export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   protected abstract contract: Promise<DividendCheckpointBaseContract>;
 
+  protected abstract getDecimals(dividendIndex: number): Promise<BigNumber>;
+
   public wallet = async () => {
     return (await this.contract).wallet.callAsync();
   };
@@ -165,18 +175,19 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public dividends = async (params: DividendIndexParams) => {
+    const decimals = await this.getDecimals(params.dividendIndex);
     const result = await (await this.contract).dividends.callAsync(numberToBigNumber(params.dividendIndex));
     const typedResult: Dividend = {
       checkpointId: result[0].toNumber(),
       created: bigNumberToDate(result[1]),
       maturity: bigNumberToDate(result[2]),
       expiry: bigNumberToDate(result[3]),
-      amount: result[4],
-      claimedAmount: result[5],
-      totalSupply: result[6],
+      amount: weiToValue(result[4], decimals),
+      claimedAmount: weiToValue(result[5], decimals),
+      totalSupply: weiToValue(result[6], decimals),
       reclaimed: result[7],
-      totalWithheld: result[8],
-      totalWithheldWithdrawn: result[9],
+      totalWithheld: weiToValue(result[8], decimals),
+      totalWithheldWithdrawn: weiToValue(result[9], decimals),
       name: result[10],
     };
     return typedResult;
@@ -252,7 +263,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     params.withholding.forEach(withholding => assert.isPercentage('withholding tax', withholding));
     return (await this.contract).setWithholding.sendTransactionAsync(
       params.investors,
-      params.withholding,
+      valueArrayToWeiArray(params.withholding, PERCENTAGE_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -263,7 +274,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.isPercentage('withholding tax', params.withholding);
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
-      params.withholding,
+      valueToWei(params.withholding, PERCENTAGE_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -332,9 +343,10 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       numberToBigNumber(params.dividendIndex),
       params.payee,
     );
+    const decimals = await this.getDecimals(params.dividendIndex);
     const typedResult: CalculateDividendResult = {
-      claim: result[0],
-      withheld: result[1],
+      claim: weiToValue(result[0], decimals),
+      withheld: weiToValue(result[1], decimals),
     };
     return typedResult;
   };
@@ -367,29 +379,37 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getDividendsData = async () => {
     const result = await (await this.contract).getDividendsData.callAsync();
-    const typedResult: DividendData[] = [];
+    const typedResult: Promise<DividendData>[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
-      const dividendData: DividendData = {
-        created: bigNumberToDate(result[0][i]),
-        maturity: bigNumberToDate(result[1][i]),
-        expiry: bigNumberToDate(result[2][i]),
-        amount: result[3][i],
-        claimedAmount: result[4][i],
-        name: bytes32ToString(result[5][i]),
-      };
-      typedResult.push(dividendData);
+      typedResult.push(this.pushDividendsData(result, i));
     }
-    return typedResult;
+    return Promise.all(typedResult);
+  };
+
+  private pushDividendsData = async (
+    result: [BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]],
+    i: number,
+  ): Promise<DividendData> => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return {
+      created: bigNumberToDate(result[0][i]),
+      maturity: bigNumberToDate(result[1][i]),
+      expiry: bigNumberToDate(result[2][i]),
+      amount: weiToValue(result[3][i], decimals),
+      claimedAmount: weiToValue(result[4][i], decimals),
+      name: bytes32ToString(result[5][i]),
+    };
   };
 
   public getDividendData = async (params: DividendIndexParams) => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getDividendData.callAsync(numberToBigNumber(params.dividendIndex));
     const typedResult: DividendData = {
       created: bigNumberToDate(result[0]),
       maturity: bigNumberToDate(result[1]),
       expiry: bigNumberToDate(result[2]),
-      amount: result[3],
-      claimedAmount: result[4],
+      amount: weiToValue(result[3], decimals),
+      claimedAmount: weiToValue(result[4], decimals),
       name: bytes32ToString(result[5]),
     };
     return typedResult;
@@ -398,35 +418,50 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   public getDividendProgress = async (params: DividendIndexParams) => {
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
     const result = await (await this.contract).getDividendProgress.callAsync(numberToBigNumber(params.dividendIndex));
-    const typedResult: DividendProgress[] = [];
+    const typedResult: Promise<DividendProgress>[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
-      const dividendProgress: DividendProgress = {
-        investor: result[0][i],
-        claimed: result[1][i],
-        excluded: result[2][i],
-        withheld: result[3][i],
-        amount: result[4][i],
-        balance: result[5][i],
-      };
-      typedResult.push(dividendProgress);
+      typedResult.push(this.pushDividendProgress(result, i, params.dividendIndex));
     }
-    return typedResult;
+    return Promise.all(typedResult);
+  };
+
+  private pushDividendProgress = async (
+    result: [string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]],
+    i: number,
+    dividendIndex: number,
+  ): Promise<DividendProgress> => {
+    const decimals = await this.getDecimals(dividendIndex);
+    return {
+      investor: result[0][i],
+      claimed: result[1][i],
+      excluded: result[2][i],
+      withheld: weiToValue(result[3][i], decimals),
+      amount: weiToValue(result[4][i], decimals),
+      balance: weiToValue(result[5][i], decimals),
+    };
   };
 
   public getCheckpointData = async (params: CheckpointIdParams) => {
     const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
     assert.assert(params.checkpointId <= currentCheckpointId.toNumber(), 'Invalid checkpoint');
     const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
-    const typedResult: CheckpointData[] = [];
+    const typedResult: Promise<CheckpointData>[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
-      const checkpointData: CheckpointData = {
-        investor: result[0][i],
-        balance: result[1][i],
-        withheld: result[2][i],
-      };
-      typedResult.push(checkpointData);
+      typedResult.push(this.pushCheckpointData(result, i));
     }
-    return typedResult;
+    return Promise.all(typedResult);
+  };
+
+  private pushCheckpointData = async (
+    result: [string[], BigNumber[], BigNumber[]],
+    i: number,
+  ): Promise<CheckpointData> => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return {
+      investor: result[0][i],
+      balance: weiToValue(result[1][i], decimals),
+      withheld: weiToValue(result[2][i], decimals),
+    };
   };
 
   public isClaimed = async (params: InvestorStatus) => {
