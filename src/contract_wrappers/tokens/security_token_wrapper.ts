@@ -1215,18 +1215,20 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber, txData?: Partial<TxData>) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
-    if (maxCost) {
-      assert.assert(
-        maxCost.isGreaterThanOrEqualTo(moduleCost),
-        'Insufficient max cost to cover module factory setup cost',
-      );
-    }
+    assert.assert(
+      maxCost.isGreaterThanOrEqualTo(moduleCost),
+      'Insufficient max cost to cover module factory setup cost',
+    );
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient poly token balance for module cost',
+    );
+    assert.assert(
+      polyTokenBalance.isGreaterThanOrEqualTo(weiToValue(maxCost, FULL_DECIMALS)),
+      'Insufficient poly token balance for max cost',
     );
   };
 
