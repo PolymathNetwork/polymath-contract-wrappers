@@ -25,7 +25,7 @@ import assert from '../../../utils/assert';
 import STOWrapper from './sto_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
-  EventCallback,
+  EventCallback, FULL_DECIMALS,
   FundRaiseType,
   GetLogs,
   GetLogsAsyncParams,
@@ -33,7 +33,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../../types';
-import { bigNumberToDate, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber, weiToValue } from '../../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -433,7 +433,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public finalAmountReturned = async () => {
-    return (await this.contract).finalAmountReturned.callAsync();
+    return weiToValue(
+      await (await this.contract).finalAmountReturned.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public investors = async (params: InvestorAddressParams) => {
@@ -441,7 +444,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     const result = await (await this.contract).investors.callAsync(params.investorAddress);
     const typedResult: InvestorData = {
       accredited: !result[0].isZero(),
-      nonAccreditedLimitUSDOverride: result[2],
+      nonAccreditedLimitUSDOverride: weiToValue(result[2], FULL_DECIMALS),
     };
     return typedResult;
   };
