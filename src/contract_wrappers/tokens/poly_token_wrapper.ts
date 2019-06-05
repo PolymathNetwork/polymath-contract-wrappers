@@ -14,6 +14,7 @@ import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
+import { valueToWei } from '../../utils/convert';
 
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PolyTokenEvents.Approval;
@@ -75,7 +76,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -85,7 +86,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );

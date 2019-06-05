@@ -64,6 +64,7 @@ import {
   VolumeRestrictionTMEventArgs,
   PolyTokenFaucetContract,
 } from '@polymathnetwork/abi-wrappers';
+import {BigNumber} from '@0x/utils';
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
@@ -259,3 +260,6 @@ export type GenericModuleContract =
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
 
 export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | EtherDividendCheckpointContract;
+
+export const PERCENTAGE_DECIMALS = new BigNumber(16);
+export const FULL_DECIMALS = new BigNumber(18);
