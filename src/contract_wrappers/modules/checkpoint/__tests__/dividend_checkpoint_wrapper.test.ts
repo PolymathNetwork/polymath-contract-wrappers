@@ -1625,7 +1625,7 @@ describe('DividendCheckpointWrapper', () => {
       expect(result[0].excluded).toBe(expectedResult[2][0]);
       expect(result[0].withheld).toEqual(weiToValue(expectedResult[3][0] as BigNumber, expectedDecimalsResult));
       expect(result[0].amount).toEqual(weiToValue(expectedResult[4][0] as BigNumber, expectedDecimalsResult));
-      expect(result[0].balance).toBe(expectedResult[5][0]);
+      expect(result[0].balance).toEqual(weiToValue(expectedResult[5][0] as BigNumber, expectedDecimalsResult));
 
       // Verifications
       verify(mockedContract.getDividendsData).once();

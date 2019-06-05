@@ -437,7 +437,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       excluded: result[2][i],
       withheld: weiToValue(result[3][i], decimals),
       amount: weiToValue(result[4][i], decimals),
-      balance: result[5][i],
+      balance: weiToValue(result[5][i], decimals),
     };
   };
 
