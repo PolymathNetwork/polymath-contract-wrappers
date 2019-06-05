@@ -65,7 +65,6 @@ import {
   VolumeRestrictionTMEventArgs,
   PolyTokenFaucetContract,
 } from '@polymathnetwork/abi-wrappers';
-import {BigNumber} from '@0x/utils';
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
