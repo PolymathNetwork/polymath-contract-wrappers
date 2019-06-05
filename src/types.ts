@@ -1,4 +1,5 @@
 import { TxData } from '@0x/web3-wrapper';
+import { BigNumber } from '@0x/utils';
 import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
@@ -64,7 +65,6 @@ import {
   VolumeRestrictionTMEventArgs,
   PolyTokenFaucetContract,
 } from '@polymathnetwork/abi-wrappers';
-import {BigNumber} from '@0x/utils';
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
