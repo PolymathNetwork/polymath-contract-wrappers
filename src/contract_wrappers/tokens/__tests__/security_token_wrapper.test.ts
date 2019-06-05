@@ -2366,7 +2366,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedMethod = mock(MockedSendMethod);
       when(mockedContract.addModule).thenReturn(instance(mockedMethod));
 
-      const expectedDecimalsResult = new BigNumber(18);
+      const expectedDecimalsResult = new BigNumber(16);
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
@@ -2472,8 +2472,8 @@ describe('SecurityTokenWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedCtmParams.address,
           objectContaining(ctmData),
-          objectContaining(valueToWei(mockedCtmParams.maxCost, expectedDecimalsResult)),
-          objectContaining(valueToWei(mockedCtmParams.budget, expectedDecimalsResult)),
+          objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
         ),
@@ -2496,8 +2496,8 @@ describe('SecurityTokenWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedCtmParams.address,
           objectContaining(ctmData),
-          objectContaining(valueToWei(mockedCtmParams.maxCost, expectedDecimalsResult)),
-          objectContaining(valueToWei(mockedCtmParams.budget, expectedDecimalsResult)),
+          objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
         ),

@@ -51,8 +51,6 @@ export function bytes32ArrayToStringArray(value: string[]) {
 }
 
 export function weiToValue(value: BigNumber, decimals: BigNumber) {
-  assert.assert(decimals.isInteger(), 'Decimals must be an integer number');
-  assert.assert(decimals.isLessThanOrEqualTo(18), 'Decimals must be less than or equal to 18');
   return value.dividedBy(BASE.exponentiatedBy(decimals));
 }
 
@@ -63,8 +61,6 @@ export function weiArrayToValueArray(value: BigNumber[], decimals: BigNumber) {
 }
 
 export function valueToWei(value: BigNumber, decimals: BigNumber) {
-  assert.assert(decimals.isInteger(), 'Decimals must be an integer number');
-  assert.assert(decimals.isLessThanOrEqualTo(18), 'Decimals must be less than or equal to 18');
   return value.multipliedBy(BASE.exponentiatedBy(decimals));
 }
 

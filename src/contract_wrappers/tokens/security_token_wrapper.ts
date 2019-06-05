@@ -1017,14 +1017,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const decimals = await this.decimals();
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, decimals);
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, decimals);
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
+    await this.checkModuleCostBelowMaxCost(params.address, maxCost, params.txData);
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
+    const decimals = await this.decimals();
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1213,11 +1213,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (
-    moduleFactory: string,
-    txData?: Partial<TxData>,
-    maxCost?: BigNumber,
-  ) => {
+  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber, txData?: Partial<TxData>) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
     if (maxCost) {
       assert.assert(
@@ -1274,14 +1270,20 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private isCompatibleModule = async (address: string) => {
     const versions = await this.getVersion();
-    const upperSTVersionBounds = await (await this.moduleFactoryContract(address)).getUpperSTVersionBounds.callAsync();
-    const lowerSTVersionBounds = await (await this.moduleFactoryContract(address)).getLowerSTVersionBounds.callAsync();
+    const upperSTVersionBounds = (await (await this.moduleFactoryContract(
+      address,
+    )).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    const lowerSTVersionBounds = (await (await this.moduleFactoryContract(
+      address,
+    )).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    const skipUpperVersionBound = upperSTVersionBounds.every(v => v.isZero());
+    const skipLowerVersionBound = lowerSTVersionBounds.every(v => v.isZero());
     let isCompatible = true;
     for (let i = 0; i < 3; i += 1) {
       isCompatible =
         isCompatible &&
-        lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i]) &&
-        upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]);
+        (skipLowerVersionBound || lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i])) &&
+        (skipUpperVersionBound || upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]));
     }
     return isCompatible;
   };
