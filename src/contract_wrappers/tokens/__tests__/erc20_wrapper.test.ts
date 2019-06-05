@@ -56,6 +56,12 @@ describe('ERC20TokenWrapper', () => {
   describe('totalSupply', () => {
     test('should call to totalSupply', async () => {
       const expectedResult = new BigNumber(1);
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -66,10 +72,12 @@ describe('ERC20TokenWrapper', () => {
       // Real call
       const result = await target.totalSupply();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.totalSupply).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 

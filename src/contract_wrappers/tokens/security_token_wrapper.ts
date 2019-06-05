@@ -56,8 +56,18 @@ import {
   FundRaiseType,
   ModuleName,
   Features,
+  PERCENTAGE_DECIMALS,
+  FULL_DECIMALS,
 } from '../../types';
-import { stringToBytes32, numberToBigNumber, dateToBigNumber, bytes32ToString, valueToWei } from '../../utils/convert';
+import {
+  stringToBytes32,
+  numberToBigNumber,
+  dateToBigNumber,
+  bytes32ToString,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
+} from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -744,7 +754,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeModuleBudget.sendTransactionAsync(
       params.module,
-      params.change,
+      valueToWei(params.change, await this.decimals()),
       params.increase,
       params.txData,
       params.safetyFactor,
@@ -805,7 +815,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -818,7 +828,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -844,7 +854,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mint.sendTransactionAsync(
       params.investor,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -856,7 +866,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(!(await this.mintingFrozen()), 'Minting is frozen');
     return (await this.contract).mintWithData.sendTransactionAsync(
       params.investor,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -873,7 +883,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
-      params.values,
+      valueArrayToWeiArray(params.values, await this.decimals()),
       params.txData,
       params.safetyFactor,
     );
@@ -892,7 +902,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public burnWithData = async (params: BurnWithDataParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).burnWithData.sendTransactionAsync(
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       stringToBytes32(params.data),
       params.txData,
       params.safetyFactor,
@@ -911,7 +921,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('from', params.from);
     return (await this.contract).burnFromWithData.sendTransactionAsync(
       params.from,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -932,12 +942,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
-    return (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId));
+    return weiToValue(
+      await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
+      await this.decimals(),
+    );
   };
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
-    return (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId));
+    return weiToValue(
+      await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
+      await this.decimals(),
+    );
   };
 
   public setController = async (params: SetControllerParams) => {
@@ -966,7 +982,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).forceTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.log,
       params.txData,
@@ -980,7 +996,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkMsgSenderIsController(params.txData);
     return (await this.contract).forceBurn.sendTransactionAsync(
       params.from,
-      params.value,
+      valueToWei(params.value, await this.decimals()),
       params.data,
       params.log,
       params.txData,
@@ -1001,13 +1017,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : params.maxCost;
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : params.budget;
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, params.txData, maxCost);
+    await this.checkModuleCostBelowMaxCost(params.address, maxCost, params.txData);
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
+    const decimals = await this.decimals();
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
@@ -1018,7 +1035,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       case ModuleName.percentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
-          (params.data as PercentageTransferManagerData).maxHolderPercentage.toNumber(),
+          valueToWei(
+            (params.data as PercentageTransferManagerData).maxHolderPercentage,
+            PERCENTAGE_DECIMALS,
+          ).toString(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
@@ -1028,8 +1048,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
-          (params.data as CappedSTOData).cap.toNumber(),
-          (params.data as CappedSTOData).rate.toNumber(),
+          valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
+          valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
           (params.data as CappedSTOData).fundRaiseTypes,
           (params.data as CappedSTOData).fundsReceiver,
         ]);
@@ -1041,19 +1061,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
           (params.data as USDTieredSTOData).ratePerTier.map(e => {
-            return e.toNumber();
+            return valueToWei(e, FULL_DECIMALS).toString();
           }),
           (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
-            return e.toNumber();
+            return valueToWei(e, FULL_DECIMALS).toString();
           }),
           (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals).toString();
           }),
           (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
-            return e.toNumber();
+            return valueToWei(e, decimals).toString();
           }),
-          (params.data as USDTieredSTOData).nonAccreditedLimitUSD.toNumber(),
-          (params.data as USDTieredSTOData).minimumInvestmentUSD.toNumber(),
+          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, FULL_DECIMALS).toString(),
+          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, FULL_DECIMALS).toString(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).reserveWallet,
@@ -1108,7 +1128,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    return (await this.contract).verifyTransfer.callAsync(params.from, params.to, params.value, params.data);
+    return (await this.contract).verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+    );
   };
 
   /**
@@ -1188,11 +1213,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (
-    moduleFactory: string,
-    txData?: Partial<TxData>,
-    maxCost?: BigNumber,
-  ) => {
+  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber, txData?: Partial<TxData>) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
     if (maxCost) {
       assert.assert(
@@ -1249,14 +1270,20 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private isCompatibleModule = async (address: string) => {
     const versions = await this.getVersion();
-    const upperSTVersionBounds = await (await this.moduleFactoryContract(address)).getUpperSTVersionBounds.callAsync();
-    const lowerSTVersionBounds = await (await this.moduleFactoryContract(address)).getLowerSTVersionBounds.callAsync();
+    const upperSTVersionBounds = (await (await this.moduleFactoryContract(
+      address,
+    )).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    const lowerSTVersionBounds = (await (await this.moduleFactoryContract(
+      address,
+    )).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    const skipUpperVersionBound = upperSTVersionBounds.every(v => v.isZero());
+    const skipLowerVersionBound = lowerSTVersionBounds.every(v => v.isZero());
     let isCompatible = true;
     for (let i = 0; i < 3; i += 1) {
       isCompatible =
         isCompatible &&
-        lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i]) &&
-        upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]);
+        (skipLowerVersionBound || lowerSTVersionBounds[i].isLessThanOrEqualTo(versions[i])) &&
+        (skipUpperVersionBound || upperSTVersionBounds[i].isGreaterThanOrEqualTo(versions[i]));
     }
     return isCompatible;
   };

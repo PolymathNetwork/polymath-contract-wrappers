@@ -91,7 +91,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Returns the token total supply
    */
   public totalSupply = async () => {
-    return (await this.contract).totalSupply.callAsync();
+    return weiToValue(await (await this.contract).totalSupply.callAsync(), await this.decimals());
   };
 
   /**
