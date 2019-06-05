@@ -2,9 +2,12 @@
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ERC20DividendCheckpointContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
+import {
+  EtherDividendCheckpointContract,
+  SecurityTokenContract,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import ERC20DividendCheckpointWrapper from '../erc20_dividend_checkpoint_wrapper';
+import EtherDividendCheckpointWrapper from '../ether_dividend_checkpoint_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
   bytes32ToString,
@@ -19,20 +22,20 @@ import ModuleWrapper from '../../module_wrapper';
 
 describe('DividendCheckpointWrapper', () => {
   // ERC20 Dividend Wrapper is used as contract target here as DividendCheckpoint is abstract
-  let target: ERC20DividendCheckpointWrapper;
+  let target: EtherDividendCheckpointWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ERC20DividendCheckpointContract;
+  let mockedContract: EtherDividendCheckpointContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: SecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ERC20DividendCheckpointContract);
+    mockedContract = mock(EtherDividendCheckpointContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(SecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ERC20DividendCheckpointWrapper(
+    target = new EtherDividendCheckpointWrapper(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -225,16 +228,12 @@ describe('DividendCheckpointWrapper', () => {
       // Get Decimals
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedDecimalsPercentageResult = new BigNumber(16);
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       const dividendIndex = 2;
       const expectedResult = [
@@ -269,17 +268,13 @@ describe('DividendCheckpointWrapper', () => {
       expect(valueToWei(result.claimedAmount, expectedDecimalsResult)).toEqual(expectedResult[5]);
       expect(valueToWei(result.totalSupply, expectedDecimalsResult)).toEqual(expectedResult[6]);
       expect(result.reclaimed).toBe(expectedResult[7]);
-      expect(valueToWei(result.totalWithheld, expectedDecimalsPercentageResult)).toEqual(expectedResult[8]);
-      expect(valueToWei(result.totalWithheldWithdrawn, expectedDecimalsPercentageResult)).toEqual(expectedResult[9]);
+      expect(valueToWei(result.totalWithheld, expectedDecimalsResult)).toEqual(expectedResult[8]);
+      expect(valueToWei(result.totalWithheldWithdrawn, expectedDecimalsResult)).toEqual(expectedResult[9]);
       expect(result.name).toBe(expectedResult[10]);
 
       // Verifications
       verify(mockedContract.dividends).once();
       verify(mockedMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
-      verify(mockedContract.securityToken).times(3);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
-      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -864,11 +859,11 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsMethod.callAsync()).once();
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
-      verify(mockedContract.securityToken).times(3);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -980,11 +975,11 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsMethod.callAsync()).once();
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
-      verify(mockedContract.securityToken).times(3);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1128,10 +1123,10 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedContract.getDividendData).once();
       verify(mockedDividendMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1146,9 +1141,6 @@ describe('DividendCheckpointWrapper', () => {
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // getDividendsData mock
       const pastDate = new Date(2010, 1);
@@ -1229,10 +1221,6 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
       verify(mockedContract.getDividendsData).once();
       verify(mockedGetDividendsMethod.callAsync()).once();
-      verify(mockedContract.securityToken).times(3);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
-      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -1241,16 +1229,12 @@ describe('DividendCheckpointWrapper', () => {
       // Get Decimals
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedDecimalsPercentageResult = new BigNumber(16);
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock getDividendsData
       const pastDate = new Date(2010, 1);
@@ -1288,7 +1272,7 @@ describe('DividendCheckpointWrapper', () => {
 
       // Result expectation
       expect(result.claim).toEqual(weiToValue(expectedResult[0], expectedDecimalsResult));
-      expect(result.withheld).toEqual(weiToValue(expectedResult[1], expectedDecimalsPercentageResult));
+      expect(result.withheld).toEqual(weiToValue(expectedResult[1], expectedDecimalsResult));
 
       // Verifications
       verify(mockedContract.getDividendsData).once();
@@ -1297,10 +1281,6 @@ describe('DividendCheckpointWrapper', () => {
       verify(
         mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)), mockedParams.payee),
       ).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1527,10 +1507,10 @@ describe('DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.getDividendsData).once();
       verify(mockedMethod.callAsync()).once();
-      verify(mockedContract.securityToken).times(4);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
-      verify(mockedSecurityTokenContract.decimals).times(4);
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -1583,10 +1563,10 @@ describe('DividendCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.getDividendData).once();
       verify(mockedMethod.callAsync(objectContaining(new BigNumber(dividendIndex)))).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1595,16 +1575,13 @@ describe('DividendCheckpointWrapper', () => {
       // Get Decimals
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedDecimalsPercentageResult = new BigNumber(16);
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       // Mock getDividendsData
       const pastDate = new Date(2010, 1);
       const futureDate = new Date(2030, 1);
@@ -1649,9 +1626,7 @@ describe('DividendCheckpointWrapper', () => {
       expect(result[0].investor).toBe(expectedResult[0][0]);
       expect(result[0].claimed).toBe(expectedResult[1][0]);
       expect(result[0].excluded).toBe(expectedResult[2][0]);
-      expect(result[0].withheld).toEqual(
-        weiToValue(expectedResult[3][0] as BigNumber, expectedDecimalsPercentageResult),
-      );
+      expect(result[0].withheld).toEqual(weiToValue(expectedResult[3][0] as BigNumber, expectedDecimalsResult));
       expect(result[0].amount).toEqual(weiToValue(expectedResult[4][0] as BigNumber, expectedDecimalsResult));
       expect(result[0].balance).toBe(expectedResult[5][0]);
 
@@ -1660,10 +1635,6 @@ describe('DividendCheckpointWrapper', () => {
       verify(mockedDividendsDataMethod.callAsync()).once();
       verify(mockedContract.getDividendProgress).once();
       verify(mockedMethod.callAsync(objectContaining(new BigNumber(mockedParams.dividendIndex)))).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -1674,7 +1645,6 @@ describe('DividendCheckpointWrapper', () => {
       // Mock security token
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedDecimalsPercentageResult = new BigNumber(16);
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
@@ -1716,9 +1686,7 @@ describe('DividendCheckpointWrapper', () => {
       // Result expectation
       expect(result[0].investor).toBe(expectedResult[0][0]);
       expect(result[0].balance).toEqual(weiToValue(expectedResult[1][0] as BigNumber, expectedDecimalsResult));
-      expect(result[0].withheld).toEqual(
-        weiToValue(expectedResult[2][0] as BigNumber, expectedDecimalsPercentageResult),
-      );
+      expect(result[0].withheld).toEqual(weiToValue(expectedResult[2][0] as BigNumber, expectedDecimalsResult));
 
       // Verifications
       verify(mockedContract.getCheckpointData).once();
