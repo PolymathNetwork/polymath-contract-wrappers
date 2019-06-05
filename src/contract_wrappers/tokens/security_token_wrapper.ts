@@ -1021,7 +1021,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
     await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, maxCost, params.txData);
+    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
     const decimals = await this.decimals();
@@ -1213,15 +1213,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber, txData?: Partial<TxData>) => {
+  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient max cost to cover module factory setup cost',
     );
-    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
-      await this.getCallerAddress(txData),
-    );
+    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.address());
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient poly token balance for module cost',
