@@ -256,6 +256,20 @@ describe('CappedSTOWrapper', () => {
     test('should get the tokens sold', async () => {
       // Address expected
       const expectedResult = new BigNumber(1);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -266,10 +280,15 @@ describe('CappedSTOWrapper', () => {
       // Real call
       const result = await target.getTokensSold();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.getTokensSold).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -277,16 +296,34 @@ describe('CappedSTOWrapper', () => {
     test('should call getSTODetails', async () => {
       const expectedStartTime = new Date(2025, 1);
       const expectedEndTime = new Date(2026, 1);
+      const cap = new BigNumber(1);
+      const rate = new BigNumber(1);
+      const fundsRaised = new BigNumber(1);
+      const totalTokensSold = new BigNumber(1);
       const expectedResult = [
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
+        cap,
+        rate,
+        fundsRaised,
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        totalTokensSold,
         true,
       ];
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -299,16 +336,21 @@ describe('CappedSTOWrapper', () => {
       // Result expectation
       expect(result.startTime).toEqual(expectedStartTime);
       expect(result.endTime).toEqual(expectedEndTime);
-      expect(result.cap).toBe(expectedResult[2]);
-      expect(result.rate).toBe(expectedResult[3]);
-      expect(result.fundsRaised).toBe(expectedResult[4]);
+      expect(result.cap).toEqual(weiToValue(cap, expectedDecimalsResult));
+      expect(result.rate).toEqual(weiToValue(rate, FULL_DECIMALS));
+      expect(result.fundsRaised).toEqual(weiToValue(fundsRaised, FULL_DECIMALS));
       expect(result.investorCount).toEqual(1);
-      expect(result.totalTokensSold).toBe(expectedResult[6]);
+      expect(result.totalTokensSold).toEqual(weiToValue(totalTokensSold, expectedDecimalsResult));
       expect(result.isRaisedInPoly).toBe(expectedResult[7]);
 
       // Verifications
       verify(mockedContract.getSTODetails).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -325,7 +367,7 @@ describe('CappedSTOWrapper', () => {
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      const expectedETHBalanceResult = new BigNumber(100);
+      const expectedETHBalanceResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -374,7 +416,7 @@ describe('CappedSTOWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        value: mockedParams.value,
+        value: valueToWei(mockedParams.value, FULL_DECIMALS),
       };
 
       const expectedResult = getMockedPolyResponse();
@@ -460,7 +502,7 @@ describe('CappedSTOWrapper', () => {
       when(mockedEndTimeMethod.callAsync()).thenResolve(expectedEndTimeResult);
 
       // Security Token Address expected
-      const expectedBalanceOfResult = new BigNumber(100);
+      const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
       // Setup get Security Token Address
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
@@ -484,7 +526,7 @@ describe('CappedSTOWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.investedPOLY),
+          objectContaining(valueToWei(mockedParams.investedPOLY, FULL_DECIMALS)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -499,7 +541,7 @@ describe('CappedSTOWrapper', () => {
       verify(mockedContract.buyTokensWithPoly).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.investedPOLY),
+          objectContaining(valueToWei(mockedParams.investedPOLY, FULL_DECIMALS)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
