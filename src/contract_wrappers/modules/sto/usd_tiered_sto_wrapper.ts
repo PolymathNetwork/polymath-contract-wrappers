@@ -663,15 +663,16 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public getSTODetails = async () => {
     const result = await (await this.contract).getSTODetails.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: USDTieredSTOData = {
       startTime: bigNumberToDate(result[0]),
       endTime: bigNumberToDate(result[1]),
       currentTier: result[2].toNumber(),
-      capPerTier: result[3],
-      ratePerTier: result[4],
-      fundsRaised: result[5],
+      capPerTier: weiArrayToValueArray(result[3], decimals),
+      ratePerTier: weiArrayToValueArray(result[4], FULL_DECIMALS),
+      fundsRaised: weiToValue(result[5], FULL_DECIMALS),
       investorCount: result[6].toNumber(),
-      tokensSold: result[7],
+      tokensSold: weiToValue(result[7], decimals),
       isRaisedInETH: result[8][0],
       isRaisedInPOLY: result[8][1],
       isRaisedInSC: result[8][2],

@@ -424,8 +424,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -437,6 +437,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -500,6 +513,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -590,8 +608,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -603,6 +621,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
       // Setup get Security Token Address
@@ -674,6 +705,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -764,8 +800,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -777,6 +813,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       // Security Token Address expected
       const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
@@ -853,6 +902,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDetailedERC20Contract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -945,8 +999,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -958,6 +1012,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -1018,6 +1085,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -1108,8 +1180,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -1121,6 +1193,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       // Balance expected
       const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
@@ -1190,6 +1275,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -1280,8 +1370,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -1293,6 +1383,19 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
       // Stub the request
       when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       // Balance expected
       const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
@@ -1366,6 +1469,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDetailedERC20Contract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -1414,8 +1522,8 @@ describe('USDTieredSTOWrapper', () => {
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        [new BigNumber(1), new BigNumber(1)],
+        [new BigNumber(1), new BigNumber(1)],
         new BigNumber(1),
         new BigNumber(1),
         new BigNumber(1),
@@ -1546,11 +1654,11 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
       verify(mockedContract.allowBeneficialInvestments).once();
       verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
     });
@@ -1607,17 +1715,35 @@ describe('USDTieredSTOWrapper', () => {
     test('should call getSTODetails', async () => {
       const expectedStartTime = new Date(2025, 1);
       const expectedEndTime = new Date(2026, 1);
+      const capPerTier = [new BigNumber(1), new BigNumber(2)];
+      const ratePerTier = [new BigNumber(1), new BigNumber(2)];
+      const fundsRaised = new BigNumber(1);
+      const tokensSold = new BigNumber(1);
       const expectedResult = [
         dateToBigNumber(expectedStartTime),
         dateToBigNumber(expectedEndTime),
         new BigNumber(1),
+        capPerTier,
+        ratePerTier,
+        fundsRaised,
         new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
+        tokensSold,
         [true, false, false],
       ];
+
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1631,11 +1757,11 @@ describe('USDTieredSTOWrapper', () => {
       expect(result.startTime).toEqual(expectedStartTime);
       expect(result.endTime).toEqual(expectedEndTime);
       expect(result.currentTier).toEqual(1);
-      expect(result.capPerTier).toBe(expectedResult[3]);
-      expect(result.ratePerTier).toBe(expectedResult[4]);
-      expect(result.fundsRaised).toBe(expectedResult[5]);
+      expect(result.capPerTier).toEqual(weiArrayToValueArray(capPerTier, expectedDecimalsResult));
+      expect(result.ratePerTier).toEqual(weiArrayToValueArray(ratePerTier, FULL_DECIMALS));
+      expect(result.fundsRaised).toEqual(weiToValue(fundsRaised, FULL_DECIMALS));
       expect(result.investorCount).toEqual(1);
-      expect(result.tokensSold).toBe(expectedResult[7]);
+      expect(result.tokensSold).toEqual(weiToValue(tokensSold, expectedDecimalsResult));
       expect(result.isRaisedInETH).toBe(true);
       expect(result.isRaisedInPOLY).toBe(false);
       expect(result.isRaisedInSC).toBe(false);
@@ -1643,6 +1769,11 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.getSTODetails).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
 
