@@ -1224,10 +1224,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient poly token balance for module cost',
     );
-    assert.assert(
-      polyTokenBalance.isGreaterThanOrEqualTo(weiToValue(maxCost, FULL_DECIMALS)),
-      'Insufficient poly token balance for max cost',
-    );
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
