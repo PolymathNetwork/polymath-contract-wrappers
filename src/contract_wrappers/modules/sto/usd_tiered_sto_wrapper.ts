@@ -691,14 +691,14 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Get the limit in USD for non-accredited investors
    */
   public nonAccreditedLimitUSD = async () => {
-    return (await this.contract).nonAccreditedLimitUSD.callAsync();
+    return weiToValue(await (await this.contract).nonAccreditedLimitUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * Get the minimun investment in USD
    */
   public minimumInvestmentUSD = async () => {
-    return (await this.contract).minimumInvestmentUSD.callAsync();
+    return weiToValue(await (await this.contract).minimumInvestmentUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
@@ -712,7 +712,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return the total no. of tokens sold
    */
   public getTokensSold = async () => {
-    return (await this.contract).getTokensSold.callAsync();
+    return weiToValue(
+        await (await this.contract).getTokensSold.callAsync(),
+        await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   /**
@@ -740,21 +743,22 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Amount of USD funds raised
    */
   public fundsRaisedUSD = async () => {
-    return (await this.contract).fundsRaisedUSD.callAsync();
+    return weiToValue(await (await this.contract).fundsRaisedUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * Get specific tier
    */
   public tiers = async (params: TierIndexParams) => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).tiers.callAsync(numberToBigNumber(params.tier));
     const typedResult: Tier = {
-      rate: result[0],
-      rateDiscountPoly: result[1],
-      tokenTotal: result[2],
-      tokensDiscountPoly: result[3],
-      mintedTotal: result[4],
-      mintedDiscountPoly: result[5],
+      rate: weiToValue(result[0], FULL_DECIMALS),
+      rateDiscountPoly: weiToValue(result[1], FULL_DECIMALS),
+      tokenTotal: weiToValue(result[2], decimals),
+      tokensDiscountPoly: weiToValue(result[3], decimals),
+      mintedTotal: weiToValue(result[4], decimals),
+      mintedDiscountPoly: weiToValue(result[5], decimals),
     };
     return typedResult;
   };
@@ -763,12 +767,13 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     assert.assert(params.tier < (await this.getNumberOfTiers()).toNumber(), 'Invalid tier');
     const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
-      mintedInETH: result[0],
-      mintedInPOLY: result[1],
-      mintedInSC: result[2],
+      mintedInETH: weiToValue(result[0], decimals),
+      mintedInPOLY: weiToValue(result[1], decimals),
+      mintedInSC: weiToValue(result[2], decimals),
     };
     return typedResult;
   };
