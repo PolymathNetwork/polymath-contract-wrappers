@@ -262,3 +262,4 @@ export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOCont
 export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | EtherDividendCheckpointContract;
 
 export const PERCENTAGE_DECIMALS = new BigNumber(16);
+export const FULL_DECIMALS = new BigNumber(18);

@@ -32,7 +32,7 @@ import {
   GetLogs,
   Perms,
 } from '../../../types';
-import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
+import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
@@ -254,7 +254,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
-      value: params.value,
+      value: valueToWei(params.value, await this.getDecimals()),
     };
     await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name);
     return (await this.contract).createDividend.sendTransactionAsync(
@@ -270,7 +270,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
-      value: params.value,
+      value: valueToWei(params.value, await this.getDecimals()),
     };
     await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
@@ -287,7 +287,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
-      value: params.value,
+      value: valueToWei(params.value, await this.getDecimals()),
     };
     await this.checkIfDividendIsValid(
       params.value,
@@ -313,7 +313,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
-      value: params.value,
+      value: valueToWei(params.value, await this.getDecimals()),
     };
     await this.checkIfDividendIsValid(
       params.value,
