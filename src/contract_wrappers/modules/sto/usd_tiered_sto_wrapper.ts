@@ -34,7 +34,14 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../../types';
-import { bigNumberToDate, dateToBigNumber, numberToBigNumber, valueToWei, weiToValue } from '../../../utils/convert';
+import {
+  bigNumberToDate,
+  dateToBigNumber,
+  numberToBigNumber,
+  valueToWei,
+  weiArrayToValueArray,
+  weiToValue
+} from '../../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -628,21 +635,30 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   public getRate = async (params: FundRaiseTypeParams) => {
-    return (await this.contract).getRate.callAsync(params.fundRaiseType);
+    return weiToValue(await (await this.contract).getRate.callAsync(params.fundRaiseType), FULL_DECIMALS);
   };
 
   public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
-    return (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, params.amount);
+    return weiToValue(
+      await (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, params.amount),
+      FULL_DECIMALS,
+    );
   };
 
   public getTokensMinted = async () => {
-    return (await this.contract).getTokensMinted.callAsync();
+    return weiToValue(
+      await (await this.contract).getTokensMinted.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
     assert.assert(params.tier < tiers.toNumber(), 'Invalid tier');
-    return (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
+    return weiToValue(
+        await (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier)),
+        await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public getSTODetails = async () => {
