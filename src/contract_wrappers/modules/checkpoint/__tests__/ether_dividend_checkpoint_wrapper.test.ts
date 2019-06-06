@@ -7,7 +7,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import EtherDividendCheckpointWrapper from '../ether_dividend_checkpoint_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import DividendCheckpointWrapper from '../dividend_checkpoint_wrapper';
-import { dateToBigNumber, stringToBytes32 } from '../../../../utils/convert';
+import { dateToBigNumber, stringToBytes32, valueToWei } from '../../../../utils/convert';
 
 describe('EtherDividendCheckpointWrapper', () => {
   // EtherDividend Wrapper is used as contract target here as DividendCheckpoint is abstract
@@ -45,9 +45,9 @@ describe('EtherDividendCheckpointWrapper', () => {
   });
   describe('Create Dividend', () => {
     test('should createDividend', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       // Setup get Security Token Address
@@ -74,7 +74,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        value: mockedParams.value,
+        value: valueToWei(mockedParams.value, expectedDecimalsResult),
       };
 
       const expectedResult = getMockedPolyResponse();
@@ -123,7 +123,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       const checkpointId = 2;
-
+      const expectedDecimalsResult = new BigNumber(18);
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       // Setup get Security Token Address
@@ -160,7 +160,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        value: mockedParams.value,
+        value: valueToWei(mockedParams.value, expectedDecimalsResult),
       };
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -212,7 +212,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       const checkpointId = 2;
-
+      const expectedDecimalsResult = new BigNumber(18);
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       // Setup get Security Token Address
@@ -250,7 +250,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        value: mockedParams.value,
+        value: valueToWei(mockedParams.value, expectedDecimalsResult),
       };
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -303,7 +303,7 @@ describe('EtherDividendCheckpointWrapper', () => {
     test('should createDividendWithExclusions', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-
+      const expectedDecimalsResult = new BigNumber(18);
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       // Setup get Security Token Address
@@ -332,7 +332,7 @@ describe('EtherDividendCheckpointWrapper', () => {
       };
       const txPayableData = {
         ...{},
-        value: mockedParams.value,
+        value: valueToWei(mockedParams.value, expectedDecimalsResult),
       };
       const expectedResult = getMockedPolyResponse();
       // Mocked method
