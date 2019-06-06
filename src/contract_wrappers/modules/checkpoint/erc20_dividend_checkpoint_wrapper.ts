@@ -28,7 +28,7 @@ import {
   GetLogs,
   Perms,
 } from '../../../types';
-import { numberToBigNumber, dateToBigNumber, stringToBytes32 } from '../../../utils/convert';
+import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
@@ -203,11 +203,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.name,
       params.txData,
     );
+    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.token,
-      params.amount,
+      valueToWei(params.amount, decimals),
       stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
@@ -225,11 +226,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.txData,
       params.checkpointId,
     );
+    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.token,
-      params.amount,
+      valueToWei(params.amount, decimals),
       numberToBigNumber(params.checkpointId),
       stringToBytes32(params.name),
       params.txData,
@@ -249,11 +251,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       undefined,
       params.excluded,
     );
+    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.token,
-      params.amount,
+      valueToWei(params.amount, decimals),
       params.excluded,
       stringToBytes32(params.name),
       params.txData,
@@ -275,11 +278,12 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.checkpointId,
       params.excluded,
     );
+    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
       params.token,
-      params.amount,
+      valueToWei(params.amount, decimals),
       numberToBigNumber(params.checkpointId),
       params.excluded,
       stringToBytes32(params.name),
