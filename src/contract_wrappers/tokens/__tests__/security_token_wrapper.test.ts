@@ -2385,11 +2385,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -2507,11 +2510,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -2536,6 +2539,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
 
     test('should send the transaction to addModule for PercentageTransferManager', async () => {
@@ -2564,11 +2568,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -2690,11 +2697,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -2719,6 +2726,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
 
     test('should send the transaction to addModule for CappedSTO', async () => {
@@ -2794,11 +2802,14 @@ describe('SecurityTokenWrapper', () => {
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // checkModuleStructAddressIsEmpty
       const expectedModuleResult = [
@@ -2885,11 +2896,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -2914,6 +2925,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
 
     test('should send the transaction to addModule for USDTieredSTO', async () => {
@@ -2942,11 +2954,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -3106,11 +3121,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -3135,6 +3150,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
 
     test('should send the transaction to addModule for ERC20DividendCheckpoint', async () => {
@@ -3163,11 +3179,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -3284,11 +3303,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -3313,6 +3332,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
 
     test('should send the transaction to addModule for EtherDividendCheckpoint', async () => {
@@ -3341,11 +3361,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedBalanceMethod = mock(MockedCallMethod);
       const balanceResult = new BigNumber(1);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
-      when(mockedBalanceMethod.callAsync(OWNER)).thenResolve(balanceResult);
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -3462,11 +3485,11 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.addModule).once();
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.getSetupCost).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceMethod.callAsync(OWNER)).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
@@ -3491,6 +3514,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
     });
   });
 
