@@ -24,19 +24,6 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
 }
 ```
 
-## Sandbox
-
-We provide a sandbox dev server to manually play with the package in the browser
-
-To boot it up:
-
-```
-yarn start
-```
-
-This will generate a git-ignored sandbox.ts file you can edit locally
-to start playing around with the code
-
 ## Contributing
 
 We strongly recommend that the community help us make improvements and determine the future direction of the protocol. To report bugs within this package, please create an issue in this repository.
@@ -92,3 +79,33 @@ yarn jest
 ## Deployment
 
 ** Pending, should run a prepublish script on CI or use Semantic Releases**
+## Sandbox
+
+
+We provide a sandbox dev server to manually play with the package in the browser
+
+To boot it up:
+
+```
+yarn start
+```
+
+This will generate a git-ignored sandbox.ts file you can edit locally
+to start playing around with the code
+
+## Starting up- Code Examples
+In order to setup the Polymath API included in these contract wrappers, you must first establish a blockchain provider.
+
+Ethereum providers are important in both reading and writing from an Ethereum RPC Node.
+
+The API must be provided with the network id you would like to use, or RPC Node. The provider may exist on a node, on the browser as an injected provider (like Metamask), or both.
+
+In order to configure the provider use the following code samples to set up the Project. Follow the following examples to set this up in your sandbox, dapp or node server.
+
+1. Using Injected Provider to read from the blockchain and publish transactions on the blockchain.
+
+2. Using a Redundant Provider on node to read from the blokchain and Injected Provider to publish transactions.
+
+3. Using a Redundant Provider on a node to read from the blockchain and publish transactions on an unlocked blockchain node.
+
+4. Using a PrivateKeyWalletSubProvider in place of a Redundant Provider to read from the blockchain and sign transactions being published.
