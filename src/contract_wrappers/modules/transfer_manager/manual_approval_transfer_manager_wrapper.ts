@@ -33,6 +33,9 @@ import {
   numberToBigNumber,
   stringArrayToBytes32Array,
   stringToBytes32,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
 } from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -240,10 +243,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isETHAddressHex('to', params.to);
     // SC: require(_isTransfer == false || msg.sender == securityToken,...
     // _isTransfer is hardcoded to false as an end user cannot act as securityToken
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.amount,
+      valueToWei(params.amount, decimals),
       params.data,
       false,
       params.txData,
@@ -258,10 +262,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
     assert.isBigNumberGreaterThanZero(params.allowance, 'Allowance must be greater than 0');
     await this.checkApprovalDoesNotExist(params.from, params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addManualApproval.sendTransactionAsync(
       params.from,
       params.to,
-      params.allowance,
+      valueToWei(params.allowance, decimals),
       dateToBigNumber(params.expiryTime),
       stringToBytes32(params.description),
       params.txData,
@@ -289,10 +294,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       approvals.push(this.checkApprovalDoesNotExist(params.from[i], params.to[i]));
     }
     await Promise.all(approvals);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
-      params.allowances,
+      valueArrayToWeiArray(params.allowances, decimals),
       dateArrayToBigNumberArray(params.expiryTimes),
       stringArrayToBytes32Array(params.descriptions),
       params.txData,
@@ -306,11 +312,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
     await this.checkApprovalDoesExist(params.from, params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyManualApproval.sendTransactionAsync(
       params.from,
       params.to,
       dateToBigNumber(params.expiryTime),
-      params.changeInAllowance,
+      valueToWei(params.changeInAllowance, decimals),
       stringToBytes32(params.description),
       params.increase,
       params.txData,
@@ -335,11 +342,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
     }
     await Promise.all(approvals);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyManualApprovalMulti.sendTransactionAsync(
       params.from,
       params.to,
       dateArrayToBigNumberArray(params.expiryTimes),
-      params.changedAllowances,
+      valueArrayToWeiArray(params.changedAllowances, decimals),
       stringArrayToBytes32Array(params.descriptions),
       params.increase,
       params.txData,
@@ -382,11 +390,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getActiveApprovalsToUser.callAsync(params.user);
     const typedResult: Approval[] = [];
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     for (let i = 0; i < result[0].length; i += 1) {
       const approval: Approval = {
         from: result[0][i],
         to: result[1][i],
-        allowance: result[2][i],
+        allowance: weiToValue(result[2][i], decimals),
         expiryTime: bigNumberToDate(result[3][i]),
         description: bytes32ToString(result[4][i]),
       };
@@ -399,10 +408,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).getApprovalDetails.callAsync(params.from, params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: Approval = {
       from: params.from,
       to: params.to,
-      allowance: result[0],
+      allowance: weiToValue(result[0], decimals),
       expiryTime: bigNumberToDate(result[1]),
       description: bytes32ToString(result[2]),
     };

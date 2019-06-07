@@ -19,6 +19,9 @@ import {
   numberToBigNumber,
   stringArrayToBytes32Array,
   stringToBytes32,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
 } from '../../../../utils/convert';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
@@ -260,6 +263,20 @@ describe('ManualApprovalTransferManagerWrapper', () => {
 
   describe('VerifyTransfer', () => {
     test('should verify Transfer', async () => {
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
@@ -278,7 +295,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           false,
           mockedParams.txData,
@@ -297,13 +314,18 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           false,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -324,6 +346,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -358,7 +385,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           from,
           to,
-          objectContaining(mockedParams.allowance),
+          objectContaining(valueToWei(mockedParams.allowance, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.expiryTime)),
           objectContaining(stringToBytes32(mockedParams.description)),
           mockedParams.txData,
@@ -377,7 +404,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           from,
           to,
-          objectContaining(mockedParams.allowance),
+          objectContaining(valueToWei(mockedParams.allowance, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.expiryTime)),
           objectContaining(stringToBytes32(mockedParams.description)),
           mockedParams.txData,
@@ -386,12 +413,14 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).once();
       verify(mockedGetApprovalDetailsMethod.callAsync(from, to)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -412,6 +441,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -448,7 +482,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           from,
           to,
-          objectContaining(mockedParams.allowances),
+          objectContaining(valueArrayToWeiArray(mockedParams.allowances, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
           objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
           mockedParams.txData,
@@ -467,7 +501,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           from,
           to,
-          objectContaining(mockedParams.allowances),
+          objectContaining(valueArrayToWeiArray(mockedParams.allowances, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
           objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
           mockedParams.txData,
@@ -476,14 +510,16 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).times(4);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).times(from.length);
       for (let i = 0; i < from.length; i += 1) {
         verify(mockedGetApprovalDetailsMethod.callAsync(from[i], to[i])).once();
       }
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).times(3);
+      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -504,6 +540,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -540,7 +581,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
           from,
           to,
           objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-          objectContaining(mockedParams.changeInAllowance),
+          objectContaining(valueToWei(mockedParams.changeInAllowance, expectedDecimalsResult)),
           objectContaining(stringToBytes32(mockedParams.description)),
           mockedParams.increase,
           mockedParams.txData,
@@ -560,7 +601,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
           from,
           to,
           objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-          objectContaining(mockedParams.changeInAllowance),
+          objectContaining(valueToWei(mockedParams.changeInAllowance, expectedDecimalsResult)),
           objectContaining(stringToBytes32(mockedParams.description)),
           mockedParams.increase,
           mockedParams.txData,
@@ -569,12 +610,14 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).once();
       verify(mockedGetApprovalDetailsMethod.callAsync(from, to)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -595,6 +638,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -632,7 +680,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
           from,
           to,
           objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
-          objectContaining(mockedParams.changedAllowances),
+          objectContaining(valueArrayToWeiArray(mockedParams.changedAllowances, expectedDecimalsResult)),
           objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
           mockedParams.increase,
           mockedParams.txData,
@@ -652,7 +700,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
           from,
           to,
           objectContaining(dateArrayToBigNumberArray(mockedParams.expiryTimes)),
-          objectContaining(mockedParams.changedAllowances),
+          objectContaining(valueArrayToWeiArray(mockedParams.changedAllowances, expectedDecimalsResult)),
           objectContaining(stringArrayToBytes32Array(mockedParams.descriptions)),
           mockedParams.increase,
           mockedParams.txData,
@@ -661,14 +709,16 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).times(4);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).times(from.length);
       for (let i = 0; i < from.length; i += 1) {
         verify(mockedGetApprovalDetailsMethod.callAsync(from[i], to[i])).once();
       }
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).times(3);
+      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -689,6 +739,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -730,12 +785,14 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(from, to, mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).once();
       verify(mockedGetApprovalDetailsMethod.callAsync(from, to)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -756,6 +813,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -798,19 +860,35 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(from, to, mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getApprovalDetails).times(from.length);
       for (let i = 0; i < from.length; i += 1) {
         verify(mockedGetApprovalDetailsMethod.callAsync(from[i], to[i])).once();
       }
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
   describe('Get Active Approvals To User', () => {
     test('should getActiveApprovalsToUser', async () => {
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const expiryTimes = [new BigNumber(1925035200), new BigNumber(1925035201)];
       const user = '0x4444444444444444444444444444444444444444';
       const descriptions = [stringToBytes32('description'), stringToBytes32('description')];
@@ -837,7 +915,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       for (let i = 0; i < expectedResult[0].length; i += 1) {
         expect(result[i].from).toEqual(expectedResult[0][i]);
         expect(result[i].to).toEqual(expectedResult[1][i]);
-        expect(result[i].allowance).toEqual(expectedResult[2][i]);
+        expect(result[i].allowance).toEqual(weiToValue(expectedResult[2][i] as BigNumber, expectedDecimalsResult));
         expect(result[i].expiryTime).toEqual(bigNumberToDate(expiryTimes[i]));
         expect(result[i].description).toEqual(bytes32ToString(descriptions[i]));
       }
@@ -845,11 +923,30 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getActiveApprovalsToUser).once();
       verify(mockedMethod.callAsync(user)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
   describe('Get Approval Details', () => {
     test('should getApprovalDetails', async () => {
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const expiryTime = new BigNumber(1925035200);
       const from = '0x4444444444444444444444444444444444444444';
       const to = '0x2222222222222222222222222222222222222222';
@@ -871,13 +968,18 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Result expectation
       expect(result.from).toEqual(from);
       expect(result.to).toEqual(to);
-      expect(result.allowance).toEqual(expectedResult[0]);
+      expect(result.allowance).toEqual(weiToValue(expectedResult[0] as BigNumber, expectedDecimalsResult));
       expect(result.expiryTime).toEqual(bigNumberToDate(expiryTime));
       expect(result.description).toEqual(bytes32ToString(description));
 
       // Verifications
       verify(mockedContract.getApprovalDetails).once();
       verify(mockedMethod.callAsync(from, to)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
