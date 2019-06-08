@@ -24,7 +24,9 @@ import {
   Subscribe,
   GetLogs,
   Perms,
+  PERCENTAGE_DECIMALS,
 } from '../../../types';
+import { valueToWei } from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -177,10 +179,11 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.amount,
+      valueToWei(params.amount, decimals),
       params.data,
       params.isTransfer,
       params.txData,
@@ -192,7 +195,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
-      params.maxHolderPercentage,
+      valueToWei(params.maxHolderPercentage, PERCENTAGE_DECIMALS),
       params.txData,
       params.safetyFactor,
     );

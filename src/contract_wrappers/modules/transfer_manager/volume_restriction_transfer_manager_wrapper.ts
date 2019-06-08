@@ -32,6 +32,9 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
+  valueToWei,
+  valueArrayToWeiArray,
+  weiToValue,
 } from '../../../utils/convert';
 import {
   TxParams,
@@ -373,10 +376,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.isETHAddressHex('to', params.to);
     // SC: require(_isTransfer == false || msg.sender == securityToken,...
     // _isTransfer is hardcoded to false as an end user cannot act as securityToken
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.amount,
+      valueToWei(params.amount, decimals),
       params.data,
       false,
       params.txData,
@@ -386,8 +390,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualRestriction.callAsync(params.holder);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: IndividualRestriction = {
-      allowedTokens: result[0],
+      allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
       rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
@@ -398,8 +403,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultRestriction = async () => {
     const result = await (await this.contract).defaultRestriction.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: IndividualRestriction = {
-      allowedTokens: result[0],
+      allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
       rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
@@ -410,8 +416,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultDailyRestriction = async () => {
     const result = await (await this.contract).defaultDailyRestriction.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: IndividualRestriction = {
-      allowedTokens: result[0],
+      allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
       rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
@@ -426,8 +433,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualDailyRestriction.callAsync(params.holder);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: IndividualRestriction = {
-      allowedTokens: result[0],
+      allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
       rollingPeriodInDays: result[2].toNumber(),
       endTime: bigNumberToDate(result[3]),
@@ -460,9 +468,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       params.restrictionType,
       params.rollingPeriodInDays,
     );
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addIndividualRestriction.sendTransactionAsync(
       params.holder,
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.rollingPeriodInDays),
       dateToBigNumber(params.endTime),
@@ -476,9 +485,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
     this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
       params.restrictionType,
@@ -500,9 +510,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
     }
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
-      params.allowedTokens,
+      valueArrayToWeiArray(params.allowedTokens, decimals),
       dateArrayToBigNumberArray(params.startTimes),
       dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
@@ -532,9 +543,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.rollingPeriodInDays[i],
       );
     }
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
-      params.allowedTokens,
+      valueArrayToWeiArray(params.allowedTokens, decimals),
       dateArrayToBigNumberArray(params.startTimes),
       numberArrayToBigNumberArray(params.rollingPeriodInDays),
       dateArrayToBigNumberArray(params.endTimes),
@@ -552,8 +564,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       params.restrictionType,
       params.rollingPeriodInDays,
     );
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addDefaultRestriction.sendTransactionAsync(
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.rollingPeriodInDays),
       dateToBigNumber(params.endTime),
@@ -566,8 +579,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addDefaultDailyRestriction.sendTransactionAsync(
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
       params.restrictionType,
@@ -664,9 +678,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       params.restrictionType,
       params.rollingPeriodInDays,
     );
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyIndividualRestriction.sendTransactionAsync(
       params.holder,
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.rollingPeriodInDays),
       dateToBigNumber(params.endTime),
@@ -680,9 +695,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
     this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
       params.restrictionType,
@@ -704,9 +720,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
     }
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyIndividualDailyRestrictionMulti.sendTransactionAsync(
       params.holders,
-      params.allowedTokens,
+      valueArrayToWeiArray(params.allowedTokens, decimals),
       dateArrayToBigNumberArray(params.startTimes),
       dateArrayToBigNumberArray(params.endTimes),
       params.restrictionTypes,
@@ -734,9 +751,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.rollingPeriodInDays[i],
       );
     }
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyIndividualRestrictionMulti.sendTransactionAsync(
       params.holders,
-      params.allowedTokens,
+      valueArrayToWeiArray(params.allowedTokens, decimals),
       dateArrayToBigNumberArray(params.startTimes),
       numberArrayToBigNumberArray(params.rollingPeriodInDays),
       dateArrayToBigNumberArray(params.endTimes),
@@ -754,8 +772,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       params.restrictionType,
       params.rollingPeriodInDays,
     );
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyDefaultRestriction.sendTransactionAsync(
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.rollingPeriodInDays),
       dateToBigNumber(params.endTime),
@@ -768,8 +787,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public modifyDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).modifyDefaultDailyRestriction.sendTransactionAsync(
-      params.allowedTokens,
+      valueToWei(params.allowedTokens, decimals),
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
       params.restrictionType,
@@ -818,11 +838,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public getRestrictedData = async () => {
     const result = await (await this.contract).getRestrictedData.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: GetRestrictedData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
       const getRestrictedData: GetRestrictedData = {
         allAddresses: result[0][i],
-        allowedTokens: result[1][i],
+        allowedTokens: weiToValue(result[1][i], decimals),
         startTime: bigNumberToDate(result[2][i]),
         rollingPeriodInDays: result[3][i].toNumber(),
         endTime: bigNumberToDate(result[4][i]),
