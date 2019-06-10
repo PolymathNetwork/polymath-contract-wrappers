@@ -641,7 +641,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
     return weiToValue(
-      await (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, params.amount),
+      await (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, valueToWei(params.amount, FULL_DECIMALS)),
       FULL_DECIMALS,
     );
   };
@@ -785,7 +785,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public convertToUSD = async (params: ConvertToOrFromUSDParams) => {
     return weiToValue(
-      await (await this.contract).convertToUSD.callAsync(params.fundRaiseType, params.amount),
+      await (await this.contract).convertToUSD.callAsync(params.fundRaiseType, valueToWei(params.amount, FULL_DECIMALS)),
       FULL_DECIMALS,
     );
   };

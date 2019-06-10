@@ -1700,7 +1700,7 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the method
       when(mockedContract.convertFromUSD).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).thenResolve(expectedAmount);
+      when(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).thenResolve(expectedAmount);
 
       // Real call
       const result = await target.convertFromUSD(params);
@@ -1708,7 +1708,7 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toEqual(weiToValue(expectedAmount, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.convertFromUSD).once();
-      verify(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).once();
+      verify(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).once();
     });
   });
 
@@ -2234,7 +2234,7 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the method
       when(mockedContract.convertToUSD).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).thenResolve(expectedAmount);
+      when(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).thenResolve(expectedAmount);
 
       // Real call
       const result = await target.convertToUSD(params);
@@ -2242,7 +2242,7 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toEqual(weiToValue(expectedAmount, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.convertToUSD).once();
-      verify(mockedMethod.callAsync(FundRaiseType.ETH, params.amount)).once();
+      verify(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).once();
     });
   });
 

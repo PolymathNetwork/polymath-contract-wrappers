@@ -37,7 +37,6 @@ import {
   dateToBigNumber,
   bytes32ArrayToStringArray,
   weiToValue,
-  valueToWei,
 } from '../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
@@ -675,12 +674,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
-    const newFeeWei = valueToWei(params.newFee, FULL_DECIMALS);
     await this.checkOnlyOwner();
     const actualFee = await this.getTickerRegistrationFee();
-    assert.assert(!actualFee.eq(newFeeWei), 'Fee not changed');
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeTickerRegistrationFee.sendTransactionAsync(
-      newFeeWei,
+      params.newFee,
       params.txData,
       params.safetyFactor,
     );
@@ -690,12 +688,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
   public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
-    const newFeeWei = valueToWei(params.newFee, FULL_DECIMALS);
     await this.checkOnlyOwner();
     const actualFee = await this.getSecurityTokenLaunchFee();
-    assert.assert(!actualFee.eq(newFeeWei), 'Fee not changed');
+    assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeSecurityLaunchFee.sendTransactionAsync(
-      newFeeWei,
+      params.newFee,
       params.txData,
       params.safetyFactor,
     );
