@@ -1025,7 +1025,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.changeTickerRegistrationFee).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1036,7 +1040,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.changeTickerRegistrationFee).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedTickerRegistrationMethod.callAsync()).once();
@@ -1078,7 +1086,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.changeSecurityLaunchFee).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1089,7 +1101,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.changeSecurityLaunchFee).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
       verify(mockedSecurityTokenMethod.callAsync()).once();

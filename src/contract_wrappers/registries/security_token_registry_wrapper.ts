@@ -37,6 +37,7 @@ import {
   dateToBigNumber,
   bytes32ArrayToStringArray,
   weiToValue,
+  valueToWei,
 } from '../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
@@ -678,7 +679,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const actualFee = await this.getTickerRegistrationFee();
     assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeTickerRegistrationFee.sendTransactionAsync(
-      params.newFee,
+      valueToWei(params.newFee, FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -692,7 +693,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const actualFee = await this.getSecurityTokenLaunchFee();
     assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeSecurityLaunchFee.sendTransactionAsync(
-      params.newFee,
+      valueToWei(params.newFee, FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
