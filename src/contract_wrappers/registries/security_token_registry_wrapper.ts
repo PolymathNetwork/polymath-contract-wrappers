@@ -23,8 +23,22 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
-import { bigNumberToDate, dateToBigNumber, bytes32ArrayToStringArray } from '../../utils/convert';
+import {
+  TxParams,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  FULL_DECIMALS,
+} from '../../types';
+import {
+  bigNumberToDate,
+  dateToBigNumber,
+  bytes32ArrayToStringArray,
+  weiToValue,
+  valueToWei,
+} from '../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -399,7 +413,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Gets the ticker registration fee
    */
   public getTickerRegistrationFee = async () => {
-    return (await this.contract).getTickerRegistrationFee.callAsync();
+    return weiToValue(await (await this.contract).getTickerRegistrationFee.callAsync(), FULL_DECIMALS);
   };
 
   /**
@@ -423,7 +437,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     // Check poly token allowance
     const tickerRegistrationFee = await this.getTickerRegistrationFee();
     if (tickerRegistrationFee.isGreaterThan(BIG_NUMBER_ZERO)) {
-      const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(owner);
+      const polyBalance = weiToValue(await (await this.polyTokenContract()).balanceOf.callAsync(owner), FULL_DECIMALS);
       assert.assert(polyBalance.isGreaterThanOrEqualTo(tickerRegistrationFee), 'Insufficient Poly token allowance');
     }
 
@@ -479,7 +493,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     // Check PolyToken allowance
     const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
     if (securityTokenLaunchFee.isGreaterThan(BIG_NUMBER_ZERO)) {
-      const polyBalance = await (await this.polyTokenContract()).balanceOf.callAsync(address);
+      const polyBalance = weiToValue(
+        await (await this.polyTokenContract()).balanceOf.callAsync(address),
+        FULL_DECIMALS,
+      );
       assert.assert(polyBalance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Poly token allowance');
     }
 
@@ -498,7 +515,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Fee amount
    */
   public getSecurityTokenLaunchFee = async () => {
-    return (await this.contract).getSecurityTokenLaunchFee.callAsync();
+    return weiToValue(await (await this.contract).getSecurityTokenLaunchFee.callAsync(), FULL_DECIMALS);
   };
 
   /**
@@ -662,7 +679,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const actualFee = await this.getTickerRegistrationFee();
     assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeTickerRegistrationFee.sendTransactionAsync(
-      params.newFee,
+      valueToWei(params.newFee, FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -676,7 +693,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const actualFee = await this.getSecurityTokenLaunchFee();
     assert.assert(!actualFee.eq(params.newFee), 'Fee not changed');
     return (await this.contract).changeSecurityLaunchFee.sendTransactionAsync(
-      params.newFee,
+      valueToWei(params.newFee, FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );

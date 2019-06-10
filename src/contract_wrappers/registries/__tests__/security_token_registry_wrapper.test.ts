@@ -11,8 +11,15 @@ import {
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { dateToBigNumber, bytes32ArrayToStringArray, stringArrayToBytes32Array } from '../../../utils/convert';
+import {
+  dateToBigNumber,
+  bytes32ArrayToStringArray,
+  stringArrayToBytes32Array,
+  weiToValue,
+  valueToWei,
+} from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
+import { FULL_DECIMALS } from '../../../types';
 
 describe('SecurityTokenRegistryWrapper', () => {
   let target: SecurityTokenRegistryWrapper;
@@ -413,7 +420,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       const result = await target.getTickerRegistrationFee();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedMethod.callAsync()).once();
@@ -446,13 +453,13 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // Get ticker registration fee
-      const expectedTickerRegistrationFeeResult = new BigNumber(10);
+      const expectedTickerRegistrationFeeResult = valueToWei(new BigNumber(10), FULL_DECIMALS);
       const mockedTickerRegistrationFeeMethod = mock(MockedCallMethod);
       when(mockedContract.getTickerRegistrationFee).thenReturn(instance(mockedTickerRegistrationFeeMethod));
       when(mockedTickerRegistrationFeeMethod.callAsync()).thenResolve(expectedTickerRegistrationFeeResult);
 
       // Get Poly Balance
-      const polyBalance = new BigNumber(100);
+      const polyBalance = valueToWei(new BigNumber(100), FULL_DECIMALS);
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
       when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(polyBalance);
@@ -629,13 +636,13 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // Get Security token launch fee
-      const expectedLaunchFeeResult = new BigNumber(10);
+      const expectedLaunchFeeResult = valueToWei(new BigNumber(10), FULL_DECIMALS);
       const mockedLaunchFeeMethod = mock(MockedCallMethod);
       when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedLaunchFeeMethod));
       when(mockedLaunchFeeMethod.callAsync()).thenResolve(expectedLaunchFeeResult);
 
       // Get ERC20 Allowance
-      const erc20Allowance = new BigNumber(100);
+      const erc20Allowance = valueToWei(new BigNumber(100), FULL_DECIMALS);
       when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
       const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
       when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(erc20Allowance);
@@ -713,7 +720,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       const result = await target.getSecurityTokenLaunchFee();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.getSecurityTokenLaunchFee).once();
       verify(mockedMethod.callAsync()).once();
@@ -1018,7 +1025,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.changeTickerRegistrationFee).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1029,7 +1040,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.changeTickerRegistrationFee).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedTickerRegistrationMethod.callAsync()).once();
@@ -1071,7 +1086,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedContract.changeSecurityLaunchFee).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1082,7 +1101,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.changeSecurityLaunchFee).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.newFee, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(mockedParams.newFee, FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.getSecurityTokenLaunchFee).once();
       verify(mockedSecurityTokenMethod.callAsync()).once();
