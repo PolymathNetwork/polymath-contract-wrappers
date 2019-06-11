@@ -105,7 +105,7 @@ In order to configure the provider use the following code samples to set up the 
 
 (1) Using Injected Provider (Metamask) to read from the blockchain and publish transactions on the blockchain.
 
-```
+```typescript
   // Setup Metamask
   let injectedProviderIfExists = (window as any).ethereum;
   if (injectedProviderIfExists !== undefined) {
@@ -133,7 +133,7 @@ In order to configure the provider use the following code samples to set up the 
 
 (2) Using a Redundant Provider on node to read from the blokchain and Injected Provider (Metamask) to publish transactions.
 
-```
+```typescript
 // Instantiate a provider engine
   const providerEngine = new Web3ProviderEngine();
 
@@ -172,7 +172,7 @@ In order to configure the provider use the following code samples to set up the 
 
 (3) Using a Redundant Provider on a node to read from the blockchain and publish transactions on an unlocked blockchain node (No Private Key Required).
 
-```
+```typescript
  // Instantiate Provider Engine
  const providerEngine = new Web3ProviderEngine();
   providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('<http://examplenoderpc:port>')]));
@@ -189,7 +189,7 @@ In order to configure the provider use the following code samples to set up the 
 
 (4) Using a PrivateKeyWalletSubProvider to sign transactions being published on a normal blockchain node, and using Redundant Provider to read from blockchain.
 
-```
+```typescript
   // Instantiate Provider Engine
   const providerEngine = new Web3ProviderEngine();
   providerEngine.addProvider(
