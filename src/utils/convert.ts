@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import { BigNumber } from '@0x/utils';
-import assert from './assert';
 
 const BASE = new BigNumber(10);
 

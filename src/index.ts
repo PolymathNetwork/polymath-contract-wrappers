@@ -1,4 +1,3 @@
-export { default as CappedSTOFactory } from './contract_wrappers/modules/sto/capped_sto_factory_wrapper';
 export { default as CappedSTO } from './contract_wrappers/modules/sto/capped_sto_wrapper';
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';
@@ -8,7 +7,6 @@ export { default as PolyToken } from './contract_wrappers/tokens/poly_token_wrap
 export { default as PolymathRegistry } from './contract_wrappers/registries/polymath_registry_wrapper';
 export { default as SecurityTokenRegistry } from './contract_wrappers/registries/security_token_registry_wrapper';
 export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
-export { default as USDTieredSTOFactory } from './contract_wrappers/modules/sto/usd_tiered_sto_factory_wrapper';
 export { default as USDTieredSTO } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export { default as DetailedERC20 } from './contract_wrappers/tokens/erc20_wrapper';
 export {
