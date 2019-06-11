@@ -293,7 +293,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const startTime = new BigNumber(2);
       const rollingPeriodInDays = new BigNumber(3);
       const endTime = new BigNumber(4);
-      const restrictionType = new BigNumber(5);
+      const restrictionType = new BigNumber(0);
       const expectedResult = [allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -309,7 +309,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Percentage);
+      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
       // Verifications
       verify(mockedContract.individualRestriction).once();
       verify(mockedMethod.callAsync(mockedParams.holder)).once();
@@ -342,7 +342,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const startTime = new BigNumber(2);
       const rollingPeriodInDays = new BigNumber(3);
       const endTime = new BigNumber(4);
-      const restrictionType = new BigNumber(5);
+      const restrictionType = new BigNumber(0);
       const expectedResult = [allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -358,7 +358,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Percentage);
+      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
       // Verifications
       verify(mockedContract.defaultRestriction).once();
       verify(mockedMethod.callAsync()).once();
@@ -391,7 +391,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const startTime = new BigNumber(2);
       const rollingPeriodInDays = new BigNumber(3);
       const endTime = new BigNumber(4);
-      const restrictionType = new BigNumber(5);
+      const restrictionType = new BigNumber(0);
       const expectedResult = [allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -407,7 +407,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Percentage);
+      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
       // Verifications
       verify(mockedContract.defaultDailyRestriction).once();
       verify(mockedMethod.callAsync()).once();
@@ -467,7 +467,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const startTime = new BigNumber(2);
       const rollingPeriodInDays = new BigNumber(3);
       const endTime = new BigNumber(4);
-      const restrictionType = new BigNumber(5);
+      const restrictionType = new BigNumber(0);
       const expectedResult = [allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -483,7 +483,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Percentage);
+      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
       // Verifications
       verify(mockedContract.individualDailyRestriction).once();
       verify(mockedMethod.callAsync(mockedParams.holder)).once();
@@ -552,7 +552,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
         holder: '0x7777777777777777777777777777777777777777',
@@ -652,7 +652,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
         holder: '0x7777777777777777777777777777777777777777',
@@ -768,9 +768,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
       const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -813,12 +810,10 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -864,9 +859,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
       const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -911,14 +903,12 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedExemptMethod.callAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -927,7 +917,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
         allowedTokens,
@@ -1014,7 +1004,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         allowedTokens,
         startTime,
@@ -1128,11 +1118,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
-
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -1160,12 +1145,10 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1236,8 +1219,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
@@ -1283,11 +1266,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
-
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -1315,12 +1293,10 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -1391,8 +1367,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
@@ -1430,11 +1406,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
-
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -1443,7 +1414,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         new BigNumber(2),
         new BigNumber(3),
         new BigNumber(4),
-        new BigNumber(5),
+        new BigNumber(1),
       ];
       const mockedRestrictionMethod = mock(MockedCallMethod);
       when(mockedContract.defaultRestriction).thenReturn(instance(mockedRestrictionMethod));
@@ -1459,13 +1430,11 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedContract.defaultRestriction).once();
       verify(mockedRestrictionMethod.callAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).times(3);
     });
   });
 
@@ -1501,11 +1470,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
-
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -1514,7 +1478,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         new BigNumber(2),
         new BigNumber(3),
         new BigNumber(4),
-        new BigNumber(5),
+        new BigNumber(1),
       ];
       const mockedRestrictionMethod = mock(MockedCallMethod);
       when(mockedContract.defaultDailyRestriction).thenReturn(instance(mockedRestrictionMethod));
@@ -1530,13 +1494,11 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedContract.defaultDailyRestriction).once();
       verify(mockedRestrictionMethod.callAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1545,7 +1507,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
         holder: '0x7777777777777777777777777777777777777777',
@@ -1635,7 +1597,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         holder: '0x7777777777777777777777777777777777777777',
         allowedTokens,
@@ -1722,7 +1684,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = [new BigNumber(1), new BigNumber(2)];
       const startTimes = [new Date(2020, 1), new Date(2020, 2)];
       const endTimes = [new Date(2021, 1), new Date(2021, 2)];
-      const restrictionTypes = [1, 1];
+      const restrictionTypes = [0, 0];
       const mockedParams = {
         holders: ['0x7777777777777777777777777777777777777777', '0x7777777777777777777777777777777777777777'],
         allowedTokens,
@@ -1795,12 +1757,12 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -1809,7 +1771,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = [new BigNumber(1), new BigNumber(2)];
       const startTimes = [new Date(2020, 1), new Date(2020, 2)];
       const endTimes = [new Date(2021, 1), new Date(2021, 2)];
-      const restrictionTypes = [1, 1];
+      const restrictionTypes = [0, 0];
       const mockedParams = {
         rollingPeriodInDays: [1, 2],
         holders: ['0x7777777777777777777777777777777777777777', '0x7777777777777777777777777777777777777777'],
@@ -1885,12 +1847,12 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
     });
   });
 
@@ -1899,7 +1861,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
         allowedTokens,
@@ -1986,7 +1948,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const allowedTokens = new BigNumber(1);
       const startTime = new Date(2020, 1);
       const endTime = new Date(2021, 1);
-      const restrictionType = 1;
+      const restrictionType = 0;
       const mockedParams = {
         allowedTokens,
         startTime,
@@ -2067,6 +2029,18 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('getIndividualBucketDetailsToUser', () => {
     test('should get getIndividualBucketDetailsToUser', async () => {
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       // Address expected
       const user = '0x2222222222222222222222222222222222222222';
       const mockedParams = {
@@ -2096,18 +2070,35 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const result = await target.getIndividualBucketDetailsToUser(mockedParams);
       // Result expectation
       expect(result.lastTradedDayTime).toEqual(bigNumberToDate(lastTradedDayTime));
-      expect(result.sumOfLastPeriod).toEqual(sumOfLastPeriod);
+      expect(result.sumOfLastPeriod).toEqual(weiToValue(sumOfLastPeriod, expectedDecimalsResult));
       expect(result.daysCovered).toEqual(daysCovered.toNumber());
       expect(result.dailyLastTradedDayTime).toEqual(bigNumberToDate(dailyLastTradedDayTime));
       expect(result.lastTradedTimestamp).toEqual(bigNumberToDate(lastTradedTimestamp));
       // Verifications
       verify(mockedContract.getIndividualBucketDetailsToUser).once();
       verify(mockedMethod.callAsync(mockedParams.user)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
   describe('getDefaultBucketDetailsToUser', () => {
     test('should get getDefaultBucketDetailsToUser', async () => {
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       // Address expected
       const user = '0x2222222222222222222222222222222222222222';
       const mockedParams = {
@@ -2137,13 +2128,18 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       const result = await target.getDefaultBucketDetailsToUser(mockedParams);
       // Result expectation
       expect(result.lastTradedDayTime).toEqual(bigNumberToDate(lastTradedDayTime));
-      expect(result.sumOfLastPeriod).toEqual(sumOfLastPeriod);
+      expect(result.sumOfLastPeriod).toEqual(weiToValue(sumOfLastPeriod, expectedDecimalsResult));
       expect(result.daysCovered).toEqual(daysCovered.toNumber());
       expect(result.dailyLastTradedDayTime).toEqual(bigNumberToDate(dailyLastTradedDayTime));
       expect(result.lastTradedTimestamp).toEqual(bigNumberToDate(lastTradedTimestamp));
       // Verifications
       verify(mockedContract.getDefaultBucketDetailsToUser).once();
       verify(mockedMethod.callAsync(mockedParams.user)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -2243,7 +2239,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
           startTime,
           rollingPeriodInDays,
           endTime,
-          [new BigNumber(1), new BigNumber(2)],
+          [new BigNumber(0), new BigNumber(0)],
         ];
         // Mocked method
         const mockedMethod = mock(MockedCallMethod);
@@ -2269,11 +2265,11 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         // Verifications
         verify(mockedContract.getRestrictedData).once();
         verify(mockedMethod.callAsync()).once();
-        verify(mockedContract.securityToken).once();
-        verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-        verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-        verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-        verify(mockedSecurityTokenContract.decimals).once();
+        verify(mockedContract.securityToken).twice();
+        verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+        verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+        verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+        verify(mockedSecurityTokenContract.decimals).twice();
       });
     });
 

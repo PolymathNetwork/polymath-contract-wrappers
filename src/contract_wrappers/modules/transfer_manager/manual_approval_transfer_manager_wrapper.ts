@@ -224,10 +224,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   public approvals = async (params: ApprovalsParams) => {
     const result = await (await this.contract).approvals.callAsync(numberToBigNumber(params.index));
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: Approval = {
       from: result[0],
       to: result[1],
-      allowance: result[2],
+      allowance: valueToWei(result[2], decimals),
       expiryTime: bigNumberToDate(result[3]),
       description: result[4],
     };
@@ -425,12 +426,13 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   public getAllApprovals = async () => {
     const result = await (await this.contract).getAllApprovals.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: Approval[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
       const approval: Approval = {
         from: result[0][i],
         to: result[1][i],
-        allowance: result[2][i],
+        allowance: weiToValue(result[2][i], decimals),
         expiryTime: bigNumberToDate(result[3][i]),
         description: bytes32ToString(result[4][i]),
       };

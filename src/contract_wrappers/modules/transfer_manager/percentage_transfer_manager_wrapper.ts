@@ -26,7 +26,7 @@ import {
   Perms,
   PERCENTAGE_DECIMALS,
 } from '../../../types';
-import { valueToWei } from '../../../utils/convert';
+import { valueToWei, weiToValue } from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -152,7 +152,9 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public maxHolderPercentage = async () => {
-    return (await this.contract).maxHolderPercentage.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const result = await (await this.contract).maxHolderPercentage.callAsync();
+    return weiToValue(result, decimals);
   };
 
   public unpause = async (params: TxParams) => {

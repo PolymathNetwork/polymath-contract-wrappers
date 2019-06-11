@@ -207,6 +207,22 @@ describe('ManualApprovalTransferManagerWrapper', () => {
 
   describe('Approvals', () => {
     test('should get approvals', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityDecimalsMethod));
+
       const expiryTime = new BigNumber(1893499200);
       // Address expected
       const expectedResult = [
@@ -231,12 +247,17 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Result expectation
       expect(result.from).toEqual(expectedResult[0]);
       expect(result.to).toEqual(expectedResult[1]);
-      expect(result.allowance).toEqual(expectedResult[2]);
+      expect(result.allowance).toEqual(valueToWei(expectedResult[2] as BigNumber, expectedDecimalsResult));
       expect(result.expiryTime).toEqual(bigNumberToDate(expiryTime));
       expect(result.description).toEqual(expectedResult[4]);
       // Verifications
       verify(mockedContract.approvals).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.index)))).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1006,6 +1027,22 @@ describe('ManualApprovalTransferManagerWrapper', () => {
 
   describe('Get All Approvals', () => {
     test('should getAllApprovals', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityDecimalsMethod));
+
       const expiryTimes = [new BigNumber(1925035200), new BigNumber(1925035201)];
       const descriptions = [stringToBytes32('description'), stringToBytes32('description')];
       const expectedResult = [
@@ -1028,7 +1065,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       for (let i = 0; i < expectedResult[0].length; i += 1) {
         expect(result[i].from).toEqual(expectedResult[0][i]);
         expect(result[i].to).toEqual(expectedResult[1][i]);
-        expect(result[i].allowance).toEqual(expectedResult[2][i]);
+        expect(result[i].allowance).toEqual(weiToValue(expectedResult[2][i] as BigNumber, expectedDecimalsResult));
         expect(result[i].expiryTime).toEqual(bigNumberToDate(expiryTimes[i]));
         expect(result[i].description).toEqual(bytes32ToString(descriptions[i]));
       }
@@ -1036,6 +1073,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getAllApprovals).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 

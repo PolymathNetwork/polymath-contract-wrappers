@@ -11,7 +11,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import PercentageTransferManagerWrapper from '../percentage_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { valueToWei } from '../../../../utils/convert';
+import { valueToWei, weiToValue } from '../../../../utils/convert';
 
 describe('PercentageTransferManagerWrapper', () => {
   let target: PercentageTransferManagerWrapper;
@@ -70,6 +70,22 @@ describe('PercentageTransferManagerWrapper', () => {
 
   describe('maxHolderPercentage', () => {
     test('should get maxHolderPercentage', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityDecimalsMethod));
+
       // Address expected
       const expectedResult = new BigNumber(1);
       // Mocked method
@@ -82,10 +98,15 @@ describe('PercentageTransferManagerWrapper', () => {
       // Real call
       const result = await target.maxHolderPercentage();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.maxHolderPercentage).once();
       verify(mockedMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
