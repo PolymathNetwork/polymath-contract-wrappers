@@ -1,6 +1,7 @@
-import { TxParams, STOBaseContract, FundRaiseType } from '../../../types';
+import {TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS} from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
+import { weiToValue } from '../../../utils/convert';
 
 interface FundRaiseTypesParams {
   type: FundRaiseType;
@@ -35,7 +36,10 @@ export default abstract class STOWrapper extends ModuleWrapper {
    * Returns funds raised by the STO
    */
   public fundsRaised = async (params: FundRaiseTypesParams) => {
-    return (await this.contract).fundsRaised.callAsync(params.type);
+    return weiToValue(
+      await (await this.contract).fundsRaised.callAsync(params.type),
+      FULL_DECIMALS,
+    );
   };
 
   /**
@@ -74,11 +78,17 @@ export default abstract class STOWrapper extends ModuleWrapper {
    * Return the total no. of tokens sold
    */
   public totalTokensSold = async () => {
-    return (await this.contract).totalTokensSold.callAsync();
+    return weiToValue(
+        await (await this.contract).totalTokensSold.callAsync(),
+        await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public getRaised = async (params: FundRaiseTypesParams) => {
-    return (await this.contract).getRaised.callAsync(params.type);
+    return weiToValue(
+        await (await this.contract).getRaised.callAsync(params.type),
+        FULL_DECIMALS,
+    );
   };
 
   public pause = async (params: TxParams) => {
@@ -88,7 +98,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public unpause = async (params: TxParams) => {
-    assert.assert((await this.paused()), 'Contract is not paused');
+    assert.assert(await this.paused(), 'Contract is not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };

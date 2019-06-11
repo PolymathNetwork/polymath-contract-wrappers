@@ -24,8 +24,9 @@ import {
   Subscribe,
   GetLogs,
   FundRaiseType,
+  FULL_DECIMALS,
 } from '../../../types';
-import { bigNumberToDate } from '../../../utils/convert';
+import { bigNumberToDate, valueToWei, weiToValue } from '../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase;
@@ -150,14 +151,17 @@ export default class CappedSTOWrapper extends STOWrapper {
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
    */
   public rate = async () => {
-    return (await this.contract).rate.callAsync();
+    return weiToValue(await (await this.contract).rate.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * How many token base units this STO will be allowed to sell to investors
    */
   public cap = async () => {
-    return (await this.contract).cap.callAsync();
+    return weiToValue(
+      await (await this.contract).cap.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public allowBeneficialInvestments = async () => {
@@ -190,7 +194,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.assert(!(await this.paused()), 'Should not be paused');
     assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
     const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(await this.getCallerAddress(params.txData));
-    assert.assert(weiBalance.isGreaterThan(params.value), 'Insufficient ETH funds');
+    assert.assert(weiBalance.isGreaterThan(valueToWei(params.value, FULL_DECIMALS)), 'Insufficient ETH funds');
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.ETH,
@@ -207,7 +211,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     const txPayableData = {
       ...params.txData,
-      value: params.value,
+      value: valueToWei(params.value, FULL_DECIMALS),
     };
     return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, txPayableData, params.safetyFactor);
   };
@@ -225,13 +229,13 @@ export default class CappedSTOWrapper extends STOWrapper {
       await this.getCallerAddress(params.txData),
     );
     assert.assert(
-      polyTokenBalance.isGreaterThanOrEqualTo(params.investedPOLY),
+      polyTokenBalance.isGreaterThanOrEqualTo(valueToWei(params.investedPOLY, FULL_DECIMALS)),
       'Budget less than amount unable to transfer fee',
     );
     assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
     assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
-      params.investedPOLY,
+      valueToWei(params.investedPOLY, FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -242,19 +246,23 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public getTokensSold = async () => {
-    return (await this.contract).getTokensSold.callAsync();
+    return weiToValue(
+      await (await this.contract).getTokensSold.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
+    );
   };
 
   public getSTODetails = async () => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getSTODetails.callAsync();
     const typedResult: CappedSTODetails = {
       startTime: bigNumberToDate(result[0]),
       endTime: bigNumberToDate(result[1]),
-      cap: result[2],
-      rate: result[3],
-      fundsRaised: result[4],
+      cap: weiToValue(result[2], decimals),
+      rate: weiToValue(result[3], FULL_DECIMALS),
+      fundsRaised: weiToValue(result[3], FULL_DECIMALS),
       investorCount: result[5].toNumber(),
-      totalTokensSold: result[6],
+      totalTokensSold: weiToValue(result[6], decimals),
       isRaisedInPoly: result[7],
     };
     return typedResult;
