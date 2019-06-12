@@ -5,6 +5,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
 import {valueToWei, weiToValue} from '../src/utils/convert';
 import {FundRaiseType, ModuleName, ModuleType} from '../src';
+import {EtherDividendCheckpointEvents, USDTieredSTOEvents} from '@polymathnetwork/abi-wrappers/lib/src';
 
 
 // This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
@@ -104,4 +105,30 @@ window.addEventListener('load', async () => {
     },
   });
   console.log(usdTieredResult);
+
+  const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({ moduleName: ModuleName.usdTieredSTO }))[0];
+  const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({name: ModuleName.usdTieredSTO, address: usdTieredAddress});
+  const buyWithETH = await usdTiered.buyWithETH({value: new BigNumber(1), beneficiary: address[0]});
+  console.log(buyWithETH);
+
+  // Subscribe to event of update dividend dates
+  await usdTiered.subscribeAsync({
+    eventName: USDTieredSTOEvents.SetTiers,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Dividend Date Updated!', log);
+      }
+    },
+  });
+
+  // Update dividend dates
+  await usdTiered.modifyTiers({
+    ratePerTier: [new BigNumber(5), new BigNumber(5)],
+    ratePerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
+    tokensPerTierTotal: [new BigNumber(5), new BigNumber(5)],
+    tokensPerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
+  });
 });
