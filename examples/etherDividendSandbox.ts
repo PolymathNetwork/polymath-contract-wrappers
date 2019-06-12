@@ -129,6 +129,7 @@ window.addEventListener('load', async () => {
     maturity: new Date(2018, 1),
   });
 
+
   await etherDividendCheckpoint.createDividendWithCheckpoint({
     name: 'MyDividend2',
     value: new BigNumber(1),
@@ -137,20 +138,19 @@ window.addEventListener('load', async () => {
     checkpointId: 0,
   });
 
+  // Subscribe to event of update dividend dates
   await etherDividendCheckpoint.subscribeAsync({
-    eventName: EtherDividendCheckpointEvents.UpdateDividendDates,
+    eventName: EtherDividendCheckpointEvents.EtherDividendWithholdingWithdrawn,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
         console.log(error);
       } else {
-        console.log('Dividend Date Updated!', log);
+        console.log('Withholding withdrawn', log);
       }
     },
   });
-  await etherDividendCheckpoint.updateDividendDates({
-    dividendIndex: 0,
-    expiry: new Date(2038, 2),
-    maturity: new Date(2037, 4),
-  });
+
+  await etherDividendCheckpoint.pushDividendPayment({dividendIndex: 0, start: new Date(Date.now() + 10), iterations: 10});
+  await etherDividendCheckpoint.withdrawWithholding({dividendIndex: 0});
 });
