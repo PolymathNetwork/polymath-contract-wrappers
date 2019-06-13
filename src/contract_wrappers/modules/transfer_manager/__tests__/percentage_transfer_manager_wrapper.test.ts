@@ -11,6 +11,8 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import PercentageTransferManagerWrapper from '../percentage_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
+import { valueToWei, weiToValue } from '../../../../utils/convert';
+import { PERCENTAGE_DECIMALS } from '../../../../types';
 
 describe('PercentageTransferManagerWrapper', () => {
   let target: PercentageTransferManagerWrapper;
@@ -81,7 +83,7 @@ describe('PercentageTransferManagerWrapper', () => {
       // Real call
       const result = await target.maxHolderPercentage();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(weiToValue(expectedResult, PERCENTAGE_DECIMALS));
       // Verifications
       verify(mockedContract.maxHolderPercentage).once();
       verify(mockedMethod.callAsync()).once();
@@ -261,6 +263,20 @@ describe('PercentageTransferManagerWrapper', () => {
 
   describe('verifyTransfer', () => {
     test('should verifyTransfer', async () => {
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
@@ -280,7 +296,7 @@ describe('PercentageTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           mockedParams.isTransfer,
           mockedParams.txData,
@@ -299,13 +315,18 @@ describe('PercentageTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           mockedParams.isTransfer,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -315,7 +336,7 @@ describe('PercentageTransferManagerWrapper', () => {
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-
+      const expectedPercentageDecimals = new BigNumber(16);
       // Setup get Security Token Address
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
@@ -343,7 +364,7 @@ describe('PercentageTransferManagerWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.maxHolderPercentage),
+          objectContaining(valueToWei(mockedParams.maxHolderPercentage, expectedPercentageDecimals)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -358,7 +379,7 @@ describe('PercentageTransferManagerWrapper', () => {
       verify(mockedContract.changeHolderPercentage).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.maxHolderPercentage),
+          objectContaining(valueToWei(mockedParams.maxHolderPercentage, expectedPercentageDecimals)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),

@@ -20,7 +20,13 @@ import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import { bigNumberToDate, dateArrayToBigNumberArray, dateToBigNumber, numberToBigNumber } from '../../../utils/convert';
+import {
+  bigNumberToDate,
+  dateArrayToBigNumberArray,
+  dateToBigNumber,
+  numberToBigNumber,
+  valueToWei,
+} from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   TxParams,
@@ -433,10 +439,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).verifyTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      params.amount,
+      valueToWei(params.amount, decimals),
       params.data,
       params.isTransfer,
       params.txData,

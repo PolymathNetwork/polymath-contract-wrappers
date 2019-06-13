@@ -1131,7 +1131,6 @@ describe('DividendCheckpointWrapper', () => {
     test('should reclaimDividend', async () => {
       // Get Decimals
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const expectedDecimalsResult = new BigNumber(18);
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);

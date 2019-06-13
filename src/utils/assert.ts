@@ -3,7 +3,7 @@ import { BigNumber } from '@0x/utils';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
 const MAX_64_BYTES_DATE = new Date(18446744073709);
-const MAX_PERCENTAGE = new BigNumber(10).pow(18);
+const MAX_PERCENTAGE = new BigNumber(100);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 const assert = {
