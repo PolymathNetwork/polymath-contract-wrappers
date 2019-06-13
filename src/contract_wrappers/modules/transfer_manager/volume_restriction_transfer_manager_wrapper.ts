@@ -33,7 +33,6 @@ import {
   numberArrayToBigNumberArray,
   numberToBigNumber,
   valueToWei,
-  valueArrayToWeiArray,
   weiToValue,
 } from '../../../utils/convert';
 import {

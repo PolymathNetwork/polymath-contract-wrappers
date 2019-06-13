@@ -152,9 +152,8 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public maxHolderPercentage = async () => {
-    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).maxHolderPercentage.callAsync();
-    return weiToValue(result, decimals);
+    return weiToValue(result, PERCENTAGE_DECIMALS);
   };
 
   public unpause = async (params: TxParams) => {
