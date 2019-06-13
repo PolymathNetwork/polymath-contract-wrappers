@@ -2,6 +2,7 @@ import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { SecurityTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { ModuleName } from '../src/types';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a cappedSTO module on an unlocked node (like ganache)
 
@@ -22,8 +23,14 @@ window.addEventListener('load', async () => {
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
   const investorAddress = '<investor address>'.toLowerCase();
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
 
-  const listInvestors = await TEST.getInvestors();
+  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.generalTransferManager,
+    address: generalTMAddress,
+  });
+
+  const listInvestors = await generalTM.getInvestors();
   const found = listInvestors.find(function(addr) {
     return addr == investorAddress;
   });
