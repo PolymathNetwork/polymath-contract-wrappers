@@ -589,7 +589,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const expectedExemptResult = [
-        '0x7777777777777777777777777777777777777777',
+        '0x1111111111111111111111111111111111111111',
         '0x2222222222222222222222222222222222222222',
       ];
       const mockedExemptMethod = mock(MockedCallMethod);
@@ -835,8 +835,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       };
 
       const expectedExemptResult = [
-        '0x7777777777777777777777777777777777777777',
-        '0x8888888888888888888888888888888888888888',
+        '0x5555555555555555555555555555555555555555',
+        '0x9999999999999999999999999999999999999999',
       ];
       const mockedExemptMethod = mock(MockedCallMethod);
       when(mockedContract.getExemptAddress).thenReturn(instance(mockedExemptMethod));

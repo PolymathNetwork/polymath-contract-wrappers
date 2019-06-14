@@ -390,7 +390,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualRestriction.callAsync(params.holder);
-    const restrictionType = result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
@@ -404,7 +404,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultRestriction = async () => {
     const result = await (await this.contract).defaultRestriction.callAsync();
-    const restrictionType = result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
@@ -418,7 +418,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultDailyRestriction = async () => {
     const result = await (await this.contract).defaultDailyRestriction.callAsync();
-    const restrictionType = result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
@@ -436,7 +436,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualDailyRestriction.callAsync(params.holder);
-    const restrictionType = result[4].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
@@ -465,7 +465,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addIndividualRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
-    assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
+    assert.assert(!(await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
     this.checkRestrictionInputParams(
       params.startTime,
       params.allowedTokens,
@@ -536,7 +536,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     const exemptAddress = await this.getExemptAddress();
-    assert.assert(exemptAddress.some(address => params.holders.includes(address)), 'Holder is exempt from restriction');
+    assert.assert(!exemptAddress.some(address => params.holders.includes(address)), 'Holder is exempt from restriction');
     assert.assert(
       params.startTimes.length === params.allowedTokens.length &&
         params.startTimes.length === params.restrictionTypes.length &&
