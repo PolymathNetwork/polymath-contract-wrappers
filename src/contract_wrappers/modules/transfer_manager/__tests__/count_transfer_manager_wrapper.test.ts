@@ -7,7 +7,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import CountTransferManagerWrapper from '../count_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { numberToBigNumber } from '../../../../utils/convert';
+import { numberToBigNumber, valueToWei } from '../../../../utils/convert';
 
 describe('CountTransferManagerWrapper', () => {
   let target: CountTransferManagerWrapper;
@@ -213,6 +213,20 @@ describe('CountTransferManagerWrapper', () => {
 
   describe('VerifyTransfer', () => {
     test('should verify Transfer', async () => {
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
@@ -232,7 +246,7 @@ describe('CountTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           mockedParams.isTransfer,
           mockedParams.txData,
@@ -251,13 +265,18 @@ describe('CountTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
           mockedParams.isTransfer,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -267,7 +286,7 @@ describe('CountTransferManagerWrapper', () => {
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      
+
       // Setup get Security Token Address
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
