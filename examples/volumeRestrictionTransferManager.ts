@@ -14,7 +14,7 @@ window.addEventListener('load', async () => {
   providerEngine.start();
   const params: ApiConstructorParams = {
     provider: providerEngine,
-    polymathRegistryAddress: '0xc2284c80fe1d0f6c8a8a7ff375b750ac2761e165',
+    polymathRegistryAddress: '<Deployed Polymath Registry address>',
   };
 
   // Instantiate the API
