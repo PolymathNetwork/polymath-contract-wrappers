@@ -283,6 +283,10 @@ interface IndividualRestrictionParams extends RestrictionParams {
   holder: string;
 }
 
+interface RemoveIndividualRestrictionMultiParams extends TxParams {
+  holders: string[];
+}
+
 interface IndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[];
   allowedTokens: BigNumber[];
@@ -620,7 +624,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
-  public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+  public removeIndividualRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     Promise.all(
@@ -652,7 +656,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
-  public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+  public removeIndividualDailyRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     Promise.all(
       params.holders.map(async holder =>

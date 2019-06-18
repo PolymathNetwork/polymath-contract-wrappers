@@ -1156,11 +1156,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     test('should removeIndividualRestrictionMulti', async () => {
       const mockedParams = {
         holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
-        rollingPeriodInDays: [5, 10],
-        allowedTokens: [new BigNumber(1), new BigNumber(2)],
-        startTimes: [new Date(2020, 1), new Date(2020, 2)],
-        endTimes: [new Date(2021, 1), new Date(2021, 2)],
-        restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
       };
@@ -1304,11 +1299,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     test('should removeIndividualDailyRestrictionMulti', async () => {
       const mockedParams = {
         holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
-        rollingPeriodInDays: [5, 10],
-        allowedTokens: [new BigNumber(1), new BigNumber(2)],
-        startTimes: [new Date(2020, 1), new Date(2020, 2)],
-        endTimes: [new Date(2021, 1), new Date(2021, 2)],
-        restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
       };
