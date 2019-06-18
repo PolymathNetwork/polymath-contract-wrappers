@@ -1,10 +1,10 @@
-import {BigNumber} from '@0x/utils';
-import {RedundantSubprovider, RPCSubprovider, Web3ProviderEngine} from '@0x/subproviders';
-import {Web3Wrapper} from '@0x/web3-wrapper';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {valueToWei, weiToValue} from '../src/utils/convert';
-import {ModuleName, ModuleType} from '../src';
-
+import { BigNumber } from '@0x/utils';
+import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { valueToWei, weiToValue, stringToBytes32 } from '../src/utils/convert';
+import { ModuleName, ModuleType } from '../src';
 
 // This file acts as a valid sandbox for adding a permission manager  module on an unlocked node (like ganache)
 
@@ -70,20 +70,41 @@ window.addEventListener('load', async () => {
   });
 
   // Get permission manager factory address
-  const permissionFactory = await polymathAPI.moduleRegistry.getModulesByType({ moduleType: ModuleType.PermissionManager });
-  console.log(permissionFactory);
+  const modules = await polymathAPI.moduleRegistry.getModulesByType({
+    moduleType: ModuleType.PermissionManager,
+  });
+
+  const moduleStringName = 'GeneralPermissionManager';
+  const moduleName = ModuleName.generalPermissionManager;
+
+  const instances: Promise<ModuleFactoryContract>[] = [];
+  modules.map(address => {
+    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
+  });
+  const resultInstances = await Promise.all(instances);
+
+  const names: Promise<string>[] = [];
+  resultInstances.map(instanceFactory => {
+    names.push(instanceFactory.name.callAsync());
+  });
+  const resultNames = await Promise.all(names);
+
+  const index = resultNames.indexOf(stringToBytes32(moduleStringName));
+
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Call to add module
   await tickerSecurityTokenInstance.addModule({
-    moduleName: ModuleName.generalPermissionManager,
-    address: permissionFactory[0],
+    moduleName,
+    address: modules[index],
     maxCost: new BigNumber(100000),
     budget: new BigNumber(100000),
   });
 
-  const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({ moduleName: ModuleName.generalPermissionManager }))[0];
+  const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.generalPermissionManager,
+  }))[0];
 
   const generalPM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.generalPermissionManager,
@@ -91,36 +112,38 @@ window.addEventListener('load', async () => {
   });
 
   // Add a delegate which can have permissions in different modules
-  await generalPM.addDelegate({delegate: address[0], details: 'details'});
+  await generalPM.addDelegate({ delegate: address[0], details: 'details' });
 
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.generalTransferManager,
+  }))[0];
 
   // Get all delegates
-  await generalPM.changePermission({valid: true, perm: 'FLAGS', delegate: address[0], module: generalTMAddress});
+  await generalPM.changePermission({ valid: true, perm: 'FLAGS', delegate: address[0], module: generalTMAddress });
 
   // Check  delegate
   console.log('Delegate is added:');
-  console.log(await generalPM.checkDelegate({delegate: address[0]}));
+  console.log(await generalPM.checkDelegate({ delegate: address[0] }));
   console.log('Delegate has flags perm added on general transfer manager:');
-  console.log(await generalPM.checkPermission({delegate: address[0], module: generalTMAddress, permission: 'FLAGS'}));
+  console.log(await generalPM.checkPermission({ delegate: address[0], module: generalTMAddress, permission: 'FLAGS' }));
 
   // Use FLAGS permission to allow all whitelist transfers, this validates that the user can use the
-  const generalTM = await  polymathAPI.moduleFactory.getModuleInstance({
+  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.generalTransferManager,
     address: generalTMAddress,
   });
-  await generalTM.changeAllowAllWhitelistTransfers({allowAllWhitelistTransfers: true});
+  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
   // Revoking Permission
-  await generalPM.changePermission({valid: false, perm: 'FLAGS', delegate: address[0], module: generalTMAddress});
+  await generalPM.changePermission({ valid: false, perm: 'FLAGS', delegate: address[0], module: generalTMAddress });
 
   console.log('Delegate perm has been revoked. Check permission result: ');
-  console.log(await generalPM.checkPermission({delegate: address[0], module: generalTMAddress, permission: 'FLAGS'}));
+  console.log(await generalPM.checkPermission({ delegate: address[0], module: generalTMAddress, permission: 'FLAGS' }));
 
   // Removing Delegate
-  await generalPM.deleteDelegate({delegate: address[0]});
+  await generalPM.deleteDelegate({ delegate: address[0] });
 
   // Check delegate
   console.log('Delegate is removed. Check delegate result:');
-  console.log(await generalPM.checkDelegate({delegate: address[0]}));
+  console.log(await generalPM.checkDelegate({ delegate: address[0] }));
 });
