@@ -1,9 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {valueToWei, weiToValue} from '../src/utils/convert';
-import {ModuleName} from '../src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { valueToWei, weiToValue } from '../src/utils/convert';
+import { ModuleName } from '../src';
+import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 
 // This file acts as a valid sandbox for using a general transfer manager  module on an unlocked node (like ganache)
 
@@ -83,6 +84,18 @@ window.addEventListener('load', async () => {
   });
 
   // Allow all transfers
+  // Subscribe to event of allow all transfers
+  await generalTM.subscribeAsync({
+    eventName: GeneralTransferManagerEvents.AllowAllTransfers,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Allow all transfers', log);
+      }
+    },
+  });
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
@@ -109,8 +122,22 @@ window.addEventListener('load', async () => {
   await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
   // Verify we can make transfers
-  console.log(await tickerSecurityTokenInstance.verifyTransfer({from: address[0], to: randomBeneficiary1, data: '0x00', value: new BigNumber(10)}));
-  console.log(await tickerSecurityTokenInstance.verifyTransfer({from: address[0], to: randomBeneficiary2, data: '0x00', value: new BigNumber(10)}));
+  console.log(
+    await tickerSecurityTokenInstance.verifyTransfer({
+      from: address[0],
+      to: randomBeneficiary1,
+      data: '0x00',
+      value: new BigNumber(10),
+    }),
+  );
+  console.log(
+    await tickerSecurityTokenInstance.verifyTransfer({
+      from: address[0],
+      to: randomBeneficiary2,
+      data: '0x00',
+      value: new BigNumber(10),
+    }),
+  );
 
   // Make the transfers
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });

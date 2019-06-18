@@ -1,9 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {valueToWei, weiToValue} from '../src/utils/convert';
-import {ModuleName, ModuleType} from '../src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { valueToWei, weiToValue } from '../src/utils/convert';
+import { ModuleName, ModuleType } from '../src';
+import { CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 
 // This file acts as a valid sandbox for using a count transfer manager  module on an unlocked node (like ganache)
 
@@ -115,6 +116,18 @@ window.addEventListener('load', async () => {
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
 
   // We need to increase max holder account to get another transfer through (We are currently at max)
+  // Subscribe to event of modify holder count
+  await countTM.subscribeAsync({
+    eventName: CountTransferManagerEvents.ModifyHolderCount,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Modify holder count', log);
+      }
+    },
+  });
   await countTM.changeHolderCount({ maxHolderCount: 4 });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary3, value: new BigNumber(30) });
 
