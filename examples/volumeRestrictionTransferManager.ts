@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { ModuleFactoryContract, VolumeRestrictionTMEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue } from '../src/utils/convert';
+import { valueToWei, weiToValue, stringToBytes32 } from '../src/utils/convert';
 import { ModuleName, ModuleType, RestrictionTypes } from '../src';
-import { VolumeRestrictionTMEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
 
@@ -74,11 +74,31 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Get sto factory address
-  const tmFactory = await polymathAPI.moduleRegistry.getModulesByType({ moduleType: ModuleType.TransferManager });
+  const moduleStringName = 'VolumeRestrictionTransferManager';
+  const moduleName = ModuleName.volumeRestrictionTM;
+
+  const modules = await polymathAPI.moduleRegistry.getModulesByType({
+    moduleType: ModuleType.TransferManager,
+  });
+
+  const instances: Promise<ModuleFactoryContract>[] = [];
+  modules.map(address => {
+    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
+  });
+  const resultInstances = await Promise.all(instances);
+
+  const names: Promise<string>[] = [];
+  resultInstances.map(instanceFactory => {
+    names.push(instanceFactory.name.callAsync());
+  });
+  const resultNames = await Promise.all(names);
+
+  const index = resultNames.indexOf(stringToBytes32(moduleStringName));
+
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
-    moduleName: ModuleName.volumeRestrictionTM,
-    address: tmFactory[5],
+    moduleName,
+    address: modules[index],
     maxCost: new BigNumber(100000),
     budget: new BigNumber(100000),
   });

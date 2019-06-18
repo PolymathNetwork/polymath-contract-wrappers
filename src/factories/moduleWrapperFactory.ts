@@ -1,4 +1,5 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
@@ -83,6 +84,11 @@ export default class ModuleWrapperFactory {
     this.web3Wrapper = web3Wrapper;
     this.contractFactory = contractFactory;
   }
+
+  public getModuleFactory = async (address: string): Promise<ModuleFactoryContract> => {
+    const factory = await this.contractFactory.getModuleFactoryContract(address);
+    return factory;
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public getModuleInstance: GetModuleInstance = async (params: GetModuleParams): Promise<any> => {
