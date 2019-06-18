@@ -1,9 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {valueToWei, weiToValue} from '../src/utils/convert';
-import {ModuleName, ModuleType, RestrictionTypes} from '../src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { valueToWei, weiToValue } from '../src/utils/convert';
+import { ModuleName, ModuleType, RestrictionTypes } from '../src';
+import { VolumeRestrictionTMEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
 
@@ -102,19 +103,26 @@ window.addEventListener('load', async () => {
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({ investor: address[0], value: new BigNumber(100) });
+  await tickerSecurityTokenInstance.mint({ investor: address[0], value: new BigNumber(1000) });
 
   // VRTM
-  const delay = 2000;
+  const delay = 3000;
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
-  const now = Date.now();
-  function sleepy() {
-    while (Date.now() < now + delay) {
-      // Do nothing for dev purposes
-    }
-  }
+
+  // Subscribe to event of add individual daily restriction
+  await vrtm.subscribeAsync({
+    eventName: VolumeRestrictionTMEvents.AddIndividualRestriction,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('individual restriction added', log);
+      }
+    },
+  });
 
   // Call VRTM restrictions individual daily on this caller
   await vrtm.addIndividualDailyRestriction({
@@ -125,9 +133,8 @@ window.addEventListener('load', async () => {
     restrictionType: RestrictionTypes.Fixed,
     allowedTokens: new BigNumber(10),
   });
-  sleepy();
+  // Transfer
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
-
   // Modify vrtm daily and try transferring again after sleeping (time pass), then remove
   await vrtm.modifyIndividualDailyRestriction({
     holder: address[0],
@@ -136,14 +143,13 @@ window.addEventListener('load', async () => {
     allowedTokens: new BigNumber(50),
     restrictionType: RestrictionTypes.Percentage,
   });
-  sleepy();
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
-  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary3, value: new BigNumber(30) });
+  // Remove
   await vrtm.removeIndividualDailyRestriction({
     holder: address[0],
   });
 
-  // Modify vrtm individual restrictions and multi and try transferring again after sleeping (time pass)
+  // Add individual restriction
   await vrtm.addIndividualRestriction({
     holder: randomBeneficiary1,
     startTime: new Date(Date.now().valueOf() + delay),
@@ -152,6 +158,45 @@ window.addEventListener('load', async () => {
     restrictionType: RestrictionTypes.Fixed,
     rollingPeriodInDays: 2,
   });
+  // Modify individual restriction
+  await vrtm.modifyIndividualRestriction({
+    holder: randomBeneficiary1,
+    startTime: new Date(Date.now().valueOf() + delay),
+    endTime: new Date(2035, 2),
+    allowedTokens: new BigNumber(25),
+    restrictionType: RestrictionTypes.Fixed,
+    rollingPeriodInDays: 2,
+  });
+  // Transfer
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(15) });
+  // Remove
+  await vrtm.removeIndividualRestriction({
+    holder: randomBeneficiary1,
+  });
+
+  // Add Individual Daily Restriction Multi
+  await vrtm.addIndividualDailyRestrictionMulti({
+    holders: [address[0], randomBeneficiary2],
+    startTimes: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    endTimes: [new Date(2035, 1), new Date(2035, 1)],
+    allowedTokens: [new BigNumber(20), new BigNumber(20)],
+    restrictionTypes: [RestrictionTypes.Fixed, RestrictionTypes.Fixed],
+  });
+  // Transfers
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  // Modify Individual Daily Restriction Multi
+  await vrtm.modifyIndividualDailyRestrictionMulti({
+    holders: [address[0], randomBeneficiary2],
+    startTimes: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    endTimes: [new Date(2035, 2), new Date(2035, 2)],
+    allowedTokens: [new BigNumber(30), new BigNumber(30)],
+    restrictionTypes: [RestrictionTypes.Fixed, RestrictionTypes.Fixed],
+  });
+  // Remove Individual Daily Restriction Multi
+  await vrtm.removeIndividualDailyRestrictionMulti({ holders: [address[0], randomBeneficiary2] });
+
+  // Add individual restriction multi
   await vrtm.addIndividualRestrictionMulti({
     holders: [address[0], randomBeneficiary2],
     startTimes: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
@@ -160,12 +205,20 @@ window.addEventListener('load', async () => {
     restrictionTypes: [RestrictionTypes.Fixed, RestrictionTypes.Fixed],
     rollingPeriodInDays: [2, 3],
   });
-  sleepy();
+  // Transfers
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
-  await vrtm.removeIndividualRestriction({
-    holder: address[0],
+  // Modify individual restriction multi
+  await vrtm.modifyIndividualRestrictionMulti({
+    holders: [address[0], randomBeneficiary2],
+    startTimes: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    endTimes: [new Date(2035, 2), new Date(2035, 2)],
+    allowedTokens: [new BigNumber(30), new BigNumber(30)],
+    restrictionTypes: [RestrictionTypes.Fixed, RestrictionTypes.Fixed],
+    rollingPeriodInDays: [3, 4],
   });
+  // Remove
+  await vrtm.removeIndividualRestrictionMulti({ holders: [address[0], randomBeneficiary2] });
 
   // Add default restriction for all, sleep, tx and remove
   await vrtm.addDefaultRestriction({
@@ -175,21 +228,55 @@ window.addEventListener('load', async () => {
     restrictionType: RestrictionTypes.Percentage,
     rollingPeriodInDays: 2,
   });
-  sleepy();
+  // Transfers
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(5) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(5) });
+  // Modify Default restriction
+  await vrtm.modifyDefaultRestriction({
+    startTime: new Date(Date.now().valueOf() + delay),
+    endTime: new Date(2035, 2),
+    allowedTokens: new BigNumber(45),
+    restrictionType: RestrictionTypes.Percentage,
+    rollingPeriodInDays: 3,
+  });
+  // Remove
   await vrtm.removeDefaultRestriction({});
 
-  // Default daily and try to transfer after sleep
+  // Add Default daily
   await vrtm.addDefaultDailyRestriction({
     startTime: new Date(Date.now().valueOf() + delay),
     endTime: new Date(2035, 1),
     allowedTokens: new BigNumber(80),
     restrictionType: RestrictionTypes.Percentage,
   });
-  sleepy();
+  // Transfer
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(4) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(4) });
+  // Modify default daily restriction
+  await vrtm.modifyDefaultDailyRestriction({
+    startTime: new Date(Date.now().valueOf() + delay),
+    endTime: new Date(2036, 2),
+    allowedTokens: new BigNumber(85),
+    restrictionType: RestrictionTypes.Fixed,
+  });
+  // Remove the default daily restriction
+  await vrtm.removeDefaultDailyRestriction({});
+
+  // Add some exemptions
+  // Subscribe to event change exempt wallet list
+  await vrtm.subscribeAsync({
+    eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('changed exempt wallet list', log);
+      }
+    },
+  });
+
+  await vrtm.changeExemptWalletList({ wallet: randomBeneficiary3, change: true });
 
   // BalanceOf
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
