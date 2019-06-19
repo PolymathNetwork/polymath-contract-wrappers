@@ -4,7 +4,7 @@ import { BigNumber } from '@0x/utils';
 const BASE = new BigNumber(10);
 
 export function bytes32ToString(value: string): string {
-  return ethers.utils.toUtf8String(value);
+  return ethers.utils.parseBytes32String(value);
 }
 
 export function stringToBytes32(value: string): string {

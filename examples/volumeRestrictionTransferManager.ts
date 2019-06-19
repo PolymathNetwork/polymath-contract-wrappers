@@ -3,7 +3,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue, stringToBytes32 } from '../src/utils/convert';
+import { valueToWei, weiToValue, bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType, RestrictionTypes } from '../src';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
@@ -93,7 +93,10 @@ window.addEventListener('load', async () => {
   });
   const resultNames = await Promise.all(names);
 
-  const index = resultNames.indexOf(stringToBytes32(moduleStringName));
+  const finalNames = resultNames.map(name => {
+    return bytes32ToString(name);
+  });
+  const index = finalNames.indexOf(moduleStringName);
 
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
