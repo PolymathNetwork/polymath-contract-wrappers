@@ -38,8 +38,8 @@ import {
   bytes32ArrayToStringArray,
   weiToValue,
   valueToWei,
-  checksumAddress,
 } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -461,7 +461,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       tokenName: params.ticker,
     });
     const address = await this.getCallerAddress(params.txData);
-    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    assert.assert(functionsUtils.checksumAddressComparision(address, tickerDetails.owner), 'Not authorised');
     if (tickerDetails.status) {
       const securityTokenOwner = await (await this.securityTokenContract(
         await this.getSecurityTokenAddress(params.ticker),
@@ -488,7 +488,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     });
     assert.assert(!tickerDetails.status, 'Ticker already deployed');
     const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
-    assert.assert(address === tickerDetails.owner, 'Not authorised');
+    assert.assert(functionsUtils.checksumAddressComparision(address, tickerDetails.owner), 'Not authorised');
     assert.assert(tickerDetails.expiryDate.getTime() >= Date.now(), 'Ticker gets expired');
 
     // Check PolyToken allowance
@@ -848,9 +848,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   private checkWhenNotPausedOrOwner = async () => {
     if (
-      !(
-        checksumAddress(await this.owner()) ===
-        checksumAddress((await this.web3Wrapper.getAvailableAddressesAsync())[0])
+      !functionsUtils.checksumAddressComparision(
+        await this.owner(),
+        (await this.web3Wrapper.getAvailableAddressesAsync())[0],
       )
     ) {
       assert.assert(!(await this.isPaused()), 'Msg sender is not owner and the contract is paused');
@@ -859,7 +859,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   private checkOnlyOwner = async () => {
     assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      functionsUtils.checksumAddressComparision(
+        await this.owner(),
+        (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      ),
       'Msg sender must be owner',
     );
   };

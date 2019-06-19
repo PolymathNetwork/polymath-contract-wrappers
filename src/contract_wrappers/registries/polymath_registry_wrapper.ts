@@ -21,7 +21,7 @@ import {
   GetLogs,
   Subscribe,
 } from '../../types';
-import { checksumAddress } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 
 interface ChangeAddressSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PolymathRegistryEvents.ChangeAddress;
@@ -165,7 +165,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    */
   public changeAddress = async (params: ChangeAddressParams) => {
     assert.assert(
-      checksumAddress(await this.owner()) === checksumAddress(await this.getCallerAddress(params.txData)),
+      functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
       'Form sender must be owner',
     );
     assert.isETHAddressHex('newAddress', params.newAddress);

@@ -31,7 +31,8 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../types';
-import { bytes32ArrayToStringArray, checksumAddress } from '../../utils/convert';
+import { bytes32ArrayToStringArray } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause;
@@ -210,12 +211,13 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
       const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
       assert.assert(
-        callerAddress === owner || callerAddress === factoryOwner,
+        functionsUtils.checksumAddressComparision(callerAddress, owner) ||
+          functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
         'Calling address must be owner or factory owner with custom modules allowed feature status',
       );
     } else {
       assert.assert(
-        callerAddress === owner,
+        functionsUtils.checksumAddressComparision(callerAddress, owner),
         'Calling address must be owner without custom modules allowed feature status',
       );
     }
@@ -240,7 +242,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     const owner = await this.owner();
     const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
     assert.assert(
-      callerAddress === owner || callerAddress === factoryOwner,
+      functionsUtils.checksumAddressComparision(callerAddress, owner) ||
+        functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
       'Calling address must be owner or factory owner ',
     );
     return (await this.contract).removeModule.sendTransactionAsync(
@@ -435,7 +438,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkMsgSenderIsOwner = async () => {
     assert.assert(
-      checksumAddress(await this.owner()) === checksumAddress((await this.web3Wrapper.getAvailableAddressesAsync())[0]),
+      functionsUtils.checksumAddressComparision(
+        await this.owner(),
+        (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      ),
       'Msg sender must be owner',
     );
   };
@@ -451,7 +457,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
       !(await this.isPaused()) ||
-        checksumAddress(await this.owner()) === checksumAddress(await this.getCallerAddress(undefined)),
+        functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
       'Contract should not be Paused',
     );
   };
