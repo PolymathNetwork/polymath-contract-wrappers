@@ -31,7 +31,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
 } from '../../types';
-import { bytes32ArrayToStringArray } from '../../utils/convert';
+import { bytes32ArrayToStringArray, checksumAddress } from '../../utils/convert';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.Pause;
@@ -435,7 +435,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkMsgSenderIsOwner = async () => {
     assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      checksumAddress(await this.owner()) === checksumAddress((await this.web3Wrapper.getAvailableAddressesAsync())[0]),
       'Msg sender must be owner',
     );
   };
@@ -450,7 +450,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
-      !(await this.isPaused()) || (await this.owner()) === (await this.getCallerAddress(undefined)),
+      !(await this.isPaused()) ||
+        checksumAddress(await this.owner()) === checksumAddress(await this.getCallerAddress(undefined)),
       'Contract should not be Paused',
     );
   };

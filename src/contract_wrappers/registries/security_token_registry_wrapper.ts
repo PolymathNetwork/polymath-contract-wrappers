@@ -38,6 +38,7 @@ import {
   bytes32ArrayToStringArray,
   weiToValue,
   valueToWei,
+  checksumAddress,
 } from '../../utils/convert';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
@@ -846,7 +847,12 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   private checkWhenNotPausedOrOwner = async () => {
-    if (!((await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0])) {
+    if (
+      !(
+        checksumAddress(await this.owner()) ===
+        checksumAddress((await this.web3Wrapper.getAvailableAddressesAsync())[0])
+      )
+    ) {
       assert.assert(!(await this.isPaused()), 'Msg sender is not owner and the contract is paused');
     }
   };

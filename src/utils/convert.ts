@@ -11,6 +11,10 @@ export function stringToBytes32(value: string): string {
   return ethers.utils.formatBytes32String(value);
 }
 
+export function checksumAddress(value: string): string {
+  return ethers.utils.getAddress(value);
+}
+
 export function bigNumberToDate(value: BigNumber) {
   const date = new Date(0);
   date.setUTCSeconds(value.toNumber());

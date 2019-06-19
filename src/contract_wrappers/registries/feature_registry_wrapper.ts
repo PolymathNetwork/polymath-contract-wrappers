@@ -21,6 +21,7 @@ import {
   Subscribe,
   GetLogs,
 } from '../../types';
+import { checksumAddress } from '../../utils/convert';
 
 interface ChangeFeatureStatusSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: FeatureRegistryEvents.ChangeFeatureStatus;
@@ -117,7 +118,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Change a feature status
    */
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
-    assert.assert((await this.owner()) === (await this.getCallerAddress(params.txData)), 'From sender must be owner');
+    assert.assert(
+      checksumAddress(await this.owner()) === checksumAddress(await this.getCallerAddress(params.txData)),
+      'From sender must be owner',
+    );
     const currentStatus = await this.getFeatureStatus({ nameKey: params.nameKey });
     assert.assert(currentStatus !== params.newStatus, 'FeatureStatus must change');
     return (await this.contract).setFeatureStatus.sendTransactionAsync(

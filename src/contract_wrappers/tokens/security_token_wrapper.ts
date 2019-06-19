@@ -67,6 +67,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  checksumAddress,
 } from '../../utils/convert';
 
 const NO_MODULE_DATA = '0x0000000000000000';
@@ -842,7 +843,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
     assert.assert(!(await this.mintingFrozen()), 'Minting already frozen');
     assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      checksumAddress(await this.owner()) === checksumAddress((await this.web3Wrapper.getAvailableAddressesAsync())[0]),
       'Msg sender must be owner',
     );
     return (await this.contract).freezeMinting.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1227,7 +1228,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
-    assert.assert((await this.owner()) === (await this.getCallerAddress(txData)), 'Msg sender must be owner');
+    assert.assert(
+      checksumAddress(await this.owner()) === checksumAddress(await this.getCallerAddress(txData)),
+      'Msg sender must be owner',
+    );
   };
 
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
