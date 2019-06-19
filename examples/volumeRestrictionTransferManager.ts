@@ -74,7 +74,7 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Get sto factory address
-  const moduleStringName = 'VolumeRestrictionTransferManager';
+  const moduleStringName = 'VolumeRestrictionTM';
   const moduleName = ModuleName.volumeRestrictionTM;
 
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
