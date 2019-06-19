@@ -1116,7 +1116,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       address: result[1],
       factoryAddress: result[2],
       archived: result[3],
-      types: result[4].map(t => t.toNumber()),
+      types: result[4].map(t => new BigNumber(t).toNumber()),
     };
     return typedResult;
   };

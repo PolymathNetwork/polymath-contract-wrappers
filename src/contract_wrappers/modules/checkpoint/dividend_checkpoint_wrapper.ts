@@ -178,7 +178,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     const decimals = await this.getDecimals(params.dividendIndex);
     const result = await (await this.contract).dividends.callAsync(numberToBigNumber(params.dividendIndex));
     const typedResult: Dividend = {
-      checkpointId: result[0].toNumber(),
+      checkpointId: new BigNumber(result[0]).toNumber(),
       created: bigNumberToDate(result[1]),
       maturity: bigNumberToDate(result[2]),
       expiry: bigNumberToDate(result[3]),
@@ -443,7 +443,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   public getCheckpointData = async (params: CheckpointIdParams) => {
     const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
-    assert.assert(params.checkpointId <= currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    assert.assert(params.checkpointId <= new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
     const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
     const typedResult: Promise<CheckpointData>[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
