@@ -394,12 +394,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualRestriction.callAsync(params.holder);
-    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType =
+      new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: result[2].toNumber(),
+      rollingPeriodInDays: new BigNumber(result[2]).toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType,
     };
@@ -408,12 +409,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultRestriction = async () => {
     const result = await (await this.contract).defaultRestriction.callAsync();
-    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType =
+      new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: result[2].toNumber(),
+      rollingPeriodInDays: new BigNumber(result[2]).toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType,
     };
@@ -422,12 +424,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public defaultDailyRestriction = async () => {
     const result = await (await this.contract).defaultDailyRestriction.callAsync();
-    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType =
+      new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: result[2].toNumber(),
+      rollingPeriodInDays: new BigNumber(result[2]).toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType,
     };
@@ -440,12 +443,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public individualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     const result = await (await this.contract).individualDailyRestriction.callAsync(params.holder);
-    const restrictionType = result[4].toString()==='0' ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+    const restrictionType =
+      new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
     const typedResult: IndividualRestriction = {
       allowedTokens: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      rollingPeriodInDays: result[2].toNumber(),
+      rollingPeriodInDays: new BigNumber(result[2]).toNumber(),
       endTime: bigNumberToDate(result[3]),
       restrictionType,
     };
@@ -540,7 +544,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     const exemptAddress = await this.getExemptAddress();
-    assert.assert(!exemptAddress.some(address => params.holders.includes(address)), 'Holder is exempt from restriction');
+    assert.assert(
+      !exemptAddress.some(address => params.holders.includes(address)),
+      'Holder is exempt from restriction',
+    );
     assert.assert(
       params.startTimes.length === params.allowedTokens.length &&
         params.startTimes.length === params.restrictionTypes.length &&
@@ -837,7 +844,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: weiToValue(result[1], decimals),
-      daysCovered: result[2].toNumber(),
+      daysCovered: new BigNumber(result[2]).toNumber(),
       dailyLastTradedDayTime: bigNumberToDate(result[3]),
       lastTradedTimestamp: bigNumberToDate(result[4]),
     };
@@ -851,7 +858,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const typedResult: GetIndividualBucketDetails = {
       lastTradedDayTime: bigNumberToDate(result[0]),
       sumOfLastPeriod: weiToValue(result[1], decimals),
-      daysCovered: result[2].toNumber(),
+      daysCovered: new BigNumber(result[2]).toNumber(),
       dailyLastTradedDayTime: bigNumberToDate(result[3]),
       lastTradedTimestamp: bigNumberToDate(result[4]),
     };
@@ -874,7 +881,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const result = await (await this.contract).getRestrictedData.callAsync();
     const restrictionType = [];
     for (let i = 0; i < result[0].length; i += 1) {
-      const type = result[5][i].toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
+      const type = new BigNumber(result[5][i]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
       restrictionType.push(this.decimalsByRestrictionType(type));
     }
     const decimals = await Promise.all(restrictionType);
@@ -884,7 +891,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         allAddresses: result[0][i],
         allowedTokens: weiToValue(result[1][i], decimals[i]),
         startTime: bigNumberToDate(result[2][i]),
-        rollingPeriodInDays: result[3][i].toNumber(),
+        rollingPeriodInDays: new BigNumber(result[3][i]).toNumber(),
         endTime: bigNumberToDate(result[4][i]),
         typeOfRestriction: result[5][i],
       };

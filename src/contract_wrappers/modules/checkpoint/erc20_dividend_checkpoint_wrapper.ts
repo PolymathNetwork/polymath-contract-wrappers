@@ -359,7 +359,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
     if (checkpointId !== undefined) {
       const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
-      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+      assert.assert(checkpointId < new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
     }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');

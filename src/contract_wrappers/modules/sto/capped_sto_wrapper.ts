@@ -27,6 +27,7 @@ import {
   FULL_DECIMALS,
 } from '../../../types';
 import { bigNumberToDate, valueToWei, weiToValue } from '../../../utils/convert';
+import functionsUtils from '../../../utils/functions_utils';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents.TokenPurchase;
@@ -203,7 +204,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     );
     if (await this.allowBeneficialInvestments()) {
       assert.assert(
-        params.beneficiary === (await this.getCallerAddress(params.txData)),
+        functionsUtils.checksumAddressComparision(params.beneficiary, await this.getCallerAddress(params.txData)),
         'Beneficiary address does not match msg.sender',
       );
     }
@@ -261,7 +262,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       cap: weiToValue(result[2], decimals),
       rate: weiToValue(result[3], FULL_DECIMALS),
       fundsRaised: weiToValue(result[3], FULL_DECIMALS),
-      investorCount: result[5].toNumber(),
+      investorCount: new BigNumber(result[5]).toNumber(),
       totalTokensSold: weiToValue(result[6], decimals),
       isRaisedInPoly: result[7],
     };

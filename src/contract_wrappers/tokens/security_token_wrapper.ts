@@ -68,6 +68,7 @@ import {
   valueArrayToWeiArray,
   weiToValue,
 } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -842,7 +843,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
     assert.assert(!(await this.mintingFrozen()), 'Minting already frozen');
     assert.assert(
-      (await this.owner()) === (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      functionsUtils.checksumAddressComparision(
+        await this.owner(),
+        (await this.web3Wrapper.getAvailableAddressesAsync())[0],
+      ),
       'Msg sender must be owner',
     );
     return (await this.contract).freezeMinting.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1116,7 +1120,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       address: result[1],
       factoryAddress: result[2],
       archived: result[3],
-      types: result[4].map(t => t.toNumber()),
+      types: result[4].map(t => new BigNumber(t).toNumber()),
     };
     return typedResult;
   };
@@ -1197,7 +1201,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
     assert.assert(
-      (await this.getModule({ moduleAddress })).address === '0x0000000000000000000000000000000000000000',
+      functionsUtils.checksumAddressComparision(
+        (await this.getModule({ moduleAddress })).address,
+        '0x0000000000000000000000000000000000000000',
+      ),
       'Module already exists at that address',
     );
   };
@@ -1227,7 +1234,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
-    assert.assert((await this.owner()) === (await this.getCallerAddress(txData)), 'Msg sender must be owner');
+    assert.assert(
+      functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
+      'Msg sender must be owner',
+    );
   };
 
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
