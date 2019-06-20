@@ -43,6 +43,7 @@ import {
   weiArrayToValueArray,
   weiToValue,
 } from '../../../utils/convert';
+import functionsUtils from '../../../utils/functions_utils';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -641,7 +642,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
     return weiToValue(
-      await (await this.contract).convertFromUSD.callAsync(params.fundRaiseType, valueToWei(params.amount, FULL_DECIMALS)),
+      await (await this.contract).convertFromUSD.callAsync(
+        params.fundRaiseType,
+        valueToWei(params.amount, FULL_DECIMALS),
+      ),
       FULL_DECIMALS,
     );
   };
@@ -785,7 +789,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public convertToUSD = async (params: ConvertToOrFromUSDParams) => {
     return weiToValue(
-      await (await this.contract).convertToUSD.callAsync(params.fundRaiseType, valueToWei(params.amount, FULL_DECIMALS)),
+      await (await this.contract).convertToUSD.callAsync(
+        params.fundRaiseType,
+        valueToWei(params.amount, FULL_DECIMALS),
+      ),
       FULL_DECIMALS,
     );
   };
@@ -1051,7 +1058,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       }
     }
     if (!(await this.allowBeneficialInvestments())) {
-      assert.assert(beneficiary === from, 'Beneficiary != funder');
+      assert.assert(functionsUtils.checksumAddressComparision(beneficiary, from), 'Beneficiary != funder');
     }
     const rate = await this.getRate({
       fundRaiseType,

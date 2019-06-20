@@ -2,11 +2,17 @@ import { Module } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
-import { SecurityTokenContract, ModuleFactoryContract, PolyTokenContract, DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
+import {
+  SecurityTokenContract,
+  ModuleFactoryContract,
+  PolyTokenContract,
+  DetailedERC20Contract,
+} from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
 import { stringToBytes32 } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
 
 interface TakeFeeParams extends TxParams {
@@ -35,7 +41,6 @@ export default class ModuleWrapper extends ContractWrapper {
   protected detailedErc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
     return this.contractFactory.getDetailedERC20Contract(address);
   };
-
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
     const address = await (await this.contract).factory.callAsync();
@@ -92,7 +97,10 @@ export default class ModuleWrapper extends ContractWrapper {
 
   protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
     const from = await this.getCallerAddress(txData);
-    return from === (await (await this.securityTokenContract()).owner.callAsync());
+    return functionsUtils.checksumAddressComparision(
+      from,
+      await (await this.securityTokenContract()).owner.callAsync(),
+    );
   };
 
   protected isCallerAllowed = async (txData: Partial<TxData> | undefined, perm: string): Promise<boolean> => {
