@@ -262,7 +262,7 @@ export default class CappedSTOWrapper extends STOWrapper {
       cap: weiToValue(result[2], decimals),
       rate: weiToValue(result[3], FULL_DECIMALS),
       fundsRaised: weiToValue(result[3], FULL_DECIMALS),
-      investorCount: result[5].toNumber(),
+      investorCount: new BigNumber(result[5]).toNumber(),
       totalTokensSold: weiToValue(result[6], decimals),
       isRaisedInPoly: result[7],
     };

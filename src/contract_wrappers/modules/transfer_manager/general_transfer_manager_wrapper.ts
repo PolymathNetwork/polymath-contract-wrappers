@@ -335,7 +335,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       canSendAfter: bigNumberToDate(result[0]),
       canReceiveAfter: bigNumberToDate(result[1]),
       expiryTime: bigNumberToDate(result[2]),
-      canBuyFromSTO: result[3].toNumber() === 1,
+      canBuyFromSTO: new BigNumber(result[3]).toNumber() === 1,
     };
     return typedResult;
   };

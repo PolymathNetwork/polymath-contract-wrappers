@@ -659,7 +659,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   public getTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
-    assert.assert(params.tier < tiers.toNumber(), 'Invalid tier');
+    assert.assert(params.tier < new BigNumber(tiers).toNumber(), 'Invalid tier');
     return weiToValue(
       await (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier)),
       await (await this.securityTokenContract()).decimals.callAsync(),
@@ -672,7 +672,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     const typedResult: USDTieredSTOData = {
       startTime: bigNumberToDate(result[0]),
       endTime: bigNumberToDate(result[1]),
-      currentTier: result[2].toNumber(),
+      currentTier: new BigNumber(result[2]).toNumber(),
       capPerTier: weiArrayToValueArray(result[3], decimals),
       ratePerTier: weiArrayToValueArray(result[4], FULL_DECIMALS),
       fundsRaised: weiToValue(result[5], FULL_DECIMALS),
