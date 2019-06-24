@@ -453,6 +453,7 @@ interface ForceBurnParams extends TxParams {
 interface AddModuleParams extends TxParams {
   moduleName: ModuleName;
   address: string;
+  archived: boolean;
   maxCost?: BigNumber;
   budget?: BigNumber;
   data?:
@@ -1104,6 +1105,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       data,
       maxCost,
       budget,
+      params.archived,
       params.txData,
       params.safetyFactor,
     );

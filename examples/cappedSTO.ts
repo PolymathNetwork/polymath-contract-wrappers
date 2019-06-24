@@ -34,6 +34,7 @@ window.addEventListener('load', async () => {
     address: (await polymathAPI.moduleRegistry.getModulesByType({ moduleType: ModuleType.STO }))[0],
     maxCost: new BigNumber(25000),
     budget: new BigNumber(26000),
+    archived: false,
     data: {
       startTime: new Date(),
       endTime: new Date(2019, 8),

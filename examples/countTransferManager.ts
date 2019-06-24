@@ -102,6 +102,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: new BigNumber(100000),
     budget: new BigNumber(100000),
+    archived: false,
     data: {
       maxHolderCount: 3,
     },

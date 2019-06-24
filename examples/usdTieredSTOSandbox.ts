@@ -89,6 +89,7 @@ window.addEventListener('load', async () => {
     address: stoFactory[1],
     maxCost: new BigNumber(100000),
     budget: new BigNumber(100000),
+    archived: false,
     data: {
       startTime: new Date(2030, 1),
       endTime: new Date(2031, 1),

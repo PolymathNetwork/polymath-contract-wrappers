@@ -91,6 +91,7 @@ window.addEventListener('load', async () => {
     address: dividendsFactory[0],
     maxCost: new BigNumber(100000),
     budget: new BigNumber(100000),
+    archived: false,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
