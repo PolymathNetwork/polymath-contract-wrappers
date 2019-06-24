@@ -1280,10 +1280,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const versions = await this.getVersion();
     const upperSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
-    )).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    )).upperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
     const lowerSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
-    )).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    )).lowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
     const skipUpperVersionBound = upperSTVersionBounds.every(v => v.isZero());
     const skipLowerVersionBound = lowerSTVersionBounds.every(v => v.isZero());
     let isCompatible = true;

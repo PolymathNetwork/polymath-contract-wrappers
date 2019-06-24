@@ -2428,7 +2428,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -2436,7 +2436,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
         instance(mockedGetLowerBoundsSTVersionMethod),
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
@@ -2535,8 +2535,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
@@ -2615,7 +2615,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -2623,7 +2623,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
         instance(mockedGetLowerBoundsSTVersionMethod),
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
@@ -2726,8 +2726,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
@@ -2797,7 +2797,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -2805,7 +2805,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
         instance(mockedGetLowerBoundsSTVersionMethod),
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
@@ -2929,7 +2929,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
       verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
@@ -3009,7 +3009,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -3158,8 +3158,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
@@ -3238,7 +3238,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -3246,7 +3246,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
         instance(mockedGetLowerBoundsSTVersionMethod),
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
@@ -3344,8 +3344,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
@@ -3424,7 +3424,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
         instance(mockedGetUpperBoundsSTVersionMethod),
       );
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
@@ -3432,7 +3432,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
         instance(mockedGetLowerBoundsSTVersionMethod),
       );
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
@@ -3530,8 +3530,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
-      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
