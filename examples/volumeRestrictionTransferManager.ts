@@ -306,4 +306,6 @@ window.addEventListener('load', async () => {
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary2 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary3 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: address[0] }));
+
+  vrtm.unsubscribeAll();
 });

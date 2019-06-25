@@ -143,4 +143,6 @@ window.addEventListener('load', async () => {
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
   console.log('Funds transferred');
+
+  generalTM.unsubscribeAll();
 });

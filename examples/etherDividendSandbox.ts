@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EtherDividendCheckpointEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import {EtherDividendCheckpointEvents, ModuleFactoryContract} from '@polymathnetwork/abi-wrappers/lib/src';
 import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {valueToWei, weiToValue} from '../src/utils/convert';
-import {ModuleName, ModuleType} from '../src';
+import {bytes32ToString, valueToWei, weiToValue} from '../src/utils/convert';
+import {FULL_DECIMALS, ModuleName, ModuleType} from '../src';
 
 // This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
 
@@ -17,7 +17,6 @@ window.addEventListener('load', async () => {
     provider: providerEngine,
     polymathRegistryAddress: '<Deployed Polymath Registry address>',
   };
-
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
@@ -69,11 +68,40 @@ window.addEventListener('load', async () => {
     divisible: false,
   });
 
-  // Get sto factory address
-  const dividendsFactory = await polymathAPI.moduleRegistry.getModulesByType({ moduleType: ModuleType.Dividends });
+  const moduleStringName = 'EtherDividendCheckpoint';
+  const moduleName = ModuleName.etherDividendCheckpoint;
+  const modules = await polymathAPI.moduleRegistry.getModulesByType({
+    moduleType: ModuleType.Dividends,
+  });
+
+  const instances: Promise<ModuleFactoryContract>[] = [];
+  modules.map(address => {
+    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
+  });
+  const resultInstances = await Promise.all(instances);
+
+  const names: Promise<string>[] = [];
+  resultInstances.map(instanceFactory => {
+    names.push(instanceFactory.name.callAsync());
+  });
+  const resultNames = await Promise.all(names);
+
+  const finalNames = resultNames.map(name => {
+    return bytes32ToString(name);
+  });
+  const index = finalNames.indexOf(moduleStringName);
+
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
+
+  // Get some poly tokens on the security token instance
+  await polymathAPI.getPolyTokens({
+    amount: new BigNumber(1000000),
+    address: await tickerSecurityTokenInstance.address(),
+  });
+  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
+  const setupCost = weiToValue(await factory.getSetupCost.callAsync(), FULL_DECIMALS);
 
   // Get some poly tokens on the security token instance
   await polymathAPI.getPolyTokens({
@@ -87,15 +115,16 @@ window.addEventListener('load', async () => {
 
   // Call to add etherdividend module
   await tickerSecurityTokenInstance.addModule({
-    moduleName: ModuleName.etherDividendCheckpoint,
-    address: dividendsFactory[0],
-    maxCost: new BigNumber(100000),
-    budget: new BigNumber(100000),
+    moduleName,
+    address: modules[index],
+    maxCost: setupCost,
+    budget: setupCost,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
   });
 
+  // Get module for ether dividend checkpoint and address for module
   const etherDividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.etherDividendCheckpoint,
   }))[0];
@@ -105,6 +134,7 @@ window.addEventListener('load', async () => {
     address: etherDividendAddress,
   });
 
+  //Create Dividends
   await etherDividendCheckpoint.createDividendWithExclusions({
     name: 'MyDividend2',
     value: new BigNumber(1),
@@ -129,7 +159,6 @@ window.addEventListener('load', async () => {
     maturity: new Date(2018, 1),
   });
 
-
   await etherDividendCheckpoint.createDividendWithCheckpoint({
     name: 'MyDividend2',
     value: new BigNumber(1),
@@ -140,17 +169,23 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of update dividend dates
   await etherDividendCheckpoint.subscribeAsync({
-    eventName: EtherDividendCheckpointEvents.EtherDividendWithholdingWithdrawn,
+    eventName: EtherDividendCheckpointEvents.UpdateDividendDates,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
         console.log(error);
       } else {
-        console.log('Withholding withdrawn', log);
+        console.log('Dividend Date Updated!', log);
       }
     },
   });
 
-  await etherDividendCheckpoint.pushDividendPayment({dividendIndex: 0, start: new Date(Date.now() + 10), iterations: 10});
-  await etherDividendCheckpoint.withdrawWithholding({dividendIndex: 0});
+  // Update dividend dates
+  await etherDividendCheckpoint.updateDividendDates({
+    dividendIndex: 0,
+    expiry: new Date(2038, 2),
+    maturity: new Date(2037, 4),
+  });
+
+  etherDividendCheckpoint.unsubscribeAll();
 });

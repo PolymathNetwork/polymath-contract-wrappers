@@ -162,4 +162,6 @@ window.addEventListener('load', async () => {
   // Check delegate
   console.log('Delegate is removed. Check delegate result:');
   console.log(await generalPM.checkDelegate({ delegate: address[0] }));
+
+  generalPM.unsubscribeAll();
 });
