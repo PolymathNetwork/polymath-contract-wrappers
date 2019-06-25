@@ -21,10 +21,7 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
   // Get some poly tokens in your account and the security token
-  const web3Wrapper = new Web3Wrapper(params.provider, {
-    gasPrice: params.defaultGasPrice,
-  });
-  const address = await web3Wrapper.getAvailableAddressesAsync();
+  const myAddress = await polymathAPI.getAccount();
 
   await polymathAPI.getPolyTokens({amount: new BigNumber(1000000)});
   await polymathAPI.getPolyTokens({
@@ -134,7 +131,7 @@ window.addEventListener('load', async () => {
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({investor: address[0], value: new BigNumber(200)});
+  await tickerSecurityTokenInstance.mint({investor: myAddress, value: new BigNumber(200)});
   await tickerSecurityTokenInstance.transfer({to: randomBeneficiary1, value: new BigNumber(10)});
   await tickerSecurityTokenInstance.transfer({to: randomBeneficiary2, value: new BigNumber(20)});
 
@@ -158,7 +155,7 @@ window.addEventListener('load', async () => {
   console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary1}));
   console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary2}));
   console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary3}));
-  console.log(await tickerSecurityTokenInstance.balanceOf({owner: address[0]}));
+  console.log(await tickerSecurityTokenInstance.balanceOf({owner: myAddress}));
 
   console.log('Funds transferred');
 

@@ -29,11 +29,8 @@ window.addEventListener('load', async () => {
   const polymathAPI = new PolymathAPI(params);
 
   // Get some poly tokens in your account and the security token
-  const web3Wrapper = new Web3Wrapper(params.provider, {
-    gasPrice: params.defaultGasPrice,
-  });
-  const address = await web3Wrapper.getAvailableAddressesAsync();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: address[0] });
+  const myAddress = await polymathAPI.getAccount();
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.getPolyTokens({
     amount: new BigNumber(1000000),
     address: await polymathAPI.securityTokenRegistry.address(),
@@ -136,7 +133,7 @@ window.addEventListener('load', async () => {
 
   const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({ moduleName: ModuleName.usdTieredSTO }))[0];
   const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({name: ModuleName.usdTieredSTO, address: usdTieredAddress});
-  const buyWithETH = await usdTiered.buyWithETH({value: new BigNumber(1), beneficiary: address[0]});
+  const buyWithETH = await usdTiered.buyWithETH({value: new BigNumber(1), beneficiary: myAddress});
   console.log(buyWithETH);
 
   // Subscribe to event of update dividend dates

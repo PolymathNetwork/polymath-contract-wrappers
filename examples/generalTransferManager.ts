@@ -21,12 +21,9 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
   // Get some poly tokens in your account and the security token
-  const web3Wrapper = new Web3Wrapper(params.provider, {
-    gasPrice: params.defaultGasPrice,
-  });
-  const address = await web3Wrapper.getAvailableAddressesAsync();
+  const myAddress = await polymathAPI.getAccount();
 
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: address[0] });
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.getPolyTokens({
     amount: new BigNumber(1000000),
     address: await polymathAPI.securityTokenRegistry.address(),
@@ -101,17 +98,17 @@ window.addEventListener('load', async () => {
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
 
   // Mint yourself some tokens and transfer them around, check balances
-  await tickerSecurityTokenInstance.mint({ investor: address[0], value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(50) });
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
-  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: address[0] }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
 
   // Disallow all transfers between token holders
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: false });
 
   // Add whitelist special users
   await generalTM.modifyWhitelistMulti({
-    investors: [randomBeneficiary1, randomBeneficiary2, address[0]],
+    investors: [randomBeneficiary1, randomBeneficiary2, myAddress],
     canBuyFromSTO: [true, true, true],
     canReceiveAfters: [new Date(2018, 1), new Date(2018, 1), new Date(2018, 1)],
     canSendAfters: [new Date(), new Date(), new Date(2018, 2)],
@@ -124,7 +121,7 @@ window.addEventListener('load', async () => {
   // Verify we can make transfers
   console.log(
     await tickerSecurityTokenInstance.verifyTransfer({
-      from: address[0],
+      from: myAddress,
       to: randomBeneficiary1,
       data: '0x00',
       value: new BigNumber(10),
@@ -132,7 +129,7 @@ window.addEventListener('load', async () => {
   );
   console.log(
     await tickerSecurityTokenInstance.verifyTransfer({
-      from: address[0],
+      from: myAddress,
       to: randomBeneficiary2,
       data: '0x00',
       value: new BigNumber(10),

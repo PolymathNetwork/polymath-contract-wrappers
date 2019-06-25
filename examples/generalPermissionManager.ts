@@ -21,12 +21,9 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
   // Get some poly tokens in your account and the security token
-  const web3Wrapper = new Web3Wrapper(params.provider, {
-    gasPrice: params.defaultGasPrice,
-  });
-  const address = await web3Wrapper.getAvailableAddressesAsync();
+  const myAddress = await polymathAPI.getAccount();
 
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: address[0] });
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.getPolyTokens({
     amount: new BigNumber(1000000),
     address: await polymathAPI.securityTokenRegistry.address(),
@@ -128,20 +125,20 @@ window.addEventListener('load', async () => {
   });
 
   // Add a delegate which can have permissions in different modules
-  await generalPM.addDelegate({ delegate: address[0], details: 'details' });
+  await generalPM.addDelegate({ delegate: myAddress, details: 'details' });
 
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.generalTransferManager,
   }))[0];
 
   // Get all delegates
-  await generalPM.changePermission({ valid: true, perm: 'FLAGS', delegate: address[0], module: generalTMAddress });
+  await generalPM.changePermission({ valid: true, perm: 'FLAGS', delegate: myAddress, module: generalTMAddress });
 
   // Check  delegate
   console.log('Delegate is added:');
-  console.log(await generalPM.checkDelegate({ delegate: address[0] }));
+  console.log(await generalPM.checkDelegate({ delegate: myAddress }));
   console.log('Delegate has flags perm added on general transfer manager:');
-  console.log(await generalPM.checkPermission({ delegate: address[0], module: generalTMAddress, permission: 'FLAGS' }));
+  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
 
   // Use FLAGS permission to allow all whitelist transfers, this validates that the user can use the
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
@@ -151,17 +148,17 @@ window.addEventListener('load', async () => {
   await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
   // Revoking Permission
-  await generalPM.changePermission({ valid: false, perm: 'FLAGS', delegate: address[0], module: generalTMAddress });
+  await generalPM.changePermission({ valid: false, perm: 'FLAGS', delegate: myAddress, module: generalTMAddress });
 
   console.log('Delegate perm has been revoked. Check permission result: ');
-  console.log(await generalPM.checkPermission({ delegate: address[0], module: generalTMAddress, permission: 'FLAGS' }));
+  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
 
   // Removing Delegate
-  await generalPM.deleteDelegate({ delegate: address[0] });
+  await generalPM.deleteDelegate({ delegate: myAddress });
 
   // Check delegate
   console.log('Delegate is removed. Check delegate result:');
-  console.log(await generalPM.checkDelegate({ delegate: address[0] }));
+  console.log(await generalPM.checkDelegate({ delegate: myAddress }));
 
   generalPM.unsubscribeAll();
 });
