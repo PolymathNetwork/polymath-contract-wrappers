@@ -17,16 +17,14 @@ window.addEventListener('load', async () => {
     provider: providerEngine,
     polymathRegistryAddress: '<Deployed Polymath Registry address>',
   };
+
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-  await polymathAPI.getPolyTokens({
-    amount: new BigNumber(1000000),
-    address: await polymathAPI.securityTokenRegistry.address(),
-  });
+  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value:  new BigNumber(500000)});
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -93,18 +91,13 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Get some poly tokens on the security token instance
-  await polymathAPI.getPolyTokens({
-    amount: new BigNumber(1000000),
-    address: await tickerSecurityTokenInstance.address(),
-  });
+  await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
+
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = weiToValue(await factory.getSetupCost.callAsync(), FULL_DECIMALS);
 
   // Get some poly tokens on the security token instance
-  await polymathAPI.getPolyTokens({
-    amount: new BigNumber(1000000),
-    address: await tickerSecurityTokenInstance.address(),
-  });
+  await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
 
   // Create 2 checkpoints
   await tickerSecurityTokenInstance.createCheckpoint({});

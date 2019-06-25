@@ -23,12 +23,8 @@ window.addEventListener('load', async () => {
 
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
-
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-  await polymathAPI.getPolyTokens({
-    amount: new BigNumber(1000000),
-    address: await polymathAPI.securityTokenRegistry.address(),
-  });
+  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value:  new BigNumber(500000)});
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
