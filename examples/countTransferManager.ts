@@ -36,24 +36,24 @@ window.addEventListener('load', async () => {
     tokenName: ticker!,
   });
 
-  // Get the st launch fee and approve the security token registry to spend
-  const getSecurityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: weiToValue(getSecurityTokenLaunchFee, new BigNumber(18)),
-  });
-
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
     spender: await polymathAPI.securityTokenRegistry.address(),
-    value: valueToWei(tickerFee, new BigNumber(18)),
+    value: tickerFee,
   });
 
   // Register a ticker
   await polymathAPI.securityTokenRegistry.registerTicker({
     ticker: ticker!,
     tokenName: tokenName!,
+  });
+
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
   });
 
   // Generate a security token
@@ -90,8 +90,10 @@ window.addEventListener('load', async () => {
     return bytes32ToString(name);
   });
   const index = finalNames.indexOf(moduleStringName);
+
+  // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = weiToValue(await factory.getSetupCost.callAsync(), FULL_DECIMALS);
+  const setupCost = await factory.getSetupCost();
 
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
