@@ -35,6 +35,18 @@ window.addEventListener('load', async () => {
     return addr == investorAddress;
   });
 
+  await TEST.subscribeAsync({
+    eventName: SecurityTokenEvents.Minted,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Minted', log);
+      }
+    },
+  });
+
   if (found) {
     await TEST.mint({
       investor: investorAddress,
@@ -47,15 +59,5 @@ window.addEventListener('load', async () => {
     console.log('Please make sure beneficiary address has been whitelisted');
   }
 
-  await TEST.subscribeAsync({
-    eventName: SecurityTokenEvents.Minted,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Minted', log);
-      }
-    },
-  });
+  TEST.unsubscribeAll();
 });
