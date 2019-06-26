@@ -5,6 +5,7 @@ import {EtherDividendCheckpointEvents, ModuleFactoryContract} from '@polymathnet
 import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
 import {bytes32ToString, valueToWei, weiToValue} from '../src/utils/convert';
 import {FULL_DECIMALS, ModuleName, ModuleType} from '../src';
+import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
 
@@ -35,18 +36,11 @@ window.addEventListener('load', async () => {
     tokenName: ticker!,
   });
 
-  // Get the st launch fee and approve the security token registry to spend
-  const getSecurityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: weiToValue(getSecurityTokenLaunchFee, new BigNumber(18)),
-  });
-
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
     spender: await polymathAPI.securityTokenRegistry.address(),
-    value: valueToWei(tickerFee, new BigNumber(18)),
+    value: tickerFee,
   });
 
   // Register a ticker
@@ -54,6 +48,14 @@ window.addEventListener('load', async () => {
     ticker: ticker!,
     tokenName: tokenName!,
   });
+
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
+  });
+
 
   // Generate a security token
   await polymathAPI.securityTokenRegistry.generateSecurityToken({
@@ -69,7 +71,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.Dividends,
   });
 
-  const instances: Promise<ModuleFactoryContract>[] = [];
+  const instances: Promise<ModuleFactoryWrapper>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -77,7 +79,7 @@ window.addEventListener('load', async () => {
 
   const names: Promise<string>[] = [];
   resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name.callAsync());
+    names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
 
@@ -94,7 +96,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = weiToValue(await factory.getSetupCost.callAsync(), FULL_DECIMALS);
+  const setupCost = await factory.getSetupCost();
 
   // Get some poly tokens on the security token instance
   await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
