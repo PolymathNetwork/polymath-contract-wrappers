@@ -1,13 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {bytes32ToString, valueToWei, weiToValue} from '../src/utils/convert';
-import {FULL_DECIMALS, FundRaiseType, ModuleName, ModuleType} from '../src';
-import {
-  USDTieredSTOEvents
-} from '@polymathnetwork/abi-wrappers/lib/src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
+import { FULL_DECIMALS, FundRaiseType, ModuleName, ModuleType } from '../src';
+import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
-
 
 // This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
 
@@ -27,7 +24,10 @@ window.addEventListener('load', async () => {
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value: new BigNumber(200000)});
+  await polymathAPI.polyToken.transfer({
+    to: await polymathAPI.securityTokenRegistry.address(),
+    value: new BigNumber(200000),
+  });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -37,25 +37,24 @@ window.addEventListener('load', async () => {
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
     tokenName: ticker!,
   });
-
-  // Get the st launch fee and approve the security token registry to spend
-  const getSecurityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: weiToValue(getSecurityTokenLaunchFee, new BigNumber(18)),
-  });
-
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
     spender: await polymathAPI.securityTokenRegistry.address(),
-    value: valueToWei(tickerFee, new BigNumber(18)),
+    value: tickerFee,
   });
 
   // Register a ticker
   await polymathAPI.securityTokenRegistry.registerTicker({
     ticker: ticker!,
     tokenName: tokenName!,
+  });
+
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
   });
 
   // Generate a security token
@@ -94,11 +93,14 @@ window.addEventListener('load', async () => {
 
   // Get some poly tokens on the security token instance
 
-  await polymathAPI.polyToken.transfer({to: await tickerSecurityTokenInstance.address(), value: new BigNumber(200000)});
+  await polymathAPI.polyToken.transfer({
+    to: await tickerSecurityTokenInstance.address(),
+    value: new BigNumber(200000),
+  });
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.getSetupCost();
-  console.log(setupCost);
+
   // Call to add module
   const usdTieredResult = await tickerSecurityTokenInstance.addModule({
     moduleName,
@@ -122,9 +124,14 @@ window.addEventListener('load', async () => {
   });
   console.log(usdTieredResult);
 
-  const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({ moduleName: ModuleName.usdTieredSTO }))[0];
-  const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({name: ModuleName.usdTieredSTO, address: usdTieredAddress});
-  const buyWithETH = await usdTiered.buyWithETH({value: new BigNumber(1), beneficiary: myAddress});
+  const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.usdTieredSTO,
+  }))[0];
+  const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.usdTieredSTO,
+    address: usdTieredAddress,
+  });
+  const buyWithETH = await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });
   console.log(buyWithETH);
 
   // Subscribe to event of update dividend dates
