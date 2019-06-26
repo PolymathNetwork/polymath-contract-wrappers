@@ -24,10 +24,6 @@ window.addEventListener('load', async () => {
   // Get some poly tokens in your account and the security token
   // Poly token faucet works on test net
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000) });
-  await polymathAPI.polyToken.transfer({
-    to: await polymathAPI.securityTokenRegistry.address(),
-    value: new BigNumber(500),
-  });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
