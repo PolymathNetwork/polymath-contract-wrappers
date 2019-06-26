@@ -1,5 +1,4 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
