@@ -1,12 +1,13 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { EtherDividendCheckpointEvents, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers/lib/src';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString } from '../src/utils/convert';
-import { FundRaiseType, ModuleName, ModuleType } from '../src';
-import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
+import { FULL_DECIMALS, ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
-// This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
+// This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
 
 window.addEventListener('load', async () => {
   // Setup the redundant provider
@@ -15,7 +16,7 @@ window.addEventListener('load', async () => {
   providerEngine.start();
   const params: ApiConstructorParams = {
     provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
+    polymathRegistryAddress: '<Deployed Polymath Registry address>',
   };
 
   // Instantiate the API
@@ -26,7 +27,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.polyToken.transfer({
     to: await polymathAPI.securityTokenRegistry.address(),
-    value: new BigNumber(200000),
+    value: new BigNumber(500),
   });
 
   // Prompt to setup your ticker and token name
@@ -37,6 +38,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
     tokenName: ticker!,
   });
+
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
@@ -65,10 +67,10 @@ window.addEventListener('load', async () => {
     divisible: false,
   });
 
-  const moduleStringName = 'USDTieredSTO';
-  const moduleName = ModuleName.usdTieredSTO;
+  const moduleStringName = 'EtherDividendCheckpoint';
+  const moduleName = ModuleName.etherDividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.STO,
+    moduleType: ModuleType.Dividends,
   });
 
   const instances: Promise<ModuleFactoryWrapper>[] = [];
@@ -91,52 +93,70 @@ window.addEventListener('load', async () => {
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
-  // Get some poly tokens on the security token instance
-
-  await polymathAPI.polyToken.transfer({
-    to: await tickerSecurityTokenInstance.address(),
-    value: new BigNumber(200000),
-  });
-
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.getSetupCost();
 
-  // Call to add module
-  const usdTieredResult = await tickerSecurityTokenInstance.addModule({
+  // Create 2 checkpoints
+  await tickerSecurityTokenInstance.createCheckpoint({});
+  await tickerSecurityTokenInstance.createCheckpoint({});
+
+  // Call to add etherdividend module
+  await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
     data: {
-      startTime: new Date(2030, 1),
-      endTime: new Date(2031, 1),
-      ratePerTier: [new BigNumber(10), new BigNumber(10)],
-      ratePerTierDiscountPoly: [new BigNumber(8), new BigNumber(9)],
-      tokensPerTierTotal: [new BigNumber(10), new BigNumber(10)],
-      tokensPerTierDiscountPoly: [new BigNumber(8), new BigNumber(8)],
-      nonAccreditedLimitUSD: new BigNumber(5),
-      minimumInvestmentUSD: new BigNumber(5),
-      fundRaiseTypes: [FundRaiseType.ETH, FundRaiseType.POLY],
       wallet: '0x3333333333333333333333333333333333333333',
-      reserveWallet: '0x5555555555555555555555555555555555555555',
-      usdTokens: ['0x6666666666666666666666666666666666666666', '0x4444444444444444444444444444444444444444'],
     },
   });
-  console.log(usdTieredResult);
 
-  const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.usdTieredSTO,
+  // Get module for ether dividend checkpoint and address for module
+  const etherDividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.etherDividendCheckpoint,
   }))[0];
-  const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.usdTieredSTO,
-    address: usdTieredAddress,
+  console.log(etherDividendAddress);
+  const etherDividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.etherDividendCheckpoint,
+    address: etherDividendAddress,
   });
-  const buyWithETH = await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });
-  console.log(buyWithETH);
+
+  //Create Dividends
+  await etherDividendCheckpoint.createDividendWithExclusions({
+    name: 'MyDividend2',
+    value: new BigNumber(1),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+  });
+
+  await etherDividendCheckpoint.createDividendWithCheckpointAndExclusions({
+    name: 'MyDividend2',
+    value: new BigNumber(1),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    checkpointId: 1,
+    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+  });
+
+  await etherDividendCheckpoint.createDividend({
+    name: 'MyDividend',
+    value: new BigNumber(1),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+  });
+
+  await etherDividendCheckpoint.createDividendWithCheckpoint({
+    name: 'MyDividend2',
+    value: new BigNumber(1),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    checkpointId: 0,
+  });
 
   // Subscribe to event of update dividend dates
-  await usdTiered.subscribeAsync({
-    eventName: USDTieredSTOEvents.SetTiers,
+  await etherDividendCheckpoint.subscribeAsync({
+    eventName: EtherDividendCheckpointEvents.UpdateDividendDates,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -148,12 +168,11 @@ window.addEventListener('load', async () => {
   });
 
   // Update dividend dates
-  await usdTiered.modifyTiers({
-    ratePerTier: [new BigNumber(5), new BigNumber(5)],
-    ratePerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
-    tokensPerTierTotal: [new BigNumber(5), new BigNumber(5)],
-    tokensPerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
+  await etherDividendCheckpoint.updateDividendDates({
+    dividendIndex: 0,
+    expiry: new Date(2038, 2),
+    maturity: new Date(2037, 4),
   });
 
-  usdTiered.unsubscribeAll();
+  etherDividendCheckpoint.unsubscribeAll();
 });

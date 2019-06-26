@@ -28,7 +28,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.polyToken.transfer({
     to: await polymathAPI.securityTokenRegistry.address(),
-    value: new BigNumber(200000),
+    value: new BigNumber(500),
   });
 
   // Prompt to setup your ticker and token name
@@ -94,21 +94,9 @@ window.addEventListener('load', async () => {
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
-  // Get some poly tokens on the security token instance
-  await polymathAPI.polyToken.transfer({
-    to: await tickerSecurityTokenInstance.address(),
-    value: new BigNumber(200000),
-  });
-
   // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.getSetupCost();
-
-  // Get some poly tokens on the security token instance
-  await polymathAPI.polyToken.transfer({
-    to: await tickerSecurityTokenInstance.address(),
-    value: new BigNumber(200000),
-  });
 
   // Create 2 checkpoints
   await tickerSecurityTokenInstance.createCheckpoint({});
@@ -141,7 +129,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.polyToken.transfer({ to: erc20Dividend, value: new BigNumber(5) });
   await polymathAPI.polyToken.approve({
     spender: erc20Dividend,
-    value: new BigNumber(5),
+    value: new BigNumber(4),
   });
 
   //Create Dividends

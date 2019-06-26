@@ -27,7 +27,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
   await polymathAPI.polyToken.transfer({
     to: await polymathAPI.securityTokenRegistry.address(),
-    value: new BigNumber(500000),
+    value: new BigNumber(500),
   });
 
   // Prompt to setup your ticker and token name
