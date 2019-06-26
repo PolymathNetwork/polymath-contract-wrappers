@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import {EtherDividendCheckpointEvents, ModuleFactoryContract} from '@polymathnetwork/abi-wrappers/lib/src';
-import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
-import {bytes32ToString, valueToWei, weiToValue} from '../src/utils/convert';
-import {FULL_DECIMALS, ModuleName, ModuleType} from '../src';
+import { EtherDividendCheckpointEvents, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers/lib/src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
+import { FULL_DECIMALS, ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
@@ -25,7 +25,10 @@ window.addEventListener('load', async () => {
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value:  new BigNumber(500000)});
+  await polymathAPI.polyToken.transfer({
+    to: await polymathAPI.securityTokenRegistry.address(),
+    value: new BigNumber(500000),
+  });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -55,7 +58,6 @@ window.addEventListener('load', async () => {
     spender: await polymathAPI.securityTokenRegistry.address(),
     value: securityTokenLaunchFee,
   });
-
 
   // Generate a security token
   await polymathAPI.securityTokenRegistry.generateSecurityToken({
@@ -88,18 +90,23 @@ window.addEventListener('load', async () => {
   });
   const index = finalNames.indexOf(moduleStringName);
 
-
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Get some poly tokens on the security token instance
-  await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
+  await polymathAPI.polyToken.transfer({
+    to: await tickerSecurityTokenInstance.address(),
+    value: new BigNumber(200000),
+  });
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.getSetupCost();
 
   // Get some poly tokens on the security token instance
-  await polymathAPI.polyToken.transfer({to:  await tickerSecurityTokenInstance.address(), value:  new BigNumber(200000)});
+  await polymathAPI.polyToken.transfer({
+    to: await tickerSecurityTokenInstance.address(),
+    value: new BigNumber(200000),
+  });
 
   // Create 2 checkpoints
   await tickerSecurityTokenInstance.createCheckpoint({});

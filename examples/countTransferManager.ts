@@ -1,11 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import { CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue, bytes32ToString } from '../src/utils/convert';
-import {FULL_DECIMALS, ModuleName, ModuleType} from '../src';
+import { bytes32ToString } from '../src/utils/convert';
+import { ModuleName, ModuleType } from '../src';
 
 // This file acts as a valid sandbox for using a count transfer manager  module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -24,8 +23,11 @@ window.addEventListener('load', async () => {
 
   // Get some poly tokens in your account and the security token
   // Poly token faucet works on test net
-  await polymathAPI.getPolyTokens({amount: new BigNumber(1000000)});
-  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value: new BigNumber(1000000)});
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000) });
+  await polymathAPI.polyToken.transfer({
+    to: await polymathAPI.securityTokenRegistry.address(),
+    value: new BigNumber(1000000),
+  });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -124,16 +126,16 @@ window.addEventListener('load', async () => {
     name: ModuleName.generalTransferManager,
     address: generalTMAddress,
   });
-  await generalTM.changeAllowAllTransfers({allowAllTransfers: true});
+  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
 
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({investor: myAddress, value: new BigNumber(200)});
-  await tickerSecurityTokenInstance.transfer({to: randomBeneficiary1, value: new BigNumber(10)});
-  await tickerSecurityTokenInstance.transfer({to: randomBeneficiary2, value: new BigNumber(20)});
+  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
 
   // We need to increase max holder account to get another transfer through (We are currently at max)
   // Subscribe to event of modify holder count
@@ -148,14 +150,14 @@ window.addEventListener('load', async () => {
       }
     },
   });
-  await countTM.changeHolderCount({maxHolderCount: 4});
-  await tickerSecurityTokenInstance.transfer({to: randomBeneficiary3, value: new BigNumber(30)});
+  await countTM.changeHolderCount({ maxHolderCount: 4 });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary3, value: new BigNumber(30) });
 
   // Show the balances of our token holders
-  console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary1}));
-  console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary2}));
-  console.log(await tickerSecurityTokenInstance.balanceOf({owner: randomBeneficiary3}));
-  console.log(await tickerSecurityTokenInstance.balanceOf({owner: myAddress}));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary2 }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary3 }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
 
   console.log('Funds transferred');
 

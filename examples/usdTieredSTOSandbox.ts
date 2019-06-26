@@ -1,8 +1,8 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
-import { FULL_DECIMALS, FundRaiseType, ModuleName, ModuleType } from '../src';
+import { bytes32ToString } from '../src/utils/convert';
+import { FundRaiseType, ModuleName, ModuleType } from '../src';
 import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
