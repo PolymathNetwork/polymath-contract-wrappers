@@ -1,11 +1,11 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ModuleFactoryContract, CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { valueToWei, weiToValue, bytes32ToString } from '../src/utils/convert';
 import {FULL_DECIMALS, ModuleName, ModuleType} from '../src';
-
 
 // This file acts as a valid sandbox for using a count transfer manager  module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -74,7 +74,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.TransferManager,
   });
 
-  const instances: Promise<ModuleFactoryContract>[] = [];
+  const instances: Promise<ModuleFactoryWrapper>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -82,7 +82,7 @@ window.addEventListener('load', async () => {
 
   const names: Promise<string>[] = [];
   resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name.callAsync());
+    names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
 
