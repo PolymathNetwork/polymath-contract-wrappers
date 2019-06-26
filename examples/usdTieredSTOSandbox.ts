@@ -1,16 +1,12 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {ApiConstructorParams, PolymathAPI} from '../src/PolymathAPI';
 import {bytes32ToString, valueToWei, weiToValue} from '../src/utils/convert';
 import {FULL_DECIMALS, FundRaiseType, ModuleName, ModuleType} from '../src';
 import {
-  EtherDividendCheckpointEvents,
-  ModuleFactoryContract,
   USDTieredSTOEvents
 } from '@polymathnetwork/abi-wrappers/lib/src';
-import set = Reflect.set;
+import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 
 // This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
@@ -76,7 +72,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.STO,
   });
 
-  const instances: Promise<ModuleFactoryContract>[] = [];
+  const instances: Promise<ModuleFactoryWrapper>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -84,7 +80,7 @@ window.addEventListener('load', async () => {
 
   const names: Promise<string>[] = [];
   resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name.callAsync());
+    names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
 
@@ -101,7 +97,7 @@ window.addEventListener('load', async () => {
   await polymathAPI.polyToken.transfer({to: await tickerSecurityTokenInstance.address(), value: new BigNumber(200000)});
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = weiToValue(await factory.getSetupCost.callAsync(), FULL_DECIMALS);
+  const setupCost = await factory.getSetupCost();
   console.log(setupCost);
   // Call to add module
   const usdTieredResult = await tickerSecurityTokenInstance.addModule({
