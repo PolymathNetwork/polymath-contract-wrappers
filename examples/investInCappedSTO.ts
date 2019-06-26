@@ -40,6 +40,18 @@ window.addEventListener('load', async () => {
     investorAddress,
   });
 
+  await cappedSTO.subscribeAsync({
+    eventName: CappedSTOEvents.TokenPurchase,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Token purchased!', log);
+      }
+    },
+  });
+
   const investIn = async () => {
     const whitelist = await generalTM.whitelist({
       investorAddress,
@@ -61,15 +73,5 @@ window.addEventListener('load', async () => {
     console.log('Your address is not approved to participate in this token sale.');
   }
 
-  await cappedSTO.subscribeAsync({
-    eventName: CappedSTOEvents.TokenPurchase,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Token purchased!', log);
-      }
-    },
-  });
+  cappedSTO.unsubscribeAll();
 });

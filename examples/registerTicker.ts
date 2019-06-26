@@ -27,6 +27,30 @@ window.addEventListener('load', async () => {
     });
   };
 
+  await polymathAPI.polyToken.subscribeAsync({
+    eventName: PolyTokenEvents.Approval,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        await registerTicker();
+      }
+    },
+  });
+
+  await polymathAPI.securityTokenRegistry.subscribeAsync({
+    eventName: SecurityTokenRegistryEvents.RegisterTicker,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Ticker registered!', log);
+      }
+    },
+  });
+
   const tickerAvailable = await polymathAPI.securityTokenRegistry.isTickerAvailable({
     tokenName: ticker,
   });
@@ -51,27 +75,5 @@ window.addEventListener('load', async () => {
     }
   }
 
-  await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        await registerTicker();
-      }
-    },
-  });
-
-  await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.RegisterTicker,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Ticker registered!', log);
-      }
-    },
-  });
+  polymathAPI.polyToken.unsubscribeAll();
 });

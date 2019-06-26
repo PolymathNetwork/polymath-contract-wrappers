@@ -29,25 +29,6 @@ window.addEventListener('load', async () => {
     });
   };
 
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  const polyBalance = await polymathAPI.polyToken.balanceOf();
-  if (polyBalance.isGreaterThanOrEqualTo(polyBalance)) {
-    const owner = await polymathAPI.getAccount();
-    const spender = await polymathAPI.securityTokenRegistry.address();
-    const allowance = await polymathAPI.polyToken.allowance({
-      owner,
-      spender,
-    });
-    if (allowance.isLessThan(securityTokenLaunchFee)) {
-      await polymathAPI.polyToken.approve({
-        spender,
-        value: securityTokenLaunchFee,
-      });
-    } else {
-      await launchToken();
-    }
-  }
-
   await polymathAPI.polyToken.subscribeAsync({
     eventName: PolyTokenEvents.Approval,
     indexFilterValues: {},
@@ -71,4 +52,25 @@ window.addEventListener('load', async () => {
       }
     },
   });
+
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  const polyBalance = await polymathAPI.polyToken.balanceOf();
+  if (polyBalance.isGreaterThanOrEqualTo(polyBalance)) {
+    const owner = await polymathAPI.getAccount();
+    const spender = await polymathAPI.securityTokenRegistry.address();
+    const allowance = await polymathAPI.polyToken.allowance({
+      owner,
+      spender,
+    });
+    if (allowance.isLessThan(securityTokenLaunchFee)) {
+      await polymathAPI.polyToken.approve({
+        spender,
+        value: securityTokenLaunchFee,
+      });
+    } else {
+      await launchToken();
+    }
+  }
+
+  polymathAPI.securityTokenRegistry.unsubscribeAll();
 });

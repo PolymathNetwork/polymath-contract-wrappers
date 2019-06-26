@@ -20,6 +20,7 @@ window.addEventListener('load', async () => {
   let polyBalance = await polymathAPI.polyToken.balanceOf();
   console.log('Poly Balance:', polyBalance.toNumber());
   if (!polyBalance.toNumber()) {
+    // getPolyTokens only works on a testnet environment
     await polymathAPI.getPolyTokens({ amount: new BigNumber(500000) });
   }
   polyBalance = await polymathAPI.polyToken.balanceOf();
