@@ -92,12 +92,15 @@ window.addEventListener('load', async () => {
   });
   const index = finalNames.indexOf(moduleStringName);
 
+  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
+  const setupCost = await factory.getSetupCost();
+
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
-    maxCost: new BigNumber(100000),
-    budget: new BigNumber(100000),
+    maxCost: setupCost,
+    budget: setupCost,
   });
 
   // Get Count TM address and create count transfer manager
