@@ -17,7 +17,14 @@ import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
-import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import {
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  FULL_DECIMALS,
+} from '../../types';
 import { weiToValue } from '../../utils/convert';
 
 interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -147,7 +154,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public getSetupCost = async (): Promise<BigNumber> => {
     const value = await (await this.contract).getSetupCost.callAsync();
-    return weiToValue(value, new BigNumber(18));
+    return weiToValue(value, FULL_DECIMALS);
   };
 
   /**
