@@ -25,7 +25,10 @@ window.addEventListener('load', async () => {
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-  await polymathAPI.polyToken.transfer({to: await polymathAPI.securityTokenRegistry.address(), value:  new BigNumber(500000)});
+  await polymathAPI.polyToken.transfer({
+    to: await polymathAPI.securityTokenRegistry.address(),
+    value: new BigNumber(500000),
+  });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -36,24 +39,24 @@ window.addEventListener('load', async () => {
     tokenName: ticker!,
   });
 
-  // Get the st launch fee and approve the security token registry to spend
-  const getSecurityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: weiToValue(getSecurityTokenLaunchFee, new BigNumber(18)),
-  });
-
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
     spender: await polymathAPI.securityTokenRegistry.address(),
-    value: valueToWei(tickerFee, new BigNumber(18)),
+    value: tickerFee,
   });
 
   // Register a ticker
   await polymathAPI.securityTokenRegistry.registerTicker({
     ticker: ticker!,
     tokenName: tokenName!,
+  });
+
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
   });
 
   // Generate a security token
@@ -92,12 +95,15 @@ window.addEventListener('load', async () => {
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
+  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
+  const setupCost = await factory.getSetupCost();
+
   // Call to add module
   await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
-    maxCost: new BigNumber(100000),
-    budget: new BigNumber(100000),
+    maxCost: setupCost,
+    budget: setupCost,
   });
 
   const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({
