@@ -2391,10 +2391,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
       when(mockedContract.address).thenReturn(stAddressResult);
@@ -2524,7 +2524,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
@@ -2575,10 +2575,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
       when(mockedContract.address).thenReturn(stAddressResult);
@@ -2712,7 +2712,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
@@ -2763,10 +2763,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -2912,7 +2912,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
@@ -2963,10 +2963,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
       when(mockedContract.address).thenReturn(stAddressResult);
@@ -3138,7 +3138,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
@@ -3189,10 +3189,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
       when(mockedContract.address).thenReturn(stAddressResult);
@@ -3321,7 +3321,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
@@ -3372,10 +3372,10 @@ describe('SecurityTokenWrapper', () => {
 
       // checkModuleCostBelowMaxCost
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
-      const mockedGetModuleStatusMethod = mock(MockedCallMethod);
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
-      when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
       when(mockedContract.address).thenReturn(stAddressResult);
@@ -3504,7 +3504,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedModuleFactoryContract.setupCostInPoly).once();
-      verify(mockedGetModuleStatusMethod.callAsync()).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
       verify(mockedContract.getModule).once();
