@@ -1,13 +1,13 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { GeneralPermissionManagerEvents } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue, bytes32ToString } from '../src/utils/convert';
-import { ModuleName, ModuleType } from '../src';
 
-// This file acts as a valid sandbox for adding a permission manager  module on an unlocked node (like ganache)
+import { ERC20DividendCheckpointEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { bytes32ToString } from '../src/utils/convert';
+import { ModuleName, ModuleType } from '../src';
+import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+
+// This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
 
 window.addEventListener('load', async () => {
   // Setup the redundant provider
@@ -24,6 +24,7 @@ window.addEventListener('load', async () => {
 
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
+  // Token faucet on test net only
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
 
   // Prompt to setup your ticker and token name
@@ -63,13 +64,11 @@ window.addEventListener('load', async () => {
     divisible: false,
   });
 
-  // Get permission manager factory address
+  const moduleStringName = 'ERC20DividendCheckpoint';
+  const moduleName = ModuleName.erc20DividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.PermissionManager,
+    moduleType: ModuleType.Dividends,
   });
-
-  const moduleStringName = 'GeneralPermissionManager';
-  const moduleName = ModuleName.generalPermissionManager;
 
   const instances: Promise<ModuleFactoryWrapper>[] = [];
   modules.map(address => {
@@ -91,74 +90,100 @@ window.addEventListener('load', async () => {
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
+  // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.getSetupCost();
 
-  // Call to add module
+  // Create 2 checkpoints
+  await tickerSecurityTokenInstance.createCheckpoint({});
+  await tickerSecurityTokenInstance.createCheckpoint({});
+
+  // Call to add etherdividend module
   await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    data: {
+      wallet: '0x3333333333333333333333333333333333333333',
+    },
   });
 
-  const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalPermissionManager,
+  // Get module for ether dividend checkpoint and address for module
+  const erc20DividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.erc20DividendCheckpoint,
   }))[0];
 
-  const generalPM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalPermissionManager,
-    address: generalPMAddress,
+  const erc20DividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.erc20DividendCheckpoint,
+    address: erc20DividendAddress,
+  });
+  const erc20Dividend = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.erc20DividendCheckpoint,
+  }))[0];
+
+  await polymathAPI.polyToken.transfer({ to: erc20Dividend, value: new BigNumber(5) });
+  await polymathAPI.polyToken.approve({
+    spender: erc20Dividend,
+    value: new BigNumber(4),
   });
 
-  // Subscribe to event of add delegate
-  await generalPM.subscribeAsync({
-    eventName: GeneralPermissionManagerEvents.AddDelegate,
+  //Create Dividends
+  await erc20DividendCheckpoint.createDividendWithExclusions({
+    name: 'MyDividend2',
+    amount: new BigNumber(1),
+    token: await polymathAPI.polyToken.address(),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+  });
+
+  await erc20DividendCheckpoint.createDividendWithCheckpointAndExclusions({
+    name: 'MyDividend2',
+    amount: new BigNumber(1),
+    token: await polymathAPI.polyToken.address(),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    checkpointId: 1,
+    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+  });
+
+  await erc20DividendCheckpoint.createDividend({
+    name: 'MyDividend',
+    amount: new BigNumber(1),
+    token: await polymathAPI.polyToken.address(),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+  });
+
+  await erc20DividendCheckpoint.createDividendWithCheckpoint({
+    name: 'MyDividend2',
+    amount: new BigNumber(1),
+    token: await polymathAPI.polyToken.address(),
+    expiry: new Date(2035, 2),
+    maturity: new Date(2018, 1),
+    checkpointId: 0,
+  });
+
+  // Subscribe to event of update dividend dates
+  await erc20DividendCheckpoint.subscribeAsync({
+    eventName: ERC20DividendCheckpointEvents.UpdateDividendDates,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
         console.log(error);
       } else {
-        console.log('Add delegate', log);
+        console.log('Dividend Date Updated!', log);
       }
     },
   });
 
-  // Add a delegate which can have permissions in different modules
-  await generalPM.addDelegate({ delegate: myAddress, details: 'details' });
-
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalTransferManager,
-  }))[0];
-
-  // Get all delegates
-  await generalPM.changePermission({ valid: true, perm: 'FLAGS', delegate: myAddress, module: generalTMAddress });
-
-  // Check  delegate
-  console.log('Delegate is added:');
-  console.log(await generalPM.checkDelegate({ delegate: myAddress }));
-  console.log('Delegate has flags perm added on general transfer manager:');
-  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
-
-  // Use FLAGS permission to allow all whitelist transfers, this validates that the user can use the
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
-    address: generalTMAddress,
+  // Update dividend dates
+  await erc20DividendCheckpoint.updateDividendDates({
+    dividendIndex: 0,
+    expiry: new Date(2038, 2),
+    maturity: new Date(2037, 4),
   });
-  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
-  // Revoking Permission
-  await generalPM.changePermission({ valid: false, perm: 'FLAGS', delegate: myAddress, module: generalTMAddress });
-
-  console.log('Delegate perm has been revoked. Check permission result: ');
-  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
-
-  // Removing Delegate
-  await generalPM.deleteDelegate({ delegate: myAddress });
-
-  // Check delegate
-  console.log('Delegate is removed. Check delegate result:');
-  console.log(await generalPM.checkDelegate({ delegate: myAddress }));
-
-  generalPM.unsubscribeAll();
+  erc20DividendCheckpoint.unsubscribeAll();
 });
