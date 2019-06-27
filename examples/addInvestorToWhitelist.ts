@@ -28,17 +28,6 @@ window.addEventListener('load', async () => {
     address: generalTMAddress,
   });
 
-  generalTM.modifyWhitelist({
-    investor: '0x72aF7849ffc7753B5ccEA5cb80F97e9Aeaf7d999',
-    canSendAfter: new Date(),
-    canReceiveAfter: new Date(),
-    expiryTime: new Date(2020),
-    canBuyFromSTO: true,
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
-  });
-
   await generalTM.subscribeAsync({
     eventName: GeneralTransferManagerEvents.ModifyWhitelist,
     indexFilterValues: {},
@@ -50,4 +39,17 @@ window.addEventListener('load', async () => {
       }
     },
   });
+
+  await generalTM.modifyWhitelist({
+    investor: '0x72aF7849ffc7753B5ccEA5cb80F97e9Aeaf7d999',
+    canSendAfter: new Date(),
+    canReceiveAfter: new Date(),
+    expiryTime: new Date(2020),
+    canBuyFromSTO: true,
+    txData: {
+      from: await polymathAPI.getAccount(),
+    },
+  });
+
+  generalTM.unsubscribeAll();
 });
