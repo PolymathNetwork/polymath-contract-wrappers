@@ -2367,6 +2367,197 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+
+  describe('addModuleWithLabel', () => {
+    test.todo('should fail as address is not an Eth address');
+
+    test('should send the transaction to addModuleWithLabel for CountTransferManager', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModuleWithLabel).thenReturn(instance(mockedMethod));
+
+      const expectedDecimalsResult = new BigNumber(16);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
+
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
+
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('CountTransferManager'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
+
+      // === Start CountTransferManager test ===
+      const ctmParams = {
+        maxHolderCount: 10,
+      };
+      const mockedCtmParams = {
+        moduleName: ModuleName.countTransferManager,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        label: 'count-tm-label',
+        archived: false,
+        data: ctmParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iCtmFace = new ethers.utils.Interface(CountTransferManager.abi);
+      const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
+
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedCtmParams.address,
+              objectContaining(ctmData),
+              objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+              objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
+              objectContaining(mockedCtmParams.label),
+              mockedCtmParams.archived,
+              mockedCtmParams.txData,
+              mockedCtmParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      const ctmResult = await target.addModuleWithLabel({
+        moduleName: ModuleName.countTransferManager,
+        address: mockedCtmParams.address,
+        maxCost: mockedCtmParams.maxCost,
+        budget: mockedCtmParams.budget,
+        archived: mockedCtmParams.archived,
+        label: mockedCtmParams.label,
+        data: {
+          maxHolderCount: ctmParams.maxHolderCount,
+        },
+        txData: mockedCtmParams.txData,
+        safetyFactor: mockedCtmParams.safetyFactor,
+      });
+
+      expect(ctmResult).toBe(expectedResult);
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedCtmParams.address,
+              objectContaining(ctmData),
+              objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+              objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
+              objectContaining(mockedCtmParams.label),
+              mockedCtmParams.archived,
+              mockedCtmParams.txData,
+              mockedCtmParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedContract.addModuleWithLabel).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
+    });
+  });
+
   describe('addModule', () => {
     test.todo('should fail as address is not an Eth address');
 

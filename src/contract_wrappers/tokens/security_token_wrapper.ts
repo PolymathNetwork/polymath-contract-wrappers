@@ -457,12 +457,19 @@ interface AddModuleParams extends TxParams {
   archived: boolean;
   maxCost?: BigNumber;
   budget?: BigNumber;
+  label?: string,
   data?:
     | CountTransferManagerData
     | PercentageTransferManagerData
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData;
+}
+
+interface ProduceAddModuleInformation {
+  maxCost: BigNumber,
+  budget: BigNumber,
+  data: string,
 }
 
 interface AddNoDataModuleParams extends AddModuleParams {
@@ -1025,92 +1032,29 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
-    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
-    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
-    assert.isETHAddressHex('address', params.address);
-    await this.checkOnlyOwner(params.txData);
-    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
-    await this.checkModuleStructAddressIsEmpty(params.address);
-    await this.checkUseModuleVerified(params.address);
-    const decimals = await this.decimals();
-    let iface: ethers.utils.Interface;
-    let data: string;
-    switch (params.moduleName) {
-      case ModuleName.countTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManager.abi);
-        data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
-        break;
-      case ModuleName.percentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManager.abi);
-        data = iface.functions.configure.encode([
-          valueToWei(
-            (params.data as PercentageTransferManagerData).maxHolderPercentage,
-            PERCENTAGE_DECIMALS,
-          ).toString(),
-          (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
-        ]);
-        break;
-      case ModuleName.cappedSTO:
-        await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTO.abi);
-        data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
-          dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
-          valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
-          valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
-          (params.data as CappedSTOData).fundRaiseTypes,
-          (params.data as CappedSTOData).fundsReceiver,
-        ]);
-        break;
-      case ModuleName.usdTieredSTO:
-        await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTO.abi);
-        data = iface.functions.configure.encode([
-          dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
-          dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
-          (params.data as USDTieredSTOData).ratePerTier.map(e => {
-            return valueToWei(e, FULL_DECIMALS).toString();
-          }),
-          (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
-            return valueToWei(e, FULL_DECIMALS).toString();
-          }),
-          (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
-            return valueToWei(e, decimals).toString();
-          }),
-          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
-            return valueToWei(e, decimals).toString();
-          }),
-          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, FULL_DECIMALS).toString(),
-          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, FULL_DECIMALS).toString(),
-          (params.data as USDTieredSTOData).fundRaiseTypes,
-          (params.data as USDTieredSTOData).wallet,
-          (params.data as USDTieredSTOData).reserveWallet,
-          (params.data as USDTieredSTOData).usdTokens,
-        ]);
-        break;
-      case ModuleName.erc20DividendCheckpoint:
-        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
-        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
-        break;
-      case ModuleName.etherDividendCheckpoint:
-        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
-        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
-        break;
-      default:
-        data = NO_MODULE_DATA;
-        break;
-    }
-
+    const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
-      data,
-      maxCost,
-      budget,
+      producedAddModuleInfo.data,
+      producedAddModuleInfo.maxCost,
+      producedAddModuleInfo.budget,
       params.archived,
       params.txData,
       params.safetyFactor,
+    );
+  };
+
+  public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams) => {
+    const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
+    return (await this.contract).addModuleWithLabel.sendTransactionAsync(
+        params.address,
+        producedAddModuleInfo.data,
+        producedAddModuleInfo.maxCost,
+        producedAddModuleInfo.budget,
+        params.label ? params.label : '',
+        params.archived,
+        params.txData,
+        params.safetyFactor,
     );
   };
 
@@ -1331,4 +1275,85 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.reserveWallet);
   };
+
+  private async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
+    const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
+    const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
+    assert.isETHAddressHex('address', params.address);
+    await this.checkOnlyOwner(params.txData);
+    await this.checkModuleCostBelowMaxCost(params.address, maxCost);
+    await this.checkModuleStructAddressIsEmpty(params.address);
+    await this.checkUseModuleVerified(params.address);
+    const decimals = await this.decimals();
+    let iface: ethers.utils.Interface;
+    let data: string;
+    switch (params.moduleName) {
+      case ModuleName.countTransferManager:
+        iface = new ethers.utils.Interface(CountTransferManager.abi);
+        data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
+        break;
+      case ModuleName.percentageTransferManager:
+        iface = new ethers.utils.Interface(PercentageTransferManager.abi);
+        data = iface.functions.configure.encode([
+          valueToWei(
+            (params.data as PercentageTransferManagerData).maxHolderPercentage,
+            PERCENTAGE_DECIMALS,
+          ).toString(),
+          (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
+        ]);
+        break;
+      case ModuleName.cappedSTO:
+        await this.cappedSTOAssertions(params.data as CappedSTOData);
+        iface = new ethers.utils.Interface(CappedSTO.abi);
+        data = iface.functions.configure.encode([
+          dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
+          valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
+          valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
+          (params.data as CappedSTOData).fundRaiseTypes,
+          (params.data as CappedSTOData).fundsReceiver,
+        ]);
+        break;
+      case ModuleName.usdTieredSTO:
+        await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
+        iface = new ethers.utils.Interface(USDTieredSTO.abi);
+        data = iface.functions.configure.encode([
+          dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
+          dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
+          (params.data as USDTieredSTOData).ratePerTier.map(e => {
+            return valueToWei(e, FULL_DECIMALS).toString();
+          }),
+          (params.data as USDTieredSTOData).ratePerTierDiscountPoly.map(e => {
+            return valueToWei(e, FULL_DECIMALS).toString();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierTotal.map(e => {
+            return valueToWei(e, decimals).toString();
+          }),
+          (params.data as USDTieredSTOData).tokensPerTierDiscountPoly.map(e => {
+            return valueToWei(e, decimals).toString();
+          }),
+          valueToWei((params.data as USDTieredSTOData).nonAccreditedLimitUSD, FULL_DECIMALS).toString(),
+          valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, FULL_DECIMALS).toString(),
+          (params.data as USDTieredSTOData).fundRaiseTypes,
+          (params.data as USDTieredSTOData).wallet,
+          (params.data as USDTieredSTOData).reserveWallet,
+          (params.data as USDTieredSTOData).usdTokens,
+        ]);
+        break;
+      case ModuleName.erc20DividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
+        iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
+        break;
+      case ModuleName.etherDividendCheckpoint:
+        assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
+        iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+        data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
+        break;
+      default:
+        data = NO_MODULE_DATA;
+        break;
+    }
+    return {maxCost, budget, data};
+  }
 }
