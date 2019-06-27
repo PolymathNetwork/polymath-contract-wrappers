@@ -1,5 +1,4 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ModuleFactoryContract } from '@polymathnetwork/abi-wrappers';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
@@ -10,6 +9,7 @@ import CappedSTOWrapper from '../contract_wrappers/modules/sto/capped_sto_wrappe
 import USDTieredSTOWrapper from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
+import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName } from '../types';
@@ -85,9 +85,9 @@ export default class ModuleWrapperFactory {
     this.contractFactory = contractFactory;
   }
 
-  public getModuleFactory = async (address: string): Promise<ModuleFactoryContract> => {
-    const factory = await this.contractFactory.getModuleFactoryContract(address);
-    return factory;
+  public getModuleFactory = async (address: string): Promise<ModuleFactoryWrapper> => {
+    const factory = this.contractFactory.getModuleFactoryContract(address);
+    return new ModuleFactoryWrapper(this.web3Wrapper, factory);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

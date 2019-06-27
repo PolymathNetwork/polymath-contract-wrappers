@@ -1,11 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ModuleFactoryContract, CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue, bytes32ToString } from '../src/utils/convert';
+import { bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType } from '../src';
-
 
 // This file acts as a valid sandbox for using a count transfer manager  module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -20,17 +19,11 @@ window.addEventListener('load', async () => {
 
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
-  // Get some poly tokens in your account and the security token
-  const web3Wrapper = new Web3Wrapper(params.provider, {
-    gasPrice: params.defaultGasPrice,
-  });
-  const address = await web3Wrapper.getAvailableAddressesAsync();
+  const myAddress = await polymathAPI.getAccount();
 
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: address[0] });
-  await polymathAPI.getPolyTokens({
-    amount: new BigNumber(1000000),
-    address: await polymathAPI.securityTokenRegistry.address(),
-  });
+  // Get some poly tokens in your account and the security token
+  // Poly token faucet works on test net
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000) });
 
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
@@ -41,24 +34,24 @@ window.addEventListener('load', async () => {
     tokenName: ticker!,
   });
 
-  // Get the st launch fee and approve the security token registry to spend
-  const getSecurityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: weiToValue(getSecurityTokenLaunchFee, new BigNumber(18)),
-  });
-
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
   await polymathAPI.polyToken.approve({
     spender: await polymathAPI.securityTokenRegistry.address(),
-    value: valueToWei(tickerFee, new BigNumber(18)),
+    value: tickerFee,
   });
 
   // Register a ticker
   await polymathAPI.securityTokenRegistry.registerTicker({
     ticker: ticker!,
     tokenName: tokenName!,
+  });
+
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
   });
 
   // Generate a security token
@@ -79,7 +72,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.TransferManager,
   });
 
-  const instances: Promise<ModuleFactoryContract>[] = [];
+  const instances: Promise<ModuleFactoryWrapper>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -87,7 +80,7 @@ window.addEventListener('load', async () => {
 
   const names: Promise<string>[] = [];
   resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name.callAsync());
+    names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
 
@@ -96,12 +89,16 @@ window.addEventListener('load', async () => {
   });
   const index = finalNames.indexOf(moduleStringName);
 
+  // Get setup cost
+  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
+  const setupCost = await factory.getSetupCost();
+
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
-    maxCost: new BigNumber(100000),
-    budget: new BigNumber(100000),
+    maxCost: setupCost,
+    budget: setupCost,
     data: {
       maxHolderCount: 3,
     },
@@ -132,7 +129,7 @@ window.addEventListener('load', async () => {
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({ investor: address[0], value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
 
@@ -156,7 +153,9 @@ window.addEventListener('load', async () => {
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary2 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary3 }));
-  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: address[0] }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
 
   console.log('Funds transferred');
+
+  countTM.unsubscribeAll();
 });
