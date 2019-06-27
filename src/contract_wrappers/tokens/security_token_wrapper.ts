@@ -1,5 +1,5 @@
 import {
-  SecurityTokenContract,
+  ISecurityTokenContract,
   SecurityTokenEventArgs,
   SecurityTokenEvents,
   SecurityTokenApprovalEventArgs,
@@ -29,7 +29,7 @@ import {
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import {
-  SecurityToken,
+  ISecurityToken,
   CountTransferManager,
   ERC20DividendCheckpoint,
   CappedSTO,
@@ -69,6 +69,7 @@ import {
   weiToValue,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
+import ModuleFactoryWrapper from '../modules/module_factory_wrapper';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -556,6 +557,8 @@ interface ModuleData {
   archived: boolean;
   /** Modules types */
   types: number[];
+  /** Module label */
+  label: string;
 }
 // // End of return types ////
 
@@ -563,9 +566,9 @@ interface ModuleData {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = SecurityToken.abi;
+  public abi: ContractAbi = ISecurityToken.abi;
 
-  protected contract: Promise<SecurityTokenContract>;
+  protected contract: Promise<ISecurityTokenContract>;
 
   protected contractFactory: ContractFactory;
 
@@ -592,7 +595,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<SecurityTokenContract>,
+    contract: Promise<ISecurityTokenContract>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -1123,6 +1126,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       factoryAddress: result[2],
       archived: result[3],
       types: result[4].map(t => new BigNumber(t).toNumber()),
+      label: bytes32ToString(result[5]),
     };
     return typedResult;
   };
@@ -1157,7 +1161,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      SecurityToken.abi,
+      ISecurityToken.abi,
       params.callback,
       params.isVerbose,
     );
@@ -1180,7 +1184,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      SecurityToken.abi,
+      ISecurityToken.abi,
     );
     return logs;
   };
@@ -1223,7 +1227,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
-    const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).getSetupCost.callAsync();
+    const factory = new ModuleFactoryWrapper(this.web3Wrapper, this.moduleFactoryContract(moduleFactory));
+    const moduleCost = await factory.setupCostInPoly();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient max cost to cover module factory setup cost',

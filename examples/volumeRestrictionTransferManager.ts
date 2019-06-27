@@ -91,7 +91,7 @@ window.addEventListener('load', async () => {
   const index = finalNames.indexOf(moduleStringName);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({

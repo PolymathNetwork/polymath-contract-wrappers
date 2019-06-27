@@ -152,8 +152,8 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Get setup cost
    */
-  public getSetupCost = async (): Promise<BigNumber> => {
-    const value = await (await this.contract).getSetupCost.callAsync();
+  public setupCostInPoly = async (): Promise<BigNumber> => {
+    const value = await (await this.contract).setupCostInPoly.callAsync();
     return weiToValue(value, FULL_DECIMALS);
   };
 

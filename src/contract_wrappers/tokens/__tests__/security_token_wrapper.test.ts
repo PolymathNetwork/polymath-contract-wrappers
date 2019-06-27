@@ -12,7 +12,7 @@ import {
   EtherDividendCheckpoint,
 } from '@polymathnetwork/contract-artifacts';
 import {
-  SecurityTokenContract,
+  ISecurityTokenContract,
   FeatureRegistryContract,
   FeatureRegistryEvents,
   ModuleFactoryContract,
@@ -38,7 +38,7 @@ describe('SecurityTokenWrapper', () => {
   // Declare SecurityTokenWrapper object
   let target: SecurityTokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: SecurityTokenContract;
+  let mockedContract: ISecurityTokenContract;
   let mockedContractFactory: ContractFactory;
   let mockedFeatureRegistryContract: FeatureRegistryContract;
   let mockedModuleFactoryContract: ModuleFactoryContract;
@@ -47,7 +47,7 @@ describe('SecurityTokenWrapper', () => {
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(SecurityTokenContract);
+    mockedContract = mock(ISecurityTokenContract);
     mockedContractFactory = mock(ContractFactory);
     mockedFeatureRegistryContract = mock(FeatureRegistryContract);
     mockedModuleFactoryContract = mock(ModuleFactoryContract);
@@ -650,6 +650,7 @@ describe('SecurityTokenWrapper', () => {
 
     test('should call to getModule', async () => {
       const expectedString = 'Name';
+      const expectedLabel = 'Label';
       const expectedNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedResult = [
         stringToBytes32(expectedString),
@@ -657,6 +658,7 @@ describe('SecurityTokenWrapper', () => {
         'stringstringstring',
         true,
         expectedNumbers,
+        stringToBytes32(expectedLabel),
       ];
       const mockedParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -676,6 +678,7 @@ describe('SecurityTokenWrapper', () => {
       expect(result.factoryAddress).toBe(expectedResult[2]);
       expect(result.archived).toBe(expectedResult[3]);
       expect(result.types).toEqual(expectedNumbers.map(x => x.toNumber()));
+      expect(result.label).toBe(bytes32ToString(stringToBytes32(expectedLabel)));
       // Verifications
       verify(mockedContract.getModule).once();
       verify(mockedMethod.callAsync(mockedParams.moduleAddress)).once();
@@ -956,6 +959,7 @@ describe('SecurityTokenWrapper', () => {
 
       // getModuleArchiveModule  expected
       const expectedGetModuleString = 'Name';
+      const expectedGetModuleLabel = 'Label';
       const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedGetModuleResult = [
         stringToBytes32(expectedGetModuleString),
@@ -963,6 +967,7 @@ describe('SecurityTokenWrapper', () => {
         'stringstringstring',
         false,
         expectedGetModuleNumbers,
+        stringToBytes32(expectedGetModuleLabel),
       ];
       const mockedGetModuleParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -1023,6 +1028,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const expectedGetModuleString = 'Name';
+      const expectedGetModuleLabel = 'Label';
       const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedGetModuleResult = [
         stringToBytes32(expectedGetModuleString),
@@ -1030,6 +1036,7 @@ describe('SecurityTokenWrapper', () => {
         'stringstringstring',
         true,
         expectedGetModuleNumbers,
+        stringToBytes32(expectedGetModuleLabel),
       ];
       const mockedGetModuleParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -1090,6 +1097,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const expectedGetModuleString = 'Name';
+      const expectedGetModuleLabel = 'Label';
       const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedGetModuleResult = [
         stringToBytes32(expectedGetModuleString),
@@ -1097,6 +1105,7 @@ describe('SecurityTokenWrapper', () => {
         '0x1111111111111111111111111111111111111111',
         true,
         expectedGetModuleNumbers,
+        stringToBytes32(expectedGetModuleLabel),
       ];
       const mockedGetModuleParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -1236,6 +1245,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const expectedGetModuleString = 'Name';
+      const expectedGetModuleLabel = 'Label';
       const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
       const expectedGetModuleResult = [
         stringToBytes32(expectedGetModuleString),
@@ -1243,6 +1253,7 @@ describe('SecurityTokenWrapper', () => {
         '0x1111111111111111111111111111111111111111',
         true,
         expectedGetModuleNumbers,
+        stringToBytes32(expectedGetModuleLabel),
       ];
       const mockedGetModuleParams = {
         moduleAddress: '0x1111111111111111111111111111111111111111',
@@ -2382,7 +2393,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -2428,17 +2439,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -2448,6 +2455,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
 
@@ -2515,7 +2523,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
@@ -2569,7 +2577,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -2615,17 +2623,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -2635,6 +2639,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
@@ -2706,7 +2711,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
@@ -2760,7 +2765,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       // Setup mocked Get Feature registry contract
@@ -2797,17 +2802,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -2826,6 +2827,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
@@ -2909,7 +2911,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
@@ -2930,7 +2932,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.upperSTVersionBounds).once();
-      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.lowerSTVersionBounds).once();
       verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
       verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
@@ -2963,7 +2965,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -3009,17 +3011,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -3029,6 +3027,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
@@ -3138,7 +3137,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
@@ -3192,7 +3191,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -3238,17 +3237,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -3258,6 +3253,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
@@ -3324,7 +3320,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
@@ -3378,7 +3374,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
       const mockedGetModuleStatusMethod = mock(MockedCallMethod);
       const moduleResult = new BigNumber(1);
-      when(mockedModuleFactoryContract.getSetupCost).thenReturn(instance(mockedGetModuleStatusMethod));
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedGetModuleStatusMethod));
       when(mockedGetModuleStatusMethod.callAsync()).thenResolve(moduleResult);
 
       const stAddressResult = '0x7777777777777777777777777777777777777777';
@@ -3424,17 +3420,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock getUpperBoundsSTVersion
       const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
       const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(
-        instance(mockedGetUpperBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.upperSTVersionBounds).thenReturn(instance(mockedGetUpperBoundsSTVersionMethod));
       when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
 
       // Mock getLowerBoundsSTVersion
       const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
       const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
-      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(
-        instance(mockedGetLowerBoundsSTVersionMethod),
-      );
+      when(mockedModuleFactoryContract.lowerSTVersionBounds).thenReturn(instance(mockedGetLowerBoundsSTVersionMethod));
       when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
 
       // checkModuleStructAddressIsEmpty
@@ -3444,6 +3436,7 @@ describe('SecurityTokenWrapper', () => {
         '0x5555555555555555555555555555555555555555',
         false,
         [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
       ];
       const mockedModuleMethod = mock(MockedCallMethod);
       when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
@@ -3510,7 +3503,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).twice();
       verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedModuleFactoryContract.getSetupCost).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
       verify(mockedGetModuleStatusMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
