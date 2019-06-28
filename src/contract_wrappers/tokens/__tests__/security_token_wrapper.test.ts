@@ -688,6 +688,7 @@ describe('SecurityTokenWrapper', () => {
   describe('canTransferFrom', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
+    test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransferFrom', async () => {
       const expectedStatusCode = 'X';
@@ -742,6 +743,8 @@ describe('SecurityTokenWrapper', () => {
 
   describe('canTransfer', () => {
     test.todo('should fail as to is not an Eth address');
+    test.todo('should fail as granularity is a zero big number');
+
     test('should call to canTransfer', async () => {
       const expectedStatusCode = 'X';
       const expectedReasonCode = 'Reason';
@@ -793,6 +796,8 @@ describe('SecurityTokenWrapper', () => {
   describe('canTransferByPartition', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
+    test.todo('should fail as granularity is a zero big number');
+
     test('should call to canTransferByPartition', async () => {
       const expectedStatusCode = 'X';
       const expectedReasonCode = 'Reason';
