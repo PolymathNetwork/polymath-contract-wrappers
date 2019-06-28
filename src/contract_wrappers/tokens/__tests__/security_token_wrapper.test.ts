@@ -450,7 +450,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getInvestorCount', () => {
     test('should call to getInvestorCount', async () => {
-      const expectedResult = new BigNumber(0);
+      const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -2483,16 +2483,16 @@ describe('SecurityTokenWrapper', () => {
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedCtmParams.address,
-              objectContaining(ctmData),
-              objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
-              objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-              objectContaining(mockedCtmParams.label),
-              mockedCtmParams.archived,
-              mockedCtmParams.txData,
-              mockedCtmParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedCtmParams.address,
+          objectContaining(ctmData),
+          objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
+          objectContaining(mockedCtmParams.label),
+          mockedCtmParams.archived,
+          mockedCtmParams.txData,
+          mockedCtmParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       const ctmResult = await target.addModuleWithLabel({
@@ -2511,16 +2511,16 @@ describe('SecurityTokenWrapper', () => {
 
       expect(ctmResult).toBe(expectedResult);
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedCtmParams.address,
-              objectContaining(ctmData),
-              objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
-              objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-              objectContaining(mockedCtmParams.label),
-              mockedCtmParams.archived,
-              mockedCtmParams.txData,
-              mockedCtmParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedCtmParams.address,
+          objectContaining(ctmData),
+          objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
+          objectContaining(mockedCtmParams.label),
+          mockedCtmParams.archived,
+          mockedCtmParams.txData,
+          mockedCtmParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.addModuleWithLabel).once();
       verify(mockedContract.owner).twice();
