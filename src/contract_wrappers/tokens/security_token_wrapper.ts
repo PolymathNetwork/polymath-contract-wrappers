@@ -834,7 +834,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public getInvestorCount = async () => {
+  public getInvestorCount = async (): Promise<BigNumber> => {
     return (await this.contract).getInvestorCount.callAsync();
   };
 
