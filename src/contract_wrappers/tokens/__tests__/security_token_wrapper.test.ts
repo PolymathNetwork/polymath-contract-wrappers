@@ -1738,10 +1738,11 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('freezeMinting', () => {
-    test('should send the transaction to freezeMinting', async () => {
+  describe('freezeIssuance', () => {
+    test('should send the transaction to freezeIssuance', async () => {
       // Mocked parameters
       const mockedParams = {
+        signature: 'signature',
         txData: {},
         safetyFactor: 10,
       };
@@ -1749,9 +1750,9 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.freezeMinting).thenReturn(instance(mockedMethod));
+      when(mockedContract.freezeIssuance).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+      when(mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
         expectedResult,
       );
 
@@ -1766,13 +1767,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = true;
+      const expectedIsIssuableResult = true;
       // Mocked method
-      const mockedFrozenMethod = mock(MockedCallMethod);
+      const mockedIsIssuableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.isIssuable).thenReturn(instance(mockedFrozenMethod));
+      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
       // Stub the request
-      when(mockedFrozenMethod.callAsync()).thenResolve(expectedFrozenResult);
+      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Setup mocked Get Feature registry contract
       when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
@@ -1782,17 +1783,17 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetFeatureStatusMethod.callAsync(Features.FreezeMintingAllowed)).thenResolve(currentFeatureStatus);
 
       // Real call
-      const result = await target.freezeMinting(mockedParams);
+      const result = await target.freezeIssuance(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.freezeMinting).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedContract.freezeIssuance).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
-      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
       verify(mockedGetFeatureStatusMethod.callAsync(Features.FreezeMintingAllowed)).once();
@@ -1842,13 +1843,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = true;
+      const expectedIsIssuableResult = true;
       // Mocked method
-      const mockedFrozenMethod = mock(MockedCallMethod);
+      const mockedIsIssuableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.isIssuable).thenReturn(instance(mockedFrozenMethod));
+      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
       // Stub the request
-      when(mockedFrozenMethod.callAsync()).thenResolve(expectedFrozenResult);
+      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Real call
       const result = await target.mint(mockedParams);
@@ -1868,7 +1869,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
-      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
@@ -1919,13 +1920,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = true;
+      const expectedIsIssuableResult = true;
       // Mocked method
-      const mockedFrozenMethod = mock(MockedCallMethod);
+      const mockedIsIssuableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.isIssuable).thenReturn(instance(mockedFrozenMethod));
+      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
       // Stub the request
-      when(mockedFrozenMethod.callAsync()).thenResolve(expectedFrozenResult);
+      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Real call
       const result = await target.mintWithData(mockedParams);
@@ -1946,7 +1947,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
-      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
@@ -1996,13 +1997,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = true;
+      const expectedIsIssuableResult = true;
       // Mocked method
-      const mockedFrozenMethod = mock(MockedCallMethod);
+      const mockedIsIssuableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.isIssuable).thenReturn(instance(mockedFrozenMethod));
+      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
       // Stub the request
-      when(mockedFrozenMethod.callAsync()).thenResolve(expectedFrozenResult);
+      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Real call
       const result = await target.mintMulti(mockedParams);
@@ -2022,7 +2023,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
-      verify(mockedFrozenMethod.callAsync()).once();
+      verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();

@@ -311,6 +311,9 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   >;
 }
 
+interface FreezeIssuanceParams extends TxParams{
+  signature: string;
+}
 /**
  * @param type type of the module
  */
@@ -878,7 +881,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public freezeMinting = async (params: TxParams) => {
+  public freezeIssuance = async (params: FreezeIssuanceParams) => {
     assert.assert(
       await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.FreezeMintingAllowed),
       'FreezeMintingAllowed Feature Status not enabled',
@@ -891,7 +894,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       ),
       'Msg sender must be owner',
     );
-    return (await this.contract).fre.sendTransactionAsync(params.txData, params.safetyFactor);
+    return (await this.contract).freezeIssuance.sendTransactionAsync(params.signature, params.txData, params.safetyFactor);
   };
 
   public mint = async (params: MintParams) => {
