@@ -335,11 +335,18 @@ interface ModuleAddressTxParams extends TxParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface VerifyTransferParams {
-  from: string;
+interface CanTransferParams {
   to: string;
   value: BigNumber;
   data: string;
+}
+
+interface CanTransferFromParams extends CanTransferParams {
+  from: string;
+}
+
+interface CanTransferByPartitionParams extends CanTransferFromParams {
+  partition: string;
 }
 
 interface ChangeApprovalParams extends TxParams {
@@ -566,6 +573,18 @@ interface ModuleData {
   types: number[];
   /** Module label */
   label: string;
+}
+
+interface CanTransferFromData {
+  /** Status Code */
+  statusCode: string;
+  /** Reason Code */
+  reasonCode: string;
+}
+
+interface CanTransferByPartitionData extends CanTransferFromData {
+  /** Partition */
+  partition: string;
 }
 // // End of return types ////
 
@@ -1084,18 +1103,64 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * Validates a transfer with a TransferManager module if it exists
-   * @return bool
+   * Validates if can transfer
+   * @return statusCode, reasonCode
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public canTransfer = async (params: CanTransferParams) => {
+    assert.isETHAddressHex('to', params.to);
+    const result = await (await this.contract).canTransfer.callAsync(
+        params.to,
+        valueToWei(params.value, await this.decimals()),
+        params.data,
+    );
+
+    const typedResult: CanTransferFromData = {
+      statusCode: result[0],
+      reasonCode: bytes32ToString(result[1]),
+    };
+    return typedResult;
+  };
+
+  /**
+   * Validates if can transfer from
+   * @return statusCode, reasonCode
+   */
+  public canTransferFrom = async (params: CanTransferFromParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    return (await this.contract).verifyTransfer.callAsync(
-      params.from,
-      params.to,
-      valueToWei(params.value, await this.decimals()),
-      params.data,
+    const result = await (await this.contract).canTransferFrom.callAsync(
+        params.from,
+        params.to,
+        valueToWei(params.value, await this.decimals()),
+        params.data,
     );
+    const typedResult: CanTransferFromData = {
+      statusCode: result[0],
+      reasonCode: bytes32ToString(result[1]),
+    };
+    return typedResult;
+  };
+
+  /**
+   * Validates if can transfer with partition
+   * @return statusCode, reasonCode, partition
+   */
+  public canTransferByPartition = async (params: CanTransferByPartitionParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
+    const result = await (await this.contract).canTransferByPartition.callAsync(
+        params.from,
+        params.to,
+        stringToBytes32(params.partition),
+        valueToWei(params.value, await this.decimals()),
+        params.data,
+    );
+    const typedResult: CanTransferByPartitionData = {
+      statusCode: result[0],
+      reasonCode: bytes32ToString(result[1]),
+      partition: bytes32ToString(result[2]),
+    };
+    return typedResult;
   };
 
   /**

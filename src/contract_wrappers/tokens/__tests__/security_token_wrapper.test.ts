@@ -685,13 +685,15 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('verifyTransfer', () => {
+  describe('canTransferFrom', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');
-    test.todo('should fail as granularity is a zero big number');
 
-    test('should call to verifyTransfer', async () => {
-      const expectedResult = false;
+    test('should call to canTransferFrom', async () => {
+      const expectedStatusCode = 'X';
+      const expectedReasonCode = 'Reason';
+      const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
+
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
@@ -707,7 +709,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
+      when(mockedContract.canTransferFrom).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.callAsync(
@@ -719,15 +721,129 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.verifyTransfer(mockedParams);
+      const result = await target.canTransferFrom(mockedParams);
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result.statusCode).toBe(expectedStatusCode);
+      expect(result.reasonCode).toBe(bytes32ToString(stringToBytes32(expectedReasonCode)));
       // Verifications
-      verify(mockedContract.verifyTransfer).once();
+      verify(mockedContract.canTransferFrom).once();
       verify(
         mockedMethod.callAsync(
           mockedParams.from,
           mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('canTransfer', () => {
+    test.todo('should fail as to is not an Eth address');
+    test('should call to canTransfer', async () => {
+      const expectedStatusCode = 'X';
+      const expectedReasonCode = 'Reason';
+      const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
+
+      const mockedParams = {
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(0.9),
+        data: 'string',
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.canTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.canTransfer(mockedParams);
+      // Result expectation
+      expect(result.statusCode).toBe(expectedStatusCode);
+      expect(result.reasonCode).toBe(bytes32ToString(stringToBytes32(expectedReasonCode)));
+      // Verifications
+      verify(mockedContract.canTransfer).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('canTransferByPartition', () => {
+    test.todo('should fail as from is not an Eth address');
+    test.todo('should fail as to is not an Eth address');
+    test('should call to canTransferByPartition', async () => {
+      const expectedStatusCode = 'X';
+      const expectedReasonCode = 'Reason';
+      const expectedPartition = 'Partition';
+      const expectedResult = [
+        expectedStatusCode,
+        stringToBytes32(expectedReasonCode),
+        stringToBytes32(expectedPartition),
+      ];
+
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        partition: expectedPartition,
+        value: new BigNumber(0.9),
+        data: 'string',
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.canTransferByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          stringToBytes32(mockedParams.partition),
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.canTransferByPartition(mockedParams);
+      // Result expectation
+      expect(result.statusCode).toBe(expectedStatusCode);
+      expect(result.reasonCode).toBe(bytes32ToString(stringToBytes32(expectedReasonCode)));
+      expect(result.partition).toBe(bytes32ToString(stringToBytes32(expectedPartition)));
+      // Verifications
+      verify(mockedContract.canTransferByPartition).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          stringToBytes32(mockedParams.partition),
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
         ),
