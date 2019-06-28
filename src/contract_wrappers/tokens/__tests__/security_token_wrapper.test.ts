@@ -254,26 +254,6 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('featureRegistry', () => {
-    test('should call to featureRegistry', async () => {
-      const expectedResult = '0x0123456789012345678901234567890123456789';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.featureRegistry).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.featureRegistry();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.featureRegistry).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
   describe('securityTokenRegistry', () => {
     test('should call to securityTokenRegistry', async () => {
       const expectedResult = '0x0123456789012345678901234567890123456789';

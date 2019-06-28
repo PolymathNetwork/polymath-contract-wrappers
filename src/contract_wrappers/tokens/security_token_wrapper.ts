@@ -672,10 +672,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).moduleRegistry.callAsync();
   };
 
-  public featureRegistry = async () => {
-    return (await this.contract).featureRegistry.callAsync();
-  };
-
   public securityTokenRegistry = async () => {
     return (await this.contract).securityTokenRegistry.callAsync();
   };
