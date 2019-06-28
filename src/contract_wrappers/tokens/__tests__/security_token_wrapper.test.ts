@@ -468,6 +468,26 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('holderCount', () => {
+    test('should call to holderCount', async () => {
+      const expectedResult = new BigNumber(3);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.holderCount).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.holderCount();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.holderCount).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('checkPermission', () => {
     test.todo('should fail as modudelegateAddressle is not an Eth address');
     test.todo('should fail as moduleAddress is not an Eth address');

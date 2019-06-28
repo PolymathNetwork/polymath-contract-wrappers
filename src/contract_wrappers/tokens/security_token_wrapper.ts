@@ -838,6 +838,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).getInvestorCount.callAsync();
   };
 
+  public holderCount = async (): Promise<BigNumber> => {
+    return (await this.contract).holderCount.callAsync();
+  };
+
   public freezeTransfers = async (params: TxParams) => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(!(await this.transfersFrozen()), 'Transfers already frozen');
