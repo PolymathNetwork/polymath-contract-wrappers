@@ -859,7 +859,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.FreezeMintingAllowed),
       'FreezeMintingAllowed Feature Status not enabled',
     );
-    assert.assert((await this.isIssuable()), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), 'Issuance frozen');
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -867,13 +867,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       ),
       'Msg sender must be owner',
     );
-    return (await this.contract).freezeIssuance.sendTransactionAsync(params.signature, params.txData, params.safetyFactor);
+    return (await this.contract).freezeIssuance.sendTransactionAsync(
+      params.signature,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   public mint = async (params: MintParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
-    assert.assert((await this.isIssuable()), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), 'Issuance frozen');
     return (await this.contract).mint.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
@@ -885,7 +889,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public mintWithData = async (params: MintWithDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
-    assert.assert((await this.isIssuable()), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), 'Issuance frozen');
     return (await this.contract).mintWithData.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
@@ -901,7 +905,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.investors.length === params.values.length,
       'Number of investors passed in must be equivalent to number of values',
     );
-    assert.assert((await this.isIssuable()), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), 'Issuance frozen');
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).mintMulti.sendTransactionAsync(
       params.investors,
