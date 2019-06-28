@@ -618,6 +618,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
+   * Datastore address
+   * @return address
+   */
+  public dataStore = async (): Promise<string> => {
+    return (await this.contract).dataStore.callAsync();
+  };
+
+  /**
    * Granular level of the token
    */
   public granularity = async () => {

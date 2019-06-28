@@ -2091,6 +2091,27 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('dataStore', () => {
+    test('should call to dataStore', async () => {
+      const expectedResult = '0x1111111111111111111111111111111111111111';
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.dataStore).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.dataStore();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.dataStore).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('setController', () => {
     test.todo('should fail as controller is not an Eth address');
     test('should send the transaction to setController', async () => {
@@ -2366,7 +2387,6 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).twice();
     });
   });
-
 
   describe('addModuleWithLabel', () => {
     test.todo('should fail as address is not an Eth address');
