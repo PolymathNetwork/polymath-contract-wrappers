@@ -929,34 +929,6 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('renounceOwnership', () => {
-    test('should send the transaction to renounceOwnership', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.renounceOwnership).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.renounceOwnership(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.renounceOwnership).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-    });
-  });
-
   describe('increaseApproval', () => {
     test.todo('should fail as spender is not an Eth address');
     test('should send the transaction to increaseApproval', async () => {

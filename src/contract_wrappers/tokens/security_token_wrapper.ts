@@ -652,10 +652,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).polyToken.callAsync();
   };
 
-  public renounceOwnership = async (params: TxParams) => {
-    return (await this.contract).renounceOwnership.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
   public polymathRegistry = async () => {
     return (await this.contract).polymathRegistry.callAsync();
   };
