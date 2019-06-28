@@ -2,26 +2,38 @@ import {
   ISecurityTokenContract,
   SecurityTokenEventArgs,
   SecurityTokenEvents,
-  SecurityTokenApprovalEventArgs,
-  SecurityTokenTransferEventArgs,
   SecurityTokenModuleAddedEventArgs,
+  SecurityTokenModuleUpgradedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
+  SecurityTokenUpdateTokenNameEventArgs,
   SecurityTokenGranularityChangedEventArgs,
+  SecurityTokenFreezeIssuanceEventArgs,
+  SecurityTokenFreezeTransfersEventArgs,
+  SecurityTokenCheckpointCreatedEventArgs,
+  SecurityTokenSetControllerEventArgs,
+  SecurityTokenTreasuryWalletChangedEventArgs,
+  SecurityTokenDisableControllerEventArgs,
+  SecurityTokenOwnershipTransferredEventArgs,
+  SecurityTokenTokenUpgradedEventArgs,
   SecurityTokenModuleArchivedEventArgs,
   SecurityTokenModuleUnarchivedEventArgs,
   SecurityTokenModuleRemovedEventArgs,
   SecurityTokenModuleBudgetChangedEventArgs,
-  SecurityTokenFreezeTransfersEventArgs,
-  SecurityTokenCheckpointCreatedEventArgs,
-  SecurityTokenFreezeMintingEventArgs,
-  SecurityTokenMintedEventArgs,
-  SecurityTokenBurntEventArgs,
-  SecurityTokenSetControllerEventArgs,
-  SecurityTokenForceTransferEventArgs,
-  SecurityTokenForceBurnEventArgs,
-  SecurityTokenDisableControllerEventArgs,
-  SecurityTokenOwnershipRenouncedEventArgs,
-  SecurityTokenOwnershipTransferredEventArgs,
+  SecurityTokenTransferByPartitionEventArgs,
+  SecurityTokenAuthorizedOperatorEventArgs,
+  SecurityTokenRevokedOperatorEventArgs,
+  SecurityTokenAuthorizedOperatorByPartitionEventArgs,
+  SecurityTokenRevokedOperatorByPartitionEventArgs,
+  SecurityTokenIssuedByPartitionEventArgs,
+  SecurityTokenRedeemedByPartitionEventArgs,
+  SecurityTokenControllerTransferEventArgs,
+  SecurityTokenControllerRedemptionEventArgs,
+  SecurityTokenDocumentRemovedEventArgs,
+  SecurityTokenDocumentUpdatedEventArgs,
+  SecurityTokenIssuedEventArgs,
+  SecurityTokenRedeemedEventArgs,
+  SecurityTokenTransferEventArgs,
+  SecurityTokenApprovalEventArgs,
   FeatureRegistryContract,
   ModuleFactoryContract,
   PolyTokenContract,
@@ -175,30 +187,30 @@ interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
 }
 
 interface FreezeMintingSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.FreezeMinting;
-  callback: EventCallback<SecurityTokenFreezeMintingEventArgs>;
+  eventName: SecurityTokenEvents.FreezeIssuance;
+  callback: EventCallback<SecurityTokenFreezeIssuanceEventArgs>;
 }
 
 interface GetFreezeMintingLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.FreezeMinting;
+  eventName: SecurityTokenEvents.FreezeIssuance;
 }
 
 interface MintedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Minted;
-  callback: EventCallback<SecurityTokenMintedEventArgs>;
+  eventName: SecurityTokenEvents.Issued;
+  callback: EventCallback<SecurityTokenIssuedEventArgs>;
 }
 
 interface GetMintedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Minted;
+  eventName: SecurityTokenEvents.Issued;
 }
 
 interface BurntSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Burnt;
-  callback: EventCallback<SecurityTokenBurntEventArgs>;
+  eventName: SecurityTokenEvents.Redeemed;
+  callback: EventCallback<SecurityTokenRedeemedEventArgs>;
 }
 
 interface GetBurntLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Burnt;
+  eventName: SecurityTokenEvents.Redeemed;
 }
 
 interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -210,24 +222,6 @@ interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.SetController;
 }
 
-interface ForceTransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ForceTransfer;
-  callback: EventCallback<SecurityTokenForceTransferEventArgs>;
-}
-
-interface GetForceTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ForceTransfer;
-}
-
-interface ForceBurnSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ForceBurn;
-  callback: EventCallback<SecurityTokenForceBurnEventArgs>;
-}
-
-interface GetForceBurnLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ForceBurn;
-}
-
 interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.DisableController;
   callback: EventCallback<SecurityTokenDisableControllerEventArgs>;
@@ -235,15 +229,6 @@ interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetDisableControllerLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.DisableController;
-}
-
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.OwnershipRenounced;
-  callback: EventCallback<SecurityTokenOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.OwnershipRenounced;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -271,10 +256,7 @@ interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: MintedSubscribeAsyncParams): Promise<string>;
   (params: BurntSubscribeAsyncParams): Promise<string>;
   (params: SetControllerSubscribeAsyncParams): Promise<string>;
-  (params: ForceTransferSubscribeAsyncParams): Promise<string>;
-  (params: ForceBurnSubscribeAsyncParams): Promise<string>;
   (params: DisableControllerSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
@@ -296,22 +278,17 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   >;
   (params: GetFreezeTransfersLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
   (params: GetCheckpointCreatedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenCheckpointCreatedEventArgs>[]>;
-  (params: GetFreezeMintingLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeMintingEventArgs>[]>;
-  (params: GetMintedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenMintedEventArgs>[]>;
-  (params: GetBurntLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenBurntEventArgs>[]>;
+  (params: GetFreezeMintingLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeIssuanceEventArgs>[]>;
+  (params: GetMintedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenIssuedEventArgs>[]>;
+  (params: GetBurntLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenRedeemedEventArgs>[]>;
   (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenSetControllerEventArgs>[]>;
-  (params: GetForceTransferLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenForceTransferEventArgs>[]>;
-  (params: GetForceBurnLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenForceBurnEventArgs>[]>;
   (params: GetDisableControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenDisableControllerEventArgs>[]>;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>[]
   >;
 }
 
-interface FreezeIssuanceParams extends TxParams{
+interface FreezeIssuanceParams extends TxParams {
   signature: string;
 }
 /**
@@ -467,7 +444,7 @@ interface AddModuleParams extends TxParams {
   archived: boolean;
   maxCost?: BigNumber;
   budget?: BigNumber;
-  label?: string,
+  label?: string;
   data?:
     | CountTransferManagerData
     | PercentageTransferManagerData
@@ -477,9 +454,9 @@ interface AddModuleParams extends TxParams {
 }
 
 interface ProduceAddModuleInformation {
-  maxCost: BigNumber,
-  budget: BigNumber,
-  data: string,
+  maxCost: BigNumber;
+  budget: BigNumber;
+  data: string;
 }
 
 interface AddNoDataModuleParams extends AddModuleParams {
@@ -1081,14 +1058,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams) => {
     const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
     return (await this.contract).addModuleWithLabel.sendTransactionAsync(
-        params.address,
-        producedAddModuleInfo.data,
-        producedAddModuleInfo.maxCost,
-        producedAddModuleInfo.budget,
-        params.label ? params.label : '',
-        params.archived,
-        params.txData,
-        params.safetyFactor,
+      params.address,
+      producedAddModuleInfo.data,
+      producedAddModuleInfo.maxCost,
+      producedAddModuleInfo.budget,
+      params.label ? params.label : '',
+      params.archived,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -1116,9 +1093,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public canTransfer = async (params: CanTransferParams) => {
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransfer.callAsync(
-        params.to,
-        valueToWei(params.value, await this.decimals()),
-        params.data,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
     );
 
     const typedResult: CanTransferFromData = {
@@ -1136,10 +1113,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransferFrom.callAsync(
-        params.from,
-        params.to,
-        valueToWei(params.value, await this.decimals()),
-        params.data,
+      params.from,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
     );
     const typedResult: CanTransferFromData = {
       statusCode: result[0],
@@ -1156,11 +1133,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransferByPartition.callAsync(
-        params.from,
-        params.to,
-        stringToBytes32(params.partition),
-        valueToWei(params.value, await this.decimals()),
-        params.data,
+      params.from,
+      params.to,
+      stringToBytes32(params.partition),
+      valueToWei(params.value, await this.decimals()),
+      params.data,
     );
     const typedResult: CanTransferByPartitionData = {
       statusCode: result[0],
@@ -1434,6 +1411,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         data = NO_MODULE_DATA;
         break;
     }
-    return {maxCost, budget, data};
+    return { maxCost, budget, data };
   }
 }
