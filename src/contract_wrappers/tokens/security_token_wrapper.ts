@@ -404,12 +404,16 @@ interface CheckPermissionParams {
   permission: string;
 }
 
-interface BurnWithDataParams extends TxParams {
+interface RedeemParams extends TxParams {
   value: BigNumber;
   data: string;
 }
 
-interface BurnFromWithDataParams extends TxParams {
+interface RedeemByPartitionParams extends RedeemParams {
+  partition: string;
+}
+
+interface RedeemFromParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
@@ -933,9 +937,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public burnWithData = async (params: BurnWithDataParams) => {
+  public redeem = async (params: RedeemParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
-    return (await this.contract).burnWithData.sendTransactionAsync(
+    return (await this.contract).redeem.sendTransactionAsync(
       valueToWei(params.value, await this.decimals()),
       stringToBytes32(params.data),
       params.txData,
@@ -943,7 +947,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public burnFromWithData = async (params: BurnFromWithDataParams) => {
+  public redeemByPartition = async (params: RedeemByPartitionParams) => {
+    await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).redeemByPartition.sendTransactionAsync(
+      params.partition,
+      valueToWei(params.value, await this.decimals()),
+      stringToBytes32(params.data),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public redeemFrom = async (params: RedeemFromParams) => {
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     assert.assert(
       (await this.allowance({
@@ -953,7 +969,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       'Insufficient allowance for inputted burn value',
     );
     assert.isETHAddressHex('from', params.from);
-    return (await this.contract).burnFromWithData.sendTransactionAsync(
+    return (await this.contract).redeemFrom.sendTransactionAsync(
       params.from,
       valueToWei(params.value, await this.decimals()),
       params.data,

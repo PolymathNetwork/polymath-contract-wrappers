@@ -2010,8 +2010,8 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('burnWithData', () => {
-    test('should send the transaction to burnWithData', async () => {
+  describe('redeem', () => {
+    test('should send the transaction to redeem', async () => {
       // Mocked parameters
       const mockedParams = {
         value: new BigNumber(1),
@@ -2029,7 +2029,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.burnWithData).thenReturn(instance(mockedMethod));
+      when(mockedContract.redeem).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -2057,12 +2057,12 @@ describe('SecurityTokenWrapper', () => {
       when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
 
       // Real call
-      const result = await target.burnWithData(mockedParams);
+      const result = await target.redeem(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.burnWithData).once();
+      verify(mockedContract.redeem).once();
       verify(
         mockedMethod.sendTransactionAsync(
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
@@ -2079,8 +2079,80 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('burnFromWithData', () => {
-    test('should send the transaction to burnFromWithData', async () => {
+  describe('redeemByPartition', () => {
+    test('should send the transaction to redeem', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        value: new BigNumber(1),
+        data: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.redeemByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              stringToBytes32(mockedParams.partition),
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const owner = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
+
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
+      const params = {
+        owner,
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      // Real call
+      const result = await target.redeemByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.redeemByPartition).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              stringToBytes32(mockedParams.partition),
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
+    });
+  });
+
+  describe('redeemFrom', () => {
+    test('should send the transaction to redeemFrom', async () => {
       // Mocked parameters
       const mockedParams = {
         from: '0x5555555555555555555555555555555555555555',
@@ -2099,7 +2171,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.burnFromWithData).thenReturn(instance(mockedMethod));
+      when(mockedContract.redeemFrom).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -2136,12 +2208,12 @@ describe('SecurityTokenWrapper', () => {
       when(mockedAllowanceMethod.callAsync(mockedParams.from, params.owner)).thenResolve(expectedAllowanceResult);
 
       // Real call
-      const result = await target.burnFromWithData(mockedParams);
+      const result = await target.redeemFrom(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.burnFromWithData).once();
+      verify(mockedContract.redeemFrom).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
