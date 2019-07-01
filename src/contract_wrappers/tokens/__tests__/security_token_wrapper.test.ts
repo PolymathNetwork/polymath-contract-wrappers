@@ -234,6 +234,26 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('isControllable', () => {
+    test('should call to isControllable', async () => {
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isControllable).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isControllable();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isControllable).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('moduleRegistry', () => {
     test('should call to moduleRegistry', async () => {
       const expectedResult = '0x0123456789012345678901234567890123456789';
@@ -1704,9 +1724,9 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.freezeIssuance).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1741,7 +1761,9 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.freezeIssuance).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
@@ -1777,13 +1799,13 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.issue).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1813,13 +1835,13 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.issue).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
@@ -1856,14 +1878,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.issueByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              stringToBytes32(mockedParams.partition),
-              mockedParams.investor,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1893,14 +1915,14 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.issueByPartition).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              stringToBytes32(mockedParams.partition),
-              mockedParams.investor,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
@@ -2272,6 +2294,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to disableController', async () => {
       // Mocked parameters
       const mockedParams = {
+        signature: 'Signed',
         txData: {},
         safetyFactor: 10,
       };
@@ -2281,9 +2304,9 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.disableController).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -2311,7 +2334,9 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.disableController).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.controllerDisabled).once();
@@ -2320,17 +2345,17 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('forceTransfer', () => {
+  describe('controllerTransfer', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not a zero Eth address');
-    test('should send the transaction to forceTransfer', async () => {
+    test('should send the transaction to controllerTransfer', async () => {
       // Mocked parameters
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
         value: new BigNumber(1),
         data: 'string',
-        log: 'log',
+        operatorData: 'string',
         txData: {},
         safetyFactor: 10,
       };
@@ -2340,11 +2365,19 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
+      const expectedIsControllableResult = true;
+      // Mocked method
+      const mockedIsControllableMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isControllable).thenReturn(instance(mockedIsControllableMethod));
+      // Stub the request
+      when(mockedIsControllableMethod.callAsync()).thenResolve(expectedIsControllableResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.forceTransfer).thenReturn(instance(mockedMethod));
+      when(mockedContract.controllerTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -2352,7 +2385,7 @@ describe('SecurityTokenWrapper', () => {
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.log,
+          mockedParams.operatorData,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2379,19 +2412,19 @@ describe('SecurityTokenWrapper', () => {
       when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
 
       // Real call
-      const result = await target.forceTransfer(mockedParams);
+      const result = await target.controllerTransfer(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.forceTransfer).once();
+      verify(mockedContract.controllerTransfer).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.log,
+          mockedParams.operatorData,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2403,18 +2436,20 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.decimals).twice();
       verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.isControllable).once();
+      verify(mockedIsControllableMethod.callAsync()).once();
     });
   });
 
-  describe('forceBurn', () => {
+  describe('controllerRedeem', () => {
     test.todo('should fail as from is not an Eth address');
-    test('should send the transaction to forceBurn', async () => {
+    test('should send the transaction to controllerRedeem', async () => {
       // Mocked parameters
       const mockedParams = {
         from: '0x1111111111111111111111111111111111111111',
         value: new BigNumber(1),
         data: 'string',
-        log: 'log',
+        operatorData: 'string',
         txData: {},
         safetyFactor: 10,
       };
@@ -2424,18 +2459,26 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
+      const expectedIsControllableResult = true;
+      // Mocked method
+      const mockedIsControllableMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isControllable).thenReturn(instance(mockedIsControllableMethod));
+      // Stub the request
+      when(mockedIsControllableMethod.callAsync()).thenResolve(expectedIsControllableResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.forceBurn).thenReturn(instance(mockedMethod));
+      when(mockedContract.controllerRedeem).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.log,
+          mockedParams.operatorData,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2462,18 +2505,18 @@ describe('SecurityTokenWrapper', () => {
       when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
 
       // Real call
-      const result = await target.forceBurn(mockedParams);
+      const result = await target.controllerRedeem(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.forceBurn).once();
+      verify(mockedContract.controllerRedeem).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.from,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.log,
+          mockedParams.operatorData,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2485,6 +2528,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.decimals).twice();
       verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.isControllable).once();
+      verify(mockedIsControllableMethod.callAsync()).once();
     });
   });
 

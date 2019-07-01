@@ -424,19 +424,23 @@ interface SetControllerParams extends TxParams {
   controller: string;
 }
 
-interface ForceTransferParams extends TxParams {
+interface DisableControllerParams extends TxParams {
+  signature: string;
+}
+
+interface ControllerTransferParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
   data: string;
-  log: string;
+  operatorData: string;
 }
 
-interface ForceBurnParams extends TxParams {
+interface ControllerRedeemParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
-  log: string;
+  operatorData: string;
 }
 
 interface AddModuleParams extends TxParams {
@@ -669,6 +673,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).isIssuable.callAsync();
   };
 
+  public isControllable = async () => {
+    return (await this.contract).isControllable.callAsync();
+  };
+
   public moduleRegistry = async () => {
     return (await this.contract).moduleRegistry.callAsync();
   };
@@ -871,17 +879,16 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-
   public issue = async (params: IssueParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
     return (await this.contract).issue.sendTransactionAsync(
-        params.investor,
-        valueToWei(params.value, await this.decimals()),
-        params.data,
-        params.txData,
-        params.safetyFactor,
+      params.investor,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -889,13 +896,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
     return (await this.contract).issueByPartition.sendTransactionAsync(
-        params.partition,
-        params.investor,
-        valueToWei(params.value, await this.decimals()),
-        params.data,
-        params.txData,
-        params.safetyFactor,
+      params.partition,
+      params.investor,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -993,38 +1001,42 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public disableController = async (params: TxParams) => {
+  public disableController = async (params: DisableControllerParams) => {
     await this.checkOnlyOwner(params.txData);
     await this.checkControllerEnabled();
-    return (await this.contract).disableController.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public forceTransfer = async (params: ForceTransferParams) => {
-    assert.isETHAddressHex('from', params.from);
-    assert.isNonZeroETHAddressHex('to', params.to);
-    await this.checkMsgSenderIsController(params.txData);
-    await this.checkBalanceFromGreaterThanValue(params.from, params.value);
-
-    return (await this.contract).forceTransfer.sendTransactionAsync(
-      params.from,
-      params.to,
-      valueToWei(params.value, await this.decimals()),
-      params.data,
-      params.log,
+    return (await this.contract).disableController.sendTransactionAsync(
+      params.signature,
       params.txData,
       params.safetyFactor,
     );
   };
 
-  public forceBurn = async (params: ForceBurnParams) => {
+  public controllerTransfer = async (params: ControllerTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isNonZeroETHAddressHex('to', params.to);
+    await this.checkMsgSenderIsController(params.txData);
+    await this.checkBalanceFromGreaterThanValue(params.from, params.value);
+
+    return (await this.contract).controllerTransfer.sendTransactionAsync(
+      params.from,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+      params.operatorData,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public controllerRedeem = async (params: ControllerRedeemParams) => {
     assert.isETHAddressHex('from', params.from);
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     await this.checkMsgSenderIsController(params.txData);
-    return (await this.contract).forceBurn.sendTransactionAsync(
+    return (await this.contract).controllerRedeem.sendTransactionAsync(
       params.from,
       valueToWei(params.value, await this.decimals()),
       params.data,
-      params.log,
+      params.operatorData,
       params.txData,
       params.safetyFactor,
     );
@@ -1249,7 +1261,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
-    assert.assert((await this.controller()) === (await this.getCallerAddress(txData)), 'Msg sender must be controller');
+    assert.assert(
+      (await this.isControllable()) && (await this.controller()) === (await this.getCallerAddress(txData)),
+      'Msg sender must be controller',
+    );
   };
 
   private checkUseModuleVerified = async (address: string) => {
