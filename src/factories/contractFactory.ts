@@ -4,8 +4,8 @@ import {
   ModuleContract,
   ModuleFactoryContract,
   EtherDividendCheckpointContract,
-  DetailedERC20Contract,
-  SecurityTokenContract,
+  ERC20DetailedContract,
+  ISecurityTokenContract,
   PolyTokenContract,
   GeneralPermissionManagerContract,
   PolyTokenFaucetContract,
@@ -28,9 +28,8 @@ import {
   Module,
   ModuleFactory,
   EtherDividendCheckpoint,
-  DetailedERC20,
-  AlternativeERC20,
-  SecurityToken,
+  ERC20Detailed,
+  ISecurityToken,
   PolyToken,
   GeneralPermissionManager,
   PolyTokenFaucet,
@@ -112,19 +111,19 @@ export default class ContractFactory {
     );
   }
 
-  public async getDetailedERC20Contract(address: string): Promise<DetailedERC20Contract> {
+  public async getDetailedERC20Contract(address: string): Promise<ERC20DetailedContract> {
     assert.isETHAddressHex('address', address);
-    return new DetailedERC20Contract(DetailedERC20.abi, address, this.provider, this.contractDefaults);
+    return new ERC20DetailedContract(ERC20Detailed.abi, address, this.provider, this.contractDefaults);
   }
 
-  public async getAlternativeERC20Contract(address: string): Promise<DetailedERC20Contract> {
+  public async getAlternativeERC20Contract(address: string): Promise<ERC20DetailedContract> {
     assert.isETHAddressHex('address', address);
-    return new DetailedERC20Contract(AlternativeERC20.abi, address, this.provider, this.contractDefaults);
+    return new ERC20DetailedContract(ERC20Detailed.abi, address, this.provider, this.contractDefaults);
   }
 
-  public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {
+  public async getSecurityTokenContract(address: string): Promise<ISecurityTokenContract> {
     assert.isETHAddressHex('address', address);
-    return new SecurityTokenContract(SecurityToken.abi, address, this.provider, this.contractDefaults);
+    return new ISecurityTokenContract(ISecurityToken.abi, address, this.provider, this.contractDefaults);
   }
 
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {

@@ -1924,7 +1924,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          stringToBytes32(mockedParams.partition),
+          mockedParams.partition,
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
@@ -1961,7 +1961,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.issueByPartition).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          stringToBytes32(mockedParams.partition),
+          mockedParams.partition,
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           mockedParams.data,
@@ -2148,7 +2148,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          stringToBytes32(mockedParams.partition),
+          mockedParams.partition,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           stringToBytes32(mockedParams.data),
           mockedParams.txData,
@@ -2181,7 +2181,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.redeemByPartition).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          stringToBytes32(mockedParams.partition),
+          mockedParams.partition,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
           stringToBytes32(mockedParams.data),
           mockedParams.txData,
@@ -4021,7 +4021,7 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ModuleAdded', 'UpdateTokenDetails', 'GranularityChanged', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'FreezeTransfers', 'CheckpointCreated', 'FreezeMinting', 'Minted', 'Burnt', 'SetController', 'ForceTransfer', 'ForceBurn', 'DisableController', 'OwnershipRenounced', 'OwnershipTransferred', 'Approval', 'Transfer', encountered: ChangeFeatureStatus`,
+          `Expected eventName to be one of: 'ModuleAdded', 'ModuleUpgraded', 'UpdateTokenDetails', 'UpdateTokenName', 'GranularityChanged', 'FreezeIssuance', 'FreezeTransfers', 'CheckpointCreated', 'SetController', 'TreasuryWalletChanged', 'DisableController', 'OwnershipTransferred', 'TokenUpgraded', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'TransferByPartition', 'AuthorizedOperator', 'RevokedOperator', 'AuthorizedOperatorByPartition', 'RevokedOperatorByPartition', 'IssuedByPartition', 'RedeemedByPartition', 'ControllerTransfer', 'ControllerRedemption', 'DocumentRemoved', 'DocumentUpdated', 'Issued', 'Redeemed', 'Transfer', 'Approval', encountered: ChangeFeatureStatus`,
         ),
       );
     });

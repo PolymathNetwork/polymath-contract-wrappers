@@ -6,10 +6,8 @@ import {
   PolyTokenEvents,
   CappedSTOFactoryEventArgs,
   CappedSTOEventArgs,
-  DetailedERC20EventArgs,
-  DetailedERC20Events,
-  AlternativeERC20EventArgs,
-  AlternativeERC20Events,
+  ERC20DetailedEventArgs,
+  ERC20DetailedEvents,
   ERC20DividendCheckpointEventArgs,
   EtherDividendCheckpointEventArgs,
   FeatureRegistryEventArgs,
@@ -49,7 +47,7 @@ import {
   STOContract,
   STOEvents,
   STOEventArgs,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
   PolyTokenContract,
   SecurityTokenContract,
   EtherDividendCheckpointContract,
@@ -163,8 +161,7 @@ export type ContractEventArgs =
   | PolyTokenEventArgs
   | CappedSTOFactoryEventArgs
   | CappedSTOEventArgs
-  | DetailedERC20EventArgs
-  | AlternativeERC20EventArgs
+  | ERC20DetailedEventArgs
   | ERC20DividendCheckpointEventArgs
   | EtherDividendCheckpointEventArgs
   | FeatureRegistryEventArgs
@@ -188,8 +185,7 @@ export type ContractEvents =
   | PolyTokenEvents
   | CappedSTOFactoryEvents
   | CappedSTOEvents
-  | DetailedERC20Events
-  | AlternativeERC20Events
+  | ERC20DetailedEvents
   | ERC20DividendCheckpointEvents
   | EtherDividendCheckpointEvents
   | FeatureRegistryEvents
@@ -244,7 +240,7 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+export type ERC20Contract = ERC20DetailedContract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract
