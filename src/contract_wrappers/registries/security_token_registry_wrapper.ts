@@ -37,6 +37,7 @@ import {
   Subscribe,
   GetLogs,
   FULL_DECIMALS,
+  FundRaiseType,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -275,6 +276,20 @@ interface OwnerParams {
 }
 
 /**
+ * @param feeType Key corresponding to fee type
+ */
+interface GetFeesParams {
+  feeType: FundRaiseType;
+}
+
+/**
+ * @param ticker Ticker whose status need to determine
+ */
+interface TickerParams {
+  ticker: string;
+}
+
+/**
  * @param tokenName is the ticker symbol
  */
 interface TokenNameParams {
@@ -355,7 +370,7 @@ interface ChangeExpiryLimitParams extends TxParams {
  * @param treasuryWallet Ethereum address which will holds the STs.
  * @param protocolVersion Version of securityToken contract
  */
-interface NewSecurityToken extends TxParams {
+interface NewSecurityTokenParams extends TxParams {
   name: string;
   ticker: string;
   tokenDetails: string;
@@ -369,7 +384,7 @@ interface NewSecurityToken extends TxParams {
  * @param stLaunchFee is the st generation fee (base 18 decimals)
  * @param isFeeInPoly defines if the fee is in poly or usd
  */
-interface ChangeFeesAmountAndCurrency extends TxParams {
+interface ChangeFeesAmountAndCurrencyParams extends TxParams {
   tickerRegFee: BigNumber;
   stLaunchFee: BigNumber;
   isFeeInPoly: boolean;
@@ -381,7 +396,7 @@ interface ChangeFeesAmountAndCurrency extends TxParams {
  * @param tokenDetails is the off-chain details of the token
  * @param divisible is whether or not the token is divisible
  */
-interface RefreshSecurityToken extends TxParams {
+interface RefreshSecurityTokenParams extends TxParams {
   name: string;
   ticker: string;
   tokenDetails: string;
@@ -396,7 +411,7 @@ interface RefreshSecurityToken extends TxParams {
  * @param tokenDetails is the off-chain details of the token
  * @param deployedAt is the timestamp at which the security token is deployed
  */
-interface ModifyExistingSecurityToken extends TxParams {
+interface ModifyExistingSecurityTokenParams extends TxParams {
   ticker: string;
   owner: string;
   securityToken: string;
@@ -442,7 +457,7 @@ interface ReclaimERC20Params extends TxParams {
 /**
  * @param version of the proxy.
  */
-interface PackageVersion extends TxParams {
+interface PackageVersionParams extends TxParams {
   version: string;
 }
 
@@ -453,7 +468,7 @@ interface PackageVersion extends TxParams {
  * @param expiryDate is the expiry date for the ticker
  * @param status is the token deployment status
  */
-interface ModifyExistingTicker extends TxParams {
+interface ModifyExistingTickerParams extends TxParams {
   owner: string;
   ticker: string;
   registrationDate: Date;
@@ -464,7 +479,7 @@ interface ModifyExistingTicker extends TxParams {
 /**
  * @param STFactoryAddress is the address of the proxy.
  */
-interface SetProtocolFactoryParams extends PackageVersion {
+interface SetProtocolFactoryParams extends PackageVersionParams {
   STFactoryAddress: string;
 }
 
@@ -472,16 +487,9 @@ interface SetProtocolFactoryParams extends PackageVersion {
  * @param owner is address of the owner of the token
  * @param ticker is unique token ticker
  */
-interface RegisterNewTicker extends TxParams {
+interface RegisterNewTickerParams extends TxParams {
   owner: string;
   ticker: string;
-}
-
-/**
- * @param newAddress is the address of the polytoken.
- */
-interface UpdatePolyTokenAddressParams extends TxParams {
-  newAddress: string;
 }
 
 // // Return types ////
@@ -578,7 +586,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration and ST launch fee amount and currency
    */
-  public changeFeesAmountAndCurrency = async (params: ChangeFeesAmountAndCurrency) => {
+  public changeFeesAmountAndCurrency = async (params: ChangeFeesAmountAndCurrencyParams) => {
     const isOldFeesInPoly = await this.getIsFeeInPoly();
     assert.assert(isOldFeesInPoly !== params.isFeeInPoly, 'Currency unchanged');
     return (await this.contract).changeFeesAmountAndCurrency.sendTransactionAsync(
@@ -594,7 +602,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Deploys an instance of a new Security Token and replaces the old one in the registry
    * This can be used to upgrade from version 2.0 of ST to 3.0 or in case something goes wrong with earlier ST
    */
-  public refreshSecurityToken = async (params: RefreshSecurityToken) => {
+  public refreshSecurityToken = async (params: RefreshSecurityTokenParams) => {
     await this.checkWhenNotPausedOrOwner();
     await this.checkOnlyOwner();
     assert.assert(params.name.length > 0, 'Name is empty');
@@ -622,11 +630,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Removes a STFactory
    */
-  public removeProtocolFactory = async (params: PackageVersion) => {
+  public removeProtocolFactory = async (params: PackageVersionParams) => {
     await this.checkOnlyOwner();
     const LATEST_VERSION = await this.getLatestProtocolVersion();
     assert.isValidVersion(params.version);
-    const splitVersion = params.version.split(".");
+    const splitVersion = params.version.split('.');
     const major = new BigNumber(splitVersion[0]);
     const minor = new BigNumber(splitVersion[1]);
     const patch = new BigNumber(splitVersion[2]);
@@ -652,9 +660,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Returns the STFactory Address of a particular version
    */
-  public getSTFactoryAddressOfVersion = async (params: PackageVersion) => {
+  public getSTFactoryAddressOfVersion = async (params: PackageVersionParams) => {
     assert.isValidVersion(params.version);
-    const splitVersion = params.version.split(".");
+    const splitVersion = params.version.split('.');
     const pack = packVersion(splitVersion[0], splitVersion[1], splitVersion[2]);
     const result = await (await this.contract).getSTFactoryAddressOfVersion.callAsync(new BigNumber(pack));
     return result;
@@ -671,7 +679,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return tokens;
   };
 
-  public generateNewSecurityToken = async (params: NewSecurityToken) => {
+  public generateNewSecurityToken = async (params: NewSecurityTokenParams) => {
     const version = params.protocolVersion;
     let protocolVersion = new BigNumber(0);
     if (version !== '0') {
@@ -696,7 +704,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Once the token ticker is registered to its owner then no other issuer can claim
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
-  public registerNewTicker = async (params: RegisterNewTicker) => {
+  public registerNewTicker = async (params: RegisterNewTickerParams) => {
     await this.checkWhenNotPausedOrOwner();
     assert.isNonZeroETHAddressHex(params.owner, 'Bad address');
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
@@ -718,7 +726,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    * Only allowed to modify the tickers which are not yet deployed.
    */
-  public modifyExistingTicker = async (params: ModifyExistingTicker) => {
+  public modifyExistingTicker = async (params: ModifyExistingTickerParams) => {
     await this.checkOnlyOwner();
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(params.expiryDate.getTime() > new Date(0).getTime(), 'Bad expiry date');
@@ -738,7 +746,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
-  public modifyExistingSecurityToken = async (params: ModifyExistingSecurityToken) => {
+  public modifyExistingSecurityToken = async (params: ModifyExistingSecurityTokenParams) => {
     await this.checkOnlyOwner();
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(params.deployedAt.getTime() > new Date(0).getTime(), 'Bad deployed date');
@@ -1071,7 +1079,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     await this.checkOnlyOwner();
     assert.isValidVersion(params.version);
     assert.isNonZeroETHAddressHex('STFactoryAddress', params.STFactoryAddress);
-    const splitVersion = params.version.split(".");
+    const splitVersion = params.version.split('.');
     const major = new BigNumber(splitVersion[0]);
     const minor = new BigNumber(splitVersion[1]);
     const patch = new BigNumber(splitVersion[2]);
@@ -1126,6 +1134,60 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public owner = async () => {
     return (await this.contract).owner.callAsync();
+  };
+
+  /**
+   * Returns the list of all tokens
+   */
+  public getTokens = async () => {
+    return (await this.contract).getTokens.callAsync();
+  };
+
+  /**
+   * Changes the default protocol version
+   * Used only by Polymath to upgrade the SecurityToken contract and add more functionalities to future versions
+   * Changing versions does not affect existing tokens.
+   */
+  public setLatestVersion = async (params: PackageVersionParams) => {
+    assert.isValidVersion(params.version);
+    const splitVersion = params.version.split('.');
+    const major = new BigNumber(splitVersion[0]);
+    const minor = new BigNumber(splitVersion[1]);
+    const patch = new BigNumber(splitVersion[2]);
+    return (await this.contract).setLatestVersion.sendTransactionAsync(
+      major,
+      minor,
+      patch,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Returns the usd & poly fee for a particular feetype
+   */
+  /* public getFees = async (params: GetFeesParams) => {
+    return (await this.contract).getFees.sendTransactionAsync(
+      params.feeType.,
+      params.txData,
+      params.safetyFactor,
+    );
+  }; */
+
+  /**
+   * Gets the status of the ticker
+   * @return bool
+   */
+  public getTickerStatus = async (params: TickerParams) => {
+    return (await this.contract).getTickerStatus.callAsync(params.ticker);
+  };
+
+  /**
+   * Gets the owner of the ticker
+   * @return address Address of the owner
+   */
+  public getTickerOwner = async (params: TickerParams) => {
+    return (await this.contract).getTickerOwner.callAsync(params.ticker);
   };
 
   /**
