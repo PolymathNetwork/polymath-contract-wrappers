@@ -638,9 +638,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).controller.callAsync();
   };
 
-  public decreaseApproval = async (params: ChangeApprovalParams) => {
+  public decreaseAllowance = async (params: ChangeApprovalParams) => {
     assert.isETHAddressHex('spender', params.spender);
-    return (await this.contract).decreaseApproval.sendTransactionAsync(
+    return (await this.contract).decreaseAllowance.sendTransactionAsync(
       params.spender,
       valueToWei(params.value, await this.decimals()),
       params.txData,
@@ -680,9 +680,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).tokenDetails.callAsync();
   };
 
-  public increaseApproval = async (params: ChangeApprovalParams) => {
+  public increaseAllowance = async (params: ChangeApprovalParams) => {
     assert.isETHAddressHex('spender', params.spender);
-    return (await this.contract).increaseApproval.sendTransactionAsync(
+    return (await this.contract).increaseAllowance.sendTransactionAsync(
       params.spender,
       valueToWei(params.value, await this.decimals()),
       params.txData,

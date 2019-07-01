@@ -858,9 +858,9 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('decreaseApproval', () => {
+  describe('decreaseAllowance', () => {
     test.todo('should fail as spender is not an Eth address');
-    test('should send the transaction to decreaseApproval', async () => {
+    test('should send the transaction to decreaseAllowance', async () => {
       // Mocked parameters
       const mockedParams = {
         spender: '0x2222222222222222222222222222222222222222',
@@ -878,7 +878,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.decreaseApproval).thenReturn(instance(mockedMethod));
+      when(mockedContract.decreaseAllowance).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -890,12 +890,12 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.decreaseApproval(mockedParams);
+      const result = await target.decreaseAllowance(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.decreaseApproval).once();
+      verify(mockedContract.decreaseAllowance).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
@@ -909,9 +909,9 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('increaseApproval', () => {
+  describe('increaseAllowance', () => {
     test.todo('should fail as spender is not an Eth address');
-    test('should send the transaction to increaseApproval', async () => {
+    test('should send the transaction to increaseAllowance', async () => {
       // Mocked parameters
       const mockedParams = {
         spender: '0x1111111111111111111111111111111111111111',
@@ -929,7 +929,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.increaseApproval).thenReturn(instance(mockedMethod));
+      when(mockedContract.increaseAllowance).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -941,12 +941,12 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.increaseApproval(mockedParams);
+      const result = await target.increaseAllowance(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.increaseApproval).once();
+      verify(mockedContract.increaseAllowance).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.spender,
