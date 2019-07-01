@@ -361,6 +361,10 @@ interface ChangeGranularityParams extends TxParams {
   granularity: BigNumber;
 }
 
+interface ChangeNameParams extends TxParams {
+  name: string;
+}
+
 interface CheckpointIdParams {
   checkpointId: number;
 }
@@ -802,6 +806,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  public changeName = async (params: ChangeNameParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(params.name.length > 0, 'Name required');
+    return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
   };
 
   public getInvestors = async () => {
