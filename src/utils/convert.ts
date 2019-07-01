@@ -72,3 +72,9 @@ export function valueArrayToWeiArray(value: BigNumber[], decimals: BigNumber) {
     return valueToWei(x, decimals);
   });
 }
+
+export function packVersion(major: string, minor: string, patch: string) {
+  // eslint-disable-next-line no-bitwise
+  const packedVersion = (parseInt(major, 10) << 16) | (parseInt(minor, 10) << 8) | parseInt(patch, 10);
+  return packedVersion;
+}
