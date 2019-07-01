@@ -79,7 +79,7 @@ window.addEventListener('load', async () => {
   // Allow all transfers
   // Subscribe to event of allow all transfers
   await generalTM.subscribeAsync({
-    eventName: GeneralTransferManagerEvents.AllowAllTransfers,
+    eventName: GeneralTransferManagerEvents.ModifyTransferRequirements,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -94,7 +94,7 @@ window.addEventListener('load', async () => {
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
 
   // Mint yourself some tokens and transfer them around, check balances
-  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.issue({ investor: myAddress, value: new BigNumber(200), data: '' });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(50) });
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
@@ -116,7 +116,7 @@ window.addEventListener('load', async () => {
 
   // Verify we can make transfers
   console.log(
-    await tickerSecurityTokenInstance.verifyTransfer({
+    await tickerSecurityTokenInstance.canTransferFrom({
       from: myAddress,
       to: randomBeneficiary1,
       data: '0x00',
@@ -124,7 +124,7 @@ window.addEventListener('load', async () => {
     }),
   );
   console.log(
-    await tickerSecurityTokenInstance.verifyTransfer({
+    await tickerSecurityTokenInstance.canTransferFrom({
       from: myAddress,
       to: randomBeneficiary2,
       data: '0x00',
