@@ -37,7 +37,7 @@ import {
   Subscribe,
   GetLogs,
   FULL_DECIMALS,
-  FundRaiseType,
+  FeeType,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -46,6 +46,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
+  stringToKeccak256,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -279,7 +280,7 @@ interface OwnerParams {
  * @param feeType Key corresponding to fee type
  */
 interface GetFeesParams {
-  feeType: FundRaiseType;
+  feeType: FeeType;
 }
 
 /**
@@ -1166,13 +1167,24 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Returns the usd & poly fee for a particular feetype
    */
-  /* public getFees = async (params: GetFeesParams) => {
-    return (await this.contract).getFees.sendTransactionAsync(
-      params.feeType.,
-      params.txData,
-      params.safetyFactor,
-    );
-  }; */
+  public getFees = async (params: GetFeesParams) => {
+    let feeType = '';
+    switch (params.feeType) {
+      case FeeType.stLaunchFee: {
+        feeType = stringToKeccak256('stLaunchFee');
+        break;
+      }
+      case FeeType.tickerRegFee: {
+        feeType = stringToKeccak256('tickerRegFee');
+        break;
+      }
+      default: {
+        assert.assert(false, 'Missing fee type');
+        break;
+      }
+    }
+    return (await this.contract).getFees.callAsync(feeType);
+  };
 
   /**
    * Gets the status of the ticker

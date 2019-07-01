@@ -95,6 +95,11 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
+export enum FeeType {
+  tickerRegFee,
+  stLaunchFee
+}
+
 export enum Features {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
