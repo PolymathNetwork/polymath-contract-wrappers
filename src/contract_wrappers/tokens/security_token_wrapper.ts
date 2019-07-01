@@ -383,16 +383,17 @@ interface TransferFromWithDataParams extends TxParams {
   data: string;
 }
 
-interface MintParams extends TxParams {
+interface IssueParams extends TxParams {
   investor: string;
   value: BigNumber;
-}
-
-interface MintWithDataParams extends MintParams {
   data: string;
 }
 
-interface MintMultiParams extends TxParams {
+interface IssueByPartitionParams extends IssueParams {
+  partition: string;
+}
+
+interface IssueMultiParams extends TxParams {
   investors: string[];
   values: BigNumber[];
 }
@@ -870,32 +871,35 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public mint = async (params: MintParams) => {
+
+  public issue = async (params: IssueParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
-    return (await this.contract).mint.sendTransactionAsync(
-      params.investor,
-      valueToWei(params.value, await this.decimals()),
-      params.txData,
-      params.safetyFactor,
+    return (await this.contract).issue.sendTransactionAsync(
+        params.investor,
+        valueToWei(params.value, await this.decimals()),
+        params.data,
+        params.txData,
+        params.safetyFactor,
     );
   };
 
-  public mintWithData = async (params: MintWithDataParams) => {
+  public issueByPartition = async (params: IssueByPartitionParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
-    return (await this.contract).mintWithData.sendTransactionAsync(
-      params.investor,
-      valueToWei(params.value, await this.decimals()),
-      params.data,
-      params.txData,
-      params.safetyFactor,
+    return (await this.contract).issueByPartition.sendTransactionAsync(
+        params.partition,
+        params.investor,
+        valueToWei(params.value, await this.decimals()),
+        params.data,
+        params.txData,
+        params.safetyFactor,
     );
   };
 
-  public mintMulti = async (params: MintMultiParams) => {
+  public issueMulti = async (params: IssueMultiParams) => {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
       params.investors.length === params.values.length,
@@ -903,7 +907,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
     assert.assert(await this.isIssuable(), 'Issuance frozen');
     await this.checkOnlyOwner(params.txData);
-    return (await this.contract).mintMulti.sendTransactionAsync(
+    return (await this.contract).issueMulti.sendTransactionAsync(
       params.investors,
       valueArrayToWeiArray(params.values, await this.decimals()),
       params.txData,

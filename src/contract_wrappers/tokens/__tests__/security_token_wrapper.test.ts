@@ -1753,84 +1753,9 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('mint', () => {
+  describe('issue', () => {
     test.todo('should fail as investor is not a zero Eth address');
-    test('should send the transaction to mint', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        investor: '0x1111111111111111111111111111111111111111',
-        value: new BigNumber(2),
-        txData: {},
-        safetyFactor: 10,
-      };
-
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
-      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.mint).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Mocked method
-      const mockedOwnerMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
-      // Stub the request
-      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const expectedIsIssuableResult = true;
-      // Mocked method
-      const mockedIsIssuableMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
-      // Stub the request
-      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
-
-      // Real call
-      const result = await target.mint(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.mint).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
-      verify(mockedContract.isIssuable).once();
-      verify(mockedIsIssuableMethod.callAsync()).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
-    });
-  });
-
-  describe('mintWithData', () => {
-    test.todo('should fail as investor is not a zero Eth address');
-    test('should send the transaction to mintWithData', async () => {
+    test('should send the transaction to issue', async () => {
       // Mocked parameters
       const mockedParams = {
         investor: '0x1111111111111111111111111111111111111111',
@@ -1849,16 +1774,16 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.mintWithData).thenReturn(instance(mockedMethod));
+      when(mockedContract.issue).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investor,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1881,20 +1806,20 @@ describe('SecurityTokenWrapper', () => {
       when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Real call
-      const result = await target.mintWithData(mockedParams);
+      const result = await target.issue(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.mintWithData).once();
+      verify(mockedContract.issue).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investor,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
@@ -1906,10 +1831,91 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
-  describe('mintMulti', () => {
+  describe('issueByPartition', () => {
+    test.todo('should fail as investor is not a zero Eth address');
+    test('should send the transaction to issue', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        investor: '0x1111111111111111111111111111111111111111',
+        value: new BigNumber(2),
+        data: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.issueByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              stringToBytes32(mockedParams.partition),
+              mockedParams.investor,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedIsIssuableResult = true;
+      // Mocked method
+      const mockedIsIssuableMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
+      // Stub the request
+      when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
+
+      // Real call
+      const result = await target.issueByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.issueByPartition).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              stringToBytes32(mockedParams.partition),
+              mockedParams.investor,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.isIssuable).once();
+      verify(mockedIsIssuableMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('issueMulti', () => {
     test.todo('should fail as investors is not a zero Eth address');
     test.todo('should fail as investors length is not equals than values length');
-    test('should send the transaction to mintMulti', async () => {
+    test('should send the transaction to issueMulti', async () => {
       // Mocked parameters
       const mockedParams = {
         investors: ['0x1111111111111111111111111111111111111111', '0x1111111111111111111111111111111111111111'],
@@ -1927,7 +1933,7 @@ describe('SecurityTokenWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.mintMulti).thenReturn(instance(mockedMethod));
+      when(mockedContract.issueMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
@@ -1958,12 +1964,12 @@ describe('SecurityTokenWrapper', () => {
       when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
       // Real call
-      const result = await target.mintMulti(mockedParams);
+      const result = await target.issueMulti(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.mintMulti).once();
+      verify(mockedContract.issueMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.investors,
