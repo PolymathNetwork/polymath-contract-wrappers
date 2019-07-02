@@ -114,6 +114,15 @@ interface GetModuleAddedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.ModuleAdded;
 }
 
+interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ModuleUpgraded;
+  callback: EventCallback<SecurityTokenModuleUpgradedEventArgs>;
+}
+
+interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ModuleUpgraded;
+}
+
 interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.UpdateTokenDetails;
   callback: EventCallback<SecurityTokenUpdateTokenDetailsEventArgs>;
@@ -168,6 +177,105 @@ interface GetModuleBudgetChangedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.ModuleBudgetChanged;
 }
 
+interface TransferByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.TransferByPartition;
+  callback: EventCallback<SecurityTokenTransferByPartitionEventArgs>;
+}
+
+interface GetTransferByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.TransferByPartition;
+}
+
+interface AuthorizedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.AuthorizedOperator;
+  callback: EventCallback<SecurityTokenAuthorizedOperatorEventArgs>;
+}
+
+interface GetAuthorizedOperatorLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.AuthorizedOperator;
+}
+
+interface RevokedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.RevokedOperator;
+  callback: EventCallback<SecurityTokenRevokedOperatorEventArgs>;
+}
+
+interface GetRevokedOperatorLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.RevokedOperator;
+}
+
+interface AuthorizedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.AuthorizedOperatorByPartition;
+  callback: EventCallback<SecurityTokenAuthorizedOperatorByPartitionEventArgs>;
+}
+
+interface GetAuthorizedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.AuthorizedOperatorByPartition;
+}
+
+interface RevokedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.RevokedOperatorByPartition;
+  callback: EventCallback<SecurityTokenRevokedOperatorByPartitionEventArgs>;
+}
+
+interface GetRevokedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.RevokedOperatorByPartition;
+}
+
+interface IssuedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.IssuedByPartition;
+  callback: EventCallback<SecurityTokenIssuedByPartitionEventArgs>;
+}
+
+interface GetIssuedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.IssuedByPartition;
+}
+
+interface RedeemedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.RedeemedByPartition;
+  callback: EventCallback<SecurityTokenRedeemedByPartitionEventArgs>;
+}
+
+interface GetRedeemedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.RedeemedByPartition;
+}
+
+interface ControllerTransferSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ControllerTransfer;
+  callback: EventCallback<SecurityTokenControllerTransferEventArgs>;
+}
+
+interface GetControllerTransferLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ControllerTransfer;
+}
+
+interface ControllerRedemptionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.ControllerRedemption;
+  callback: EventCallback<SecurityTokenControllerRedemptionEventArgs>;
+}
+
+interface GetControllerRedemptionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.ControllerRedemption;
+}
+
+interface DocumentRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.DocumentRemoved;
+  callback: EventCallback<SecurityTokenDocumentRemovedEventArgs>;
+}
+
+interface GetDocumentRemovedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.DocumentRemoved;
+}
+
+interface DocumentUpdatedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.DocumentUpdated;
+  callback: EventCallback<SecurityTokenDocumentUpdatedEventArgs>;
+}
+
+interface GetDocumentUpdatedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.DocumentUpdated;
+}
+
 interface FreezeTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.FreezeTransfers;
   callback: EventCallback<SecurityTokenFreezeTransfersEventArgs>;
@@ -186,30 +294,30 @@ interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.CheckpointCreated;
 }
 
-interface FreezeMintingSubscribeAsyncParams extends SubscribeAsyncParams {
+interface FreezeIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.FreezeIssuance;
   callback: EventCallback<SecurityTokenFreezeIssuanceEventArgs>;
 }
 
-interface GetFreezeMintingLogsAsyncParams extends GetLogsAsyncParams {
+interface GetFreezeIssuanceLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.FreezeIssuance;
 }
 
-interface MintedSubscribeAsyncParams extends SubscribeAsyncParams {
+interface IssuedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.Issued;
   callback: EventCallback<SecurityTokenIssuedEventArgs>;
 }
 
-interface GetMintedLogsAsyncParams extends GetLogsAsyncParams {
+interface GetIssuedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.Issued;
 }
 
-interface BurntSubscribeAsyncParams extends SubscribeAsyncParams {
+interface RedeemedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents.Redeemed;
   callback: EventCallback<SecurityTokenRedeemedEventArgs>;
 }
 
-interface GetBurntLogsAsyncParams extends GetLogsAsyncParams {
+interface GetRedeemedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.Redeemed;
 }
 
@@ -220,6 +328,15 @@ interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.SetController;
+}
+
+interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.TreasuryWalletChanged;
+  callback: EventCallback<SecurityTokenTreasuryWalletChangedEventArgs>;
+}
+
+interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.TreasuryWalletChanged;
 }
 
 interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -240,30 +357,54 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.OwnershipTransferred;
 }
 
+interface TokenUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.TokenUpgraded;
+  callback: EventCallback<SecurityTokenTokenUpgradedEventArgs>;
+}
+
+interface GetTokenUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.TokenUpgraded;
+}
+
 interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: ApprovalSubscribeAsyncParams): Promise<string>;
   (params: TransferSubscribeAsyncParams): Promise<string>;
   (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
   (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
   (params: ModuleArchivedSubscribeAsyncParams): Promise<string>;
   (params: ModuleUnarchivedSubscribeAsyncParams): Promise<string>;
   (params: ModuleRemovedSubscribeAsyncParams): Promise<string>;
   (params: ModuleBudgetChangedSubscribeAsyncParams): Promise<string>;
+  (params: TransferByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: AuthorizedOperatorSubscribeAsyncParams): Promise<string>;
+  (params: RevokedOperatorSubscribeAsyncParams): Promise<string>;
+  (params: AuthorizedOperatorByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: RevokedOperatorByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: IssuedByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: RedeemedByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: ControllerTransferSubscribeAsyncParams): Promise<string>;
+  (params: ControllerRedemptionSubscribeAsyncParams): Promise<string>;
+  (params: DocumentRemovedSubscribeAsyncParams): Promise<string>;
+  (params: DocumentUpdatedSubscribeAsyncParams): Promise<string>;
   (params: FreezeTransfersSubscribeAsyncParams): Promise<string>;
   (params: CheckpointCreatedSubscribeAsyncParams): Promise<string>;
-  (params: FreezeMintingSubscribeAsyncParams): Promise<string>;
-  (params: MintedSubscribeAsyncParams): Promise<string>;
-  (params: BurntSubscribeAsyncParams): Promise<string>;
+  (params: FreezeIssuanceSubscribeAsyncParams): Promise<string>;
+  (params: IssuedSubscribeAsyncParams): Promise<string>;
+  (params: RedeemedSubscribeAsyncParams): Promise<string>;
   (params: SetControllerSubscribeAsyncParams): Promise<string>;
+  (params: TreasuryWalletChangedSubscribeAsyncParams): Promise<string>;
   (params: DisableControllerSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
+  (params: TokenUpgradedSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>[]>;
   (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTransferEventArgs>[]>;
   (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>[]>;
+  (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
   >;
@@ -276,16 +417,39 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetModuleBudgetChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenModuleBudgetChangedEventArgs>[]
   >;
+  (params: GetTransferByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<SecurityTokenModuleBudgetChangedEventArgs>[]
+  >;
+  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetRevokedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetAuthorizedOperatorByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+  >;
+  (params: GetRevokedOperatorByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+  >;
+  (params: GetIssuedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetControllerTransferLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetControllerRedemptionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+  >;
+  (params: GetDocumentRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetDocumentUpdatedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
   (params: GetFreezeTransfersLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
   (params: GetCheckpointCreatedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenCheckpointCreatedEventArgs>[]>;
-  (params: GetFreezeMintingLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeIssuanceEventArgs>[]>;
-  (params: GetMintedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenIssuedEventArgs>[]>;
-  (params: GetBurntLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenRedeemedEventArgs>[]>;
+  (params: GetFreezeIssuanceLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeIssuanceEventArgs>[]>;
+  (params: GetIssuedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenIssuedEventArgs>[]>;
+  (params: GetRedeemedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenRedeemedEventArgs>[]>;
   (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenSetControllerEventArgs>[]>;
+  (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<SecurityTokenTreasuryWalletChangedEventArgs>[]
+  >;
   (params: GetDisableControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenDisableControllerEventArgs>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>[]
   >;
+  (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTokenUpgradedEventArgs>[]>;
 }
 
 interface FreezeIssuanceParams extends TxParams {
