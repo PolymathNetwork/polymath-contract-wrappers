@@ -53,6 +53,12 @@ const assert = {
       message,
     );
   },
+  isValidVersion(version: string) {
+    sharedAssert.assert(
+      /^(\d+\.)(\d+\.)(\d+)$/.test(version),
+      'Invalid package version. Right format: major.minor.patch',
+    );
+  },
 };
 
 export default assert;
