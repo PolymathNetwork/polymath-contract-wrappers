@@ -3,13 +3,10 @@ import {
   GeneralTransferManagerEventArgs,
   GeneralTransferManagerEvents,
   GeneralTransferManagerChangeIssuanceAddressEventArgs,
-  GeneralTransferManagerAllowAllTransfersEventArgs,
-  GeneralTransferManagerAllowAllWhitelistTransfersEventArgs,
-  GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs,
-  GeneralTransferManagerAllowAllBurnTransfersEventArgs,
-  GeneralTransferManagerChangeSigningAddressEventArgs,
+  GeneralTransferManagerModifyKYCDataEventArgs,
+  GeneralTransferManagerModifyInvestorFlagEventArgs,
+  GeneralTransferManagerModifyTransferRequirementsEventArgs,
   GeneralTransferManagerChangeDefaultsEventArgs,
-  GeneralTransferManagerModifyWhitelistEventArgs,
   GeneralTransferManagerPauseEventArgs,
   GeneralTransferManagerUnpauseEventArgs,
 } from '@polymathnetwork/abi-wrappers';
@@ -47,51 +44,6 @@ interface GetChangeIssuanceAddressLogsAsyncParams extends GetLogsAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
 }
 
-interface AllowAllTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllTransfers;
-  callback: EventCallback<GeneralTransferManagerAllowAllTransfersEventArgs>;
-}
-
-interface GetAllowAllTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllTransfers;
-}
-
-interface AllowAllWhitelistTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers;
-  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>;
-}
-
-interface GetAllowAllWhitelistTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistTransfers;
-}
-
-interface AllowAllWhitelistIssuancesSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances;
-  callback: EventCallback<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>;
-}
-
-interface GetAllowAllWhitelistIssuancesLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllWhitelistIssuances;
-}
-
-interface AllowAllBurnTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers;
-  callback: EventCallback<GeneralTransferManagerAllowAllBurnTransfersEventArgs>;
-}
-
-interface GetAllowAllBurnTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.AllowAllBurnTransfers;
-}
-
-interface ChangeSigningAddressSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeSigningAddress;
-  callback: EventCallback<GeneralTransferManagerChangeSigningAddressEventArgs>;
-}
-
-interface GetChangeSigningAddressLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeSigningAddress;
-}
-
 interface ChangeDefaultsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeDefaults;
   callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs>;
@@ -99,15 +51,6 @@ interface ChangeDefaultsSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetChangeDefaultsLogsAsyncParams extends GetLogsAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeDefaults;
-}
-
-interface ModifyWhitelistSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyWhitelist;
-  callback: EventCallback<GeneralTransferManagerModifyWhitelistEventArgs>;
-}
-
-interface GetModifyWhitelistLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyWhitelist;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -128,46 +71,61 @@ interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
   eventName: GeneralTransferManagerEvents.Unpause;
 }
 
+interface ModifyKYCDataSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyKYCData;
+  callback: EventCallback<GeneralTransferManagerModifyKYCDataEventArgs>;
+}
+
+interface GetModifyKYCDataLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyKYCData;
+}
+
+interface ModifyInvestorFlagSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyInvestorFlag;
+  callback: EventCallback<GeneralTransferManagerModifyInvestorFlagEventArgs>;
+}
+
+interface GetModifyInvestorFlagLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyInvestorFlag;
+}
+
+interface ModifyTransferRequirementsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyTransferRequirements;
+  callback: EventCallback<GeneralTransferManagerModifyTransferRequirementsEventArgs>;
+}
+
+interface GetModifyTransferRequirementsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents.ModifyTransferRequirements;
+}
+
 interface GeneralTransferManagerSubscribeAsyncParams extends Subscribe {
   (params: ChangeIssuanceAddressSubscribeAsyncParams): Promise<string>;
-  (params: AllowAllTransfersSubscribeAsyncParams): Promise<string>;
-  (params: AllowAllWhitelistTransfersSubscribeAsyncParams): Promise<string>;
-  (params: AllowAllWhitelistIssuancesSubscribeAsyncParams): Promise<string>;
-  (params: AllowAllBurnTransfersSubscribeAsyncParams): Promise<string>;
-  (params: ChangeSigningAddressSubscribeAsyncParams): Promise<string>;
   (params: ChangeDefaultsSubscribeAsyncParams): Promise<string>;
-  (params: ModifyWhitelistSubscribeAsyncParams): Promise<string>;
   (params: PauseSubscribeAsyncParams): Promise<string>;
   (params: UnpauseSubscribeAsyncParams): Promise<string>;
+  (params: ModifyKYCDataSubscribeAsyncParams): Promise<string>;
+  (params: ModifyInvestorFlagSubscribeAsyncParams): Promise<string>;
+  (params: ModifyTransferRequirementsSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetChangeIssuanceAddressLogsAsyncParams): Promise<
     LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs>[]
   >;
-  (params: GetAllowAllTransfersLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerAllowAllTransfersEventArgs>[]
-  >;
-  (params: GetAllowAllWhitelistTransfersLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistTransfersEventArgs>[]
-  >;
-  (params: GetAllowAllWhitelistIssuancesLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerAllowAllWhitelistIssuancesEventArgs>[]
-  >;
-  (params: GetAllowAllBurnTransfersLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerAllowAllBurnTransfersEventArgs>[]
-  >;
-  (params: GetChangeSigningAddressLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerChangeSigningAddressEventArgs>[]
-  >;
   (params: GetChangeDefaultsLogsAsyncParams): Promise<
     LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs>[]
   >;
-  (params: GetModifyWhitelistLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerModifyWhitelistEventArgs>[]
-  >;
   (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs>[]>;
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>[]>;
+  (params: GetModifyKYCDataLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyKYCDataEventArgs>[]
+  >;
+  (params: GetModifyInvestorFlagLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyInvestorFlagEventArgs>[]
+  >;
+  (params: GetModifyTransferRequirementsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyTransferRequirementsEventArgs>[]
+  >;
 }
 
 interface InvestorIndexParams {
@@ -220,12 +178,11 @@ interface VerifyTransferParams extends TxParams {
   isTransfer: boolean;
 }
 
-interface ModifyWhitelistParams extends TxParams {
+interface ModifyKYCDataParams extends TxParams {
   investor: string;
   canSendAfter: Date;
   canReceiveAfter: Date;
   expiryTime: Date;
-  canBuyFromSTO: boolean;
 }
 
 interface ModifyWhitelistMultiParams extends TxParams {
@@ -451,18 +408,17 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public modifyWhitelist = async (params: ModifyWhitelistParams) => {
+  public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
-    return (await this.contract).modifyWhitelist.sendTransactionAsync(
+    return (await this.contract).modifyKYCData.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.canSendAfter),
       dateToBigNumber(params.canReceiveAfter),
       dateToBigNumber(params.expiryTime),
-      params.canBuyFromSTO,
       params.txData,
       params.safetyFactor,
     );
