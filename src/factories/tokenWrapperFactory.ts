@@ -43,7 +43,7 @@ export default class TokenWrapperFactory {
     assert.isETHAddressHex('address', address);
     const token = new ERC20DetailedTokenWrapper(
       this.web3Wrapper,
-      this.contractFactory.getDetailedERC20Contract(address),
+      this.contractFactory.getERC20DetailedContract(address),
     );
     if (await token.isValidContract()) {
       return token;

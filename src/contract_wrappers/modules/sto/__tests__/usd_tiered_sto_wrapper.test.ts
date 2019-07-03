@@ -835,7 +835,7 @@ describe('USDTieredSTOWrapper', () => {
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -902,7 +902,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedDetailedERC20Contract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
+      verify(mockedContractFactory.getERC20DetailedContract(usdToken)).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContract.securityToken).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
@@ -1405,7 +1405,7 @@ describe('USDTieredSTOWrapper', () => {
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -1469,7 +1469,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedDetailedERC20Contract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
+      verify(mockedContractFactory.getERC20DetailedContract(usdToken)).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContract.securityToken).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
