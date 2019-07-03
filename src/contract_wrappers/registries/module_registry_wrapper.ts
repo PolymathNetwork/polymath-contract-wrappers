@@ -131,11 +131,6 @@ interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
 
-interface VerifyModuleParams extends TxParams {
-  moduleFactory: string;
-  verified: boolean;
-}
-
 /**
  * @param moduleType is the module type to look for
  * @param securityToken is the address of SecurityToken
@@ -253,13 +248,23 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public verifyModule = async (params: VerifyModuleParams) => {
+  public verifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
-      params.verified,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public unverifyModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+    return (await this.contract).unverifyModule.sendTransactionAsync(
+      params.moduleFactory,
       params.txData,
       params.safetyFactor,
     );

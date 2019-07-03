@@ -272,7 +272,6 @@ describe('ModuleRegistryWrapper', () => {
       // Mocked parameters
       const mockedParams = {
         moduleFactory: '0x2222222222222222222222222222222222222222',
-        verified: true,
         txData: {},
         safetyFactor: 10,
       };
@@ -283,12 +282,11 @@ describe('ModuleRegistryWrapper', () => {
       when(mockedContract.verifyModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.moduleFactory,
-          mockedParams.verified,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.moduleFactory,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -299,12 +297,88 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.verifyModule).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.moduleFactory,
-          mockedParams.verified,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.moduleFactory,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedContract.getModulesByType).times(5);
+
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('UnverifyModule', () => {
+    test.todo('should fail as moduleFactory is not an Eth address');
+
+    test('should successfully call to unverifyModule', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      // Mock web3 wrapper
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Module not already registered - the new Module factory is at '0x0123456789012345678901234567890123456789'
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mocked parameters
+      const mockedParams = {
+        moduleFactory: '0x2222222222222222222222222222222222222222',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.unverifyModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.moduleFactory,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.unverifyModule(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.unverifyModule).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.moduleFactory,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
 
