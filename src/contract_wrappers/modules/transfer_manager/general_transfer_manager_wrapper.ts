@@ -211,6 +211,15 @@ interface GetInvestorsDataParams {
   investors: string[];
 }
 
+interface GetInvestorFlag {
+  investor: string;
+  flag: number;
+}
+
+interface GetInvestorFlags {
+  investor: string;
+}
+
 // // Return types ////
 interface TimeRestriction {
   /** The moment when the sale lockup period ends and the investor can freely sell or transfer away their tokens */
@@ -422,6 +431,21 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  public getAllInvestorFlags = async () => {
+    const result = await (await this.contract).getAllInvestorFlags.callAsync();
+    return result;
+  };
+
+  public getInvestorFlag = async (params: GetInvestorFlag) => {
+    const result = await (await this.contract).getInvestorFlag.callAsync(params.investor, params.flag);
+    return result;
+  };
+
+  public getInvestorFlags = async (params: GetInvestorFlags) => {
+    const result = await (await this.contract).getInvestorFlags.callAsync(params.investor);
+    return result;
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
