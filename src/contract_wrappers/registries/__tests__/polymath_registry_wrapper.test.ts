@@ -258,7 +258,7 @@ describe('PolyMathRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ChangeAddress', 'OwnershipRenounced', 'OwnershipTransferred', encountered: Transfer`,
+          `Expected eventName to be one of: 'ChangeAddress', 'OwnershipTransferred', encountered: Transfer`,
         ),
       );
     });
