@@ -79,7 +79,7 @@ describe('ModuleRegistryWrapper', () => {
       // Stub the get types
       const mockedGetTypesMethod = mock(MockedCallMethod);
       const types = [new BigNumber(1), new BigNumber(2)];
-      when(mockedModuleFactoryContract.getTypes).thenReturn(instance(mockedGetTypesMethod));
+      when(mockedModuleFactoryContract.types).thenReturn(instance(mockedGetTypesMethod));
       when(mockedGetTypesMethod.callAsync()).thenResolve(types);
 
       // Mock contract paused
@@ -142,7 +142,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).twice();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.owner).once();
-      verify(mockedModuleFactoryContract.getTypes).once();
+      verify(mockedModuleFactoryContract.types).once();
       verify(mockedGetTypesMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
       verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
@@ -597,33 +597,6 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getTagsByType).once();
       verify(mockedMethod.callAsync(params.moduleType)).once();
-    });
-  });
-
-  describe('GetReputationByFactory', () => {
-    test.todo('should fail as moduleFactory is not an Eth address');
-
-    test('should call to get reputation by factory', async () => {
-      // Address expected
-      const expectedResult = [
-        '0x1111111111111111111111111111111111111111',
-        '0x2222222222222222222222222222222222222222',
-      ];
-      const factory = '0x0123456789012345678901234567890123456789';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getReputationByFactory).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(factory)).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getReputationByFactory({ moduleFactory: factory });
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.getReputationByFactory).once();
-      verify(mockedMethod.callAsync(factory)).once();
     });
   });
 

@@ -216,7 +216,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
         'Calling address must be owner without custom modules allowed feature status',
       );
     }
-    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync();
+    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).types.callAsync();
     // Check for duplicates
     if (getTypesResult.length > 1) {
       assert.assert(getTypesResult.length === new Set(getTypesResult).size, 'Type mismatch');
@@ -313,11 +313,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       },
     );
     return typedResult;
-  };
-
-  public getReputationByFactory = async (params: ModuleFactoryParams) => {
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    return (await this.contract).getReputationByFactory.callAsync(params.moduleFactory);
   };
 
   public getModulesByType = async (params: ModuleTypeParams) => {
