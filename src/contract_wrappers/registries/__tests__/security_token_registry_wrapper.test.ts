@@ -396,8 +396,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.tickerRegFee,
-          mockedParams.stLaunchFee,
+          objectContaining(valueToWei(mockedParams.tickerRegFee, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.stLaunchFee, FULL_DECIMALS)),
           mockedParams.isFeeInPoly,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -413,8 +413,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.changeFeesAmountAndCurrency).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.tickerRegFee,
-          mockedParams.stLaunchFee,
+          objectContaining(valueToWei(mockedParams.tickerRegFee, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.stLaunchFee, FULL_DECIMALS)),
           mockedParams.isFeeInPoly,
           mockedParams.txData,
           mockedParams.safetyFactor,
