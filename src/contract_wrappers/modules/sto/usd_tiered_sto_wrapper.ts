@@ -15,6 +15,7 @@ import {
   USDTieredSTOSetTimesEventArgs,
   USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
+  GeneralTransferManagerContract,
 } from '@polymathnetwork/abi-wrappers';
 import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -30,6 +31,7 @@ import {
   FundRaiseType,
   GetLogs,
   GetLogsAsyncParams,
+  ModuleName,
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
@@ -38,12 +40,14 @@ import {
   bigNumberToDate,
   dateToBigNumber,
   numberToBigNumber,
+  stringToBytes32,
   valueArrayToWeiArray,
   valueToWei,
   weiArrayToValueArray,
   weiToValue,
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
+import GeneralTransferManagerWrapper from '../transfer_manager/general_transfer_manager_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -385,6 +389,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   protected contract: Promise<USDTieredSTOContract>;
 
+  protected generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract> => {
+    return this.contractFactory.getGeneralTransferManagerContract(address);
+  };
+
   /**
    * Instantiate USDTieredSTOWrapper
    * @param web3Wrapper Web3Wrapper instance to use
@@ -412,16 +420,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await (await this.contract).finalAmountReturned.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
-  };
-
-  public investors = async (params: InvestorAddressParams) => {
-    assert.isETHAddressHex('investorAddress', params.investorAddress);
-    const result = await (await this.contract).investors.callAsync(params.investorAddress);
-    const typedResult: InvestorData = {
-      accredited: !result[0].isZero(),
-      nonAccreditedLimitUSDOverride: weiToValue(result[2], FULL_DECIMALS),
-    };
-    return typedResult;
   };
 
   public investorInvested = async (params: InvestorInvestedParams) => {
@@ -988,17 +986,28 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       investorAddress: beneficiary,
     });
     const minimumInvestmentUSD = await this.minimumInvestmentUSD();
-    assert.assert(
-      investedUSD.plus(investorInvestedUSD).isGreaterThan(minimumInvestmentUSD),
-      'investment < minimumInvestmentUSD',
+    assert.assert(investedUSD.plus(investorInvestedUSD).isGreaterThan(minimumInvestmentUSD), 'Investment < min');
+
+    const generalTMAddress = await (await this.securityTokenContract()).getModulesByName.callAsync(
+      stringToBytes32(ModuleName.generalTransferManager),
     );
-    const investor = await this.investors({
-      investorAddress: beneficiary,
-    });
-    if (investor.accredited) {
-      const nonAccreditedLimitUSD = investor.nonAccreditedLimitUSDOverride.isEqualTo(BIG_NUMBER_ZERO)
-        ? await this.nonAccreditedLimitUSD()
-        : investor.nonAccreditedLimitUSDOverride;
+    const generalTM = new GeneralTransferManagerWrapper(
+      this.web3Wrapper,
+      this.generalTransferManagerContract(generalTMAddress[0]),
+      this.contractFactory,
+    );
+    if (await generalTM.getInvestorFlag({ investor: beneficiary, flag: 0 })) {
+      const accreditedData = await this.getAccreditedData();
+      let nonAccreditedLimit;
+      for (let i = 0; i < accreditedData.length; i += 1) {
+        if (accreditedData[i].investor === beneficiary) {
+          nonAccreditedLimit = accreditedData[i].accreditedData.nonAccreditedLimitUSDOverride;
+        }
+      }
+      const nonAccreditedLimitUSD =
+        !nonAccreditedLimit || nonAccreditedLimit.isEqualTo(BIG_NUMBER_ZERO)
+          ? await this.nonAccreditedLimitUSD()
+          : nonAccreditedLimit;
       assert.assert(investorInvestedUSD.isLessThan(nonAccreditedLimitUSD), 'Over investor limit');
     }
   };
