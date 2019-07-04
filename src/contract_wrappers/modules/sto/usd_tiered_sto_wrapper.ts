@@ -217,10 +217,6 @@ interface StableCoinParams {
   stableCoinAddress: string;
 }
 
-interface InvestorIndexParams {
-  investorIndex: number;
-}
-
 interface InvestorAddressParams {
   investorAddress: string;
 }
@@ -228,10 +224,6 @@ interface InvestorAddressParams {
 interface InvestorInvestedParams {
   investorAddress: string;
   fundRaiseType: FundRaiseType;
-}
-
-interface UsdTokenIndexParams {
-  usdTokenIndex: number;
 }
 
 /**
@@ -407,10 +399,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     this.contract = contract;
   }
 
-  public investorsList = async (params: InvestorIndexParams) => {
-    return (await this.contract).investorsList.callAsync(numberToBigNumber(params.investorIndex));
-  };
-
   public allowBeneficialInvestments = async () => {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
@@ -442,15 +430,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       await (await this.contract).investorInvested.callAsync(params.investorAddress, params.fundRaiseType),
       FULL_DECIMALS,
     );
-  };
-
-  public usdTokenEnabled = async (params: StableCoinParams) => {
-    assert.isETHAddressHex('stableCoinAddress', params.stableCoinAddress);
-    return (await this.contract).usdTokenEnabled.callAsync(params.stableCoinAddress);
-  };
-
-  public usdTokens = async (params: UsdTokenIndexParams) => {
-    return (await this.contract).usdTokens.callAsync(numberToBigNumber(params.usdTokenIndex));
   };
 
   public investorInvestedUSD = async (params: InvestorAddressParams) => {

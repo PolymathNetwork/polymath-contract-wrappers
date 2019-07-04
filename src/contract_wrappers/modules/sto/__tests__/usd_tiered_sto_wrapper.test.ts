@@ -60,30 +60,6 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('InvestorsList', () => {
-    test('should get address in investors list', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      const params = { investorIndex: 1 };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investorsList).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.investorIndex)))).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.investorsList(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.investorsList).once();
-      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.investorIndex)))).once();
-    });
-  });
-
   describe('AllowBeneficialInvestments', () => {
     test('should get boolean of allowBeneficialInvestments', async () => {
       // Address expected
@@ -193,56 +169,8 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('USDTokenEnabled', () => {
-    test('should get boolean of usdTokenEnabled', async () => {
-      // Result expected
-      const expectedResult = true;
-      const params = {
-        stableCoinAddress: '0x1111111111111111111111111111111111111111',
-      };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.usdTokenEnabled).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(params.stableCoinAddress)).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.usdTokenEnabled(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.usdTokenEnabled).once();
-      verify(mockedMethod.callAsync(params.stableCoinAddress)).once();
-    });
-  });
-
-  describe('USDTokens', () => {
-    test('should get address in USDTokens', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      const params = { usdTokenIndex: 1 };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.usdTokens).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.usdTokens(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.usdTokens).once();
-      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).once();
-    });
-  });
-
   describe('InvestorInvestedUSD', () => {
-    test('should get address in USDTokens', async () => {
+    test('should get InvestorInvestedUSD', async () => {
       // Address expected
       const expectedResult = new BigNumber(1);
       const params = { investorAddress: '0x1111111111111111111111111111111111111111' };
