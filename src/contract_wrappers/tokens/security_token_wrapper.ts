@@ -703,7 +703,7 @@ interface USDTieredSTOData {
   minimumInvestmentUSD: BigNumber;
   fundRaiseTypes: FundRaiseType[];
   wallet: string;
-  reserveWallet: string;
+  treasuryWallet: string;
   usdTokens: string[];
 }
 
