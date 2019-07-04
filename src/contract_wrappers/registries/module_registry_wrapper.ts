@@ -6,6 +6,7 @@ import {
   ModuleRegistryModuleRemovedEventArgs,
   ModuleRegistryModuleUsedEventArgs,
   ModuleRegistryModuleVerifiedEventArgs,
+  ModuleRegistryModuleUnverifiedEventArgs,
   ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
@@ -79,6 +80,15 @@ interface GetModuleVerifiedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: ModuleRegistryEvents.ModuleVerified;
 }
 
+interface ModuleUnverifiedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUnverified;
+  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs>;
+}
+
+interface GetModuleUnverifiedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUnverified;
+}
+
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.ModuleRemoved;
   callback: EventCallback<ModuleRegistryModuleRemovedEventArgs>;
@@ -103,6 +113,7 @@ interface ModuleRegistrySubscribeAsyncParams extends Subscribe {
   (params: ModuleUsedSubscribeAsyncParams): Promise<string>;
   (params: ModuleRegisteredSubscribeAsyncParams): Promise<string>;
   (params: ModuleVerifiedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUnverifiedSubscribeAsyncParams): Promise<string>;
   (params: ModuleRemovedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
@@ -113,6 +124,7 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   (params: GetModuleUsedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>[]>;
   (params: GetModuleRegisteredLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRegisteredEventArgs>[]>;
   (params: GetModuleVerifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleVerifiedEventArgs>[]>;
+  (params: GetModuleUnverifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUnverifiedEventArgs>[]>;
   (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRemovedEventArgs>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs>[]
@@ -129,11 +141,6 @@ interface GetValueByKeyParams {
 
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
-}
-
-interface VerifyModuleParams extends TxParams {
-  moduleFactory: string;
-  verified: boolean;
 }
 
 /**
@@ -221,7 +228,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
         'Calling address must be owner without custom modules allowed feature status',
       );
     }
-    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync();
+    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).types.callAsync();
     // Check for duplicates
     if (getTypesResult.length > 1) {
       assert.assert(getTypesResult.length === new Set(getTypesResult).size, 'Type mismatch');
@@ -253,13 +260,23 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public verifyModule = async (params: VerifyModuleParams) => {
+  public verifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
-      params.verified,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public unverifyModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+    return (await this.contract).unverifyModule.sendTransactionAsync(
+      params.moduleFactory,
       params.txData,
       params.safetyFactor,
     );
@@ -308,11 +325,6 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       },
     );
     return typedResult;
-  };
-
-  public getReputationByFactory = async (params: ModuleFactoryParams) => {
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    return (await this.contract).getReputationByFactory.callAsync(params.moduleFactory);
   };
 
   public getModulesByType = async (params: ModuleTypeParams) => {

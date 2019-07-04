@@ -5,7 +5,7 @@ import { BigNumber } from '@0x/utils';
 import {
   ISecurityTokenRegistryContract,
   PolyTokenEvents,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
@@ -26,14 +26,14 @@ describe('SecurityTokenRegistryWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ISecurityTokenRegistryContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
   let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(ISecurityTokenRegistryContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
     mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));

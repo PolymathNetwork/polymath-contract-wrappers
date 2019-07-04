@@ -39,7 +39,7 @@ export default class ModuleWrapper extends ContractWrapper {
   };
 
   protected detailedErc20TokenContract = async (address: string): Promise<ERC20DetailedContract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
+    return this.contractFactory.getERC20DetailedContract(address);
   };
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {

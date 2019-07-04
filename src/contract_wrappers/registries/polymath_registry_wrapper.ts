@@ -3,7 +3,6 @@ import {
   PolymathRegistryEventArgs,
   PolymathRegistryEvents,
   PolymathRegistryChangeAddressEventArgs,
-  PolymathRegistryOwnershipRenouncedEventArgs,
   PolymathRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
@@ -32,15 +31,6 @@ interface GetChangeAddressLogsAsyncParams extends GetLogsAsyncParams {
   eventName: PolymathRegistryEvents.ChangeAddress;
 }
 
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<PolymathRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
-}
-
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PolymathRegistryEvents.OwnershipTransferred;
   callback: EventCallback<PolymathRegistryOwnershipTransferredEventArgs>;
@@ -52,15 +42,11 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface PolymathRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeAddressSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetPolymathRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeAddressLogsAsyncParams): Promise<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>[]>;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>[]
   >;
