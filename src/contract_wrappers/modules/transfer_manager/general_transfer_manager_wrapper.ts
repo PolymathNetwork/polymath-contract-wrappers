@@ -17,12 +17,7 @@ import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import {
-  bigNumberToDate,
-  dateToBigNumber,
-  numberToBigNumber,
-  valueToWei,
-} from '../../../utils/convert';
+import { bigNumberToDate, dateToBigNumber, numberToBigNumber, valueToWei } from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   TxParams,
@@ -149,18 +144,25 @@ interface ModifyKYCDataParams extends TxParams {
   expiryTime: Date;
 }
 
-interface ModifyWhitelistSignedParams extends TxParams {
+/**
+ * @param investor is the address to whitelist
+ * @param canSendAfter is the moment when the sale lockup period ends and the investor can freely sell his tokens
+ * @param canReceiveAfter is the moment when the purchase lockup period ends and the investor can freely purchase tokens from others
+ * @param expiryTime is the moment till investors KYC will be validated. After that investor need to do re-KYC
+ * @param validFrom is the time that this signature is valid from
+ * @param validTo is the time that this signature is valid until
+ * @param nonce nonce of signature (avoid replay attack)
+ * @param signature issuer signature
+ */
+interface ModifyKYCDataSignedParams extends TxParams {
   investor: string;
   canSendAfter: Date;
   canReceiveAfter: Date;
   expiryTime: Date;
-  canNotBuyFromSTO: boolean;
   validFrom: Date;
   validTo: Date;
   nonce: number;
-  v: number | BigNumber;
-  r: string;
-  s: string;
+  signature: string;
 }
 
 interface GetInvestorFlag {
@@ -452,7 +454,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return valueToWei(result, decimals);
   };
 
-  public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
+  public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
@@ -464,18 +466,15 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
       'Already used signature of investor address and nonce',
     );
-    return (await this.contract).modifyWhitelistSigned.sendTransactionAsync(
+    return (await this.contract).modifyKYCDataSigned.sendTransactionAsync(
       params.investor,
       dateToBigNumber(params.canSendAfter),
       dateToBigNumber(params.canReceiveAfter),
       dateToBigNumber(params.expiryTime),
-      params.canNotBuyFromSTO,
       dateToBigNumber(params.validFrom),
       dateToBigNumber(params.validTo),
       numberToBigNumber(params.nonce),
-      params.v,
-      params.r,
-      params.s,
+      params.signature,
       params.txData,
       params.safetyFactor,
     );
