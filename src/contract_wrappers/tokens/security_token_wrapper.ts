@@ -1535,7 +1535,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     }
     assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, 'Raise type is not specified');
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
-    assert.isNonZeroETHAddressHex('ReserveWallet', data.reserveWallet);
+    assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };
 
   private async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
@@ -1598,7 +1598,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           valueToWei((params.data as USDTieredSTOData).minimumInvestmentUSD, FULL_DECIMALS).toString(),
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
-          (params.data as USDTieredSTOData).reserveWallet,
+          (params.data as USDTieredSTOData).treasuryWallet,
           (params.data as USDTieredSTOData).usdTokens,
         ]);
         break;

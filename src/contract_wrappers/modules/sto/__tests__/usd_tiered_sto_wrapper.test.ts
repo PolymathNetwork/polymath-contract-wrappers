@@ -1792,23 +1792,23 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('ReserveWallet', () => {
-    test('should get address from reserveWallet', async () => {
+  describe('TreasuryWallet', () => {
+    test('should get address from treasuryWallet', async () => {
       // Address expected
       const expectedResult = '0x1111111111111111111111111111111111111111';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.reserveWallet).thenReturn(instance(mockedMethod));
+      when(mockedContract.treasuryWallet).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.reserveWallet();
+      const result = await target.treasuryWallet();
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.reserveWallet).once();
+      verify(mockedContract.treasuryWallet).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
@@ -2502,7 +2502,7 @@ describe('USDTieredSTOWrapper', () => {
 
       const mockedParams = {
         wallet: '0x1234567890123456789012345678901234567890',
-        reserveWallet: '0x0987654321098765432109876543210987654321',
+        treasuryWallet: '0x0987654321098765432109876543210987654321',
         usdTokens: ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'],
         txData: {},
         safetyFactor: 10,
@@ -2516,7 +2516,7 @@ describe('USDTieredSTOWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.reserveWallet,
+          mockedParams.treasuryWallet,
           mockedParams.usdTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -2533,7 +2533,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.reserveWallet,
+          mockedParams.treasuryWallet,
           mockedParams.usdTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,

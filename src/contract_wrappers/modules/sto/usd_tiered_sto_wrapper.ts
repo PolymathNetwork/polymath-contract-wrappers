@@ -270,12 +270,12 @@ interface ModifyFundingParams extends TxParams {
 
 /**
  * @param wallet Address of wallet where funds are sent
- * @param reserveWallet Address of wallet where unsold tokens are sent
+ * @param treasuryWallet Address of wallet where unsold tokens are sent
  * @param usdTokens Address of usd tokens
  */
 interface ModifyAddressesParams extends TxParams {
   wallet: string;
-  reserveWallet: string;
+  treasuryWallet: string;
   usdTokens: string[];
 }
 
@@ -665,8 +665,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Ethereum account address to receive unsold tokens
    */
-  public reserveWallet = async () => {
-    return (await this.contract).reserveWallet.callAsync();
+  public treasuryWallet = async () => {
+    return (await this.contract).treasuryWallet.callAsync();
   };
 
   /**
@@ -848,10 +848,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     params.usdTokens.forEach(address => assert.isETHAddressHex('usdTokens', address));
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
-    assert.isNonZeroETHAddressHex('reserveWallet', params.reserveWallet);
+    assert.isNonZeroETHAddressHex('treasuryWallet', params.treasuryWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
-      params.reserveWallet,
+      params.treasuryWallet,
       params.usdTokens,
       params.txData,
       params.safetyFactor,
