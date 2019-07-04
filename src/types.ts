@@ -93,9 +93,15 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
+export enum FlagsType {
+  IsAccredited,
+  CanNotBuyFromSto,
+  IsVolRestricted,
+}
+
 export enum FeeType {
   tickerRegFee,
-  stLaunchFee
+  stLaunchFee,
 }
 
 export enum Features {
@@ -245,7 +251,11 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract = ERC20DetailedContract | ISecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+export type ERC20Contract =
+  | ERC20DetailedContract
+  | ISecurityTokenContract
+  | PolyTokenContract
+  | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract

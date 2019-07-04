@@ -33,6 +33,7 @@ import {
   Subscribe,
   GetLogs,
   Perms,
+  FlagsType,
 } from '../../../types';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -220,6 +221,21 @@ interface GetInvestorFlags {
   investor: string;
 }
 
+interface GetKYCDataParams {
+  investors: string[];
+}
+
+/**
+ * @param partition Identifier
+ * @param tokenHolder Whom token amount need to query
+ * @param additionalBalance It is the `_value` that transfer during transfer/transferFrom function call
+ */
+interface GetTokensByPartitionParams {
+  partition: string;
+  tokenHolder: string;
+  additionalBalance: BigNumber;
+}
+
 // // Return types ////
 interface TimeRestriction {
   /** The moment when the sale lockup period ends and the investor can freely sell or transfer away their tokens */
@@ -240,6 +256,21 @@ interface Defaults {
 interface WhitelistData {
   investor: string;
   timeRestriction: TimeRestriction;
+}
+
+interface KYCData {
+  canSendAfter: Date;
+  canReceiveAfter: Date;
+  expiryTime: Date;
+}
+
+interface KYCDataWithInvestor extends KYCData {
+  investor: string;
+}
+
+interface InvestorAndFlag {
+  investor: string;
+  flag: FlagsType;
 }
 // // End of return types ////
 
@@ -435,7 +466,34 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public getAllInvestorFlags = async () => {
     const result = await (await this.contract).getAllInvestorFlags.callAsync();
-    return result;
+    const typedResult: InvestorAndFlag[] = [];
+    let flag = FlagsType.IsAccredited;
+    for (let i = 0; i < result[0].length; i += 1) {
+      switch (result[1][i].toNumber()) {
+        case 0: {
+          flag = FlagsType.IsAccredited;
+          break;
+        }
+        case 1: {
+          flag = FlagsType.CanNotBuyFromSto;
+          break;
+        }
+        case 2: {
+          flag = FlagsType.IsVolRestricted;
+          break;
+        }
+        default: {
+          assert.assert(false, 'Missing Flag');
+          break;
+        }
+      }
+      const InvestorAndFlag: InvestorAndFlag = {
+        investor: result[0][i],
+        flag,
+      };
+      typedResult.push(InvestorAndFlag);
+    }
+    return typedResult;
   };
 
   public getInvestorFlag = async (params: GetInvestorFlag) => {
@@ -443,9 +501,101 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return result;
   };
 
+  private isFlagTrue = (flagPosition: FlagsType, packedFlags: number) => {
+    // eslint-disable-next-line no-bitwise
+    const bitInFlagPosition = (packedFlags >> flagPosition) & 1;
+    return !!bitInFlagPosition;
+  };
+
   public getInvestorFlags = async (params: GetInvestorFlags) => {
-    const result = await (await this.contract).getInvestorFlags.callAsync(params.investor);
-    return result;
+    const { investor } = params;
+    const result = await (await this.contract).getInvestorFlags.callAsync(investor);
+    let isAccredited = false;
+    let canNotBuyFromSTO = false;
+    let isVolRestricted = false;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const flag in FlagsType) {
+      if (Object.prototype.hasOwnProperty.call(FlagsType, flag)) {
+        // This check is required because iterating through an enum
+        // yields the names of the enum members as well as the indexes.
+        // We only need the indexes so we skip the names in this case
+        const position = Number(flag); // NaN if flag is string
+        if (!flag) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        const isSet = this.isFlagTrue(position, result.toNumber());
+
+        switch (position) {
+          case FlagsType.IsAccredited: {
+            isAccredited = isSet;
+            break;
+          }
+          case FlagsType.CanNotBuyFromSto: {
+            canNotBuyFromSTO = isSet;
+            break;
+          }
+          case FlagsType.IsVolRestricted: {
+            isVolRestricted = isSet;
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
+    }
+
+    return {
+      investor,
+      isAccredited,
+      canNotBuyFromSTO,
+      isVolRestricted,
+    };
+  };
+
+  public getAllKYCData = async () => {
+    const result = await (await this.contract).getAllKYCData.callAsync();
+    const typedResult: KYCDataWithInvestor[] = [];
+    for (let i = 0; i < result[0].length; i += 1) {
+      const KYCData: KYCDataWithInvestor = {
+        investor: result[0][i],
+        canSendAfter: bigNumberToDate(result[1][i]),
+        canReceiveAfter: bigNumberToDate(result[2][i]),
+        expiryTime: bigNumberToDate(result[3][i]),
+      };
+      typedResult.push(KYCData);
+    }
+    return typedResult;
+  };
+
+  public getKYCData = async (params: GetKYCDataParams) => {
+    const result = await (await this.contract).getKYCData.callAsync(params.investors);
+    const typedResult: KYCData[] = [];
+    for (let i = 0; i < result[0].length; i += 1) {
+      const KYCData: KYCData = {
+        canSendAfter: bigNumberToDate(result[0][i]),
+        canReceiveAfter: bigNumberToDate(result[1][i]),
+        expiryTime: bigNumberToDate(result[2][i]),
+      };
+      typedResult.push(KYCData);
+    }
+    return typedResult;
+  };
+
+  /**
+   * Return the amount of tokens for a given user as per the partition
+   */
+  public getTokensByPartition = async (params: GetTokensByPartitionParams) => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const result = await (await this.contract).getTokensByPartition.callAsync(
+      params.partition,
+      params.tokenHolder,
+      params.additionalBalance,
+    );
+    return valueToWei(result, decimals);
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
