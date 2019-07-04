@@ -5,7 +5,7 @@ import {
   USDTieredSTOFundsReceivedEventArgs,
   USDTieredSTOPauseEventArgs,
   USDTieredSTOReserveTokenMintEventArgs,
-  USDTieredSTOSetAccreditedEventArgs,
+  USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOSetAddressesEventArgs,
   USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
   USDTieredSTOSetFundRaiseTypesEventArgs,
@@ -65,13 +65,13 @@ interface GetSetNonAccreditedLimitLogsAsyncParams extends GetLogsAsyncParams {
   eventName: USDTieredSTOEvents.SetNonAccreditedLimit;
 }
 
-interface SetAccreditedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAccredited;
-  callback: EventCallback<USDTieredSTOSetAccreditedEventArgs>;
+interface SetTreasuryWalletSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents.SetTreasuryWallet;
+  callback: EventCallback<USDTieredSTOSetTreasuryWalletEventArgs>;
 }
 
-interface GetSetAccreditedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAccredited;
+interface GetSetTreasuryWalletLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents.SetTreasuryWallet;
 }
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -167,7 +167,7 @@ interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
 interface USDTieredSTOSubscribeAsyncParams extends Subscribe {
   (params: SetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>;
   (params: SetNonAccreditedLimitSubscribeAsyncParams): Promise<string>;
-  (params: SetAccreditedSubscribeAsyncParams): Promise<string>;
+  (params: SetTreasuryWalletSubscribeAsyncParams): Promise<string>;
   (params: TokenPurchaseSubscribeAsyncParams): Promise<string>;
   (params: FundsReceivedSubscribeAsyncParams): Promise<string>;
   (params: ReserveTokenMintSubscribeAsyncParams): Promise<string>;
@@ -187,7 +187,7 @@ interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
   (params: GetSetNonAccreditedLimitLogsAsyncParams): Promise<
     LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>[]
   >;
-  (params: GetSetAccreditedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAccreditedEventArgs>[]>;
+  (params: GetSetTreasuryWalletLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTreasuryWalletEventArgs>[]>;
   (params: GetTokenPurchaseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs>[]>;
   (params: GetFundsReceivedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs>[]>;
   (params: GetReserveTokenMintLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs>[]>;
@@ -232,21 +232,6 @@ interface InvestorInvestedParams {
 
 interface UsdTokenIndexParams {
   usdTokenIndex: number;
-}
-
-interface BuyTokensViewParams {
-  beneficiary: string;
-  investmentValue: BigNumber;
-  fundRaiseType: FundRaiseType;
-}
-
-/**
- * @param investors Array of investor addresses to modify
- * @param accredited Array of bools specifying accreditation status
- */
-interface ChangeAccreditedParams extends TxParams {
-  investors: string[];
-  accredited: boolean[];
 }
 
 /**
@@ -351,14 +336,6 @@ interface InvestorData {
   accredited: boolean;
   /** Overrides for default limit in USD for non-accredited investors multiplied by 10**18 (0 = no override) */
   nonAccreditedLimitUSDOverride: BigNumber;
-}
-
-interface BuyTokensViewData {
-  /** USD amount spent */
-  spentUSD: BigNumber;
-  spentValue: BigNumber;
-  /** Minted tokens amount */
-  tokensMinted: BigNumber;
 }
 
 interface Tier {
@@ -607,27 +584,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
-  public buyTokensView = async (params: BuyTokensViewParams) => {
-    const investmentValue = valueToWei(params.investmentValue, FULL_DECIMALS);
-    await this.checkIfBuyIsValid(
-      params.beneficiary,
-      await this.getCallerAddress(undefined),
-      investmentValue,
-      params.fundRaiseType,
-    );
-    const result = await (await this.contract).buyTokensView.callAsync(
-      params.beneficiary,
-      investmentValue,
-      params.fundRaiseType,
-    );
-    const typedResult: BuyTokensViewData = {
-      spentUSD: weiToValue(result[0], FULL_DECIMALS),
-      spentValue: weiToValue(result[1], FULL_DECIMALS),
-      tokensMinted: weiToValue(result[2], await (await this.securityTokenContract()).decimals.callAsync()),
-    };
-    return typedResult;
-  };
-
   public isOpen = async () => {
     return (await this.contract).isOpen.callAsync();
   };
@@ -825,21 +781,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.assert(!(await this.isFinalized()), 'STO is finalized');
     // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   * Modifies the list of accredited addresses
-   */
-  public changeAccredited = async (params: ChangeAccreditedParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    params.investors.forEach(address => assert.isETHAddressHex('investors', address));
-    assert.assert(params.investors.length === params.accredited.length, 'Array lengths mismatch');
-    return (await this.contract).changeAccredited.sendTransactionAsync(
-      params.investors,
-      params.accredited,
-      params.txData,
-      params.safetyFactor,
-    );
   };
 
   /**
