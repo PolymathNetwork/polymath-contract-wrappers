@@ -367,7 +367,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -551,7 +551,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -743,7 +743,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(10);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -942,7 +942,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -1123,7 +1123,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -1313,7 +1313,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(10);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -1734,7 +1734,7 @@ describe('USDTieredSTOWrapper', () => {
       // Result expected
       const expectedResult = new BigNumber(1);
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedMethod));
       // Stub the request
@@ -2043,7 +2043,7 @@ describe('USDTieredSTOWrapper', () => {
         amount: new BigNumber(2),
       };
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.convertToUSD).thenReturn(instance(mockedMethod));
       // Stub the request
