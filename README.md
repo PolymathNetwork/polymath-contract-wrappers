@@ -1,5 +1,7 @@
 ## @polymathnetwork/contract-wrappers
 
+Version 3.0.0 Polymath-Core contracts
+
 Smart TS wrappers for Polymath smart contracts.
 
 ## Installation
