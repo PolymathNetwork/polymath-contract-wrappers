@@ -3518,7 +3518,7 @@ describe('SecurityTokenWrapper', () => {
         minimumInvestmentUSD: new BigNumber(1),
         fundRaiseTypes: [FundRaiseType.StableCoin],
         wallet: '0x1111111111111111111111111111111111111111',
-        reserveWallet: '0x2222222222222222222222222222222222222222',
+        treasuryWallet: '0x2222222222222222222222222222222222222222',
         usdTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
       };
       const mockedUsdTieredStoParams = {
@@ -3552,7 +3552,7 @@ describe('SecurityTokenWrapper', () => {
         valueToWei(mockedUsdTieredStoParams.data.minimumInvestmentUSD, FULL_DECIMALS).toString(),
         mockedUsdTieredStoParams.data.fundRaiseTypes,
         mockedUsdTieredStoParams.data.wallet,
-        mockedUsdTieredStoParams.data.reserveWallet,
+        mockedUsdTieredStoParams.data.treasuryWallet,
         mockedUsdTieredStoParams.data.usdTokens,
       ]);
 
@@ -3585,7 +3585,7 @@ describe('SecurityTokenWrapper', () => {
           minimumInvestmentUSD: usdTieredStoParams.minimumInvestmentUSD,
           fundRaiseTypes: usdTieredStoParams.fundRaiseTypes,
           wallet: usdTieredStoParams.wallet,
-          reserveWallet: usdTieredStoParams.reserveWallet,
+          treasuryWallet: usdTieredStoParams.treasuryWallet,
           usdTokens: usdTieredStoParams.usdTokens,
         },
         txData: mockedUsdTieredStoParams.txData,
