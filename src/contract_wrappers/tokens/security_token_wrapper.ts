@@ -481,6 +481,13 @@ interface DataStoreAddressParams extends TxParams {
 }
 
 /**
+ * @param treasuryWallet address
+ */
+interface ChangeTreasuryWalletParams extends TxParams {
+  treasuryWallet: string;
+}
+
+/**
  * @param from sender of transfer
  * @param to receiver of transfer
  * @param value value of transfer
@@ -985,8 +992,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
   };
 
+  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
+    assert.isETHAddressHex('treasuryWallet', params.treasuryWallet);
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
+      params.treasuryWallet,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
   public changeDataStore = async (params: DataStoreAddressParams) => {
-    assert.isETHAddressHex('moduleAddress', params.dataStore);
+    assert.isETHAddressHex('dataStore', params.dataStore);
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeDataStore.sendTransactionAsync(
       params.dataStore,
