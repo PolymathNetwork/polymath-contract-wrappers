@@ -121,21 +121,6 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).maxHolderCount.callAsync();
   };
 
-  public verifyTransfer = async (params: VerifyTransferParams) => {
-    assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
-    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
-      params.from,
-      params.to,
-      valueToWei(params.amount, decimals),
-      params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderCount.sendTransactionAsync(
