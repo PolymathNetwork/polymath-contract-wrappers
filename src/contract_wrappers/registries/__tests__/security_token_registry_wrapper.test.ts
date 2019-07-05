@@ -1578,7 +1578,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityToken', 'RegisterTicker', encountered: Transfer`,
+          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'ChangeFeeCurrency', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityTokenCreated', 'NewSecurityToken', 'RegisterTicker', 'SecurityTokenRefreshed', 'ProtocolFactorySet', 'LatestVersionSet', 'ProtocolFactoryRemoved', encountered: Transfer`,
         ),
       );
     });
