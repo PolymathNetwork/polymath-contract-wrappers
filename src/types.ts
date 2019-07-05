@@ -95,12 +95,12 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
-export enum Features {
+export enum Feature {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
 }
 
-export enum PolymathContracts {
+export enum PolymathContract {
   PolyToken = 'PolyToken',
   ModuleRegistry = 'ModuleRegistry',
   FeatureRegistry = 'FeatureRegistry',
@@ -109,7 +109,7 @@ export enum PolymathContracts {
   EthUsdOracle = 'EthUsdOracle',
 }
 
-export enum ModuleNames {
+export enum ModuleName {
   GeneralPermissionManager = 'GeneralPermissionManager',
   CountTransferManager = 'CountTransferManager',
   GeneralTransferManager = 'GeneralTransferManager',
@@ -122,7 +122,7 @@ export enum ModuleNames {
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
-export enum Perms {
+export enum Perm {
   ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
   Flags = 'FLAGS',
@@ -135,7 +135,7 @@ export enum Perms {
   PreSaleAdmin = 'PRE_SALE_ADMIN',
 }
 
-export enum RestrictionTypes {
+export enum RestrictionType {
   Fixed = 0,
   Percentage = 1,
 }

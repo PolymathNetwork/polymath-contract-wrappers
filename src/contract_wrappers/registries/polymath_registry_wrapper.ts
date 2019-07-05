@@ -17,7 +17,7 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  PolymathContracts,
+  PolymathContract,
   GetLogs,
   Subscribe,
 } from '../../types';
@@ -117,7 +117,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyTokenAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.PolyToken);
+    return this.getAddressInternal(PolymathContract.PolyToken);
   };
 
   /**
@@ -125,7 +125,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getModuleRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.ModuleRegistry);
+    return this.getAddressInternal(PolymathContract.ModuleRegistry);
   };
 
   /**
@@ -133,7 +133,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getFeatureRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.FeatureRegistry);
+    return this.getAddressInternal(PolymathContract.FeatureRegistry);
   };
 
   /**
@@ -141,7 +141,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getSecurityTokenRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.SecurityTokenRegistry);
+    return this.getAddressInternal(PolymathContract.SecurityTokenRegistry);
   };
 
   /**
@@ -149,7 +149,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.PolyUsdOracle);
+    return this.getAddressInternal(PolymathContract.PolyUsdOracle);
   };
 
   /**
@@ -157,7 +157,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getEthUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.EthUsdOracle);
+    return this.getAddressInternal(PolymathContract.EthUsdOracle);
   };
 
   /**

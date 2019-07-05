@@ -35,7 +35,7 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  Perm,
 } from '../../../types';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -371,7 +371,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -382,7 +382,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -392,7 +392,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeSigningAddress = async (params: ChangeSigningAddressParams) => {
     assert.isETHAddressHex('signingAddress', params.signingAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeSigningAddress.sendTransactionAsync(
       params.signingAddress,
       params.txData,
@@ -401,7 +401,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllTransfers = async (params: ChangeAllowAllTransfersParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllTransfers.sendTransactionAsync(
       params.allowAllTransfers,
       params.txData,
@@ -410,7 +410,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistTransfers = async (params: ChangeAllowAllWhitelistTransfersParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistTransfers.sendTransactionAsync(
       params.allowAllWhitelistTransfers,
       params.txData,
@@ -419,7 +419,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllWhitelistIssuances = async (params: ChangeAllowAllWhitelistIssuancesParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllWhitelistIssuances.sendTransactionAsync(
       params.allowAllWhitelistIssuances,
       params.txData,
@@ -428,7 +428,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeAllowAllBurnTransfers = async (params: ChangeAllowAllBurnTransfersParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
     return (await this.contract).changeAllowAllBurnTransfers.sendTransactionAsync(
       params.allowAllBurnTransfers,
       params.txData,
@@ -453,7 +453,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -469,7 +469,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
       params.canSendAfters.length === params.canReceiveAfters.length &&
@@ -493,7 +493,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyWhitelistSigned = async (params: ModifyWhitelistSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
