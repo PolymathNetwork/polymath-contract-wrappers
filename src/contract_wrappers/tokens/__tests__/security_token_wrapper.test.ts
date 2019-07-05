@@ -20,7 +20,7 @@ import {
   ModuleRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { ModuleType, ModuleName, Features, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
+import { ModuleType, ModuleNames, Features, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -341,7 +341,7 @@ describe('SecurityTokenWrapper', () => {
         '0x0123456789012345678901234567890123456788',
       ];
       const mockedParams = {
-        moduleName: ModuleName.generalPermissionManager,
+        moduleName: ModuleNames.GeneralPermissionManager,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -2459,7 +2459,7 @@ describe('SecurityTokenWrapper', () => {
         maxHolderCount: 10,
       };
       const mockedCtmParams = {
-        moduleName: ModuleName.countTransferManager,
+        moduleName: ModuleNames.CountTransferManager,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2483,7 +2483,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const ctmResult = await target.addModule({
-        moduleName: ModuleName.countTransferManager,
+        moduleName: ModuleNames.CountTransferManager,
         address: mockedCtmParams.address,
         maxCost: mockedCtmParams.maxCost,
         budget: mockedCtmParams.budget,
@@ -2642,7 +2642,7 @@ describe('SecurityTokenWrapper', () => {
         allowPrimaryIssuance: true,
       };
       const mockedPtmParams = {
-        moduleName: ModuleName.percentageTransferManager,
+        moduleName: ModuleNames.PercentageTransferManager,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2669,7 +2669,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const ptmResult = await target.addModule({
-        moduleName: ModuleName.percentageTransferManager,
+        moduleName: ModuleNames.PercentageTransferManager,
         address: mockedPtmParams.address,
         maxCost: mockedPtmParams.maxCost,
         budget: mockedPtmParams.budget,
@@ -2833,7 +2833,7 @@ describe('SecurityTokenWrapper', () => {
         fundsReceiver: '0x2222222222222222222222222222222222222222',
       };
       const mockedCappedParams = {
-        moduleName: ModuleName.cappedSTO,
+        moduleName: ModuleNames.CappedSTO,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2864,7 +2864,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const cappedResult = await target.addModule({
-        moduleName: ModuleName.cappedSTO,
+        moduleName: ModuleNames.CappedSTO,
         address: mockedCappedParams.address,
         maxCost: mockedCappedParams.maxCost,
         budget: mockedCappedParams.budget,
@@ -3038,7 +3038,7 @@ describe('SecurityTokenWrapper', () => {
         usdTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
       };
       const mockedUsdTieredStoParams = {
-        moduleName: ModuleName.usdTieredSTO,
+        moduleName: ModuleNames.UsdTieredSTO,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3083,7 +3083,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const usdTieredStoResult = await target.addModule({
-        moduleName: ModuleName.usdTieredSTO,
+        moduleName: ModuleNames.UsdTieredSTO,
         address: mockedUsdTieredStoParams.address,
         maxCost: mockedUsdTieredStoParams.maxCost,
         budget: mockedUsdTieredStoParams.budget,
@@ -3252,7 +3252,7 @@ describe('SecurityTokenWrapper', () => {
         wallet: '0x1111111111111111111111111111111111111111',
       };
       const mockedErc20DividendParams = {
-        moduleName: ModuleName.erc20DividendCheckpoint,
+        moduleName: ModuleNames.ERC20DividendCheckpoint,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3276,7 +3276,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const erc20DividendResult = await target.addModule({
-        moduleName: ModuleName.erc20DividendCheckpoint,
+        moduleName: ModuleNames.ERC20DividendCheckpoint,
         address: mockedErc20DividendParams.address,
         maxCost: mockedErc20DividendParams.maxCost,
         budget: mockedErc20DividendParams.budget,
@@ -3434,7 +3434,7 @@ describe('SecurityTokenWrapper', () => {
         wallet: '0x1111111111111111111111111111111111111111',
       };
       const mockedEtherDividendParams = {
-        moduleName: ModuleName.etherDividendCheckpoint,
+        moduleName: ModuleNames.EtherDividendCheckpoint,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3458,7 +3458,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const etherDividendResult = await target.addModule({
-        moduleName: ModuleName.etherDividendCheckpoint,
+        moduleName: ModuleNames.EtherDividendCheckpoint,
         address: mockedEtherDividendParams.address,
         maxCost: mockedEtherDividendParams.maxCost,
         budget: mockedEtherDividendParams.budget,

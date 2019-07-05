@@ -54,7 +54,7 @@ import {
   Subscribe,
   ModuleType,
   FundRaiseType,
-  ModuleName,
+  ModuleNames,
   Features,
   PERCENTAGE_DECIMALS,
   FULL_DECIMALS,
@@ -351,7 +351,7 @@ interface TransferOwnershipParams extends TxParams {
 }
 
 interface ModuleNameParams {
-  moduleName: ModuleName;
+  moduleName: ModuleNames;
 }
 
 interface WithdrawERC20Params extends TxParams {
@@ -451,7 +451,7 @@ interface ForceBurnParams extends TxParams {
 }
 
 interface AddModuleParams extends TxParams {
-  moduleName: ModuleName;
+  moduleName: ModuleNames;
   address: string;
   maxCost?: BigNumber;
   budget?: BigNumber;
@@ -465,35 +465,35 @@ interface AddModuleParams extends TxParams {
 
 interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
-    | ModuleName.generalPermissionManager
-    | ModuleName.generalTransferManager
-    | ModuleName.manualApprovalTransferManager
-    | ModuleName.volumeRestrictionTM;
+    | ModuleNames.GeneralPermissionManager
+    | ModuleNames.GeneralTransferManager
+    | ModuleNames.ManualApprovalTransferManager
+    | ModuleNames.VolumeRestrictionTM;
   data?: undefined;
 }
 
 interface AddCountTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.countTransferManager;
+  moduleName: ModuleNames.CountTransferManager;
   data: CountTransferManagerData;
 }
 
 interface AddPercentageTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.percentageTransferManager;
+  moduleName: ModuleNames.PercentageTransferManager;
   data: PercentageTransferManagerData;
 }
 
 interface AddDividendCheckpointParams extends AddModuleParams {
-  moduleName: ModuleName.etherDividendCheckpoint | ModuleName.erc20DividendCheckpoint;
+  moduleName: ModuleNames.EtherDividendCheckpoint | ModuleNames.ERC20DividendCheckpoint;
   data: DividendCheckpointData;
 }
 
 interface AddCappedSTOParams extends AddModuleParams {
-  moduleName: ModuleName.cappedSTO;
+  moduleName: ModuleNames.CappedSTO;
   data: CappedSTOData;
 }
 
 interface AddUSDTieredSTOParams extends AddModuleParams {
-  moduleName: ModuleName.usdTieredSTO;
+  moduleName: ModuleNames.UsdTieredSTO;
   data: USDTieredSTOData;
 }
 
@@ -1032,11 +1032,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
-      case ModuleName.countTransferManager:
+      case ModuleNames.CountTransferManager:
         iface = new ethers.utils.Interface(CountTransferManager.abi);
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
-      case ModuleName.percentageTransferManager:
+      case ModuleNames.PercentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
           valueToWei(
@@ -1046,7 +1046,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
-      case ModuleName.cappedSTO:
+      case ModuleNames.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
@@ -1058,7 +1058,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as CappedSTOData).fundsReceiver,
         ]);
         break;
-      case ModuleName.usdTieredSTO:
+      case ModuleNames.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
@@ -1084,12 +1084,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as USDTieredSTOData).usdTokens,
         ]);
         break;
-      case ModuleName.erc20DividendCheckpoint:
+      case ModuleNames.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
-      case ModuleName.etherDividendCheckpoint:
+      case ModuleNames.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);

@@ -101,25 +101,25 @@ export enum Features {
 }
 
 export enum PolymathContracts {
-  polyToken = 'PolyToken',
-  moduleRegistry = 'ModuleRegistry',
-  featureRegistry = 'FeatureRegistry',
-  securityTokenRegistry = 'SecurityTokenRegistry',
-  polyUsdOracle = 'PolyUsdOracle',
-  ethUsdOracle = 'EthUsdOracle',
+  PolyToken = 'PolyToken',
+  ModuleRegistry = 'ModuleRegistry',
+  FeatureRegistry = 'FeatureRegistry',
+  SecurityTokenRegistry = 'SecurityTokenRegistry',
+  PolyUsdOracle = 'PolyUsdOracle',
+  EthUsdOracle = 'EthUsdOracle',
 }
 
-export enum ModuleName {
-  generalPermissionManager = 'GeneralPermissionManager',
-  countTransferManager = 'CountTransferManager',
-  generalTransferManager = 'GeneralTransferManager',
-  manualApprovalTransferManager = 'ManualApprovalTransferManager',
-  percentageTransferManager = 'PercentageTransferManager',
-  volumeRestrictionTM = 'VolumeRestrictionTM',
-  cappedSTO = 'CappedSTO',
-  usdTieredSTO = 'USDTieredSTO',
-  erc20DividendCheckpoint = 'ERC20DividendCheckpoint',
-  etherDividendCheckpoint = 'EtherDividendCheckpoint',
+export enum ModuleNames {
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  UsdTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
 export enum Perms {
