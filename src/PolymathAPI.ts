@@ -31,6 +31,7 @@ import ModuleRegistryWrapper from './contract_wrappers/registries/module_registr
 import TokenWrapperFactory from './factories/tokenWrapperFactory';
 import ModuleWrapperFactory from './factories/moduleWrapperFactory';
 import FeatureRegistryWrapper from './contract_wrappers/registries/feature_registry_wrapper';
+import ERC20 from './contract_wrappers/tokens/erc20_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
 import ContractFactory from './factories/contractFactory';
@@ -55,6 +56,10 @@ export interface GetBalanceParams {
 export interface GetTokensParams {
   amount: BigNumber;
   address?: string;
+}
+
+export interface GetERC20WrapperParams {
+  address: string;
 }
 
 /**
@@ -205,6 +210,14 @@ export class PolymathAPI {
       recipient: address,
     });
   };
+
+  /**
+   * Get a wrapped token from an address
+   * @return TokenWrapper ERC20
+   */
+  public getERC20TokenWrapper = async (params: GetERC20WrapperParams): Promise<ERC20> => {
+    return this.tokenFactory.getERC20TokenInstanceFromAddress(params.address);
+  }
 
   /**
    * Get the account currently used by PolymathAPI
