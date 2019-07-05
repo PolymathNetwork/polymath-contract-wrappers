@@ -45,6 +45,7 @@ import {
   Perms,
   RestrictionTypes,
   PERCENTAGE_DECIMALS,
+  TransferResult
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -252,11 +253,7 @@ interface VerifyTransferParams extends TxParams {
 }
 
 interface HolderIndividualRestrictionParams extends TxParams {
-  holder: string;
-}
-
-interface ExemptAddressesParams {
-  index: number;
+  investor: string;
 }
 
 interface ChangeExemptWalletListParams extends TxParams {
@@ -378,22 +375,43 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    // SC: require(_isTransfer == false || msg.sender == securityToken,...
-    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      false,
-      params.txData,
-      params.safetyFactor,
     );
+    let transferResult: TransferResult = TransferResult.NA;
+    switch (result[0].toNumber()) {
+      case 0: {
+        transferResult = TransferResult.INVALID;
+        break;
+      }
+      case 1: {
+        transferResult = TransferResult.NA;
+        break;
+      }
+      case 2: {
+        transferResult = TransferResult.VALID;
+        break;
+      }
+      case 3: {
+        transferResult = TransferResult.FORCE_VALID;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return {
+      transferResult,
+      address: result[1]
+    }
   };
 
-  public individualRestriction = async (params: HolderIndividualRestrictionParams) => {
-    const result = await (await this.contract).individualRestriction.callAsync(params.holder);
+  public getIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
+    const result = await (await this.contract).getIndividualRestriction.callAsync(params.investor);
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
@@ -407,8 +425,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public defaultRestriction = async () => {
-    const result = await (await this.contract).defaultRestriction.callAsync();
+  public getDefaultRestriction = async () => {
+    const result = await (await this.contract).getDefaultRestriction.callAsync();
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
@@ -422,8 +440,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public defaultDailyRestriction = async () => {
-    const result = await (await this.contract).defaultDailyRestriction.callAsync();
+  public getDefaultDailyRestriction = async () => {
+    const result = await (await this.contract).getDefaultDailyRestriction.callAsync();
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
@@ -437,12 +455,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public exemptAddresses = async (params: ExemptAddressesParams) => {
-    return (await this.contract).exemptAddresses.callAsync(numberToBigNumber(params.index));
+  public getExemptAddress = async () => {
+    return (await this.contract).getExemptAddress.callAsync();
   };
 
-  public individualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
-    const result = await (await this.contract).individualDailyRestriction.callAsync(params.holder);
+  public getIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
+    const result = await (await this.contract).getIndividualDailyRestriction.callAsync(params.investor);
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;
     const decimals = await this.decimalsByRestrictionType(restrictionType);
@@ -620,12 +638,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
-      (await this.individualRestriction({ holder: params.holder })).endTime,
+      (await this.getIndividualRestriction({ investor: params.investor })).endTime,
       'Individual Restriction not set with end time',
     );
-    assert.isNonZeroETHAddressHex('holder', params.holder);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     return (await this.contract).removeIndividualRestriction.sendTransactionAsync(
-      params.holder,
+      params.investor,
       params.txData,
       params.safetyFactor,
     );
@@ -637,7 +655,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     Promise.all(
       params.holders.map(async holder =>
         assert.isNotDateZero(
-          (await this.individualRestriction({ holder })).endTime,
+          (await this.getIndividualRestriction({ investor: holder })).endTime,
           'Individual Restriction not set with end time',
         ),
       ),
@@ -652,12 +670,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
-      (await this.individualDailyRestriction({ holder: params.holder })).endTime,
+      (await this.getIndividualDailyRestriction({ investor: params.investor })).endTime,
       'Individual Daily Restriction not set with end time',
     );
-    assert.isNonZeroETHAddressHex('holder', params.holder);
+    assert.isNonZeroETHAddressHex('investor', params.investor);
     return (await this.contract).removeIndividualDailyRestriction.sendTransactionAsync(
-      params.holder,
+      params.investor,
       params.txData,
       params.safetyFactor,
     );
@@ -668,7 +686,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     Promise.all(
       params.holders.map(async holder =>
         assert.isNotDateZero(
-          (await this.individualRestriction({ holder })).endTime,
+          (await this.getIndividualRestriction({ investor: holder })).endTime,
           'Individual Restriction not set with end time',
         ),
       ),
@@ -683,14 +701,14 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeDefaultRestriction = async (params: TxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
-    assert.isNotDateZero((await this.defaultRestriction()).endTime, 'Individual Restriction not set with end time');
+    assert.isNotDateZero((await this.getDefaultRestriction()).endTime, 'Individual Restriction not set with end time');
     return (await this.contract).removeDefaultRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public removeDefaultDailyRestriction = async (params: TxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
-      (await this.defaultDailyRestriction()).endTime,
+      (await this.getDefaultDailyRestriction()).endTime,
       'Individual Restriction not set with end time',
     );
     return (await this.contract).removeDefaultDailyRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -873,12 +891,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public getExemptAddress = async () => {
-    return (await this.contract).getExemptAddress.callAsync();
-  };
-
   public getRestrictedData = async () => {
-    const result = await (await this.contract).getRestrictedData.callAsync();
+    const result = await (await this.contract).getRestrictionData.callAsync();
     const restrictionType = [];
     for (let i = 0; i < result[0].length; i += 1) {
       const type = new BigNumber(result[5][i]).toNumber() === 0 ? RestrictionTypes.Fixed : RestrictionTypes.Percentage;

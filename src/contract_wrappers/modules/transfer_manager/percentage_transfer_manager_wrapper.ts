@@ -25,6 +25,7 @@ import {
   GetLogs,
   Perms,
   PERCENTAGE_DECIMALS,
+  TransferResult,
 } from '../../../types';
 import { valueToWei, weiToValue } from '../../../utils/convert';
 
@@ -99,12 +100,11 @@ interface InvestorAddressParams {
   investorAddress: string;
 }
 
-interface VerifyTransferParams extends TxParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface ChangeHolderPercentageParams extends TxParams {
@@ -175,6 +175,44 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   public whitelist = async (params: InvestorAddressParams) => {
     assert.isETHAddressHex('investorAddress', params.investorAddress);
     return (await this.contract).whitelist.callAsync(params.investorAddress);
+  };
+
+  public verifyTransfer = async (params: VerifyTransferParams) => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const result = await (await this.contract).verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      valueToWei(params.amount, decimals),
+      params.data,
+    );
+    let transferResult: TransferResult = TransferResult.NA;
+    switch (result[0].toNumber()) {
+      case 0: {
+        transferResult = TransferResult.INVALID;
+        break;
+      }
+      case 1: {
+        transferResult = TransferResult.NA;
+        break;
+      }
+      case 2: {
+        transferResult = TransferResult.VALID;
+        break;
+      }
+      case 3: {
+        transferResult = TransferResult.FORCE_VALID;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return {
+      transferResult,
+      address: result[1]
+    }
   };
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {

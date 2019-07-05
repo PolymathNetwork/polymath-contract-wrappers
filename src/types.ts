@@ -99,6 +99,13 @@ export enum FlagsType {
   IsVolRestricted,
 }
 
+export enum TransferResult {
+  INVALID,
+  NA,
+  VALID,
+  FORCE_VALID,
+}
+
 export enum FeeType {
   tickerRegFee,
   stLaunchFee,
