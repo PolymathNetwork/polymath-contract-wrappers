@@ -239,23 +239,6 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public verifyTransfer = async (params: VerifyTransferParams) => {
-    assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
-    // SC: require(_isTransfer == false || msg.sender == securityToken,...
-    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
-    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
-      params.from,
-      params.to,
-      valueToWei(params.amount, decimals),
-      params.data,
-      false,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public addManualApproval = async (params: AddManualApprovalParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
