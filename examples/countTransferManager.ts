@@ -130,7 +130,7 @@ window.addEventListener('load', async () => {
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.issue({ investor: myAddress, value: new BigNumber(200), data: '' });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
 
