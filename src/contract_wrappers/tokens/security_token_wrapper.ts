@@ -1271,6 +1271,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
+  public upgradeModule = async (params: ModuleAddressTxParams) => {
+    assert.isETHAddressHex('moduleAddress', params.moduleAddress);
+    await this.checkOnlyOwner(params.txData);
+    await this.checkModuleExists(params.moduleAddress);
+    return (await this.contract).upgradeModule.sendTransactionAsync(
+        params.moduleAddress,
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
   /**
    * @return Returns the data associated to a module
    */

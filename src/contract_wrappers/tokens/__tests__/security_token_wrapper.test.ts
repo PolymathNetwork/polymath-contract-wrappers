@@ -1179,6 +1179,76 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('upgradeModule', () => {
+    test.todo('should fail as moduleAddress is not an Eth address');
+    test('should send the transaction to upgradeModule', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        moduleAddress: '0x1111111111111111111111111111111111111111',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.upgradeModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // getModule  expected
+      const expectedGetModuleString = 'Name';
+      const expectedGetModuleLabel = 'Label';
+      const expectedGetModuleNumbers = [new BigNumber(1), new BigNumber(2)];
+      const expectedGetModuleResult = [
+        stringToBytes32(expectedGetModuleString),
+        'stringstringstring',
+        'stringstringstring',
+        false,
+        expectedGetModuleNumbers,
+        stringToBytes32(expectedGetModuleLabel),
+      ];
+      const mockedGetModuleParams = {
+        moduleAddress: '0x1111111111111111111111111111111111111111',
+      };
+      // Mocked method
+      const mockedGetModuleMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getModule).thenReturn(instance(mockedGetModuleMethod));
+      // Stub the request
+      when(mockedGetModuleMethod.callAsync(mockedGetModuleParams.moduleAddress)).thenResolve(expectedGetModuleResult);
+
+      // Real call
+      const result = await target.upgradeModule(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.upgradeModule).once();
+      verify(
+          mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
   describe('removeModule', () => {
     test.todo('should fail as moduleAddress is not an Eth address');
     test('should send the transaction to removeModule', async () => {
