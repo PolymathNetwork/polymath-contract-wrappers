@@ -936,7 +936,7 @@ describe('ModuleRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'Pause', 'Unpause', 'ModuleUsed', 'ModuleRegistered', 'ModuleVerified', 'ModuleRemoved', 'OwnershipTransferred', encountered: Transfer`,
+          `Expected eventName to be one of: 'Pause', 'Unpause', 'ModuleUsed', 'ModuleRegistered', 'ModuleVerified', 'ModuleUnverified', 'ModuleRemoved', 'OwnershipTransferred', encountered: Transfer`,
         ),
       );
     });

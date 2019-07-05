@@ -176,7 +176,7 @@ describe('FeatureRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ChangeFeatureStatus', 'OwnershipRenounced', 'OwnershipTransferred', encountered: Transfer`,
+          `Expected eventName to be one of: 'OwnershipTransferred', 'ChangeFeatureStatus', encountered: Transfer`,
         ),
       );
     });

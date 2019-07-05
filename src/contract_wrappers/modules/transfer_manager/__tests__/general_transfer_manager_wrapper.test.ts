@@ -2,7 +2,7 @@
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { GeneralTransferManagerContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { GeneralTransferManagerContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -20,13 +20,13 @@ describe('GeneralTransferManagerWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralTransferManagerContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(GeneralTransferManagerContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new GeneralTransferManagerWrapper(

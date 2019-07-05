@@ -570,7 +570,7 @@ describe('CappedSTOWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'SetFundRaiseTypes', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
         ),
       );
     });

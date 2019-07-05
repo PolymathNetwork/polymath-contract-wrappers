@@ -112,7 +112,7 @@ describe('ERC20DetailedTokenWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'Approval', 'Transfer', encountered: ChangeExpiryLimit`),
+        new Error(`Expected eventName to be one of: 'Transfer', 'Approval', encountered: ChangeExpiryLimit`),
       );
     });
   });

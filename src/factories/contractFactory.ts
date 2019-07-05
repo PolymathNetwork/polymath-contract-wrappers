@@ -20,7 +20,7 @@ import {
   VolumeRestrictionTMContract,
   FeatureRegistryContract,
   ModuleRegistryContract,
-  SecurityTokenRegistryContract,
+  ISecurityTokenRegistryContract,
   PolymathRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import {
@@ -44,7 +44,7 @@ import {
   VolumeRestrictionTransferManager,
   FeatureRegistry,
   ModuleRegistry,
-  SecurityTokenRegistry,
+  ISecurityTokenRegistry,
   PolymathRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
@@ -238,9 +238,9 @@ export default class ContractFactory {
     );
   }
 
-  public async getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
-    return new SecurityTokenRegistryContract(
-      SecurityTokenRegistry.abi,
+  public async getSecurityTokenRegistryContract(): Promise<ISecurityTokenRegistryContract> {
+    return new ISecurityTokenRegistryContract(
+      ISecurityTokenRegistry.abi,
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.securityTokenRegistry),
       this.provider,
       this.contractDefaults,

@@ -10,7 +10,7 @@ import {
   ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
-  SecurityTokenRegistryContract,
+  ISecurityTokenRegistryContract,
   FeatureRegistryContract,
   ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
@@ -181,7 +181,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenRegistryContract = async (): Promise<SecurityTokenRegistryContract> => {
+  protected securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract> => {
     return this.contractFactory.getSecurityTokenRegistryContract();
   };
 
