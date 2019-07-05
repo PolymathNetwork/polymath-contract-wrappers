@@ -177,21 +177,6 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).whitelist.callAsync(params.investorAddress);
   };
 
-  public verifyTransfer = async (params: VerifyTransferParams) => {
-    assert.isETHAddressHex('from', params.from);
-    assert.isETHAddressHex('to', params.to);
-    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
-      params.from,
-      params.to,
-      valueToWei(params.amount, decimals),
-      params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
