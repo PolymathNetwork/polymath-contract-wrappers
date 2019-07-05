@@ -2,7 +2,7 @@
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
-import { VolumeRestrictionTMContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { VolumeRestrictionTMContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import { RestrictionTypes } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
@@ -24,13 +24,13 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: VolumeRestrictionTMContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(VolumeRestrictionTMContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new VolumeRestrictionTransferManagerWrapper(
