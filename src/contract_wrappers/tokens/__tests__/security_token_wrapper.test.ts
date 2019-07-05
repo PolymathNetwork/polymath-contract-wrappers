@@ -1249,6 +1249,50 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('upgradeToken', () => {
+    test('should send the transaction to upgradeToken', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.upgradeToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.upgradeToken(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.upgradeToken).once();
+      verify(
+          mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
   describe('removeModule', () => {
     test.todo('should fail as moduleAddress is not an Eth address');
     test('should send the transaction to removeModule', async () => {

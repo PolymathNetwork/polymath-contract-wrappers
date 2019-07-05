@@ -989,9 +989,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('moduleAddress', params.dataStore);
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeDataStore.sendTransactionAsync(
-        params.dataStore,
-        params.txData,
-        params.safetyFactor,
+      params.dataStore,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -1293,10 +1293,15 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleExists(params.moduleAddress);
     return (await this.contract).upgradeModule.sendTransactionAsync(
-        params.moduleAddress,
-        params.txData,
-        params.safetyFactor,
+      params.moduleAddress,
+      params.txData,
+      params.safetyFactor,
     );
+  };
+
+  public upgradeToken = async (params: TxParams) => {
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).upgradeToken.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   /**
