@@ -474,6 +474,13 @@ interface ModuleAddressTxParams extends TxParams {
 }
 
 /**
+ * @param datastore address
+ */
+interface DataStoreAddressParams extends TxParams {
+  dataStore: string;
+}
+
+/**
  * @param from sender of transfer
  * @param to receiver of transfer
  * @param value value of transfer
@@ -976,6 +983,16 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.name.length > 0, 'Name required');
     return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
+  };
+
+  public changeDataStore = async (params: DataStoreAddressParams) => {
+    assert.isETHAddressHex('moduleAddress', params.dataStore);
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).changeDataStore.sendTransactionAsync(
+        params.dataStore,
+        params.txData,
+        params.safetyFactor,
+    );
   };
 
   public getInvestors = async () => {

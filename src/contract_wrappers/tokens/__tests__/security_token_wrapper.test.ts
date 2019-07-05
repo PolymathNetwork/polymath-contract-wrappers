@@ -1609,6 +1609,52 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('changeDataStore', () => {
+    test.todo('should fail as moduleAddress is not an Eth address');
+    test('should send the transaction to changeDataStore', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        dataStore: '0x1111111111111111111111111111111111111111',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeDataStore).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.changeDataStore(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.changeDataStore).once();
+      verify(
+          mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
   describe('freezeTransfers', () => {
     test('should send the transaction to freezeTransfers', async () => {
       // Mocked parameters
