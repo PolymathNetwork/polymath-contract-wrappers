@@ -619,6 +619,40 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('balanceOfByPartition', () => {
+    test.todo('should fail as tokenHolder is not an Eth address');
+
+    test('should call to balanceOfByPartition', async () => {
+      const expectedResult = new BigNumber(1);
+      const mockedParams = {
+        tokenHolder: '0x1111111111111111111111111111111111111111',
+        partition: 'Partition',
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOfByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.partition, mockedParams.tokenHolder)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.balanceOfByPartition(mockedParams);
+      // Result expectation
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
+      // Verifications
+      verify(mockedContract.balanceOfByPartition).once();
+      verify(mockedMethod.callAsync(mockedParams.partition, mockedParams.tokenHolder)).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
   describe('getVersion', () => {
     test('should call to getVersion', async () => {
       const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
@@ -1195,7 +1229,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.upgradeModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1241,7 +1275,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.upgradeModule).once();
       verify(
-          mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModule).once();
       verify(mockedGetModuleMethod.callAsync(mockedParams.moduleAddress)).once();
@@ -1262,9 +1296,9 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.upgradeToken).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(
-          mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor),
-      ).thenResolve(expectedResult);
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1286,9 +1320,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.upgradeToken).once();
-      verify(
-          mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor),
-      ).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -1669,7 +1701,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.changeDataStore).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1693,7 +1725,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.changeDataStore).once();
       verify(
-          mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.dataStore, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
@@ -1715,7 +1747,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.changeTreasuryWallet).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(mockedParams.treasuryWallet, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.treasuryWallet, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1739,7 +1771,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.changeTreasuryWallet).once();
       verify(
-          mockedMethod.sendTransactionAsync(mockedParams.treasuryWallet, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.treasuryWallet, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });

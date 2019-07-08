@@ -606,6 +606,11 @@ interface BalanceOfAtParams {
   checkpointId: number;
 }
 
+interface BalanceOfByPartitionParams {
+  partition: string;
+  tokenHolder: string;
+}
+
 interface SetControllerParams extends TxParams {
   controller: string;
 }
@@ -1209,8 +1214,16 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
     return weiToValue(
-      await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
+      await(await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
       await this.decimals(),
+    );
+  };
+
+  public balanceOfByPartition = async (params: BalanceOfByPartitionParams) => {
+    assert.isETHAddressHex('investor', params.tokenHolder);
+    return weiToValue(
+        await (await this.contract).balanceOfByPartition.callAsync(params.partition, params.tokenHolder),
+        await this.decimals(),
     );
   };
 
