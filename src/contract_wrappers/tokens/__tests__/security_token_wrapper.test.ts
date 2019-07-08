@@ -2054,6 +2054,159 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('authorizeOperator', () => {
+    test.todo('should fail as operator is not an Eth address');
+    test('should send the transaction to authorizeOperator', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        operator: '0x2222222222222222222222222222222222222222',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.authorizeOperator).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.operator, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.authorizeOperator(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.authorizeOperator).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.operator, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+
+  describe('revokeOperator', () => {
+    test.todo('should fail as operator is not an Eth address');
+    test('should send the transaction to revokeOperator', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        operator: '0x2222222222222222222222222222222222222222',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.revokeOperator).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.operator, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.revokeOperator(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.revokeOperator).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.operator, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+    });
+  });
+
+  describe('authorizeOperatorByPartition', () => {
+    test.todo('should fail as operator is not an Eth address');
+    test('should send the transaction to authorizeOperatorByPartition', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        operator: '0x2222222222222222222222222222222222222222',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.authorizeOperatorByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.authorizeOperatorByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.authorizeOperatorByPartition).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+  describe('revokeOperatorByPartition', () => {
+    test.todo('should fail as operator is not an Eth address');
+    test('should send the transaction to revokeOperatorByPartition', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        operator: '0x2222222222222222222222222222222222222222',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.revokeOperatorByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.revokeOperatorByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.revokeOperatorByPartition).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
   describe('operatorTransferByPartition', () => {
     test.todo('should fail as from is not an Eth address');
     test.todo('should fail as to is not an Eth address');

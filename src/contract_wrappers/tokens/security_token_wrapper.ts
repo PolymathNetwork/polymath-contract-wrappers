@@ -618,6 +618,22 @@ interface TransferByPartitionParams extends TxParams {
   data: string;
 }
 
+interface AuthorizeOperatorParams extends TxParams {
+  operator: string;
+}
+
+interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
+  partition: string;
+}
+
+interface RevokeOperatorParams extends TxParams {
+  operator: string;
+}
+
+interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
+  partition: string;
+}
+
 interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
   from: string;
   operatorData: string;
@@ -1247,6 +1263,46 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.to,
       valueToWei(params.value, await this.decimals()),
       params.data,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public authorizeOperator = async (params: AuthorizeOperatorParams) => {
+    assert.isETHAddressHex('Operator', params.operator);
+    return (await this.contract).authorizeOperator.sendTransactionAsync(
+      params.operator,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public revokeOperator = async (params: AuthorizeOperatorParams) => {
+    assert.isETHAddressHex('Operator', params.operator);
+    return (await this.contract).revokeOperator.sendTransactionAsync(
+      params.operator,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public authorizeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams) => {
+    assert.isETHAddressHex('Operator', params.operator);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).authorizeOperatorByPartition.sendTransactionAsync(
+      stringToBytes32(params.partition),
+      params.operator,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public revokeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams) => {
+    assert.isETHAddressHex('Operator', params.operator);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).revokeOperatorByPartition.sendTransactionAsync(
+      stringToBytes32(params.partition),
+      params.operator,
       params.txData,
       params.safetyFactor,
     );
