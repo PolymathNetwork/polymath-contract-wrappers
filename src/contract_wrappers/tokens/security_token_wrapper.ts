@@ -611,6 +611,13 @@ interface BalanceOfByPartitionParams {
   tokenHolder: string;
 }
 
+interface TransferByPartitionParams extends TxParams {
+  partition: string;
+  to: string;
+  value: BigNumber;
+  data: string;
+}
+
 interface SetControllerParams extends TxParams {
   controller: string;
 }
@@ -1224,6 +1231,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return weiToValue(
         await (await this.contract).balanceOfByPartition.callAsync(stringToBytes32(params.partition), params.tokenHolder),
         await this.decimals(),
+    );
+  };
+
+  public transferByPartition = async (params: TransferByPartitionParams) => {
+    assert.isETHAddressHex('To', params.to);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).transferByPartition.sendTransactionAsync(
+        stringToBytes32(params.partition),
+        params.to,
+        valueToWei(params.value, await this.decimals()),
+        params.data,
+        params.txData,
+        params.safetyFactor,
     );
   };
 

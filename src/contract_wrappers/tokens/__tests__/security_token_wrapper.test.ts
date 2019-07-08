@@ -626,7 +626,7 @@ describe('SecurityTokenWrapper', () => {
       const expectedResult = new BigNumber(1);
       const mockedParams = {
         tokenHolder: '0x1111111111111111111111111111111111111111',
-        partition: 'Partition',
+        partition: 'UNLOCKED',
       };
 
       const expectedDecimalsResult = new BigNumber(18);
@@ -1987,6 +1987,63 @@ describe('SecurityTokenWrapper', () => {
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
+      ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('transferByPartition', () => {
+    test.todo('should fail as to is not an Eth address');
+    test('should send the transaction to transferByPartition', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        data: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.transferByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              objectContaining(stringToBytes32((mockedParams.partition))),
+              mockedParams.to,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.transferByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.transferByPartition).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              objectContaining(stringToBytes32((mockedParams.partition))),
+              mockedParams.to,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              mockedParams.data,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
