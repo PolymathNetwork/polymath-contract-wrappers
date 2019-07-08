@@ -2663,13 +2663,13 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.redeemByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.partition,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          stringToBytes32(mockedParams.data),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.partition,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -2696,13 +2696,91 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.redeemByPartition).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.partition,
-          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          stringToBytes32(mockedParams.data),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+          mockedMethod.sendTransactionAsync(
+              mockedParams.partition,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(params.owner)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
+    });
+  });
+
+  describe('operatorRedeemByPartition', () => {
+    test('should send the transaction to operatorRedeemByPartition', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        tokenHolder: '0x9999999999999999999999999999999999999999',
+        value: new BigNumber(1),
+        data: 'string',
+        operatorData: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.operatorRedeemByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.partition,
+              mockedParams.tokenHolder,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              stringToBytes32(mockedParams.operatorData),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const owner = '0x5555555555555555555555555555555555555555';
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([owner]);
+
+      const expectedBalanceResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
+      const params = {
+        owner,
+      };
+      // Mocked method
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      // Stub the request
+      when(mockedBalanceMethod.callAsync(params.owner)).thenResolve(expectedBalanceResult);
+
+      // Real call
+      const result = await target.operatorRedeemByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.operatorRedeemByPartition).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.partition,
+              mockedParams.tokenHolder,
+              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+              stringToBytes32(mockedParams.data),
+              stringToBytes32(mockedParams.operatorData),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
       ).once();
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();

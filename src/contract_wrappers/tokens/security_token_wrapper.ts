@@ -595,6 +595,11 @@ interface RedeemByPartitionParams extends RedeemParams {
   partition: string;
 }
 
+interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
+  tokenHolder: string;
+  operatorData: string;
+}
+
 interface RedeemFromParams extends TxParams {
   from: string;
   value: BigNumber;
@@ -1192,11 +1197,26 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
     return (await this.contract).redeemByPartition.sendTransactionAsync(
-      params.partition,
-      valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data),
-      params.txData,
-      params.safetyFactor,
+        params.partition,
+        valueToWei(params.value, await this.decimals()),
+        stringToBytes32(params.data),
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
+  public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
+    await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
+    assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
+        params.partition,
+        params.tokenHolder,
+        valueToWei(params.value, await this.decimals()),
+        stringToBytes32(params.data),
+        stringToBytes32(params.operatorData),
+        params.txData,
+        params.safetyFactor,
     );
   };
 
