@@ -639,7 +639,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.balanceOfByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(mockedParams.partition, mockedParams.tokenHolder)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.balanceOfByPartition(mockedParams);
@@ -647,7 +647,7 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.balanceOfByPartition).once();
-      verify(mockedMethod.callAsync(mockedParams.partition, mockedParams.tokenHolder)).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder)).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });

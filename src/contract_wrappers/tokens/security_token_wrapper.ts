@@ -1222,7 +1222,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public balanceOfByPartition = async (params: BalanceOfByPartitionParams) => {
     assert.isETHAddressHex('investor', params.tokenHolder);
     return weiToValue(
-        await (await this.contract).balanceOfByPartition.callAsync(params.partition, params.tokenHolder),
+        await (await this.contract).balanceOfByPartition.callAsync(stringToBytes32(params.partition), params.tokenHolder),
         await this.decimals(),
     );
   };
