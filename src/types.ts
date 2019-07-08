@@ -33,6 +33,7 @@ import {
   PolyTokenFaucetEvents,
   PolymathRegistryEvents,
   SecurityTokenRegistryEvents,
+  ISecurityTokenRegistryEvents,
   SecurityTokenEvents,
   USDTieredSTOFactoryEvents,
   USDTieredSTOEvents,
@@ -215,6 +216,7 @@ export type ContractEvents =
   | PolyTokenFaucetEvents
   | PolymathRegistryEvents
   | SecurityTokenRegistryEvents
+  | ISecurityTokenRegistryEvents
   | SecurityTokenEvents
   | USDTieredSTOFactoryEvents
   | USDTieredSTOEvents
