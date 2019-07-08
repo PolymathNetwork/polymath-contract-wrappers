@@ -8,7 +8,7 @@ import {
   FeatureRegistryContract,
   ModuleFactoryContract,
 } from '@polymathnetwork/abi-wrappers';
-import { Features, ModuleType } from '../../../types';
+import { Feature, ModuleType } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import ModuleRegistryWrapper from '../module_registry_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -65,7 +65,7 @@ describe('ModuleRegistryWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked owner from module factory contract
       const moduleFactoryAddress = '0x3333333333333333333333333333333333333333';
@@ -145,7 +145,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedModuleFactoryContract.getTypes).once();
       verify(mockedGetTypesMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedContractOwnerMethod.callAsync()).once();
       verify(mockedContract.owner).once();
       verify(mockedContract.isPaused).once();
