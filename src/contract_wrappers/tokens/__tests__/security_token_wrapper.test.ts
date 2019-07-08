@@ -639,7 +639,9 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.balanceOfByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder)).thenResolve(expectedResult);
+      when(
+        mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder),
+      ).thenResolve(expectedResult);
 
       // Real call
       const result = await target.balanceOfByPartition(mockedParams);
@@ -647,7 +649,9 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.balanceOfByPartition).once();
-      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder)).once();
+      verify(
+        mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.partition)), mockedParams.tokenHolder),
+      ).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });
@@ -2018,14 +2022,14 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.transferByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(stringToBytes32((mockedParams.partition))),
-              mockedParams.to,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -2036,14 +2040,78 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.transferByPartition).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(stringToBytes32((mockedParams.partition))),
-              mockedParams.to,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('operatorTransferByPartition', () => {
+    test.todo('should fail as from is not an Eth address');
+    test.todo('should fail as to is not an Eth address');
+    test('should send the transaction to transferByPartition', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        from: '0x2222222222222222222222222222222222222222',
+        to: '0x2222222222222222222222222222222222222222',
+        value: new BigNumber(1),
+        data: 'string',
+        operatorData: 'string',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.operatorTransferByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.operatorData,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.operatorTransferByPartition(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.operatorTransferByPartition).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+          mockedParams.operatorData,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();

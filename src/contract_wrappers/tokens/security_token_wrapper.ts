@@ -618,6 +618,11 @@ interface TransferByPartitionParams extends TxParams {
   data: string;
 }
 
+interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
+  from: string;
+  operatorData: string;
+}
+
 interface SetControllerParams extends TxParams {
   controller: string;
 }
@@ -1221,7 +1226,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
     return weiToValue(
-      await(await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
+      await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
       await this.decimals(),
     );
   };
@@ -1229,8 +1234,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public balanceOfByPartition = async (params: BalanceOfByPartitionParams) => {
     assert.isETHAddressHex('investor', params.tokenHolder);
     return weiToValue(
-        await (await this.contract).balanceOfByPartition.callAsync(stringToBytes32(params.partition), params.tokenHolder),
-        await this.decimals(),
+      await (await this.contract).balanceOfByPartition.callAsync(stringToBytes32(params.partition), params.tokenHolder),
+      await this.decimals(),
     );
   };
 
@@ -1238,12 +1243,28 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('To', params.to);
     assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
     return (await this.contract).transferByPartition.sendTransactionAsync(
-        stringToBytes32(params.partition),
-        params.to,
-        valueToWei(params.value, await this.decimals()),
-        params.data,
-        params.txData,
-        params.safetyFactor,
+      stringToBytes32(params.partition),
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
+    assert.isETHAddressHex('To', params.to);
+    assert.isETHAddressHex('From', params.from);
+    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
+      stringToBytes32(params.partition),
+      params.from,
+      params.to,
+      valueToWei(params.value, await this.decimals()),
+      params.data,
+      params.operatorData,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
