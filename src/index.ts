@@ -8,7 +8,7 @@ export { default as PolymathRegistry } from './contract_wrappers/registries/poly
 export { default as SecurityTokenRegistry } from './contract_wrappers/registries/security_token_registry_wrapper';
 export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
 export { default as USDTieredSTO } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-export { default as DetailedERC20 } from './contract_wrappers/tokens/erc20_wrapper';
+export { default as ERC20 } from './contract_wrappers/tokens/erc20_wrapper';
 export {
   default as ERC20DividendCheckpoint,
 } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
