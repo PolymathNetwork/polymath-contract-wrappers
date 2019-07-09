@@ -62,6 +62,7 @@
     "jest": "^24.7.1",
     "lint-staged": ">=8",
     "prettier": "^1.16.4",
+    "semantic-release": "^15.13.18",
     "semantic-release-cli": "^5.1.1",
     "shx": "^0.3.2",
     "ts-jest": "^24.0.1",
