@@ -1346,7 +1346,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public setController = async (params: SetControllerParams) => {
     await this.checkOnlyOwner(params.txData);
-    await this.checkControllerEnabled();
+    await this.checkIsControllable();
     assert.isETHAddressHex('controller', params.controller);
     return (await this.contract).setController.sendTransactionAsync(
       params.controller,
@@ -1357,7 +1357,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public disableController = async (params: DisableControllerParams) => {
     await this.checkOnlyOwner(params.txData);
-    await this.checkControllerEnabled();
+    await this.checkIsControllable();
     return (await this.contract).disableController.sendTransactionAsync(
       params.signature,
       params.txData,
@@ -1598,7 +1598,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkControllerEnabled = async () => {
+  private checkIsControllable = async () => {
     assert.assert(!(await this.controllerDisabled()), 'Controller currently disabled');
   };
 
