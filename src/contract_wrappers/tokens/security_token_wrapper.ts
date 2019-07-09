@@ -67,6 +67,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  bigNumberToDate,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -942,7 +943,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public getCheckpointTimes = async () => {
-    return (await this.contract).getCheckpointTimes.callAsync();
+    const timestamps = await (await this.contract).getCheckpointTimes.callAsync();
+
+    return timestamps.map(bigNumberToDate);
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
