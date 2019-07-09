@@ -1637,7 +1637,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkIsControllable = async () => {
-    assert.assert(!(await this.controllerDisabled()), 'Controller currently disabled');
+    assert.assert(await this.isControllable(), 'Controller currently disabled');
   };
 
   private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {

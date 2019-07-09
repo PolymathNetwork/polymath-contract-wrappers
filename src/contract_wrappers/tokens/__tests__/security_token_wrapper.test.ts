@@ -2975,13 +2975,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedControllerResult = false;
+      const expectedIsControllableResult = true;
       // Mocked method
-      const mockedControllerMethod = mock(MockedCallMethod);
+      const mockedIsControllableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.controllerDisabled).thenReturn(instance(mockedControllerMethod));
+      when(mockedContract.isControllable).thenReturn(instance(mockedIsControllableMethod));
       // Stub the request
-      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+      when(mockedIsControllableMethod.callAsync()).thenResolve(expectedIsControllableResult);
 
       // Real call
       const result = await target.setController(mockedParams);
@@ -2995,8 +2995,8 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
-      verify(mockedContract.controllerDisabled).once();
-      verify(mockedControllerMethod.callAsync()).once();
+      verify(mockedContract.isControllable).once();
+      verify(mockedIsControllableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -3030,13 +3030,13 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedControllerResult = false;
+      const expectedIsControllableResult = true;
       // Mocked method
-      const mockedControllerMethod = mock(MockedCallMethod);
+      const mockedIsControllableMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.controllerDisabled).thenReturn(instance(mockedControllerMethod));
+      when(mockedContract.isControllable).thenReturn(instance(mockedIsControllableMethod));
       // Stub the request
-      when(mockedControllerMethod.callAsync()).thenResolve(expectedControllerResult);
+      when(mockedIsControllableMethod.callAsync()).thenResolve(expectedIsControllableResult);
 
       // Real call
       const result = await target.disableController(mockedParams);
@@ -3050,8 +3050,8 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
-      verify(mockedContract.controllerDisabled).once();
-      verify(mockedControllerMethod.callAsync()).once();
+      verify(mockedContract.isControllable).once();
+      verify(mockedIsControllableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
