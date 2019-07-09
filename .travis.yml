@@ -9,3 +9,9 @@ script:
   - yarn run build:ci
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then yarn coveralls; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn jest; fi'
+jobs:
+  include:
+    - stage: release
+      node_js: lts/*
+      script:
+        - npm run semantic-release
