@@ -31,6 +31,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  stringArrayToBytes32Array, bytes32ArrayToStringArray,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -129,6 +130,39 @@ describe('SecurityTokenWrapper', () => {
         mockedMethod.callAsync(
           objectContaining(stringToBytes32(mockedParams.partition)),
           mockedParams.operator,
+          mockedParams.tokenHolder,
+        ),
+      ).once();
+    });
+  });
+
+  describe('partitionsOf', () => {
+    test('should call to partitionsOf', async () => {
+      const expectedResult = stringArrayToBytes32Array(['LOCKED', 'UNLOCKED']);
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        operator: '0x5555555555555555555555555555555555555555',
+        tokenHolder: '0x4444444444444444444444444444444444444444',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.partitionsOf).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.tokenHolder,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.partitionsOf(mockedParams);
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+      // Verifications
+      verify(mockedContract.partitionsOf).once();
+      verify(
+        mockedMethod.callAsync(
           mockedParams.tokenHolder,
         ),
       ).once();
@@ -4840,6 +4874,30 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('getAllDocuments', () => {
+    test('should call to getAllDocuments', async () => {
+      const expectedResult = stringArrayToBytes32Array([
+        'DOC1',
+        'DOC2',
+      ]);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllDocuments).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllDocuments();
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+      // Verifications
+      verify(mockedContract.getAllDocuments).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 

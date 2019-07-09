@@ -78,7 +78,7 @@ import {
   bytes32ToString,
   valueToWei,
   valueArrayToWeiArray,
-  weiToValue,
+  weiToValue, bytes32ArrayToStringArray, bigNumberToDate,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import ModuleFactoryWrapper from '../modules/module_factory_wrapper';
@@ -461,6 +461,10 @@ interface IsOperatorForPartitionParams extends IsOperatorParams {
   partition: string;
 }
 
+interface PartitionsOfParams {
+  tokenHolder: string;
+}
+
 interface FreezeIssuanceParams extends TxParams {
   signature: string;
 }
@@ -501,7 +505,7 @@ interface SetDocumentParams extends TxParams {
 /**
  * @param name
  */
-interface RemoveDocumentParams extends TxParams {
+interface DocumentParams extends TxParams {
   name: string;
 }
 
@@ -814,6 +818,12 @@ interface ModuleData {
   label: string;
 }
 
+interface DocumentData {
+  documentUri: string;
+  documentHash: string;
+  documentTime: Date;
+}
+
 interface CanTransferFromData {
   /** Status Code */
   statusCode: string;
@@ -885,6 +895,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.operator,
       params.tokenHolder,
     );
+  };
+
+  public partitionsOf = async (params: PartitionsOfParams): Promise<string[]> => {
+    const partitions = await (await this.contract).partitionsOf.callAsync(
+        params.tokenHolder,
+    );
+    return bytes32ArrayToStringArray(partitions);
   };
 
   /**
@@ -1596,13 +1613,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public removeDocument = async (params: RemoveDocumentParams) => {
+  public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).removeDocument.sendTransactionAsync(
       stringToBytes32(params.name),
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  public getAllDocuments = async (): Promise <string[]> => {
+    return bytes32ArrayToStringArray(await (await this.contract).getAllDocuments.callAsync());
   };
 
   /**
