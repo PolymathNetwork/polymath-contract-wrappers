@@ -2663,13 +2663,13 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.redeemByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.partition,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              stringToBytes32(mockedParams.data),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.partition,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          stringToBytes32(mockedParams.data),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -2696,13 +2696,13 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.redeemByPartition).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.partition,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              stringToBytes32(mockedParams.data),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.partition,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          stringToBytes32(mockedParams.data),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
@@ -2737,15 +2737,15 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.operatorRedeemByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.partition,
-              mockedParams.tokenHolder,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              stringToBytes32(mockedParams.data),
-              stringToBytes32(mockedParams.operatorData),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.partition,
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          stringToBytes32(mockedParams.data),
+          stringToBytes32(mockedParams.operatorData),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -2772,15 +2772,15 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.operatorRedeemByPartition).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.partition,
-              mockedParams.tokenHolder,
-              objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-              stringToBytes32(mockedParams.data),
-              stringToBytes32(mockedParams.operatorData),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.partition,
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          stringToBytes32(mockedParams.data),
+          stringToBytes32(mockedParams.operatorData),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.balanceOf).once();
       verify(mockedBalanceMethod.callAsync(params.owner)).once();
@@ -4599,6 +4599,124 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContract.address).once();
+    });
+  });
+
+  describe('setDocument', () => {
+    test.todo('should fail if name is 0 length');
+    test.todo('should fail if uri is 0 length');
+    test('should send the transaction to setDocument', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        name: 'Name',
+        uri: 'Uri',
+        documentHash: 'Hash',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.setDocument).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.uri,
+          objectContaining(stringToBytes32(mockedParams.documentHash)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.setDocument(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.setDocument).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.uri,
+          objectContaining(stringToBytes32(mockedParams.documentHash)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('removeDocument', () => {
+    test.todo('should fail if name is 0 length');
+    test.todo('should fail if uri is 0 length');
+    test('should send the transaction to removeDocument', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        name: 'Name',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.removeDocument).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.removeDocument(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.removeDocument).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(stringToBytes32(mockedParams.name)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 

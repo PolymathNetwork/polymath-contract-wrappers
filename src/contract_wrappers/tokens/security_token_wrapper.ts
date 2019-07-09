@@ -481,6 +481,22 @@ interface DataStoreAddressParams extends TxParams {
 }
 
 /**
+ * @param name, uri, documentHash
+ */
+interface SetDocumentParams extends TxParams {
+  name: string;
+  uri: string;
+  documentHash: string;
+}
+
+/**
+ * @param name
+ */
+interface RemoveDocumentParams extends TxParams {
+  name: string;
+}
+
+/**
  * @param treasuryWallet address
  */
 interface ChangeTreasuryWalletParams extends TxParams {
@@ -1197,11 +1213,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
     return (await this.contract).redeemByPartition.sendTransactionAsync(
-        params.partition,
-        valueToWei(params.value, await this.decimals()),
-        stringToBytes32(params.data),
-        params.txData,
-        params.safetyFactor,
+      params.partition,
+      valueToWei(params.value, await this.decimals()),
+      stringToBytes32(params.data),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -1210,13 +1226,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
     assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
-        params.partition,
-        params.tokenHolder,
-        valueToWei(params.value, await this.decimals()),
-        stringToBytes32(params.data),
-        stringToBytes32(params.operatorData),
-        params.txData,
-        params.safetyFactor,
+      params.partition,
+      params.tokenHolder,
+      valueToWei(params.value, await this.decimals()),
+      stringToBytes32(params.data),
+      stringToBytes32(params.operatorData),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
@@ -1527,6 +1543,28 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       partition: bytes32ToString(result[2]),
     };
     return typedResult;
+  };
+
+  public setDocument = async (params: SetDocumentParams) => {
+    assert.assert(params.name.length > 0, 'Bad name');
+    assert.assert(params.uri.length > 0, 'Bad uri');
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).setDocument.sendTransactionAsync(
+      stringToBytes32(params.name),
+      params.uri,
+      stringToBytes32(params.documentHash),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public removeDocument = async (params: RemoveDocumentParams) => {
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).removeDocument.sendTransactionAsync(
+      stringToBytes32(params.name),
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
