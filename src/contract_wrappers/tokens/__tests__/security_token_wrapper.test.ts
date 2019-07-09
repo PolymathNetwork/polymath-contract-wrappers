@@ -74,6 +74,67 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('isOperator', () => {
+    test('should call to isOperator', async () => {
+      const expectedResult = true;
+      const mockedParams = {
+        operator: '0x5555555555555555555555555555555555555555',
+        tokenHolder: '0x4444444444444444444444444444444444444444',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isOperator).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.operator, mockedParams.tokenHolder)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isOperator(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isOperator).once();
+      verify(mockedMethod.callAsync(mockedParams.operator, mockedParams.tokenHolder)).once();
+    });
+  });
+
+  describe('isOperatorForPartition', () => {
+    test('should call to isOperatorForPartition', async () => {
+      const expectedResult = true;
+      const mockedParams = {
+        partition: 'UNLOCKED',
+        operator: '0x5555555555555555555555555555555555555555',
+        tokenHolder: '0x4444444444444444444444444444444444444444',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isOperatorForPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.tokenHolder,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isOperatorForPartition(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isOperatorForPartition).once();
+      verify(
+        mockedMethod.callAsync(
+          objectContaining(stringToBytes32(mockedParams.partition)),
+          mockedParams.operator,
+          mockedParams.tokenHolder,
+        ),
+      ).once();
+    });
+  });
+
   describe('currentCheckpointId', () => {
     test('should call to currentCheckpointId', async () => {
       const expectedResult = new BigNumber(1);
@@ -741,6 +802,27 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.getModulesByType).once();
       verify(mockedMethod.callAsync(mockedParams.type)).once();
+    });
+  });
+
+  describe('getTreasuryWallet', () => {
+    test('should call to getTreasuryWallet', async () => {
+      const expectedResult = '0x0123456789012345678901234567890123456789';
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTreasuryWallet).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTreasuryWallet();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTreasuryWallet).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 

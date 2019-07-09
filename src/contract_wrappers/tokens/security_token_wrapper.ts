@@ -452,6 +452,15 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTokenUpgradedEventArgs>[]>;
 }
 
+interface IsOperatorParams {
+  operator: string;
+  tokenHolder: string;
+}
+
+interface IsOperatorForPartitionParams extends IsOperatorParams {
+  partition: string;
+}
+
 interface FreezeIssuanceParams extends TxParams {
   signature: string;
 }
@@ -864,6 +873,18 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    */
   public currentCheckpointId = async () => {
     return (await this.contract).currentCheckpointId.callAsync();
+  };
+
+  public isOperator = async (params: IsOperatorParams): Promise<boolean> => {
+    return (await this.contract).isOperator.callAsync(params.operator, params.tokenHolder);
+  };
+
+  public isOperatorForPartition = async (params: IsOperatorForPartitionParams): Promise<boolean> => {
+    return (await this.contract).isOperatorForPartition.callAsync(
+      stringToBytes32(params.partition),
+      params.operator,
+      params.tokenHolder,
+    );
   };
 
   /**
@@ -1435,6 +1456,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    */
   public getModulesByType = async (params: ModuleTypeParams) => {
     return (await this.contract).getModulesByType.callAsync(params.type);
+  };
+
+  public getTreasuryWallet = async (): Promise<string> => {
+    return (await this.contract).getTreasuryWallet.callAsync();
   };
 
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
