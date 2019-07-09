@@ -411,6 +411,47 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('getInvestorsSubsetAt', () => {
+    test('should call to getInvestorsSubsetAt', async () => {
+      const expectedResult = [
+        '0x0123456789012345678901234567890123456781',
+        '0x0123456789012345678901234567890123456782',
+        '0x0123456789012345678901234567890123456783',
+      ];
+      const mockedParams = {
+        checkpointId: 1,
+        start: 2,
+        end: 4,
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInvestorsSubsetAt).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInvestorsSubsetAt(mockedParams);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getInvestorsSubsetAt).once();
+      verify(
+        mockedMethod.callAsync(
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
+        ),
+      ).once();
+    });
+  });
+
   describe('iterateInvestors', () => {
     test('should call to iterateInvestors', async () => {
       const expectedResult = [

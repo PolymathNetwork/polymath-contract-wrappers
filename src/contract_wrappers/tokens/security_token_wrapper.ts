@@ -563,6 +563,11 @@ interface CheckpointIdParams {
   checkpointId: number;
 }
 
+interface GetInvestorsSubsetAtParams extends CheckpointIdParams {
+  start: number;
+  end: number;
+}
+
 interface IterateInvestorsParams {
   start: number;
   end: number;
@@ -1072,6 +1077,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public getInvestorsAt = async (params: CheckpointIdParams) => {
     return (await this.contract).getInvestorsAt.callAsync(numberToBigNumber(params.checkpointId));
+  };
+
+  public getInvestorsSubsetAt = async (params: GetInvestorsSubsetAtParams) => {
+    return (await this.contract).getInvestorsSubsetAt.callAsync(
+      numberToBigNumber(params.checkpointId),
+      numberToBigNumber(params.start),
+      numberToBigNumber(params.end),
+    );
   };
 
   public iterateInvestors = async (params: IterateInvestorsParams) => {
