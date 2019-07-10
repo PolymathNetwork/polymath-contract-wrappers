@@ -956,6 +956,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).isIssuable.callAsync();
   };
 
+  public isOwner = async (): Promise<boolean> => {
+    return (await this.contract).isOwner.callAsync();
+  };
+
   public isControllable = async () => {
     return (await this.contract).isControllable.callAsync();
   };
