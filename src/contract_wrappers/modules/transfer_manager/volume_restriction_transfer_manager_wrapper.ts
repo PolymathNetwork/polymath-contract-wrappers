@@ -891,7 +891,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public getRestrictedData = async () => {
+  public getRestrictionData = async () => {
     const result = await (await this.contract).getRestrictionData.callAsync();
     const restrictionType = [];
     for (let i = 0; i < result[0].length; i += 1) {

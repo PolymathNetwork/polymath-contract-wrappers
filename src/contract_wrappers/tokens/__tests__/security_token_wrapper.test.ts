@@ -322,6 +322,27 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+
+  describe('isOwner', () => {
+    test('should call to isOwner', async () => {
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isOwner).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isOwner();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isOwner).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('isControllable', () => {
     test('should call to isControllable', async () => {
       const expectedResult = true;
@@ -2011,7 +2032,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = false;
+      const expectedFrozenResult = true;
       // Mocked method
       const mockedFrozenMethod = mock(MockedCallMethod);
       // Stub the method
