@@ -3,8 +3,10 @@ module.exports = {
   branches: [
     'master',
     {
+      channel: 'beta',
+      type: 'prerelease',
       name: 'develop',
-      prerelease: true,
+      prerelease: 'beta',
     },
   ],
   /**
