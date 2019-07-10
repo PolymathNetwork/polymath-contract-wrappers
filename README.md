@@ -78,7 +78,7 @@ yarn jest
 
 ## Deployment
 
-** Pending, should run a prepublish script on CI or use Semantic Releases**
+** Pending description of conventional commits and semantic release**
 
 ## Sandbox
 
