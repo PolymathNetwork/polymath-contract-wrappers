@@ -18,7 +18,7 @@ import {
   ISecurityTokenRegistryProtocolFactorySetEventArgs,
   ISecurityTokenRegistryLatestVersionSetEventArgs,
   ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import { ISecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
@@ -521,7 +521,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (address: string): Promise<SecurityTokenContract> => {
+  protected securityTokenContract = async (address: string): Promise<ISecurityTokenContract> => {
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
@@ -605,10 +605,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public refreshSecurityToken = async (params: RefreshSecurityTokenParams) => {
     await this.checkWhenNotPausedOrOwner();
-    await this.checkOnlyOwner();
     assert.assert(params.name.length > 0, 'Name is empty');
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
-    assert.isNonZeroETHAddressHex(params.treasuryWallet, '0x0 not allowed');
+    assert.isNonZeroETHAddressHex('treasuryWallet', params.treasuryWallet);
     const tickerDetails = await this.getTickerDetails({
       tokenName: params.ticker,
     });
@@ -707,7 +706,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public registerNewTicker = async (params: RegisterNewTickerParams) => {
     await this.checkWhenNotPausedOrOwner();
-    assert.isNonZeroETHAddressHex(params.owner, 'Bad address');
+    assert.isNonZeroETHAddressHex('owner', params.owner);
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(
       await this.isTickerAvailable({
@@ -732,7 +731,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(params.expiryDate.getTime() > new Date(0).getTime(), 'Bad expiry date');
     assert.assert(params.registrationDate.getTime() > new Date(0).getTime(), 'Bad registration date');
-    assert.isNonZeroETHAddressHex(params.owner, 'Bad owner address');
+    assert.isNonZeroETHAddressHex('owner', params.owner);
     return (await this.contract).modifyExistingTicker.sendTransactionAsync(
       params.owner,
       params.ticker,
@@ -751,7 +750,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     await this.checkOnlyOwner();
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(params.deployedAt.getTime() > new Date(0).getTime(), 'Bad deployed date');
-    assert.isNonZeroETHAddressHex(params.owner, 'Bad owner address');
+    assert.isNonZeroETHAddressHex('owner', params.owner);
     return (await this.contract).modifyExistingSecurityToken.sendTransactionAsync(
       params.ticker,
       params.owner,
