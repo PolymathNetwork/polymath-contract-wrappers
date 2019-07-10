@@ -1152,7 +1152,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public unfreezeTransfers = async (params: TxParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(!(await this.transfersFrozen()), 'Transfers are not frozen');
+    assert.assert((await this.transfersFrozen()), 'Transfers are not frozen');
     return (await this.contract).unfreezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 

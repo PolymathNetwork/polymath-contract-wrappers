@@ -2032,7 +2032,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedFrozenResult = false;
+      const expectedFrozenResult = true;
       // Mocked method
       const mockedFrozenMethod = mock(MockedCallMethod);
       // Stub the method
