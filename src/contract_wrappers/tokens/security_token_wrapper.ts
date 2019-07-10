@@ -78,7 +78,9 @@ import {
   bytes32ToString,
   valueToWei,
   valueArrayToWeiArray,
-  weiToValue, bytes32ArrayToStringArray, bigNumberToDate,
+  weiToValue,
+  bytes32ArrayToStringArray,
+  bigNumberToDate,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import ModuleFactoryWrapper from '../modules/module_factory_wrapper';
@@ -898,9 +900,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public partitionsOf = async (params: PartitionsOfParams): Promise<string[]> => {
-    const partitions = await (await this.contract).partitionsOf.callAsync(
-        params.tokenHolder,
-    );
+    const partitions = await (await this.contract).partitionsOf.callAsync(params.tokenHolder);
     return bytes32ArrayToStringArray(partitions);
   };
 
@@ -1622,7 +1622,20 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public getAllDocuments = async (): Promise <string[]> => {
+  /**
+   * @return Returns the data associated to a module
+   */
+  public getDocument = async (params: DocumentParams) => {
+    const result = await (await this.contract).getDocument.callAsync(stringToBytes32(params.name));
+    const typedResult: DocumentData = {
+      documentUri: result[0],
+      documentHash: bytes32ToString(result[1]),
+      documentTime: bigNumberToDate(result[2]),
+    };
+    return typedResult;
+  };
+
+  public getAllDocuments = async (): Promise<string[]> => {
     return bytes32ArrayToStringArray(await (await this.contract).getAllDocuments.callAsync());
   };
 

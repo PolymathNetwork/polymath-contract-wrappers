@@ -31,7 +31,8 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
-  stringArrayToBytes32Array, bytes32ArrayToStringArray,
+  stringArrayToBytes32Array,
+  bytes32ArrayToStringArray,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -149,11 +150,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the method
       when(mockedContract.partitionsOf).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(
-        mockedMethod.callAsync(
-          mockedParams.tokenHolder,
-        ),
-      ).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(mockedParams.tokenHolder)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.partitionsOf(mockedParams);
@@ -161,11 +158,7 @@ describe('SecurityTokenWrapper', () => {
       expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
       // Verifications
       verify(mockedContract.partitionsOf).once();
-      verify(
-        mockedMethod.callAsync(
-          mockedParams.tokenHolder,
-        ),
-      ).once();
+      verify(mockedMethod.callAsync(mockedParams.tokenHolder)).once();
     });
   });
 
@@ -4877,12 +4870,36 @@ describe('SecurityTokenWrapper', () => {
     });
   });
 
+  describe('getDocument', () => {
+    test('should call to getDocument', async () => {
+      const documentUri = 'Uri';
+      const documentHash = stringToBytes32('Hash');
+      const documentTime = new Date(2030, 1);
+      const expectedResult = [documentUri, documentHash, dateToBigNumber(documentTime)];
+
+      // Mocked method
+      const mockedParams = { name: 'Name' };
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDocument).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.name)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getDocument(mockedParams);
+      // Result expectation
+      expect(result.documentUri).toEqual(documentUri);
+      expect(result.documentHash).toEqual(bytes32ToString(documentHash));
+      expect(result.documentTime).toEqual(documentTime);
+      // Verifications
+      verify(mockedContract.getDocument).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.name)))).once();
+    });
+  });
+
   describe('getAllDocuments', () => {
     test('should call to getAllDocuments', async () => {
-      const expectedResult = stringArrayToBytes32Array([
-        'DOC1',
-        'DOC2',
-      ]);
+      const expectedResult = stringArrayToBytes32Array(['DOC1', 'DOC2']);
 
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
