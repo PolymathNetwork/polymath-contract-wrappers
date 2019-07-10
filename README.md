@@ -95,7 +95,11 @@ yarn jest
 
 ## Deployment
 
+<<<<<<< HEAD
 This package has automatic publishing and versioning via [semantic-release](https://github.com/semantic-release/semantic-release) and forceful use of [conventional commits](https://www.conventionalcommits.org) 
+=======
+** Pending description of conventional commits and semantic release **
+>>>>>>> 1fa7e2b658fe093763933c015b43520ca51d2aea
 
 ## Sandbox
 
