@@ -7,7 +7,7 @@
     "ethereum"
   ],
   "files": [
-    "/lib"
+    "lib/**/*"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
