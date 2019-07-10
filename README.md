@@ -78,7 +78,7 @@ yarn jest
 
 ## Deployment
 
-** Pending description of conventional commits and semantic release**
+** Pending description of conventional commits and semantic release **
 
 ## Sandbox
 
