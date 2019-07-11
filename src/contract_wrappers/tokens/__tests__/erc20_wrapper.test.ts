@@ -4,13 +4,13 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ERC20DetailedContract } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
-import DetailedERC20Wrapper from '../erc20_detailed_wrapper';
+import ERC20DetailedWrapper from '../erc20_detailed_wrapper';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { valueToWei, weiToValue } from '../../../utils/convert';
 
 describe('ERC20TokenWrapper', () => {
   // Declare ERC20TokenWrapper object
-  let target: DetailedERC20Wrapper;
+  let target: ERC20DetailedWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ERC20DetailedContract;
 
@@ -19,7 +19,7 @@ describe('ERC20TokenWrapper', () => {
     mockedContract = mock(ERC20DetailedContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new DetailedERC20Wrapper(instance(mockedWrapper), myContractPromise);
+    target = new ERC20DetailedWrapper(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
