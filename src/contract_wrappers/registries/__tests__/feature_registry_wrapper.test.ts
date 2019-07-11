@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
-import { Features } from '../../../types';
+import { Feature } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
 import FeatureRegistryWrapper from '../feature_registry_wrapper';
 
@@ -36,7 +36,7 @@ describe('FeatureRegistryWrapper', () => {
       // Address expected
       const expectedResult = true;
       // Contract requested
-      const featureName = Features.CustomModulesAllowed.toString();
+      const featureName = Feature.CustomModulesAllowed.toString();
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -57,7 +57,7 @@ describe('FeatureRegistryWrapper', () => {
       // Address expected
       const expectedResult = true;
       // Contract requested
-      const featureName = Features.CustomModulesAllowed.toString();
+      const featureName = Feature.CustomModulesAllowed.toString();
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -78,7 +78,7 @@ describe('FeatureRegistryWrapper', () => {
       // Address expected
       const expectedResult = true;
       // Contract requested
-      const featureName = Features.FreezeMintingAllowed.toString();
+      const featureName = Feature.FreezeMintingAllowed.toString();
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -110,7 +110,7 @@ describe('FeatureRegistryWrapper', () => {
         // Address expected
         const currentFeatureStatus = false;
         // Feature name requested
-        const featureName = Features.CustomModulesAllowed.toString();
+        const featureName = Feature.CustomModulesAllowed.toString();
         // Mocked Get method
         const mockedGetMethod = mock(MockedCallMethod);
         // Stub the get method
@@ -120,7 +120,7 @@ describe('FeatureRegistryWrapper', () => {
 
         // Mocked parameters
         const mockedParams = {
-          nameKey: Features.CustomModulesAllowed,
+          nameKey: Feature.CustomModulesAllowed,
           newStatus: true,
           txData: {},
           safetyFactor: 10,

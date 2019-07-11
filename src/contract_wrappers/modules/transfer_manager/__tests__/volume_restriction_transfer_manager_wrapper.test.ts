@@ -4,7 +4,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { BigNumber } from '@0x/utils';
 import { VolumeRestrictionTMContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { RestrictionTypes } from '../../../../types';
+import { RestrictionType } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import VolumeRestrictionTransferManagerWrapper from '../volume_restriction_transfer_manager_wrapper';
@@ -302,7 +302,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
+      expect(result.restrictionType).toEqual(RestrictionType.Fixed);
       // Verifications
       verify(mockedContract.getIndividualRestriction).once();
       verify(mockedMethod.callAsync(mockedParams.investor)).once();
@@ -351,7 +351,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
+      expect(result.restrictionType).toEqual(RestrictionType.Fixed);
       // Verifications
       verify(mockedContract.getDefaultRestriction).once();
       verify(mockedMethod.callAsync()).once();
@@ -400,7 +400,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
+      expect(result.restrictionType).toEqual(RestrictionType.Fixed);
       // Verifications
       verify(mockedContract.getDefaultDailyRestriction).once();
       verify(mockedMethod.callAsync()).once();
@@ -452,7 +452,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result.startTime).toEqual(bigNumberToDate(startTime));
       expect(result.rollingPeriodInDays).toEqual(rollingPeriodInDays.toNumber());
       expect(result.endTime).toEqual(bigNumberToDate(endTime));
-      expect(result.restrictionType).toEqual(RestrictionTypes.Fixed);
+      expect(result.restrictionType).toEqual(RestrictionType.Fixed);
       // Verifications
       verify(mockedContract.getIndividualDailyRestriction).once();
       verify(mockedMethod.callAsync(mockedParams.investor)).once();
@@ -1123,8 +1123,14 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('removeIndividualRestrictionMulti', () => {
     test('should removeIndividualRestrictionMulti', async () => {
+      const holders = ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'];
       const mockedParams = {
-        holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
+        holders,
+        rollingPeriodInDays: [5, 10],
+        allowedTokens: [new BigNumber(1), new BigNumber(2)],
+        startTimes: [new Date(2020, 1), new Date(2020, 2)],
+        endTimes: [new Date(2021, 1), new Date(2021, 2)],
+        restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
       };
@@ -1138,7 +1144,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ];
       const mockedIndividualMethod = mock(MockedCallMethod);
       when(mockedContract.getIndividualRestriction).thenReturn(instance(mockedIndividualMethod));
-      when(mockedIndividualMethod.callAsync(mockedParams.holders[0])).thenResolve(expectedIndividualResult);
+      holders.forEach(holder => when(mockedIndividualMethod.callAsync(holder)).thenResolve(expectedIndividualResult));
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1176,7 +1182,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getIndividualRestriction).twice();
-      verify(mockedIndividualMethod.callAsync(mockedParams.holders[0])).once();
+      holders.forEach(holder => verify(mockedIndividualMethod.callAsync(holder)).once());
       verify(mockedContract.removeIndividualRestrictionMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.holders, mockedParams.txData, mockedParams.safetyFactor),
@@ -1266,8 +1272,14 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('removeIndividualDailyRestrictionMulti', () => {
     test('should removeIndividualDailyRestrictionMulti', async () => {
+      const holders = ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'];
       const mockedParams = {
-        holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
+        holders,
+        rollingPeriodInDays: [5, 10],
+        allowedTokens: [new BigNumber(1), new BigNumber(2)],
+        startTimes: [new Date(2020, 1), new Date(2020, 2)],
+        endTimes: [new Date(2021, 1), new Date(2021, 2)],
+        restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
       };
@@ -1281,7 +1293,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ];
       const mockedIndividualMethod = mock(MockedCallMethod);
       when(mockedContract.getIndividualRestriction).thenReturn(instance(mockedIndividualMethod));
-      when(mockedIndividualMethod.callAsync(mockedParams.holders[0])).thenResolve(expectedIndividualResult);
+      holders.forEach(holder => when(mockedIndividualMethod.callAsync(holder)).thenResolve(expectedIndividualResult));
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1319,7 +1331,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getIndividualRestriction).twice();
-      verify(mockedIndividualMethod.callAsync(mockedParams.holders[0])).once();
+      holders.forEach(holder => verify(mockedIndividualMethod.callAsync(holder)).once());
       verify(mockedContract.removeIndividualDailyRestrictionMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.holders, mockedParams.txData, mockedParams.safetyFactor),

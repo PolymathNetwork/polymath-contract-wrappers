@@ -30,6 +30,23 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
 
 We strongly recommend that the community help us make improvements and determine the future direction of the protocol. To report bugs within this package, please create an issue in this repository.
 
+Commits should follow the [conventional commits](https://www.conventionalcommits.org) standard. You can use `yarn commit` which will launch [commitizen](https://github.com/commitizen/cz-cli) to help you format commit messages in the correct manner
+
+### A note on breaking changes
+
+*Anything* that forcefully changes the way the client interacts with the package is considered a breaking change and should be described in the `BREAKING CHANGE` section of the corresponding commit.  This includes (but is not limited to):
+
+- Renaming a public function/class/interface/type
+- Deleting a public function/class/interface/type
+- Changing a public function's argument list in a way that the user needs to rewrite existing calls to it
+- Changing a public function's return type
+
+Whatever is written under `BREAKING CHANGES` is literally what will go into the changelog, so please be clear on the messages. For example, if I change the return type of a function called  `foo` in class `Bar`, the `BREAKING CHANGE` section of my commit should say something like
+
+```
+change return type of the `Bar` class's `foo` function from `string` to `number`
+```
+
 ### Install dependencies
 
 If you don't have yarn workspaces enabled (Yarn < v1.0) - enable them:
@@ -80,7 +97,7 @@ yarn jest
 
 ## Deployment
 
-** Pending, should run a prepublish script on CI or use Semantic Releases**
+This package has automatic publishing and versioning via [semantic-release](https://github.com/semantic-release/semantic-release) and forceful use of [conventional commits](https://www.conventionalcommits.org) 
 
 ## Sandbox
 

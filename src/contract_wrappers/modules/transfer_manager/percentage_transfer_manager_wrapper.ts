@@ -23,7 +23,7 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  Perm,
   PERCENTAGE_DECIMALS,
   TransferResult,
 } from '../../../types';
@@ -216,7 +216,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       valueToWei(params.maxHolderPercentage, PERCENTAGE_DECIMALS),
@@ -226,7 +226,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -237,7 +237,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.assert(
       params.investors.length === params.valids.length,
       'Array lengths are not equal for investors and valids',
@@ -252,7 +252,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(
       (await this.allowPrimaryIssuance()) !== params.allowPrimaryIssuance,
       'AllowPrimaryIssuance value must change ',

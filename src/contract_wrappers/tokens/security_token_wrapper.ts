@@ -67,7 +67,7 @@ import {
   ModuleType,
   FundRaiseType,
   ModuleName,
-  Features,
+  Feature,
   PERCENTAGE_DECIMALS,
   FULL_DECIMALS,
 } from '../../types';
@@ -726,35 +726,35 @@ interface ProduceAddModuleInformation {
 
 interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
-    | ModuleName.generalPermissionManager
-    | ModuleName.generalTransferManager
-    | ModuleName.manualApprovalTransferManager
-    | ModuleName.volumeRestrictionTM;
+    | ModuleName.GeneralPermissionManager
+    | ModuleName.GeneralTransferManager
+    | ModuleName.ManualApprovalTransferManager
+    | ModuleName.VolumeRestrictionTM;
   data?: undefined;
 }
 
 interface AddCountTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.countTransferManager;
+  moduleName: ModuleName.CountTransferManager;
   data: CountTransferManagerData;
 }
 
 interface AddPercentageTransferManagerParams extends AddModuleParams {
-  moduleName: ModuleName.percentageTransferManager;
+  moduleName: ModuleName.PercentageTransferManager;
   data: PercentageTransferManagerData;
 }
 
 interface AddDividendCheckpointParams extends AddModuleParams {
-  moduleName: ModuleName.etherDividendCheckpoint | ModuleName.erc20DividendCheckpoint;
+  moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
   data: DividendCheckpointData;
 }
 
 interface AddCappedSTOParams extends AddModuleParams {
-  moduleName: ModuleName.cappedSTO;
+  moduleName: ModuleName.CappedSTO;
   data: CappedSTOData;
 }
 
 interface AddUSDTieredSTOParams extends AddModuleParams {
-  moduleName: ModuleName.usdTieredSTO;
+  moduleName: ModuleName.UsdTieredSTO;
   data: USDTieredSTOData;
 }
 
@@ -1182,7 +1182,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public freezeIssuance = async (params: FreezeIssuanceParams) => {
     assert.assert(
-      await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.FreezeMintingAllowed),
+      await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed),
       'FreezeMintingAllowed Feature Status not enabled',
     );
     assert.assert(await this.isIssuable(), 'Issuance frozen');
@@ -1320,7 +1320,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public getCheckpointTimes = async () => {
-    return (await this.contract).getCheckpointTimes.callAsync();
+    const timestamps = await (await this.contract).getCheckpointTimes.callAsync();
+
+    return timestamps.map(bigNumberToDate);
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
@@ -1752,7 +1754,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkUseModuleVerified = async (address: string) => {
-    if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+    if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.CustomModulesAllowed)) {
       const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
       assert.assert(
         (await this.checkForRegisteredModule(address)) || isOwner,
@@ -1844,11 +1846,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
-      case ModuleName.countTransferManager:
+      case ModuleName.CountTransferManager:
         iface = new ethers.utils.Interface(CountTransferManager.abi);
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
-      case ModuleName.percentageTransferManager:
+      case ModuleName.PercentageTransferManager:
         iface = new ethers.utils.Interface(PercentageTransferManager.abi);
         data = iface.functions.configure.encode([
           valueToWei(
@@ -1858,7 +1860,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
         ]);
         break;
-      case ModuleName.cappedSTO:
+      case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
         iface = new ethers.utils.Interface(CappedSTO.abi);
         data = iface.functions.configure.encode([
@@ -1870,7 +1872,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as CappedSTOData).fundsReceiver,
         ]);
         break;
-      case ModuleName.usdTieredSTO:
+      case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
         iface = new ethers.utils.Interface(USDTieredSTO.abi);
         data = iface.functions.configure.encode([
@@ -1896,12 +1898,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           (params.data as USDTieredSTOData).usdTokens,
         ]);
         break;
-      case ModuleName.erc20DividendCheckpoint:
+      case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
-      case ModuleName.etherDividendCheckpoint:
+      case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);

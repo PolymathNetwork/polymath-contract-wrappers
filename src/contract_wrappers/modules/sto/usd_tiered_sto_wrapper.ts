@@ -962,7 +962,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
         assert.assert(stoDetails.isRaisedInSC, 'USD Not Allowed');
         assert.assert(usdToken !== null, 'USD Token Address must exist');
         if (usdToken) {
-          const scTokenBalance = await (await this.detailedErc20TokenContract(usdToken)).balanceOf.callAsync(from);
+          const scTokenBalance = await (await this.detailedERC20TokenContract(usdToken)).balanceOf.callAsync(from);
           assert.assert(
             scTokenBalance.isGreaterThanOrEqualTo(investmentValue),
             'Budget less than amount unable to transfer fee',

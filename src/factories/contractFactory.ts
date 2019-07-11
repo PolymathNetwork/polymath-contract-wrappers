@@ -48,7 +48,7 @@ import {
   PolymathRegistry,
 } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolymathContracts, NetworkId } from '../types';
+import { PolymathContract, NetworkId } from '../types';
 import assert from '../utils/assert';
 import getDefaultContractAddresses from '../utils/addresses';
 
@@ -129,7 +129,7 @@ export default class ContractFactory {
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
     return new PolyTokenFaucetContract(
       PolyTokenFaucet.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.polyToken),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.PolyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -138,7 +138,7 @@ export default class ContractFactory {
   public async getPolyTokenContract(): Promise<PolyTokenContract> {
     return new PolyTokenContract(
       PolyToken.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.polyToken),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.PolyToken),
       this.provider,
       this.contractDefaults,
     );
@@ -223,7 +223,7 @@ export default class ContractFactory {
   public async getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
     return new FeatureRegistryContract(
       FeatureRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.featureRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.FeatureRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -232,7 +232,7 @@ export default class ContractFactory {
   public async getModuleRegistryContract(): Promise<ModuleRegistryContract> {
     return new ModuleRegistryContract(
       ModuleRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.moduleRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.ModuleRegistry),
       this.provider,
       this.contractDefaults,
     );
@@ -241,7 +241,7 @@ export default class ContractFactory {
   public async getSecurityTokenRegistryContract(): Promise<ISecurityTokenRegistryContract> {
     return new ISecurityTokenRegistryContract(
       ISecurityTokenRegistry.abi,
-      await (await this.polymathRegistry).getAddress.callAsync(PolymathContracts.securityTokenRegistry),
+      await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.SecurityTokenRegistry),
       this.provider,
       this.contractDefaults,
     );

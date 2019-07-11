@@ -21,8 +21,8 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
-  TransferResult
+  TransferResult,
+  Perm,
 } from '../../../types';
 import { numberToBigNumber, valueToWei } from '../../../utils/convert';
 
@@ -160,7 +160,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,

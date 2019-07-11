@@ -112,34 +112,34 @@ export enum FeeType {
   stLaunchFee,
 }
 
-export enum Features {
+export enum Feature {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
 }
 
-export enum PolymathContracts {
-  polyToken = 'PolyToken',
-  moduleRegistry = 'ModuleRegistry',
-  featureRegistry = 'FeatureRegistry',
-  securityTokenRegistry = 'SecurityTokenRegistry',
-  polyUsdOracle = 'PolyUsdOracle',
-  ethUsdOracle = 'EthUsdOracle',
+export enum PolymathContract {
+  PolyToken = 'PolyToken',
+  ModuleRegistry = 'ModuleRegistry',
+  FeatureRegistry = 'FeatureRegistry',
+  SecurityTokenRegistry = 'SecurityTokenRegistry',
+  PolyUsdOracle = 'PolyUsdOracle',
+  EthUsdOracle = 'EthUsdOracle',
 }
 
 export enum ModuleName {
-  generalPermissionManager = 'GeneralPermissionManager',
-  countTransferManager = 'CountTransferManager',
-  generalTransferManager = 'GeneralTransferManager',
-  manualApprovalTransferManager = 'ManualApprovalTransferManager',
-  percentageTransferManager = 'PercentageTransferManager',
-  volumeRestrictionTM = 'VolumeRestrictionTM',
-  cappedSTO = 'CappedSTO',
-  usdTieredSTO = 'USDTieredSTO',
-  erc20DividendCheckpoint = 'ERC20DividendCheckpoint',
-  etherDividendCheckpoint = 'EtherDividendCheckpoint',
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  UsdTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
-export enum Perms {
+export enum Perm {
   ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
   Flags = 'FLAGS',
@@ -152,7 +152,7 @@ export enum Perms {
   PreSaleAdmin = 'PRE_SALE_ADMIN',
 }
 
-export enum RestrictionTypes {
+export enum RestrictionType {
   Fixed = 0,
   Percentage = 1,
 }

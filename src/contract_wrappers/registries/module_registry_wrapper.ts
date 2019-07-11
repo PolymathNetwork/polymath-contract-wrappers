@@ -24,7 +24,7 @@ import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import {
   EventCallback,
-  Features,
+  Feature,
   GetLogs,
   GetLogsAsyncParams,
   ModuleType,
@@ -215,7 +215,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     await this.checkModuleNotRegistered(params.moduleFactory);
     const callerAddress = await this.getCallerAddress(params.txData);
     const owner = await this.owner();
-    if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Features.CustomModulesAllowed)) {
+    if ((await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.CustomModulesAllowed)) {
       const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
       assert.assert(
         functionsUtils.checksumAddressComparision(callerAddress, owner) ||

@@ -67,7 +67,7 @@ window.addEventListener('load', async () => {
 
   // Get sto factory address
   const moduleStringName = 'CountTransferManager';
-  const moduleName = ModuleName.countTransferManager;
+  const moduleName = ModuleName.CountTransferManager;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.TransferManager,
   });
@@ -107,20 +107,20 @@ window.addEventListener('load', async () => {
 
   // Get Count TM address and create count transfer manager
   const countTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.countTransferManager,
+    moduleName: ModuleName.CountTransferManager,
   }))[0];
   console.log(countTMAddress);
   const countTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.countTransferManager,
+    name: ModuleName.CountTransferManager,
     address: countTMAddress,
   });
 
   // Get General TM Address and allow all transfers so we can test unlocked account transfers
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalTransferManager,
+    moduleName: ModuleName.GeneralTransferManager,
   }))[0];
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
