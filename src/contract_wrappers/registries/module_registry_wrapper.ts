@@ -156,6 +156,11 @@ interface ModuleTypeParams {
   moduleType: ModuleType;
 }
 
+interface IsCompatibleModuleParams {
+  moduleFactory: string;
+  securityToken: string;
+}
+
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
@@ -208,6 +213,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contract = contract;
     this.contractFactory = contractFactory;
   }
+
+  public isCompatibleModule = async (params: IsCompatibleModuleParams): Promise<boolean> => {
+    return (await this.contract).isCompatibleModule.callAsync(params.moduleFactory, params.securityToken);
+  };
 
   public registerModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);

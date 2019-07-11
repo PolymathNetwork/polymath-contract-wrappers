@@ -53,6 +53,31 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
+  describe('IsCompatibleModule', () => {
+    test('should call to isCompatibleModule', async () => {
+      // Address expected
+      const expectedResult = true;
+      const params = {
+        moduleFactory: '0x4444444444444444444444444444444444444444',
+        securityToken: '0x5555555555555555555555555555555555555555',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isCompatibleModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleFactory, params.securityToken)).thenResolve(expectedResult);
+      // Real call
+      const result = await target.isCompatibleModule(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isCompatibleModule).once();
+      verify(mockedMethod.callAsync(params.moduleFactory, params.securityToken)).once();
+    });
+  });
+
+
   describe('RegisterModule', () => {
     test.todo('should fail as moduleFactory is not an Eth address');
 
