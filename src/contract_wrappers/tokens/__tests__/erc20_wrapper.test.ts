@@ -202,7 +202,7 @@ describe('ERC20TokenWrapper', () => {
 
       const mockedNameMethod = mock(MockedCallMethod);
       when(mockedContract.name).thenReturn(instance(mockedNameMethod));
-      when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
+      when(mockedNameMethod.callAsync()).thenResolve(expectedStringResult);
 
       const expectedIsValidResult = true;
       const result = await target.isValidContract();
