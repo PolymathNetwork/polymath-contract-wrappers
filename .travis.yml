@@ -5,13 +5,17 @@ before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
   - export PATH="$HOME/.yarn/bin:$PATH"
   - export NODE_OPTIONS=--max_old_space_size=4096
-script:
-  - yarn run build:ci
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then yarn coveralls; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn jest; fi'
+#script:
+#  - yarn run build:ci
+#  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then yarn coveralls; fi'
+#  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn jest; fi'
+
 jobs:
   include:
     - stage: release
       node_js: lts/*
       script:
+        - yarn run build:ci
+        - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then yarn coveralls; fi'
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn jest; fi'
         - npm run semantic-release
