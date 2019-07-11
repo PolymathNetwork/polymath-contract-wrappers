@@ -31,6 +31,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  bigNumberToDate,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -510,18 +511,19 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getCheckpointTimes', () => {
     test('should call to getCheckpointTimes', async () => {
-      const expectedResult = [new BigNumber(0), new BigNumber(1)];
+      const timestamps = [new BigNumber(0), new BigNumber(1)];
+      const expectedResult = timestamps.map(bigNumberToDate);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getCheckpointTimes).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+      when(mockedMethod.callAsync()).thenResolve(timestamps);
 
       // Real call
       const result = await target.getCheckpointTimes();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult);
       // Verifications
       verify(mockedContract.getCheckpointTimes).once();
       verify(mockedMethod.callAsync()).once();

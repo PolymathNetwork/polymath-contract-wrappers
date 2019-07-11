@@ -623,7 +623,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public removeIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
-    Promise.all(
+    await Promise.all(
       params.holders.map(async holder =>
         assert.isNotDateZero(
           (await this.individualRestriction({ holder })).endTime,
@@ -654,7 +654,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public removeIndividualDailyRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    Promise.all(
+    await Promise.all(
       params.holders.map(async holder =>
         assert.isNotDateZero(
           (await this.individualRestriction({ holder })).endTime,

@@ -1154,8 +1154,9 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('removeIndividualRestrictionMulti', () => {
     test('should removeIndividualRestrictionMulti', async () => {
+      const holders = ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'];
       const mockedParams = {
-        holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
+        holders,
         rollingPeriodInDays: [5, 10],
         allowedTokens: [new BigNumber(1), new BigNumber(2)],
         startTimes: [new Date(2020, 1), new Date(2020, 2)],
@@ -1174,7 +1175,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ];
       const mockedIndividualMethod = mock(MockedCallMethod);
       when(mockedContract.individualRestriction).thenReturn(instance(mockedIndividualMethod));
-      when(mockedIndividualMethod.callAsync(mockedParams.holders[0])).thenResolve(expectedIndividualResult);
+      holders.forEach(holder => when(mockedIndividualMethod.callAsync(holder)).thenResolve(expectedIndividualResult));
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1212,7 +1213,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.individualRestriction).twice();
-      verify(mockedIndividualMethod.callAsync(mockedParams.holders[0])).once();
+      holders.forEach(holder => verify(mockedIndividualMethod.callAsync(holder)).once());
       verify(mockedContract.removeIndividualRestrictionMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.holders, mockedParams.txData, mockedParams.safetyFactor),
@@ -1302,8 +1303,9 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('removeIndividualDailyRestrictionMulti', () => {
     test('should removeIndividualDailyRestrictionMulti', async () => {
+      const holders = ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'];
       const mockedParams = {
-        holders: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
+        holders,
         rollingPeriodInDays: [5, 10],
         allowedTokens: [new BigNumber(1), new BigNumber(2)],
         startTimes: [new Date(2020, 1), new Date(2020, 2)],
@@ -1322,7 +1324,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       ];
       const mockedIndividualMethod = mock(MockedCallMethod);
       when(mockedContract.individualRestriction).thenReturn(instance(mockedIndividualMethod));
-      when(mockedIndividualMethod.callAsync(mockedParams.holders[0])).thenResolve(expectedIndividualResult);
+      holders.forEach(holder => when(mockedIndividualMethod.callAsync(holder)).thenResolve(expectedIndividualResult));
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1360,7 +1362,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.individualRestriction).twice();
-      verify(mockedIndividualMethod.callAsync(mockedParams.holders[0])).once();
+      holders.forEach(holder => verify(mockedIndividualMethod.callAsync(holder)).once());
       verify(mockedContract.removeIndividualDailyRestrictionMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.holders, mockedParams.txData, mockedParams.safetyFactor),
