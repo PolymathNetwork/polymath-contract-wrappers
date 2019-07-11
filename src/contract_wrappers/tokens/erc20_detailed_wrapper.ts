@@ -1,11 +1,11 @@
-import { ERC20DetailedContract ,ERC20DetailedEventArgs, ERC20DetailedEvents} from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract, ERC20DetailedEventArgs, ERC20DetailedEvents } from '@polymathnetwork/abi-wrappers';
 import { ERC20Detailed } from '@polymathnetwork/contract-artifacts';
-import {LogWithDecodedArgs, Web3Wrapper} from '@0x/web3-wrapper';
+import { LogWithDecodedArgs, Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi } from 'ethereum-types';
-import {schemas} from '@0x/json-schemas';
+import { schemas } from '@0x/json-schemas';
 import { bytes32ToString } from '../../utils/convert';
 import ERC20TokenWrapper from './erc20_wrapper';
-import {GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams} from '../../types';
+import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams } from '../../types';
 
 import assert from '../../utils/assert';
 
@@ -33,16 +33,14 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
    * Returns the token name
    */
   public name = async () => {
-    const name = (await this.contract).name.callAsync();
-    return bytes32ToString(await name);
+    return (await this.contract).name.callAsync();
   };
 
   /**
    * Returns the token symbol
    */
   public symbol = async () => {
-    const symbol = (await this.contract).symbol.callAsync();
-    return bytes32ToString(await symbol);
+    return (await this.contract).symbol.callAsync();
   };
 
   public async isValidContract() {
@@ -51,7 +49,7 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
       const totalSupply = await contract.totalSupply.callAsync();
       const symbol = await contract.symbol.callAsync();
       const name = await contract.name.callAsync();
-      if (bytes32ToString(symbol) === '' || bytes32ToString(name) === '' || totalSupply.isZero()) {
+      if (symbol === '' || name === '' || totalSupply.isZero()) {
         return false;
       }
       return true;
@@ -61,36 +59,36 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
   }
 
   public subscribeAsync: Subscribe = async <ArgsType extends ERC20DetailedEventArgs>(
-      params: SubscribeAsyncParams,
+    params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DetailedEvents);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const subscriptionToken = this.subscribeInternal<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.indexFilterValues,
-        ERC20Detailed.abi,
-        params.callback,
-        !_.isUndefined(params.isVerbose),
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      ERC20Detailed.abi,
+      params.callback,
+      !_.isUndefined(params.isVerbose),
     );
     return subscriptionToken;
   };
 
   public getLogsAsync: GetLogs = async <ArgsType extends ERC20DetailedEventArgs>(
-      params: GetLogsAsyncParams,
+    params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DetailedEvents);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
-        normalizedContractAddress,
-        params.eventName,
-        params.blockRange,
-        params.indexFilterValues,
-        ERC20Detailed.abi,
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+      ERC20Detailed.abi,
     );
     return logs;
   };

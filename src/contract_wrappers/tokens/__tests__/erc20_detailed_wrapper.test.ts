@@ -6,7 +6,6 @@ import { BigNumber } from '@0x/utils';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import ERC20DetailedTokenWrapper from '../erc20_detailed_wrapper';
 import { MockedCallMethod } from '../../../test_utils/mocked_methods';
-import { bytes32ToString, stringToBytes32 } from '../../../utils/convert';
 
 describe('ERC20DetailedTokenWrapper', () => {
   // Declare ERC20DetailedTokenWrapper object
@@ -35,7 +34,7 @@ describe('ERC20DetailedTokenWrapper', () => {
 
   describe('name', () => {
     test('should call to name', async () => {
-      const expectedResult = stringToBytes32('string');
+      const expectedResult = 'string';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -46,7 +45,7 @@ describe('ERC20DetailedTokenWrapper', () => {
       // Real call
       const result = await target.name();
       // Result expectation
-      expect(result).toBe(bytes32ToString(expectedResult));
+      expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.name).once();
       verify(mockedMethod.callAsync()).once();
@@ -55,7 +54,7 @@ describe('ERC20DetailedTokenWrapper', () => {
 
   describe('symbol', () => {
     test('should call to symbol', async () => {
-      const expectedResult = stringToBytes32('string');
+      const expectedResult = 'string';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -66,7 +65,7 @@ describe('ERC20DetailedTokenWrapper', () => {
       // Real call
       const result = await target.symbol();
       // Result expectation
-      expect(result).toBe(bytes32ToString(expectedResult));
+      expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.symbol).once();
       verify(mockedMethod.callAsync()).once();
@@ -76,7 +75,7 @@ describe('ERC20DetailedTokenWrapper', () => {
   describe('isValidContract', () => {
     test('should call to isValidContract', async () => {
       const expectedBNResult = new BigNumber(1);
-      const expectedStringResult = stringToBytes32('string');
+      const expectedStringResult = 'string';
 
       const mockedTotalSupplyMethod = mock(MockedCallMethod);
       when(mockedContract.totalSupply).thenReturn(instance(mockedTotalSupplyMethod));
@@ -90,7 +89,7 @@ describe('ERC20DetailedTokenWrapper', () => {
       when(mockedContract.name).thenReturn(instance(mockedNameMethod));
       when(mockedSymbolMethod.callAsync()).thenResolve(expectedStringResult);
 
-      const expectedIsValidResult = false;
+      const expectedIsValidResult = true;
       const result = await target.isValidContract();
       expect(result).toBe(expectedIsValidResult);
 
