@@ -355,6 +355,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return (await this.contract).getModulesByType.callAsync(params.moduleType);
   };
 
+  public getAllModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
+    return (await this.contract).getAllModulesByType.callAsync(params.moduleType);
+  };
+
   /**
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.

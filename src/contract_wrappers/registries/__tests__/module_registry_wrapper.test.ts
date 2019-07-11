@@ -633,6 +633,31 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
+  describe('GetAllModulesByType', () => {
+    test('should call to getAllModulesByType', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const params = { moduleType: ModuleType.PermissionManager };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllModulesByType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllModulesByType(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getAllModulesByType).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
+    });
+  });
+
   describe('GetModulesByTypeAndToken', () => {
     test.todo('should fail as securityToken is not an Eth address');
 
