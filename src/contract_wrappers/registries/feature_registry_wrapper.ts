@@ -17,7 +17,7 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  Features,
+  Feature,
   Subscribe,
   GetLogs,
 } from '../../types';
@@ -137,7 +137,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getCustomModulesAllowedStatus = async () => {
-    return (await this.contract).getFeatureStatus.callAsync(Features.CustomModulesAllowed);
+    return (await this.contract).getFeatureStatus.callAsync(Feature.CustomModulesAllowed);
   };
 
   /**
@@ -145,7 +145,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getFreezeMintingAllowedStatus = async () => {
-    return (await this.contract).getFeatureStatus.callAsync(Features.FreezeMintingAllowed);
+    return (await this.contract).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed);
   };
 
   /**

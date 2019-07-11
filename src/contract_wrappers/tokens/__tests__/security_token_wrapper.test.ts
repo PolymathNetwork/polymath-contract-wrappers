@@ -20,7 +20,7 @@ import {
   ModuleRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { ModuleType, ModuleName, Features, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
+import { ModuleType, ModuleName, Feature, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -31,6 +31,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  bigNumberToDate,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -341,7 +342,7 @@ describe('SecurityTokenWrapper', () => {
         '0x0123456789012345678901234567890123456788',
       ];
       const mockedParams = {
-        moduleName: ModuleName.generalPermissionManager,
+        moduleName: ModuleName.GeneralPermissionManager,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -510,18 +511,19 @@ describe('SecurityTokenWrapper', () => {
 
   describe('getCheckpointTimes', () => {
     test('should call to getCheckpointTimes', async () => {
-      const expectedResult = [new BigNumber(0), new BigNumber(1)];
+      const timestamps = [new BigNumber(0), new BigNumber(1)];
+      const expectedResult = timestamps.map(bigNumberToDate);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getCheckpointTimes).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+      when(mockedMethod.callAsync()).thenResolve(timestamps);
 
       // Real call
       const result = await target.getCheckpointTimes();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult);
       // Verifications
       verify(mockedContract.getCheckpointTimes).once();
       verify(mockedMethod.callAsync()).once();
@@ -1627,7 +1629,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.FreezeMintingAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.FreezeMintingAllowed)).thenResolve(currentFeatureStatus);
 
       // Real call
       const result = await target.freezeMinting(mockedParams);
@@ -1643,7 +1645,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedFrozenMethod.callAsync()).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.FreezeMintingAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.FreezeMintingAllowed)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -2399,7 +2401,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -2459,7 +2461,7 @@ describe('SecurityTokenWrapper', () => {
         maxHolderCount: 10,
       };
       const mockedCtmParams = {
-        moduleName: ModuleName.countTransferManager,
+        moduleName: ModuleName.CountTransferManager,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2483,7 +2485,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const ctmResult = await target.addModule({
-        moduleName: ModuleName.countTransferManager,
+        moduleName: ModuleName.CountTransferManager,
         address: mockedCtmParams.address,
         maxCost: mockedCtmParams.maxCost,
         budget: mockedCtmParams.budget,
@@ -2519,7 +2521,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
@@ -2582,7 +2584,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -2642,7 +2644,7 @@ describe('SecurityTokenWrapper', () => {
         allowPrimaryIssuance: true,
       };
       const mockedPtmParams = {
-        moduleName: ModuleName.percentageTransferManager,
+        moduleName: ModuleName.PercentageTransferManager,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2669,7 +2671,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const ptmResult = await target.addModule({
-        moduleName: ModuleName.percentageTransferManager,
+        moduleName: ModuleName.PercentageTransferManager,
         address: mockedPtmParams.address,
         maxCost: mockedPtmParams.maxCost,
         budget: mockedPtmParams.budget,
@@ -2706,7 +2708,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
@@ -2760,7 +2762,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -2833,7 +2835,7 @@ describe('SecurityTokenWrapper', () => {
         fundsReceiver: '0x2222222222222222222222222222222222222222',
       };
       const mockedCappedParams = {
-        moduleName: ModuleName.cappedSTO,
+        moduleName: ModuleName.CappedSTO,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -2864,7 +2866,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const cappedResult = await target.addModule({
-        moduleName: ModuleName.cappedSTO,
+        moduleName: ModuleName.CappedSTO,
         address: mockedCappedParams.address,
         maxCost: mockedCappedParams.maxCost,
         budget: mockedCappedParams.budget,
@@ -2905,7 +2907,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
@@ -2968,7 +2970,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -3038,7 +3040,7 @@ describe('SecurityTokenWrapper', () => {
         usdTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
       };
       const mockedUsdTieredStoParams = {
-        moduleName: ModuleName.usdTieredSTO,
+        moduleName: ModuleName.UsdTieredSTO,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3083,7 +3085,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const usdTieredStoResult = await target.addModule({
-        moduleName: ModuleName.usdTieredSTO,
+        moduleName: ModuleName.UsdTieredSTO,
         address: mockedUsdTieredStoParams.address,
         maxCost: mockedUsdTieredStoParams.maxCost,
         budget: mockedUsdTieredStoParams.budget,
@@ -3130,7 +3132,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
@@ -3193,7 +3195,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -3252,7 +3254,7 @@ describe('SecurityTokenWrapper', () => {
         wallet: '0x1111111111111111111111111111111111111111',
       };
       const mockedErc20DividendParams = {
-        moduleName: ModuleName.erc20DividendCheckpoint,
+        moduleName: ModuleName.ERC20DividendCheckpoint,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3276,7 +3278,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const erc20DividendResult = await target.addModule({
-        moduleName: ModuleName.erc20DividendCheckpoint,
+        moduleName: ModuleName.ERC20DividendCheckpoint,
         address: mockedErc20DividendParams.address,
         maxCost: mockedErc20DividendParams.maxCost,
         budget: mockedErc20DividendParams.budget,
@@ -3312,7 +3314,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
@@ -3375,7 +3377,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
       const currentFeatureStatus = true;
       when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
 
       // Setup mocked contractFactory owner
       const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
@@ -3434,7 +3436,7 @@ describe('SecurityTokenWrapper', () => {
         wallet: '0x1111111111111111111111111111111111111111',
       };
       const mockedEtherDividendParams = {
-        moduleName: ModuleName.etherDividendCheckpoint,
+        moduleName: ModuleName.EtherDividendCheckpoint,
         address: ADDRESS,
         maxCost: new BigNumber(1),
         budget: new BigNumber(1),
@@ -3458,7 +3460,7 @@ describe('SecurityTokenWrapper', () => {
       ).thenResolve(expectedResult);
 
       const etherDividendResult = await target.addModule({
-        moduleName: ModuleName.etherDividendCheckpoint,
+        moduleName: ModuleName.EtherDividendCheckpoint,
         address: mockedEtherDividendParams.address,
         maxCost: mockedEtherDividendParams.maxCost,
         budget: mockedEtherDividendParams.budget,
@@ -3494,7 +3496,7 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleMethod.callAsync(ADDRESS)).once();
       verify(mockedContractFactory.getFeatureRegistryContract()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Features.CustomModulesAllowed)).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();

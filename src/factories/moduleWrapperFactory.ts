@@ -21,43 +21,43 @@ interface GetModuleParams {
 }
 
 interface GetGeneralPermissionManager extends GetModuleParams {
-  name: ModuleName.generalPermissionManager;
+  name: ModuleName.GeneralPermissionManager;
 }
 
 interface GetCountTransferManager extends GetModuleParams {
-  name: ModuleName.countTransferManager;
+  name: ModuleName.CountTransferManager;
 }
 
 interface GetGeneralTransferManager extends GetModuleParams {
-  name: ModuleName.generalTransferManager;
+  name: ModuleName.GeneralTransferManager;
 }
 
 interface GetManualApprovalTransferManager extends GetModuleParams {
-  name: ModuleName.manualApprovalTransferManager;
+  name: ModuleName.ManualApprovalTransferManager;
 }
 
 interface GetPercentageTransferManager extends GetModuleParams {
-  name: ModuleName.percentageTransferManager;
+  name: ModuleName.PercentageTransferManager;
 }
 
 interface GetVolumeRestrictionTransferManager extends GetModuleParams {
-  name: ModuleName.volumeRestrictionTM;
+  name: ModuleName.VolumeRestrictionTM;
 }
 
 interface GetCappedSTO extends GetModuleParams {
-  name: ModuleName.cappedSTO;
+  name: ModuleName.CappedSTO;
 }
 
 interface GetUSDTieredSTO extends GetModuleParams {
-  name: ModuleName.usdTieredSTO;
+  name: ModuleName.UsdTieredSTO;
 }
 
 interface GetERC20DividendCheckpoint extends GetModuleParams {
-  name: ModuleName.erc20DividendCheckpoint;
+  name: ModuleName.ERC20DividendCheckpoint;
 }
 
 interface GetEtherDividendCheckpoint extends GetModuleParams {
-  name: ModuleName.etherDividendCheckpoint;
+  name: ModuleName.EtherDividendCheckpoint;
 }
 
 interface GetModuleInstance {
@@ -96,64 +96,64 @@ export default class ModuleWrapperFactory {
     assert.isETHAddressHex('address', params.address);
     switch (params.name) {
       // Permission
-      case ModuleName.generalPermissionManager:
+      case ModuleName.GeneralPermissionManager:
         return new GeneralPermissionManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralPermissionManagerContract(params.address),
           this.contractFactory,
         );
       // TMs
-      case ModuleName.countTransferManager:
+      case ModuleName.CountTransferManager:
         return new CountTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getCountTransferManagerContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.generalTransferManager:
+      case ModuleName.GeneralTransferManager:
         return new GeneralTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralTransferManagerContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.manualApprovalTransferManager:
+      case ModuleName.ManualApprovalTransferManager:
         return new ManualApprovalTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getManualApprovalTransferManagerContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.percentageTransferManager:
+      case ModuleName.PercentageTransferManager:
         return new PercentageTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.volumeRestrictionTM:
+      case ModuleName.VolumeRestrictionTM:
         return new VolumeRestrictionTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,
         );
       // STOs
-      case ModuleName.cappedSTO:
+      case ModuleName.CappedSTO:
         return new CappedSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getCappedSTOContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.usdTieredSTO:
+      case ModuleName.UsdTieredSTO:
         return new USDTieredSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getUSDTieredSTOContract(params.address),
           this.contractFactory,
         );
       // Checkpoint
-      case ModuleName.erc20DividendCheckpoint:
+      case ModuleName.ERC20DividendCheckpoint:
         return new ERC20DividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getERC20DividendCheckpointContract(params.address),
           this.contractFactory,
         );
-      case ModuleName.etherDividendCheckpoint:
+      case ModuleName.EtherDividendCheckpoint:
         return new EtherDividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
