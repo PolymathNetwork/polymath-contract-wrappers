@@ -131,14 +131,6 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
-interface GetValueByVariableParams {
-  variable: string;
-}
-
-interface GetValueByKeyParams {
-  key: string;
-}
-
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -161,6 +153,10 @@ interface IsCompatibleModuleParams {
   securityToken: string;
 }
 
+interface GetFactoryDetailsParams {
+  factoryAddress: string;
+}
+
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
@@ -173,6 +169,12 @@ interface TransferOwnershipParams extends TxParams {
 interface TagsByModule {
   module: string;
   tags: string[];
+}
+
+interface FactoryDetails {
+  factoryIsVerified: boolean;
+  factoryOwnerAddress: string;
+  listSecurityTokens: string[];
 }
 // // End of return types ////
 
@@ -333,6 +335,19 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
         typedResult.push(tagsByModule);
       },
     );
+    return typedResult;
+  };
+
+  /**
+   * @returns Returns factoryIsVerified, factoryOwnerAddress, listSecurityTokens
+   */
+  public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
+    const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
+    const typedResult: FactoryDetails = {
+      factoryIsVerified: result[0],
+      factoryOwnerAddress: result[1],
+      listSecurityTokens: result[2],
+    };
     return typedResult;
   };
 

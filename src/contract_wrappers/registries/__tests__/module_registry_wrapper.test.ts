@@ -77,7 +77,6 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
-
   describe('RegisterModule', () => {
     test.todo('should fail as moduleFactory is not an Eth address');
 
@@ -307,11 +306,7 @@ describe('ModuleRegistryWrapper', () => {
       when(mockedContract.verifyModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -322,11 +317,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.verifyModule).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
 
@@ -384,11 +375,7 @@ describe('ModuleRegistryWrapper', () => {
       when(mockedContract.unverifyModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -399,11 +386,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.unverifyModule).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
 
@@ -672,6 +655,37 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getModulesByTypeAndToken).once();
       verify(mockedMethod.callAsync(params.moduleType, params.securityToken)).once();
+    });
+  });
+
+  describe('GetFactoryDetails', () => {
+    test('should call to getFactoryDetails', async () => {
+      // Address expected
+      const factoryIsVerified = true;
+      const factoryOwnerAddress = '0x1111111111111111111111111111111111111111';
+      const listSecurityTokens = [
+        '0x4444444444444444444444444444444444444444',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const expectedResult = [factoryIsVerified, factoryOwnerAddress, listSecurityTokens];
+      const params = {
+        factoryAddress: '0x5555555555555555555555555555555555555555',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getFactoryDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.factoryAddress)).thenResolve(expectedResult);
+      // Real call
+      const result = await target.getFactoryDetails(params);
+      // Result expectation
+      expect(result.factoryIsVerified).toBe(factoryIsVerified);
+      expect(result.factoryOwnerAddress).toBe(factoryOwnerAddress);
+      expect(result.listSecurityTokens).toBe(listSecurityTokens);
+      // Verifications
+      verify(mockedContract.getFactoryDetails).once();
+      verify(mockedMethod.callAsync(params.factoryAddress)).once();
     });
   });
 
