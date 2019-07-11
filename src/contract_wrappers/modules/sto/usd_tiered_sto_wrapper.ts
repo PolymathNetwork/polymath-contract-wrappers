@@ -989,7 +989,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.assert(investedUSD.plus(investorInvestedUSD).isGreaterThan(minimumInvestmentUSD), 'Investment < min');
 
     const generalTMAddress = await (await this.securityTokenContract()).getModulesByName.callAsync(
-      stringToBytes32(ModuleName.generalTransferManager),
+      stringToBytes32(ModuleName.GeneralTransferManager),
     );
     const generalTM = new GeneralTransferManagerWrapper(
       this.web3Wrapper,

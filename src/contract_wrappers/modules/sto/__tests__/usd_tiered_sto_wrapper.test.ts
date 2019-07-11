@@ -356,7 +356,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -456,7 +456,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
@@ -521,7 +521,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -678,7 +678,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
@@ -743,7 +743,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -905,7 +905,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
@@ -972,7 +972,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -1121,7 +1121,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
@@ -1186,7 +1186,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -1341,7 +1341,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
@@ -1406,7 +1406,7 @@ describe('USDTieredSTOWrapper', () => {
       const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
       const mockedGetModulesByNameMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
-      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).thenResolve(
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
       when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
@@ -1565,7 +1565,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
-      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.generalTransferManager))).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
       verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
       verify(mockedContract.getAccreditedData).once();
