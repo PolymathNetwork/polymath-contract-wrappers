@@ -283,6 +283,10 @@ interface IndividualRestrictionParams extends RestrictionParams {
   holder: string;
 }
 
+interface RemoveIndividualRestrictionMultiParams extends TxParams {
+  holders: string[];
+}
+
 interface IndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[];
   allowedTokens: BigNumber[];
@@ -465,7 +469,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addIndividualRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
-    assert.assert((await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
+    assert.assert(!(await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
     this.checkRestrictionInputParams(
       params.startTime,
       params.allowedTokens,
@@ -536,7 +540,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
     const exemptAddress = await this.getExemptAddress();
-    assert.assert(exemptAddress.some(address => params.holders.includes(address)), 'Holder is exempt from restriction');
+    assert.assert(
+      !exemptAddress.some(address => params.holders.includes(address)),
+      'Holder is exempt from restriction',
+    );
     assert.assert(
       params.startTimes.length === params.allowedTokens.length &&
         params.startTimes.length === params.restrictionTypes.length &&

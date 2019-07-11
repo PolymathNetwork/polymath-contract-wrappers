@@ -10,13 +10,22 @@ import {
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
   ModuleFactoryChangeSTVersionBoundEventArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { BigNumber } from '@0x/utils';
 import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
-import { GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import {
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+  FULL_DECIMALS,
+} from '../../types';
+import { weiToValue } from '../../utils/convert';
 
 interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipRenounced;
@@ -138,6 +147,14 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public name = async (): Promise<string> => {
     return (await this.contract).name.callAsync();
+  };
+
+  /**
+   * Get setup cost
+   */
+  public getSetupCost = async (): Promise<BigNumber> => {
+    const value = await (await this.contract).getSetupCost.callAsync();
+    return weiToValue(value, FULL_DECIMALS);
   };
 
   /**
