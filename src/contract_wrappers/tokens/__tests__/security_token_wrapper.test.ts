@@ -148,7 +148,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('partitionsOf', () => {
     test('should call to partitionsOf', async () => {
-      const expectedResult = stringArrayToBytes32Array(['LOCKED', 'UNLOCKED']);
+      const expectedResult = stringArrayToBytes32Array(['UNDEFINED', 'UNLOCKED']);
       const mockedParams = {
         partition: 'UNLOCKED',
         operator: '0x5555555555555555555555555555555555555555',

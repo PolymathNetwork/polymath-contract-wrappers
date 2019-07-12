@@ -418,11 +418,9 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>[]>;
   (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
-      LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
-      >;
-  (params: GetUpdateTokenNameLogsAsyncParams): Promise<
-      LogWithDecodedArgs<SecurityTokenUpdateTokenNameEventArgs>[]
-      >;
+    LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
+  >;
+  (params: GetUpdateTokenNameLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenUpdateTokenNameEventArgs>[]>;
   (params: GetGranularityChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>[]
   >;
@@ -912,9 +910,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public partitionsOf = async (params: PartitionsOfParams): Promise<string[]> => {
+  public partitionsOf = async (params: PartitionsOfParams): Promise<Partition[]> => {
     const partitions = await (await this.contract).partitionsOf.callAsync(params.tokenHolder);
-    return bytes32ArrayToStringArray(partitions);
+    return bytes32ArrayToStringArray(partitions).map(element => {
+      return element === Partition.Unlocked ? Partition.Unlocked : Partition.Undefined;
+    });
   };
 
   /**
