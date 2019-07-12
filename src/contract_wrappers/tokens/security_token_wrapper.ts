@@ -1181,10 +1181,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public freezeIssuance = async (params: FreezeIssuanceParams) => {
-    assert.assert(
-      await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed),
-      'FreezeMintingAllowed Feature Status not enabled',
-    );
     assert.assert(await this.isIssuable(), 'Issuance frozen');
     assert.assert(
       functionsUtils.checksumAddressComparision(

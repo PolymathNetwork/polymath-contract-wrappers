@@ -2481,13 +2481,6 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
 
-      // Setup mocked Get Feature registry contract
-      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
-      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
-      const currentFeatureStatus = true;
-      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
-      when(mockedGetFeatureStatusMethod.callAsync(Feature.FreezeMintingAllowed)).thenResolve(currentFeatureStatus);
-
       // Real call
       const result = await target.freezeIssuance(mockedParams);
 
@@ -2502,9 +2495,6 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.isIssuable).once();
       verify(mockedIsIssuableMethod.callAsync()).once();
-      verify(mockedContractFactory.getFeatureRegistryContract()).once();
-      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
-      verify(mockedGetFeatureStatusMethod.callAsync(Feature.FreezeMintingAllowed)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
