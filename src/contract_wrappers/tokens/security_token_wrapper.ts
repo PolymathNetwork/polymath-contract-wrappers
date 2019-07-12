@@ -1726,8 +1726,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
-    const factory = new ModuleFactoryWrapper(this.web3Wrapper, this.moduleFactoryContract(moduleFactory));
-    const moduleCost = await factory.setupCostInPoly();
+    const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).setupCostInPoly.callAsync();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
       'Insufficient max cost to cover module factory setup cost',
