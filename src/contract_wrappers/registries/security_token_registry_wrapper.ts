@@ -46,7 +46,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToKeccak256,
+  stringToBytes32,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -1170,11 +1170,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     let feeType = '';
     switch (params.feeType) {
       case FeeType.stLaunchFee: {
-        feeType = stringToKeccak256('stLaunchFee');
+        feeType = stringToBytes32('stLaunchFee');
         break;
       }
       case FeeType.tickerRegFee: {
-        feeType = stringToKeccak256('tickerRegFee');
+        feeType = stringToBytes32('tickerRegFee');
         break;
       }
       default: {

@@ -18,7 +18,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToKeccak256
+  stringToBytes32
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { FULL_DECIMALS, FeeType } from '../../../types';
@@ -781,7 +781,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       const mockedParams = {
         feeType: FeeType.tickerRegFee
       };
-      const bytes32 = stringToKeccak256("tickerRegFee");
+      const bytes32 = stringToBytes32("tickerRegFee");
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
