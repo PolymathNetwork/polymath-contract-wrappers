@@ -1,55 +1,55 @@
 import {
-  ISecurityTokenContract,
-  SecurityTokenEventArgs,
-  SecurityTokenEvents,
-  SecurityTokenModuleAddedEventArgs,
-  SecurityTokenModuleUpgradedEventArgs,
-  SecurityTokenUpdateTokenDetailsEventArgs,
-  SecurityTokenUpdateTokenNameEventArgs,
-  SecurityTokenGranularityChangedEventArgs,
-  SecurityTokenFreezeIssuanceEventArgs,
-  SecurityTokenFreezeTransfersEventArgs,
-  SecurityTokenCheckpointCreatedEventArgs,
-  SecurityTokenSetControllerEventArgs,
-  SecurityTokenTreasuryWalletChangedEventArgs,
-  SecurityTokenDisableControllerEventArgs,
-  SecurityTokenOwnershipTransferredEventArgs,
-  SecurityTokenTokenUpgradedEventArgs,
-  SecurityTokenModuleArchivedEventArgs,
-  SecurityTokenModuleUnarchivedEventArgs,
-  SecurityTokenModuleRemovedEventArgs,
-  SecurityTokenModuleBudgetChangedEventArgs,
-  SecurityTokenTransferByPartitionEventArgs,
-  SecurityTokenAuthorizedOperatorEventArgs,
-  SecurityTokenRevokedOperatorEventArgs,
-  SecurityTokenAuthorizedOperatorByPartitionEventArgs,
-  SecurityTokenRevokedOperatorByPartitionEventArgs,
-  SecurityTokenIssuedByPartitionEventArgs,
-  SecurityTokenRedeemedByPartitionEventArgs,
-  SecurityTokenControllerTransferEventArgs,
-  SecurityTokenControllerRedemptionEventArgs,
-  SecurityTokenDocumentRemovedEventArgs,
-  SecurityTokenDocumentUpdatedEventArgs,
-  SecurityTokenIssuedEventArgs,
-  SecurityTokenRedeemedEventArgs,
-  SecurityTokenTransferEventArgs,
-  SecurityTokenApprovalEventArgs,
   FeatureRegistryContract,
+  ISecurityTokenContract,
   ModuleFactoryContract,
-  PolyTokenContract,
   ModuleRegistryContract,
   PolyResponse,
+  PolyTokenContract,
+  SecurityTokenApprovalEventArgs,
+  SecurityTokenAuthorizedOperatorByPartitionEventArgs,
+  SecurityTokenAuthorizedOperatorEventArgs,
+  SecurityTokenCheckpointCreatedEventArgs,
+  SecurityTokenControllerRedemptionEventArgs,
+  SecurityTokenControllerTransferEventArgs,
+  SecurityTokenDisableControllerEventArgs,
+  SecurityTokenDocumentRemovedEventArgs,
+  SecurityTokenDocumentUpdatedEventArgs,
+  SecurityTokenEventArgs,
+  SecurityTokenEvents,
+  SecurityTokenFreezeIssuanceEventArgs,
+  SecurityTokenFreezeTransfersEventArgs,
+  SecurityTokenGranularityChangedEventArgs,
+  SecurityTokenIssuedByPartitionEventArgs,
+  SecurityTokenIssuedEventArgs,
+  SecurityTokenModuleAddedEventArgs,
+  SecurityTokenModuleArchivedEventArgs,
+  SecurityTokenModuleBudgetChangedEventArgs,
+  SecurityTokenModuleRemovedEventArgs,
+  SecurityTokenModuleUnarchivedEventArgs,
+  SecurityTokenModuleUpgradedEventArgs,
+  SecurityTokenOwnershipTransferredEventArgs,
+  SecurityTokenRedeemedByPartitionEventArgs,
+  SecurityTokenRedeemedEventArgs,
+  SecurityTokenRevokedOperatorByPartitionEventArgs,
+  SecurityTokenRevokedOperatorEventArgs,
+  SecurityTokenSetControllerEventArgs,
+  SecurityTokenTokenUpgradedEventArgs,
+  SecurityTokenTransferByPartitionEventArgs,
+  SecurityTokenTransferEventArgs,
+  SecurityTokenTreasuryWalletChangedEventArgs,
+  SecurityTokenUpdateTokenDetailsEventArgs,
+  SecurityTokenUpdateTokenNameEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import {
-  ISecurityToken,
+  CappedSTO,
   CountTransferManager,
   ERC20DividendCheckpoint,
-  CappedSTO,
-  USDTieredSTO,
-  PercentageTransferManager,
   EtherDividendCheckpoint,
+  ISecurityToken,
+  PercentageTransferManager,
+  USDTieredSTO,
 } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper, TxData } from '@0x/web3-wrapper';
+import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import { ethers } from 'ethers';
@@ -58,32 +58,32 @@ import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
   EventCallback,
-  GetLogs,
-  Subscribe,
-  ModuleType,
-  FundRaiseType,
-  ModuleName,
   Feature,
-  PERCENTAGE_DECIMALS,
   FULL_DECIMALS,
+  FundRaiseType,
+  GetLogs,
+  GetLogsAsyncParams,
+  ModuleName,
+  ModuleType,
+  Partition,
+  PERCENTAGE_DECIMALS,
+  Subscribe,
+  SubscribeAsyncParams,
+  TxParams,
 } from '../../types';
 import {
-  stringToBytes32,
-  numberToBigNumber,
-  dateToBigNumber,
-  bytes32ToString,
-  valueToWei,
-  valueArrayToWeiArray,
-  weiToValue,
-  bytes32ArrayToStringArray,
   bigNumberToDate,
+  bytes32ArrayToStringArray,
+  bytes32ToString,
+  dateToBigNumber,
+  numberToBigNumber,
+  stringToBytes32,
+  valueArrayToWeiArray,
+  valueToWei,
+  weiToValue,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
-import ModuleFactoryWrapper from '../modules/module_factory_wrapper';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -132,6 +132,15 @@ interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetUpdateTokenDetailsLogsAsyncParams extends GetLogsAsyncParams {
   eventName: SecurityTokenEvents.UpdateTokenDetails;
+}
+
+interface UpdateTokenNameSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents.UpdateTokenName;
+  callback: EventCallback<SecurityTokenUpdateTokenNameEventArgs>;
+}
+
+interface GetUpdateTokenNameLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents.UpdateTokenName;
 }
 
 interface GranularityChangedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -374,6 +383,7 @@ interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
   (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
+  (params: UpdateTokenNameSubscribeAsyncParams): Promise<string>;
   (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
   (params: ModuleArchivedSubscribeAsyncParams): Promise<string>;
   (params: ModuleUnarchivedSubscribeAsyncParams): Promise<string>;
@@ -408,8 +418,11 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>[]>;
   (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
-  >;
+      LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
+      >;
+  (params: GetUpdateTokenNameLogsAsyncParams): Promise<
+      LogWithDecodedArgs<SecurityTokenUpdateTokenNameEventArgs>[]
+      >;
   (params: GetGranularityChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>[]
   >;
@@ -460,7 +473,7 @@ interface IsOperatorParams {
 }
 
 interface IsOperatorForPartitionParams extends IsOperatorParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface PartitionsOfParams {
@@ -535,7 +548,7 @@ interface CanTransferFromParams extends CanTransferParams {
 }
 
 interface CanTransferByPartitionParams extends CanTransferFromParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface ChangeApprovalParams extends TxParams {
@@ -608,7 +621,7 @@ interface IssueParams extends TxParams {
 }
 
 interface IssueByPartitionParams extends IssueParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface IssueMultiParams extends TxParams {
@@ -628,7 +641,7 @@ interface RedeemParams extends TxParams {
 }
 
 interface RedeemByPartitionParams extends RedeemParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
@@ -648,12 +661,12 @@ interface BalanceOfAtParams {
 }
 
 interface BalanceOfByPartitionParams {
-  partition: string;
+  partition: Partition;
   tokenHolder: string;
 }
 
 interface TransferByPartitionParams extends TxParams {
-  partition: string;
+  partition: Partition;
   to: string;
   value: BigNumber;
   data: string;
@@ -664,7 +677,7 @@ interface AuthorizeOperatorParams extends TxParams {
 }
 
 interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface RevokeOperatorParams extends TxParams {
@@ -672,7 +685,7 @@ interface RevokeOperatorParams extends TxParams {
 }
 
 interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
-  partition: string;
+  partition: Partition;
 }
 
 interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
@@ -835,7 +848,7 @@ interface CanTransferFromData {
 
 interface CanTransferByPartitionData extends CanTransferFromData {
   /** Partition */
-  partition: string;
+  partition: Partition;
 }
 // // End of return types ////
 
@@ -1152,7 +1165,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public unfreezeTransfers = async (params: TxParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert((await this.transfersFrozen()), 'Transfers are not frozen');
+    assert.assert(await this.transfersFrozen(), 'Transfers are not frozen');
     return (await this.contract).unfreezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -1213,7 +1226,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).issueByPartition.sendTransactionAsync(
       params.partition,
       params.investor,
@@ -1262,7 +1275,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public redeemByPartition = async (params: RedeemByPartitionParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).redeemByPartition.sendTransactionAsync(
       params.partition,
       valueToWei(params.value, await this.decimals()),
@@ -1275,7 +1288,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
       params.partition,
       params.tokenHolder,
@@ -1346,7 +1359,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public transferByPartition = async (params: TransferByPartitionParams) => {
     assert.isETHAddressHex('To', params.to);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).transferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.to,
@@ -1377,7 +1390,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public authorizeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams) => {
     assert.isETHAddressHex('Operator', params.operator);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).authorizeOperatorByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.operator,
@@ -1386,9 +1399,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public revokeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams) => {
+  public revokeOperatorByPartition = async (params: RevokeOperatorByPartitionParams) => {
     assert.isETHAddressHex('Operator', params.operator);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).revokeOperatorByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.operator,
@@ -1400,7 +1413,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
     assert.isETHAddressHex('To', params.to);
     assert.isETHAddressHex('From', params.from);
-    assert.assert(params.partition === 'UNLOCKED', 'Invalid Partition');
+    assert.isValidPartition(params.partition);
     return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.from,
@@ -1597,7 +1610,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const typedResult: CanTransferByPartitionData = {
       statusCode: result[0],
       reasonCode: bytes32ToString(result[1]),
-      partition: bytes32ToString(result[2]),
+      partition: bytes32ToString(result[2]) === Partition.Unlocked ? Partition.Unlocked : Partition.Undefined,
     };
     return typedResult;
   };

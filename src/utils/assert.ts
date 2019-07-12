@@ -1,5 +1,6 @@
 import { assert as sharedAssert } from '@0x/assert';
 import { BigNumber } from '@0x/utils';
+import {Partition} from '../types';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
 const MAX_64_BYTES_DATE = new Date(18446744073709);
@@ -59,6 +60,9 @@ const assert = {
       'Invalid package version. Right format: major.minor.patch',
     );
   },
+  isValidPartition(partition: Partition) {
+    sharedAssert.assert(partition === Partition.Unlocked, 'Invalid Partition');
+  }
 };
 
 export default assert;

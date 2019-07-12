@@ -20,7 +20,15 @@ import {
   ModuleRegistryContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import { ModuleType, ModuleName, Feature, FundRaiseType, PERCENTAGE_DECIMALS, FULL_DECIMALS } from '../../../types';
+import {
+  ModuleType,
+  ModuleName,
+  Feature,
+  FundRaiseType,
+  PERCENTAGE_DECIMALS,
+  FULL_DECIMALS,
+  Partition,
+} from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -105,7 +113,7 @@ describe('SecurityTokenWrapper', () => {
     test('should call to isOperatorForPartition', async () => {
       const expectedResult = true;
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         operator: '0x5555555555555555555555555555555555555555',
         tokenHolder: '0x4444444444444444444444444444444444444444',
       };
@@ -322,7 +330,6 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.callAsync()).once();
     });
   });
-
 
   describe('isOwner', () => {
     test('should call to isOwner', async () => {
@@ -778,7 +785,7 @@ describe('SecurityTokenWrapper', () => {
       const expectedResult = new BigNumber(1);
       const mockedParams = {
         tokenHolder: '0x1111111111111111111111111111111111111111',
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
       };
 
       const expectedDecimalsResult = new BigNumber(18);
@@ -1032,7 +1039,7 @@ describe('SecurityTokenWrapper', () => {
     test('should call to canTransferByPartition', async () => {
       const expectedStatusCode = 'X';
       const expectedReasonCode = 'Reason';
-      const expectedPartition = 'Partition';
+      const expectedPartition = Partition.Unlocked;
       const expectedResult = [
         expectedStatusCode,
         stringToBytes32(expectedReasonCode),
@@ -2175,7 +2182,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to transferByPartition', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         to: '0x2222222222222222222222222222222222222222',
         value: new BigNumber(1),
         data: 'string',
@@ -2298,7 +2305,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to authorizeOperatorByPartition', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         operator: '0x2222222222222222222222222222222222222222',
         txData: {},
         safetyFactor: 10,
@@ -2341,7 +2348,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to revokeOperatorByPartition', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         operator: '0x2222222222222222222222222222222222222222',
         txData: {},
         safetyFactor: 10,
@@ -2386,7 +2393,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to transferByPartition', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         from: '0x2222222222222222222222222222222222222222',
         to: '0x2222222222222222222222222222222222222222',
         value: new BigNumber(1),
@@ -2582,7 +2589,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to issue', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         investor: '0x1111111111111111111111111111111111111111',
         value: new BigNumber(2),
         data: 'string',
@@ -2807,7 +2814,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to redeem', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         value: new BigNumber(1),
         data: 'string',
         txData: {},
@@ -2879,7 +2886,7 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to operatorRedeemByPartition', async () => {
       // Mocked parameters
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         tokenHolder: '0x9999999999999999999999999999999999999999',
         value: new BigNumber(1),
         data: 'string',

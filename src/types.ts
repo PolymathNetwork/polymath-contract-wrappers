@@ -117,6 +117,11 @@ export enum Feature {
   FreezeMintingAllowed = 'freezeMintingAllowed',
 }
 
+export enum Partition {
+  Unlocked = 'UNLOCKED',
+  Undefined = 'UNDEFINED',
+}
+
 export enum PolymathContract {
   PolyToken = 'PolyToken',
   ModuleRegistry = 'ModuleRegistry',
