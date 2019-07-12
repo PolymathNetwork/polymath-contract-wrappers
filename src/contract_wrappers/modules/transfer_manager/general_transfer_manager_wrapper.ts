@@ -167,7 +167,7 @@ interface ModifyKYCDataSignedParams extends TxParams {
 
 interface GetInvestorFlag {
   investor: string;
-  flag: number;
+  flag: FlagsType;
 }
 
 interface GetInvestorFlags {
@@ -320,38 +320,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public getAllInvestorFlags = async () => {
-    const result = await (await this.contract).getAllInvestorFlags.callAsync();
-    const typedResult: InvestorAndFlag[] = [];
-    let flag = FlagsType.IsAccredited;
-    for (let i = 0; i < result[0].length; i += 1) {
-      switch (result[1][i].toNumber()) {
-        case 0: {
-          flag = FlagsType.IsAccredited;
-          break;
-        }
-        case 1: {
-          flag = FlagsType.CanNotBuyFromSto;
-          break;
-        }
-        case 2: {
-          flag = FlagsType.IsVolRestricted;
-          break;
-        }
-        default: {
-          assert.assert(false, 'Missing Flag');
-          break;
-        }
-      }
-      const InvestorAndFlag: InvestorAndFlag = {
-        investor: result[0][i],
-        flag,
-      };
-      typedResult.push(InvestorAndFlag);
-    }
-    return typedResult;
-  };
-
   public getInvestorFlag = async (params: GetInvestorFlag) => {
     const result = await (await this.contract).getInvestorFlag.callAsync(params.investor, params.flag);
     return result;
@@ -363,9 +331,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return !!bitInFlagPosition;
   };
 
-  public getInvestorFlags = async (params: GetInvestorFlags) => {
-    const { investor } = params;
-    const result = await (await this.contract).getInvestorFlags.callAsync(investor);
+  private flagsCheking = (investor: string, flags: BigNumber) => {
     let isAccredited = false;
     let canNotBuyFromSTO = false;
     let isVolRestricted = false;
@@ -373,17 +339,12 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     // eslint-disable-next-line no-restricted-syntax
     for (const flag in FlagsType) {
       if (Object.prototype.hasOwnProperty.call(FlagsType, flag)) {
-        // This check is required because iterating through an enum
-        // yields the names of the enum members as well as the indexes.
-        // We only need the indexes so we skip the names in this case
-        const position = Number(flag); // NaN if flag is string
+        const position = Number(flag);
         if (!flag) {
           // eslint-disable-next-line no-continue
           continue;
         }
-
-        const isSet = this.isFlagTrue(position, result.toNumber());
-
+        const isSet = this.isFlagTrue(position, flags.toNumber());
         switch (position) {
           case FlagsType.IsAccredited: {
             isAccredited = isSet;
@@ -410,6 +371,23 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       canNotBuyFromSTO,
       isVolRestricted,
     };
+  };
+
+  public getAllInvestorFlags = async () => {
+    const result = await (await this.contract).getAllInvestorFlags.callAsync();
+    const investors = result[0];
+    const flags = result[1];
+    const investorFalgs = [];
+    for (let i = 0; i < investors[0].length; i += 1) {
+      investorFalgs.push(this.flagsCheking(investors[i], flags[i]));
+    }
+    return investorFalgs;
+  };
+
+  public getInvestorFlags = async (params: GetInvestorFlags) => {
+    const { investor } = params;
+    const flags = await (await this.contract).getInvestorFlags.callAsync(investor);
+    return this.flagsCheking(investor, flags);
   };
 
   public getAllKYCData = async () => {
