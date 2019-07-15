@@ -125,6 +125,7 @@ export enum Feature {
 
 export enum Partition {
   Unlocked = 'UNLOCKED',
+  Locked = 'LOCKED',
   Undefined = 'UNDEFINED',
 }
 

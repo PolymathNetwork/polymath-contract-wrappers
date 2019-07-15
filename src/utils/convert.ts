@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { BigNumber } from '@0x/utils';
+import { Partition } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -80,4 +81,16 @@ export function packVersion(major: string, minor: string, patch: string) {
 }
 export function stringToKeccak256(value: string) {
   return ethers.utils.keccak256(value);
+}
+export function parsePartitionBytes32Value(value: string): Partition {
+  switch (bytes32ToString(value)) {
+    case 'UNLOCKED':
+      return Partition.Unlocked;
+    case 'LOCKED':
+      return Partition.Locked;
+    case '0':
+      return Partition.Undefined;
+    default:
+      throw new Error('Partition not recognized');
+  }
 }
