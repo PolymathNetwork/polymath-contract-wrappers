@@ -285,7 +285,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -296,7 +296,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -306,7 +306,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -433,7 +433,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);

@@ -158,7 +158,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public addDelegate = async (params: AddDelegateParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.ChangePermission), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
     assert.assert(!await (await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
@@ -171,7 +171,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public deleteDelegate = async (params: DelegateTxParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.ChangePermission), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(await (await this.contract).checkDelegate.callAsync(params.delegate), 'Delegate does not exist');
     return (await this.contract).deleteDelegate.sendTransactionAsync(
@@ -187,7 +187,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermission = async (params: ChangePermissionParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.ChangePermission), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).changePermission.sendTransactionAsync(
@@ -201,7 +201,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.ChangePermission), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     params.modules.forEach(address => assert.isETHAddressHex('modules', address));
     assert.assert(params.modules.length > 0, '0 length is not allowed');
