@@ -41,7 +41,7 @@ import {
   weiToValue,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
-  bigNumberToDate,
+  bigNumberToDate, parsePartitionBytes32Value,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -148,7 +148,7 @@ describe('SecurityTokenWrapper', () => {
 
   describe('partitionsOf', () => {
     test('should call to partitionsOf', async () => {
-      const expectedResult = stringArrayToBytes32Array(['UNDEFINED', 'UNLOCKED']);
+      const expectedResult = stringArrayToBytes32Array(['0', 'UNLOCKED', 'LOCKED']);
       const mockedParams = {
         partition: 'UNLOCKED',
         operator: '0x5555555555555555555555555555555555555555',
@@ -164,7 +164,7 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       const result = await target.partitionsOf(mockedParams);
       // Result expectation
-      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+      expect(result).toEqual(expectedResult.map(parsePartitionBytes32Value));
       // Verifications
       verify(mockedContract.partitionsOf).once();
       verify(mockedMethod.callAsync(mockedParams.tokenHolder)).once();

@@ -78,6 +78,7 @@ import {
   bytes32ToString,
   dateToBigNumber,
   numberToBigNumber,
+  parsePartitionBytes32Value,
   stringToBytes32,
   valueArrayToWeiArray,
   valueToWei,
@@ -912,8 +913,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public partitionsOf = async (params: PartitionsOfParams): Promise<Partition[]> => {
     const partitions = await (await this.contract).partitionsOf.callAsync(params.tokenHolder);
-    return bytes32ArrayToStringArray(partitions).map(element => {
-      return element === Partition.Unlocked ? Partition.Unlocked : Partition.Undefined;
+    return partitions.map(element => {
+      return parsePartitionBytes32Value(element);
     });
   };
 
@@ -1610,7 +1611,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const typedResult: CanTransferByPartitionData = {
       statusCode: result[0],
       reasonCode: bytes32ToString(result[1]),
-      partition: bytes32ToString(result[2]) === Partition.Unlocked ? Partition.Unlocked : Partition.Undefined,
+      partition: parsePartitionBytes32Value(result[2]),
     };
     return typedResult;
   };
