@@ -17,7 +17,13 @@ import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import { bigNumberToDate, dateToBigNumber, numberToBigNumber, valueToWei } from '../../../utils/convert';
+import {
+  bigNumberToDate,
+  dateToBigNumber,
+  numberToBigNumber,
+  valueToWei,
+  bytes32ToString,
+} from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   TxParams,
@@ -28,6 +34,7 @@ import {
   GetLogs,
   FlagsType,
   Perm,
+  TransferType,
 } from '../../../types';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -179,6 +186,107 @@ interface GetKYCDataParams {
 }
 
 /**
+ * @param investor is the address of the investor.
+ * @param flag index of flag to change. flag is used to know specifics about investor like isAccredited.
+ * @param value value of the flag. a flag can be true or false.
+ */
+interface ModifyInvestorFlag extends TxParams {
+  investor: string;
+  flag: FlagsType;
+  value: boolean;
+}
+
+/**
+ * @param investors List of the addresses to modify data about.
+ * @param flag index of flag to change. flag is used to know specifics about investor like isAccredited.
+ * @param value value of the flag. a flag can be true or false.
+ */
+interface ModifyInvestorFlagMulti extends TxParams {
+  investors: string[];
+  flag: FlagsType[];
+  value: boolean[];
+}
+
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ */
+interface ExecuteTransfer extends TxParams {
+  from: string;
+  to: string;
+  data: string;
+}
+
+/**
+ * @param transferType Type of transfer (0 = General, 1 = Issuance, 2 = Redemption)
+ * @param fromValidKYC Defines if KYC is required for the sender
+ * @param toValidKYC Defines if KYC is required for the receiver
+ * @param fromRestricted Defines if transfer time restriction is checked for the sender
+ * @param toRestricted Defines if transfer time restriction is checked for the receiver
+ */
+interface ModifyTransferRequirements extends TxParams {
+  transferType: TransferType;
+  fromValidKYC: boolean;
+  toValidKYC: boolean;
+  fromRestricted: boolean;
+  toRestricted: boolean;
+}
+
+/**
+ * @param transferTypes Types of transfer (0 = General, 1 = Issuance, 2 = Redemption)
+ * @param fromValidKYC Defines if KYC is required for the sender
+ * @param toValidKYC Defines if KYC is required for the receiver
+ * @param fromRestricted Defines if transfer time restriction is checked for the sender
+ * @param toRestricted Defines if transfer time restriction is checked for the receiver
+ */
+interface ModifyTransferRequirementsMulti extends TxParams {
+  transferTypes: TransferType[];
+  fromValidKYC: boolean[];
+  toValidKYC: boolean[];
+  fromRestricted: boolean[];
+  toRestricted: boolean[];
+}
+
+/**
+ * @param investors is the address to whitelist
+ * @param canSendAfter is the moment when the sale lockup period ends and the investor can freely sell his tokens
+ * @param canReceiveAfter is the moment when the purchase lockup period ends and the investor can freely purchase tokens from others
+ * @param expiryTime is the moment till investors KYC will be validated. After that investor need to do re-KYC
+ */
+interface ModifyKYCDataMulti extends TxParams {
+  investors: string[];
+  canSendAfter: Date[];
+  canReceiveAfter: Date[];
+  expiryTime: Date[];
+}
+
+/**
+ * @param investor is the address to whitelist
+ * @param canSendAfter is the moment when the sale lockup period ends and the investor can freely sell his tokens
+ * @param canReceiveAfter is the moment when the purchase lockup period ends and the investor can freely purchase tokens from others
+ * @param expiryTime is the moment till investors KYC will be validated. After that investor need to do re-KYC
+ * @param validFrom is the time that this signature is valid from
+ * @param validTo is the time that this signature is valid until
+ * @param nonce nonce of signature (avoid replay attack)
+ * @param signature issuer signature
+ */
+interface ModifyKYCDataSignedMulti extends TxParams {
+  investor: string[];
+  canSendAfter: Date[];
+  canReceiveAfter: Date[];
+  expiryTime: Date[];
+  validFrom: Date;
+  validTo: Date;
+  nonce: number;
+  signature: string;
+}
+
+interface GetInvestors {
+  fromIndex: number;
+  toIndex: number;
+}
+
+/**
  * @param partition Identifier
  * @param tokenHolder Whom token amount need to query
  * @param additionalBalance It is the `_value` that transfer during transfer/transferFrom function call
@@ -285,7 +393,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -296,7 +404,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -306,7 +414,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -433,7 +541,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -455,6 +562,222 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  /**
+   * Used to modify investor Flag.
+   */
+  public modifyInvestorFlag = async (params: ModifyInvestorFlag) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('investor', params.investor);
+    return (await this.contract).modifyInvestorFlag.sendTransactionAsync(
+      params.investor,
+      params.flag,
+      params.value,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Used to modify investor data.
+   */
+  public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMulti) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      params.investors.length === params.flag.length && params.flag.length === params.value.length,
+      'Mismatched input lengths',
+    );
+    return (await this.contract).modifyInvestorFlagMulti.sendTransactionAsync(
+      params.investors,
+      params.flag,
+      params.value,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Default implementation of verifyTransfer used by SecurityToken
+   * If the transfer request comes from the STO, it only checks that the investor is in the whitelist
+   * If the transfer request comes from a token holder, it checks that:
+   * a) Both are on the whitelist
+   * b) Seller's sale lockup period is over
+   * c) Buyer's purchase lockup is over
+   */
+  public executeTransfer = async (params: ExecuteTransfer) => {
+    return (await this.contract).executeTransfer.sendTransactionAsync(
+      params.from,
+      params.to,
+      new BigNumber(0),
+      params.data,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Default implementation of verifyTransfer used by SecurityToken
+   */
+  public verifyTransfer = async (params: ExecuteTransfer) => {
+    const result = await (await this.contract).verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      new BigNumber(0),
+      params.data,
+      params.txData,
+      params.safetyFactor,
+    );
+    return result;
+  };
+
+  /**
+   * Modifies the successful checks required for a transfer to be deemed valid.
+   */
+  public modifyTransferRequirements = async (params: ModifyTransferRequirements) => {
+    const result = await (await this.contract).modifyTransferRequirements.callAsync(
+      params.transferType,
+      params.fromValidKYC,
+      params.toValidKYC,
+      params.fromRestricted,
+      params.toRestricted,
+      params.txData,
+      params.safetyFactor,
+    );
+    return result;
+  };
+
+  /**
+   * Modifies the successful checks required for transfers.
+   */
+  public modifyTransferRequirementsMulti = async (params: ModifyTransferRequirementsMulti) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      params.transferTypes.length === params.fromValidKYC.length &&
+        params.fromValidKYC.length === params.toValidKYC.length &&
+        params.toValidKYC.length === params.fromRestricted.length &&
+        params.fromRestricted.length === params.toRestricted.length,
+      'Mismatched input lengths',
+    );
+    return (await this.contract).modifyTransferRequirementsMulti.sendTransactionAsync(
+      params.transferTypes,
+      params.fromValidKYC,
+      params.toValidKYC,
+      params.fromRestricted,
+      params.toRestricted,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Add or remove KYC info of an investor.
+   */
+  public modifyKYCDataMulti = async (params: ModifyKYCDataMulti) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      params.investors.length === params.canSendAfter.length &&
+        params.canSendAfter.length === params.canReceiveAfter.length &&
+        params.canReceiveAfter.length === params.expiryTime.length,
+      'Mismatched input lengths',
+    );
+    const canSendAfter: BigNumber[] = [];
+    const canReceiveAfter: BigNumber[] = [];
+    const expiryTime: BigNumber[] = [];
+
+    for (let i = 0; i < params.canSendAfter.length; i += 1) {
+      canSendAfter.push(dateToBigNumber(params.canSendAfter[i]));
+      canReceiveAfter.push(dateToBigNumber(params.canReceiveAfter[i]));
+      expiryTime.push(dateToBigNumber(params.expiryTime[i]));
+    }
+
+    return (await this.contract).modifyKYCDataMulti.sendTransactionAsync(
+      params.investors,
+      canSendAfter,
+      canReceiveAfter,
+      expiryTime,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
+   */
+  public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMulti) => {
+    const canSendAfter: BigNumber[] = [];
+    const canReceiveAfter: BigNumber[] = [];
+    const expiryTime: BigNumber[] = [];
+    for (let i = 0; i < params.canSendAfter.length; i += 1) {
+      canSendAfter.push(dateToBigNumber(params.canSendAfter[i]));
+    }
+    for (let i = 0; i < params.canReceiveAfter.length; i += 1) {
+      canReceiveAfter.push(dateToBigNumber(params.canReceiveAfter[i]));
+    }
+    for (let i = 0; i < params.expiryTime.length; i += 1) {
+      expiryTime.push(dateToBigNumber(params.expiryTime[i]));
+    }
+
+    return (await this.contract).modifyKYCDataSignedMulti.sendTransactionAsync(
+      params.investor,
+      canSendAfter,
+      canReceiveAfter,
+      expiryTime,
+      dateToBigNumber(params.validFrom),
+      dateToBigNumber(params.validTo),
+      new BigNumber(params.nonce),
+      params.signature,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Returns list of all investors
+   */
+  public getAllInvestors = async () => {
+    const result = await (await this.contract).getAllInvestors.callAsync();
+    return result;
+  };
+
+  /**
+   * Returns list of investors in a range
+   */
+  public getInvestors = async (params: GetInvestors) => {
+    const result = await (await this.contract).getInvestors.callAsync(
+      new BigNumber(params.fromIndex),
+      new BigNumber(params.toIndex),
+    );
+    return result;
+  };
+
+  /**
+   * Return the permissions flag that are associated with general trnasfer manager
+   */
+  public getPermissions = async () => {
+    const call = await (await this.contract).getPermissions.callAsync();
+    const result: Perm[] = [];
+    for (let i = 0; i < call.length; i += 1) {
+      switch (bytes32ToString(call[i])) {
+        case Perm.Admin: {
+          result.push(Perm.Admin);
+          break;
+        }
+        case Perm.Operator: {
+          result.push(Perm.Operator);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+    return result;
+  };
+
+  public getAddressBytes32 = async () => {
+    const result = await (await this.contract).getAddressBytes32.callAsync();
+    return bytes32ToString(result);
   };
 
   /**

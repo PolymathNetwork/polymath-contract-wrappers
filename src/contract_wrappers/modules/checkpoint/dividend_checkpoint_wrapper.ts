@@ -40,10 +40,6 @@ interface ChangeWalletParams extends TxParams {
   wallet: string;
 }
 
-interface ReclaimERC20Params extends TxParams {
-  tokenContract: string;
-}
-
 interface SetDefaultExcludedParams extends TxParams {
   excluded: string[];
 }
@@ -212,22 +208,6 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.assert(await this.paused(), 'Contract currently not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    // require(token.transfer(msg.sender, balance), "Transfer failed");
-    return (await this.contract).reclaimERC20.sendTransactionAsync(
-      params.tokenContract,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public reclaimETH = async (params: TxParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public changeWallet = async (params: ChangeWalletParams) => {

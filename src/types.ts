@@ -88,6 +88,12 @@ export enum ModuleType {
   Burn = 5,
 }
 
+export enum TransferType {
+  General,
+  Issuance,
+  Redemption,
+}
+
 export enum FundRaiseType {
   ETH = 0,
   POLY = 1,
@@ -155,6 +161,7 @@ export enum Perm {
   Distribute = 'DISTRIBUTE',
   FeeAdmin = 'FEE_ADMIN',
   PreSaleAdmin = 'PRE_SALE_ADMIN',
+  Operator = 'OPERATOR',
 }
 
 export enum RestrictionType {
