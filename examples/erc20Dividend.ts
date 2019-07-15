@@ -65,7 +65,7 @@ window.addEventListener('load', async () => {
   });
 
   const moduleStringName = 'ERC20DividendCheckpoint';
-  const moduleName = ModuleName.erc20DividendCheckpoint;
+  const moduleName = ModuleName.ERC20DividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.Dividends,
   });
@@ -112,15 +112,15 @@ window.addEventListener('load', async () => {
 
   // Get module for ether dividend checkpoint and address for module
   const erc20DividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.erc20DividendCheckpoint,
+    moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
 
   const erc20DividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.erc20DividendCheckpoint,
+    name: ModuleName.ERC20DividendCheckpoint,
     address: erc20DividendAddress,
   });
   const erc20Dividend = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.erc20DividendCheckpoint,
+    moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
 
   await polymathAPI.polyToken.transfer({ to: erc20Dividend, value: new BigNumber(5) });

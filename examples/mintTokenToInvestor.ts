@@ -26,7 +26,7 @@ window.addEventListener('load', async () => {
   const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
 
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
@@ -36,7 +36,7 @@ window.addEventListener('load', async () => {
   });
 
   await TEST.subscribeAsync({
-    eventName: SecurityTokenEvents.Minted,
+    eventName: SecurityTokenEvents.Issued,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -48,9 +48,10 @@ window.addEventListener('load', async () => {
   });
 
   if (found) {
-    await TEST.mint({
+    await TEST.issue({
       investor: investorAddress,
       value: new BigNumber(100),
+      data: '',
       txData: {
         from: '<sto owner>'.toLowerCase(),
       },

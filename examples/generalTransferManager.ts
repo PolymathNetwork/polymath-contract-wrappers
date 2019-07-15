@@ -1,9 +1,7 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue } from '../src/utils/convert';
 import { ModuleName } from '../src';
 
 // This file acts as a valid sandbox for using a general transfer manager  module on an unlocked node (like ganache)
@@ -67,12 +65,12 @@ window.addEventListener('load', async () => {
 
   // Get General TM Address
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalTransferManager,
+    moduleName: ModuleName.GeneralTransferManager,
   }))[0];
 
   // Get general TM module instance
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
@@ -89,6 +87,14 @@ window.addEventListener('load', async () => {
       }
     },
   });
+
+  // Change allow all whitelist transfers: I_GeneralTransferManager.modifyTransferRequirementsMulti(
+  //                 [0, 1, 2],
+  //                 [false, false, false],
+  //                 [false, false, false],
+  //                 [false, false, false],
+  //                 [false, false, false],
+  //                 { from: token_owner }
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
@@ -103,7 +109,7 @@ window.addEventListener('load', async () => {
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: false });
 
   // Add whitelist special users
-  await generalTM.modifyWhitelistMulti({
+  await generalTM.modify({
     investors: [randomBeneficiary1, randomBeneficiary2, myAddress],
     canBuyFromSTO: [true, true, true],
     canReceiveAfters: [new Date(2018, 1), new Date(2018, 1), new Date(2018, 1)],
@@ -111,7 +117,6 @@ window.addEventListener('load', async () => {
     expiryTimes: [new Date(2035, 1), new Date(2035, 1), new Date(2035, 1)],
   });
 
-  // Change allow all whitelist transfers
   await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
   // Verify we can make transfers

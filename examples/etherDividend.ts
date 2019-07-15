@@ -1,10 +1,9 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EtherDividendCheckpointEvents, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers/lib/src';
+import { EtherDividendCheckpointEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
-import { FULL_DECIMALS, ModuleName, ModuleType } from '../src';
+import { bytes32ToString } from '../src/utils/convert';
+import { ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
@@ -64,7 +63,7 @@ window.addEventListener('load', async () => {
   });
 
   const moduleStringName = 'EtherDividendCheckpoint';
-  const moduleName = ModuleName.etherDividendCheckpoint;
+  const moduleName = ModuleName.EtherDividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.Dividends,
   });
@@ -110,11 +109,11 @@ window.addEventListener('load', async () => {
 
   // Get module for ether dividend checkpoint and address for module
   const etherDividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.etherDividendCheckpoint,
+    moduleName: ModuleName.EtherDividendCheckpoint,
   }))[0];
   console.log(etherDividendAddress);
   const etherDividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.etherDividendCheckpoint,
+    name: ModuleName.EtherDividendCheckpoint,
     address: etherDividendAddress,
   });
 
