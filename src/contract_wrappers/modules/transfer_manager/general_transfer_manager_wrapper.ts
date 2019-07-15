@@ -331,7 +331,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return !!bitInFlagPosition;
   };
 
-  private flagsCheking = (investor: string, flags: BigNumber) => {
+  private unpackFlags = (investor: string, flags: BigNumber) => {
     let isAccredited = false;
     let canNotBuyFromSTO = false;
     let isVolRestricted = false;
@@ -375,19 +375,18 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public getAllInvestorFlags = async () => {
     const result = await (await this.contract).getAllInvestorFlags.callAsync();
-    const investors = result[0];
-    const flags = result[1];
-    const investorFalgs = [];
+    const [investors, flags] = result;
+    const investorFlags = [];
     for (let i = 0; i < investors[0].length; i += 1) {
-      investorFalgs.push(this.flagsCheking(investors[i], flags[i]));
+      investorFlags.push(this.unpackFlags(investors[i], flags[i]));
     }
-    return investorFalgs;
+    return investorFlags;
   };
 
   public getInvestorFlags = async (params: GetInvestorFlags) => {
     const { investor } = params;
     const flags = await (await this.contract).getInvestorFlags.callAsync(investor);
-    return this.flagsCheking(investor, flags);
+    return this.unpackFlags(investor, flags);
   };
 
   public getAllKYCData = async () => {
