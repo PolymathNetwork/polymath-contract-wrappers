@@ -14,6 +14,7 @@ import {
   numberToBigNumber,
   valueToWei,
 } from '../../../../utils/convert';
+import { FlagsType } from '../../../../types';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
@@ -533,6 +534,350 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getAllKYCData).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetInvestorFlag', () => {
+    test('should getInvestorFlag', async () => {
+      const mockedParams = {
+        investor: '0x3333333333333333333333333333333333333333',
+        flag: FlagsType.IsAccredited,
+      };
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInvestorFlag).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.investor, mockedParams.flag)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInvestorFlag(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getInvestorFlag).once();
+      verify(mockedMethod.callAsync(mockedParams.investor, mockedParams.flag)).once();
+    });
+  });
+
+  describe('GetAllInvestorFlags', () => {
+    test('should getAllInvestorFlags', async () => {
+      // Address expected
+      const expectedResult = [['0x3333333333333333333333333333333333333333'], [new BigNumber(2)]];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllInvestorFlags).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllInvestorFlags();
+
+      // Result expectation
+      expect(result[0]).toEqual({
+        canNotBuyFromSTO: true,
+        investor: expectedResult[0][0],
+        isAccredited: false,
+        isVolRestricted: false,
+      });
+
+      // Verifications
+      verify(mockedContract.getAllInvestorFlags).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetInvestorFlags', () => {
+    test('should getInvestorFlags', async () => {
+      const mockedParams = {
+        investor: '0x3333333333333333333333333333333333333333',
+      };
+      // Address expected
+      const expectedResult = new BigNumber(2);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getInvestorFlags).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.investor)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getInvestorFlags(mockedParams);
+
+      // Result expectation
+      expect(result).toEqual({
+        canNotBuyFromSTO: true,
+        investor: mockedParams.investor,
+        isAccredited: false,
+        isVolRestricted: false,
+      });
+
+      // Verifications
+      verify(mockedContract.getInvestorFlags).once();
+      verify(mockedMethod.callAsync(mockedParams.investor)).once();
+    });
+  });
+
+  describe('ModifyKYCDataSigned', () => {
+    test('should modifyKYCDataSigned', async () => {
+      const mockedParams = {
+        investor: '0x5555555555555555555555555555555555555555',
+        canSendAfter: new Date(2030, 1),
+        canReceiveAfter: new Date(2031, 1),
+        expiryTime: new Date(2032, 1),
+        validFrom: new Date(2019, 1),
+        validTo: new Date(2031, 1),
+        nonce: 1,
+        signature: '0x5555555555555555555555555555555555555555',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // nonceMap
+      const expectedNonceResult = false;
+      const mockedNonceMethod = mock(MockedCallMethod);
+      when(mockedContract.nonceMap).thenReturn(instance(mockedNonceMethod));
+      when(
+        mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
+      ).thenResolve(expectedNonceResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyKYCDataSigned).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyKYCDataSigned(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.nonceMap).once();
+      verify(
+        mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
+      ).once();
+      verify(mockedContract.modifyKYCDataSigned).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('ModifyInvestorFlag', () => {
+    test('should modifyInvestorFlag', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        investor: '0x5555555555555555555555555555555555555555',
+        flag: FlagsType.IsVolRestricted,
+        value: true,
+        txData: {},
+        safetyFactor: 0,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyInvestorFlag).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyInvestorFlag(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyInvestorFlag).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('ModifyInvestorFlagMulti', () => {
+    test('should modifyInvestorFlagMulti', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        investors: ['0x4444444444444444444444444444444444444444', '0x5555555555555555555555555555555555555555'],
+        flag: [FlagsType.IsVolRestricted, FlagsType.IsVolRestricted],
+        value: [true, true],
+        txData: {},
+        safetyFactor: 0,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyInvestorFlagMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyInvestorFlagMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyInvestorFlagMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('ExecuteTransfer', () => {
+    test('should executeTransfer', async () => {
+      const value = new BigNumber(100);
+      const mockedParams = {
+        from: '0x4444444444444444444444444444444444444444',
+        to: '0x5555555555555555555555555555555555555555',
+        data: '0x5',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.executeTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(value),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.executeTransfer(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.executeTransfer).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(value),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
     });
   });
 

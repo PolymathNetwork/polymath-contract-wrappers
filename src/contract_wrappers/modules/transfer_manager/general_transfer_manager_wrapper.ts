@@ -485,7 +485,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this.contract).getAllInvestorFlags.callAsync();
     const [investors, flags] = result;
     const investorFlags = [];
-    for (let i = 0; i < investors[0].length; i += 1) {
+    for (let i = 0; i < investors.length; i += 1) {
       investorFlags.push(this.unpackFlags(investors[i], flags[i]));
     }
     return investorFlags;
@@ -609,7 +609,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).executeTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      new BigNumber(0),
+      new BigNumber(100),
       params.data,
       params.txData,
       params.safetyFactor,
@@ -623,7 +623,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
-      new BigNumber(0),
+      new BigNumber(100),
       params.data,
       params.txData,
       params.safetyFactor,
