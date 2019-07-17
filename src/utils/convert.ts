@@ -80,10 +80,6 @@ export function packVersion(major: string, minor: string, patch: string) {
   return packedVersion;
 }
 
-export function stringToKeccak256(value: string) {
-  return ethers.utils.keccak256(value);
-}
-
 export function parsePartitionBytes32Value(value: string): Partition {
   switch (bytes32ToString(value)) {
     case 'UNLOCKED':
