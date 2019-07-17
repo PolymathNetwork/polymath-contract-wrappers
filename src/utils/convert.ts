@@ -79,9 +79,7 @@ export function packVersion(major: string, minor: string, patch: string) {
   const packedVersion = (parseInt(major, 10) << 16) | (parseInt(minor, 10) << 8) | parseInt(patch, 10);
   return packedVersion;
 }
-export function stringToKeccak256(value: string) {
-  return ethers.utils.keccak256(value);
-}
+
 export function parsePartitionBytes32Value(value: string): Partition {
   switch (bytes32ToString(value)) {
     case 'UNLOCKED':
