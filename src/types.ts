@@ -6,10 +6,8 @@ import {
   PolyTokenEvents,
   CappedSTOFactoryEventArgs,
   CappedSTOEventArgs,
-  DetailedERC20EventArgs,
-  DetailedERC20Events,
-  AlternativeERC20EventArgs,
-  AlternativeERC20Events,
+  ERC20DetailedEventArgs,
+  ERC20DetailedEvents,
   ERC20DividendCheckpointEventArgs,
   EtherDividendCheckpointEventArgs,
   FeatureRegistryEventArgs,
@@ -35,6 +33,7 @@ import {
   PolyTokenFaucetEvents,
   PolymathRegistryEvents,
   SecurityTokenRegistryEvents,
+  ISecurityTokenRegistryEvents,
   SecurityTokenEvents,
   USDTieredSTOFactoryEvents,
   USDTieredSTOEvents,
@@ -49,9 +48,9 @@ import {
   STOContract,
   STOEvents,
   STOEventArgs,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
   PolyTokenContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   EtherDividendCheckpointContract,
   ManualApprovalTransferManagerContract,
   CountTransferManagerContract,
@@ -95,34 +94,58 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
-export enum Features {
+export enum FlagsType {
+  IsAccredited,
+  CanNotBuyFromSto,
+  IsVolRestricted,
+}
+
+export enum TransferResult {
+  INVALID,
+  NA,
+  VALID,
+  FORCE_VALID,
+}
+
+export enum FeeType {
+  tickerRegFee,
+  stLaunchFee,
+}
+
+export enum Feature {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
 }
 
-export enum PolymathContracts {
-  polyToken = 'PolyToken',
-  moduleRegistry = 'ModuleRegistry',
-  featureRegistry = 'FeatureRegistry',
-  securityTokenRegistry = 'SecurityTokenRegistry',
-  polyUsdOracle = 'PolyUsdOracle',
-  ethUsdOracle = 'EthUsdOracle',
+export enum Partition {
+  Unlocked = 'UNLOCKED',
+  Locked = 'LOCKED',
+  Undefined = 'UNDEFINED',
+}
+
+export enum PolymathContract {
+  PolyToken = 'PolyToken',
+  ModuleRegistry = 'ModuleRegistry',
+  FeatureRegistry = 'FeatureRegistry',
+  SecurityTokenRegistry = 'SecurityTokenRegistry',
+  PolyUsdOracle = 'PolyUsdOracle',
+  EthUsdOracle = 'EthUsdOracle',
 }
 
 export enum ModuleName {
-  generalPermissionManager = 'GeneralPermissionManager',
-  countTransferManager = 'CountTransferManager',
-  generalTransferManager = 'GeneralTransferManager',
-  manualApprovalTransferManager = 'ManualApprovalTransferManager',
-  percentageTransferManager = 'PercentageTransferManager',
-  volumeRestrictionTM = 'VolumeRestrictionTM',
-  cappedSTO = 'CappedSTO',
-  usdTieredSTO = 'USDTieredSTO',
-  erc20DividendCheckpoint = 'ERC20DividendCheckpoint',
-  etherDividendCheckpoint = 'EtherDividendCheckpoint',
+  GeneralPermissionManager = 'GeneralPermissionManager',
+  CountTransferManager = 'CountTransferManager',
+  GeneralTransferManager = 'GeneralTransferManager',
+  ManualApprovalTransferManager = 'ManualApprovalTransferManager',
+  PercentageTransferManager = 'PercentageTransferManager',
+  VolumeRestrictionTM = 'VolumeRestrictionTM',
+  CappedSTO = 'CappedSTO',
+  UsdTieredSTO = 'USDTieredSTO',
+  ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
+  EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
-export enum Perms {
+export enum Perm {
   ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
   Flags = 'FLAGS',
@@ -135,7 +158,7 @@ export enum Perms {
   PreSaleAdmin = 'PRE_SALE_ADMIN',
 }
 
-export enum RestrictionTypes {
+export enum RestrictionType {
   Fixed = 0,
   Percentage = 1,
 }
@@ -163,8 +186,7 @@ export type ContractEventArgs =
   | PolyTokenEventArgs
   | CappedSTOFactoryEventArgs
   | CappedSTOEventArgs
-  | DetailedERC20EventArgs
-  | AlternativeERC20EventArgs
+  | ERC20DetailedEventArgs
   | ERC20DividendCheckpointEventArgs
   | EtherDividendCheckpointEventArgs
   | FeatureRegistryEventArgs
@@ -188,8 +210,7 @@ export type ContractEvents =
   | PolyTokenEvents
   | CappedSTOFactoryEvents
   | CappedSTOEvents
-  | DetailedERC20Events
-  | AlternativeERC20Events
+  | ERC20DetailedEvents
   | ERC20DividendCheckpointEvents
   | EtherDividendCheckpointEvents
   | FeatureRegistryEvents
@@ -201,6 +222,7 @@ export type ContractEvents =
   | PolyTokenFaucetEvents
   | PolymathRegistryEvents
   | SecurityTokenRegistryEvents
+  | ISecurityTokenRegistryEvents
   | SecurityTokenEvents
   | USDTieredSTOFactoryEvents
   | USDTieredSTOEvents
@@ -244,7 +266,11 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+export type ERC20Contract =
+  | ERC20DetailedContract
+  | ISecurityTokenContract
+  | PolyTokenContract
+  | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract

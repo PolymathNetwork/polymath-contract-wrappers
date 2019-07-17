@@ -4,7 +4,7 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   GeneralPermissionManagerContract,
   PolyTokenEvents,
-  SecurityTokenContract,
+  ISecurityTokenContract,
 } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../../module_wrapper';
 import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';
@@ -23,13 +23,13 @@ describe('GeneralPermissionManagerWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(GeneralPermissionManagerContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new GeneralPermissionManagerWrapper(
@@ -587,7 +587,7 @@ describe('GeneralPermissionManagerWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'ChangePermission', 'AddDelegate', encountered: Transfer`),
+        new Error(`Expected eventName to be one of: 'ChangePermission', 'AddDelegate', 'Pause', 'Unpause', encountered: Transfer`),
       );
     });
   });

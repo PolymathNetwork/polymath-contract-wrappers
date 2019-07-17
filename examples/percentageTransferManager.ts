@@ -54,5 +54,6 @@ window.addEventListener('load', async () => {
       maxHolderPercentage: new BigNumber(10),
       allowPrimaryIssuance: true,
     },
+    archived: false,
   });
 });

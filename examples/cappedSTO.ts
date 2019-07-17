@@ -50,7 +50,7 @@ window.addEventListener('load', async () => {
   const index = finalNames.indexOf(moduleStringName);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Get some poly tokens on the security token instance
   await polymathAPI.polyToken.transfer({
@@ -75,6 +75,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       startTime: new Date(),
       endTime: new Date(2019, 8),

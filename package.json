@@ -6,12 +6,17 @@
     "polymath",
     "ethereum"
   ],
+  "files": [
+    "lib/**/*"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config=webpack.config.dev.js",
     "build": "webpack",
     "build:ci": "yarn build",
+    "commit": "npx git-cz",
+    "semantic-release": "semantic-release",
     "lint": "./node_modules/.bin/eslint ./src --ext .js,.ts",
     "lint:fix": "./node_modules/.bin/eslint ./src --ext .js,.ts --fix",
     "clean": "shx rm -rf lib docs",
@@ -31,6 +36,9 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.0.0",
+    "@commitlint/config-conventional": "^8.0.0",
+    "@semantic-release/git": "^7.1.0-beta.3",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/jest": "^24.0.11",
     "@types/lodash": "4.14.104",
@@ -43,6 +51,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
     "coveralls": "^3.0.3",
+    "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-config-prettier": "^4.1.0",
@@ -50,10 +59,12 @@
     "eslint-plugin-jest": "^22.4.1",
     "eslint-plugin-prettier": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
-    "husky": ">=1",
+    "husky": "^3.0.0",
     "jest": "^24.7.1",
     "lint-staged": ">=8",
     "prettier": "^1.16.4",
+    "semantic-release": "16.0.0-beta.18",
+    "semantic-release-cli": "^5.1.1",
     "shx": "^0.3.2",
     "ts-jest": "^24.0.1",
     "ts-mockito": "^2.3.1",
@@ -74,8 +85,8 @@
     "@0x/typescript-typings": "^4.2.2",
     "@0x/utils": "^4.3.1",
     "@0x/web3-wrapper": "^6.0.5",
-    "@polymathnetwork/abi-wrappers": "^3.0.0-beta.1",
-    "@polymathnetwork/contract-artifacts": "^3.0.0-beta.3",
+    "@polymathnetwork/abi-wrappers": "3.0.0-beta.1",
+    "@polymathnetwork/contract-artifacts": "3.0.0-beta.3",
     "ethereum-types": "^2.1.2",
     "ethereumjs-blockstream": "6.0.0",
     "ethereumjs-util": "^6.1.0",
@@ -90,10 +101,16 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "lint-staged": {
     "*.{js,ts}": "eslint"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

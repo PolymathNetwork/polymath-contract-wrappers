@@ -3,10 +3,10 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ContractAbi, TxData } from 'ethereum-types';
 import { BigNumber } from '@0x/utils';
 import {
-  SecurityTokenContract,
+  ISecurityTokenContract,
   ModuleFactoryContract,
   PolyTokenContract,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
@@ -29,7 +29,7 @@ export default class ModuleWrapper extends ContractWrapper {
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (): Promise<SecurityTokenContract> => {
+  protected securityTokenContract = async (): Promise<ISecurityTokenContract> => {
     const address = await (await this.contract).securityToken.callAsync();
     return this.contractFactory.getSecurityTokenContract(address);
   };
@@ -38,8 +38,8 @@ export default class ModuleWrapper extends ContractWrapper {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected detailedErc20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
+  protected detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract> => {
+    return this.contractFactory.getERC20DetailedContract(address);
   };
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
@@ -84,15 +84,6 @@ export default class ModuleWrapper extends ContractWrapper {
 
   public factory = async () => {
     return (await this.contract).factory.callAsync();
-  };
-
-  public takeFee = async (params: TakeFeeParams) => {
-    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.securityToken());
-    assert.assert(
-      polyTokenBalance.isGreaterThanOrEqualTo(params.amount),
-      'Allowance less than amount unable to take fee',
-    );
-    return (await this.contract).takeFee.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
   };
 
   protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {

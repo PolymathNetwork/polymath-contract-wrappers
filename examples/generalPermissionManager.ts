@@ -92,7 +92,7 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Call to add module
   await tickerSecurityTokenInstance.addModule({
@@ -100,6 +100,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
   });
 
   const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({

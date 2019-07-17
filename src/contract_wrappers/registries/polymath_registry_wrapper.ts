@@ -3,7 +3,6 @@ import {
   PolymathRegistryEventArgs,
   PolymathRegistryEvents,
   PolymathRegistryChangeAddressEventArgs,
-  PolymathRegistryOwnershipRenouncedEventArgs,
   PolymathRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
@@ -17,7 +16,7 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  PolymathContracts,
+  PolymathContract,
   GetLogs,
   Subscribe,
 } from '../../types';
@@ -32,15 +31,6 @@ interface GetChangeAddressLogsAsyncParams extends GetLogsAsyncParams {
   eventName: PolymathRegistryEvents.ChangeAddress;
 }
 
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<PolymathRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
-}
-
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PolymathRegistryEvents.OwnershipTransferred;
   callback: EventCallback<PolymathRegistryOwnershipTransferredEventArgs>;
@@ -52,15 +42,11 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface PolymathRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeAddressSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetPolymathRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeAddressLogsAsyncParams): Promise<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>[]>;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>[]
   >;
@@ -117,7 +103,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyTokenAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.polyToken);
+    return this.getAddressInternal(PolymathContract.PolyToken);
   };
 
   /**
@@ -125,7 +111,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getModuleRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.moduleRegistry);
+    return this.getAddressInternal(PolymathContract.ModuleRegistry);
   };
 
   /**
@@ -133,7 +119,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getFeatureRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.featureRegistry);
+    return this.getAddressInternal(PolymathContract.FeatureRegistry);
   };
 
   /**
@@ -141,7 +127,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getSecurityTokenRegistryAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.securityTokenRegistry);
+    return this.getAddressInternal(PolymathContract.SecurityTokenRegistry);
   };
 
   /**
@@ -149,7 +135,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getPolyUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.polyUsdOracle);
+    return this.getAddressInternal(PolymathContract.PolyUsdOracle);
   };
 
   /**
@@ -157,7 +143,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * @return address string
    */
   public getEthUsdOracleAddress = async () => {
-    return this.getAddressInternal(PolymathContracts.ethUsdOracle);
+    return this.getAddressInternal(PolymathContract.EthUsdOracle);
   };
 
   /**

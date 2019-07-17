@@ -3,7 +3,6 @@ import {
   FeatureRegistryEventArgs,
   FeatureRegistryEvents,
   FeatureRegistryChangeFeatureStatusEventArgs,
-  FeatureRegistryOwnershipRenouncedEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
@@ -17,7 +16,7 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   EventCallback,
-  Features,
+  Feature,
   Subscribe,
   GetLogs,
 } from '../../types';
@@ -32,15 +31,6 @@ interface GetChangeFeatureStatusLogsAsyncParams extends GetLogsAsyncParams {
   eventName: FeatureRegistryEvents.ChangeFeatureStatus;
 }
 
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
-}
-
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: FeatureRegistryEvents.OwnershipTransferred;
   callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>;
@@ -52,16 +42,12 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeFeatureStatusSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeatureStatusLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>[]
-  >;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>[]
   >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]
@@ -137,7 +123,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getCustomModulesAllowedStatus = async () => {
-    return (await this.contract).getFeatureStatus.callAsync(Features.CustomModulesAllowed);
+    return (await this.contract).getFeatureStatus.callAsync(Feature.CustomModulesAllowed);
   };
 
   /**
@@ -145,7 +131,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * @return bool
    */
   public getFreezeMintingAllowedStatus = async () => {
-    return (await this.contract).getFeatureStatus.callAsync(Features.FreezeMintingAllowed);
+    return (await this.contract).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed);
   };
 
   /**

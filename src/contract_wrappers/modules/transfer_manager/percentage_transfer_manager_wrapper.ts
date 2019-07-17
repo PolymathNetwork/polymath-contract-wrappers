@@ -23,8 +23,9 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  Perm,
   PERCENTAGE_DECIMALS,
+  TransferResult,
 } from '../../../types';
 import { valueToWei, weiToValue } from '../../../utils/convert';
 
@@ -99,12 +100,11 @@ interface InvestorAddressParams {
   investorAddress: string;
 }
 
-interface VerifyTransferParams extends TxParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface ChangeHolderPercentageParams extends TxParams {
@@ -181,19 +181,42 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
     );
+    let transferResult: TransferResult = TransferResult.NA;
+    switch (result[0].toNumber()) {
+      case 0: {
+        transferResult = TransferResult.INVALID;
+        break;
+      }
+      case 1: {
+        transferResult = TransferResult.NA;
+        break;
+      }
+      case 2: {
+        transferResult = TransferResult.VALID;
+        break;
+      }
+      case 3: {
+        transferResult = TransferResult.FORCE_VALID;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return {
+      transferResult,
+      address: result[1]
+    }
   };
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       valueToWei(params.maxHolderPercentage, PERCENTAGE_DECIMALS),
@@ -203,7 +226,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -214,7 +237,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
     assert.assert(
       params.investors.length === params.valids.length,
       'Array lengths are not equal for investors and valids',
@@ -229,7 +252,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(
       (await this.allowPrimaryIssuance()) !== params.allowPrimaryIssuance,
       'AllowPrimaryIssuance value must change ',

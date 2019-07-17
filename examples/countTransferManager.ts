@@ -67,7 +67,7 @@ window.addEventListener('load', async () => {
 
   // Get sto factory address
   const moduleStringName = 'CountTransferManager';
-  const moduleName = ModuleName.countTransferManager;
+  const moduleName = ModuleName.CountTransferManager;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.TransferManager,
   });
@@ -91,7 +91,7 @@ window.addEventListener('load', async () => {
 
   // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Call to add count transfer manager module with max 3 holders
   await tickerSecurityTokenInstance.addModule({
@@ -99,6 +99,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       maxHolderCount: 3,
     },
@@ -106,20 +107,20 @@ window.addEventListener('load', async () => {
 
   // Get Count TM address and create count transfer manager
   const countTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.countTransferManager,
+    moduleName: ModuleName.CountTransferManager,
   }))[0];
   console.log(countTMAddress);
   const countTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.countTransferManager,
+    name: ModuleName.CountTransferManager,
     address: countTMAddress,
   });
 
   // Get General TM Address and allow all transfers so we can test unlocked account transfers
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalTransferManager,
+    moduleName: ModuleName.GeneralTransferManager,
   }))[0];
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
   await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
@@ -129,7 +130,7 @@ window.addEventListener('load', async () => {
   const randomBeneficiary3 = '0x6644444444444444444444444444444444444444';
 
   // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
+  await tickerSecurityTokenInstance.issue({ investor: myAddress, value: new BigNumber(200), data: '' });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(20) });
 

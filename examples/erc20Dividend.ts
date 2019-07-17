@@ -92,7 +92,7 @@ window.addEventListener('load', async () => {
 
   // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Create 2 checkpoints
   await tickerSecurityTokenInstance.createCheckpoint({});
@@ -104,6 +104,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
@@ -128,7 +129,7 @@ window.addEventListener('load', async () => {
     value: new BigNumber(4),
   });
 
-  //Create Dividends
+  // Create Dividends
   await erc20DividendCheckpoint.createDividendWithExclusions({
     name: 'MyDividend2',
     amount: new BigNumber(1),

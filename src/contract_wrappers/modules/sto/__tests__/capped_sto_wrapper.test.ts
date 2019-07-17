@@ -4,7 +4,7 @@ import { BigNumber } from '@0x/utils';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   CappedSTOContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenContract,
   PolyTokenEvents,
 } from '@polymathnetwork/abi-wrappers';
@@ -21,14 +21,14 @@ describe('CappedSTOWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
   let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(CappedSTOContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
     mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
@@ -570,7 +570,7 @@ describe('CappedSTOWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'SetFundRaiseTypes', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
         ),
       );
     });

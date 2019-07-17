@@ -21,7 +21,8 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  TransferResult,
+  Perm,
 } from '../../../types';
 import { numberToBigNumber, valueToWei } from '../../../utils/convert';
 
@@ -66,12 +67,11 @@ interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
 }
 
-interface VerifyTransferParams extends TxParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
 interface ChangeHolderCountParams extends TxParams {
@@ -125,19 +125,42 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
     );
+    let transferResult: TransferResult = TransferResult.NA;
+    switch (result[0].toNumber()) {
+      case 0: {
+        transferResult = TransferResult.INVALID;
+        break;
+      }
+      case 1: {
+        transferResult = TransferResult.NA;
+        break;
+      }
+      case 2: {
+        transferResult = TransferResult.VALID;
+        break;
+      }
+      case 3: {
+        transferResult = TransferResult.FORCE_VALID;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Admin), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,

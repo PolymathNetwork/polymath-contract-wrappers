@@ -1,9 +1,9 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
-import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
@@ -88,7 +88,7 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   await polymathAPI.polyToken.transfer({
     to: await tickerSecurityTokenInstance.address(),
@@ -101,6 +101,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       startTime: new Date(2030, 1),
       endTime: new Date(2031, 1),

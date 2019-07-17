@@ -1,25 +1,25 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { DetailedERC20Contract } from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
 import { BigNumber } from '@0x/utils';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import AlternativeERC20TokenWrapper from '../alternative_erc20_wrapper';
+import ERC20DetailedTokenWrapper from '../erc20_detailed_wrapper';
 import { MockedCallMethod } from '../../../test_utils/mocked_methods';
-import { stringToBytes32, bytes32ToString } from '../../../utils/convert';
+import { bytes32ToString, stringToBytes32 } from '../../../utils/convert';
 
-describe('AlternativeERC20TokenWrapper', () => {
-  // Declare AlternativeERC20TokenWrapper object
-  let target: AlternativeERC20TokenWrapper;
+describe('ERC20DetailedTokenWrapper', () => {
+  // Declare ERC20DetailedTokenWrapper object
+  let target: ERC20DetailedTokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: DetailedERC20Contract;
+  let mockedContract: ERC20DetailedContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(DetailedERC20Contract);
+    mockedContract = mock(ERC20DetailedContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new AlternativeERC20TokenWrapper(instance(mockedWrapper), myContractPromise);
+    target = new ERC20DetailedTokenWrapper(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
@@ -97,6 +97,23 @@ describe('AlternativeERC20TokenWrapper', () => {
       verify(mockedContract.totalSupply).once();
       verify(mockedContract.symbol).once();
       verify(mockedContract.name).once();
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(`Expected eventName to be one of: 'Transfer', 'Approval', encountered: ChangeExpiryLimit`),
+      );
     });
   });
 });

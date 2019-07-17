@@ -30,7 +30,7 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  Perm,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
 
@@ -251,7 +251,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   }
 
   public createDividend = async (params: CreateDividendParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -267,7 +267,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -284,7 +284,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -310,7 +310,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),

@@ -23,7 +23,8 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  Perms,
+  TransferResult,
+  Perm,
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -109,7 +110,7 @@ interface ApprovalsParams {
   index: number;
 }
 
-interface VerifyTransferParams extends TxParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
@@ -242,22 +243,43 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    // SC: require(_isTransfer == false || msg.sender == securityToken,...
-    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      false,
-      params.txData,
-      params.safetyFactor,
     );
+    let transferResult: TransferResult = TransferResult.NA;
+    switch (result[0].toNumber()) {
+      case 0: {
+        transferResult = TransferResult.INVALID;
+        break;
+      }
+      case 1: {
+        transferResult = TransferResult.NA;
+        break;
+      }
+      case 2: {
+        transferResult = TransferResult.VALID;
+        break;
+      }
+      case 3: {
+        transferResult = TransferResult.FORCE_VALID;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -276,7 +298,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -308,7 +330,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -327,7 +349,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -357,7 +379,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     await this.checkApprovalDoesExist(params.from, params.to);
@@ -370,7 +392,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perms.TransferApproval), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
