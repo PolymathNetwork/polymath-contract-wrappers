@@ -23,7 +23,7 @@ window.addEventListener('load', async () => {
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
   const investorAddress = '<investor address>'.toLowerCase();
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
 
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.GeneralTransferManager,

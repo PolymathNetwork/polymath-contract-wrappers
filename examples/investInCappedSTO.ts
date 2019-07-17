@@ -23,15 +23,15 @@ window.addEventListener('load', async () => {
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
 
-  const cappedSTOAddress = (await TEST.getModulesByName({ moduleName: ModuleName.cappedSTO }))[0];
+  const cappedSTOAddress = (await TEST.getModulesByName({ moduleName: ModuleName.CappedSTO }))[0];
   const cappedSTO = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.cappedSTO,
+    name: ModuleName.CappedSTO,
     address: cappedSTOAddress,
   });
 
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 

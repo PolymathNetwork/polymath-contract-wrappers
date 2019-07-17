@@ -26,7 +26,7 @@ window.addEventListener('load', async () => {
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
 
   const moduleStringName = 'CappedSTO';
-  const moduleName = ModuleName.cappedSTO;
+  const moduleName = ModuleName.CappedSTO;
 
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.TransferManager,
