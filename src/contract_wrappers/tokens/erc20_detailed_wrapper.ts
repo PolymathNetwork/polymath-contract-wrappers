@@ -29,35 +29,6 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
     this.contract = contract;
   }
 
-  /**
-   * Returns the token name
-   */
-  public name = async () => {
-    return (await this.contract).name.callAsync();
-  };
-
-  /**
-   * Returns the token symbol
-   */
-  public symbol = async () => {
-    return (await this.contract).symbol.callAsync();
-  };
-
-  public async isValidContract() {
-    try {
-      const contract = await this.contract;
-      const totalSupply = await contract.totalSupply.callAsync();
-      const symbol = await contract.symbol.callAsync();
-      const name = await contract.name.callAsync();
-      if (symbol === '' || name === '' || totalSupply.isZero()) {
-        return false;
-      }
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
   public subscribeAsync: Subscribe = async <ArgsType extends ERC20DetailedEventArgs>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
