@@ -149,8 +149,8 @@ interface ModuleTypeParams {
 }
 
 interface IsCompatibleModuleParams {
-  moduleFactory: string;
-  securityToken: string;
+  moduleFactoryAddress: string;
+  securityTokenAddress: string;
 }
 
 interface GetFactoryDetailsParams {
@@ -172,9 +172,9 @@ interface TagsByModule {
 }
 
 interface FactoryDetails {
-  factoryIsVerified: boolean;
-  factoryOwnerAddress: string;
-  listSecurityTokens: string[];
+  isVerified: boolean;
+  ownerAddress: string;
+  securityTokenAddresses: string[];
 }
 // // End of return types ////
 
@@ -217,7 +217,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   }
 
   public isCompatibleModule = async (params: IsCompatibleModuleParams): Promise<boolean> => {
-    return (await this.contract).isCompatibleModule.callAsync(params.moduleFactory, params.securityToken);
+    return (await this.contract).isCompatibleModule.callAsync(params.moduleFactoryAddress, params.securityTokenAddress);
   };
 
   public registerModule = async (params: ModuleFactoryParams) => {
@@ -344,9 +344,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
     const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
     const typedResult: FactoryDetails = {
-      factoryIsVerified: result[0],
-      factoryOwnerAddress: result[1],
-      listSecurityTokens: result[2],
+      isVerified: result[0],
+      ownerAddress: result[1],
+      securityTokenAddresses: result[2],
     };
     return typedResult;
   };

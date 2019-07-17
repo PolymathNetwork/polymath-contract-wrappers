@@ -58,22 +58,22 @@ describe('ModuleRegistryWrapper', () => {
       // Address expected
       const expectedResult = true;
       const params = {
-        moduleFactory: '0x4444444444444444444444444444444444444444',
-        securityToken: '0x5555555555555555555555555555555555555555',
+        moduleFactoryAddress: '0x4444444444444444444444444444444444444444',
+        securityTokenAddress: '0x5555555555555555555555555555555555555555',
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.isCompatibleModule).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(params.moduleFactory, params.securityToken)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.moduleFactoryAddress, params.securityTokenAddress)).thenResolve(expectedResult);
       // Real call
       const result = await target.isCompatibleModule(params);
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.isCompatibleModule).once();
-      verify(mockedMethod.callAsync(params.moduleFactory, params.securityToken)).once();
+      verify(mockedMethod.callAsync(params.moduleFactoryAddress, params.securityTokenAddress)).once();
     });
   });
 
@@ -705,9 +705,9 @@ describe('ModuleRegistryWrapper', () => {
       // Real call
       const result = await target.getFactoryDetails(params);
       // Result expectation
-      expect(result.factoryIsVerified).toBe(factoryIsVerified);
-      expect(result.factoryOwnerAddress).toBe(factoryOwnerAddress);
-      expect(result.listSecurityTokens).toBe(listSecurityTokens);
+      expect(result.isVerified).toBe(factoryIsVerified);
+      expect(result.ownerAddress).toBe(factoryOwnerAddress);
+      expect(result.securityTokenAddresses).toBe(listSecurityTokens);
       // Verifications
       verify(mockedContract.getFactoryDetails).once();
       verify(mockedMethod.callAsync(params.factoryAddress)).once();
