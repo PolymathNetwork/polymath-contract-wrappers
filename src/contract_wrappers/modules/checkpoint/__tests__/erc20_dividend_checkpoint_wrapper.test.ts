@@ -21,14 +21,14 @@ describe('ERC20DividendCheckpointWrapper', () => {
   let mockedContract: ERC20DividendCheckpointContract;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: ISecurityTokenContract;
-  let mockedDetailedERC20Contract: ERC20DetailedContract;
+  let mockedERC20DetailedContract: ERC20DetailedContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(ERC20DividendCheckpointContract);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(ISecurityTokenContract);
-    mockedDetailedERC20Contract = mock(ERC20DetailedContract);
+    mockedERC20DetailedContract = mock(ERC20DetailedContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new ERC20DividendCheckpointWrapper(
@@ -43,7 +43,7 @@ describe('ERC20DividendCheckpointWrapper', () => {
     reset(mockedContract);
     reset(mockedContractFactory);
     reset(mockedSecurityTokenContract);
-    reset(mockedDetailedERC20Contract);
+    reset(mockedERC20DetailedContract);
   });
 
   describe('Types', () => {
@@ -99,15 +99,15 @@ describe('ERC20DividendCheckpointWrapper', () => {
 
       const expectedBalanceOfResult = new BigNumber(100);
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedERC20DetailedContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedERC20DetailedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -163,10 +163,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).times(2);
-      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedERC20DetailedContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContractFactory.getERC20DetailedContract(token)).twice();
-      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedERC20DetailedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
@@ -193,15 +193,15 @@ describe('ERC20DividendCheckpointWrapper', () => {
 
       const expectedBalanceOfResult = new BigNumber(100);
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedERC20DetailedContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedERC20DetailedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -271,10 +271,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).times(2);
-      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedERC20DetailedContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContractFactory.getERC20DetailedContract(token)).twice();
-      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedERC20DetailedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
@@ -301,15 +301,15 @@ describe('ERC20DividendCheckpointWrapper', () => {
 
       const expectedBalanceOfResult = new BigNumber(100);
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedERC20DetailedContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedERC20DetailedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -382,10 +382,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedWrapper.getAvailableAddressesAsync()).times(2);
-      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedERC20DetailedContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContractFactory.getERC20DetailedContract(token)).twice();
-      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedERC20DetailedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });
   });
@@ -411,15 +411,15 @@ describe('ERC20DividendCheckpointWrapper', () => {
 
       const expectedBalanceOfResult = new BigNumber(100);
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
+      when(mockedERC20DetailedContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedERC20DetailedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
@@ -479,10 +479,10 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).times(2);
-      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedERC20DetailedContract.balanceOf).once();
       verify(mockedBalanceOfAddressMethod.callAsync(expectedOwnerResult)).once();
       verify(mockedContractFactory.getERC20DetailedContract(token)).twice();
-      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedERC20DetailedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
     });
   });

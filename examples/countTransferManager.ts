@@ -99,7 +99,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
-      archived: false,
+    archived: false,
     data: {
       maxHolderCount: 3,
     },

@@ -104,7 +104,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
-      archived: false,
+    archived: false,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
@@ -129,7 +129,7 @@ window.addEventListener('load', async () => {
     value: new BigNumber(4),
   });
 
-  //Create Dividends
+  // Create Dividends
   await erc20DividendCheckpoint.createDividendWithExclusions({
     name: 'MyDividend2',
     amount: new BigNumber(1),

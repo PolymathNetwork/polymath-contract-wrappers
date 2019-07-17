@@ -1,10 +1,10 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { valueToWei, weiToValue } from '../src/utils/convert';
 import { ModuleName } from '../src';
-import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 
 // This file acts as a valid sandbox for using a general transfer manager  module on an unlocked node (like ganache)
 
@@ -76,8 +76,8 @@ window.addEventListener('load', async () => {
     address: generalTMAddress,
   });
 
-  // Allow all transfers
-  // Subscribe to event of allow all transfers
+  // Modify transfer requirements
+  // Subscribe to event of modify transfer requirements
   await generalTM.subscribeAsync({
     eventName: GeneralTransferManagerEvents.ModifyTransferRequirements,
     indexFilterValues: {},

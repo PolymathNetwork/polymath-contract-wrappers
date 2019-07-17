@@ -167,7 +167,7 @@ interface ModifyKYCDataSignedParams extends TxParams {
 
 interface GetInvestorFlag {
   investor: string;
-  flag: number;
+  flag: FlagsType;
 }
 
 interface GetInvestorFlags {
@@ -285,7 +285,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -296,7 +296,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Flags), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -306,7 +306,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -320,38 +320,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public getAllInvestorFlags = async () => {
-    const result = await (await this.contract).getAllInvestorFlags.callAsync();
-    const typedResult: InvestorAndFlag[] = [];
-    let flag = FlagsType.IsAccredited;
-    for (let i = 0; i < result[0].length; i += 1) {
-      switch (result[1][i].toNumber()) {
-        case 0: {
-          flag = FlagsType.IsAccredited;
-          break;
-        }
-        case 1: {
-          flag = FlagsType.CanNotBuyFromSto;
-          break;
-        }
-        case 2: {
-          flag = FlagsType.IsVolRestricted;
-          break;
-        }
-        default: {
-          assert.assert(false, 'Missing Flag');
-          break;
-        }
-      }
-      const InvestorAndFlag: InvestorAndFlag = {
-        investor: result[0][i],
-        flag,
-      };
-      typedResult.push(InvestorAndFlag);
-    }
-    return typedResult;
-  };
-
   public getInvestorFlag = async (params: GetInvestorFlag) => {
     const result = await (await this.contract).getInvestorFlag.callAsync(params.investor, params.flag);
     return result;
@@ -363,9 +331,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return !!bitInFlagPosition;
   };
 
-  public getInvestorFlags = async (params: GetInvestorFlags) => {
-    const { investor } = params;
-    const result = await (await this.contract).getInvestorFlags.callAsync(investor);
+  private unpackFlags = (investor: string, flags: BigNumber) => {
     let isAccredited = false;
     let canNotBuyFromSTO = false;
     let isVolRestricted = false;
@@ -373,17 +339,12 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     // eslint-disable-next-line no-restricted-syntax
     for (const flag in FlagsType) {
       if (Object.prototype.hasOwnProperty.call(FlagsType, flag)) {
-        // This check is required because iterating through an enum
-        // yields the names of the enum members as well as the indexes.
-        // We only need the indexes so we skip the names in this case
-        const position = Number(flag); // NaN if flag is string
+        const position = Number(flag);
         if (!flag) {
           // eslint-disable-next-line no-continue
           continue;
         }
-
-        const isSet = this.isFlagTrue(position, result.toNumber());
-
+        const isSet = this.isFlagTrue(position, flags.toNumber());
         switch (position) {
           case FlagsType.IsAccredited: {
             isAccredited = isSet;
@@ -410,6 +371,22 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       canNotBuyFromSTO,
       isVolRestricted,
     };
+  };
+
+  public getAllInvestorFlags = async () => {
+    const result = await (await this.contract).getAllInvestorFlags.callAsync();
+    const [investors, flags] = result;
+    const investorFlags = [];
+    for (let i = 0; i < investors[0].length; i += 1) {
+      investorFlags.push(this.unpackFlags(investors[i], flags[i]));
+    }
+    return investorFlags;
+  };
+
+  public getInvestorFlags = async (params: GetInvestorFlags) => {
+    const { investor } = params;
+    const flags = await (await this.contract).getInvestorFlags.callAsync(investor);
+    return this.unpackFlags(investor, flags);
   };
 
   public getAllKYCData = async () => {
@@ -456,7 +433,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
