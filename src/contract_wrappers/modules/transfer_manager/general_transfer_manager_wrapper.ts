@@ -625,8 +625,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.to,
       new BigNumber(100),
       params.data,
-      params.txData,
-      params.safetyFactor,
     );
     return result;
   };
@@ -635,7 +633,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Modifies the successful checks required for a transfer to be deemed valid.
    */
   public modifyTransferRequirements = async (params: ModifyTransferRequirements) => {
-    const result = await (await this.contract).modifyTransferRequirements.callAsync(
+    const result = await (await this.contract).modifyTransferRequirements.sendTransactionAsync(
       params.transferType,
       params.fromValidKYC,
       params.toValidKYC,
