@@ -221,12 +221,12 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public createCheckpoint = async (params: TxParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Checkpoint), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(params.excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many excluded addresses');
     params.excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
     assert.areThereDuplicatedStrings('excluded', params.excluded);
@@ -238,7 +238,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setWithholding = async (params: SetWithholdingParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(params.investors.length === params.withholding.length, 'Mismatched input lengths');
     params.withholding.forEach(withholding => assert.isPercentage('withholding tax', withholding));
     return (await this.contract).setWithholding.sendTransactionAsync(
@@ -250,7 +250,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isPercentage('withholding tax', params.withholding);
     return (await this.contract).setWithholdingFixed.sendTransactionAsync(
       params.investors,
@@ -261,7 +261,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Distribute), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     params.payees.forEach(address => assert.isNonZeroETHAddressHex('payees', address));
     await this.checkValidDividend(params.dividendIndex);
     return (await this.contract).pushDividendPaymentToAddresses.sendTransactionAsync(
@@ -273,7 +273,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Distribute), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     await this.checkValidDividend(params.dividendIndex);
     return (await this.contract).pushDividendPayment.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
@@ -306,6 +306,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public reclaimDividend = async (params: DividendIndexTxParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
     const dividend = await this.dividends(params);
     assert.isPastDate(dividend.expiry, 'Dividend expiry is in the future');
@@ -336,6 +337,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
     return (await this.contract).withdrawWithholding.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),

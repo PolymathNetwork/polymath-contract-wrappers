@@ -14,7 +14,7 @@ import _ = require('lodash');
 /**
  * This class includes the functionality related to interacting with the AlternativeERC20 contract.
  */
-export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
+export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
   public abi: ContractAbi = ERC20Detailed.abi;
 
   protected contract: Promise<ERC20DetailedContract>;
@@ -27,6 +27,37 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
   public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DetailedContract>) {
     super(web3Wrapper, contract);
     this.contract = contract;
+  }
+
+  /**
+   * Returns the token name
+   */
+  public name = async () => {
+    const name = (await this.contract).name.callAsync();
+    return bytes32ToString(await name);
+  };
+
+  /**
+   * Returns the token symbol
+   */
+  public symbol = async () => {
+    const symbol = (await this.contract).symbol.callAsync();
+    return bytes32ToString(await symbol);
+  };
+
+  public async isValidContract() {
+    try {
+      const contract = await this.contract;
+      const totalSupply = await contract.totalSupply.callAsync();
+      const symbol = await contract.symbol.callAsync();
+      const name = await contract.name.callAsync();
+      if (bytes32ToString(symbol) === '' || bytes32ToString(name) === '' || totalSupply.isZero()) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   public subscribeAsync: Subscribe = async <ArgsType extends ERC20DetailedEventArgs>(
