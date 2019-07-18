@@ -152,16 +152,7 @@ export enum ModuleName {
 }
 
 export enum Perm {
-  ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
-  Flags = 'FLAGS',
-  Whitelist = 'WHITELIST',
-  TransferApproval = 'TRANSFER_APPROVAL',
-  Checkpoint = 'CHECKPOINT',
-  Manage = 'MANAGE',
-  Distribute = 'DISTRIBUTE',
-  FeeAdmin = 'FEE_ADMIN',
-  PreSaleAdmin = 'PRE_SALE_ADMIN',
   Operator = 'OPERATOR',
 }
 

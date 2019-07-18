@@ -226,7 +226,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -237,7 +237,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(
       params.investors.length === params.valids.length,
       'Array lengths are not equal for investors and valids',

@@ -913,9 +913,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public partitionsOf = async (params: PartitionsOfParams): Promise<Partition[]> => {
     const partitions = await (await this.contract).partitionsOf.callAsync(params.tokenHolder);
-    return partitions.map(element => {
-      return parsePartitionBytes32Value(element);
-    });
+    return partitions.map(parsePartitionBytes32Value);
   };
 
   /**

@@ -541,6 +541,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
