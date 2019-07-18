@@ -29,7 +29,7 @@ window.addEventListener('load', async () => {
   const moduleName = ModuleName.CappedSTO;
 
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.TransferManager,
+    moduleType: ModuleType.STO,
   });
 
   const instances: Promise<ModuleFactoryWrapper>[] = [];
