@@ -1,3 +1,6 @@
+import * as conversionUtils from './utils/convert';
+
+export { conversionUtils };
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';
 export { default as ModuleFactory } from './contract_wrappers/modules/module_factory_wrapper';
