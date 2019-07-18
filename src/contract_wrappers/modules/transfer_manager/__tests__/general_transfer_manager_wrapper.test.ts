@@ -9,15 +9,12 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
   bigNumberToDate,
-  dateArrayToBigNumberArray,
   dateToBigNumber,
   numberToBigNumber,
   valueToWei,
-  weiToValue,
   stringToBytes32,
-  parsePartitionBytes32Value
 } from '../../../../utils/convert';
-import { FlagsType, TransferType, Perm } from '../../../../types';
+import { FlagsType, TransferType, Perm, Partition } from '../../../../types';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
@@ -570,7 +567,7 @@ describe('GeneralTransferManagerWrapper', () => {
   describe('GetAllInvestorFlags', () => {
     test('should getAllInvestorFlags', async () => {
       // Address expected
-      const expectedResult = [['0x3333333333333333333333333333333333333333'], [new BigNumber(2)]];
+      const expectedResult = [['0x3333333333333333333333333333333333333333', '0x4444444444444444444444444444444444444444'], [new BigNumber(2), new BigNumber(2)]];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -582,12 +579,14 @@ describe('GeneralTransferManagerWrapper', () => {
       const result = await target.getAllInvestorFlags();
 
       // Result expectation
-      expect(result[0]).toEqual({
-        canNotBuyFromSTO: true,
-        investor: expectedResult[0][0],
-        isAccredited: false,
-        isVolRestricted: false,
-      });
+      for (let i = 0; i < expectedResult[0].length; i += 1) {
+        expect(result[i]).toEqual({
+          canNotBuyFromSTO: true,
+          investor: expectedResult[0][i],
+          isAccredited: false,
+          isVolRestricted: false,
+        });
+      }
 
       // Verifications
       verify(mockedContract.getAllInvestorFlags).once();
@@ -1360,7 +1359,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       const mockedParams = {
-        partition: "UNLOCKED",
+        partition: Partition.Unlocked,
         tokenHolder: "0x2222222222222222222222222222222222222222",
         additionalBalance: new BigNumber(100)
       };
