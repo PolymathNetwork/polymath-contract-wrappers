@@ -13,7 +13,9 @@ import {
   dateToBigNumber,
   numberToBigNumber,
   valueToWei,
+  weiToValue,
   stringToBytes32,
+  parsePartitionBytes32Value
 } from '../../../../utils/convert';
 import { FlagsType, TransferType, Perm } from '../../../../types';
 
@@ -1340,6 +1342,51 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getAddressBytes32).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('GetTokensByPartition', () => {
+    test('should getTokensByPartition', async () => {
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
+      const mockedParams = {
+        partition: "UNLOCKED",
+        tokenHolder: "0x2222222222222222222222222222222222222222",
+        additionalBalance: new BigNumber(100)
+      };
+      // Address expected
+      const expectedResult = new BigNumber(200);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTokensByPartition(mockedParams);
+
+      // Result expectation
+      expect(valueToWei(result, expectedDecimalsResult)).toEqual(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getTokensByPartition).once();
+      verify(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 

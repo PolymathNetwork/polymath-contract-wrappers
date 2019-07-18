@@ -22,7 +22,10 @@ import {
   dateToBigNumber,
   numberToBigNumber,
   valueToWei,
+  weiToValue,
   bytes32ToString,
+  parsePartitionBytes32Value,
+  stringToBytes32,
 } from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -532,11 +535,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   public getTokensByPartition = async (params: GetTokensByPartitionParams) => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getTokensByPartition.callAsync(
-      params.partition,
+      stringToBytes32(params.partition),
       params.tokenHolder,
-      params.additionalBalance,
+      valueToWei(params.additionalBalance, decimals),
     );
-    return valueToWei(result, decimals);
+    return weiToValue(result, decimals);
   };
 
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
