@@ -40,6 +40,8 @@ import {
   TransferType,
 } from '../../../types';
 
+const ONEHUNDRED = new BigNumber(100);
+
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
   callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs>;
@@ -613,7 +615,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).executeTransfer.sendTransactionAsync(
       params.from,
       params.to,
-      new BigNumber(100),
+      ONEHUNDRED,
       params.data,
       params.txData,
       params.safetyFactor,
@@ -627,7 +629,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
-      new BigNumber(100),
+      ONEHUNDRED,
       params.data,
     );
     return result;
@@ -683,15 +685,10 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
         params.canReceiveAfter.length === params.expiryTime.length,
       'Mismatched input lengths',
     );
-    const canSendAfter: BigNumber[] = [];
-    const canReceiveAfter: BigNumber[] = [];
-    const expiryTime: BigNumber[] = [];
 
-    for (let i = 0; i < params.canSendAfter.length; i += 1) {
-      canSendAfter.push(dateToBigNumber(params.canSendAfter[i]));
-      canReceiveAfter.push(dateToBigNumber(params.canReceiveAfter[i]));
-      expiryTime.push(dateToBigNumber(params.expiryTime[i]));
-    }
+    const canSendAfter = params.canSendAfter.map(dateToBigNumber);
+    const canReceiveAfter = params.canReceiveAfter.map(dateToBigNumber);
+    const expiryTime = params.expiryTime.map(dateToBigNumber);
 
     return (await this.contract).modifyKYCDataMulti.sendTransactionAsync(
       params.investors,
@@ -707,18 +704,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
    */
   public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMulti) => {
-    const canSendAfter: BigNumber[] = [];
-    const canReceiveAfter: BigNumber[] = [];
-    const expiryTime: BigNumber[] = [];
-    for (let i = 0; i < params.canSendAfter.length; i += 1) {
-      canSendAfter.push(dateToBigNumber(params.canSendAfter[i]));
-    }
-    for (let i = 0; i < params.canReceiveAfter.length; i += 1) {
-      canReceiveAfter.push(dateToBigNumber(params.canReceiveAfter[i]));
-    }
-    for (let i = 0; i < params.expiryTime.length; i += 1) {
-      expiryTime.push(dateToBigNumber(params.expiryTime[i]));
-    }
+    const canSendAfter = params.canSendAfter.map(dateToBigNumber);
+    const canReceiveAfter = params.canReceiveAfter.map(dateToBigNumber);
+    const expiryTime = params.expiryTime.map(dateToBigNumber);
 
     return (await this.contract).modifyKYCDataSignedMulti.sendTransactionAsync(
       params.investor,
@@ -754,7 +742,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Return the permissions flag that are associated with general trnasfer manager
+   * Return the permissions flags that are associated with general transfer manager
    */
   public getPermissions = async () => {
     const call = await (await this.contract).getPermissions.callAsync();

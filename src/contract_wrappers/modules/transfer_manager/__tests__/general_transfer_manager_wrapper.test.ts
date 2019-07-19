@@ -1111,15 +1111,9 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyKYCDataMulti).thenReturn(instance(mockedMethod));
       // Stub the request
 
-      const canSendAfter: BigNumber[] = [];
-      const canReceiveAfter: BigNumber[] = [];
-      const expiryTime: BigNumber[] = [];
-
-      for (let i = 0; i < mockedParams.canSendAfter.length; i += 1) {
-        canSendAfter.push(dateToBigNumber(mockedParams.canSendAfter[i]));
-        canReceiveAfter.push(dateToBigNumber(mockedParams.canReceiveAfter[i]));
-        expiryTime.push(dateToBigNumber(mockedParams.expiryTime[i]));
-      }
+      const canSendAfter = mockedParams.canSendAfter.map(dateToBigNumber);
+      const canReceiveAfter = mockedParams.canReceiveAfter.map(dateToBigNumber);
+      const expiryTime = mockedParams.expiryTime.map(dateToBigNumber);
 
       when(
         mockedMethod.sendTransactionAsync(
@@ -1182,15 +1176,9 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyKYCDataSignedMulti).thenReturn(instance(mockedMethod));
       // Stub the request
 
-      const canSendAfter: BigNumber[] = [];
-      const canReceiveAfter: BigNumber[] = [];
-      const expiryTime: BigNumber[] = [];
-
-      for (let i = 0; i < mockedParams.canSendAfter.length; i += 1) {
-        canSendAfter.push(dateToBigNumber(mockedParams.canSendAfter[i]));
-        canReceiveAfter.push(dateToBigNumber(mockedParams.canReceiveAfter[i]));
-        expiryTime.push(dateToBigNumber(mockedParams.expiryTime[i]));
-      }
+      const canSendAfter = mockedParams.canSendAfter.map(dateToBigNumber);
+      const canReceiveAfter = mockedParams.canReceiveAfter.map(dateToBigNumber);
+      const expiryTime = mockedParams.expiryTime.map(dateToBigNumber);
 
       when(
         mockedMethod.sendTransactionAsync(
