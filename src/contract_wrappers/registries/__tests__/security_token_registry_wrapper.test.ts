@@ -499,9 +499,45 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('GenerateNewSecurityToken', () => {
     test('should call generateNewSecurityToken with NewSecurityTokenParams', async () => {
+      const ticker = 'TICK';
+      const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedTickerDetailsResult = [
+        '0x0123456789012345678901234567890123456789',
+        new BigNumber(1735689600),
+        new BigNumber(1735689605),
+        ticker,
+        false,
+      ];
+
+      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
+      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get Security token launch fee
+      const expectedLaunchFeeResult = valueToWei(new BigNumber(10), FULL_DECIMALS);
+      const mockedLaunchFeeMethod = mock(MockedSendMethod);
+      when(mockedContract.getSecurityTokenLaunchFee).thenReturn(instance(mockedLaunchFeeMethod));
+      when(mockedLaunchFeeMethod.callAsync()).thenResolve(expectedLaunchFeeResult);
+
+      // Get ERC20 Allowance
+      const erc20Allowance = valueToWei(new BigNumber(100), FULL_DECIMALS);
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
+      when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(erc20Allowance);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
+      
       const mockedParams = {
         name: "TOKEN TEST",
-        ticker: "TTEST",
+        ticker,
         tokenDetails: "",
         divisible: true,
         treasuryWallet: "0x0023456789002345678900234567890023456789",
@@ -548,6 +584,16 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedContract.getTickerDetails).once();
+      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
+      verify(mockedContract.getSecurityTokenLaunchFee).once();
+      verify(mockedLaunchFeeMethod.callAsync()).once();
+      verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
     });
   });
 

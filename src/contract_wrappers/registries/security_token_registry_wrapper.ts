@@ -680,6 +680,27 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   public generateNewSecurityToken = async (params: NewSecurityTokenParams) => {
+    assert.assert(params.ticker.length > 0, 'Ticker is empty');
+    assert.assert(params.name.length > 0, 'Name is empty');
+    await this.checkWhenNotPausedOrOwner();
+    const tickerDetails = await this.getTickerDetails({
+      tokenName: params.ticker,
+    });
+    assert.assert(!tickerDetails.status, 'Ticker already deployed');
+    const address = (await this.web3Wrapper.getAvailableAddressesAsync())[0];
+    assert.assert(functionsUtils.checksumAddressComparision(address, tickerDetails.owner), 'Not authorised');
+    assert.assert(tickerDetails.expiryDate.getTime() >= Date.now(), 'Ticker gets expired');
+
+    // Check PolyToken allowance
+    const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
+    if (securityTokenLaunchFee.isGreaterThan(BIG_NUMBER_ZERO)) {
+      const polyBalance = weiToValue(
+          await (await this.polyTokenContract()).balanceOf.callAsync(address),
+          FULL_DECIMALS,
+      );
+      assert.assert(polyBalance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Poly token allowance');
+    }
+
     const version = params.protocolVersion;
     let protocolVersion = new BigNumber(0);
     if (version !== '0') {
