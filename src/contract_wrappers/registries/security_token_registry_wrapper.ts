@@ -682,6 +682,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   public generateNewSecurityToken = async (params: NewSecurityTokenParams) => {
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
     assert.assert(params.name.length > 0, 'Name is empty');
+    assert.isNonZeroETHAddressHex('treasuryWallet', params.treasuryWallet);
     await this.checkWhenNotPausedOrOwner();
     const tickerDetails = await this.getTickerDetails({
       tokenName: params.ticker,
@@ -985,6 +986,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.ticker.length > 0, 'Ticker is empty');
     assert.assert(params.name.length > 0, 'Name is empty');
     assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
+    assert.assert(params.deployedAt.getTime() > new Date(0).getTime(), 'Bad deployed date');
     assert.isNonZeroETHAddressHex('owner', params.owner);
     assert.isNonZeroETHAddressHex('securityToken', params.securityToken);
     assert.isNonZeroETHAddressHex(
