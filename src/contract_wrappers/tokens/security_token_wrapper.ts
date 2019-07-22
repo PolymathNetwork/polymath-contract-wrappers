@@ -1615,8 +1615,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public setDocument = async (params: SetDocumentParams) => {
-    assert.assert(params.name.length > 0, 'Bad name');
-    assert.assert(params.uri.length > 0, 'Bad uri');
+    assert.assert(params.name.length > 0, 'Bad name, cannot be empty');
+    assert.assert(params.uri.length > 0, 'Bad uri, cannot be empty');
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).setDocument.sendTransactionAsync(
       stringToBytes32(params.name),
@@ -1629,6 +1629,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
+    const document = await this.getDocument({name: params.name});
+    assert.assert(document.documentUri.length !== 0, 'Document does not exist');
     return (await this.contract).removeDocument.sendTransactionAsync(
       stringToBytes32(params.name),
       params.txData,

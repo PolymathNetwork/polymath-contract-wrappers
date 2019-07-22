@@ -41,7 +41,8 @@ import {
   weiToValue,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
-  bigNumberToDate, parsePartitionBytes32Value,
+  bigNumberToDate,
+  parsePartitionBytes32Value,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -4838,6 +4839,20 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail if name is 0 length');
     test.todo('should fail if uri is 0 length');
     test('should send the transaction to removeDocument', async () => {
+      const documentUri = 'Uri';
+      const documentHash = stringToBytes32('Hash');
+      const documentTime = new Date(2030, 1);
+      const expectedGetDocumentResult = [documentUri, documentHash, dateToBigNumber(documentTime)];
+      // Mocked method
+      const mockedGetDocumentParams = { name: 'Name' };
+      const mockedGetDocumentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDocument).thenReturn(instance(mockedGetDocumentMethod));
+      // Stub the request
+      when(
+        mockedGetDocumentMethod.callAsync(objectContaining(stringToBytes32(mockedGetDocumentParams.name))),
+      ).thenResolve(expectedGetDocumentResult);
+
       // Mocked parameters
       const mockedParams = {
         name: 'Name',
@@ -4887,6 +4902,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getDocument).once();
+      verify(mockedGetDocumentMethod.callAsync(objectContaining(stringToBytes32(mockedGetDocumentParams.name)))).once();
     });
   });
 
