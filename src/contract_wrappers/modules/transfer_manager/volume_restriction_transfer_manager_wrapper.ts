@@ -17,11 +17,12 @@ import {
   VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs,
   VolumeRestrictionTMPauseEventArgs,
   VolumeRestrictionTMUnpauseEventArgs,
+  VolumeRestrictionTransferManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { VolumeRestrictionTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
@@ -45,7 +46,7 @@ import {
   Perm,
   RestrictionType,
   PERCENTAGE_DECIMALS,
-  TransferResult
+  TransferResult,
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -406,8 +407,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     }
     return {
       transferResult,
-      address: result[1]
-    }
+      address: result[1],
+    };
   };
 
   public getIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {

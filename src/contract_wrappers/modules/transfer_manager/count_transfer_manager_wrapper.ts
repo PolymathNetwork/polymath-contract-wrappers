@@ -5,11 +5,12 @@ import {
   CountTransferManagerModifyHolderCountEventArgs,
   CountTransferManagerPauseEventArgs,
   CountTransferManagerUnpauseEventArgs,
+  CountTransferManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { CountTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';

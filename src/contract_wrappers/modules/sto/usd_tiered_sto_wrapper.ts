@@ -16,11 +16,12 @@ import {
   USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
+  USDTieredSTO,
+  Web3Wrapper,
+  BigNumber,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import STOWrapper from './sto_wrapper';

@@ -10,11 +10,13 @@ import {
   ERC20DividendCheckpointSetWithholdingEventArgs,
   ERC20DividendCheckpointSetWithholdingFixedEventArgs,
   ERC20DetailedContract,
+  BigNumber,
+  ContractAbi,
+  LogWithDecodedArgs,
+  TxData,
+  Web3Wrapper,
+  ERC20DividendCheckpoint,
 } from '@polymathnetwork/abi-wrappers';
-import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';

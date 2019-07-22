@@ -13,10 +13,11 @@ import {
   ISecurityTokenRegistryContract,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  ModuleRegistry,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -302,17 +303,14 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       return value[1];
     }); // [module1: [[tag1, module1], [tag2, module1]], ...]
     const typedResult: TagsByModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const tags = _.unzip(value as string[][])[0];
-        const tagsByModule: TagsByModule = {
-          module: key,
-          tags: bytes32ArrayToStringArray(tags),
-        };
-        typedResult.push(tagsByModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const tags = _.unzip(value as string[][])[0];
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: bytes32ArrayToStringArray(tags),
+      };
+      typedResult.push(tagsByModule);
+    });
     return typedResult;
   };
 
@@ -324,17 +322,14 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       return value[1];
     }); // [module1: [[tag1, module1], [tag2, module1]], ...]
     const typedResult: TagsByModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const tags = _.unzip(value as string[][])[0];
-        const tagsByModule: TagsByModule = {
-          module: key,
-          tags: bytes32ArrayToStringArray(tags),
-        };
-        typedResult.push(tagsByModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const tags = _.unzip(value as string[][])[0];
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: bytes32ArrayToStringArray(tags),
+      };
+      typedResult.push(tagsByModule);
+    });
     return typedResult;
   };
 

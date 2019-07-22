@@ -4,10 +4,11 @@ import {
   GeneralPermissionManagerEvents,
   GeneralPermissionManagerChangePermissionEventArgs,
   GeneralPermissionManagerAddDelegateEventArgs,
+  GeneralPermissionManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { GeneralPermissionManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -161,7 +162,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
-    assert.assert(!await (await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
+    assert.assert(!(await (await this.contract).checkDelegate.callAsync(params.delegate)), 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -231,16 +232,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       return value[0];
     }); // [module1: [[module1, perm1], [module1, perm2]], ...]
     const typedResult: PermissonsPerModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const permissonsPerModule: PermissonsPerModule = {
-          module: key,
-          permissions: value.map(pair => bytes32ToString(pair[1] as string)),
-        };
-        typedResult.push(permissonsPerModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const permissonsPerModule: PermissonsPerModule = {
+        module: key,
+        permissions: value.map(pair => bytes32ToString(pair[1] as string)),
+      };
+      typedResult.push(permissonsPerModule);
+    });
     return typedResult;
   };
 
