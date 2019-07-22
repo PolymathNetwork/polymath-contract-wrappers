@@ -18,7 +18,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToBytes32
+  stringToBytes32,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { FULL_DECIMALS, FeeType } from '../../../types';
@@ -388,7 +388,7 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('RemoveProtocolFactory', () => {
     test('should call removeProtocolFactory with PackageVersionParams', async () => {
       const mockedParams = {
-        version: "3.0.0",
+        version: '3.0.0',
         txData: {},
         safetyFactor: 10,
       };
@@ -451,7 +451,10 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('GetTokensByDelegate', () => {
     test('should call getTokensByDelegate with given delegate address', async () => {
       // Params and result expected
-      const expectedResult = ['0x0123456789012345678901234567890123456789', '0x0123456789012345678901234567890123456789'];
+      const expectedResult = [
+        '0x0123456789012345678901234567890123456789',
+        '0x0123456789012345678901234567890123456789',
+      ];
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -473,13 +476,13 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('GetSTFactoryAddressOfVersion', () => {
     test('should call getSTFactoryAddressOfVersion', async () => {
       const mockedParams = {
-        version: "3.0.0"
+        version: '3.0.0',
       };
 
       const splitVersion = mockedParams.version.split('.');
       const pack = new BigNumber(packVersion(splitVersion[0], splitVersion[1], splitVersion[2]));
 
-      const expectedResult = "0x0123456789012345678901234567890123456789";
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -495,7 +498,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.getSTFactoryAddressOfVersion).once();
       verify(mockedMethod.callAsync(objectContaining(pack))).once();
     });
-  })
+  });
 
   describe('GenerateNewSecurityToken', () => {
     test('should call generateNewSecurityToken with NewSecurityTokenParams', async () => {
@@ -534,14 +537,14 @@ describe('SecurityTokenRegistryWrapper', () => {
       const mockedPolyTokenBalanceOfMethod = mock(MockedCallMethod);
       when(mockedPolyTokenBalanceOfMethod.callAsync(expectedOwnerResult)).thenResolve(erc20Allowance);
       when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedPolyTokenBalanceOfMethod));
-      
+
       const mockedParams = {
-        name: "TOKEN TEST",
+        name: 'TOKEN TEST',
         ticker,
-        tokenDetails: "",
+        tokenDetails: '',
         divisible: true,
-        treasuryWallet: "0x0023456789002345678900234567890023456789",
-        protocolVersion: "3.0.0",
+        treasuryWallet: '0x0023456789002345678900234567890023456789',
+        protocolVersion: '3.0.0',
         txData: {},
         safetyFactor: 10,
       };
@@ -687,10 +690,10 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('ModifyExistingTicker', () => {
     test('should call modifyExistingTicker with ModifyExistingTickerParams', async () => {
       const mockedParams = {
-        owner: "0x0023456789002345678900234567890023456789",
-        ticker: "TTEST",
-        registrationDate: new Date(2020,10, 10),
-        expiryDate: new Date(2021,10, 10),
+        owner: '0x0023456789002345678900234567890023456789',
+        ticker: 'TTEST',
+        registrationDate: new Date(2020, 10, 10),
+        expiryDate: new Date(2021, 10, 10),
         status: true,
         txData: {},
         safetyFactor: 10,
@@ -748,18 +751,17 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getSecurityTokenAddress).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).once();
-
     });
   });
 
   describe('ModifyExistingSecurityToken', () => {
     test('should call modifyExistingSecurityToken with ModifyExistingSecurityTokenParams', async () => {
-      const securityToken= '0x5555555555555555555555555555555555555555';
+      const securityToken = '0x5555555555555555555555555555555555555555';
       const mockedParams = {
-        ticker: "TTEST",
-        owner: "0x0023456789002345678900234567890023456789",
+        ticker: 'TTEST',
+        owner: '0x0023456789002345678900234567890023456789',
         securityToken,
-        tokenDetails: "",
+        tokenDetails: '',
         deployedAt: new Date(2018, 10, 10),
         txData: {},
         safetyFactor: 10,
@@ -834,7 +836,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const mockedParams = {
-        version: "3.0.0",
+        version: '3.0.0',
         txData: {},
         safetyFactor: 10,
       };
@@ -884,9 +886,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Params and result expected
       const expectedResult = [new BigNumber(10), new BigNumber(10)];
       const mockedParams = {
-        feeType: FeeType.tickerRegFee
+        feeType: FeeType.tickerRegFee,
       };
-      const bytes32 = stringToBytes32("tickerRegFee");
+      const bytes32 = stringToBytes32('tickerRegFee');
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
@@ -909,7 +911,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Params and result expected
       const expectedResult = true;
       const mockedParams = {
-        ticker: "TEST"
+        ticker: 'TEST',
       };
 
       // Mocked method
@@ -932,9 +934,9 @@ describe('SecurityTokenRegistryWrapper', () => {
   describe('GetTickerOwner', () => {
     test('should call getTickerOwner', async () => {
       // Params and result expected
-      const expectedResult = "0x0123456789012345678901234567890123456789";
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       const mockedParams = {
-        ticker: "TEST"
+        ticker: 'TEST',
       };
 
       // Mocked method

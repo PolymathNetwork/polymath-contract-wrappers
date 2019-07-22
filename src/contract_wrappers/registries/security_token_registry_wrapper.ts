@@ -695,8 +695,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     const securityTokenLaunchFee = await this.getSecurityTokenLaunchFee();
     if (securityTokenLaunchFee.isGreaterThan(BIG_NUMBER_ZERO)) {
       const polyBalance = weiToValue(
-          await (await this.polyTokenContract()).balanceOf.callAsync(address),
-          FULL_DECIMALS,
+        await (await this.polyTokenContract()).balanceOf.callAsync(address),
+        FULL_DECIMALS,
       );
       assert.assert(polyBalance.isGreaterThanOrEqualTo(securityTokenLaunchFee), 'Insufficient Poly token allowance');
     }
@@ -770,8 +770,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, 'Bad ticker');
     assert.assert(params.deployedAt.getTime() > new Date(0).getTime(), 'Bad deployed date');
     assert.isNonZeroETHAddressHex('owner', params.owner);
-    assert.isNonZeroETHAddressHex('Security token not registered for ticker',
-        await this.getSecurityTokenAddress(params.ticker));
+    assert.isNonZeroETHAddressHex(
+      'Security token not registered for ticker',
+      await this.getSecurityTokenAddress(params.ticker),
+    );
     return (await this.contract).modifyExistingSecurityToken.sendTransactionAsync(
       params.ticker,
       params.owner,
@@ -985,8 +987,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.ticker.length <= 10, 'Ticker length can not be greater than 10');
     assert.isNonZeroETHAddressHex('owner', params.owner);
     assert.isNonZeroETHAddressHex('securityToken', params.securityToken);
-    assert.isNonZeroETHAddressHex('Security token not registered for ticker',
-        await this.getSecurityTokenAddress(params.ticker));
+    assert.isNonZeroETHAddressHex(
+      'Security token not registered for ticker',
+      await this.getSecurityTokenAddress(params.ticker),
+    );
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.name,
       params.ticker,
@@ -1303,10 +1307,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('owner', owner);
     assert.assert(ticker.length > 0 && ticker.length <= 10, 'Bad ticker, must be 1 to 10 characters');
     assert.assert(
-        await this.isTickerAvailable({
-          tokenName: ticker,
-        }),
-        'Ticker is not available',
+      await this.isTickerAvailable({
+        tokenName: ticker,
+      }),
+      'Ticker is not available',
     );
 
     // Check poly token allowance
@@ -1315,6 +1319,5 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       const polyBalance = weiToValue(await (await this.polyTokenContract()).balanceOf.callAsync(owner), FULL_DECIMALS);
       assert.assert(polyBalance.isGreaterThanOrEqualTo(tickerRegistrationFee), 'Insufficient Poly token allowance');
     }
-
-  }
+  };
 }
