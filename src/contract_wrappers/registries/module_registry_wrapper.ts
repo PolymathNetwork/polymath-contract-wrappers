@@ -131,14 +131,6 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
-interface GetValueByVariableParams {
-  variable: string;
-}
-
-interface GetValueByKeyParams {
-  key: string;
-}
-
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -156,6 +148,15 @@ interface ModuleTypeParams {
   moduleType: ModuleType;
 }
 
+interface IsCompatibleModuleParams {
+  moduleFactoryAddress: string;
+  securityTokenAddress: string;
+}
+
+interface GetFactoryDetailsParams {
+  factoryAddress: string;
+}
+
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
@@ -168,6 +169,12 @@ interface TransferOwnershipParams extends TxParams {
 interface TagsByModule {
   module: string;
   tags: string[];
+}
+
+interface FactoryDetails {
+  isVerified: boolean;
+  ownerAddress: string;
+  securityTokenAddresses: string[];
 }
 // // End of return types ////
 
@@ -208,6 +215,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contract = contract;
     this.contractFactory = contractFactory;
   }
+
+  public isCompatibleModule = async (params: IsCompatibleModuleParams): Promise<boolean> => {
+    return (await this.contract).isCompatibleModule.callAsync(params.moduleFactoryAddress, params.securityTokenAddress);
+  };
 
   public registerModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
@@ -320,8 +331,25 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return typedResult;
   };
 
+  /**
+   * @returns Returns factoryIsVerified, factoryOwnerAddress, listSecurityTokens
+   */
+  public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
+    const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
+    const typedResult: FactoryDetails = {
+      isVerified: result[0],
+      ownerAddress: result[1],
+      securityTokenAddresses: result[2],
+    };
+    return typedResult;
+  };
+
   public getModulesByType = async (params: ModuleTypeParams) => {
     return (await this.contract).getModulesByType.callAsync(params.moduleType);
+  };
+
+  public getAllModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
+    return (await this.contract).getAllModulesByType.callAsync(params.moduleType);
   };
 
   /**

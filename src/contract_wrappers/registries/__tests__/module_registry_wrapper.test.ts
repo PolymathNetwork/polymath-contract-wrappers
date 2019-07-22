@@ -53,6 +53,30 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
+  describe('IsCompatibleModule', () => {
+    test('should call to isCompatibleModule', async () => {
+      // Address expected
+      const expectedResult = true;
+      const params = {
+        moduleFactoryAddress: '0x4444444444444444444444444444444444444444',
+        securityTokenAddress: '0x5555555555555555555555555555555555555555',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isCompatibleModule).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleFactoryAddress, params.securityTokenAddress)).thenResolve(expectedResult);
+      // Real call
+      const result = await target.isCompatibleModule(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isCompatibleModule).once();
+      verify(mockedMethod.callAsync(params.moduleFactoryAddress, params.securityTokenAddress)).once();
+    });
+  });
+
   describe('RegisterModule', () => {
     test.todo('should fail as moduleFactory is not an Eth address');
 
@@ -282,11 +306,7 @@ describe('ModuleRegistryWrapper', () => {
       when(mockedContract.verifyModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -297,11 +317,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.verifyModule).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
 
@@ -369,11 +385,7 @@ describe('ModuleRegistryWrapper', () => {
       when(mockedContract.unverifyModule).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -384,11 +396,7 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.unverifyModule).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.moduleFactory,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.moduleFactory, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedContract.getModulesByType).times(5);
 
@@ -638,6 +646,31 @@ describe('ModuleRegistryWrapper', () => {
     });
   });
 
+  describe('GetAllModulesByType', () => {
+    test('should call to getAllModulesByType', async () => {
+      // Address expected
+      const expectedResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const params = { moduleType: ModuleType.PermissionManager };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllModulesByType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.moduleType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllModulesByType(params);
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getAllModulesByType).once();
+      verify(mockedMethod.callAsync(params.moduleType)).once();
+    });
+  });
+
   describe('GetModulesByTypeAndToken', () => {
     test.todo('should fail as securityToken is not an Eth address');
 
@@ -660,6 +693,37 @@ describe('ModuleRegistryWrapper', () => {
       // Verifications
       verify(mockedContract.getModulesByTypeAndToken).once();
       verify(mockedMethod.callAsync(params.moduleType, params.securityToken)).once();
+    });
+  });
+
+  describe('GetFactoryDetails', () => {
+    test('should call to getFactoryDetails', async () => {
+      // Address expected
+      const factoryIsVerified = true;
+      const factoryOwnerAddress = '0x1111111111111111111111111111111111111111';
+      const listSecurityTokens = [
+        '0x4444444444444444444444444444444444444444',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const expectedResult = [factoryIsVerified, factoryOwnerAddress, listSecurityTokens];
+      const params = {
+        factoryAddress: '0x5555555555555555555555555555555555555555',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getFactoryDetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.factoryAddress)).thenResolve(expectedResult);
+      // Real call
+      const result = await target.getFactoryDetails(params);
+      // Result expectation
+      expect(result.isVerified).toBe(factoryIsVerified);
+      expect(result.ownerAddress).toBe(factoryOwnerAddress);
+      expect(result.securityTokenAddresses).toBe(listSecurityTokens);
+      // Verifications
+      verify(mockedContract.getFactoryDetails).once();
+      verify(mockedMethod.callAsync(params.factoryAddress)).once();
     });
   });
 
