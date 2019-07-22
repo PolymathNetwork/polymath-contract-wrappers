@@ -695,6 +695,13 @@ describe('SecurityTokenRegistryWrapper', () => {
         txData: {},
         safetyFactor: 10,
       };
+      const securityToken = '0x9999999999999999999999999999999999999999';
+      // Mocked method
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      // Stub the request
+      when(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).thenResolve(securityToken);
 
       // checkOnlyOwner
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
@@ -739,20 +746,31 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).once();
+
     });
   });
 
   describe('ModifyExistingSecurityToken', () => {
     test('should call modifyExistingSecurityToken with ModifyExistingSecurityTokenParams', async () => {
+      const securityToken= '0x5555555555555555555555555555555555555555';
       const mockedParams = {
         ticker: "TTEST",
         owner: "0x0023456789002345678900234567890023456789",
-        securityToken: "0x1123456789112345678911234567891123456789",
+        securityToken,
         tokenDetails: "",
         deployedAt: new Date(2018, 10, 10),
         txData: {},
         safetyFactor: 10,
       };
+
+      // Mocked method
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      // Stub the request
+      when(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).thenResolve(securityToken);
 
       // checkOnlyOwner
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
@@ -797,6 +815,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).once();
     });
   });
 
@@ -2000,6 +2020,13 @@ describe('SecurityTokenRegistryWrapper', () => {
         safetyFactor: 10,
       };
 
+      // Mocked method
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSecurityTokenAddress).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      // Stub the request
+      when(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).thenResolve(securityToken);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -2042,6 +2069,8 @@ describe('SecurityTokenRegistryWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getSecurityTokenAddress).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync(mockedParams.ticker)).once();
     });
   });
 
