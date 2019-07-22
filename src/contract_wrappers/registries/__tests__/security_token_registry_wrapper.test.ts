@@ -731,6 +731,17 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('SetLatestVersion', () => {
     test('should call setLatestVersion with PackageVersionParams', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
       const mockedParams = {
         version: "3.0.0",
         txData: {},
@@ -771,6 +782,9 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 

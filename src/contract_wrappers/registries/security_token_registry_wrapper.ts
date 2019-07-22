@@ -1149,6 +1149,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Changing versions does not affect existing tokens.
    */
   public setLatestVersion = async (params: PackageVersionParams) => {
+    await this.checkOnlyOwner();
     assert.isValidVersion(params.version);
     const splitVersion = params.version.split('.');
     const major = new BigNumber(splitVersion[0]);
