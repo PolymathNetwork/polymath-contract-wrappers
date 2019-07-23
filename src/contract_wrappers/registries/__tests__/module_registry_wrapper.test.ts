@@ -103,7 +103,7 @@ describe('ModuleRegistryWrapper', () => {
       // Stub the get types
       const mockedGetTypesMethod = mock(MockedCallMethod);
       const types = [new BigNumber(1), new BigNumber(2)];
-      when(mockedModuleFactoryContract.types).thenReturn(instance(mockedGetTypesMethod));
+      when(mockedModuleFactoryContract.getTypes).thenReturn(instance(mockedGetTypesMethod));
       when(mockedGetTypesMethod.callAsync()).thenResolve(types);
 
       // Mock contract paused
@@ -166,7 +166,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).twice();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.owner).once();
-      verify(mockedModuleFactoryContract.types).once();
+      verify(mockedModuleFactoryContract.getTypes).once();
       verify(mockedGetTypesMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
       verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();

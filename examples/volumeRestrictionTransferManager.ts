@@ -119,7 +119,7 @@ window.addEventListener('load', async () => {
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
+//  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
 
   // Mint yourself some tokens and make some transfers
   await tickerSecurityTokenInstance.issue({ investor: myAddress, value: new BigNumber(1000), data: '' });

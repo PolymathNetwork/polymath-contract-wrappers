@@ -475,6 +475,7 @@ describe('GeneralTransferManagerWrapper', () => {
       const expectedResult = [
         [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
         [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
       ];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -486,7 +487,12 @@ describe('GeneralTransferManagerWrapper', () => {
       // Real call
       const result = await target.getKYCData(mockedParams);
       // Result expectation
-      expect(result).toBe(expectedResult);
+
+      for (let i = 0; i < 3; i += 1) {
+        expect(dateToBigNumber(result[i].canSendAfter)).toEqual(expectedResult[1][i]);
+        expect(dateToBigNumber(result[i].canReceiveAfter)).toEqual(expectedResult[2][i]);
+        expect(dateToBigNumber(result[i].expiryTime)).toEqual(expectedResult[3][i]);
+      }
       // Verifications
       verify(mockedContract.getKYCData).once();
       verify(mockedMethod.callAsync()).once();
@@ -542,7 +548,7 @@ describe('GeneralTransferManagerWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'AllowAllTransfers', 'AllowAllWhitelistTransfers', 'AllowAllWhitelistIssuances', 'AllowAllBurnTransfers', 'ChangeSigningAddress', 'ChangeDefaults', 'ModifyWhitelist', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'ChangeDefaults', 'ModifyKYCData', 'ModifyInvestorFlag', 'ModifyTransferRequirements', 'Pause', 'Unpause', encountered: Transfer`,
         ),
       );
     });

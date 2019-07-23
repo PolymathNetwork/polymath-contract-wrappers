@@ -2,6 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
+import BigNumber from 'bignumber.js';
 
 // This file acts as a valid sandbox.ts file in root directory for invest in a capped STO token on an unlocked node (like ganache)
 
@@ -35,9 +36,7 @@ window.addEventListener('load', async () => {
   });
 
   const investorAddress = await polymathAPI.getAccount();
-  const whitelist = await generalTM.whitelist({
-    investorAddress,
-  });
+  const whitelist = await generalTM.getAllKYCData();
 
   await cappedSTO.subscribeAsync({
     eventName: CappedSTOEvents.TokenPurchase,
@@ -52,10 +51,8 @@ window.addEventListener('load', async () => {
   });
 
   const investIn = async () => {
-    const whitelist = await generalTM.whitelist({
-      investorAddress,
-    });
-    if (whitelist.canBuyFromSTO) {
+    const whitelist = await generalTM.getAllKYCData();
+    if (whitelist[0].investor) {
       await cappedSTO.buyTokens({
         beneficiary: investorAddress,
         value: new BigNumber(2),
@@ -66,7 +63,7 @@ window.addEventListener('load', async () => {
     }
   };
 
-  if (whitelist.canBuyFromSTO) {
+  if (whitelist[0].investor) {
     await investIn();
   } else {
     console.log('Your address is not approved to participate in this token sale.');

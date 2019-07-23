@@ -13,7 +13,6 @@ import {
   ISecurityTokenRegistryTickerRemovedEventArgs,
   ISecurityTokenRegistryChangeTickerOwnershipEventArgs,
   ISecurityTokenRegistryChangeFeeCurrencyEventArgs,
-  ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs,
   ISecurityTokenRegistrySecurityTokenRefreshedEventArgs,
   ISecurityTokenRegistryProtocolFactorySetEventArgs,
   ISecurityTokenRegistryLatestVersionSetEventArgs,
@@ -60,15 +59,6 @@ interface ChangeFeeCurrencySubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetChangeFeeCurrencyLogsAsyncParams extends GetLogsAsyncParams {
   eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
-}
-
-interface NewSecurityTokenCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityTokenCreated;
-  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs>;
-}
-
-interface GetNewSecurityTokenCreatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityTokenCreated;
 }
 
 interface SecurityTokenRefreshedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -199,7 +189,6 @@ interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
 
 interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeFeeCurrencySubscribeAsyncParams): Promise<string>;
-  (params: NewSecurityTokenCreatedSubscribeAsyncParams): Promise<string>;
   (params: SecurityTokenRefreshedSubscribeAsyncParams): Promise<string>;
   (params: ProtocolFactorySetSubscribeAsyncParams): Promise<string>;
   (params: LatestVersionSetSubscribeAsyncParams): Promise<string>;
@@ -219,9 +208,6 @@ interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
 interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeeCurrencyLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>[]
-  >;
-  (params: GetNewSecurityTokenCreatedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs>[]
   >;
   (params: GetSecurityTokenRefreshedLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>[]
@@ -500,7 +486,6 @@ interface SecurityTokenData {
   owner: string;
   tokenDetails: string;
   deployedAt: Date;
-  version: string;
 }
 
 interface TickerDetails {
@@ -563,15 +548,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
     assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     const result = await (await this.contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
-    const unpackVersion = result[4].map(num => {
-      return num.toNumber();
-    });
     const typedResult: SecurityTokenData = {
       ticker: result[0],
       owner: result[1],
       tokenDetails: result[2],
       deployedAt: bigNumberToDate(result[3]),
-      version: unpackVersion.join('.'),
     };
     return typedResult;
   };

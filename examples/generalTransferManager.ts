@@ -95,7 +95,7 @@ window.addEventListener('load', async () => {
   //                 [false, false, false],
   //                 [false, false, false],
   //                 { from: token_owner }
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
+//  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
 
@@ -105,19 +105,18 @@ window.addEventListener('load', async () => {
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
   console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
 
-  // Disallow all transfers between token holders
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: false });
+  // Disallow all transfers between token holders//
+//  await generalTM.changeAllowAllTransfers({ allowAllTransfers: false });
 
   // Add whitelist special users
-  await generalTM.modify({
-    investors: [randomBeneficiary1, randomBeneficiary2, myAddress],
-    canBuyFromSTO: [true, true, true],
-    canReceiveAfters: [new Date(2018, 1), new Date(2018, 1), new Date(2018, 1)],
-    canSendAfters: [new Date(), new Date(), new Date(2018, 2)],
-    expiryTimes: [new Date(2035, 1), new Date(2035, 1), new Date(2035, 1)],
+  await generalTM.modifyKYCData({
+    investor: randomBeneficiary1,
+    canReceiveAfter: new Date(2018, 1),
+    canSendAfter: new Date(2018, 2),
+    expiryTime:  new Date(2035, 1),
   });
 
-  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
+//  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
 
   // Verify we can make transfers
   console.log(
