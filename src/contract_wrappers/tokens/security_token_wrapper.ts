@@ -68,6 +68,7 @@ import {
   ModuleType,
   Partition,
   PERCENTAGE_DECIMALS,
+  Perm,
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
@@ -631,7 +632,7 @@ interface IssueMultiParams extends TxParams {
 interface CheckPermissionParams {
   delegateAddress: string;
   moduleAddress: string;
-  permission: string;
+  permission: Perm;
 }
 
 interface RedeemParams extends TxParams {

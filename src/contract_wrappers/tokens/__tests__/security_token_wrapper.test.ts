@@ -28,6 +28,7 @@ import {
   PERCENTAGE_DECIMALS,
   FULL_DECIMALS,
   Partition,
+  Perm,
 } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -41,7 +42,8 @@ import {
   weiToValue,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
-  bigNumberToDate, parsePartitionBytes32Value,
+  bigNumberToDate,
+  parsePartitionBytes32Value,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 
@@ -655,7 +657,7 @@ describe('SecurityTokenWrapper', () => {
       const mockedParams = {
         delegateAddress: '0x1111111111111111111111111111111111111111',
         moduleAddress: '0x1111111111111111111111111111111111111111',
-        permission: 'string',
+        permission: Perm.Admin,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
