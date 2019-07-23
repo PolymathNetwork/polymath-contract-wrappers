@@ -39,8 +39,6 @@ import {
   SecurityTokenTreasuryWalletChangedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
   SecurityTokenUpdateTokenNameEventArgs,
-} from '@polymathnetwork/abi-wrappers';
-import {
   CappedSTO,
   CountTransferManager,
   ERC20DividendCheckpoint,
@@ -48,11 +46,13 @@ import {
   ISecurityToken,
   PercentageTransferManager,
   USDTieredSTO,
-} from '@polymathnetwork/contract-artifacts';
-import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
-import { ethers } from 'ethers';
+  TxData,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
+  ethers,
+} from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';

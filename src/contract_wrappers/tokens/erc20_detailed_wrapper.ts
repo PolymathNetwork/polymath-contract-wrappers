@@ -1,7 +1,12 @@
-import { ERC20DetailedContract, ERC20DetailedEventArgs, ERC20DetailedEvents } from '@polymathnetwork/abi-wrappers';
-import { ERC20Detailed } from '@polymathnetwork/contract-artifacts';
-import { LogWithDecodedArgs, Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
+import {
+  ERC20DetailedContract,
+  ERC20DetailedEventArgs,
+  ERC20DetailedEvents,
+  ERC20Detailed,
+  LogWithDecodedArgs,
+  Web3Wrapper,
+  ContractAbi,
+} from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import { bytes32ToString } from '../../utils/convert';
 import ERC20TokenWrapper from './erc20_wrapper';

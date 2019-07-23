@@ -5,11 +5,12 @@ import {
   ModuleFactoryOwnershipTransferredEventArgs,
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
   ModuleFactoryChangeSTVersionBoundEventArgs,
+  BigNumber,
+  ModuleFactory,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { BigNumber } from '@0x/utils';
-import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
