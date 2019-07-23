@@ -393,7 +393,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getTickerDetails({ tokenName: ticker });
+      const result = await target.getTickerDetails({ ticker });
       // Result expectation
       expect(result.owner).toBe(expectedResult[0]);
       expect(result.registrationDate).toEqual(expectedRegistrationDate);
@@ -767,7 +767,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ tokenName: ticker });
+      const result = await target.isTickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
@@ -788,7 +788,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ tokenName: ticker });
+      const result = await target.isTickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
@@ -803,7 +803,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call to getTickerDetails and return true', async () => {
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       const expectedResult = [ownerAddress, new BigNumber(1), new BigNumber(1), 'tokenName', true];
-      const tokenName = 'TICK';
+      const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -813,14 +813,14 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(tokenName)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
       // Real call
-      const result = await target.isTickerRegisteredByCurrentIssuer({ tokenName });
+      const result = await target.isTickerRegisteredByCurrentIssuer({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
-      verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
@@ -833,7 +833,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should return false as ticker is registered by a different owner', async () => {
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       const expectedResult = [ownerAddress, new BigNumber(1), new BigNumber(1), 'tokenName', true];
-      const tokenName = 'TICK';
+      const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -843,14 +843,14 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(tokenName)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
       // Real call
-      const result = await target.isTickerRegisteredByCurrentIssuer({ tokenName });
+      const result = await target.isTickerRegisteredByCurrentIssuer({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
-      verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -873,7 +873,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
 
       // Real call
-      const result = await target.isTokenLaunched({ tokenName: ticker });
+      const result = await target.isTokenLaunched({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
@@ -898,7 +898,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
 
       // Real call
-      const result = await target.isTokenLaunched({ tokenName: ticker });
+      const result = await target.isTokenLaunched({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
