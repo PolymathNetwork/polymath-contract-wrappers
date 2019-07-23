@@ -96,11 +96,11 @@ export function parsePartitionBytes32Value(value: string): Partition {
 }
 export function parsePermBytes32Value(value: string): Perm {
   switch (bytes32ToString(value)) {
-    case 'ADMIN':
+    case Perm.Admin:
       return Perm.Admin;
-    case 'OPERATOR':
+    case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new Error('Partition not recognized');
+      throw new Error('Permission not recognized');
   }
 }

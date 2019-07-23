@@ -107,7 +107,7 @@ interface ChangePermissionMultiParams extends TxParams {
 }
 
 // // Return types ////
-interface PermissonsPerModule {
+interface PermissionsPerModule {
   /** Module address */
   module: string;
   /** List of permissions */
@@ -235,15 +235,15 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     const groupedResult = _.groupBy(zippedResult, value => {
       return value[0];
     }); // [module1: [[module1, perm1], [module1, perm2]], ...]
-    const typedResult: PermissonsPerModule[] = [];
+    const typedResult: PermissionsPerModule[] = [];
     _.forEach(
       groupedResult,
       (value, key): void => {
-        const permissonsPerModule: PermissonsPerModule = {
+        const permissionsPerModule: PermissionsPerModule = {
           module: key,
           permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
         };
-        typedResult.push(permissonsPerModule);
+        typedResult.push(permissionsPerModule);
       },
     );
     return typedResult;

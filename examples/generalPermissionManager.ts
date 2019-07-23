@@ -4,7 +4,7 @@ import { GeneralPermissionManagerEvents } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
-import { ModuleName, ModuleType } from '../src';
+import { ModuleName, ModuleType, Perm } from '../src';
 
 // This file acts as a valid sandbox for adding a permission manager  module on an unlocked node (like ganache)
 
@@ -132,14 +132,22 @@ window.addEventListener('load', async () => {
   }))[0];
 
   // Get all delegates
-  await generalPM.changePermission({ valid: true, perm: 'ADMIN', delegate: myAddress, module: generalTMAddress });
+  const permissionChanged = await generalPM.changePermission({
+    valid: true,
+    perm: Perm.Admin,
+    delegate: myAddress,
+    module: generalTMAddress,
+  });
 
   // Check  delegate
-  console.log('Delegate is added:');
+  console.log('Permission changed:');
+  console.log(permissionChanged);
+
   console.log(await generalPM.checkDelegate({ delegate: myAddress }));
   console.log('Delegate has flags perm added on general transfer manager:');
-  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
-
+  console.log(
+    await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: Perm.Admin }),
+  );
 
   // Change allow all whitelist transfers: I_GeneralTransferManager.modifyTransferRequirementsMulti(
   //                 [0, 1, 2],
@@ -153,19 +161,29 @@ window.addEventListener('load', async () => {
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
+  /*
   await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
-
+*/
   // Revoking Permission
-  await generalPM.changePermission({ valid: false, perm: 'ADMIN', delegate: myAddress, module: generalTMAddress });
+  const permissionResult = await generalPM.changePermission({
+    valid: false,
+    perm: Perm.Admin,
+    delegate: myAddress,
+    module: generalTMAddress,
+  });
 
-  console.log('Delegate perm has been revoked. Check permission result: ');
-  console.log(await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: 'FLAGS' }));
+  console.log('Delegate perm has been revoked. Check permission result:');
+  console.log(permissionResult);
+  console.log(
+    await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: Perm.Admin }),
+  );
 
   // Removing Delegate
-  await generalPM.deleteDelegate({ delegate: myAddress });
+  const deleteDelegateResult = await generalPM.deleteDelegate({ delegate: myAddress });
 
   // Check delegate
   console.log('Delegate is removed. Check delegate result:');
+  console.log(deleteDelegateResult);
   console.log(await generalPM.checkDelegate({ delegate: myAddress }));
 
   generalPM.unsubscribeAll();
