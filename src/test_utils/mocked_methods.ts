@@ -5,6 +5,10 @@ export class MockedCallMethod {
   public callAsync(...args: any): Promise<any> {
     return Promise.resolve();
   }
+
+  public getABIEncodedTransactionData(): string {
+    return '';
+  }
 }
 
 export class MockedSendMethod extends MockedCallMethod {

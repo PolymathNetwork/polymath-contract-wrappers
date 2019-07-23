@@ -1,11 +1,11 @@
 import {
+  GeneralTransferManagerContract,
   USDTieredSTOContract,
   USDTieredSTOEventArgs,
   USDTieredSTOEvents,
   USDTieredSTOFundsReceivedEventArgs,
   USDTieredSTOPauseEventArgs,
   USDTieredSTOReserveTokenMintEventArgs,
-  USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOSetAddressesEventArgs,
   USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
   USDTieredSTOSetFundRaiseTypesEventArgs,
@@ -13,14 +13,15 @@ import {
   USDTieredSTOSetNonAccreditedLimitEventArgs,
   USDTieredSTOSetTiersEventArgs,
   USDTieredSTOSetTimesEventArgs,
+  USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
-  GeneralTransferManagerContract,
+  USDTieredSTO,
+  Web3Wrapper,
+  BigNumber,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { USDTieredSTO } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import STOWrapper from './sto_wrapper';
@@ -255,6 +256,14 @@ interface ModifyTimesParams extends TxParams {
 interface ModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
+}
+/**
+ * @param nonAccreditedLimitUSD max non accredited invets limit
+ * @param minimumInvestmentUSD overall minimum investment limit
+ */
+interface ModifyOracleParams extends TxParams {
+  fundRaiseType: FundRaiseType;
+  oracleAddress: string;
 }
 
 /**
@@ -786,6 +795,23 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     return (await this.contract).modifyTimes.sendTransactionAsync(
       dateToBigNumber(params.startTime),
       dateToBigNumber(params.endTime),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Modifies oracle
+   */
+  public modifyOracle = async (params: ModifyOracleParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      params.fundRaiseType === FundRaiseType.POLY || params.fundRaiseType === FundRaiseType.ETH,
+      'Invalid currency',
+    );
+    return (await this.contract).modifyOracle.sendTransactionAsync(
+      params.fundRaiseType,
+      params.oracleAddress,
       params.txData,
       params.safetyFactor,
     );

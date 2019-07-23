@@ -20,11 +20,12 @@ import {
   ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
   ISecurityTokenContract,
   PolyTokenContract,
+  ISecurityTokenRegistry,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { ISecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
@@ -46,7 +47,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToKeccak256,
+  stringToBytes32,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -1170,11 +1171,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     let feeType = '';
     switch (params.feeType) {
       case FeeType.stLaunchFee: {
-        feeType = stringToKeccak256('stLaunchFee');
+        feeType = stringToBytes32('stLaunchFee');
         break;
       }
       case FeeType.tickerRegFee: {
-        feeType = stringToKeccak256('tickerRegFee');
+        feeType = stringToBytes32('tickerRegFee');
         break;
       }
       default: {

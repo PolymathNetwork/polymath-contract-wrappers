@@ -1,8 +1,12 @@
 // VolumeRestrictionTransferManagerWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { VolumeRestrictionTMContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  VolumeRestrictionTMContract,
+  ISecurityTokenContract,
+  PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 import { RestrictionType } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';

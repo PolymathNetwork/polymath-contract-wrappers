@@ -4,10 +4,11 @@ import {
   GeneralPermissionManagerEvents,
   GeneralPermissionManagerChangePermissionEventArgs,
   GeneralPermissionManagerAddDelegateEventArgs,
+  GeneralPermissionManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { GeneralPermissionManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';

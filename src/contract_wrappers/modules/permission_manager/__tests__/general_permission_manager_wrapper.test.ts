@@ -1,10 +1,10 @@
 // GeneralPermissionManagerWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   GeneralPermissionManagerContract,
   PolyTokenEvents,
   ISecurityTokenContract,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../../module_wrapper';
 import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';

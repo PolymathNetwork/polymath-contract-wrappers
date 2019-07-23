@@ -1,19 +1,19 @@
-import { Module } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import {
   ISecurityTokenContract,
   ModuleFactoryContract,
   PolyTokenContract,
   ERC20DetailedContract,
+  Module,
+  Web3Wrapper,
+  ContractAbi,
+  TxData,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
 import { stringToBytes32 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
-import assert from '../../utils/assert';
 
 interface TakeFeeParams extends TxParams {
   amount: BigNumber;

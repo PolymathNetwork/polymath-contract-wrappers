@@ -1,12 +1,14 @@
-import { PolyTokenFaucetContract } from '@polymathnetwork/abi-wrappers';
-import { PolyTokenFaucet } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
+import {
+  PolyTokenFaucetContract,
+  PolyTokenFaucet,
+  Web3Wrapper,
+  ContractAbi,
+  BigNumber,
+} from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams } from '../../types';
 import assert from '../../utils/assert';
-import {valueToWei} from '../../utils/convert';
+import { valueToWei } from '../../utils/convert';
 
 const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
 

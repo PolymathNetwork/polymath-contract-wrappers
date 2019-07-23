@@ -1,12 +1,12 @@
 // ERC20DividendCheckpointWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   ERC20DividendCheckpointContract,
   ISecurityTokenContract,
   PolyTokenEvents,
   ERC20DetailedContract,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import ERC20DividendCheckpointWrapper from '../erc20_dividend_checkpoint_wrapper';
