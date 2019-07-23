@@ -151,6 +151,13 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   };
 
   /**
+   * Get the version of the Module
+   */
+  public version = async (): Promise<string> => {
+    return (await this.contract).version.callAsync();
+  }
+
+  /**
    * Get setup cost
    */
   public getSetupCost = async (): Promise<BigNumber> => {
