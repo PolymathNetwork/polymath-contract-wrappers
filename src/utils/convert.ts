@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { BigNumber } from '@0x/utils';
-import { Partition } from '../types';
+import { Partition, Perm } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -90,6 +90,16 @@ export function parsePartitionBytes32Value(value: string): Partition {
       return Partition.Locked;
     case '0':
       return Partition.Undefined;
+    default:
+      throw new Error('Partition not recognized');
+  }
+}
+export function parsePermBytes32Value(value: string): Perm {
+  switch (bytes32ToString(value)) {
+    case 'ADMIN':
+      return Perm.Admin;
+    case 'OPERATOR':
+      return Perm.Operator;
     default:
       throw new Error('Partition not recognized');
   }

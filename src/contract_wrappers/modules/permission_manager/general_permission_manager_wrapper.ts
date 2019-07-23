@@ -22,7 +22,12 @@ import {
   Subscribe,
   Perm,
 } from '../../../types';
-import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
+import {
+  numberToBigNumber,
+  stringToBytes32,
+  stringArrayToBytes32Array,
+  parsePermBytes32Value,
+} from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission;
@@ -57,7 +62,7 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
 interface PermParams {
   module: string;
   delegate: string;
-  permission: string;
+  permission: Perm;
 }
 
 interface DelegateIndexParams {
@@ -70,7 +75,7 @@ interface DelegateParams {
 
 interface GetAllDelegatesWithPermParams {
   module: string;
-  perm: string;
+  perm: Perm;
 }
 
 interface GetAllModulesAndPermsFromTypesParams {
@@ -90,14 +95,14 @@ interface AddDelegateParams extends TxParams {
 interface ChangePermissionParams extends TxParams {
   delegate: string;
   module: string;
-  perm: string;
+  perm: Perm;
   valid: boolean;
 }
 
 interface ChangePermissionMultiParams extends TxParams {
   delegate: string;
   modules: string[];
-  perms: string[];
+  perms: Perm[];
   valids: boolean[];
 }
 
@@ -106,7 +111,7 @@ interface PermissonsPerModule {
   /** Module address */
   module: string;
   /** List of permissions */
-  permissions: string[];
+  permissions: Perm[];
 }
 // // End of return types ////
 
@@ -161,7 +166,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
-    assert.assert(!await (await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
+    assert.assert(!(await (await this.contract).checkDelegate.callAsync(params.delegate)), 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -236,7 +241,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       (value, key): void => {
         const permissonsPerModule: PermissonsPerModule = {
           module: key,
-          permissions: value.map(pair => bytes32ToString(pair[1] as string)),
+          permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
         };
         typedResult.push(permissonsPerModule);
       },
