@@ -1,4 +1,3 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';

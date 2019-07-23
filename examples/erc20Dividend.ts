@@ -1,7 +1,6 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-
-import { ERC20DividendCheckpointEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { ERC20DividendCheckpointEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType } from '../src';

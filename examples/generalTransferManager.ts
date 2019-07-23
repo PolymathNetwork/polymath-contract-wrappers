@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
 
