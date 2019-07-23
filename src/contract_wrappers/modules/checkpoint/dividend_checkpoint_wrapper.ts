@@ -170,6 +170,10 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).wallet.callAsync();
   };
 
+  public getTreasuryWallet = async (): Promise<string> => {
+    return (await this.contract).getTreasuryWallet.callAsync();
+  };
+
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
