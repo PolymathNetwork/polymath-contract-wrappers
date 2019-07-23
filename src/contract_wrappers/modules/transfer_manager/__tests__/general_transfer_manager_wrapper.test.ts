@@ -482,20 +482,20 @@ describe('GeneralTransferManagerWrapper', () => {
       // Stub the method
       when(mockedContract.getKYCData).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(mockedParams)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(mockedParams.investors)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getKYCData(mockedParams);
       // Result expectation
 
       for (let i = 0; i < 3; i += 1) {
-        expect(dateToBigNumber(result[i].canSendAfter)).toEqual(expectedResult[1][i]);
-        expect(dateToBigNumber(result[i].canReceiveAfter)).toEqual(expectedResult[2][i]);
-        expect(dateToBigNumber(result[i].expiryTime)).toEqual(expectedResult[3][i]);
+        expect(dateToBigNumber(result[i].canSendAfter)).toEqual(expectedResult[0][i]);
+        expect(dateToBigNumber(result[i].canReceiveAfter)).toEqual(expectedResult[1][i]);
+        expect(dateToBigNumber(result[i].expiryTime)).toEqual(expectedResult[2][i]);
       }
       // Verifications
       verify(mockedContract.getKYCData).once();
-      verify(mockedMethod.callAsync()).once();
+      verify(mockedMethod.callAsync(mockedParams.investors)).once();
     });
   });
 
