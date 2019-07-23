@@ -23,20 +23,20 @@ window.addEventListener('load', async () => {
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
   const investorAddress = '<investor address>'.toLowerCase();
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
 
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
-  const listInvestors = await generalTM.getInvestors();
+  const listInvestors = await generalTM.getAllKYCData();
   const found = listInvestors.find(function(addr) {
-    return addr == investorAddress;
+    return addr.investor == investorAddress;
   });
 
   await TEST.subscribeAsync({
-    eventName: SecurityTokenEvents.Minted,
+    eventName: SecurityTokenEvents.Issued,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -48,9 +48,10 @@ window.addEventListener('load', async () => {
   });
 
   if (found) {
-    await TEST.mint({
+    await TEST.issue({
       investor: investorAddress,
       value: new BigNumber(100),
+      data: '',
       txData: {
         from: '<sto owner>'.toLowerCase(),
       },

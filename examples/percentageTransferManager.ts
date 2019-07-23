@@ -22,7 +22,7 @@ window.addEventListener('load', async () => {
   const ticker = 'TEST';
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker);
   const moduleStringName = 'PercentageTransferManager';
-  const moduleName = ModuleName.percentageTransferManager;
+  const moduleName = ModuleName.PercentageTransferManager;
 
   // Get permission manager factory address
   const modules = await polymathAPI.moduleRegistry.getModulesByType({

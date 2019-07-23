@@ -1,8 +1,8 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
+import BigNumber from 'bignumber.js';
 
 // This file acts as a valid sandbox.ts file in root directory for invest in a capped STO token on an unlocked node (like ganache)
 
@@ -23,22 +23,20 @@ window.addEventListener('load', async () => {
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
 
-  const cappedSTOAddress = (await TEST.getModulesByName({ moduleName: ModuleName.cappedSTO }))[0];
+  const cappedSTOAddress = (await TEST.getModulesByName({ moduleName: ModuleName.CappedSTO }))[0];
   const cappedSTO = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.cappedSTO,
+    name: ModuleName.CappedSTO,
     address: cappedSTOAddress,
   });
 
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
   const investorAddress = await polymathAPI.getAccount();
-  const whitelist = await generalTM.whitelist({
-    investorAddress,
-  });
+  const whitelist = await generalTM.getAllKYCData();
 
   await cappedSTO.subscribeAsync({
     eventName: CappedSTOEvents.TokenPurchase,
@@ -53,10 +51,8 @@ window.addEventListener('load', async () => {
   });
 
   const investIn = async () => {
-    const whitelist = await generalTM.whitelist({
-      investorAddress,
-    });
-    if (whitelist.canBuyFromSTO) {
+    const whitelist = await generalTM.getAllKYCData();
+    if (whitelist[0].investor) {
       await cappedSTO.buyTokens({
         beneficiary: investorAddress,
         value: new BigNumber(2),
@@ -67,7 +63,7 @@ window.addEventListener('load', async () => {
     }
   };
 
-  if (whitelist.canBuyFromSTO) {
+  if (whitelist[0].investor) {
     await investIn();
   } else {
     console.log('Your address is not approved to participate in this token sale.');

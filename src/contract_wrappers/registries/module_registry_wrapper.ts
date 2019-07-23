@@ -240,7 +240,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
         'Calling address must be owner without custom modules allowed feature status',
       );
     }
-    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).types.callAsync();
+    const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync();
     // Check for duplicates
     if (getTypesResult.length > 1) {
       assert.assert(getTypesResult.length === new Set(getTypesResult).size, 'Type mismatch');

@@ -1,6 +1,5 @@
-import { ethers } from 'ethers';
-import { BigNumber } from '@0x/utils';
-import { Partition } from '../types';
+import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { Partition, Perm } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -90,5 +89,15 @@ export function parsePartitionBytes32Value(value: string): Partition {
       return Partition.Undefined;
     default:
       throw new Error('Partition not recognized');
+  }
+}
+export function parsePermBytes32Value(value: string): Perm {
+  switch (bytes32ToString(value)) {
+    case Perm.Admin:
+      return Perm.Admin;
+    case Perm.Operator:
+      return Perm.Operator;
+    default:
+      throw new Error('Permission not recognized');
   }
 }

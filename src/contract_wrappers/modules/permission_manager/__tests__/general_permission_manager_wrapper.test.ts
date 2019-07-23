@@ -1,10 +1,10 @@
 // GeneralPermissionManagerWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   GeneralPermissionManagerContract,
   PolyTokenEvents,
   ISecurityTokenContract,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../../module_wrapper';
 import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';
@@ -16,6 +16,7 @@ import {
   numberToBigNumber,
 } from '../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
+import { Perm } from '../../../../types';
 
 describe('GeneralPermissionManagerWrapper', () => {
   // Declare GeneralPermissionManagerWrapper object
@@ -62,7 +63,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       const params = {
         module: '0x1111111111111111111111111111111111111111',
         delegate: '0x2222222222222222222222222222222222222222',
-        permission: 'Permission1',
+        permission: Perm.Admin,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -143,7 +144,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       const params = {
         module: '0x1111111111111111111111111111111111111111',
         delegate: '0x2222222222222222222222222222222222222222',
-        permission: 'Permission1',
+        permission: Perm.Admin,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -197,7 +198,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       const expectedResult = ['string1', 'string2'];
       const params = {
         module: '0x2222222222222222222222222222222222222222',
-        perm: 'Perm1',
+        perm: Perm.Admin,
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -246,7 +247,7 @@ describe('GeneralPermissionManagerWrapper', () => {
         '0x2222222222222222222222222222222222222222',
         '0x3333333333333333333333333333333333333333',
       ];
-      const perms = stringArrayToBytes32Array(['Perm1', 'Perm2', 'Perm3']);
+      const perms = stringArrayToBytes32Array(['ADMIN', 'OPERATOR', 'OPERATOR']);
       const expectedResult = [modules, perms];
       const params = {
         delegate: '0x2222222222222222222222222222222222222222',
@@ -449,7 +450,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       const mockedParams = {
         delegate: '0x1111111111111111111111111111111111111111',
         module: '0x1111111111111111111111111111111111111111',
-        perm: 'string',
+        perm: Perm.Admin,
         valid: false,
         txData: {},
         safetyFactor: 10,
@@ -523,7 +524,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // Mocked parameters
-      const mockedPerms = ['string', 'string2'];
+      const mockedPerms = [Perm.Admin, Perm.Operator];
       const mockedParams = {
         delegate: '0x1111111111111111111111111111111111111111',
         modules: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
@@ -587,7 +588,9 @@ describe('GeneralPermissionManagerWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'ChangePermission', 'AddDelegate', 'Pause', 'Unpause', encountered: Transfer`),
+        new Error(
+          `Expected eventName to be one of: 'ChangePermission', 'AddDelegate', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
       );
     });
   });

@@ -1,12 +1,12 @@
 // ModuleRegistryWrapper test
 import { instance, mock, reset, verify, when } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
 import {
   ModuleRegistryContract,
   PolyTokenEvents,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { Feature, ModuleType } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
@@ -103,7 +103,7 @@ describe('ModuleRegistryWrapper', () => {
       // Stub the get types
       const mockedGetTypesMethod = mock(MockedCallMethod);
       const types = [new BigNumber(1), new BigNumber(2)];
-      when(mockedModuleFactoryContract.types).thenReturn(instance(mockedGetTypesMethod));
+      when(mockedModuleFactoryContract.getTypes).thenReturn(instance(mockedGetTypesMethod));
       when(mockedGetTypesMethod.callAsync()).thenResolve(types);
 
       // Mock contract paused
@@ -166,7 +166,7 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).twice();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.owner).once();
-      verify(mockedModuleFactoryContract.types).once();
+      verify(mockedModuleFactoryContract.getTypes).once();
       verify(mockedGetTypesMethod.callAsync()).once();
       verify(mockedFeatureRegistryContract.getFeatureStatus).once();
       verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();

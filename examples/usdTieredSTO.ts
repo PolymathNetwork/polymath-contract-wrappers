@@ -1,6 +1,6 @@
 import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
@@ -62,7 +62,7 @@ window.addEventListener('load', async () => {
   });
 
   const moduleStringName = 'USDTieredSTO';
-  const moduleName = ModuleName.usdTieredSTO;
+  const moduleName = ModuleName.UsdTieredSTO;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.STO,
   });
@@ -113,17 +113,17 @@ window.addEventListener('load', async () => {
       minimumInvestmentUSD: new BigNumber(5),
       fundRaiseTypes: [FundRaiseType.ETH, FundRaiseType.POLY],
       wallet: '0x3333333333333333333333333333333333333333',
-      reserveWallet: '0x5555555555555555555555555555555555555555',
+      treasuryWallet: '0x5555555555555555555555555555555555555555',
       usdTokens: ['0x6666666666666666666666666666666666666666', '0x4444444444444444444444444444444444444444'],
     },
   });
   console.log(usdTieredResult);
 
   const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.usdTieredSTO,
+    moduleName: ModuleName.UsdTieredSTO,
   }))[0];
   const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.usdTieredSTO,
+    name: ModuleName.UsdTieredSTO,
     address: usdTieredAddress,
   });
   const buyWithETH = await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });

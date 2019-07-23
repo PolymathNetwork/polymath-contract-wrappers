@@ -1,7 +1,11 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolymathRegistryContract, PolyTokenEvents, PolymathRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  PolymathRegistryContract,
+  PolyTokenEvents,
+  PolymathRegistryEvents,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { PolymathContract } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
@@ -257,9 +261,7 @@ describe('PolyMathRegistryWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ChangeAddress', 'OwnershipTransferred', encountered: Transfer`,
-        ),
+        new Error(`Expected eventName to be one of: 'ChangeAddress', 'OwnershipTransferred', encountered: Transfer`),
       );
     });
 

@@ -123,7 +123,7 @@ window.addEventListener('load', async () => {
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
+//  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
 
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';

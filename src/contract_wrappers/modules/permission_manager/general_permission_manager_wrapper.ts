@@ -23,7 +23,12 @@ import {
   Subscribe,
   Perm,
 } from '../../../types';
-import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
+import {
+  numberToBigNumber,
+  stringToBytes32,
+  stringArrayToBytes32Array,
+  parsePermBytes32Value,
+} from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission;
@@ -58,7 +63,7 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
 interface PermParams {
   module: string;
   delegate: string;
-  permission: string;
+  permission: Perm;
 }
 
 interface DelegateIndexParams {
@@ -71,7 +76,7 @@ interface DelegateParams {
 
 interface GetAllDelegatesWithPermParams {
   module: string;
-  perm: string;
+  perm: Perm;
 }
 
 interface GetAllModulesAndPermsFromTypesParams {
@@ -91,23 +96,23 @@ interface AddDelegateParams extends TxParams {
 interface ChangePermissionParams extends TxParams {
   delegate: string;
   module: string;
-  perm: string;
+  perm: Perm;
   valid: boolean;
 }
 
 interface ChangePermissionMultiParams extends TxParams {
   delegate: string;
   modules: string[];
-  perms: string[];
+  perms: Perm[];
   valids: boolean[];
 }
 
 // // Return types ////
-interface PermissonsPerModule {
+interface PermissionsPerModule {
   /** Module address */
   module: string;
   /** List of permissions */
-  permissions: string[];
+  permissions: Perm[];
 }
 // // End of return types ////
 
@@ -231,14 +236,17 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     const groupedResult = _.groupBy(zippedResult, value => {
       return value[0];
     }); // [module1: [[module1, perm1], [module1, perm2]], ...]
-    const typedResult: PermissonsPerModule[] = [];
-    _.forEach(groupedResult, (value, key): void => {
-      const permissonsPerModule: PermissonsPerModule = {
-        module: key,
-        permissions: value.map(pair => bytes32ToString(pair[1] as string)),
-      };
-      typedResult.push(permissonsPerModule);
-    });
+    const typedResult: PermissionsPerModule[] = [];
+    _.forEach(
+      groupedResult,
+      (value, key): void => {
+        const permissionsPerModule: PermissionsPerModule = {
+          module: key,
+          permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
+        };
+        typedResult.push(permissionsPerModule);
+      },
+    );
     return typedResult;
   };
 
