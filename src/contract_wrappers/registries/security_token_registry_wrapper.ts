@@ -13,18 +13,18 @@ import {
   ISecurityTokenRegistryTickerRemovedEventArgs,
   ISecurityTokenRegistryChangeTickerOwnershipEventArgs,
   ISecurityTokenRegistryChangeFeeCurrencyEventArgs,
-  ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs,
   ISecurityTokenRegistrySecurityTokenRefreshedEventArgs,
   ISecurityTokenRegistryProtocolFactorySetEventArgs,
   ISecurityTokenRegistryLatestVersionSetEventArgs,
   ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
   ISecurityTokenContract,
   PolyTokenContract,
+  ISecurityTokenRegistry,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { ISecurityTokenRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
@@ -59,15 +59,6 @@ interface ChangeFeeCurrencySubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetChangeFeeCurrencyLogsAsyncParams extends GetLogsAsyncParams {
   eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
-}
-
-interface NewSecurityTokenCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityTokenCreated;
-  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs>;
-}
-
-interface GetNewSecurityTokenCreatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityTokenCreated;
 }
 
 interface SecurityTokenRefreshedSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -198,7 +189,6 @@ interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
 
 interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeFeeCurrencySubscribeAsyncParams): Promise<string>;
-  (params: NewSecurityTokenCreatedSubscribeAsyncParams): Promise<string>;
   (params: SecurityTokenRefreshedSubscribeAsyncParams): Promise<string>;
   (params: ProtocolFactorySetSubscribeAsyncParams): Promise<string>;
   (params: LatestVersionSetSubscribeAsyncParams): Promise<string>;
@@ -218,9 +208,6 @@ interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
 interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeeCurrencyLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>[]
-  >;
-  (params: GetNewSecurityTokenCreatedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenCreatedEventArgs>[]
   >;
   (params: GetSecurityTokenRefreshedLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>[]
@@ -499,7 +486,6 @@ interface SecurityTokenData {
   owner: string;
   tokenDetails: string;
   deployedAt: Date;
-  version: string;
 }
 
 interface TickerDetails {
@@ -562,15 +548,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
     assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     const result = await (await this.contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
-    const unpackVersion = result[4].map(num => {
-      return num.toNumber();
-    });
     const typedResult: SecurityTokenData = {
       ticker: result[0],
       owner: result[1],
       tokenDetails: result[2],
       deployedAt: bigNumberToDate(result[3]),
-      version: unpackVersion.join('.'),
     };
     return typedResult;
   };

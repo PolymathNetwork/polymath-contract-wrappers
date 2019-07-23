@@ -1,12 +1,12 @@
 // SecurityTokenRegistryWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
 import {
   ISecurityTokenRegistryContract,
   PolyTokenEvents,
   ISecurityTokenContract,
   PolyTokenContract,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
@@ -987,13 +987,11 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call getSecurityTokenData', async () => {
       // Params and result expected
       const expectedDeployedDate = new Date(2019, 1);
-      const expectedVersion = [new BigNumber(3), new BigNumber(0), new BigNumber(0)];
       const expectedResult = [
         'TICK',
         '0x0123456789012345678901234567890123456789',
         'Details',
         dateToBigNumber(expectedDeployedDate),
-        expectedVersion,
       ];
       const securityTokenAddress = '0x0123456789012345678901234567890123456789';
       // Mocked method
@@ -1010,10 +1008,6 @@ describe('SecurityTokenRegistryWrapper', () => {
       expect(result.owner).toBe(expectedResult[1]);
       expect(result.tokenDetails).toBe(expectedResult[2]);
       expect(result.deployedAt).toEqual(expectedDeployedDate);
-      const unpackVersion = expectedVersion.map(num => {
-        return num.toNumber();
-      });
-      expect(result.version).toEqual(unpackVersion.join('.'));
       // Verifications
       verify(mockedContract.getSecurityTokenData).once();
       verify(mockedMethod.callAsync(securityTokenAddress)).once();
@@ -2260,7 +2254,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'ChangeFeeCurrency', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityTokenCreated', 'NewSecurityToken', 'RegisterTicker', 'SecurityTokenRefreshed', 'ProtocolFactorySet', 'LatestVersionSet', 'ProtocolFactoryRemoved', encountered: Transfer`,
+          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'ChangeFeeCurrency', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityToken', 'RegisterTicker', 'SecurityTokenRefreshed', 'ProtocolFactorySet', 'LatestVersionSet', 'ProtocolFactoryRemoved', encountered: Transfer`,
         ),
       );
     });

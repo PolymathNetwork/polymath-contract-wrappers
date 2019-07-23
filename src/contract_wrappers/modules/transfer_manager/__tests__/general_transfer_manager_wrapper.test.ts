@@ -1,8 +1,12 @@
 // GeneralTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { GeneralTransferManagerContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  GeneralTransferManagerContract,
+  ISecurityTokenContract,
+  PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -471,21 +475,27 @@ describe('GeneralTransferManagerWrapper', () => {
       const expectedResult = [
         [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
         [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
+        [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
       ];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.getKYCData).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(mockedParams)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(mockedParams.investors)).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getKYCData(mockedParams);
       // Result expectation
-      expect(result).toBe(expectedResult);
+
+      for (let i = 0; i < 3; i += 1) {
+        expect(dateToBigNumber(result[i].canSendAfter)).toEqual(expectedResult[0][i]);
+        expect(dateToBigNumber(result[i].canReceiveAfter)).toEqual(expectedResult[1][i]);
+        expect(dateToBigNumber(result[i].expiryTime)).toEqual(expectedResult[2][i]);
+      }
       // Verifications
       verify(mockedContract.getKYCData).once();
-      verify(mockedMethod.callAsync()).once();
+      verify(mockedMethod.callAsync(mockedParams.investors)).once();
     });
   });
 
@@ -538,7 +548,7 @@ describe('GeneralTransferManagerWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'AllowAllTransfers', 'AllowAllWhitelistTransfers', 'AllowAllWhitelistIssuances', 'AllowAllBurnTransfers', 'ChangeSigningAddress', 'ChangeDefaults', 'ModifyWhitelist', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'ChangeDefaults', 'ModifyKYCData', 'ModifyInvestorFlag', 'ModifyTransferRequirements', 'Pause', 'Unpause', encountered: Transfer`,
         ),
       );
     });

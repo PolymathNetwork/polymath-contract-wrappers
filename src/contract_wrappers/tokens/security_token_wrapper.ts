@@ -39,8 +39,6 @@ import {
   SecurityTokenTreasuryWalletChangedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
   SecurityTokenUpdateTokenNameEventArgs,
-} from '@polymathnetwork/abi-wrappers';
-import {
   CappedSTO,
   CountTransferManager,
   ERC20DividendCheckpoint,
@@ -48,11 +46,13 @@ import {
   ISecurityToken,
   PercentageTransferManager,
   USDTieredSTO,
-} from '@polymathnetwork/contract-artifacts';
-import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
-import { ethers } from 'ethers';
+  TxData,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
+  ethers,
+} from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
@@ -68,6 +68,7 @@ import {
   ModuleType,
   Partition,
   PERCENTAGE_DECIMALS,
+  Perm,
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
@@ -631,7 +632,7 @@ interface IssueMultiParams extends TxParams {
 interface CheckPermissionParams {
   delegateAddress: string;
   moduleAddress: string;
-  permission: string;
+  permission: Perm;
 }
 
 interface RedeemParams extends TxParams {
@@ -1796,10 +1797,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const versions = await this.getVersion();
     const upperSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
-    )).upperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    )).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
     const lowerSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
-    )).lowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+    )).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
     const skipUpperVersionBound = upperSTVersionBounds.every(v => v.isZero());
     const skipLowerVersionBound = lowerSTVersionBounds.every(v => v.isZero());
     let isCompatible = true;

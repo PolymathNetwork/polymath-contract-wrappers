@@ -30,9 +30,9 @@ window.addEventListener('load', async () => {
     address: generalTMAddress,
   });
 
-  const listInvestors = await generalTM.getInvestors();
+  const listInvestors = await generalTM.getAllKYCData();
   const found = listInvestors.find(function(addr) {
-    return addr == investorAddress;
+    return addr.investor == investorAddress;
   });
 
   await TEST.subscribeAsync({

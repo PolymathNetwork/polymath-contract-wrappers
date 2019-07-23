@@ -4,10 +4,11 @@ import {
   GeneralPermissionManagerEvents,
   GeneralPermissionManagerChangePermissionEventArgs,
   GeneralPermissionManagerAddDelegateEventArgs,
+  GeneralPermissionManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { GeneralPermissionManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -22,7 +23,12 @@ import {
   Subscribe,
   Perm,
 } from '../../../types';
-import { numberToBigNumber, stringToBytes32, bytes32ToString, stringArrayToBytes32Array } from '../../../utils/convert';
+import {
+  numberToBigNumber,
+  stringToBytes32,
+  stringArrayToBytes32Array,
+  parsePermBytes32Value,
+} from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents.ChangePermission;
@@ -57,7 +63,7 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
 interface PermParams {
   module: string;
   delegate: string;
-  permission: string;
+  permission: Perm;
 }
 
 interface DelegateIndexParams {
@@ -70,7 +76,7 @@ interface DelegateParams {
 
 interface GetAllDelegatesWithPermParams {
   module: string;
-  perm: string;
+  perm: Perm;
 }
 
 interface GetAllModulesAndPermsFromTypesParams {
@@ -90,23 +96,23 @@ interface AddDelegateParams extends TxParams {
 interface ChangePermissionParams extends TxParams {
   delegate: string;
   module: string;
-  perm: string;
+  perm: Perm;
   valid: boolean;
 }
 
 interface ChangePermissionMultiParams extends TxParams {
   delegate: string;
   modules: string[];
-  perms: string[];
+  perms: Perm[];
   valids: boolean[];
 }
 
 // // Return types ////
-interface PermissonsPerModule {
+interface PermissionsPerModule {
   /** Module address */
   module: string;
   /** List of permissions */
-  permissions: string[];
+  permissions: Perm[];
 }
 // // End of return types ////
 
@@ -161,7 +167,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(params.details.length > 0, '0 value not allowed');
-    assert.assert(!await (await this.contract).checkDelegate.callAsync(params.delegate), 'Already present');
+    assert.assert(!(await (await this.contract).checkDelegate.callAsync(params.delegate)), 'Already present');
     return (await this.contract).addDelegate.sendTransactionAsync(
       params.delegate,
       stringToBytes32(params.details),
@@ -230,15 +236,15 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     const groupedResult = _.groupBy(zippedResult, value => {
       return value[0];
     }); // [module1: [[module1, perm1], [module1, perm2]], ...]
-    const typedResult: PermissonsPerModule[] = [];
+    const typedResult: PermissionsPerModule[] = [];
     _.forEach(
       groupedResult,
       (value, key): void => {
-        const permissonsPerModule: PermissonsPerModule = {
+        const permissionsPerModule: PermissionsPerModule = {
           module: key,
-          permissions: value.map(pair => bytes32ToString(pair[1] as string)),
+          permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
         };
-        typedResult.push(permissonsPerModule);
+        typedResult.push(permissionsPerModule);
       },
     );
     return typedResult;
