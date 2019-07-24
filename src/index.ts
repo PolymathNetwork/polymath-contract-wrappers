@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import * as conversionUtils from './utils/convert';
 
 export { conversionUtils };
