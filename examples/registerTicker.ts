@@ -76,7 +76,7 @@ window.addEventListener('load', async () => {
   });
 
   const tickerAvailable = await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker,
+    ticker: ticker,
   });
   if (tickerAvailable) {
     const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
