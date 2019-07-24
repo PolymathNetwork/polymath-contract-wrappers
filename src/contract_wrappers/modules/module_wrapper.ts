@@ -7,16 +7,16 @@ import {
   Web3Wrapper,
   ContractAbi,
   TxData,
-  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
 import { stringToBytes32 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
+import assert from '../../utils/assert';
 
-interface TakeFeeParams extends TxParams {
-  amount: BigNumber;
+interface ReclaimERC20Params extends TxParams {
+  tokenContract: string;
 }
 
 /**
@@ -84,6 +84,21 @@ export default class ModuleWrapper extends ContractWrapper {
 
   public factory = async () => {
     return (await this.contract).factory.callAsync();
+  };
+
+  public reclaimETH = async (params: TxParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
+    return (await this.contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {

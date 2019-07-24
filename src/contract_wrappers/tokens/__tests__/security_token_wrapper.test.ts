@@ -148,9 +148,9 @@ describe('SecurityTokenWrapper', () => {
 
   describe('partitionsOf', () => {
     test('should call to partitionsOf', async () => {
-      const expectedResult = stringArrayToBytes32Array(['0', 'UNLOCKED', 'LOCKED']);
+      const expectedResult = stringArrayToBytes32Array(['0', Partition.Unlocked, Partition.Locked]);
       const mockedParams = {
-        partition: 'UNLOCKED',
+        partition: Partition.Unlocked,
         operator: '0x5555555555555555555555555555555555555555',
         tokenHolder: '0x4444444444444444444444444444444444444444',
       };
@@ -1079,7 +1079,7 @@ describe('SecurityTokenWrapper', () => {
       // Result expectation
       expect(result.statusCode).toBe(expectedStatusCode);
       expect(result.reasonCode).toBe(bytes32ToString(stringToBytes32(expectedReasonCode)));
-      expect(result.partition).toBe(bytes32ToString(stringToBytes32(expectedPartition)));
+      expect(result.partition).toBe(parsePartitionBytes32Value(stringToBytes32(expectedPartition)));
       // Verifications
       verify(mockedContract.canTransferByPartition).once();
       verify(
