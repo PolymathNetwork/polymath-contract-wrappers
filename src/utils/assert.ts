@@ -1,5 +1,5 @@
 import { assert as sharedAssert } from '@0x/assert';
-import { BigNumber } from '@0x/utils';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import {Partition} from '../types';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
@@ -45,15 +45,16 @@ const assert = {
   },
   isBigNumberGreaterThanZero(value: BigNumber, message: string): void {
     sharedAssert.assert(value >= BIG_NUMBER_ZERO, message);
-  },
-  areValidArrayLengths(value: any[][], message: string) {
+  },  
+  areValidArrayLengths(value: any[][], message: string) { // eslint-disable-line
     sharedAssert.assert(
-      value.every((x: any[]) => {
+      value.every((x: any[]) => { // eslint-disable-line
         return x.length === value[0].length;
       }),
       message,
     );
   },
+  // eslint-enable no-any
   isValidVersion(version: string) {
     sharedAssert.assert(
       /^(\d+\.)(\d+\.)(\d+)$/.test(version),

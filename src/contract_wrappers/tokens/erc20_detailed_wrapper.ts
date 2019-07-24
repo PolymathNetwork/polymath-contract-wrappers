@@ -8,7 +8,6 @@ import {
   ContractAbi,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import { bytes32ToString } from '../../utils/convert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams } from '../../types';
 

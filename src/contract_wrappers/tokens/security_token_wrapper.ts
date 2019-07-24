@@ -509,7 +509,9 @@ interface DataStoreAddressParams extends TxParams {
 }
 
 /**
- * @param name, uri, documentHash
+ * @param name
+ * @param uri
+ * @param documentHash
  */
 interface SetDocumentParams extends TxParams {
   name: string;

@@ -1,6 +1,5 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers';
+import { USDTieredSTOEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
@@ -31,7 +30,7 @@ window.addEventListener('load', async () => {
 
   // Double check available
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+    ticker: ticker!,
   });
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();

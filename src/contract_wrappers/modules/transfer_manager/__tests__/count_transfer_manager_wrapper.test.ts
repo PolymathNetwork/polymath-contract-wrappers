@@ -11,7 +11,7 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import CountTransferManagerWrapper from '../count_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { numberToBigNumber, valueToWei } from '../../../../utils/convert';
+import { numberToBigNumber } from '../../../../utils/convert';
 
 describe('CountTransferManagerWrapper', () => {
   let target: CountTransferManagerWrapper;

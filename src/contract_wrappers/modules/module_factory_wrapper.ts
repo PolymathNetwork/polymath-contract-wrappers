@@ -22,7 +22,7 @@ import {
   GetLogs,
   FULL_DECIMALS,
 } from '../../types';
-import { weiToValue } from '../../utils/convert';
+import { weiToValue, bytes32ToString } from '../../utils/convert';
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipTransferred;
@@ -88,8 +88,16 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    * Get the name of the Module
    */
   public name = async (): Promise<string> => {
-    return (await this.contract).name.callAsync();
+    const name = await (await this.contract).name.callAsync();
+    return bytes32ToString(name);
   };
+
+  /**
+   * Get the version of the Module
+   */
+  public version = async (): Promise<string> => {
+    return (await this.contract).version.callAsync();
+  }
 
   /**
    * Get setup cost

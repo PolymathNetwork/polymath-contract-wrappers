@@ -1,6 +1,3 @@
-import { TxData } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
   PolyTokenEvents,
@@ -63,6 +60,12 @@ import {
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
   PolyTokenFaucetContract,
+  TxData,
+  BigNumber,
+  ContractEventArg,
+  DecodedLogArgs,
+  LogWithDecodedArgs,
+  BlockParam,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -86,6 +89,12 @@ export enum ModuleType {
   STO = 3,
   Dividends = 4,
   Burn = 5,
+}
+
+export enum TransferType {
+  General,
+  Issuance,
+  Redemption,
 }
 
 export enum FundRaiseType {

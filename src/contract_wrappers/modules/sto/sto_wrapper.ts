@@ -1,14 +1,10 @@
-import {TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS} from '../../../types';
+import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { weiToValue } from '../../../utils/convert';
 
 interface FundRaiseTypesParams {
   type: FundRaiseType;
-}
-
-interface ReclaimERC20Params extends TxParams {
-  tokenContract: string;
 }
 
 /**
@@ -36,10 +32,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
    * Returns funds raised by the STO
    */
   public fundsRaised = async (params: FundRaiseTypesParams) => {
-    return weiToValue(
-      await (await this.contract).fundsRaised.callAsync(params.type),
-      FULL_DECIMALS,
-    );
+    return weiToValue(await (await this.contract).fundsRaised.callAsync(params.type), FULL_DECIMALS);
   };
 
   /**
@@ -79,16 +72,13 @@ export default abstract class STOWrapper extends ModuleWrapper {
    */
   public totalTokensSold = async () => {
     return weiToValue(
-        await (await this.contract).totalTokensSold.callAsync(),
-        await (await this.securityTokenContract()).decimals.callAsync(),
+      await (await this.contract).totalTokensSold.callAsync(),
+      await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
 
   public getRaised = async (params: FundRaiseTypesParams) => {
-    return weiToValue(
-        await (await this.contract).getRaised.callAsync(params.type),
-        FULL_DECIMALS,
-    );
+    return weiToValue(await (await this.contract).getRaised.callAsync(params.type), FULL_DECIMALS);
   };
 
   public pause = async (params: TxParams) => {
@@ -101,20 +91,5 @@ export default abstract class STOWrapper extends ModuleWrapper {
     assert.assert(await this.paused(), 'Contract is not paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
-    return (await this.contract).reclaimERC20.sendTransactionAsync(
-      params.tokenContract,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  public reclaimETH = async (params: TxParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 }
