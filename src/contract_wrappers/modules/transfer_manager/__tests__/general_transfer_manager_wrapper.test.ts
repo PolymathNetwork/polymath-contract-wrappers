@@ -13,10 +13,8 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
   bigNumberToDate,
-  dateArrayToBigNumberArray,
   dateToBigNumber,
   numberToBigNumber,
-  valueToWei,
 } from '../../../../utils/convert';
 
 describe('GeneralTransferManagerWrapper', () => {

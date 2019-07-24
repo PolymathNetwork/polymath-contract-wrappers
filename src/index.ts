@@ -1,3 +1,6 @@
+import * as conversionUtils from './utils/convert';
+
+export { conversionUtils };
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';
 export { default as ModuleFactory } from './contract_wrappers/modules/module_factory_wrapper';
@@ -35,7 +38,6 @@ export {
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
-export { BlockParamLiteral } from 'ethereum-types';
 export {
   PolyResponse,
   PolyTokenEvents,
@@ -150,4 +152,5 @@ export {
   EtherDividendCheckpointUpdateDividendDatesEventArgs,
   EtherDividendCheckpointPauseEventArgs,
   EtherDividendCheckpointUnpauseEventArgs,
+  BlockParamLiteral,
 } from '@polymathnetwork/abi-wrappers';

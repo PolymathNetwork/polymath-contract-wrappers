@@ -1,6 +1,5 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { ModuleRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { ModuleRegistryEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';

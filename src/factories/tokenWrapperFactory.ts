@@ -1,4 +1,4 @@
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import SecurityTokenRegistryWrapper from '../contract_wrappers/registries/security_token_registry_wrapper';
 import SecurityTokenWrapper from '../contract_wrappers/tokens/security_token_wrapper';
 import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
@@ -78,6 +78,7 @@ export default class TokenWrapperFactory {
    */
   public getSecurityTokenInstanceFromTicker = async (ticker: string): Promise<SecurityTokenWrapper> => {
     const address = await this.securityTokenRegistry.getSecurityTokenAddress(ticker);
+    assert.isNonZeroETHAddressHex('address', address);
     return new SecurityTokenWrapper(
       this.web3Wrapper,
       this.contractFactory.getSecurityTokenContract(address),
