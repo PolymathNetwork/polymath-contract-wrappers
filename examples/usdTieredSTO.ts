@@ -1,9 +1,8 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { USDTieredSTOEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
-import { USDTieredSTOEvents } from '@polymathnetwork/abi-wrappers/lib/src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a usdtieredSTO module on an unlocked node (like ganache)
@@ -31,7 +30,7 @@ window.addEventListener('load', async () => {
 
   // Double check available
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+    ticker: ticker!,
   });
   // Get the ticker fee and approve the security token registry to spend
   const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
@@ -62,7 +61,7 @@ window.addEventListener('load', async () => {
   });
 
   const moduleStringName = 'USDTieredSTO';
-  const moduleName = ModuleName.usdTieredSTO;
+  const moduleName = ModuleName.UsdTieredSTO;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.STO,
   });
@@ -88,7 +87,7 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   await polymathAPI.polyToken.transfer({
     to: await tickerSecurityTokenInstance.address(),
@@ -101,6 +100,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       startTime: new Date(2030, 1),
       endTime: new Date(2031, 1),
@@ -112,17 +112,17 @@ window.addEventListener('load', async () => {
       minimumInvestmentUSD: new BigNumber(5),
       fundRaiseTypes: [FundRaiseType.ETH, FundRaiseType.POLY],
       wallet: '0x3333333333333333333333333333333333333333',
-      reserveWallet: '0x5555555555555555555555555555555555555555',
+      treasuryWallet: '0x5555555555555555555555555555555555555555',
       usdTokens: ['0x6666666666666666666666666666666666666666', '0x4444444444444444444444444444444444444444'],
     },
   });
   console.log(usdTieredResult);
 
   const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.usdTieredSTO,
+    moduleName: ModuleName.UsdTieredSTO,
   }))[0];
   const usdTiered = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.usdTieredSTO,
+    name: ModuleName.UsdTieredSTO,
     address: usdTieredAddress,
   });
   const buyWithETH = await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });

@@ -9,12 +9,14 @@ import {
   ERC20DividendCheckpointSetDefaultExcludedAddressesEventArgs,
   ERC20DividendCheckpointSetWithholdingEventArgs,
   ERC20DividendCheckpointSetWithholdingFixedEventArgs,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
+  BigNumber,
+  ContractAbi,
+  LogWithDecodedArgs,
+  TxData,
+  Web3Wrapper,
+  ERC20DividendCheckpoint,
 } from '@polymathnetwork/abi-wrappers';
-import { ERC20DividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import { TxData, Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
@@ -162,15 +164,15 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
 
   protected contract: Promise<ERC20DividendCheckpointContract>;
 
-  protected detailedERC20Contract = async (address: string): Promise<DetailedERC20Contract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
+  protected erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract> => {
+    return this.contractFactory.getERC20DetailedContract(address);
   };
 
   protected getDecimals = async (dividendIndex: number): Promise<BigNumber> => {
     const token = await this.dividendTokens({
       dividendIndex,
     });
-    const decimals = await (await this.detailedERC20Contract(token)).decimals.callAsync();
+    const decimals = await (await this.erc20DetailedContract(token)).decimals.callAsync();
     return decimals;
   };
 
@@ -194,7 +196,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividend = async (params: CreateDividendParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
@@ -203,7 +205,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.name,
       params.txData,
     );
-    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
+    const decimals = await (await this.erc20DetailedContract(params.token)).decimals.callAsync();
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -216,7 +218,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
@@ -226,7 +228,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.txData,
       params.checkpointId,
     );
-    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
+    const decimals = await (await this.erc20DetailedContract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -240,7 +242,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
@@ -251,7 +253,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       undefined,
       params.excluded,
     );
-    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
+    const decimals = await (await this.erc20DetailedContract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -267,7 +269,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkIfDividendIsValid(
       params.expiry,
       params.maturity,
@@ -278,7 +280,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.checkpointId,
       params.excluded,
     );
-    const decimals = await (await this.detailedERC20Contract(params.token)).decimals.callAsync();
+    const decimals = await (await this.erc20DetailedContract(params.token)).decimals.callAsync();
     return (await this.contract).createDividendWithCheckpointAndExclusions.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -363,7 +365,7 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
-    const erc20TokenBalance = await (await this.detailedERC20Contract(token)).balanceOf.callAsync(
+    const erc20TokenBalance = await (await this.erc20DetailedContract(token)).balanceOf.callAsync(
       await this.getCallerAddress(txData),
     );
     assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');

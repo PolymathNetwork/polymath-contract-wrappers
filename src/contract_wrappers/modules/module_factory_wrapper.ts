@@ -2,18 +2,15 @@ import {
   ModuleFactoryContract,
   ModuleFactoryEventArgs,
   ModuleFactoryEvents,
-  ModuleFactoryOwnershipRenouncedEventArgs,
   ModuleFactoryOwnershipTransferredEventArgs,
-  ModuleFactoryChangeFactorySetupFeeEventArgs,
-  ModuleFactoryChangeFactoryUsageFeeEventArgs,
-  ModuleFactoryChangeFactorySubscriptionFeeEventArgs,
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
   ModuleFactoryChangeSTVersionBoundEventArgs,
+  BigNumber,
+  ModuleFactory,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { BigNumber } from '@0x/utils';
-import { ModuleFactory } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
@@ -27,15 +24,6 @@ import {
 } from '../../types';
 import { weiToValue, bytes32ToString } from '../../utils/convert';
 
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipRenounced;
-  callback: EventCallback<ModuleFactoryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipRenounced;
-}
-
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipTransferred;
   callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs>;
@@ -43,33 +31,6 @@ interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams 
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipTransferred;
-}
-
-interface ChangeFactorySetupFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySetupFee;
-  callback: EventCallback<ModuleFactoryChangeFactorySetupFeeEventArgs>;
-}
-
-interface GetChangeFactorySetupFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySetupFee;
-}
-
-interface ChangeFactoryUsageFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee;
-  callback: EventCallback<ModuleFactoryChangeFactoryUsageFeeEventArgs>;
-}
-
-interface GetChangeFactoryUsageFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactoryUsageFee;
-}
-
-interface ChangeFactorySubscriptionFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee;
-  callback: EventCallback<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>;
-}
-
-interface GetChangeFactorySubscriptionFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeFactorySubscriptionFee;
 }
 
 interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
@@ -91,30 +52,11 @@ interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
 }
 
 interface ModuleFactorySubscribeAsyncParams extends Subscribe {
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
-  (params: ChangeFactorySetupFeeSubscribeAsyncParams): Promise<string>;
-  (params: ChangeFactoryUsageFeeSubscribeAsyncParams): Promise<string>;
-  (params: ChangeFactorySubscriptionFeeSubscribeAsyncParams): Promise<string>;
   (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
   (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
-}
-
-interface GetModuleFactoryLogsAsyncParams extends GetLogs {
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs>[]
-  >;
-  (params: GetChangeFactorySetupFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryChangeFactorySetupFeeEventArgs>[]
-  >;
-  (params: GetChangeFactoryUsageFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryChangeFactoryUsageFeeEventArgs>[]
-  >;
-  (params: GetChangeFactorySubscriptionFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryChangeFactorySubscriptionFeeEventArgs>[]
   >;
   (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
     LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs>[]
@@ -160,8 +102,8 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Get setup cost
    */
-  public getSetupCost = async (): Promise<BigNumber> => {
-    const value = await (await this.contract).getSetupCost.callAsync();
+  public setupCostInPoly = async (): Promise<BigNumber> => {
+    const value = await (await this.contract).setupCostInPoly.callAsync();
     return weiToValue(value, FULL_DECIMALS);
   };
 
@@ -169,7 +111,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: ModuleFactorySubscribeAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
+  public subscribeAsync: Subscribe = async <ArgsType extends ModuleFactoryEventArgs>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
@@ -191,7 +133,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetModuleFactoryLogsAsyncParams = async <ArgsType extends ModuleFactoryEventArgs>(
+  public getLogsAsync: GetLogs = async <ArgsType extends ModuleFactoryEventArgs>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);

@@ -1,11 +1,11 @@
 // ManualApprovalTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   ManualApprovalTransferManagerContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import ManualApprovalTransferManagerWrapper from '../manual_approval_transfer_manager_wrapper';
@@ -29,13 +29,13 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ManualApprovalTransferManagerContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(ManualApprovalTransferManagerContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new ManualApprovalTransferManagerWrapper(
@@ -279,74 +279,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getInitFunction).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('VerifyTransfer', () => {
-    test('should verify Transfer', async () => {
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
-
-      const mockedParams = {
-        from: '0x1111111111111111111111111111111111111111',
-        to: '0x2222222222222222222222222222222222222222',
-        amount: new BigNumber(10),
-        data: 'Data',
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.from,
-          mockedParams.to,
-          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
-          mockedParams.data,
-          false,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.verifyTransfer(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.verifyTransfer).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.from,
-          mockedParams.to,
-          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
-          mockedParams.data,
-          false,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 

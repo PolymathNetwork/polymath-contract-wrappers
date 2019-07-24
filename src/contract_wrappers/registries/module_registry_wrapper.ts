@@ -6,16 +6,18 @@ import {
   ModuleRegistryModuleRemovedEventArgs,
   ModuleRegistryModuleUsedEventArgs,
   ModuleRegistryModuleVerifiedEventArgs,
+  ModuleRegistryModuleUnverifiedEventArgs,
   ModuleRegistryOwnershipTransferredEventArgs,
   ModuleRegistryPauseEventArgs,
   ModuleRegistryUnpauseEventArgs,
-  SecurityTokenRegistryContract,
+  ISecurityTokenRegistryContract,
   FeatureRegistryContract,
   ModuleFactoryContract,
+  ModuleRegistry,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { ModuleRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -79,6 +81,15 @@ interface GetModuleVerifiedLogsAsyncParams extends GetLogsAsyncParams {
   eventName: ModuleRegistryEvents.ModuleVerified;
 }
 
+interface ModuleUnverifiedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUnverified;
+  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs>;
+}
+
+interface GetModuleUnverifiedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleRegistryEvents.ModuleUnverified;
+}
+
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleRegistryEvents.ModuleRemoved;
   callback: EventCallback<ModuleRegistryModuleRemovedEventArgs>;
@@ -103,6 +114,7 @@ interface ModuleRegistrySubscribeAsyncParams extends Subscribe {
   (params: ModuleUsedSubscribeAsyncParams): Promise<string>;
   (params: ModuleRegisteredSubscribeAsyncParams): Promise<string>;
   (params: ModuleVerifiedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUnverifiedSubscribeAsyncParams): Promise<string>;
   (params: ModuleRemovedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
@@ -113,27 +125,15 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   (params: GetModuleUsedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>[]>;
   (params: GetModuleRegisteredLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRegisteredEventArgs>[]>;
   (params: GetModuleVerifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleVerifiedEventArgs>[]>;
+  (params: GetModuleUnverifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUnverifiedEventArgs>[]>;
   (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRemovedEventArgs>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs>[]
   >;
 }
 
-interface GetValueByVariableParams {
-  variable: string;
-}
-
-interface GetValueByKeyParams {
-  key: string;
-}
-
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
-}
-
-interface VerifyModuleParams extends TxParams {
-  moduleFactory: string;
-  verified: boolean;
 }
 
 /**
@@ -149,6 +149,15 @@ interface ModuleTypeParams {
   moduleType: ModuleType;
 }
 
+interface IsCompatibleModuleParams {
+  moduleFactoryAddress: string;
+  securityTokenAddress: string;
+}
+
+interface GetFactoryDetailsParams {
+  factoryAddress: string;
+}
+
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
@@ -162,6 +171,12 @@ interface TagsByModule {
   module: string;
   tags: string[];
 }
+
+interface FactoryDetails {
+  isVerified: boolean;
+  ownerAddress: string;
+  securityTokenAddresses: string[];
+}
 // // End of return types ////
 
 /**
@@ -174,7 +189,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenRegistryContract = async (): Promise<SecurityTokenRegistryContract> => {
+  protected securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract> => {
     return this.contractFactory.getSecurityTokenRegistryContract();
   };
 
@@ -201,6 +216,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contract = contract;
     this.contractFactory = contractFactory;
   }
+
+  public isCompatibleModule = async (params: IsCompatibleModuleParams): Promise<boolean> => {
+    return (await this.contract).isCompatibleModule.callAsync(params.moduleFactoryAddress, params.securityTokenAddress);
+  };
 
   public registerModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
@@ -253,13 +272,23 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public verifyModule = async (params: VerifyModuleParams) => {
+  public verifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
     return (await this.contract).verifyModule.sendTransactionAsync(
       params.moduleFactory,
-      params.verified,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public unverifyModule = async (params: ModuleFactoryParams) => {
+    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
+    await this.checkMsgSenderIsOwner();
+    await this.checkModuleRegistered(params.moduleFactory);
+    return (await this.contract).unverifyModule.sendTransactionAsync(
+      params.moduleFactory,
       params.txData,
       params.safetyFactor,
     );
@@ -274,17 +303,14 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       return value[1];
     }); // [module1: [[tag1, module1], [tag2, module1]], ...]
     const typedResult: TagsByModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const tags = _.unzip(value as string[][])[0];
-        const tagsByModule: TagsByModule = {
-          module: key,
-          tags: bytes32ArrayToStringArray(tags),
-        };
-        typedResult.push(tagsByModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const tags = _.unzip(value as string[][])[0];
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: bytes32ArrayToStringArray(tags),
+      };
+      typedResult.push(tagsByModule);
+    });
     return typedResult;
   };
 
@@ -296,27 +322,36 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       return value[1];
     }); // [module1: [[tag1, module1], [tag2, module1]], ...]
     const typedResult: TagsByModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const tags = _.unzip(value as string[][])[0];
-        const tagsByModule: TagsByModule = {
-          module: key,
-          tags: bytes32ArrayToStringArray(tags),
-        };
-        typedResult.push(tagsByModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const tags = _.unzip(value as string[][])[0];
+      const tagsByModule: TagsByModule = {
+        module: key,
+        tags: bytes32ArrayToStringArray(tags),
+      };
+      typedResult.push(tagsByModule);
+    });
     return typedResult;
   };
 
-  public getReputationByFactory = async (params: ModuleFactoryParams) => {
-    assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    return (await this.contract).getReputationByFactory.callAsync(params.moduleFactory);
+  /**
+   * @returns Returns factoryIsVerified, factoryOwnerAddress, listSecurityTokens
+   */
+  public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
+    const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
+    const typedResult: FactoryDetails = {
+      isVerified: result[0],
+      ownerAddress: result[1],
+      securityTokenAddresses: result[2],
+    };
+    return typedResult;
   };
 
   public getModulesByType = async (params: ModuleTypeParams) => {
     return (await this.contract).getModulesByType.callAsync(params.moduleType);
+  };
+
+  public getAllModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
+    return (await this.contract).getAllModulesByType.callAsync(params.moduleType);
   };
 
   /**

@@ -1,15 +1,10 @@
-import { TxData } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
   PolyTokenEvents,
   CappedSTOFactoryEventArgs,
   CappedSTOEventArgs,
-  DetailedERC20EventArgs,
-  DetailedERC20Events,
-  AlternativeERC20EventArgs,
-  AlternativeERC20Events,
+  ERC20DetailedEventArgs,
+  ERC20DetailedEvents,
   ERC20DividendCheckpointEventArgs,
   EtherDividendCheckpointEventArgs,
   FeatureRegistryEventArgs,
@@ -35,6 +30,7 @@ import {
   PolyTokenFaucetEvents,
   PolymathRegistryEvents,
   SecurityTokenRegistryEvents,
+  ISecurityTokenRegistryEvents,
   SecurityTokenEvents,
   USDTieredSTOFactoryEvents,
   USDTieredSTOEvents,
@@ -49,9 +45,9 @@ import {
   STOContract,
   STOEvents,
   STOEventArgs,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
   PolyTokenContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   EtherDividendCheckpointContract,
   ManualApprovalTransferManagerContract,
   CountTransferManagerContract,
@@ -64,6 +60,12 @@ import {
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
   PolyTokenFaucetContract,
+  TxData,
+  BigNumber,
+  ContractEventArg,
+  DecodedLogArgs,
+  LogWithDecodedArgs,
+  BlockParam,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -89,15 +91,45 @@ export enum ModuleType {
   Burn = 5,
 }
 
+export enum TransferType {
+  General,
+  Issuance,
+  Redemption,
+}
+
 export enum FundRaiseType {
   ETH = 0,
   POLY = 1,
   StableCoin = 2,
 }
 
+export enum FlagsType {
+  IsAccredited,
+  CanNotBuyFromSto,
+  IsVolRestricted,
+}
+
+export enum TransferResult {
+  INVALID,
+  NA,
+  VALID,
+  FORCE_VALID,
+}
+
+export enum FeeType {
+  tickerRegFee,
+  stLaunchFee,
+}
+
 export enum Feature {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
+}
+
+export enum Partition {
+  Unlocked = 'UNLOCKED',
+  Locked = 'LOCKED',
+  Undefined = 'UNDEFINED',
 }
 
 export enum PolymathContract {
@@ -123,16 +155,8 @@ export enum ModuleName {
 }
 
 export enum Perm {
-  ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
-  Flags = 'FLAGS',
-  Whitelist = 'WHITELIST',
-  TransferApproval = 'TRANSFER_APPROVAL',
-  Checkpoint = 'CHECKPOINT',
-  Manage = 'MANAGE',
-  Distribute = 'DISTRIBUTE',
-  FeeAdmin = 'FEE_ADMIN',
-  PreSaleAdmin = 'PRE_SALE_ADMIN',
+  Operator = 'OPERATOR',
 }
 
 export enum RestrictionType {
@@ -163,8 +187,7 @@ export type ContractEventArgs =
   | PolyTokenEventArgs
   | CappedSTOFactoryEventArgs
   | CappedSTOEventArgs
-  | DetailedERC20EventArgs
-  | AlternativeERC20EventArgs
+  | ERC20DetailedEventArgs
   | ERC20DividendCheckpointEventArgs
   | EtherDividendCheckpointEventArgs
   | FeatureRegistryEventArgs
@@ -188,8 +211,7 @@ export type ContractEvents =
   | PolyTokenEvents
   | CappedSTOFactoryEvents
   | CappedSTOEvents
-  | DetailedERC20Events
-  | AlternativeERC20Events
+  | ERC20DetailedEvents
   | ERC20DividendCheckpointEvents
   | EtherDividendCheckpointEvents
   | FeatureRegistryEvents
@@ -201,6 +223,7 @@ export type ContractEvents =
   | PolyTokenFaucetEvents
   | PolymathRegistryEvents
   | SecurityTokenRegistryEvents
+  | ISecurityTokenRegistryEvents
   | SecurityTokenEvents
   | USDTieredSTOFactoryEvents
   | USDTieredSTOEvents
@@ -244,7 +267,11 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+export type ERC20Contract =
+  | ERC20DetailedContract
+  | ISecurityTokenContract
+  | PolyTokenContract
+  | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract

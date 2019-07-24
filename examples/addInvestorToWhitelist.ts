@@ -21,15 +21,15 @@ window.addEventListener('load', async () => {
   const ticker = 'TEST';
   const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
   const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.generalTransferManager }))[0];
+  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
 
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
   await generalTM.subscribeAsync({
-    eventName: GeneralTransferManagerEvents.ModifyWhitelist,
+    eventName: GeneralTransferManagerEvents.ModifyKYCData,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -40,12 +40,11 @@ window.addEventListener('load', async () => {
     },
   });
 
-  await generalTM.modifyWhitelist({
+  await generalTM.modifyKYCData({
     investor: '0x72aF7849ffc7753B5ccEA5cb80F97e9Aeaf7d999',
     canSendAfter: new Date(),
     canReceiveAfter: new Date(),
     expiryTime: new Date(2020),
-    canBuyFromSTO: true,
     txData: {
       from: await polymathAPI.getAccount(),
     },

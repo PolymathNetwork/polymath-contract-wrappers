@@ -1,7 +1,5 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-
-import { ERC20DividendCheckpointEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { ERC20DividendCheckpointEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType } from '../src';
@@ -33,7 +31,7 @@ window.addEventListener('load', async () => {
 
   // Double check available
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+    ticker: ticker!,
   });
 
   // Get the ticker fee and approve the security token registry to spend
@@ -65,7 +63,7 @@ window.addEventListener('load', async () => {
   });
 
   const moduleStringName = 'ERC20DividendCheckpoint';
-  const moduleName = ModuleName.erc20DividendCheckpoint;
+  const moduleName = ModuleName.ERC20DividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.Dividends,
   });
@@ -92,7 +90,7 @@ window.addEventListener('load', async () => {
 
   // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
+  const setupCost = await factory.setupCostInPoly();
 
   // Create 2 checkpoints
   await tickerSecurityTokenInstance.createCheckpoint({});
@@ -104,6 +102,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
@@ -111,15 +110,15 @@ window.addEventListener('load', async () => {
 
   // Get module for ether dividend checkpoint and address for module
   const erc20DividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.erc20DividendCheckpoint,
+    moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
 
   const erc20DividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.erc20DividendCheckpoint,
+    name: ModuleName.ERC20DividendCheckpoint,
     address: erc20DividendAddress,
   });
   const erc20Dividend = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.erc20DividendCheckpoint,
+    moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
 
   await polymathAPI.polyToken.transfer({ to: erc20Dividend, value: new BigNumber(5) });
@@ -128,7 +127,7 @@ window.addEventListener('load', async () => {
     value: new BigNumber(4),
   });
 
-  //Create Dividends
+  // Create Dividends
   await erc20DividendCheckpoint.createDividendWithExclusions({
     name: 'MyDividend2',
     amount: new BigNumber(1),

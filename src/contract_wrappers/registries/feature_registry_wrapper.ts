@@ -3,12 +3,12 @@ import {
   FeatureRegistryEventArgs,
   FeatureRegistryEvents,
   FeatureRegistryChangeFeatureStatusEventArgs,
-  FeatureRegistryOwnershipRenouncedEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs,
+  FeatureRegistry,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
 import assert from '../../utils/assert';
@@ -32,15 +32,6 @@ interface GetChangeFeatureStatusLogsAsyncParams extends GetLogsAsyncParams {
   eventName: FeatureRegistryEvents.ChangeFeatureStatus;
 }
 
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
-}
-
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: FeatureRegistryEvents.OwnershipTransferred;
   callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>;
@@ -52,16 +43,12 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeFeatureStatusSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeatureStatusLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>[]
-  >;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>[]
   >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]

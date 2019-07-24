@@ -1,5 +1,5 @@
-import { ethers } from 'ethers';
-import { BigNumber } from '@0x/utils';
+import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { Partition, Perm } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -71,4 +71,33 @@ export function valueArrayToWeiArray(value: BigNumber[], decimals: BigNumber) {
   return value.map<BigNumber>(x => {
     return valueToWei(x, decimals);
   });
+}
+
+export function packVersion(major: string, minor: string, patch: string) {
+  // eslint-disable-next-line no-bitwise
+  const packedVersion = (parseInt(major, 10) << 16) | (parseInt(minor, 10) << 8) | parseInt(patch, 10);
+  return packedVersion;
+}
+
+export function parsePartitionBytes32Value(value: string): Partition {
+  switch (bytes32ToString(value)) {
+    case 'UNLOCKED':
+      return Partition.Unlocked;
+    case 'LOCKED':
+      return Partition.Locked;
+    case '0':
+      return Partition.Undefined;
+    default:
+      throw new Error('Partition not recognized');
+  }
+}
+export function parsePermBytes32Value(value: string): Perm {
+  switch (bytes32ToString(value)) {
+    case Perm.Admin:
+      return Perm.Admin;
+    case Perm.Operator:
+      return Perm.Operator;
+    default:
+      throw new Error('Permission not recognized');
+  }
 }

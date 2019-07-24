@@ -1,9 +1,8 @@
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import SecurityTokenRegistryWrapper from '../contract_wrappers/registries/security_token_registry_wrapper';
 import SecurityTokenWrapper from '../contract_wrappers/tokens/security_token_wrapper';
 import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
-import DetailedERC20TokenWrapper from '../contract_wrappers/tokens/detailed_erc20_wrapper';
-import AlternativeERC20TokenWrapper from '../contract_wrappers/tokens/alternative_erc20_wrapper';
+import ERC20DetailedTokenWrapper from '../contract_wrappers/tokens/erc20_detailed_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 
@@ -42,19 +41,12 @@ export default class TokenWrapperFactory {
    */
   public getERC20TokenInstanceFromAddress = async (address: string): Promise<ERC20TokenWrapper> => {
     assert.isETHAddressHex('address', address);
-    const token = new DetailedERC20TokenWrapper(
+    const token = new ERC20DetailedTokenWrapper(
       this.web3Wrapper,
-      this.contractFactory.getDetailedERC20Contract(address),
+      this.contractFactory.getERC20DetailedContract(address),
     );
     if (await token.isValidContract()) {
       return token;
-    }
-    const alternartiveToken = new AlternativeERC20TokenWrapper(
-      this.web3Wrapper,
-      this.contractFactory.getAlternativeERC20Contract(address),
-    );
-    if (await alternartiveToken.isValidContract()) {
-      return alternartiveToken;
     }
 
     // TODO: Replace this for a typed Error

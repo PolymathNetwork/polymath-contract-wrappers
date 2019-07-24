@@ -1,22 +1,21 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { DetailedERC20Contract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract, SecurityTokenRegistryEvents, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
-import DetailedERC20TokenWrapper from '../detailed_erc20_wrapper';
+import ERC20DetailedTokenWrapper from '../erc20_detailed_wrapper';
 
-describe('DetailedERC20TokenWrapper', () => {
-  // Declare DetailedERC20TokenWrapper object
-  let target: DetailedERC20TokenWrapper;
+describe('ERC20DetailedTokenWrapper', () => {
+  // Declare ERC20DetailedTokenWrapper object
+  let target: ERC20DetailedTokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: DetailedERC20Contract;
+  let mockedContract: ERC20DetailedContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(DetailedERC20Contract);
+    mockedContract = mock(ERC20DetailedContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new DetailedERC20TokenWrapper(instance(mockedWrapper), myContractPromise);
+    target = new ERC20DetailedTokenWrapper(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
@@ -42,7 +41,7 @@ describe('DetailedERC20TokenWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'Approval', 'Transfer', encountered: ChangeExpiryLimit`),
+        new Error(`Expected eventName to be one of: 'Transfer', 'Approval', encountered: ChangeExpiryLimit`),
       );
     });
   });

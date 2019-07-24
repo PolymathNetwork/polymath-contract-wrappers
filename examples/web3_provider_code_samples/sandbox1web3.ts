@@ -1,7 +1,7 @@
 import { MetamaskSubprovider } from '@0x/subproviders';
 import { ApiConstructorParams } from '../../src/PolymathAPI';
 import { PolymathAPI } from '../../src';
-import { Provider } from 'ethereum-types';
+import { Provider } from '@polymathnetwork/abi-wrappers';
 
 // Setup metamask subprovider to read and publish transactions
 window.addEventListener('load', async () => {
