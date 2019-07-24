@@ -153,4 +153,5 @@ export {
   EtherDividendCheckpointPauseEventArgs,
   EtherDividendCheckpointUnpauseEventArgs,
   BlockParamLiteral,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
