@@ -2,7 +2,7 @@
 import { PolyResponse } from '@polymathnetwork/abi-wrappers';
 
 export class MockedCallMethod {
-  public callAsync(): Promise<void> {
+  public callAsync(...args: any): Promise<any> { // eslint-disable-line
     return Promise.resolve();
   }
 
@@ -12,15 +12,15 @@ export class MockedCallMethod {
 }
 
 export class MockedSendMethod extends MockedCallMethod {
-  public sendTransactionAsync(): Promise<void> {
+  public sendTransactionAsync(...args: any): Promise<any> { // eslint-disable-line
     return Promise.resolve();
   }
 
-  public estimateGasAsync(): Promise<void> {
+  public estimateGasAsync(...args: any): Promise<any> { // eslint-disable-line
     return Promise.resolve();
   }
 
-  public getABIEncodedTransactionData(): string {
+  public getABIEncodedTransactionData(): string { 
     return '';
   }
 }
