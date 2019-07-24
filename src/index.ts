@@ -242,4 +242,5 @@ export {
   DecodedLogArgs,
   Provider,
   Web3Wrapper,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
