@@ -359,8 +359,9 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.isFutureDate(expiry, 'Expiry in past');
     assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
+    const stContract = await this.securityTokenContract();
     if (checkpointId !== undefined) {
-      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
+      const currentCheckpointId = await stContract.currentCheckpointId.callAsync();
       assert.assert(checkpointId < new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
     }
     assert.isNonZeroETHAddressHex('token', token);
@@ -371,5 +372,44 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, token);
     assert.assert(erc20TokenAllowance.isGreaterThanOrEqualTo(amount), 'Your allowance is less than dividend amount');
     assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
+
+    function checkExcludedAssertions(addr: string) {
+      assert.isNonZeroETHAddressHex('Excluded Address', addr);
+    }
+
+    if (excluded) {
+      excluded.map(checkExcludedAssertions);
+      assert.areThereDuplicatedStrings('Excluded Addresses', excluded);
+    }
+    let currentSupply;
+    let excludedSupply = new BigNumber(0);
+    if (checkpointId) {
+      currentSupply = await stContract.totalSupplyAt.callAsync(new BigNumber(checkpointId));
+      if (excluded) {
+        const promises = [];
+        for (let i = 0; i < excluded.length; i += 1) {
+          excludedSupply = excludedSupply.plus(
+            promises.push(stContract.balanceOfAt.callAsync(excluded[i], new BigNumber(checkpointId))),
+          );
+        }
+        excludedSupply = BigNumber.sum.apply(null, await Promise.all(promises));
+      }
+    } else {
+      currentSupply = await stContract.totalSupply.callAsync();
+      if (excluded) {
+        const promises = [];
+        for (let i = 0; i < excluded.length; i += 1) {
+          excludedSupply = excludedSupply.plus(
+              promises.push(stContract.balanceOf.callAsync(excluded[i])),
+          );
+        }
+        excludedSupply = BigNumber.sum.apply(null, await Promise.all(promises));
+      }
+    }
+    assert.assert(!currentSupply.isZero(), 'Invalid supply, must be greater than 0');
+    assert.assert(
+      currentSupply.isGreaterThan(excludedSupply),
+      'Invalid supply, current supply must be greater than excluded supply',
+    );
   };
 }

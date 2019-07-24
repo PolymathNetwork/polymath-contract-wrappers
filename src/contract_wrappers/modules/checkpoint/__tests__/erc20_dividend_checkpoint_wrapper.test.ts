@@ -315,6 +315,24 @@ describe('ERC20DividendCheckpointWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
+      const excluded = ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'];
+      const expectedTotalSupplyResult = new BigNumber(1000);
+      const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).thenResolve(
+        expectedTotalSupplyResult,
+      );
+      when(mockedSecurityTokenContract.totalSupplyAt).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
+
+      const expectedSecurityTokenBalanceOfResult = new BigNumber(10);
+      const mockedSecurityTokenBalanceOfMethod = mock(MockedCallMethod);
+      function whenBalanceOf (addr: string){
+        when(
+            mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+        ).thenResolve(expectedSecurityTokenBalanceOfResult);
+        when(mockedSecurityTokenContract.balanceOfAt).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
+      }
+      excluded.map(whenBalanceOf);
+
       const expectedBalanceOfResult = new BigNumber(100);
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedERC20DetailedContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
@@ -411,6 +429,15 @@ describe('ERC20DividendCheckpointWrapper', () => {
       verify(mockedContractFactory.getERC20DetailedContract(token)).twice();
       verify(mockedERC20DetailedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
+      verify(mockedSecurityTokenContract.totalSupplyAt).once();
+      function verifyBalanceOf (addr: string){
+        verify(
+            mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+        ).once();
+      }
+      excluded.map(verifyBalanceOf);
+      verify(mockedSecurityTokenContract.balanceOfAt).times(excluded.length);
     });
   });
 
