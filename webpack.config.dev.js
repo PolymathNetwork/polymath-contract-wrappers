@@ -52,7 +52,7 @@ const devConfig = merge.smart(baseConfig, {
   plugins: [
     // We add the HTML plugin to have an HTML file we can serve
     new HtmlWebpackPlugin({
-      title: "Open the console"
+      title: "Polymath Low Level API - Sandbox"
     })
   ],
   // Custom output file
