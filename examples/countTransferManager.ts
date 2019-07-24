@@ -1,6 +1,5 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { CountTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { CountTransferManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
@@ -31,7 +30,7 @@ window.addEventListener('load', async () => {
 
   // Double check available
   await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+    ticker: ticker!,
   });
 
   // Get the ticker fee and approve the security token registry to spend
@@ -123,7 +122,7 @@ window.addEventListener('load', async () => {
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
+//  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
 
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';

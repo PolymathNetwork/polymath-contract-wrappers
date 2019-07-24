@@ -1,11 +1,11 @@
 // PercentageTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   PercentageTransferManagerContract,
   ISecurityTokenContract,
   PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import PercentageTransferManagerWrapper from '../percentage_transfer_manager_wrapper';

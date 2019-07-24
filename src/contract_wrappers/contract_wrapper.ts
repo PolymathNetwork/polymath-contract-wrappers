@@ -1,7 +1,13 @@
 /* eslint-disable no-underscore-dangle */
-import { Web3Wrapper, marshaller } from '@0x/web3-wrapper';
-import { AbiDecoder, intervalUtils, logUtils } from '@0x/utils';
+import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
+import * as _ from 'lodash';
 import {
+  BaseContract,
+  Web3Wrapper,
+  marshaller,
+  AbiDecoder,
+  intervalUtils,
+  logUtils,
   BlockParamLiteral,
   ContractAbi,
   FilterObject,
@@ -10,10 +16,7 @@ import {
   LogEntry,
   LogWithDecodedArgs,
   TxData,
-} from 'ethereum-types';
-import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
-import * as _ from 'lodash';
-import { BaseContract } from '@polymathnetwork/abi-wrappers';
+} from '@polymathnetwork/abi-wrappers';
 import filterUtils from '../utils/filter_utils';
 import {
   BlockRange,

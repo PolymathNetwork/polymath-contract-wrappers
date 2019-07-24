@@ -1,4 +1,9 @@
 import {
+  PolyResponse,
+  Web3Wrapper,
+  BigNumber,
+  providerUtils,
+  Provider,
   PolymathRegistry,
   SecurityToken,
   SecurityTokenRegistry,
@@ -18,12 +23,7 @@ import {
   PercentageTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
-  PolyTokenFaucet,
-} from '@polymathnetwork/contract-artifacts';
-import { PolyResponse } from '@polymathnetwork/abi-wrappers';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber, providerUtils } from '@0x/utils';
-import { Provider } from 'ethereum-types';
+  PolyTokenFaucet, } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';

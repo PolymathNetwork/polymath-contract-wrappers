@@ -1,12 +1,12 @@
 // SecurityTokenRegistryWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
 import {
   ISecurityTokenRegistryContract,
   PolyTokenEvents,
   ISecurityTokenContract,
   PolyTokenContract,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import SecurityTokenRegistryWrapper from '../security_token_registry_wrapper';
@@ -880,13 +880,11 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call getSecurityTokenData', async () => {
       // Params and result expected
       const expectedDeployedDate = new Date(2019, 1);
-      const expectedVersion = [new BigNumber(3), new BigNumber(0), new BigNumber(0)];
       const expectedResult = [
         'TICK',
         '0x0123456789012345678901234567890123456789',
         'Details',
         dateToBigNumber(expectedDeployedDate),
-        expectedVersion,
       ];
       const securityTokenAddress = '0x0123456789012345678901234567890123456789';
       // Mocked method
@@ -903,10 +901,6 @@ describe('SecurityTokenRegistryWrapper', () => {
       expect(result.owner).toBe(expectedResult[1]);
       expect(result.tokenDetails).toBe(expectedResult[2]);
       expect(result.deployedAt).toEqual(expectedDeployedDate);
-      const unpackVersion = expectedVersion.map(num => {
-        return num.toNumber();
-      });
-      expect(result.version).toEqual(unpackVersion.join('.'));
       // Verifications
       verify(mockedContract.getSecurityTokenData).once();
       verify(mockedMethod.callAsync(securityTokenAddress)).once();
@@ -1035,7 +1029,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getTickerDetails({ tokenName: ticker });
+      const result = await target.getTickerDetails({ ticker });
       // Result expectation
       expect(result.owner).toBe(expectedResult[0]);
       expect(result.registrationDate).toEqual(expectedRegistrationDate);
@@ -1409,7 +1403,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ tokenName: ticker });
+      const result = await target.isTickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
@@ -1430,7 +1424,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ tokenName: ticker });
+      const result = await target.isTickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
@@ -1445,7 +1439,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should call to getTickerDetails and return true', async () => {
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       const expectedResult = [ownerAddress, new BigNumber(1), new BigNumber(1), 'tokenName', true];
-      const tokenName = 'TICK';
+      const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1455,14 +1449,14 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(tokenName)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
       // Real call
-      const result = await target.isTickerRegisteredByCurrentIssuer({ tokenName });
+      const result = await target.isTickerRegisteredByCurrentIssuer({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
-      verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
@@ -1475,7 +1469,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should return false as ticker is registered by a different owner', async () => {
       const ownerAddress = '0x0123456789012345678901234567890123456789';
       const expectedResult = [ownerAddress, new BigNumber(1), new BigNumber(1), 'tokenName', true];
-      const tokenName = 'TICK';
+      const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1485,14 +1479,14 @@ describe('SecurityTokenRegistryWrapper', () => {
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(tokenName)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
       // Real call
-      const result = await target.isTickerRegisteredByCurrentIssuer({ tokenName });
+      const result = await target.isTickerRegisteredByCurrentIssuer({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
-      verify(mockedMethod.callAsync(tokenName)).once();
+      verify(mockedMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -1515,7 +1509,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
 
       // Real call
-      const result = await target.isTokenLaunched({ tokenName: ticker });
+      const result = await target.isTokenLaunched({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
@@ -1540,7 +1534,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedSCResult);
 
       // Real call
-      const result = await target.isTokenLaunched({ tokenName: ticker });
+      const result = await target.isTokenLaunched({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
@@ -2138,7 +2132,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'ChangeFeeCurrency', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityTokenCreated', 'NewSecurityToken', 'RegisterTicker', 'SecurityTokenRefreshed', 'ProtocolFactorySet', 'LatestVersionSet', 'ProtocolFactoryRemoved', encountered: Transfer`,
+          `Expected eventName to be one of: 'Pause', 'Unpause', 'TickerRemoved', 'ChangeExpiryLimit', 'ChangeSecurityLaunchFee', 'ChangeTickerRegistrationFee', 'ChangeFeeCurrency', 'OwnershipTransferred', 'ChangeTickerOwnership', 'NewSecurityToken', 'RegisterTicker', 'SecurityTokenRefreshed', 'ProtocolFactorySet', 'LatestVersionSet', 'ProtocolFactoryRemoved', encountered: Transfer`,
         ),
       );
     });

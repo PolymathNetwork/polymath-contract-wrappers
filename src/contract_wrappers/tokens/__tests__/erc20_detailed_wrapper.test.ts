@@ -1,7 +1,6 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ERC20DetailedContract, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract, SecurityTokenRegistryEvents, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import ERC20DetailedTokenWrapper from '../erc20_detailed_wrapper';
 

@@ -1,4 +1,4 @@
-import { BigNumber } from '@0x/utils';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { TxParams, DividendCheckpointBaseContract, Perm, PERCENTAGE_DECIMALS } from '../../../types';

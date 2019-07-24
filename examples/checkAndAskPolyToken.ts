@@ -1,6 +1,6 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 
 // This file acts as a valid sandbox.ts file in root directory for request POLY tokens on an unlocked node (like ganache)
 

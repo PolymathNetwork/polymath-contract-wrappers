@@ -1,8 +1,12 @@
 // GeneralTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { GeneralTransferManagerContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  GeneralTransferManagerContract,
+  ISecurityTokenContract,
+  PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -11,8 +15,8 @@ import {
   bigNumberToDate,
   dateToBigNumber,
   numberToBigNumber,
-  valueToWei,
   stringToBytes32,
+  valueToWei,
 } from '../../../../utils/convert';
 import { FlagsType, TransferType, Perm, Partition } from '../../../../types';
 
@@ -494,7 +498,6 @@ describe('GeneralTransferManagerWrapper', () => {
         expect(dateToBigNumber(result[i].canReceiveAfter)).toEqual(expectedResult[1][i]);
         expect(dateToBigNumber(result[i].expiryTime)).toEqual(expectedResult[2][i]);
       }
-
       // Verifications
       verify(mockedContract.getKYCData).once();
       verify(mockedMethod.callAsync(mockedParams.investors)).once();
@@ -1156,7 +1159,7 @@ describe('GeneralTransferManagerWrapper', () => {
   describe('ModifyKYCDataSignedMulti', () => {
     test('should modifyKYCDataSignedMulti', async () => {
       const mockedParams = {
-        investor: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+        investors: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
         canSendAfter: [new Date(2019, 6), new Date(2019, 7)],
         canReceiveAfter: [new Date(2020, 6), new Date(2020, 7)],
         expiryTime: [new Date(2021, 6), new Date(2021, 7)],
@@ -1182,7 +1185,7 @@ describe('GeneralTransferManagerWrapper', () => {
 
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
+          mockedParams.investors,
           objectContaining(canSendAfter),
           objectContaining(canReceiveAfter),
           objectContaining(expiryTime),
@@ -1205,7 +1208,7 @@ describe('GeneralTransferManagerWrapper', () => {
       verify(mockedContract.modifyKYCDataSignedMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.investor,
+          mockedParams.investors,
           objectContaining(canSendAfter),
           objectContaining(canReceiveAfter),
           objectContaining(expiryTime),

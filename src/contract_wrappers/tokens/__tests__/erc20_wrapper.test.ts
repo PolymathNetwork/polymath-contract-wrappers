@@ -1,8 +1,6 @@
 // PolymathRegistryWrapper test
-import { BigNumber } from '@0x/utils';
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ERC20DetailedContract } from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import ERC20DetailedWrapper from '../erc20_detailed_wrapper';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';

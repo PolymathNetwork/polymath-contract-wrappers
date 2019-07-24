@@ -1,13 +1,17 @@
 // CountTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CountTransferManagerContract, ISecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  CountTransferManagerContract,
+  ISecurityTokenContract,
+  PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CountTransferManagerWrapper from '../count_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { numberToBigNumber, valueToWei } from '../../../../utils/convert';
+import { numberToBigNumber } from '../../../../utils/convert';
 
 describe('CountTransferManagerWrapper', () => {
   let target: CountTransferManagerWrapper;

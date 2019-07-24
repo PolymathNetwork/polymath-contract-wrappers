@@ -1,12 +1,12 @@
 // CappedSTOWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   CappedSTOContract,
   ISecurityTokenContract,
   PolyTokenContract,
   PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';

@@ -7,11 +7,12 @@ import {
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs,
   PercentageTransferManagerPauseEventArgs,
   PercentageTransferManagerUnpauseEventArgs,
+  PercentageTransferManager,
+  Web3Wrapper,
+  ContractAbi,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { PercentageTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
@@ -211,8 +212,8 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     }
     return {
       transferResult,
-      address: result[1]
-    }
+      address: result[1],
+    };
   };
 
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {

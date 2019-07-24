@@ -1,11 +1,12 @@
-import { Module } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
 import {
   ISecurityTokenContract,
   ModuleFactoryContract,
   PolyTokenContract,
   ERC20DetailedContract,
+  Module,
+  Web3Wrapper,
+  ContractAbi,
+  TxData,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
