@@ -365,9 +365,11 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
-    const erc20TokenBalance = await (await this.erc20DetailedContract(token)).balanceOf.callAsync(
-      await this.getCallerAddress(txData),
-    );
+    const callerAddress = await this.getCallerAddress(txData);
+    const erc20Detailed = await this.erc20DetailedContract(token);
+    const erc20TokenBalance = await erc20Detailed.balanceOf.callAsync(callerAddress);
+    const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, token);
+    assert.assert(erc20TokenAllowance.isGreaterThanOrEqualTo(amount), 'Your allowance is less than dividend amount');
     assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
   };
 }
