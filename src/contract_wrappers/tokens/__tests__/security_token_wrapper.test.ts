@@ -714,6 +714,14 @@ describe('SecurityTokenWrapper', () => {
         checkpointId: 1,
       };
 
+      const expectedCheckpointIdResult = new BigNumber(2);
+      // Mocked method
+      const mockedCheckpointIdMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentCheckpointId).thenReturn(instance(mockedCheckpointIdMethod));
+      // Stub the request
+      when(mockedCheckpointIdMethod.callAsync()).thenResolve(expectedCheckpointIdResult);
+
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
@@ -737,6 +745,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.checkpointId)))).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.currentCheckpointId).once();
+      verify(mockedCheckpointIdMethod.callAsync()).once();
     });
   });
 
@@ -749,6 +759,14 @@ describe('SecurityTokenWrapper', () => {
         investor: '0x1111111111111111111111111111111111111111',
         checkpointId: 1,
       };
+
+      const expectedCheckpointIdResult = new BigNumber(2);
+      // Mocked method
+      const mockedCheckpointIdMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentCheckpointId).thenReturn(instance(mockedCheckpointIdMethod));
+      // Stub the request
+      when(mockedCheckpointIdMethod.callAsync()).thenResolve(expectedCheckpointIdResult);
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
@@ -775,6 +793,8 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.currentCheckpointId).once();
+      verify(mockedCheckpointIdMethod.callAsync()).once();
     });
   });
 

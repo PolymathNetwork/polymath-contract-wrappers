@@ -1337,6 +1337,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
+    assert.assert(
+        (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+        'Checkpoint id must be less than or equal to currentCheckpoint',
+    );
     return weiToValue(
       await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
       await this.decimals(),
@@ -1345,6 +1349,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
+    assert.assert(
+      (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      'Checkpoint id must be less than or equal to currentCheckpoint',
+    );
     return weiToValue(
       await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
       await this.decimals(),
@@ -1632,7 +1640,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
-    const document = await this.getDocument({name: params.name});
+    const document = await this.getDocument({ name: params.name });
     assert.assert(document.documentUri.length !== 0, 'Document does not exist');
     return (await this.contract).removeDocument.sendTransactionAsync(
       stringToBytes32(params.name),
