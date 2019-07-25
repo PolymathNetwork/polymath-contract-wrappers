@@ -1290,6 +1290,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
+    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
       params.partition,
@@ -1423,6 +1424,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
     assert.isETHAddressHex('To', params.to);
     assert.isETHAddressHex('From', params.from);
+    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
