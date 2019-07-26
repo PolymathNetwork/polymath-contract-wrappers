@@ -10,6 +10,7 @@ import {
   Web3Wrapper,
   ContractAbi,
   LogWithDecodedArgs,
+  TxData,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -21,8 +22,11 @@ import {
   Subscribe,
   GetLogs,
   FULL_DECIMALS,
+  ModuleType,
+  TxParams,
 } from '../../types';
-import { weiToValue, bytes32ToString } from '../../utils/convert';
+import { weiToValue, bytes32ToString, bytes32ArrayToStringArray, parseModuleTypeValue } from '../../utils/convert';
+import functionsUtils from '../../utils/functions_utils';
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ModuleFactoryEvents.OwnershipTransferred;
@@ -66,6 +70,10 @@ interface ModuleFactorySubscribeAsyncParams extends Subscribe {
   >;
 }
 
+interface ChangeSetupCostParams extends TxParams {
+  setupCost: BigNumber;
+}
+
 /**
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
@@ -83,6 +91,13 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     super(web3Wrapper, contract);
     this.contract = contract;
   }
+
+  /**
+   * Get the owner of the Module Factory
+   */
+  public owner = async () => {
+    return (await this.contract).owner.callAsync();
+  };
 
   /**
    * Get the name of the Module
@@ -118,6 +133,34 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public version = async (): Promise<string> => {
     return (await this.contract).version.callAsync();
+  };
+
+  /**
+   * Get the types
+   */
+  public getTypes = async (): Promise<ModuleType[]> => {
+    return (await (await this.contract).getTypes.callAsync()).map(type => {
+      return parseModuleTypeValue(type);
+    });
+  };
+
+  /**
+   * Get the tags
+   */
+  public getTags = async (): Promise<string[]> => {
+    return bytes32ArrayToStringArray(await (await this.contract).getTags.callAsync());
+  };
+
+  /**
+   * Change the setupCost
+   */
+  public changeSetupCost = async (params: ChangeSetupCostParams) => {
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).changeSetupCost.sendTransactionAsync(
+      params.setupCost,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
@@ -191,5 +234,12 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
       ModuleFactory.abi,
     );
     return logs;
+  };
+
+  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+    assert.assert(
+      functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
+      'Msg sender must be owner',
+    );
   };
 }
