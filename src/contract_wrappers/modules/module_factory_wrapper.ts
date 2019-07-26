@@ -74,6 +74,10 @@ interface ChangeSetupCostParams extends TxParams {
   setupCost: BigNumber;
 }
 
+interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
+  isCostInPoly: boolean;
+}
+
 /**
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
@@ -158,6 +162,19 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeSetupCost.sendTransactionAsync(
       params.setupCost,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Change the cost and type
+   */
+  public changeCostAndType = async (params: ChangeCostAndTypeParams) => {
+    await this.checkOnlyOwner(params.txData);
+    return (await this.contract).changeCostAndType.sendTransactionAsync(
+      params.setupCost,
+      params.isCostInPoly,
       params.txData,
       params.safetyFactor,
     );

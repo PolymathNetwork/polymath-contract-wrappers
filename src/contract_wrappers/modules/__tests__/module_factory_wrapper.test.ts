@@ -1,23 +1,23 @@
 // ModuleFactoryWrapper test
-import {mock, instance, reset, when, verify, objectContaining} from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
   ModuleFactoryContract,
   BigNumber,
   Web3Wrapper,
   EtherDividendCheckpointEvents,
 } from '@polymathnetwork/abi-wrappers';
-import {getMockedPolyResponse, MockedCallMethod, MockedSendMethod} from '../../../test_utils/mocked_methods';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../test_utils/mocked_methods';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   bytes32ToString,
   parseModuleTypeValue,
   stringArrayToBytes32Array,
   stringToBytes32,
-  weiToValue
+  weiToValue,
 } from '../../../utils/convert';
 import ModuleFactoryWrapper from '../module_factory_wrapper';
 import ContractWrapper from '../../contract_wrapper';
-import {FULL_DECIMALS, ModuleType} from '../../../types';
+import { FULL_DECIMALS, ModuleType } from '../../../types';
 
 describe('ModuleFactoryWrapper', () => {
   let target: ModuleFactoryWrapper;
@@ -65,7 +65,6 @@ describe('ModuleFactoryWrapper', () => {
       verify(mockedMethod.callAsync()).once();
     });
   });
-
 
   describe('Name', () => {
     test('should get name', async () => {
@@ -230,7 +229,11 @@ describe('ModuleFactoryWrapper', () => {
       when(mockedContract.changeSetupCost).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(objectContaining(mockedParams.setupCost), mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.setupCost),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -254,7 +257,68 @@ describe('ModuleFactoryWrapper', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.changeSetupCost).once();
       verify(
-          mockedMethod.sendTransactionAsync(objectContaining(mockedParams.setupCost), mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.setupCost),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('changeCostAndType', () => {
+    test.todo('should fail as changeSetupCost is 0');
+    test('should send the transaction to changeSetupCost', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        setupCost: new BigNumber(100),
+        isCostInPoly: true,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeCostAndType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.setupCost),
+          mockedParams.isCostInPoly,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Mocked method
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      // Stub the request
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Real call
+      const result = await target.changeCostAndType(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.owner).once();
+      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.changeCostAndType).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(mockedParams.setupCost),
+          mockedParams.isCostInPoly,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
