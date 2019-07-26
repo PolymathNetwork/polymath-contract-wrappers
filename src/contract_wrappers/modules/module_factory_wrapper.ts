@@ -93,11 +93,32 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   };
 
   /**
+   * Get the title of the Module
+   */
+  public title = async (): Promise<string> => {
+    return (await this.contract).title.callAsync();
+  };
+
+  /**
+   * Get isCostInPoly
+   */
+  public isCostInPoly = async (): Promise<boolean> => {
+    return (await this.contract).isCostInPoly.callAsync();
+  };
+
+  /**
+   * Get the description of the Module
+   */
+  public description = async (): Promise<string> => {
+    return (await this.contract).description.callAsync();
+  };
+
+  /**
    * Get the version of the Module
    */
   public version = async (): Promise<string> => {
     return (await this.contract).version.callAsync();
-  }
+  };
 
   /**
    * Get setup cost

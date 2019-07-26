@@ -61,6 +61,69 @@ describe('ModuleFactoryWrapper', () => {
     });
   });
 
+  describe('Title', () => {
+    test('should get title', async () => {
+      // Address expected
+      const expectedResult = 'Title';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.title).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.title();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.title).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Description', () => {
+    test('should get description', async () => {
+      // Address expected
+      const expectedResult = 'Description';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.description).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.description();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.description).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('IsCostInPoly', () => {
+    test('should get isCostInPoly', async () => {
+      // Address expected
+      const expectedResult = true;
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.isCostInPoly).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.isCostInPoly();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.isCostInPoly).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('Version', () => {
     test('should get version', async () => {
       // Address expected
