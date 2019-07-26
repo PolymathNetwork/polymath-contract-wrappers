@@ -349,23 +349,24 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     name: string,
     txData?: Partial<TxData>,
     checkpointId?: number,
-    excluded?: string[],
+    excluded: string[] = [],
   ) => {
-    if (excluded !== undefined) {
-      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
-      assert.areThereDuplicatedStrings('excluded', excluded);
-      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
-    }
+    excluded.forEach(address => assert.isNonZeroETHAddressHex('Excluded address', address));
+    assert.areThereDuplicatedStrings('Excluded addresses', excluded);
+    assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
     assert.assert(expiry > maturity, 'Expiry before maturity');
     assert.isFutureDate(expiry, 'Expiry in past');
     assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
-    const stContract = await this.securityTokenContract();
-    if (checkpointId !== undefined) {
-      const currentCheckpointId = await stContract.currentCheckpointId.callAsync();
-      assert.assert(checkpointId < new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
-    }
     assert.isNonZeroETHAddressHex('token', token);
     assert.assert(name.length > 0, 'The name can not be empty');
+
+    const stContract = await this.securityTokenContract();
+
+    if (checkpointId) {
+      const currentCheckpointId = await stContract.currentCheckpointId.callAsync();
+      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    }
+
     const callerAddress = await this.getCallerAddress(txData);
     const erc20Detailed = await this.erc20DetailedContract(token);
     const erc20TokenBalance = await erc20Detailed.balanceOf.callAsync(callerAddress);
@@ -373,42 +374,32 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     assert.assert(erc20TokenAllowance.isGreaterThanOrEqualTo(amount), 'Your allowance is less than dividend amount');
     assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
 
-    function checkExcludedAssertions(addr: string) {
-      assert.isNonZeroETHAddressHex('Excluded Address', addr);
+    let currentSupply: BigNumber;    
+    let gettingExcludedSupply: Promise<BigNumber>[] = [];
+
+    if (checkpointId) {
+      gettingExcludedSupply = excluded.map(
+        excludedAddress => stContract.balanceOfAt.callAsync(excludedAddress, new BigNumber(checkpointId))
+      );
+      currentSupply = await stContract.totalSupplyAt.callAsync(new BigNumber(checkpointId));
+    } else {
+      gettingExcludedSupply = excluded.map(
+        excludedAddress => stContract.balanceOf.callAsync(excludedAddress)
+      );
+      currentSupply = await stContract.totalSupply.callAsync();
     }
 
-    if (excluded) {
-      excluded.map(checkExcludedAssertions);
-      assert.areThereDuplicatedStrings('Excluded Addresses', excluded);
-    }
-    let currentSupply;
-    let excludedSupply = new BigNumber(0);
-    if (checkpointId) {
-      currentSupply = await stContract.totalSupplyAt.callAsync(new BigNumber(checkpointId));
-      if (excluded) {
-        const promises = [];
-        for (let i = 0; i < excluded.length; i += 1) {
-          excludedSupply = excludedSupply.plus(
-            promises.push(stContract.balanceOfAt.callAsync(excluded[i], new BigNumber(checkpointId))),
-          );
-        }
-        excludedSupply = BigNumber.sum.apply(null, await Promise.all(promises));
-      }
-    } else {
-      currentSupply = await stContract.totalSupply.callAsync();
-      if (excluded) {
-        const promises = [];
-        for (let i = 0; i < excluded.length; i += 1) {
-          excludedSupply = excludedSupply.plus(
-              promises.push(stContract.balanceOf.callAsync(excluded[i])),
-          );
-        }
-        excludedSupply = BigNumber.sum.apply(null, await Promise.all(promises));
-      }
-    }
-    assert.assert(!currentSupply.isZero(), 'Invalid supply, must be greater than 0');
+    assert.assert(!currentSupply.isZero(), 'Invalid supply, current supply must be greater than 0');
+
+    // that hardcoded 0 is necessary for the sum function not
+    // to return NaN if the excluded addresses array is empty
+    const excludedSupplyList = await Promise.all(
+      [Promise.resolve(new BigNumber(0))].concat(gettingExcludedSupply)
+    );
+    const totalExcludedSupply = BigNumber.sum.apply(null, excludedSupplyList);
+    
     assert.assert(
-      currentSupply.isGreaterThan(excludedSupply),
+      currentSupply.isGreaterThan(totalExcludedSupply),
       'Invalid supply, current supply must be greater than excluded supply',
     );
   };
