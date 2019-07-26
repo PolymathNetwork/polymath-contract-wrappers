@@ -145,6 +145,27 @@ describe('ModuleFactoryWrapper', () => {
     });
   });
 
+  describe('setupCost', () => {
+    test('should get setupCost', async () => {
+      // Address expected
+      const expectedResult = new BigNumber(100);
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.setupCost).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.setupCost();
+      // Result expectation
+      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
+      // Verifications
+      verify(mockedContract.setupCost).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('setupCostInPoly', () => {
     test('should get setupCostInPoly', async () => {
       // Address expected
