@@ -150,7 +150,7 @@ describe('ModuleFactoryWrapper', () => {
       // Address expected
       const expectedResult = new BigNumber(100);
       // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
+      const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.setupCost).thenReturn(instance(mockedMethod));
       // Stub the request
@@ -162,6 +162,48 @@ describe('ModuleFactoryWrapper', () => {
       expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.setupCost).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('getUpperSTVersionBounds', () => {
+    test('should get UpperSTVersionBounds', async () => {
+      // Address expected
+      const expectedResult = [new BigNumber(1), new BigNumber(2)];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getUpperSTVersionBounds).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getUpperSTVersionBounds();
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getUpperSTVersionBounds).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('getLowerSTVersionBounds', () => {
+    test('should get LowerSTVersionBounds', async () => {
+      // Address expected
+      const expectedResult = [new BigNumber(1), new BigNumber(2)];
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getLowerSTVersionBounds).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getLowerSTVersionBounds();
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+      // Verifications
+      verify(mockedContract.getLowerSTVersionBounds).once();
       verify(mockedMethod.callAsync()).once();
     });
   });

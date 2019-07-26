@@ -120,21 +120,35 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     return (await this.contract).version.callAsync();
   };
 
-    /**
-     * Get setup cost
-     */
-    public setupCost = async (): Promise<BigNumber> => {
-        const value = await (await this.contract).setupCost.callAsync();
-        return weiToValue(value, FULL_DECIMALS);
-    };
+  /**
+   * Get setup cost
+   */
+  public setupCost = async (): Promise<BigNumber> => {
+    const value = await (await this.contract).setupCost.callAsync();
+    return weiToValue(value, FULL_DECIMALS);
+  };
 
-    /**
-     * Get setup cost in poly
-     */
-    public setupCostInPoly = async (): Promise<BigNumber> => {
-        const value = await (await this.contract).setupCostInPoly.callAsync();
-        return weiToValue(value, FULL_DECIMALS);
-    };
+  /**
+   * Get upper ST version bounds
+   */
+  public getUpperSTVersionBounds = async (): Promise<BigNumber[]> => {
+    return (await (await this.contract).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+  };
+
+  /**
+   * Get lower ST version bounds
+   */
+  public getLowerSTVersionBounds = async (): Promise<BigNumber[]> => {
+    return (await (await this.contract).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
+  };
+
+  /**
+   * Get setup cost in poly
+   */
+  public setupCostInPoly = async (): Promise<BigNumber> => {
+    const value = await (await this.contract).setupCostInPoly.callAsync();
+    return weiToValue(value, FULL_DECIMALS);
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
