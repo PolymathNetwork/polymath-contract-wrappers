@@ -255,7 +255,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public removeModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    await this.checkModuleNotPausedOrOwner();
+    await this.checkModuleNotPaused();
     await this.checkModuleRegistered(params.moduleFactory);
     await this.checkIsOwnerOrModuleFactoryOwner(params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
@@ -484,9 +484,16 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
-      !(await this.isPaused()) ||
+        !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
-      'Check contract is not be paused or method has not been called by owner',
+        'Contract is either paused or the calling address is not the owner',
+    );
+  };
+
+  private checkModuleNotPaused = async () => {
+    assert.assert(
+        !(await this.isPaused()),
+        'Contract is currently paused',
     );
   };
 
