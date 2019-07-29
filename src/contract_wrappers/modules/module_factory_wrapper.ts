@@ -1,31 +1,38 @@
 import {
+  BigNumber,
+  ContractAbi,
+  LogWithDecodedArgs,
+  ModuleFactory,
+  ModuleFactoryChangeSTVersionBoundEventArgs,
   ModuleFactoryContract,
   ModuleFactoryEventArgs,
   ModuleFactoryEvents,
-  ModuleFactoryOwnershipTransferredEventArgs,
   ModuleFactoryGenerateModuleFromFactoryEventArgs,
-  ModuleFactoryChangeSTVersionBoundEventArgs,
-  BigNumber,
-  ModuleFactory,
-  Web3Wrapper,
-  ContractAbi,
-  LogWithDecodedArgs,
+  ModuleFactoryOwnershipTransferredEventArgs,
   TxData,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
 import {
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
+  BoundType,
   EventCallback,
-  Subscribe,
-  GetLogs,
   FULL_DECIMALS,
+  GetLogs,
+  GetLogsAsyncParams,
   ModuleType,
+  Subscribe,
+  SubscribeAsyncParams,
   TxParams,
 } from '../../types';
-import { weiToValue, bytes32ToString, bytes32ArrayToStringArray, parseModuleTypeValue } from '../../utils/convert';
+import {
+  bytes32ArrayToStringArray,
+  bytes32ToString,
+  parseModuleTypeValue,
+  stringArrayToBytes32Array,
+  weiToValue,
+} from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -76,6 +83,22 @@ interface ChangeSetupCostParams extends TxParams {
 
 interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
   isCostInPoly: boolean;
+}
+
+interface ChangeTitleParams extends TxParams {
+  title: string;
+}
+
+interface ChangeDescriptionParams extends TxParams {
+  description: string;
+}
+
+interface ChangeNameParams extends TxParams {
+  name: string;
+}
+
+interface ChangeTagsParams extends TxParams {
+  tags: string[];
 }
 
 /**
@@ -175,6 +198,50 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     return (await this.contract).changeCostAndType.sendTransactionAsync(
       params.setupCost,
       params.isCostInPoly,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Change the title
+   */
+  public changeTitle = async (params: ChangeTitleParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(params.title.length > 0, 'Invalid title');
+    return (await this.contract).changeTitle.sendTransactionAsync(params.title, params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Change the description
+   */
+  public changeDescription = async (params: ChangeDescriptionParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(params.description.length > 0, 'Invalid description');
+    return (await this.contract).changeDescription.sendTransactionAsync(
+      params.description,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Change the name
+   */
+  public changeName = async (params: ChangeNameParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(params.name.length > 0, 'Invalid name');
+    return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Change the tags
+   */
+  public changeTags = async (params: ChangeTagsParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(params.tags.length > 0, 'Invalid, must provide one or more tags');
+    return (await this.contract).changeTags.sendTransactionAsync(
+      stringArrayToBytes32Array(params.tags),
       params.txData,
       params.safetyFactor,
     );
