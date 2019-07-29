@@ -132,6 +132,11 @@ export enum Partition {
   Undefined = 'UNDEFINED',
 }
 
+export enum BoundType {
+  LowerBound = 'lowerBound',
+  UpperBound = 'upperBound',
+}
+
 export enum PolymathContract {
   PolyToken = 'PolyToken',
   ModuleRegistry = 'ModuleRegistry',

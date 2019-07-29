@@ -102,6 +102,11 @@ interface ChangeTagsParams extends TxParams {
   tags: string[];
 }
 
+interface ChangeSTVersionBoundsParams extends TxParams {
+  boundType: BoundType;
+  newVersion: number[];
+}
+
 /**
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
@@ -247,6 +252,32 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     assert.assert(params.tags.length > 0, 'Invalid, must provide one or more tags');
     return (await this.contract).changeTags.sendTransactionAsync(
       stringArrayToBytes32Array(params.tags),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Change the ST VersionBounds
+   */
+  public changeSTVersionBounds = async (params: ChangeSTVersionBoundsParams) => {
+    await this.checkOnlyOwner(params.txData);
+    assert.assert(
+      params.boundType === BoundType.LowerBound || params.boundType === BoundType.UpperBound,
+      'Invalid bound type',
+    );
+    assert.assert(params.newVersion.length === 3, 'Invalid version, number array must have 3 elements');
+    const currentBound = BoundType.LowerBound === params.boundType ? await this.getLowerSTVersionBounds() : await this.getUpperSTVersionBounds();
+    for (let i = 0; i < 3; i += 1) {
+      if (params.boundType === BoundType.LowerBound) {
+        assert.assert(currentBound[i].isLessThanOrEqualTo(params.newVersion[i]), 'New Lower ST Bounds must be less than or equal to current');
+      } else {
+        assert.assert(currentBound[i].isGreaterThanOrEqualTo(params.newVersion[i]), 'New Upper ST Bounds must be greater than or equal to current');
+      }
+    }
+    return (await this.contract).changeSTVersionBounds.sendTransactionAsync(
+      params.boundType,
+      params.newVersion,
       params.txData,
       params.safetyFactor,
     );
