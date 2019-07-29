@@ -31,6 +31,7 @@ import {
   bytes32ToString,
   parseModuleTypeValue,
   stringArrayToBytes32Array,
+  stringToBytes32,
   weiToValue,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
@@ -231,7 +232,11 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   public changeName = async (params: ChangeNameParams) => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.name.length > 0, 'Invalid name');
-    return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
+    return (await this.contract).changeName.sendTransactionAsync(
+      stringToBytes32(params.name),
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
