@@ -27,6 +27,7 @@ import {
   FULL_DECIMALS,
   Partition,
   Perm,
+  CappedSTOFundRaiseType,
 } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -4092,7 +4093,7 @@ describe('SecurityTokenWrapper', () => {
         endTime: new Date(2031, 1),
         cap: new BigNumber(1),
         rate: new BigNumber(1),
-        fundRaiseTypes: [FundRaiseType.ETH],
+        fundRaiseType: CappedSTOFundRaiseType.ETH,
         fundsReceiver: '0x2222222222222222222222222222222222222222',
       };
       const mockedCappedParams = {
@@ -4112,7 +4113,7 @@ describe('SecurityTokenWrapper', () => {
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
         valueToWei(mockedCappedParams.data.cap, expectedDecimalsResult).toString(),
         valueToWei(mockedCappedParams.data.rate, FULL_DECIMALS).toString(),
-        mockedCappedParams.data.fundRaiseTypes,
+        [mockedCappedParams.data.fundRaiseType],
         mockedCappedParams.data.fundsReceiver,
       ]);
 
@@ -4139,7 +4140,7 @@ describe('SecurityTokenWrapper', () => {
           endTime: cappedParams.endTime,
           cap: cappedParams.cap,
           rate: cappedParams.rate,
-          fundRaiseTypes: cappedParams.fundRaiseTypes,
+          fundRaiseType: cappedParams.fundRaiseType,
           fundsReceiver: cappedParams.fundsReceiver,
         },
         txData: mockedCappedParams.txData,
