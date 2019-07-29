@@ -72,6 +72,7 @@ describe('EtherDividendCheckpointWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       const mockedParams = {
         maturity: new Date(2030, 1),
@@ -123,7 +124,8 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.totalSupply).once();
     });
@@ -157,6 +159,7 @@ describe('EtherDividendCheckpointWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       // Mock security token currentCheckpointId
       const expectedCurrentCheckpointResult = new BigNumber(checkpointId + 1);
@@ -221,7 +224,8 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
       verify(mockedSecurityTokenContract.totalSupplyAt).once();
     });
@@ -266,6 +270,7 @@ describe('EtherDividendCheckpointWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       // Mock security token currentCheckpointId
       const expectedCurrentCheckpointResult = new BigNumber(checkpointId + 1);
@@ -333,7 +338,8 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
       verify(mockedSecurityTokenContract.totalSupplyAt).once();
       function verifyBalanceOf(addr: string) {
@@ -380,6 +386,7 @@ describe('EtherDividendCheckpointWrapper', () => {
 
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       const mockedParams = {
         maturity: new Date(2030, 1),
@@ -434,7 +441,8 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.totalSupply).once();
       function verifyBalanceOf(addr: string) {

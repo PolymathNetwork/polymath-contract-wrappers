@@ -1,4 +1,4 @@
-import { BigNumber } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, TxData, ERC20DetailedContract } from '@polymathnetwork/abi-wrappers';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { TxParams, DividendCheckpointBaseContract, Perm, PERCENTAGE_DECIMALS } from '../../../types';
@@ -159,6 +159,10 @@ interface CheckpointData {
  */
 export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   protected abstract contract: Promise<DividendCheckpointBaseContract>;
+
+  protected erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract> => {
+    return this.contractFactory.getERC20DetailedContract(address);
+  };
 
   protected abstract getDecimals(dividendIndex: number): Promise<BigNumber>;
 
@@ -476,5 +480,71 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
     assert.isPastDate(dividend.maturity, 'Dividend maturity in future');
     assert.isFutureDate(dividend.expiry, 'Dividend expiry in past');
+  };
+
+  protected checkIfDividendCreationIsValid = async (
+    expiry: Date,
+    maturity: Date,
+    amount: BigNumber,
+    name: string,
+    token?: string,
+    txData?: Partial<TxData>,
+    checkpointId?: number,
+    excluded: string[] = [],
+  ) => {
+    excluded.forEach(address => assert.isNonZeroETHAddressHex('Excluded address', address));
+    assert.areThereDuplicatedStrings('Excluded addresses', excluded);
+    assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
+    assert.assert(expiry > maturity, 'Expiry before maturity');
+    assert.isFutureDate(expiry, 'Expiry in past');
+    assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
+    assert.assert(name.length > 0, 'The name can not be empty');
+
+    const stContract = await this.securityTokenContract();
+
+    if (checkpointId) {
+      const currentCheckpointId = await stContract.currentCheckpointId.callAsync();
+      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+    }
+
+    const callerAddress = await this.getCallerAddress(txData);
+    if (token) {
+      assert.isNonZeroETHAddressHex('token', token);
+      const erc20Detailed = await this.erc20DetailedContract(token);
+      const erc20TokenBalance = await erc20Detailed.balanceOf.callAsync(callerAddress);
+      const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, token);
+      assert.assert(erc20TokenAllowance.isGreaterThanOrEqualTo(amount), 'Your allowance is less than dividend amount');
+      assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
+    } else {
+      assert.assert(
+        (await this.web3Wrapper.getBalanceInWeiAsync(callerAddress)).isGreaterThanOrEqualTo(amount.valueOf()),
+        'Caller Address ETH Balance does not meet amount needed to create dividend',
+      );
+    }
+
+    let currentSupply: BigNumber;
+    let gettingExcludedSupply: Promise<BigNumber>[] = [];
+
+    if (checkpointId) {
+      gettingExcludedSupply = excluded.map(excludedAddress =>
+        stContract.balanceOfAt.callAsync(excludedAddress, new BigNumber(checkpointId)),
+      );
+      currentSupply = await stContract.totalSupplyAt.callAsync(new BigNumber(checkpointId));
+    } else {
+      gettingExcludedSupply = excluded.map(excludedAddress => stContract.balanceOf.callAsync(excludedAddress));
+      currentSupply = await stContract.totalSupply.callAsync();
+    }
+
+    assert.assert(!currentSupply.isZero(), 'Invalid supply, current supply must be greater than 0');
+
+    // that hardcoded 0 is necessary for the sum function not
+    // to return NaN if the excluded addresses array is empty
+    const excludedSupplyList = await Promise.all([Promise.resolve(new BigNumber(0))].concat(gettingExcludedSupply));
+    const totalExcludedSupply = BigNumber.sum.apply(null, excludedSupplyList);
+
+    assert.assert(
+      currentSupply.isGreaterThan(totalExcludedSupply),
+      'Invalid supply, current supply must be greater than excluded supply',
+    );
   };
 }
