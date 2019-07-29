@@ -103,6 +103,11 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
+export enum CappedSTOFundRaiseType {
+  ETH = 0,
+  POLY = 1,
+}
+
 export enum FlagsType {
   IsAccredited,
   CanNotBuyFromSto,

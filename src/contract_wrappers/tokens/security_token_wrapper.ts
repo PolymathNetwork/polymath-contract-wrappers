@@ -72,6 +72,7 @@ import {
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
+  CappedSTOFundRaiseType,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -791,7 +792,11 @@ interface CappedSTOData {
   endTime: Date;
   cap: BigNumber;
   rate: BigNumber;
-  fundRaiseTypes: FundRaiseType[];
+  /**
+   * In the smart contracts, this parameter is a single-element array.
+   * It has been abstracted and simplified here
+   */
+  fundRaiseType: CappedSTOFundRaiseType;
   fundsReceiver: string;
 }
 
@@ -1818,8 +1823,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, 'End time not valid');
-    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
-    assert.assert(data.fundRaiseTypes.length === 1, 'It only selects single fund raise type');
+    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');    
   };
 
   private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
@@ -1878,7 +1882,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
           valueToWei((params.data as CappedSTOData).cap, decimals).toString(),
           valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
-          (params.data as CappedSTOData).fundRaiseTypes,
+          [(params.data as CappedSTOData).fundRaiseType], // the module's configure function expects an array
           (params.data as CappedSTOData).fundsReceiver,
         ]);
         break;
