@@ -620,7 +620,7 @@ interface TransferFromWithDataParams extends TxParams {
 interface IssueParams extends TxParams {
   investor: string;
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 interface IssueByPartitionParams extends IssueParams {
@@ -1223,7 +1223,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      params.data || "0x00",
       params.txData,
       params.safetyFactor,
     );
@@ -1238,7 +1238,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.partition,
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      params.data || "0x00",
       params.txData,
       params.safetyFactor,
     );
