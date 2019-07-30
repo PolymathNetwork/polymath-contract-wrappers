@@ -512,9 +512,15 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       assert.isNonZeroETHAddressHex('token', token);
       const erc20Detailed = await this.erc20DetailedContract(token);
       const erc20TokenBalance = await erc20Detailed.balanceOf.callAsync(callerAddress);
-      const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, token);
-      assert.assert(erc20TokenAllowance.isGreaterThanOrEqualTo(amount), 'Your allowance is less than dividend amount');
-      assert.assert(erc20TokenBalance.isGreaterThanOrEqualTo(amount), 'Your balance is less than dividend amount');
+      const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, await this.address());
+      assert.assert(
+        erc20TokenAllowance.isGreaterThanOrEqualTo(amount.absoluteValue()),
+        'Your allowance is less than dividend amount',
+      );
+      assert.assert(
+        erc20TokenBalance.isGreaterThanOrEqualTo(amount.absoluteValue()),
+        'Your balance is less than dividend amount',
+      );
     } else {
       assert.assert(
         (await this.web3Wrapper.getBalanceInWeiAsync(callerAddress)).isGreaterThanOrEqualTo(amount.valueOf()),
