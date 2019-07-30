@@ -159,6 +159,18 @@ export enum ModuleName {
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
 }
 
+export enum TransferStatusCodes {
+  TransferFailure = 'TransferFailure',
+  TransferSuccess = 'TransferSuccess',
+  InsufficientBalance = 'InsufficientBalance',
+  InsufficientAllowance = 'InsufficientAllowance',
+  TransfersHalted = 'TransfersHalted',
+  FundsLocked = 'FundsLocked',
+  InvalidSender = 'InvalidSender',
+  InvalidReceiver = 'InvalidReceiver',
+  InvalidOperator = 'InvalidOperator',
+}
+
 export enum Perm {
   Admin = 'ADMIN',
   Operator = 'OPERATOR',

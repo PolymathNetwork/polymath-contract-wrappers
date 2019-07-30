@@ -73,6 +73,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   CappedSTOFundRaiseType,
+  TransferStatusCodes
 } from '../../types';
 import {
   bigNumberToDate,
@@ -848,7 +849,7 @@ interface DocumentData {
 
 interface CanTransferFromData {
   /** Status Code */
-  statusCode: string;
+  statusCode: TransferStatusCodes;
   /** Reason Code */
   reasonCode: string;
 }
@@ -1220,6 +1221,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
+    const canTransfer = await this.canTransfer({
+      to: params.investor,
+      value: params.value,
+      data: params.data || "0x00"
+    });
+    assert.assert(canTransfer.statusCode !== TransferStatusCodes.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
@@ -1571,6 +1578,52 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return typedResult;
   };
 
+  private getTransferStatusCode = (result: string) => {
+    let status: TransferStatusCodes = TransferStatusCodes.TransferSuccess;
+    switch(result) {
+      case "0x50": {
+        status = TransferStatusCodes.TransferFailure;
+        break
+      }
+      case "0x51": {
+        status = TransferStatusCodes.TransferSuccess;
+        break
+      }
+      case "0x52": {
+        status = TransferStatusCodes.InsufficientBalance;
+        break
+      }
+      case "0x53": {
+        status = TransferStatusCodes.InsufficientAllowance;
+        break
+      }
+      case "0x54": {
+        status = TransferStatusCodes.TransfersHalted;
+        break
+      }
+      case "0x55": {
+        status = TransferStatusCodes.FundsLocked;
+        break
+      }
+      case "0x56": {
+        status = TransferStatusCodes.InvalidSender;
+        break
+      }
+      case "0x57": {
+        status = TransferStatusCodes.InvalidReceiver;
+        break
+      }
+      case "0x58": {
+        status = TransferStatusCodes.InvalidOperator;
+        break
+      }
+      default: {
+        break
+      }
+    }
+    return status
+  }
+
   /**
    * Validates if can transfer
    * @return statusCode, reasonCode
@@ -1582,9 +1635,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
-
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
     };
     return typedResult;
@@ -1603,8 +1656,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
     };
     return typedResult;
@@ -1624,8 +1678,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferByPartitionData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
       partition: parsePartitionBytes32Value(result[2]),
     };
