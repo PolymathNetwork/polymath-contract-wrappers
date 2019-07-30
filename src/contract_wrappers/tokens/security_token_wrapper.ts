@@ -1538,7 +1538,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       producedAddModuleInfo.data,
       producedAddModuleInfo.maxCost,
       producedAddModuleInfo.budget,
-      params.label ? params.label : '',
+      params.label ? stringToBytes32(params.label) : '',
       params.archived,
       params.txData,
       params.safetyFactor,

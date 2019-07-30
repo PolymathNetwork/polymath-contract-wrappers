@@ -96,12 +96,13 @@ window.addEventListener('load', async () => {
   ];
 
   // Call to add count transfer manager module with max 3 holders
-  await tickerSecurityTokenInstance.addModule({
+  await tickerSecurityTokenInstance.addModuleWithLabel({
     moduleName,
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
     archived: false,
+    label: 'CTM Test',
     data: {
       maxHolderCount: randomBeneficiaries.length + 1,
     },
