@@ -255,16 +255,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public removeModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    await this.checkModuleNotPausedOrOwner();
+    await this.checkModuleNotPaused();
     await this.checkModuleRegistered(params.moduleFactory);
-    const callerAddress = await this.getCallerAddress(undefined);
-    const owner = await this.owner();
-    const factoryOwner = await (await this.moduleFactoryContract(params.moduleFactory)).owner.callAsync();
-    assert.assert(
-      functionsUtils.checksumAddressComparision(callerAddress, owner) ||
-        functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
-      'Calling address must be owner or factory owner ',
-    );
+    await this.checkIsOwnerOrModuleFactoryOwner(params.moduleFactory);
     return (await this.contract).removeModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -285,7 +278,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public unverifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
-    await this.checkMsgSenderIsOwner();
+    await this.checkIsOwnerOrModuleFactoryOwner(params.moduleFactory);
     await this.checkModuleRegistered(params.moduleFactory);
     return (await this.contract).unverifyModule.sendTransactionAsync(
       params.moduleFactory,
@@ -491,9 +484,27 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
-      !(await this.isPaused()) ||
+        !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
-      'Contract should not be Paused',
+        'Contract is either paused or the calling address is not the owner',
     );
   };
+
+  private checkModuleNotPaused = async () => {
+    assert.assert(
+        !(await this.isPaused()),
+        'Contract is currently paused',
+    );
+  };
+
+  private checkIsOwnerOrModuleFactoryOwner = async(moduleFactoryAddress: string) => {
+    const callerAddress = await this.getCallerAddress(undefined);
+    const owner = await this.owner();
+    const factoryOwner = await (await this.moduleFactoryContract(moduleFactoryAddress)).owner.callAsync();
+    assert.assert(
+        functionsUtils.checksumAddressComparision(callerAddress, owner) ||
+        functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
+        'Calling address must be owner or factory owner ',
+    );
+  }
 }

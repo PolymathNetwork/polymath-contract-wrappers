@@ -338,6 +338,16 @@ describe('ModuleRegistryWrapper', () => {
     test('should successfully call to unverifyModule', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x0123456789012345678901234567890123456789';
+
+      // Setup mocked owner from module factory contract
+      const moduleFactoryAddress = '0x2222222222222222222222222222222222222222';
+      when(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).thenResolve(
+          instance(mockedModuleFactoryContract),
+      );
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+
       // Mocked method
       const mockedOwnerMethod = mock(MockedCallMethod);
       // Stub the method
@@ -398,6 +408,9 @@ describe('ModuleRegistryWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(moduleFactoryAddress)).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.owner).once();
     });
   });
 
