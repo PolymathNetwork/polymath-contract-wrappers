@@ -1295,6 +1295,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
+    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
       params.partition,
@@ -1342,6 +1343,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
+    assert.assert(
+        (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+        'Checkpoint id must be less than or equal to currentCheckpoint',
+    );
     return weiToValue(
       await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
       await this.decimals(),
@@ -1350,6 +1355,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public balanceOfAt = async (params: BalanceOfAtParams) => {
     assert.isETHAddressHex('investor', params.investor);
+    assert.assert(
+      (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      'Checkpoint id must be less than or equal to currentCheckpoint',
+    );
     return weiToValue(
       await (await this.contract).balanceOfAt.callAsync(params.investor, numberToBigNumber(params.checkpointId)),
       await this.decimals(),
@@ -1420,6 +1429,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
     assert.isETHAddressHex('To', params.to);
     assert.isETHAddressHex('From', params.from);
+    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
@@ -1623,8 +1633,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public setDocument = async (params: SetDocumentParams) => {
-    assert.assert(params.name.length > 0, 'Bad name');
-    assert.assert(params.uri.length > 0, 'Bad uri');
+    assert.assert(params.name.length > 0, 'Bad name, cannot be empty');
+    assert.assert(params.uri.length > 0, 'Bad uri, cannot be empty');
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).setDocument.sendTransactionAsync(
       stringToBytes32(params.name),
@@ -1637,6 +1647,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
+    const document = await this.getDocument({ name: params.name });
+    assert.assert(document.documentUri.length !== 0, 'Document does not exist');
     return (await this.contract).removeDocument.sendTransactionAsync(
       stringToBytes32(params.name),
       params.txData,

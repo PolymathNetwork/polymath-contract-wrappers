@@ -97,6 +97,27 @@ describe('DividendCheckpointWrapper', () => {
     });
   });
 
+  describe('getTreasuryWallet', () => {
+    test('should get the treasury wallet address', async () => {
+      // Address expected
+      const expectedResult = '0x1234567890123456789012345678901234567890';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTreasuryWallet).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTreasuryWallet();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getTreasuryWallet).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('Pause/Unpause', () => {
     test('should call to pause', async () => {
       // Pause Result expected

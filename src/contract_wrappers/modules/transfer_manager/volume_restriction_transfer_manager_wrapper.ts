@@ -495,6 +495,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(!(await this.getExemptAddress()).includes(params.holder), 'Holder is exempt from restriction');
     this.checkRestrictionInputParams(
       params.startTime,
+      params.endTime,
       params.allowedTokens,
       params.restrictionType,
       params.rollingPeriodInDays,
@@ -515,7 +516,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public addIndividualDailyRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
-    this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
     const decimals = await this.decimalsByRestrictionType(params.restrictionType);
     return (await this.contract).addIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
@@ -540,7 +541,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
-      this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
+      this.checkRestrictionInputParams(
+        params.startTimes[i],
+        params.endTimes[i],
+        params.allowedTokens[i],
+        params.restrictionTypes[i],
+        1,
+      );
       restrictions.push(this.decimalsByRestrictionType(params.restrictionTypes[i]));
     }
     restrictions = await Promise.all(restrictions);
@@ -579,6 +586,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(
         params.startTimes[i],
+        params.endTimes[i],
         params.allowedTokens[i],
         params.restrictionTypes[i],
         params.rollingPeriodInDays[i],
@@ -606,6 +614,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(
       params.startTime,
+      params.endTime,
       params.allowedTokens,
       params.restrictionType,
       params.rollingPeriodInDays,
@@ -624,7 +633,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public addDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
     const decimals = await this.decimalsByRestrictionType(params.restrictionType);
     return (await this.contract).addDefaultDailyRestriction.sendTransactionAsync(
       valueToWei(params.allowedTokens, decimals),
@@ -720,6 +729,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.isNonZeroETHAddressHex('holder', params.holder);
     this.checkRestrictionInputParams(
       params.startTime,
+      params.endTime,
       params.allowedTokens,
       params.restrictionType,
       params.rollingPeriodInDays,
@@ -740,7 +750,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   public modifyIndividualDailyRestriction = async (params: IndividualDailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
-    this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
     const decimals = await this.decimalsByRestrictionType(params.restrictionType);
     return (await this.contract).modifyIndividualDailyRestriction.sendTransactionAsync(
       params.holder,
@@ -765,7 +775,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
-      this.checkRestrictionInputParams(params.startTimes[i], params.allowedTokens[i], params.restrictionTypes[i], 1);
+      this.checkRestrictionInputParams(
+        params.startTimes[i],
+        params.endTimes[i],
+        params.allowedTokens[i],
+        params.restrictionTypes[i],
+        1,
+      );
       restrictions.push(this.decimalsByRestrictionType(params.restrictionTypes[i]));
     }
     restrictions = await Promise.all(restrictions);
@@ -799,6 +815,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     for (let i = 0; i < params.startTimes.length; i += 1) {
       this.checkRestrictionInputParams(
         params.startTimes[i],
+        params.endTimes[i],
         params.allowedTokens[i],
         params.restrictionTypes[i],
         params.rollingPeriodInDays[i],
@@ -826,6 +843,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(
       params.startTime,
+      params.endTime,
       params.allowedTokens,
       params.restrictionType,
       params.rollingPeriodInDays,
@@ -844,7 +862,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   public modifyDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    this.checkRestrictionInputParams(params.startTime, params.allowedTokens, params.restrictionType, 1);
+    this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
     const decimals = await this.decimalsByRestrictionType(params.restrictionType);
     return (await this.contract).modifyDefaultDailyRestriction.sendTransactionAsync(
       valueToWei(params.allowedTokens, decimals),
@@ -964,6 +982,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   private checkRestrictionInputParams = (
     startTime: Date,
+    endTime: Date,
     allowedTokens: BigNumber,
     restrictionType: RestrictionType,
     rollingPeriodInDays: number,
@@ -974,6 +993,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       assert.isPercentage('allowed tokens', allowedTokens);
     }
     assert.assert(rollingPeriodInDays <= 365 && rollingPeriodInDays >= 1, 'Invalid number of days in rolling period');
+    const diffDays = Math.ceil(Math.abs(endTime.getTime() - startTime.getTime()) / (1000 * 3600 * 24));
+    assert.assert(
+      new BigNumber(diffDays).isGreaterThanOrEqualTo(rollingPeriodInDays),
+      'Invalid times, rollingPeriodInDays must have less days than the duration',
+    );
   };
 
   private decimalsByRestrictionType = async (restrictionType: RestrictionType): Promise<BigNumber> => {

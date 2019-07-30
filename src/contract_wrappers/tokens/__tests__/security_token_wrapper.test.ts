@@ -715,6 +715,14 @@ describe('SecurityTokenWrapper', () => {
         checkpointId: 1,
       };
 
+      const expectedCheckpointIdResult = new BigNumber(2);
+      // Mocked method
+      const mockedCheckpointIdMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentCheckpointId).thenReturn(instance(mockedCheckpointIdMethod));
+      // Stub the request
+      when(mockedCheckpointIdMethod.callAsync()).thenResolve(expectedCheckpointIdResult);
+
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
@@ -738,6 +746,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.checkpointId)))).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.currentCheckpointId).once();
+      verify(mockedCheckpointIdMethod.callAsync()).once();
     });
   });
 
@@ -750,6 +760,14 @@ describe('SecurityTokenWrapper', () => {
         investor: '0x1111111111111111111111111111111111111111',
         checkpointId: 1,
       };
+
+      const expectedCheckpointIdResult = new BigNumber(2);
+      // Mocked method
+      const mockedCheckpointIdMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.currentCheckpointId).thenReturn(instance(mockedCheckpointIdMethod));
+      // Stub the request
+      when(mockedCheckpointIdMethod.callAsync()).thenResolve(expectedCheckpointIdResult);
 
       const expectedDecimalsResult = new BigNumber(18);
       const mockedDecimalsMethod = mock(MockedCallMethod);
@@ -776,6 +794,8 @@ describe('SecurityTokenWrapper', () => {
       ).once();
       verify(mockedContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.currentCheckpointId).once();
+      verify(mockedCheckpointIdMethod.callAsync()).once();
     });
   });
 
@@ -4867,6 +4887,20 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail if name is 0 length');
     test.todo('should fail if uri is 0 length');
     test('should send the transaction to removeDocument', async () => {
+      const documentUri = 'Uri';
+      const documentHash = stringToBytes32('Hash');
+      const documentTime = new Date(2030, 1);
+      const expectedGetDocumentResult = [documentUri, documentHash, dateToBigNumber(documentTime)];
+      // Mocked method
+      const mockedGetDocumentParams = { name: 'Name' };
+      const mockedGetDocumentMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getDocument).thenReturn(instance(mockedGetDocumentMethod));
+      // Stub the request
+      when(
+        mockedGetDocumentMethod.callAsync(objectContaining(stringToBytes32(mockedGetDocumentParams.name))),
+      ).thenResolve(expectedGetDocumentResult);
+
       // Mocked parameters
       const mockedParams = {
         name: 'Name',
@@ -4916,6 +4950,8 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.owner).once();
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getDocument).once();
+      verify(mockedGetDocumentMethod.callAsync(objectContaining(stringToBytes32(mockedGetDocumentParams.name)))).once();
     });
   });
 
