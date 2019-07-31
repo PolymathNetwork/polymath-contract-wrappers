@@ -2572,7 +2572,7 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      // canTransefer
+      // canTransfer
       const expectedStatusCode = TransferStatusCodes.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedCanResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
