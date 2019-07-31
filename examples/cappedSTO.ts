@@ -77,10 +77,10 @@ window.addEventListener('load', async () => {
     archived: false,
     data: {
       startTime: new Date(),
-      endTime: new Date(2019, 8),
+      endTime: new Date(2025, 8),
       cap: new BigNumber(10),
       rate: new BigNumber(10),
-      fundRaiseTypes: [FundRaiseType.ETH],
+      fundRaiseType: FundRaiseType.ETH.valueOf(),
       fundsReceiver: await polymathAPI.getAccount(),
     },
   });
