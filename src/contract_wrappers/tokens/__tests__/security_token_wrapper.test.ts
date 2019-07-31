@@ -2579,11 +2579,11 @@ describe('SecurityTokenWrapper', () => {
 
       const mockedCanMethod = mock(MockedCallMethod);
       when(mockedContract.canTransfer).thenReturn(instance(mockedCanMethod));
-      when(mockedCanMethod.callAsync({
-        to: mockedParams.investor,
-        value: objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-        data: mockedParams.data
-      })).thenResolve(expectedCanResult);
+      when(mockedCanMethod.callAsync(
+        mockedParams.investor,
+        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+        mockedParams.data
+      )).thenResolve(expectedCanResult);
 
       const expectedIsIssuableResult = true;
       // Mocked method
@@ -2613,14 +2613,14 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.isIssuable).once();
       verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContract.canTransfer).once()
-      verify(mockedCanMethod.callAsync({
-        to: mockedParams.investor,
-        value: objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-        data: mockedParams.data
-      })).once()
+      verify(mockedContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.canTransfer).once();
+      verify(mockedCanMethod.callAsync(
+        mockedParams.investor,
+        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+        mockedParams.data
+      )).once();
     });
   });
 
@@ -3578,7 +3578,7 @@ describe('SecurityTokenWrapper', () => {
           objectContaining(ctmData),
           objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
           objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-          objectContaining(mockedCtmParams.label),
+          stringToBytes32(mockedCtmParams.label),
           mockedCtmParams.archived,
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
@@ -3606,7 +3606,7 @@ describe('SecurityTokenWrapper', () => {
           objectContaining(ctmData),
           objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
           objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-          objectContaining(mockedCtmParams.label),
+          stringToBytes32(mockedCtmParams.label),
           mockedCtmParams.archived,
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
