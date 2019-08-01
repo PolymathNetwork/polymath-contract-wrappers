@@ -90,8 +90,10 @@ window.addEventListener('load', async () => {
 
   console.log('KYC data empty', await generalTM.getAllKYCData());
 
+  const randomBeneficiary = '0x3444444444444444444444444444444444444444';
+
   await generalTM.modifyKYCData({
-    investor: myAddress,
+    investor: randomBeneficiary,
     canSendAfter: new Date(2019, 7),
     canReceiveAfter: new Date(2019, 7),
     expiryTime: new Date(2020),
