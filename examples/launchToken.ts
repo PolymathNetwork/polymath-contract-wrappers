@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { PolyTokenEvents, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 
 // This file acts as a valid sandbox.ts file in root directory for launch a new Token on an unlocked node (like ganache)
@@ -17,60 +17,50 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
-  const ticker = 'TEST';
-  const tokenName = 'TEST TOKEN';
+  // Get some poly tokens in your account and the security token
+  const myAddress = await polymathAPI.getAccount();
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
 
-  const launchToken = async () => {
-    await polymathAPI.securityTokenRegistry.generateSecurityToken({
-      name: tokenName,
-      ticker,
-      details: 'http://www.polymath.network',
-      divisible: true,
-    });
-  };
+  // Prompt to setup your ticker and token name
+  const ticker = prompt('Ticker', '');
+  const tokenName = prompt('Token Name', '');
 
-  await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        await launchToken();
-      }
-    },
+  // Double check available
+  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+    ticker: ticker!,
   });
 
-  await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('New security token!', log);
-      }
-    },
+  // Get the ticker fee and approve the security token registry to spend
+  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: tickerFee,
   });
 
+  // Register a ticker
+  await polymathAPI.securityTokenRegistry.registerTicker({
+    ticker: ticker!,
+    tokenName: tokenName!,
+  });
+
+  // Get the st launch fee and approve the security token registry to spend
   const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  const polyBalance = await polymathAPI.polyToken.balanceOf();
-  if (polyBalance.isGreaterThanOrEqualTo(polyBalance)) {
-    const owner = await polymathAPI.getAccount();
-    const spender = await polymathAPI.securityTokenRegistry.address();
-    const allowance = await polymathAPI.polyToken.allowance({
-      owner,
-      spender,
-    });
-    if (allowance.isLessThan(securityTokenLaunchFee)) {
-      await polymathAPI.polyToken.approve({
-        spender,
-        value: securityTokenLaunchFee,
-      });
-    } else {
-      await launchToken();
-    }
-  }
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
+  });
 
-  polymathAPI.securityTokenRegistry.unsubscribeAll();
+  // Generate a security token
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
+    name: tokenName!,
+    ticker: ticker!,
+    tokenDetails: 'http://',
+    divisible: false,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
+  });
+
+  // Create a Security Token Instance
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
+  console.log('ST address:', await tickerSecurityTokenInstance.address());
 });
