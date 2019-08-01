@@ -1,7 +1,6 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { USDTieredSTOEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString } from '../src/utils/convert';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
@@ -38,13 +37,11 @@ window.addEventListener('load', async () => {
     spender: await polymathAPI.securityTokenRegistry.address(),
     value: tickerFee,
   });
-
   // Register a ticker
   await polymathAPI.securityTokenRegistry.registerTicker({
     ticker: ticker!,
     tokenName: tokenName!,
   });
-
   // Get the st launch fee and approve the security token registry to spend
   const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
   await polymathAPI.polyToken.approve({
@@ -52,12 +49,13 @@ window.addEventListener('load', async () => {
     value: securityTokenLaunchFee,
   });
 
-  // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateSecurityToken({
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
     name: tokenName!,
     ticker: ticker!,
-    details: 'http://',
-    divisible: false,
+    tokenDetails: 'details',
+    divisible: true,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
   });
 
   const moduleStringName = 'USDTieredSTO';
@@ -78,14 +76,10 @@ window.addEventListener('load', async () => {
   });
   const resultNames = await Promise.all(names);
 
-  const finalNames = resultNames.map(name => {
-    return bytes32ToString(name);
-  });
-  const index = finalNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleStringName);
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.setupCostInPoly();
 
@@ -94,7 +88,26 @@ window.addEventListener('load', async () => {
     value: setupCost,
   });
 
-  // Call to add module
+  // Get General TM Address to whitelist transfers
+  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.GeneralTransferManager,
+  }))[0];
+  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.GeneralTransferManager,
+    address: generalTMAddress,
+  });
+  await generalTM.modifyKYCData({
+    investor: myAddress,
+    canSendAfter: new Date(),
+    canReceiveAfter: new Date(),
+    expiryTime: new Date(2020, 0),
+    txData: {
+      from: await polymathAPI.getAccount(),
+    },
+  });
+
+  // Call to add usd tiered sto module
+  const startTime = new Date(Date.now() + 10000);
   const usdTieredResult = await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
@@ -102,7 +115,7 @@ window.addEventListener('load', async () => {
     budget: setupCost,
     archived: false,
     data: {
-      startTime: new Date(2030, 1),
+      startTime,
       endTime: new Date(2031, 1),
       ratePerTier: [new BigNumber(10), new BigNumber(10)],
       ratePerTierDiscountPoly: [new BigNumber(8), new BigNumber(9)],
@@ -117,7 +130,6 @@ window.addEventListener('load', async () => {
     },
   });
   console.log(usdTieredResult);
-
   const usdTieredAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.UsdTieredSTO,
   }))[0];
@@ -125,8 +137,6 @@ window.addEventListener('load', async () => {
     name: ModuleName.UsdTieredSTO,
     address: usdTieredAddress,
   });
-  const buyWithETH = await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });
-  console.log(buyWithETH);
 
   // Subscribe to event of update dividend dates
   await usdTiered.subscribeAsync({
@@ -136,7 +146,7 @@ window.addEventListener('load', async () => {
       if (error) {
         console.log(error);
       } else {
-        console.log('Dividend Date Updated!', log);
+        console.log('STO Tiers updated', log);
       }
     },
   });
@@ -148,6 +158,28 @@ window.addEventListener('load', async () => {
     tokensPerTierTotal: [new BigNumber(5), new BigNumber(5)],
     tokensPerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
   });
+
+  const sleep = (milliseconds: number) => {
+    console.log('Sleeping until the STO starts');
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+  };
+  await sleep(10000);
+
+  // Subscribe to event of update dividend dates
+  await usdTiered.subscribeAsync({
+    eventName: USDTieredSTOEvents.TokenPurchase,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Token Purchased!', log);
+      }
+    },
+  });
+
+  await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });
+  console.log('BuyWithETH complete');
 
   usdTiered.unsubscribeAll();
 });
