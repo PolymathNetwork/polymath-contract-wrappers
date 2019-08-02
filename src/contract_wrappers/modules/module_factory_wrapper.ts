@@ -270,9 +270,9 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     const currentBound = BoundType.LowerBound === params.boundType ? await this.getLowerSTVersionBounds() : await this.getUpperSTVersionBounds();
     for (let i = 0; i < 3; i += 1) {
       if (params.boundType === BoundType.LowerBound) {
-        assert.assert(currentBound[i].isLessThanOrEqualTo(params.newVersion[i]), 'New Lower ST Bounds must be less than or equal to current');
+        assert.assert(currentBound[i].isGreaterThanOrEqualTo(params.newVersion[i]), 'New Lower ST Bounds must be less than or equal to current');
       } else {
-        assert.assert(currentBound[i].isGreaterThanOrEqualTo(params.newVersion[i]), 'New Upper ST Bounds must be greater than or equal to current');
+        assert.assert(currentBound[i].isLessThanOrEqualTo(params.newVersion[i]), 'New Upper ST Bounds must be greater than or equal to current');
       }
     }
     return (await this.contract).changeSTVersionBounds.sendTransactionAsync(
