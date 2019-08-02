@@ -58,7 +58,6 @@ window.addEventListener('load', async () => {
     protocolVersion: '0',
   });
 
-  const moduleStringName = 'USDTieredSTO';
   const moduleName = ModuleName.UsdTieredSTO;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.STO,
@@ -76,7 +75,7 @@ window.addEventListener('load', async () => {
   });
   const resultNames = await Promise.all(names);
 
-  const index = resultNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleName);
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
@@ -88,7 +87,7 @@ window.addEventListener('load', async () => {
     value: setupCost,
   });
 
-  // Get General TM Address to whitelist transfers
+  // Get General Transfer Manager to whitelist an address to buy tokens
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.GeneralTransferManager,
   }))[0];
@@ -138,7 +137,7 @@ window.addEventListener('load', async () => {
     address: usdTieredAddress,
   });
 
-  // Subscribe to event of update dividend dates
+  // Subscribe to event for setTiers
   await usdTiered.subscribeAsync({
     eventName: USDTieredSTOEvents.SetTiers,
     indexFilterValues: {},
@@ -151,7 +150,7 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // Update dividend dates
+  // Update USDTiered STO Tiers
   await usdTiered.modifyTiers({
     ratePerTier: [new BigNumber(5), new BigNumber(5)],
     ratePerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
@@ -161,11 +160,11 @@ window.addEventListener('load', async () => {
 
   const sleep = (milliseconds: number) => {
     console.log('Sleeping until the STO starts');
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
   };
   await sleep(10000);
 
-  // Subscribe to event of update dividend dates
+  // Subscribe to event for token purchase
   await usdTiered.subscribeAsync({
     eventName: USDTieredSTOEvents.TokenPurchase,
     indexFilterValues: {},

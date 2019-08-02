@@ -4,7 +4,7 @@ import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
-// This file acts as a valid sandbox for adding a erc20Dividend  module on an unlocked node (like ganache)
+// This file acts as a valid sandbox for adding a erc20Dividend module on an unlocked node (like ganache)
 
 window.addEventListener('load', async () => {
   // Setup the redundant provider
@@ -62,7 +62,6 @@ window.addEventListener('load', async () => {
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
-  const moduleStringName = 'ERC20DividendCheckpoint';
   const moduleName = ModuleName.ERC20DividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.Dividends,
@@ -78,13 +77,13 @@ window.addEventListener('load', async () => {
     names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
-  const index = resultNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleName);
 
   // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.setupCostInPoly();
 
-  // Call to add etherdividend module
+  // Call to add erc20 dividend module
   await tickerSecurityTokenInstance.addModule({
     moduleName,
     address: modules[index],
@@ -96,7 +95,7 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // Get module for ether dividend checkpoint and address for module
+  // Get module for erc20 dividend checkpoint and address for module
   const erc20DividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
@@ -113,24 +112,6 @@ window.addEventListener('load', async () => {
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
-  });
-
-  // Add owner address in the whitelist to allow issue tokens
-  await generalTM.modifyKYCData({
-    investor: myAddress,
-    canSendAfter: new Date(),
-    canReceiveAfter: new Date(),
-    expiryTime: new Date(2020, 0),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
-  });
-
-  // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.issue({
-    investor: myAddress,
-    value: new BigNumber(50),
-    data: '0x00',
   });
 
   await polymathAPI.polyToken.approve({
@@ -152,11 +133,14 @@ window.addEventListener('load', async () => {
     expiryTime: [new Date(2020, 0), new Date(2020, 0), new Date(2020, 0)],
   });
 
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[0], value: new BigNumber(10) });
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[1], value: new BigNumber(20) });
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[2], value: new BigNumber(20) });
+  // Mint yourself some tokens and make some transfers
+  await tickerSecurityTokenInstance.issueMulti({
+    investors: randomInvestors,
+    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20)],
+  });
 
   // Create Dividends
+  // A checkpoint is created behind the scenes
   await erc20DividendCheckpoint.createDividendWithExclusions({
     name: 'MyDividend1',
     amount: new BigNumber(1),
@@ -166,9 +150,10 @@ window.addEventListener('load', async () => {
     excluded: [randomInvestors[1], randomInvestors[2]],
   });
 
-  // Create a checkpoint
+  // Create another checkpoint
   await tickerSecurityTokenInstance.createCheckpoint({});
 
+  // Using the most recent checkpoint
   await erc20DividendCheckpoint.createDividendWithCheckpointAndExclusions({
     name: 'MyDividend2',
     amount: new BigNumber(1),
@@ -187,13 +172,14 @@ window.addEventListener('load', async () => {
     maturity: new Date(2018, 1),
   });
 
+  // Another checkpoint was created behind the scenes
   await erc20DividendCheckpoint.createDividendWithCheckpoint({
     name: 'MyDividend4',
     amount: new BigNumber(1),
     token: await polymathAPI.polyToken.address(),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    checkpointId: 1,
+    checkpointId: 2,
   });
 
   console.log('4 types of erc20 dividends created');

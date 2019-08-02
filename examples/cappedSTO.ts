@@ -2,7 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { ModuleRegistryEvents, BigNumber, CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { FundRaiseType, ModuleName, ModuleType } from '../src';
+import { CappedSTOFundRaiseType, ModuleName, ModuleType } from '../src';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a cappedSTO module on an unlocked node (like ganache)
 
@@ -60,7 +60,6 @@ window.addEventListener('load', async () => {
 
   console.log('Security Token Generated');
 
-  const moduleStringName = 'CappedSTO';
   const moduleName = ModuleName.CappedSTO;
 
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
@@ -79,7 +78,7 @@ window.addEventListener('load', async () => {
   });
   const resultNames = await Promise.all(names);
 
-  const index = resultNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleName);
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
@@ -104,7 +103,7 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // Get General TM Address to whitelist transfers
+  // Get General Transfer Manager to whitelist an address to buy tokens
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
     moduleName: ModuleName.GeneralTransferManager,
   }))[0];
@@ -135,7 +134,7 @@ window.addEventListener('load', async () => {
       endTime: new Date(2031, 1),
       cap: new BigNumber(10),
       rate: new BigNumber(10),
-      fundRaiseType: FundRaiseType.ETH.valueOf(),
+      fundRaiseType: CappedSTOFundRaiseType.ETH,
       fundsReceiver: await polymathAPI.getAccount(),
     },
   });
@@ -155,7 +154,7 @@ window.addEventListener('load', async () => {
   };
   await sleep(10000);
 
-  // Subscribe to event of update dividend dates
+  // Subscribe to event of token purchase
   await cappedSTO.subscribeAsync({
     eventName: CappedSTOEvents.TokenPurchase,
     indexFilterValues: {},
