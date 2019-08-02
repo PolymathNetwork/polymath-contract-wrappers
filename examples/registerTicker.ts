@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { PolyTokenEvents, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenEvents, SecurityTokenRegistryEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 
 // This file acts as a valid sandbox.ts file in root directory for register a new Ticker on an unlocked node (like ganache)
@@ -17,8 +17,13 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
-  const ticker = 'TEST';
-  const tokenName = 'TEST TOKEN';
+  // Get some poly tokens in your account and the security token
+  const myAddress = await polymathAPI.getAccount();
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
+
+  // Prompt to setup your ticker and token name
+  const ticker = prompt('Ticker', '');
+  const tokenName = prompt('Token Name', '');
 
   await polymathAPI.polyToken.subscribeAsync({
     eventName: PolyTokenEvents.Approval,
@@ -46,38 +51,15 @@ window.addEventListener('load', async () => {
 
   const registerTicker = async () => {
     await polymathAPI.securityTokenRegistry.registerTicker({
-      ticker,
-      tokenName,
+      ticker: ticker!,
+      tokenName: tokenName!,
     });
   };
 
-  await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        await registerTicker();
-      }
-    },
-  });
-
-  await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.RegisterTicker,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Ticker registered!', log);
-      }
-    },
-  });
-
   const tickerAvailable = await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    ticker: ticker,
+    ticker: ticker!,
   });
+
   if (tickerAvailable) {
     const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
     const polyBalance = await polymathAPI.polyToken.balanceOf();
