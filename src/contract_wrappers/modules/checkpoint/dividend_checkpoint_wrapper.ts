@@ -504,7 +504,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
     if (checkpointId) {
       const currentCheckpointId = await stContract.currentCheckpointId.callAsync();
-      assert.assert(checkpointId < currentCheckpointId.toNumber(), 'Invalid checkpoint');
+      assert.assert(checkpointId <= currentCheckpointId.toNumber(), 'Invalid checkpoint');
     }
 
     const callerAddress = await this.getCallerAddress(txData);

@@ -160,7 +160,7 @@ window.addEventListener('load', async () => {
     token: await polymathAPI.polyToken.address(),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    checkpointId: 1,
+    checkpointId: 2,
     excluded: [randomInvestors[0], randomInvestors[1]],
   });
 
@@ -179,7 +179,7 @@ window.addEventListener('load', async () => {
     token: await polymathAPI.polyToken.address(),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    checkpointId: 2,
+    checkpointId: 3,
   });
 
   console.log('4 types of erc20 dividends created');
