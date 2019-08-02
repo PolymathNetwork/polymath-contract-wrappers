@@ -514,11 +514,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       const erc20TokenBalance = await erc20Detailed.balanceOf.callAsync(callerAddress);
       const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, await this.address());
       assert.assert(
-        erc20TokenAllowance.isGreaterThanOrEqualTo(amount.absoluteValue()),
+        erc20TokenAllowance.isGreaterThanOrEqualTo(amount),
         'Your allowance is less than dividend amount',
       );
       assert.assert(
-        erc20TokenBalance.isGreaterThanOrEqualTo(amount.absoluteValue()),
+        erc20TokenBalance.isGreaterThanOrEqualTo(amount),
         'Your balance is less than dividend amount',
       );
     } else {
