@@ -81,8 +81,6 @@ window.addEventListener('load', async () => {
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.setupCostInPoly();
 
   await polymathAPI.moduleRegistry.subscribeAsync({
     eventName: ModuleRegistryEvents.ModuleRegistered,
