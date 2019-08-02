@@ -15,7 +15,7 @@ window.addEventListener('load', async () => {
     polymathRegistryAddress: '<Deployed Polymath Registry address>',
   };
 
-// Instantiate the API
+  // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
   // Get some poly tokens in your account and the security token
@@ -145,24 +145,33 @@ window.addEventListener('load', async () => {
     },
   });
 
-  const randomBeneficiary = '0x0123456789012345678901234567890123456789';
+  const randomBeneficiary1 = '0x0123456789012345678901234567890123456789';
+  const randomBeneficiary2 = '0x9123456789012345678901234567890123456789';
 
   await generalTM.modifyKYCDataMulti({
-    investors: [myAddress, randomBeneficiary],
-    canReceiveAfter: [new Date(), new Date()],
-    canSendAfter: [new Date(), new Date()],
-    expiryTime: [new Date(2035, 1), new Date(2035, 1)],
+    investors: [myAddress, randomBeneficiary1, randomBeneficiary2],
+    canReceiveAfter: [new Date(), new Date(), new Date()],
+    canSendAfter: [new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2035, 1), new Date(2035, 1), new Date(2035, 1)],
   });
 
   await tickerSecurityTokenInstance.issueMulti({
-    investors: [myAddress, randomBeneficiary],
+    investors: [myAddress, randomBeneficiary1],
     values: [new BigNumber(10), new BigNumber(10)],
   });
 
   await percentageTM.setAllowPrimaryIssuance({ allowPrimaryIssuance: false });
   console.log('SetAllowPrimaryIssuance has been called');
 
-  // Issuing now invalid
+  // Primary Issuance now invalid
+  // Percentage transfer manager whitelist beneficiary 1 so they can receive more tokens
+  await percentageTM.modifyWhitelist({ investor: randomBeneficiary1, valid: true });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(1) });
+
+  // Try out transfer to beneficiary 2
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(1) });
+
+  console.log('Tokens transferred to beneficiaries');
 
   tickerSecurityTokenInstance.unsubscribeAll();
 });
