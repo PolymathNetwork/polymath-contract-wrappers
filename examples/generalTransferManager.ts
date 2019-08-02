@@ -104,11 +104,13 @@ window.addEventListener('load', async () => {
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
 
   // Add beneficiaries in the whitelist with distant dates to send and receive
+  const delay = 10000000000;
+
   await generalTM.modifyKYCDataMulti({
     investors: [randomBeneficiary1, randomBeneficiary2],
-    canSendAfter: [new Date(2020, 0), new Date(2020, 0)],
-    canReceiveAfter: [new Date(2020, 0), new Date(2020, 0)],
-    expiryTime: [new Date(2020, 0), new Date(2020, 0)],
+    canSendAfter: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    canReceiveAfter: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    expiryTime: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
   });
 
   // Mint yourself some tokens
