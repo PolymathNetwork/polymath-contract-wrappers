@@ -133,7 +133,7 @@ window.addEventListener('load', async () => {
     expiryTime: [new Date(2020, 0), new Date(2020, 0), new Date(2020, 0)],
   });
 
-  // Mint yourself some tokens and make some transfers
+  // Issue some tokens for investors
   await tickerSecurityTokenInstance.issueMulti({
     investors: randomInvestors,
     values: [new BigNumber(10), new BigNumber(20), new BigNumber(20)],

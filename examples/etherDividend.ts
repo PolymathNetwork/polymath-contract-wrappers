@@ -120,24 +120,6 @@ window.addEventListener('load', async () => {
     address: generalTMAddress,
   });
 
-  // Add owner address in the whitelist to allow issue tokens
-  await generalTM.modifyKYCData({
-    investor: myAddress,
-    canSendAfter: new Date(),
-    canReceiveAfter: new Date(),
-    expiryTime: new Date(2020, 0),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
-  });
-
-  // Mint yourself some tokens and make some transfers
-  await tickerSecurityTokenInstance.issue({
-    investor: myAddress,
-    value: new BigNumber(50),
-    data: '0x00',
-  });
-
   const randomInvestors = [
     '0x1111111111111111111111111111111111111111',
     '0x2222222222222222222222222222222222222222',
@@ -152,9 +134,11 @@ window.addEventListener('load', async () => {
     expiryTime: [new Date(2020, 0), new Date(2020, 0), new Date(2020, 0)],
   });
 
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[0], value: new BigNumber(10) });
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[1], value: new BigNumber(20) });
-  await tickerSecurityTokenInstance.transfer({ to: randomInvestors[2], value: new BigNumber(20) });
+  // Issue some tokens for investors
+  await tickerSecurityTokenInstance.issueMulti({
+    investors: randomInvestors,
+    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20)],
+  });
 
   // Create Dividends
   // A checkpoint is created behind the scenes.
