@@ -1,6 +1,6 @@
 ## @polymathnetwork/contract-wrappers
 
-Version 3.0.0 of the Polymath-Core contracts
+Version 3.0.0 of the Polymath-Core Ethereum Smart Contracts
 
 Smart TS wrappers for Polymath smart contracts.
 

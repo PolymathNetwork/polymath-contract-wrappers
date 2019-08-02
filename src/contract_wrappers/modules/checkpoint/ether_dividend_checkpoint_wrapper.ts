@@ -257,7 +257,14 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name);
+    await this.checkIfDividendCreationIsValid(
+      params.expiry,
+      params.maturity,
+      params.value,
+      params.name,
+      undefined,
+      txPayableData,
+    );
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -273,7 +280,15 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
+    await this.checkIfDividendCreationIsValid(
+      params.expiry,
+      params.maturity,
+      params.value,
+      params.name,
+      undefined,
+      txPayableData,
+      params.checkpointId,
+    );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -290,11 +305,13 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(
-      params.value,
+    await this.checkIfDividendCreationIsValid(
       params.expiry,
       params.maturity,
+      params.value,
       params.name,
+      undefined,
+      txPayableData,
       undefined,
       params.excluded,
     );
@@ -316,11 +333,13 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(
-      params.value,
+    await this.checkIfDividendCreationIsValid(
       params.expiry,
       params.maturity,
+      params.value,
       params.name,
+      undefined,
+      txPayableData,
       params.checkpointId,
       params.excluded,
     );
@@ -380,28 +399,5 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       EtherDividendCheckpoint.abi,
     );
     return logs;
-  };
-
-  private checkIfDividendIsValid = async (
-    value: BigNumber,
-    expiry: Date,
-    maturity: Date,
-    name: string,
-    checkpointId?: number,
-    excluded?: string[],
-  ) => {
-    if (excluded !== undefined) {
-      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
-      assert.areThereDuplicatedStrings('excluded', excluded);
-      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
-    }
-    assert.assert(expiry > maturity, 'Expiry before maturity');
-    assert.isFutureDate(expiry, 'Expiry in past');
-    assert.isBigNumberGreaterThanZero(value, 'No dividend sent');
-    if (checkpointId !== undefined) {
-      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
-      assert.assert(checkpointId < new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
-    }
-    assert.assert(name.length > 0, 'The name can not be empty');
   };
 }
