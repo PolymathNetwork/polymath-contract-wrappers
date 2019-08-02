@@ -28,7 +28,7 @@ import {
   Partition,
   Perm,
   CappedSTOFundRaiseType,
-  TransferStatusCodes
+  TransferStatusCode
 } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -951,7 +951,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransferFrom', async () => {
-      const expectedStatusCode = TransferStatusCodes.TransferSuccess;
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
 
@@ -1006,7 +1006,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransfer', async () => {
-      const expectedStatusCode = TransferStatusCodes.TransferSuccess;
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
 
@@ -1059,7 +1059,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransferByPartition', async () => {
-      const expectedStatusCode = TransferStatusCodes.TransferSuccess;
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedPartition = Partition.Unlocked;
       const expectedResult = [
@@ -2573,7 +2573,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // canTransfer
-      const expectedStatusCode = TransferStatusCodes.TransferSuccess;
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedCanResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
 

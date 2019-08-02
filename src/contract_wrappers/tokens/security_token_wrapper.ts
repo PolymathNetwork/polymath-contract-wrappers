@@ -73,7 +73,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   CappedSTOFundRaiseType,
-  TransferStatusCodes
+  TransferStatusCode
 } from '../../types';
 import {
   bigNumberToDate,
@@ -849,7 +849,7 @@ interface DocumentData {
 
 interface CanTransferFromData {
   /** Status Code */
-  statusCode: TransferStatusCodes;
+  statusCode: TransferStatusCode;
   /** Reason Code */
   reasonCode: string;
 }
@@ -1224,13 +1224,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const canTransfer = await this.canTransfer({
       to: params.investor,
       value: params.value,
-      data: params.data || "0x00"
+      data: params.data || '0x00'
     });
-    assert.assert(canTransfer.statusCode !== TransferStatusCodes.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
+    assert.assert(canTransfer.statusCode !== TransferStatusCode.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data || "0x00",
+      params.data || '0x00',
       params.txData,
       params.safetyFactor,
     );
@@ -1245,7 +1245,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.partition,
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data || "0x00",
+      params.data || '0x00',
       params.txData,
       params.safetyFactor,
     );
@@ -1579,42 +1579,42 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private getTransferStatusCode = (result: string) => {
-    let status: TransferStatusCodes = TransferStatusCodes.TransferSuccess;
+    let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
     switch(result) {
-      case "0x50": {
-        status = TransferStatusCodes.TransferFailure;
+      case TransferStatusCode.TransferFailure: {
+        status = TransferStatusCode.TransferFailure;
         break
       }
-      case "0x51": {
-        status = TransferStatusCodes.TransferSuccess;
+      case TransferStatusCode.TransferSuccess: {
+        status = TransferStatusCode.TransferSuccess;
         break
       }
-      case "0x52": {
-        status = TransferStatusCodes.InsufficientBalance;
+      case TransferStatusCode.InsufficientBalance: {
+        status = TransferStatusCode.InsufficientBalance;
         break
       }
-      case "0x53": {
-        status = TransferStatusCodes.InsufficientAllowance;
+      case TransferStatusCode.InsufficientAllowance: {
+        status = TransferStatusCode.InsufficientAllowance;
         break
       }
-      case "0x54": {
-        status = TransferStatusCodes.TransfersHalted;
+      case TransferStatusCode.TransfersHalted: {
+        status = TransferStatusCode.TransfersHalted;
         break
       }
-      case "0x55": {
-        status = TransferStatusCodes.FundsLocked;
+      case TransferStatusCode.FundsLocked: {
+        status = TransferStatusCode.FundsLocked;
         break
       }
-      case "0x56": {
-        status = TransferStatusCodes.InvalidSender;
+      case TransferStatusCode.InvalidSender: {
+        status = TransferStatusCode.InvalidSender;
         break
       }
-      case "0x57": {
-        status = TransferStatusCodes.InvalidReceiver;
+      case TransferStatusCode.InvalidReceiver: {
+        status = TransferStatusCode.InvalidReceiver;
         break
       }
-      case "0x58": {
-        status = TransferStatusCodes.InvalidOperator;
+      case TransferStatusCode.InvalidOperator: {
+        status = TransferStatusCode.InvalidOperator;
         break
       }
       default: {
