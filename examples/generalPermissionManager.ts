@@ -2,8 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { GeneralPermissionManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString } from '../src/utils/convert';
-import { ModuleName, ModuleType, Perm } from '../src';
+import { ModuleName, ModuleType, Perm, TransferType } from '../src';
 
 // This file acts as a valid sandbox for adding a permission manager  module on an unlocked node (like ganache)
 
@@ -54,11 +53,13 @@ window.addEventListener('load', async () => {
   });
 
   // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateSecurityToken({
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
     name: tokenName!,
     ticker: ticker!,
-    details: 'http://',
-    divisible: false,
+    tokenDetails: 'http://',
+    divisible: true,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
   });
 
   // Get permission manager factory address
@@ -80,11 +81,7 @@ window.addEventListener('load', async () => {
     names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
-
-  const finalNames = resultNames.map(name => {
-    return bytes32ToString(name);
-  });
-  const index = finalNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleStringName);
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
@@ -148,21 +145,20 @@ window.addEventListener('load', async () => {
     await generalPM.checkPermission({ delegate: myAddress, module: generalTMAddress, permission: Perm.Admin }),
   );
 
-  // Change allow all whitelist transfers: I_GeneralTransferManager.modifyTransferRequirementsMulti(
-  //                 [0, 1, 2],
-  //                 [false, false, false],
-  //                 [false, false, false],
-  //                 [false, false, false],
-  //                 [false, false, false],
-  //                 { from: token_owner }
   // Use FLAGS permission to allow all whitelist transfers, this validates that the user can use the
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
-  /*
-  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
-*/
+
+  await generalTM.modifyTransferRequirementsMulti({
+    transferTypes: [TransferType.General, TransferType.Issuance, TransferType.Redemption],
+    fromValidKYC: [true, false, false],
+    toValidKYC: [true, false, false],
+    fromRestricted: [true, false, false],
+    toRestricted: [true, false, false],
+  });
+
   // Revoking Permission
   const permissionResult = await generalPM.changePermission({
     valid: false,
