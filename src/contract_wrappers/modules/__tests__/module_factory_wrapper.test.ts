@@ -531,7 +531,7 @@ describe('ModuleFactoryWrapper', () => {
       // Mocked parameters
       const mockedParams = {
         boundType: BoundType.LowerBound,
-        newVersion: [2, 3, 4],
+        newVersion: [1, 2, 3],
         txData: {},
         safetyFactor: 10,
       };
@@ -562,7 +562,7 @@ describe('ModuleFactoryWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       // Address expected
-      const expectedLowerSTVersionBoundsResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const expectedLowerSTVersionBoundsResult = [new BigNumber(2), new BigNumber(3), new BigNumber(4)];
       // Mocked method
       const mockedLowerSTVersionBoundsMethod = mock(MockedCallMethod);
       // Stub the method

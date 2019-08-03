@@ -89,6 +89,7 @@
     "js-sha3": "^0.8.0",
     "lodash": "^4.17.5",
     "moment": "^2.24.0",
+    "semver": "^6.3.0",
     "uuid": "^3.3.2"
   },
   "publishConfig": {

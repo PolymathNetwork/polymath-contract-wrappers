@@ -14,6 +14,7 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
+import * as semver from 'semver';
 import ContractWrapper from '../contract_wrapper';
 import {
   BoundType,
@@ -267,13 +268,22 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
       'Invalid bound type',
     );
     assert.assert(params.newVersion.length === 3, 'Invalid version, number array must have 3 elements');
-    const currentBound = BoundType.LowerBound === params.boundType ? await this.getLowerSTVersionBounds() : await this.getUpperSTVersionBounds();
-    for (let i = 0; i < 3; i += 1) {
-      if (params.boundType === BoundType.LowerBound) {
-        assert.assert(currentBound[i].isGreaterThanOrEqualTo(params.newVersion[i]), 'New Lower ST Bounds must be less than or equal to current');
-      } else {
-        assert.assert(currentBound[i].isLessThanOrEqualTo(params.newVersion[i]), 'New Upper ST Bounds must be greater than or equal to current');
-      }
+    const currentBound =
+      BoundType.LowerBound === params.boundType
+        ? await this.getLowerSTVersionBounds()
+        : await this.getUpperSTVersionBounds();
+    const currentBoundVer = currentBound.join('.');
+    const newBoundVer = params.newVersion.join('.');
+    if (params.boundType === BoundType.LowerBound) {
+      assert.assert(
+        semver.lte(newBoundVer, currentBoundVer),
+        'New Lower ST Bounds must be less than or equal to current',
+      );
+    } else {
+      assert.assert(
+        semver.gte(newBoundVer, currentBoundVer),
+        'New Upper ST Bounds must be greater than or equal to current',
+      );
     }
     return (await this.contract).changeSTVersionBounds.sendTransactionAsync(
       params.boundType,
