@@ -28,6 +28,7 @@ import {
   Partition,
   Perm,
   CappedSTOFundRaiseType,
+  TransferStatusCode
 } from '../../../types';
 import SecurityTokenWrapper from '../security_token_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -950,7 +951,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransferFrom', async () => {
-      const expectedStatusCode = 'X';
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
 
@@ -1005,7 +1006,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransfer', async () => {
-      const expectedStatusCode = 'X';
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
 
@@ -1058,7 +1059,7 @@ describe('SecurityTokenWrapper', () => {
     test.todo('should fail as granularity is a zero big number');
 
     test('should call to canTransferByPartition', async () => {
-      const expectedStatusCode = 'X';
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
       const expectedPartition = Partition.Unlocked;
       const expectedResult = [
@@ -2532,9 +2533,9 @@ describe('SecurityTokenWrapper', () => {
     test('should send the transaction to issue', async () => {
       // Mocked parameters
       const mockedParams = {
-        investor: '0x1111111111111111111111111111111111111111',
+        investor: '0x1234111111111111111111111111111111111111',
         value: new BigNumber(2),
-        data: 'string',
+        data: '0x00',
         txData: {},
         safetyFactor: 10,
       };
@@ -2571,6 +2572,19 @@ describe('SecurityTokenWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
+      // canTransfer
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
+      const expectedReasonCode = 'Reason';
+      const expectedCanResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
+
+      const mockedCanMethod = mock(MockedCallMethod);
+      when(mockedContract.canTransfer).thenReturn(instance(mockedCanMethod));
+      when(mockedCanMethod.callAsync(
+        mockedParams.investor,
+        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+        mockedParams.data
+      )).thenResolve(expectedCanResult);
+
       const expectedIsIssuableResult = true;
       // Mocked method
       const mockedIsIssuableMethod = mock(MockedCallMethod);
@@ -2578,9 +2592,8 @@ describe('SecurityTokenWrapper', () => {
       when(mockedContract.isIssuable).thenReturn(instance(mockedIsIssuableMethod));
       // Stub the request
       when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
-
       // Real call
-      const result = await target.issue(mockedParams);
+      const result = await target.issue(mockedParams);    
 
       // Result expectation
       expect(result).toBe(expectedResult);
@@ -2600,8 +2613,14 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedContract.isIssuable).once();
       verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.decimals).twice();
+      verify(mockedDecimalsMethod.callAsync()).twice();
+      verify(mockedContract.canTransfer).once();
+      verify(mockedCanMethod.callAsync(
+        mockedParams.investor,
+        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+        mockedParams.data
+      )).once();
     });
   });
 
@@ -3559,7 +3578,7 @@ describe('SecurityTokenWrapper', () => {
           objectContaining(ctmData),
           objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
           objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-          objectContaining(mockedCtmParams.label),
+          stringToBytes32(mockedCtmParams.label),
           mockedCtmParams.archived,
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
@@ -3587,7 +3606,7 @@ describe('SecurityTokenWrapper', () => {
           objectContaining(ctmData),
           objectContaining(valueToWei(mockedCtmParams.maxCost, FULL_DECIMALS)),
           objectContaining(valueToWei(mockedCtmParams.budget, FULL_DECIMALS)),
-          objectContaining(mockedCtmParams.label),
+          stringToBytes32(mockedCtmParams.label),
           mockedCtmParams.archived,
           mockedCtmParams.txData,
           mockedCtmParams.safetyFactor,
