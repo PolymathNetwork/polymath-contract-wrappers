@@ -2,6 +2,7 @@ import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import ERC20DividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import EtherDividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
@@ -39,6 +40,10 @@ interface GetPercentageTransferManager extends GetModuleParams {
   name: ModuleName.PercentageTransferManager;
 }
 
+interface GetLockUpTransferManager extends GetModuleParams {
+  name: ModuleName.LockUpTransferManager;
+}
+
 interface GetVolumeRestrictionTransferManager extends GetModuleParams {
   name: ModuleName.VolumeRestrictionTM;
 }
@@ -65,6 +70,7 @@ interface GetModuleInstance {
   (params: GetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
+  (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTOWrapper>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
@@ -124,6 +130,12 @@ export default class ModuleWrapperFactory {
         return new PercentageTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
+          this.contractFactory,
+        );
+      case ModuleName.LockUpTransferManager:
+        return new LockUpTransferManagerWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getLockUpTransferManagerContract(params.address),
           this.contractFactory,
         );
       case ModuleName.VolumeRestrictionTM:

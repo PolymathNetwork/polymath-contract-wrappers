@@ -21,6 +21,7 @@ import {
   ManualApprovalTransferManager,
   CountTransferManager,
   PercentageTransferManager,
+  LockUpTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
   PolyTokenFaucet, } from '@polymathnetwork/abi-wrappers';
@@ -150,6 +151,7 @@ export class PolymathAPI {
       ManualApprovalTransferManager,
       CountTransferManager,
       PercentageTransferManager,
+      LockUpTransferManager,
       EtherDividendCheckpoint,
       VolumeRestrictionTransferManager,
       PolyTokenFaucet,
