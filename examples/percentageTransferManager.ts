@@ -117,7 +117,7 @@ window.addEventListener('load', async () => {
     moduleName,
     address: modules[index],
     data: {
-      maxHolderPercentage: new BigNumber(50),
+      maxHolderPercentage: new BigNumber(25),
       allowPrimaryIssuance: true,
     },
     archived: false,
@@ -168,9 +168,16 @@ window.addEventListener('load', async () => {
   await percentageTM.modifyWhitelist({ investor: randomBeneficiary1, valid: true });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(1) });
 
-  // Try out transfer to beneficiary 2
-  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(1) });
+  // Try out transfer above 25% to beneficiary 2, should fail
+  try {
+    await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(6) });
+  } catch (e) {
+    console.log('Transfer above 25% to non-whitelisted address fails as expected');
+  }
 
+  // Try out transfer below 25% to beneficiary 2, should pass
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(5) });
+  
   console.log('Tokens transferred to beneficiaries');
 
   tickerSecurityTokenInstance.unsubscribeAll();
