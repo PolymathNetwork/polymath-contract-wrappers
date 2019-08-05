@@ -10,7 +10,7 @@ import {
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import assert from '../../utils/assert';
