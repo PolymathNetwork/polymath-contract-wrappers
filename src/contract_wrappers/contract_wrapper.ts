@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {
   BaseContract,
   Web3Wrapper,

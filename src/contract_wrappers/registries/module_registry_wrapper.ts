@@ -18,7 +18,7 @@ import {
   ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';

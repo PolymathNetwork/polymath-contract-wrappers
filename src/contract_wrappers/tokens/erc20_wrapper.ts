@@ -1,5 +1,5 @@
 import { BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
