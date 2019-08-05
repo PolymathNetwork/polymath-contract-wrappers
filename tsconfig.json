@@ -15,7 +15,8 @@
     "outDir": "lib",
     "rootDir": "src",
     "resolveJsonModule": true,
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "lib", "examples", "sandbox.ts"]
 }

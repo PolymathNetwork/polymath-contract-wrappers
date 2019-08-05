@@ -15,6 +15,7 @@
     "outDir": "lib",
     "rootDir": ".",
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "esModuleInterop": true
   }
 }

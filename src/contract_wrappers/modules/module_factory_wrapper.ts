@@ -12,9 +12,9 @@ import {
   TxData,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
+import semver from 'semver';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
-import * as semver from 'semver';
 import ContractWrapper from '../contract_wrapper';
 import {
   BoundType,
