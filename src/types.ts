@@ -59,6 +59,9 @@ import {
   VolumeRestrictionTMContract,
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
+  VestingEscrowWalletContract,
+  VestingEscrowWalletEvents,
+  VestingEscrowWalletUnpauseEventArgs,
   PolyTokenFaucetContract,
   TxData,
   BigNumber,
@@ -247,7 +250,8 @@ export type ContractEvents =
   | STOEvents
   | CountTransferManagerEvents
   | PercentageTransferManagerEvents
-  | VolumeRestrictionTMEvents;
+  | VolumeRestrictionTMEvents
+  | VestingEscrowWalletEvents;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -299,7 +303,8 @@ export type GenericModuleContract =
   | ManualApprovalTransferManagerContract
   | CountTransferManagerContract
   | PercentageTransferManagerContract
-  | VolumeRestrictionTMContract;
+  | VolumeRestrictionTMContract
+  | VestingEscrowWalletContract;
 
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
 
