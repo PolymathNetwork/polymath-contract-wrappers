@@ -73,6 +73,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   CappedSTOFundRaiseType,
+  TransferStatusCode
 } from '../../types';
 import {
   bigNumberToDate,
@@ -620,7 +621,7 @@ interface TransferFromWithDataParams extends TxParams {
 interface IssueParams extends TxParams {
   investor: string;
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 interface IssueByPartitionParams extends IssueParams {
@@ -848,7 +849,7 @@ interface DocumentData {
 
 interface CanTransferFromData {
   /** Status Code */
-  statusCode: string;
+  statusCode: TransferStatusCode;
   /** Reason Code */
   reasonCode: string;
 }
@@ -1220,10 +1221,16 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), 'Issuance frozen');
+    const canTransfer = await this.canTransfer({
+      to: params.investor,
+      value: params.value,
+      data: params.data || '0x00'
+    });
+    assert.assert(canTransfer.statusCode !== TransferStatusCode.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      params.data || '0x00',
       params.txData,
       params.safetyFactor,
     );
@@ -1238,7 +1245,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.partition,
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      params.data || '0x00',
       params.txData,
       params.safetyFactor,
     );
@@ -1531,7 +1538,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       producedAddModuleInfo.data,
       producedAddModuleInfo.maxCost,
       producedAddModuleInfo.budget,
-      params.label ? params.label : '',
+      params.label ? stringToBytes32(params.label) : '',
       params.archived,
       params.txData,
       params.safetyFactor,
@@ -1571,6 +1578,52 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return typedResult;
   };
 
+  private getTransferStatusCode = (result: string) => {
+    let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
+    switch(result) {
+      case TransferStatusCode.TransferFailure: {
+        status = TransferStatusCode.TransferFailure;
+        break
+      }
+      case TransferStatusCode.TransferSuccess: {
+        status = TransferStatusCode.TransferSuccess;
+        break
+      }
+      case TransferStatusCode.InsufficientBalance: {
+        status = TransferStatusCode.InsufficientBalance;
+        break
+      }
+      case TransferStatusCode.InsufficientAllowance: {
+        status = TransferStatusCode.InsufficientAllowance;
+        break
+      }
+      case TransferStatusCode.TransfersHalted: {
+        status = TransferStatusCode.TransfersHalted;
+        break
+      }
+      case TransferStatusCode.FundsLocked: {
+        status = TransferStatusCode.FundsLocked;
+        break
+      }
+      case TransferStatusCode.InvalidSender: {
+        status = TransferStatusCode.InvalidSender;
+        break
+      }
+      case TransferStatusCode.InvalidReceiver: {
+        status = TransferStatusCode.InvalidReceiver;
+        break
+      }
+      case TransferStatusCode.InvalidOperator: {
+        status = TransferStatusCode.InvalidOperator;
+        break
+      }
+      default: {
+        break
+      }
+    }
+    return status
+  }
+
   /**
    * Validates if can transfer
    * @return statusCode, reasonCode
@@ -1582,9 +1635,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
-
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
     };
     return typedResult;
@@ -1603,8 +1656,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
     };
     return typedResult;
@@ -1624,8 +1678,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       valueToWei(params.value, await this.decimals()),
       params.data,
     );
+    const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferByPartitionData = {
-      statusCode: result[0],
+      statusCode: status,
       reasonCode: bytes32ToString(result[1]),
       partition: parsePartitionBytes32Value(result[2]),
     };
