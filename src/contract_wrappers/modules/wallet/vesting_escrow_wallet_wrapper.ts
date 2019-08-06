@@ -191,22 +191,40 @@ interface BeneficiariesParams {
   index: number;
 }
 
+/**
+ * @param newTreasuryWallet Address of the treasury wallet
+ */
 interface ChangeTreasuryWalletParams extends TxParams {
   newTreasuryWallet: string;
 }
 
+/**
+ * @param numberOfTokens Number of tokens that should be deposited
+ */
 interface DepositTokensParams extends TxParams {
   numberOfTokens: number;
 }
 
+/**
+ * @param amount Amount of tokens that should be send to the treasury wallet
+ */
 interface SendToTreasuryParams extends TxParams {
   amount: number;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary who will receive tokens
+ */
 interface PushAvailableTokensParams extends TxParams {
   beneficiary: string;
 }
 
+/**
+ * @param name Name of the template will be created
+ * @param numberOfTokens Number of tokens that should be assigned to schedule
+ * @param duration Duration of the vesting schedule
+ * @param frequency Frequency of the vesting schedule
+ */
 interface AddTemplateParams extends TxParams {
   name: string;
   numberOfTokens: number;
@@ -214,10 +232,21 @@ interface AddTemplateParams extends TxParams {
   frequency: number;
 }
 
+/**
+ * @param name Name of the template that will be removed
+ */
 interface RemoveTemplateParams extends TxParams {
   name: string;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary for whom it is scheduled
+ * @param templateName Name of the template that will be created
+ * @param numberOfTokens Total number of tokens for created schedule
+ * @param duration Duration of the created vesting schedule
+ * @param frequency Frequency of the created vesting schedule
+ * @param startTime Start time of the created vesting schedule
+ */
 interface AddScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
@@ -227,45 +256,84 @@ interface AddScheduleParams extends TxParams {
   startTime?: Date;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary for whom it is scheduled
+ * @param templateName Name of the exists template
+ * @param startTime Start time of the created vesting schedule
+ */
 interface AddScheduleFromTemplateParams extends TxParams {
   beneficiary: string;
   templateName: string;
   startTime?: Date;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary for whom it is modified
+ * @param templateName Name of the template was used for schedule creation
+ * @param startTime Start time of the created vesting schedule
+ */
 interface ModifyScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
   startTime?: Date;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary for whom it is revoked
+ * @param templateName Name of the template was used for schedule creation
+ */
 interface RevokeScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary for whom all schedules will be revoked
+ */
 interface RevokeAllSchedulesParams extends TxParams {
   beneficiary: string;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary who will receive tokens
+ * @param templateName Name of the template was used for schedule creation
+ */
 interface GetScheduleParams {
   beneficiary: string;
   templateName: string;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary
+ */
 interface GetTemplateNamesParams {
   beneficiary: string;
 }
 
+/**
+ * @param beneficiary Address of the beneficiary
+ */
 interface GetScheduleCountParams {
   beneficiary: string;
 }
 
+/**
+ * @param fromIndex Start index of array of beneficiary's addresses
+ * @param toIndex End index of array of beneficiary's addresses
+ */
 interface PushAvailableTokensMultiParams extends TxParams {
   fromIndex: number;
   toIndex: number;
 }
 
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ * @param templateNames Array of the template names
+ * @param numberOfTokens Array of number of tokens should be assigned to schedules
+ * @param durations Array of the vesting duration
+ * @param frequencies Array of the vesting frequency
+ * @param startTimes Array of the vesting start time
+ */
 interface AddScheduleMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
@@ -275,16 +343,29 @@ interface AddScheduleMultiParams extends TxParams {
   startTimes: Date[];
 }
 
+/**
+ * @param beneficiaries Array of beneficiary's addresses
+ * @param templateNames Array of the template names were used for schedule creation
+ * @param startTimes Array of the vesting start time
+ */
 interface AddScheduleFromTemplateMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
   startTimes: Date[];
 }
 
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ */
 interface RevokeSchedulesMultiParams extends TxParams {
   beneficiaries: string[];
 }
 
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ * @param templateNames Array of the template names
+ * @param startTimes Array of the vesting start time
+ */
 interface ModifyScheduleMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
@@ -354,6 +435,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return (await this.contract).getDataStore.callAsync();
   };
 
+  /**
+   * Used to change the treasury wallet address
+   */
   public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
     return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
       params.newTreasuryWallet,
@@ -362,6 +446,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to deposit tokens from treasury wallet to the vesting escrow wallet
+   */
   public depositTokens = async (params: DepositTokensParams) => {
     return (await this.contract).depositTokens.sendTransactionAsync(
       numberToBigNumber(params.numberOfTokens),
@@ -370,6 +457,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Sends unassigned tokens to the treasury wallet
+   */
   public sendToTreasury = async (params: SendToTreasuryParams) => {
     return (await this.contract).sendToTreasury.sendTransactionAsync(
       numberToBigNumber(params.amount),
@@ -378,10 +468,16 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Returns the treasury wallet address
+   */
   public getTreasuryWallet = async () => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
+  /**
+   * Pushes available tokens to the beneficiary's address
+   */
   public pushAvailableTokens = async (params: PushAvailableTokensParams) => {
     return (await this.contract).pushAvailableTokens.sendTransactionAsync(
       params.beneficiary,
@@ -390,10 +486,16 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to withdraw available tokens by beneficiary
+   */
   public pullAvailableTokens = async (params: TxParams) => {
     return (await this.contract).pullAvailableTokens.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Adds template that can be used for creating schedule
+   */
   public addTemplate = async (params: AddTemplateParams) => {
     return (await this.contract).addTemplate.sendTransactionAsync(
       params.name,
@@ -405,18 +507,32 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Removes template with a given name
+   */
   public removeTemplate = async (params: RemoveTemplateParams) => {
     return (await this.contract).removeTemplate.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
   };
 
+  /**
+   * Returns count of the templates those can be used for creating schedule
+   * @return Count of the templates
+   */
   public getTemplateCount = async () => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
+  /**
+   * Gets the list of the template names those can be used for creating schedule
+   * @return bytes32 Array of all template names were created
+   */
   public getAllTemplateNames = async () => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
+  /**
+   * Adds vesting schedules for each of the beneficiary's address
+   */
   public addSchedule = async (params: AddScheduleParams) => {
     let startTime = new BigNumber(0);
     if (params.startTime) {
@@ -435,6 +551,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Adds vesting schedules from template for the beneficiary
+   */
   public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
     let startTime = new BigNumber(0);
     if (params.startTime) {
@@ -449,6 +568,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Modifies vesting schedules for each of the beneficiary
+   */
   public modifySchedule = async (params: ModifyScheduleParams) => {
     let startTime = new BigNumber(0);
     if (params.startTime) {
@@ -463,6 +585,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Revokes vesting schedule with given template name for given beneficiary
+   */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
     return (await this.contract).revokeSchedule.sendTransactionAsync(
       params.beneficiary,
@@ -472,6 +597,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Revokes all vesting schedules for given beneficiary's address
+   */
   public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
     return (await this.contract).revokeAllSchedules.sendTransactionAsync(
       params.beneficiary,
@@ -480,18 +608,33 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Returns beneficiary's schedule created using template name
+   * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, State)
+   */
   public getSchedule = async (params: GetScheduleParams) => {
     return (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
   };
 
+  /**
+   * Returns list of the template names for given beneficiary's address
+   * @return List of the template names that were used for schedule creation
+   */
   public getTemplateNames = async (params: GetTemplateNamesParams) => {
     return (await this.contract).getTemplateNames.callAsync(params.beneficiary);
   };
 
+  /**
+   * Returns count of the schedules were created for given beneficiary
+   * @return Count of beneficiary's schedules
+   */
   public getScheduleCount = async (params: GetScheduleCountParams) => {
     return (await this.contract).getScheduleCount.callAsync(params.beneficiary);
   };
 
+  /**
+   * Used to bulk send available tokens for each of the beneficiaries
+   */
   public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
     return (await this.contract).pushAvailableTokensMulti.sendTransactionAsync(
       numberToBigNumber(params.fromIndex),
@@ -501,6 +644,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to bulk add vesting schedules for each of beneficiary
+   */
   public addScheduleMulti = async (params: AddScheduleMultiParams) => {
     return (await this.contract).addScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
@@ -522,6 +668,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to bulk add vesting schedules from template for each of the beneficiary
+   */
   public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
     return (await this.contract).addScheduleFromTemplateMulti.sendTransactionAsync(
       params.beneficiaries,
@@ -534,6 +683,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to bulk revoke vesting schedules for each of the beneficiaries
+   */
   public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams) => {
     return (await this.contract).revokeSchedulesMulti.sendTransactionAsync(
       params.beneficiaries,
@@ -542,6 +694,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to bulk modify vesting schedules for each of the beneficiaries
+   */
   public modifyScheduleMulti = async (params: ModifyScheduleMultiParams) => {
     return (await this.contract).modifyScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
