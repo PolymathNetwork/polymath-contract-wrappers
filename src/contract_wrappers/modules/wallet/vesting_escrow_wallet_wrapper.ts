@@ -34,7 +34,7 @@ import {
   TransferResult,
   Perm,
 } from '../../../types';
-import { numberToBigNumber, valueToWei } from '../../../utils/convert';
+import { numberToBigNumber, valueToWei, dateToBigNumber } from '../../../utils/convert';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents.AddSchedule;
@@ -178,6 +178,119 @@ interface GetVestingEscrowWalletLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletUnpauseEventArgs>[]>;
 }
 
+interface SchedulesParams {
+  beneficiary: string;
+  index: number;
+}
+
+interface TemplateNamesParams {
+  index: number;
+}
+
+interface BeneficiariesParams {
+  index: number;
+}
+
+interface ChangeTreasuryWalletParams extends TxParams {
+  newTreasuryWallet: string;
+}
+
+interface DepositTokensParams extends TxParams {
+  numberOfTokens: number;
+}
+
+interface SendToTreasuryParams extends TxParams {
+  amount: number;
+}
+
+interface PushAvailableTokensParams extends TxParams {
+  beneficiary: string;
+}
+
+interface AddTemplateParams extends TxParams {
+  name: string;
+  numberOfTokens: number;
+  duration: number;
+  frequency: number;
+}
+
+interface RemoveTemplateParams extends TxParams {
+  name: string;
+}
+
+interface AddScheduleParams extends TxParams {
+  beneficiary: string;
+  templateName: string;
+  numberOfTokens: number;
+  duration: number;
+  frequency: number;
+  startTime?: Date;
+}
+
+interface AddScheduleFromTemplateParams extends TxParams {
+  beneficiary: string;
+  templateName: string;
+  startTime?: Date;
+}
+
+interface ModifyScheduleParams extends TxParams {
+  beneficiary: string;
+  templateName: string;
+  startTime?: Date;
+}
+
+interface RevokeScheduleParams extends TxParams {
+  beneficiary: string;
+  templateName: string;
+}
+
+interface RevokeAllSchedulesParams extends TxParams {
+  beneficiary: string;
+}
+
+interface GetScheduleParams {
+  beneficiary: string;
+  templateName: string;
+}
+
+interface GetTemplateNamesParams {
+  beneficiary: string;
+}
+
+interface GetScheduleCountParams {
+  beneficiary: string;
+}
+
+interface PushAvailableTokensMultiParams extends TxParams {
+  fromIndex: number;
+  toIndex: number;
+}
+
+interface AddScheduleMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  numberOfTokens: number[];
+  durations: number[];
+  frequencies: number[];
+  startTimes: Date[];
+}
+
+interface AddScheduleFromTemplateMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  startTimes: Date[];
+}
+
+interface RevokeSchedulesMultiParams extends TxParams {
+  beneficiaries: string[];
+}
+
+interface ModifyScheduleMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  startTimes: Date[];
+}
+
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
@@ -225,39 +338,76 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return (await this.contract).unassignedTokens.callAsync();
   };
 
-  public schedules = async () => {
-    return (await this.contract).schedules.callAsync();
+  public schedules = async (params: SchedulesParams) => {
+    return (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
   };
 
-  public templateNames = async () => {
-    return (await this.contract).templateNames.callAsync();
+  public templateNames = async (params: TemplateNamesParams) => {
+    return (await this.contract).templateNames.callAsync(numberToBigNumber(params.index));
   };
 
-  public beneficiaries = async () => {
-    return (await this.contract).beneficiaries.callAsync();
+  public beneficiaries = async (params: BeneficiariesParams) => {
+    return (await this.contract).beneficiaries.callAsync(numberToBigNumber(params.index));
   };
 
   public getDataStore = async () => {
     return (await this.contract).getDataStore.callAsync();
   };
 
-  public changeTreasuryWallet = async () => {};
+  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
+    return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
+      params.newTreasuryWallet,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public depositTokens = async () => {};
+  public depositTokens = async (params: DepositTokensParams) => {
+    return (await this.contract).depositTokens.sendTransactionAsync(
+      numberToBigNumber(params.numberOfTokens),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public sendToTreasury = async () => {};
+  public sendToTreasury = async (params: SendToTreasuryParams) => {
+    return (await this.contract).sendToTreasury.sendTransactionAsync(
+      numberToBigNumber(params.amount),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
   public getTreasuryWallet = async () => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
-  public pushAvailableTokens = async () => {};
+  public pushAvailableTokens = async (params: PushAvailableTokensParams) => {
+    return (await this.contract).pushAvailableTokens.sendTransactionAsync(
+      params.beneficiary,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public pullAvailableTokens = async () => {};
+  public pullAvailableTokens = async (params: TxParams) => {
+    return (await this.contract).pullAvailableTokens.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
 
-  public addTemplate = async () => {};
+  public addTemplate = async (params: AddTemplateParams) => {
+    return (await this.contract).addTemplate.sendTransactionAsync(
+      params.name,
+      numberToBigNumber(params.numberOfTokens),
+      numberToBigNumber(params.duration),
+      numberToBigNumber(params.frequency),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public removeTemplate = async () => {};
+  public removeTemplate = async (params: RemoveTemplateParams) => {
+    return (await this.contract).removeTemplate.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
+  };
 
   public getTemplateCount = async () => {
     return (await this.contract).getTreasuryWallet.callAsync();
@@ -267,37 +417,142 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
-  public addSchedule = async () => {};
+  public addSchedule = async (params: AddScheduleParams) => {
+    let startTime = new BigNumber(0);
+    if (params.startTime) {
+      startTime = dateToBigNumber(params.startTime);
+    }
 
-  public addScheduleFromTemplate = async () => {};
-
-  public modifySchedule = async () => {};
-
-  public revokeSchedule = async () => {};
-
-  public revokeAllSchedules = async () => {};
-
-  public getSchedule = async () => {
-    return (await this.contract).getSchedule.callAsync();
+    return (await this.contract).addSchedule.sendTransactionAsync(
+      params.beneficiary,
+      params.templateName,
+      numberToBigNumber(params.numberOfTokens),
+      numberToBigNumber(params.duration),
+      numberToBigNumber(params.frequency),
+      startTime,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
-  public getTemplateNames = async () => {
-    return (await this.contract).getTemplateNames.callAsync();
+  public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
+    let startTime = new BigNumber(0);
+    if (params.startTime) {
+      startTime = dateToBigNumber(params.startTime);
+    }
+    return (await this.contract).addScheduleFromTemplate.sendTransactionAsync(
+      params.beneficiary,
+      params.templateName,
+      startTime,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
-  public getScheduleCount = async () => {
-    return (await this.contract).getScheduleCount.callAsync();
+  public modifySchedule = async (params: ModifyScheduleParams) => {
+    let startTime = new BigNumber(0);
+    if (params.startTime) {
+      startTime = dateToBigNumber(params.startTime);
+    }
+    return (await this.contract).modifySchedule.sendTransactionAsync(
+      params.beneficiary,
+      params.templateName,
+      startTime,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
-  public pushAvailableTokensMulti = async () => {};
+  public revokeSchedule = async (params: RevokeScheduleParams) => {
+    return (await this.contract).revokeSchedule.sendTransactionAsync(
+      params.beneficiary,
+      params.templateName,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public addScheduleMulti = async () => {};
+  public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
+    return (await this.contract).revokeAllSchedules.sendTransactionAsync(
+      params.beneficiary,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
-  public addScheduleFromTemplateMulti = async () => {};
+  public getSchedule = async (params: GetScheduleParams) => {
+    return (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
+  };
 
-  public revokeSchedulesMulti = async () => {};
+  public getTemplateNames = async (params: GetTemplateNamesParams) => {
+    return (await this.contract).getTemplateNames.callAsync(params.beneficiary);
+  };
 
-  public modifyScheduleMulti = async () => {};
+  public getScheduleCount = async (params: GetScheduleCountParams) => {
+    return (await this.contract).getScheduleCount.callAsync(params.beneficiary);
+  };
+
+  public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
+    return (await this.contract).pushAvailableTokensMulti.sendTransactionAsync(
+      numberToBigNumber(params.fromIndex),
+      numberToBigNumber(params.toIndex),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public addScheduleMulti = async (params: AddScheduleMultiParams) => {
+    return (await this.contract).addScheduleMulti.sendTransactionAsync(
+      params.beneficiaries,
+      params.templateNames,
+      params.numberOfTokens.map(number => {
+        return numberToBigNumber(number);
+      }),
+      params.durations.map(duration => {
+        return numberToBigNumber(duration);
+      }),
+      params.frequencies.map(frequency => {
+        return numberToBigNumber(frequency);
+      }),
+      params.startTimes.map(startTime => {
+        return dateToBigNumber(startTime);
+      }),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
+    return (await this.contract).addScheduleFromTemplateMulti.sendTransactionAsync(
+      params.beneficiaries,
+      params.templateNames,
+      params.startTimes.map(startTime => {
+        return dateToBigNumber(startTime);
+      }),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams) => {
+    return (await this.contract).revokeSchedulesMulti.sendTransactionAsync(
+      params.beneficiaries,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public modifyScheduleMulti = async (params: ModifyScheduleMultiParams) => {
+    return (await this.contract).modifyScheduleMulti.sendTransactionAsync(
+      params.beneficiaries,
+      params.templateNames,
+      params.startTimes.map(startTime => {
+        return dateToBigNumber(startTime);
+      }),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.
