@@ -261,6 +261,68 @@ describe('PercentageTransferManagerWrapper', () => {
     });
   });
 
+  describe('verifyTransfer', () => {
+    test('should verify Transfer', async () => {
+      const statusCode = new BigNumber(2);
+      const expectedResult = [statusCode, '0x1111111111111111111111111111111111111111'];
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        amount: new BigNumber(10),
+        data: 'Data',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.verifyTransfer(mockedParams);
+
+      // Result expectation
+      expect(result.transferResult).toBe(statusCode.toNumber());
+      expect(result.address).toBe(expectedResult[1]);
+      // Verifications
+      verify(mockedContract.verifyTransfer).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+    });
+  });
+
   describe('changeHolderPercentage', () => {
     test('should get changeHolderPercentage', async () => {
       // Owner Address expected

@@ -33,6 +33,7 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
+  parseTransferResult,
   valueToWei,
   weiToValue,
 } from '../../../utils/convert';
@@ -46,7 +47,6 @@ import {
   Perm,
   RestrictionType,
   PERCENTAGE_DECIMALS,
-  TransferResult,
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -383,28 +383,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],

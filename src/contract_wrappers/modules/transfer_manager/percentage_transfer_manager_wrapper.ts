@@ -26,9 +26,8 @@ import {
   GetLogs,
   Perm,
   PERCENTAGE_DECIMALS,
-  TransferResult,
 } from '../../../types';
-import { valueToWei, weiToValue } from '../../../utils/convert';
+import {parseTransferResult, valueToWei, weiToValue} from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -188,28 +187,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
