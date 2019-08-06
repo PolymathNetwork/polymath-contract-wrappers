@@ -1,35 +1,35 @@
 import {
+  BigNumber,
+  ContractAbi,
+  LockUpTransferManager,
+  LockUpTransferManagerAddLockUpToUserEventArgs,
+  LockUpTransferManagerAddNewLockUpTypeEventArgs,
   LockUpTransferManagerContract,
   LockUpTransferManagerEventArgs,
   LockUpTransferManagerEvents,
-  LockUpTransferManagerAddLockUpToUserEventArgs,
-  LockUpTransferManagerRemoveLockUpFromUserEventArgs,
   LockUpTransferManagerModifyLockUpTypeEventArgs,
-  LockUpTransferManagerAddNewLockUpTypeEventArgs,
-  LockUpTransferManagerRemoveLockUpTypeEventArgs,
   LockUpTransferManagerPauseEventArgs,
+  LockUpTransferManagerRemoveLockUpFromUserEventArgs,
+  LockUpTransferManagerRemoveLockUpTypeEventArgs,
   LockUpTransferManagerUnpauseEventArgs,
-  LockUpTransferManager,
-  Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
-  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
   EventCallback,
-  Subscribe,
+  FULL_DECIMALS,
   GetLogs,
-  Perm,
+  GetLogsAsyncParams,
+  Subscribe,
+  SubscribeAsyncParams,
   TransferResult,
+  TxParams,
 } from '../../../types';
-import { valueToWei, weiToValue } from '../../../utils/convert';
+import { bigNumberToDate, parseTransferResult, stringToBytes32, valueToWei, weiToValue } from '../../../utils/convert';
 
 interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: LockUpTransferManagerEvents.AddLockUpToUser;
@@ -41,12 +41,12 @@ interface GetAddLockUpToUserLogsAsyncParams extends GetLogsAsyncParams {
 }
 
 interface RemoveLockUpFromUserSubscribeAsyncParams extends SubscribeAsyncParams {
-    eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
-    callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs>;
+  eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
+  callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs>;
 }
 
 interface GetRemoveLockUpFromUserLogsAsyncParams extends GetLogsAsyncParams {
-    eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
+  eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
 }
 
 interface ModifyLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -105,13 +105,47 @@ interface LockUpTransferManagerSubscribeAsyncParams extends Subscribe {
 }
 
 interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
-  (params: GetAddLockUpToUserLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs>[]>;
-  (params: GetRemoveLockUpFromUserLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs>[]>;
-  (params: GetModifyLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs>[]>;
-  (params: GetAddNewLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs>[]>;
-  (params: GetRemoveLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs>[]>;
+  (params: GetAddLockUpToUserLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs>[]
+  >;
+  (params: GetRemoveLockUpFromUserLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs>[]
+  >;
+  (params: GetModifyLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs>[]
+  >;
+  (params: GetAddNewLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs>[]
+  >;
+  (params: GetRemoveLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs>[]
+  >;
   (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerPauseEventArgs>[]>;
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs>[]>;
+}
+
+interface LockupsParams extends TxParams {
+  details: string;
+}
+
+interface VerifyTransferParams {
+  from: string;
+  to: string;
+  amount: BigNumber;
+  data: string;
+}
+
+// // Return types ////
+interface LockUp {
+  lockupAmount: BigNumber;
+  startTime: Date;
+  lockUpPeriodSeconds: BigNumber;
+  releaseFrequencySeconds: BigNumber;
+}
+
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
 }
 
 /**
@@ -151,6 +185,37 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Return the lockups
+   */
+  public lockups = async (params: LockupsParams): Promise<LockUp> => {
+    assert.assert(params.details.length > 0, 'LockUp Details must not be an empty string');
+    const result = await (await this.contract).lockups.callAsync(stringToBytes32(params.details));
+    return {
+      lockupAmount: weiToValue(result[0], FULL_DECIMALS),
+      startTime: bigNumberToDate(result[1]),
+      lockUpPeriodSeconds: result[2],
+      releaseFrequencySeconds: result[3],
+    };
+  };
+
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
+    assert.isETHAddressHex('from', params.from);
+    assert.isETHAddressHex('to', params.to);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const result = await (await this.contract).verifyTransfer.callAsync(
+      params.from,
+      params.to,
+      valueToWei(params.amount, decimals),
+      params.data,
+    );
+    const transferResult = parseTransferResult(result[0]);
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
   /**

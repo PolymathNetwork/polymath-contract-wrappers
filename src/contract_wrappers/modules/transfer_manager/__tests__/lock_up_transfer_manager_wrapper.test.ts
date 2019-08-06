@@ -11,7 +11,8 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import LockUpTransferManagerWrapper from '../lock_up_transfer_manager_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
-import { valueToWei, weiToValue } from '../../../../utils/convert';
+import { dateToBigNumber, stringToBytes32, valueToWei, weiToValue } from '../../../../utils/convert';
+import { FULL_DECIMALS } from '../../../../types';
 
 describe('LockUpTransferManagerWrapper', () => {
   let target: LockUpTransferManagerWrapper;
@@ -191,6 +192,107 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('lockups', () => {
+    test.todo('should fail as lockup details is an empty string');
+
+    test('should call to lockups', async () => {
+      const expectedLockupAmount = valueToWei(new BigNumber(1), FULL_DECIMALS);
+      const startTime = new Date(2030, 1);
+      const expectedStartTime = dateToBigNumber(startTime);
+      const expectedLockUpPeriodSeconds = new BigNumber(3600);
+      const expectedReleaseFrequencySeconds = new BigNumber(60);
+      const expectedResult = [
+        expectedLockupAmount,
+        expectedStartTime,
+        expectedLockUpPeriodSeconds,
+        expectedReleaseFrequencySeconds,
+      ];
+      const mockedParams = {
+        details: 'LockupDetails',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.lockups).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.details)))).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.lockups(mockedParams);
+      // Result expectation
+      expect(result.lockupAmount).toEqual(weiToValue(expectedLockupAmount, FULL_DECIMALS));
+      expect(result.startTime).toEqual(startTime);
+      expect(result.lockUpPeriodSeconds).toBe(expectedResult[2]);
+      expect(result.releaseFrequencySeconds).toBe(expectedResult[3]);
+
+      // Verifications
+      verify(mockedContract.lockups).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.details)))).once();
+    });
+  });
+
+  describe('verifyTransfer', () => {
+    test('should verify Transfer', async () => {
+      const statusCode = new BigNumber(2);
+      const expectedResult = [statusCode, '0x1111111111111111111111111111111111111111'];
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
+      const mockedParams = {
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        amount: new BigNumber(10),
+        data: 'Data',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.verifyTransfer(mockedParams);
+
+      // Result expectation
+      expect(result.transferResult).toBe(statusCode.toNumber());
+      expect(result.address).toBe(expectedResult[1]);
+      // Verifications
+      verify(mockedContract.verifyTransfer).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
