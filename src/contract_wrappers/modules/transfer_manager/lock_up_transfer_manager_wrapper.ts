@@ -21,7 +21,6 @@ import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
 import {
   EventCallback,
-  FULL_DECIMALS,
   GetLogs,
   GetLogsAsyncParams,
   Subscribe,
@@ -29,7 +28,14 @@ import {
   TransferResult,
   TxParams,
 } from '../../../types';
-import { bigNumberToDate, parseTransferResult, stringToBytes32, valueToWei, weiToValue } from '../../../utils/convert';
+import {
+  bigNumberToDate,
+  bytes32ToString,
+  parseTransferResult,
+  stringToBytes32,
+  valueToWei,
+  weiToValue,
+} from '../../../utils/convert';
 
 interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: LockUpTransferManagerEvents.AddLockUpToUser;
@@ -125,7 +131,7 @@ interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
 }
 
 interface LockupsParams extends TxParams {
-  details: string;
+  lockupName: string;
 }
 
 interface VerifyTransferParams {
@@ -141,6 +147,14 @@ interface LockUp {
   startTime: Date;
   lockUpPeriodSeconds: BigNumber;
   releaseFrequencySeconds: BigNumber;
+}
+
+interface GetLockUp extends LockUp {
+  unlockedAmount: BigNumber;
+}
+
+interface GetLockupData extends GetLockUp {
+  lockupName: string;
 }
 
 interface VerifyTransfer {
@@ -191,14 +205,51 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
    * Return the lockups
    */
   public lockups = async (params: LockupsParams): Promise<LockUp> => {
-    assert.assert(params.details.length > 0, 'LockUp Details must not be an empty string');
-    const result = await (await this.contract).lockups.callAsync(stringToBytes32(params.details));
+    assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
+    const result = await (await this.contract).lockups.callAsync(stringToBytes32(params.lockupName));
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return {
-      lockupAmount: weiToValue(result[0], FULL_DECIMALS),
+      lockupAmount: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
       lockUpPeriodSeconds: result[2],
       releaseFrequencySeconds: result[3],
     };
+  };
+
+  /**
+   * getLockups
+   */
+  public getLockUp = async (params: LockupsParams): Promise<GetLockUp> => {
+    assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
+    const result = await (await this.contract).getLockUp.callAsync(stringToBytes32(params.lockupName));
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return {
+      lockupAmount: weiToValue(result[0], decimals),
+      startTime: bigNumberToDate(result[1]),
+      lockUpPeriodSeconds: result[2],
+      releaseFrequencySeconds: result[3],
+      unlockedAmount: weiToValue(result[4], decimals),
+    };
+  };
+
+  /**
+   * getAllLockupData
+   */
+  public getAllLockupData = async (): Promise<GetLockupData[]> => {
+    const result = await (await this.contract).getAllLockupData.callAsync();
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const typedResult: GetLockupData[] = [];
+    for (let i = 0; i <= result[0].length; i += 1) {
+      typedResult.push({
+        lockupName: bytes32ToString(result[0][i]),
+        lockupAmount: weiToValue(result[1][i], decimals),
+        startTime: bigNumberToDate(result[2][i]),
+        lockUpPeriodSeconds: result[3][i],
+        releaseFrequencySeconds: result[4][i],
+        unlockedAmount: weiToValue(result[1][i], decimals),
+      });
+    }
+    return typedResult;
   };
 
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
