@@ -39,10 +39,7 @@ interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
 interface GetAddLockUpToUserLogsAsyncParams extends GetLogsAsyncParams {
   eventName: LockUpTransferManagerEvents.AddLockUpToUser;
 }
-/*
-    LockUpTransferManagerAddNewLockUpTypeEventArgs,
-    LockUpTransferManagerRemoveLockUpTypeEventArgs,
-*/
+
 interface RemoveLockUpFromUserSubscribeAsyncParams extends SubscribeAsyncParams {
     eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
     callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs>;
@@ -98,11 +95,21 @@ interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
 }
 
 interface LockUpTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddLockUpToUserSubscribeAsyncParams): Promise<string>;
+  (params: RemoveLockUpFromUserSubscribeAsyncParams): Promise<string>;
+  (params: ModifyLockUpTypeSubscribeAsyncParams): Promise<string>;
+  (params: AddNewLockUpTypeSubscribeAsyncParams): Promise<string>;
+  (params: RemoveLockUpTypeSubscribeAsyncParams): Promise<string>;
   (params: PauseSubscribeAsyncParams): Promise<string>;
   (params: UnpauseSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddLockUpToUserLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs>[]>;
+  (params: GetRemoveLockUpFromUserLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs>[]>;
+  (params: GetModifyLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs>[]>;
+  (params: GetAddNewLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs>[]>;
+  (params: GetRemoveLockUpTypeLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs>[]>;
   (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerPauseEventArgs>[]>;
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs>[]>;
 }
