@@ -33,8 +33,18 @@ import {
   GetLogs,
   TransferResult,
   Perm,
+  TransferStatusCode,
 } from '../../../types';
-import { numberToBigNumber, valueToWei, dateToBigNumber } from '../../../utils/convert';
+import {
+  numberToBigNumber,
+  valueToWei,
+  weiToValue,
+  dateToBigNumber,
+  bytes32ToString,
+  bytes32ArrayToStringArray,
+} from '../../../utils/convert';
+
+const TRANSFER_SUCCESS = '0x51';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents.AddSchedule;
@@ -439,6 +449,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to change the treasury wallet address
    */
   public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
+    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
       params.newTreasuryWallet,
       params.txData,
@@ -450,6 +461,18 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to deposit tokens from treasury wallet to the vesting escrow wallet
    */
   public depositTokens = async (params: DepositTokensParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+
+    assert.assert(params.numberOfTokens > 0, 'Number of tokens should be > 0');
+
+    const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
+      await this.getCallerAddress(params.txData),
+      await this.address(),
+      numberToBigNumber(params.numberOfTokens),
+      '0x00',
+    );
+    assert.assert(canTransferFromResult[0] === TRANSFER_SUCCESS, 'Failed transferFrom');
+
     return (await this.contract).depositTokens.sendTransactionAsync(
       numberToBigNumber(params.numberOfTokens),
       params.txData,
@@ -461,6 +484,19 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Sends unassigned tokens to the treasury wallet
    */
   public sendToTreasury = async (params: SendToTreasuryParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
+    assert.assert(params.amount > 0, 'Amount cannot be zero');
+
+    const unassignedTokens = (await this.unassignedTokens()).toNumber();
+    assert.assert(params.amount <= unassignedTokens, 'Amount is greater than unassigned tokens');
+
+    const canTransferResult = await (await this.securityTokenContract()).canTransfer.callAsync(
+      await this.getTreasuryWallet(),
+      numberToBigNumber(params.amount),
+      '0x00',
+    );
+    assert.assert(canTransferResult[0] === TRANSFER_SUCCESS, 'Transfer failed');
+
     return (await this.contract).sendToTreasury.sendTransactionAsync(
       numberToBigNumber(params.amount),
       params.txData,
@@ -479,6 +515,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Pushes available tokens to the beneficiary's address
    */
   public pushAvailableTokens = async (params: PushAvailableTokensParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
+
     return (await this.contract).pushAvailableTokens.sendTransactionAsync(
       params.beneficiary,
       params.txData,
@@ -490,6 +528,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to withdraw available tokens by beneficiary
    */
   public pullAvailableTokens = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), 'Contract currently paused');
     return (await this.contract).pullAvailableTokens.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -497,6 +536,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Adds template that can be used for creating schedule
    */
   public addTemplate = async (params: AddTemplateParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(params.name !== '', 'Invalid name');
+    assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
+    await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     return (await this.contract).addTemplate.sendTransactionAsync(
       params.name,
       numberToBigNumber(params.numberOfTokens),
@@ -511,6 +554,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Removes template with a given name
    */
   public removeTemplate = async (params: RemoveTemplateParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(params.name !== '', 'Invalid name');
+    assert.assert((await this.getAllTemplateNames()).includes(params.name), 'Template not found');
+    // TODO 3.1: require(templateToUsers[_name].length == 0, "Template is used");
     return (await this.contract).removeTemplate.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
   };
 
@@ -519,21 +566,28 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return Count of the templates
    */
   public getTemplateCount = async () => {
-    return (await this.contract).getTreasuryWallet.callAsync();
+    const result = await (await this.contract).getTemplateCount.callAsync();
+    return result.toNumber();
   };
 
   /**
    * Gets the list of the template names those can be used for creating schedule
-   * @return bytes32 Array of all template names were created
+   * @return Array of all template names were created
    */
   public getAllTemplateNames = async () => {
-    return (await this.contract).getTreasuryWallet.callAsync();
+    const results = await (await this.contract).getAllTemplateNames.callAsync();
+    return bytes32ArrayToStringArray(results);
   };
 
   /**
    * Adds vesting schedules for each of the beneficiary's address
    */
   public addSchedule = async (params: AddScheduleParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(params.templateName !== '', 'Invalid name');
+    assert.assert(!(await this.getAllTemplateNames()).includes(params.templateName), 'Template name already exists');
+    await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
+    // TODO: _addScheduleFromTemplate assertion
     let startTime = new BigNumber(0);
     if (params.startTime) {
       startTime = dateToBigNumber(params.startTime);
@@ -707,6 +761,16 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  private validateTemplate = async (numberOfTokens: number, duration: number, frequency: number) => {
+    assert.assert(numberOfTokens > 0, 'Zero amount');
+    assert.assert(duration % frequency === 0, 'Invalid frequency');
+    const periodCount = duration / frequency;
+    assert.assert(numberOfTokens % periodCount === 0, 'Invalid period count');
+    const amountPerPeriod = numberOfTokens / periodCount;
+    const granularity = await (await this.securityTokenContract()).granularity.callAsync();
+    assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
   };
 
   /**
