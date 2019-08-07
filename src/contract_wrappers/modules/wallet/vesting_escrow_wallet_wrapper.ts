@@ -340,7 +340,7 @@ interface AddScheduleMultiParams extends TxParams {
   numberOfTokens: number[];
   durations: number[];
   frequencies: number[];
-  startTimes: Date[];
+  startTimes: (Date | number)[];
 }
 
 /**
@@ -351,7 +351,7 @@ interface AddScheduleMultiParams extends TxParams {
 interface AddScheduleFromTemplateMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
-  startTimes: Date[];
+  startTimes: (Date | number)[];
 }
 
 /**
@@ -369,7 +369,7 @@ interface RevokeSchedulesMultiParams extends TxParams {
 interface ModifyScheduleMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
-  startTimes: Date[];
+  startTimes: (Date | number)[];
 }
 
 /**
@@ -661,7 +661,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
         return numberToBigNumber(frequency);
       }),
       params.startTimes.map(startTime => {
-        return dateToBigNumber(startTime);
+        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
@@ -676,7 +676,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.beneficiaries,
       params.templateNames,
       params.startTimes.map(startTime => {
-        return dateToBigNumber(startTime);
+        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
@@ -702,7 +702,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.beneficiaries,
       params.templateNames,
       params.startTimes.map(startTime => {
-        return dateToBigNumber(startTime);
+        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
