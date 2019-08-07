@@ -206,7 +206,7 @@ describe('LockUpTransferManagerWrapper', () => {
 
     test('should call to lockups', async () => {
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedLockupAmount = valueToWei(new BigNumber(1), expectedDecimalsResult);
+      const expectedLockupAmount = new BigNumber(1);
       const startTime = new Date(2030, 1);
       const expectedStartTime = dateToBigNumber(startTime);
       const expectedLockUpPeriodSeconds = new BigNumber(3600);
@@ -439,6 +439,74 @@ describe('LockUpTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getAllLockups).once();
       verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('getLockupsNamesToUser', () => {
+    test('should call to getLockupsNamesToUser', async () => {
+      const expectedResult = stringArrayToBytes32Array(['Lock1', 'Lock2']);
+      const mockedParams = {
+        user: '0x8888888888888888888888888888888888888888'
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getLockupsNamesToUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getLockupsNamesToUser(mockedParams);
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+
+      // Verifications
+      verify(mockedContract.getLockupsNamesToUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user)).once();
+    });
+  });
+
+  describe('getLockedTokenToUser', () => {
+    test('should call to getLockedTokenToUser', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
+      const expectedResult = new BigNumber(100);
+      const mockedParams = {
+        user: '0x8888888888888888888888888888888888888888'
+      };
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getLockedTokenToUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getLockedTokenToUser(mockedParams);
+      // Result expectation
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
+
+      // Verifications
+      verify(mockedContract.getLockedTokenToUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user)).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 

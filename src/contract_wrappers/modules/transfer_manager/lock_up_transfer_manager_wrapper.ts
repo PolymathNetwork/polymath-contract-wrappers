@@ -135,6 +135,10 @@ interface LockupsParams extends TxParams {
   lockupName: string;
 }
 
+interface UserAddressParams {
+  user: string;
+}
+
 interface VerifyTransferParams {
   from: string;
   to: string;
@@ -268,6 +272,26 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return bytes32ArrayToStringArray(await (await this.contract).getAllLockups.callAsync());
   };
 
+  /**
+   * getLockupsNamesToUser
+   */
+  public getLockupsNamesToUser = async (params: UserAddressParams): Promise<string[]> => {
+    assert.isNonZeroETHAddressHex('User Address', params.user);
+    return bytes32ArrayToStringArray(await (await this.contract).getLockupsNamesToUser.callAsync(params.user));
+  };
+
+  /**
+   * getLockedTokenToUser
+   */
+  public getLockedTokenToUser = async (params: UserAddressParams): Promise<BigNumber> => {
+    assert.isNonZeroETHAddressHex('User Address', params.user);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return weiToValue(await (await this.contract).getLockedTokenToUser.callAsync(params.user), decimals);
+  };
+
+  /*
+  * verifyTransfer
+   */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
