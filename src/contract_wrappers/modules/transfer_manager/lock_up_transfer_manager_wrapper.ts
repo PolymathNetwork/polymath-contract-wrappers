@@ -23,6 +23,7 @@ import {
   EventCallback,
   GetLogs,
   GetLogsAsyncParams,
+  Partition,
   Subscribe,
   SubscribeAsyncParams,
   TransferResult,
@@ -137,6 +138,12 @@ interface LockupsParams extends TxParams {
 
 interface UserAddressParams {
   user: string;
+}
+
+interface GetTokensByPartitionParams {
+  partition: Partition;
+  tokenHolder: string;
+  additionalBalance: BigNumber;
 }
 
 interface VerifyTransferParams {
@@ -287,6 +294,22 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isNonZeroETHAddressHex('User Address', params.user);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return weiToValue(await (await this.contract).getLockedTokenToUser.callAsync(params.user), decimals);
+  };
+
+  /**
+   * getTokensByPartition
+   */
+  public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
+    assert.isNonZeroETHAddressHex('Token Holder', params.tokenHolder);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return weiToValue(
+      await (await this.contract).getTokensByPartition.callAsync(
+        params.partition,
+        params.tokenHolder,
+        valueToWei(params.additionalBalance, decimals),
+      ),
+      decimals,
+    );
   };
 
   /*
