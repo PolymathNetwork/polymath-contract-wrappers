@@ -24,6 +24,7 @@ import {
   GetLogs,
   GetLogsAsyncParams,
   Partition,
+  Perm,
   Subscribe,
   SubscribeAsyncParams,
   TransferResult,
@@ -33,6 +34,7 @@ import {
   bigNumberToDate,
   bytes32ArrayToStringArray,
   bytes32ToString,
+  parsePermBytes32Value,
   parseTransferResult,
   stringToBytes32,
   valueToWei,
@@ -310,6 +312,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       ),
       decimals,
     );
+  };
+
+  /**
+   * getPermissions
+   */
+  public getPermissions = async (): Promise<Perm[]> => {
+    const permissions = await (await this.contract).getPermissions.callAsync();
+    return permissions.map(parsePermBytes32Value);
   };
 
   /*

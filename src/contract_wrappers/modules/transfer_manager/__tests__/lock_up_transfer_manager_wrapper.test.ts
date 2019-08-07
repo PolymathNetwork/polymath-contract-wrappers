@@ -15,12 +15,13 @@ import {
   bytes32ArrayToStringArray,
   bytes32ToString,
   dateToBigNumber,
+  parsePermBytes32Value,
   stringArrayToBytes32Array,
   stringToBytes32,
   valueToWei,
   weiToValue,
 } from '../../../../utils/convert';
-import { Partition } from '../../../../types';
+import { Partition, Perm } from '../../../../types';
 
 describe('LockUpTransferManagerWrapper', () => {
   let target: LockUpTransferManagerWrapper;
@@ -567,6 +568,27 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
+    });
+  });
+
+  describe('getPermissions', () => {
+    test('should call to getPermissions', async () => {
+      const expectedResult = stringArrayToBytes32Array([Perm.Admin]);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getPermissions).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getPermissions();
+      // Result expectation
+      expect(result).toEqual(expectedResult.map(parsePermBytes32Value));
+      // Verifications
+      verify(mockedContract.getPermissions).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
