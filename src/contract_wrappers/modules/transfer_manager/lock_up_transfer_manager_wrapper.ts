@@ -244,14 +244,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     const result = await (await this.contract).getAllLockupData.callAsync();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: GetLockupData[] = [];
-    for (let i = 0; i <= result[0].length; i += 1) {
+    for (let i = 0; i < result[0].length; i += 1) {
       typedResult.push({
         lockupName: bytes32ToString(result[0][i]),
         lockupAmount: weiToValue(result[1][i], decimals),
         startTime: bigNumberToDate(result[2][i]),
         lockUpPeriodSeconds: result[3][i],
         releaseFrequencySeconds: result[4][i],
-        unlockedAmount: weiToValue(result[1][i], decimals),
+        unlockedAmount: weiToValue(result[5][i], decimals),
       });
     }
     return typedResult;
@@ -290,7 +290,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-  * verifyTransfer
+   * verifyTransfer
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);

@@ -13,6 +13,7 @@ import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
   bytes32ArrayToStringArray,
+  bytes32ToString,
   dateToBigNumber,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -330,12 +331,12 @@ describe('LockUpTransferManagerWrapper', () => {
     test('should call to getAllLockupData', async () => {
       const expectedDecimalsResult = new BigNumber(18);
       const expectedNames = stringArrayToBytes32Array(['Lockup1', 'Lockup2']);
-      const expectedLockupAmount = valueToWei(new BigNumber(2), expectedDecimalsResult);
+      const expectedLockupAmount = valueToWei(new BigNumber(50), expectedDecimalsResult);
       const startTime = new Date(2030, 1);
       const expectedStartTime = dateToBigNumber(startTime);
       const expectedLockUpPeriodSeconds = new BigNumber(3600);
       const expectedReleaseFrequencySeconds = new BigNumber(60);
-      const expectedUnlockedAmount = new BigNumber(1);
+      const expectedUnlockedAmount = valueToWei(new BigNumber(100), expectedDecimalsResult);
       const expectedResult = [
         expectedNames,
         [expectedLockupAmount, expectedLockupAmount],
@@ -369,11 +370,11 @@ describe('LockUpTransferManagerWrapper', () => {
       const result = await target.getAllLockupData();
       // Result expectation
       for (let i = 0; i < result.length; i += 1) {
-        expect(result[1].lockupName).toEqual(bytes32ArrayToStringArray(expectedNames));
+        expect(result[i].lockupName).toEqual(bytes32ToString(expectedNames[i]));
         expect(result[i].lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
         expect(result[i].startTime).toEqual(startTime);
-        expect(result[i].lockUpPeriodSeconds).toBe(expectedResult[2]);
-        expect(result[i].releaseFrequencySeconds).toBe(expectedResult[3]);
+        expect(result[i].lockUpPeriodSeconds).toBe(expectedResult[3][i]);
+        expect(result[i].releaseFrequencySeconds).toBe(expectedResult[4][i]);
         expect(result[i].unlockedAmount).toEqual(weiToValue(expectedUnlockedAmount, expectedDecimalsResult));
       }
 
@@ -446,7 +447,7 @@ describe('LockUpTransferManagerWrapper', () => {
     test('should call to getLockupsNamesToUser', async () => {
       const expectedResult = stringArrayToBytes32Array(['Lock1', 'Lock2']);
       const mockedParams = {
-        user: '0x8888888888888888888888888888888888888888'
+        user: '0x8888888888888888888888888888888888888888',
       };
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -471,7 +472,7 @@ describe('LockUpTransferManagerWrapper', () => {
       const expectedDecimalsResult = new BigNumber(18);
       const expectedResult = new BigNumber(100);
       const mockedParams = {
-        user: '0x8888888888888888888888888888888888888888'
+        user: '0x8888888888888888888888888888888888888888',
       };
 
       // Security Token Address expected
@@ -481,7 +482,7 @@ describe('LockUpTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
