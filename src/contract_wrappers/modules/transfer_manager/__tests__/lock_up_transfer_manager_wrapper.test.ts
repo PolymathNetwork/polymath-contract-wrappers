@@ -368,7 +368,6 @@ describe('LockUpTransferManagerWrapper', () => {
       // Real call
       const result = await target.getAllLockupData();
       // Result expectation
-      expect(result[0].lockupName).toEqual(expectedResult[0][0]);
       for (let i = 0; i < result.length; i += 1) {
         expect(result[1].lockupName).toEqual(bytes32ArrayToStringArray(expectedNames));
         expect(result[i].lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
