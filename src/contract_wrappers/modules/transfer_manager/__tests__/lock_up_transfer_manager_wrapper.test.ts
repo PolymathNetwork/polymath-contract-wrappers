@@ -421,6 +421,28 @@ describe('LockUpTransferManagerWrapper', () => {
     });
   });
 
+  describe('getAllLockups', () => {
+    test('should call to getAllLockups', async () => {
+      const expectedResult = stringArrayToBytes32Array(['Lock1', 'Lock2']);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllLockups).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllLockups();
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+
+      // Verifications
+      verify(mockedContract.getAllLockups).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
   describe('verifyTransfer', () => {
     test('should verify Transfer', async () => {
       const statusCode = new BigNumber(2);
