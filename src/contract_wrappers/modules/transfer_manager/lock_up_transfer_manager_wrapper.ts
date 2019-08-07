@@ -252,6 +252,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return typedResult;
   };
 
+  /**
+   * getListOfAddresses
+   */
+  public getListOfAddresses = async (params: LockupsParams): Promise<string[]> => {
+    assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
+    return (await this.contract).getListOfAddresses.callAsync(stringToBytes32(params.lockupName));
+  };
+
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);

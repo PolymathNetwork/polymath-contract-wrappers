@@ -329,10 +329,7 @@ describe('LockUpTransferManagerWrapper', () => {
   describe('getAllLockUpData', () => {
     test('should call to getAllLockupData', async () => {
       const expectedDecimalsResult = new BigNumber(18);
-      const expectedNames = stringArrayToBytes32Array([
-        'Lockup1',
-        'Lockup2',
-      ]);
+      const expectedNames = stringArrayToBytes32Array(['Lockup1', 'Lockup2']);
       const expectedLockupAmount = valueToWei(new BigNumber(2), expectedDecimalsResult);
       const startTime = new Date(2030, 1);
       const expectedStartTime = dateToBigNumber(startTime);
@@ -372,14 +369,14 @@ describe('LockUpTransferManagerWrapper', () => {
       const result = await target.getAllLockupData();
       // Result expectation
       expect(result[0].lockupName).toEqual(expectedResult[0][0]);
-      for(let i=0; i<result.length; i+=1) {
+      for (let i = 0; i < result.length; i += 1) {
         expect(result[1].lockupName).toEqual(bytes32ArrayToStringArray(expectedNames));
         expect(result[i].lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
         expect(result[i].startTime).toEqual(startTime);
         expect(result[i].lockUpPeriodSeconds).toBe(expectedResult[2]);
         expect(result[i].releaseFrequencySeconds).toBe(expectedResult[3]);
         expect(result[i].unlockedAmount).toEqual(weiToValue(expectedUnlockedAmount, expectedDecimalsResult));
-      };
+      }
 
       // Verifications
       verify(mockedContract.getAllLockupData).once();
@@ -389,6 +386,38 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
+    });
+  });
+
+  describe('getListOfAddresses', () => {
+    test.todo('should fail as lockup name is an empty string');
+
+    test('should call to getListOfAddresses', async () => {
+      const expectedResult = [
+        '0x8888888888888888888888888888888888888888',
+        '0x9999999999999999999999999999999999999999',
+      ];
+      const mockedParams = {
+        lockupName: 'LockupDetails',
+      };
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getListOfAddresses).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.lockupName)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getListOfAddresses(mockedParams);
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getListOfAddresses).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.lockupName)))).once();
     });
   });
 
