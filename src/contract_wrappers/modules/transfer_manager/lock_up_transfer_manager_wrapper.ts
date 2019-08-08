@@ -475,8 +475,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.isBigNumberGreaterThanZero(params.lockUpPeriodSeconds, 'Lockup period in seconds should be greater than 0');
     assert.isBigNumberGreaterThanZero(
-      params.releaseFrequenciesSeconds,
-      'Release frequency in seconds should be greater than 0',
+        params.releaseFrequenciesSeconds,
+        'Release frequency in seconds should be greater than 0',
     );
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };

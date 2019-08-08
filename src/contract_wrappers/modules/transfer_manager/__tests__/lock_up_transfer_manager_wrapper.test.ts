@@ -691,6 +691,8 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.securityToken).thrice();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).thrice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thrice();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
@@ -746,7 +748,7 @@ describe('LockUpTransferManagerWrapper', () => {
       // Stub the method
       when(mockedContract.getLockUp).thenReturn(instance(mockedGetLockupMethod));
       // Stub the request
-      for(let i=0; i<lockupNames.length; i+=1) {
+      for (let i = 0; i < lockupNames.length; i += 1) {
         when(mockedGetLockupMethod.callAsync(objectContaining(stringToBytes32(lockupNames[i])))).thenResolve(
           expectedGetLockupResult,
         );
@@ -800,11 +802,13 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.securityToken).times(4);
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).thrice();
+      verify(mockedSecurityTokenContract.decimals).thrice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getLockUp).times(mockedGetLockupParams.lockupNames.length);
-      for(let i=0; i<lockupNames.length; i+=1) {
+      for (let i = 0; i < lockupNames.length; i += 1) {
         verify(mockedGetLockupMethod.callAsync(objectContaining(stringToBytes32(lockupNames[i])))).once();
       }
     });
