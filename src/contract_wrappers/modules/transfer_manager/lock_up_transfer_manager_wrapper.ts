@@ -175,6 +175,11 @@ interface AddNewLockUpTypeMultiParams extends TxParams {
   lockupNames: string[];
 }
 
+interface AddLockUpByNameParams extends TxParams {
+  userAddress: string;
+  lockupName: string;
+}
+
 // // Return types ////
 interface LockUp {
   lockupAmount: BigNumber;
@@ -421,6 +426,21 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+
+  /*
+   * addLockUpByName
+   */
+  public addLockUpByName = async (params: AddLockUpByNameParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkAddLockUpByName(params);
+    return (await this.contract).addLockUpByName.sendTransactionAsync(
+        params.userAddress,
+        stringToBytes32(params.lockupName),
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
@@ -479,5 +499,16 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
         'Release frequency in seconds should be greater than 0',
     );
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
+  };
+
+  private checkAddLockUpByName = async (params: AddLockUpByNameParams) => {
+    assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
+    assert.isNonZeroETHAddressHex('User Address', params.userAddress);
+    const lockup = await this.getLockUp({ lockupName: params.lockupName });
+    assert.isFutureDate(lockup.startTime, 'Start time must be in the future');
+    const lockupNames = await this.getLockupsNamesToUser({user: params.userAddress});
+    console.log(lockupNames);
+    console.log(params.lockupName);
+    assert.assert(!lockupNames.includes(params.lockupName), 'User already added to this lockup name');
   };
 }
