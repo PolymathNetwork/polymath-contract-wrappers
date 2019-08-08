@@ -34,6 +34,8 @@ import {
   bigNumberToDate,
   bytes32ArrayToStringArray,
   bytes32ToString,
+  dateToBigNumber,
+  parseModuleTypeValue,
   parsePermBytes32Value,
   parseTransferResult,
   stringToBytes32,
@@ -153,6 +155,14 @@ interface VerifyTransferParams {
   to: string;
   amount: BigNumber;
   data: string;
+}
+
+interface AddNewLockUpTypeParams extends TxParams {
+  lockupAmount: BigNumber;
+  startTime: Date;
+  lockUpPeriodSeconds: BigNumber;
+  releaseFrequencySeconds: BigNumber;
+  lockupName: string;
 }
 
 // // Return types ////
@@ -342,6 +352,23 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     };
   };
 
+  /*
+   * addNewLockUpType
+   */
+  public addNewLockUpType = async (params: AddNewLockUpTypeParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkAddNewLockUpType(params);
+    return (await this.contract).addNewLockUpType.sendTransactionAsync(
+      params.lockupAmount,
+      dateToBigNumber(params.startTime),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequencySeconds,
+      stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
@@ -387,5 +414,18 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       LockUpTransferManager.abi,
     );
     return logs;
+  };
+
+  private checkAddNewLockUpType = async (params: AddNewLockUpTypeParams) => {
+    assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
+    const lockup = await this.getLockUp({ lockupName: params.lockupName });
+    assert.isBigNumberZero(lockup.lockupAmount, 'LockUp already exists');
+    assert.isFutureDate(params.startTime, 'Start time must be in the future');
+    assert.isBigNumberGreaterThanZero(params.lockUpPeriodSeconds, 'Lockup period in seconds should be greater than 0');
+    assert.isBigNumberGreaterThanZero(
+      params.releaseFrequencySeconds,
+      'Release frequency in seconds should be greater than 0',
+    );
+    assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };
 }
