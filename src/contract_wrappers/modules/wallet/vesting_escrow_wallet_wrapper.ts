@@ -42,6 +42,7 @@ import {
   dateToBigNumber,
   bytes32ToString,
   bytes32ArrayToStringArray,
+  bigNumberToDate,
 } from '../../../utils/convert';
 
 const TRANSFER_SUCCESS = '0x51';
@@ -263,7 +264,7 @@ interface AddScheduleParams extends TxParams {
   numberOfTokens: number;
   duration: number;
   frequency: number;
-  startTime?: Date;
+  startTime: Date;
 }
 
 /**
@@ -274,7 +275,7 @@ interface AddScheduleParams extends TxParams {
 interface AddScheduleFromTemplateParams extends TxParams {
   beneficiary: string;
   templateName: string;
-  startTime?: Date;
+  startTime: Date;
 }
 
 /**
@@ -285,7 +286,7 @@ interface AddScheduleFromTemplateParams extends TxParams {
 interface ModifyScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
-  startTime?: Date;
+  startTime: Date;
 }
 
 /**
@@ -350,7 +351,7 @@ interface AddScheduleMultiParams extends TxParams {
   numberOfTokens: number[];
   durations: number[];
   frequencies: number[];
-  startTimes: (Date | number)[];
+  startTimes: Date[];
 }
 
 /**
@@ -361,7 +362,7 @@ interface AddScheduleMultiParams extends TxParams {
 interface AddScheduleFromTemplateMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
-  startTimes: (Date | number)[];
+  startTimes: Date[];
 }
 
 /**
@@ -379,7 +380,22 @@ interface RevokeSchedulesMultiParams extends TxParams {
 interface ModifyScheduleMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
-  startTimes: (Date | number)[];
+  startTimes: Date[];
+}
+
+enum StateStatus {
+  CREATED,
+  STARTED,
+  COMPLETED,
+}
+
+interface GetSchedule {
+  numberOfTokens: number;
+  duration: number;
+  frequency: number;
+  startTime: Date;
+  claimedTokens: number;
+  State: StateStatus;
 }
 
 /**
@@ -587,19 +603,14 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(params.templateName !== '', 'Invalid name');
     assert.assert(!(await this.getAllTemplateNames()).includes(params.templateName), 'Template name already exists');
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
-    // TODO: _addScheduleFromTemplate assertion
-    let startTime = new BigNumber(0);
-    if (params.startTime) {
-      startTime = dateToBigNumber(params.startTime);
-    }
-
+    await this.validateAddScheduleFromTemplate(params.beneficiary, params.templateName, params.startTime);
     return (await this.contract).addSchedule.sendTransactionAsync(
       params.beneficiary,
       params.templateName,
       numberToBigNumber(params.numberOfTokens),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
-      startTime,
+      dateToBigNumber(params.startTime),
       params.txData,
       params.safetyFactor,
     );
@@ -609,14 +620,12 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Adds vesting schedules from template for the beneficiary
    */
   public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
-    let startTime = new BigNumber(0);
-    if (params.startTime) {
-      startTime = dateToBigNumber(params.startTime);
-    }
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.validateAddScheduleFromTemplate(params.beneficiary, params.templateName, params.startTime);
     return (await this.contract).addScheduleFromTemplate.sendTransactionAsync(
       params.beneficiary,
       params.templateName,
-      startTime,
+      dateToBigNumber(params.startTime),
       params.txData,
       params.safetyFactor,
     );
@@ -626,14 +635,14 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Modifies vesting schedules for each of the beneficiary
    */
   public modifySchedule = async (params: ModifyScheduleParams) => {
-    let startTime = new BigNumber(0);
-    if (params.startTime) {
-      startTime = dateToBigNumber(params.startTime);
-    }
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    this.checkSchedule(params.beneficiary, params.templateName);
+    assert.assert(params.startTime.getTime() > Date.now(), 'Date in the past');
+    // TODO: require(now < schedule.startTime, "Schedule started");
     return (await this.contract).modifySchedule.sendTransactionAsync(
       params.beneficiary,
       params.templateName,
-      startTime,
+      dateToBigNumber(params.startTime),
       params.txData,
       params.safetyFactor,
     );
@@ -643,6 +652,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Revokes vesting schedule with given template name for given beneficiary
    */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    this.checkSchedule(params.beneficiary, params.templateName);
+    // TODO: _sendTokensPerSchedule assert
     return (await this.contract).revokeSchedule.sendTransactionAsync(
       params.beneficiary,
       params.templateName,
@@ -655,6 +667,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Revokes all vesting schedules for given beneficiary's address
    */
   public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).revokeAllSchedules.sendTransactionAsync(
       params.beneficiary,
       params.txData,
@@ -667,7 +681,16 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, State)
    */
   public getSchedule = async (params: GetScheduleParams) => {
-    return (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
+    this.checkSchedule(params.beneficiary, params.templateName);
+    const result = await (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
+    return {
+      numberOfTokens: result[0].toNumber(),
+      duration: result[1].toNumber(),
+      frequency: result[2].toNumber(),
+      startTime: bigNumberToDate(result[3]),
+      claimedTokens: result[4].toNumber(),
+      State: StateStatus[result[5].toNumber()],
+    };
   };
 
   /**
@@ -675,7 +698,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return List of the template names that were used for schedule creation
    */
   public getTemplateNames = async (params: GetTemplateNamesParams) => {
-    return (await this.contract).getTemplateNames.callAsync(params.beneficiary);
+    assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
+    const result = await (await this.contract).getTemplateNames.callAsync(params.beneficiary);
+    return bytes32ArrayToStringArray(result);
   };
 
   /**
@@ -683,13 +708,17 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return Count of beneficiary's schedules
    */
   public getScheduleCount = async (params: GetScheduleCountParams) => {
-    return (await this.contract).getScheduleCount.callAsync(params.beneficiary);
+    assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
+    const result = await (await this.contract).getScheduleCount.callAsync(params.beneficiary);
+    return result.toNumber();
   };
 
   /**
    * Used to bulk send available tokens for each of the beneficiaries
    */
   public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
+    // TODO: require(_toIndex < beneficiaries.length, "Array out of bound");
     return (await this.contract).pushAvailableTokensMulti.sendTransactionAsync(
       numberToBigNumber(params.fromIndex),
       numberToBigNumber(params.toIndex),
@@ -702,6 +731,36 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk add vesting schedules for each of beneficiary
    */
   public addScheduleMulti = async (params: AddScheduleMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      params.beneficiaries.length === params.templateNames.length &&
+        params.beneficiaries.length === params.numberOfTokens.length &&
+        params.beneficiaries.length === params.durations.length &&
+        params.beneficiaries.length === params.frequencies.length &&
+        params.beneficiaries.length === params.startTimes.length,
+      'Arrays sizes mismatch',
+    );
+
+    const resultGetAllTemplatesNames = [];
+    const resultValidateTemplate = [];
+    const resultValidateAddScheduleFromTemplate = [];
+    for (let i = 0; i < params.beneficiaries.length; i += 1) {
+      assert.assert(params.templateNames[i] !== '', 'Invalid name');
+      resultGetAllTemplatesNames.push(this.getAllTemplateNames());
+      resultValidateTemplate.push(
+        this.validateTemplate(params.numberOfTokens[i], params.durations[i], params.frequencies[i]),
+      );
+      resultValidateAddScheduleFromTemplate.push(
+        this.validateAddScheduleFromTemplate(params.beneficiaries[i], params.templateNames[i], params.startTimes[i]),
+      );
+    }
+    const getAllTemplatesNames = await Promise.all(resultGetAllTemplatesNames);
+    getAllTemplatesNames.forEach((templateName, i) => {
+      assert.assert(!templateName.includes(params.templateNames[i]), 'Template name already exists');
+    });
+    await Promise.all(resultValidateTemplate);
+    await Promise.all(resultValidateAddScheduleFromTemplate);
+
     return (await this.contract).addScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
       params.templateNames,
@@ -715,7 +774,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
         return numberToBigNumber(frequency);
       }),
       params.startTimes.map(startTime => {
-        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
+        return dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
@@ -726,11 +785,19 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk add vesting schedules from template for each of the beneficiary
    */
   public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    const resultsValidateAddScheduleFromTemplate = [];
+    for (let i = 0; i < params.beneficiaries.length; i += 1) {
+      resultsValidateAddScheduleFromTemplate.push(
+        this.validateAddScheduleFromTemplate(params.beneficiaries[i], params.templateNames[i], params.startTimes[i]),
+      );
+    }
+    await Promise.all(resultsValidateAddScheduleFromTemplate);
     return (await this.contract).addScheduleFromTemplateMulti.sendTransactionAsync(
       params.beneficiaries,
       params.templateNames,
       params.startTimes.map(startTime => {
-        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
+        return dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
@@ -741,6 +808,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk revoke vesting schedules for each of the beneficiaries
    */
   public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    params.beneficiaries.forEach(beneficiary => {
+      assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
+    });
     return (await this.contract).revokeSchedulesMulti.sendTransactionAsync(
       params.beneficiaries,
       params.txData,
@@ -752,11 +823,23 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk modify vesting schedules for each of the beneficiaries
    */
   public modifyScheduleMulti = async (params: ModifyScheduleMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      params.beneficiaries.length === params.templateNames.length &&
+        params.beneficiaries.length === params.startTimes.length,
+      'Arrays sizes mismatch',
+    );
+
+    for (let i = 0; i < params.beneficiaries.length; i += 1) {
+      this.checkSchedule(params.beneficiaries[i], params.templateNames[i]);
+      assert.assert(params.startTimes[i].getTime() > Date.now(), 'Date in the past');
+    }
+
     return (await this.contract).modifyScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
       params.templateNames,
       params.startTimes.map(startTime => {
-        return typeof startTime === 'number' ? new BigNumber(0) : dateToBigNumber(startTime);
+        return dateToBigNumber(startTime);
       }),
       params.txData,
       params.safetyFactor,
@@ -771,6 +854,18 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     const amountPerPeriod = numberOfTokens / periodCount;
     const granularity = await (await this.securityTokenContract()).granularity.callAsync();
     assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
+  };
+
+  private validateAddScheduleFromTemplate = async (beneficiary: string, templateName: string, startTime: Date) => {
+    assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
+    assert.assert((await this.getAllTemplateNames()).includes(templateName), 'Template not found');
+    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, 'Already added');
+    assert.assert(startTime.getTime() > Date.now(), 'Date in the past');
+  };
+
+  private checkSchedule = (beneficiary: string, templateName: string) => {
+    assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
+    // TODO: userToTemplateIndex[_beneficiary][_templateName]
   };
 
   /**
