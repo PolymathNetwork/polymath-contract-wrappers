@@ -34,11 +34,13 @@ import {
   bigNumberToDate,
   bytes32ArrayToStringArray,
   bytes32ToString,
+  dateArrayToBigNumberArray,
   dateToBigNumber,
-  parseModuleTypeValue,
   parsePermBytes32Value,
   parseTransferResult,
+  stringArrayToBytes32Array,
   stringToBytes32,
+  valueArrayToWeiArray,
   valueToWei,
   weiToValue,
 } from '../../../utils/convert';
@@ -161,8 +163,16 @@ interface AddNewLockUpTypeParams extends TxParams {
   lockupAmount: BigNumber;
   startTime: Date;
   lockUpPeriodSeconds: BigNumber;
-  releaseFrequencySeconds: BigNumber;
+  releaseFrequenciesSeconds: BigNumber;
   lockupName: string;
+}
+
+interface AddNewLockUpTypeMultiParams extends TxParams {
+  lockupAmounts: BigNumber[];
+  startTimes: Date[];
+  lockUpPeriodSeconds: BigNumber[];
+  releaseFrequenciesSeconds: BigNumber[];
+  lockupNames: string[];
 }
 
 // // Return types ////
@@ -358,12 +368,54 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   public addNewLockUpType = async (params: AddNewLockUpTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkAddNewLockUpType(params);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addNewLockUpType.sendTransactionAsync(
-      params.lockupAmount,
+      valueToWei(params.lockupAmount, decimals),
       dateToBigNumber(params.startTime),
       params.lockUpPeriodSeconds,
-      params.releaseFrequencySeconds,
+      params.releaseFrequenciesSeconds,
       stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * addNewLockUpTypeMulti
+   */
+  public addNewLockUpTypeMulti = async (params: AddNewLockUpTypeMultiParams) => {
+    assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
+    assert.areValidArrayLengths(
+      [
+        params.lockupAmounts,
+        params.lockupNames,
+        params.releaseFrequenciesSeconds,
+        params.lockUpPeriodSeconds,
+        params.startTimes,
+      ],
+      'Argument arrays length mismatch',
+    );
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    const results = [];
+    for (let i = 0; i < params.lockupNames.length; i += 1) {
+      results.push(
+        this.checkAddNewLockUpType({
+          lockupAmount: params.lockupAmounts[i],
+          startTime: params.startTimes[i],
+          lockUpPeriodSeconds: params.lockUpPeriodSeconds[i],
+          releaseFrequenciesSeconds: params.releaseFrequenciesSeconds[i],
+          lockupName: params.lockupNames[i],
+        }),
+      );
+    }
+    await Promise.all(results);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return (await this.contract).addNewLockUpTypeMulti.sendTransactionAsync(
+      valueArrayToWeiArray(params.lockupAmounts, decimals),
+      dateArrayToBigNumberArray(params.startTimes),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequenciesSeconds,
+      stringArrayToBytes32Array(params.lockupNames),
       params.txData,
       params.safetyFactor,
     );
@@ -423,7 +475,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.isBigNumberGreaterThanZero(params.lockUpPeriodSeconds, 'Lockup period in seconds should be greater than 0');
     assert.isBigNumberGreaterThanZero(
-      params.releaseFrequencySeconds,
+      params.releaseFrequenciesSeconds,
       'Release frequency in seconds should be greater than 0',
     );
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
