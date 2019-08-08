@@ -930,6 +930,129 @@ describe('LockUpTransferManagerWrapper', () => {
     });
   });
 
+  describe('addLockUpByNameMulti', () => {
+    test('should call addLockUpByNameMulti', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const expectedLockUpInvestorAddresses = [
+        '0x0123456789012345678901234567890123456789',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      const lockupNames = ['Lockup1', 'Lockup2'];
+      const expectedDecimalsResult = new BigNumber(18);
+      const expectedLockupAmount = valueToWei(new BigNumber(0), expectedDecimalsResult);
+      const expectedStartTime = dateToBigNumber(new Date(2030, 1));
+      const expectedLockUpPeriodSeconds = new BigNumber(3600);
+      const expectedReleaseFrequencySeconds = new BigNumber(60);
+      const expectedUnlockedAmount = new BigNumber(0);
+      const expectedGetLockupResult = [
+        expectedLockupAmount,
+        expectedStartTime,
+        expectedLockUpPeriodSeconds,
+        expectedReleaseFrequencySeconds,
+        expectedUnlockedAmount,
+      ];
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked method
+      const mockedGetLockupMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getLockUp).thenReturn(instance(mockedGetLockupMethod));
+      // Stub the request
+      for (let i = 0; i < lockupNames.length; i += 1) {
+        when(mockedGetLockupMethod.callAsync(objectContaining(stringToBytes32(lockupNames[i])))).thenResolve(
+          expectedGetLockupResult,
+        );
+      }
+
+      const expectedGetLockupsNamesToUserResult = stringArrayToBytes32Array(['Lockup3', 'Lockup4']);
+      const mockedGetLockupsNamesToUserParams = {
+        userAddresses: expectedLockUpInvestorAddresses,
+      };
+      // Mocked method
+      const mockedGetLockupsNamesToUserMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getLockupsNamesToUser).thenReturn(instance(mockedGetLockupsNamesToUserMethod));
+      // Stub the request
+      for (let i = 0; i < lockupNames.length; i += 1) {
+        when(
+          mockedGetLockupsNamesToUserMethod.callAsync(mockedGetLockupsNamesToUserParams.userAddresses[i]),
+        ).thenResolve(expectedGetLockupsNamesToUserResult);
+      }
+
+      const mockedParams = {
+        lockupNames,
+        userAddresses: expectedLockUpInvestorAddresses,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addLockUpByNameMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddresses,
+          objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.addLockUpByNameMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addLockUpByNameMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddresses,
+          objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
+      verify(mockedSecurityTokenContract.decimals).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getLockUp).times(lockupNames.length);
+      for (let i = 0; i < lockupNames.length; i += 1) {
+        verify(mockedGetLockupMethod.callAsync(objectContaining(stringToBytes32(lockupNames[i])))).once();
+      }
+      verify(mockedContract.getLockupsNamesToUser).times(lockupNames.length);
+      // Stub the request
+      for (let i = 0; i < lockupNames.length; i += 1) {
+        verify(mockedGetLockupsNamesToUserMethod.callAsync(mockedGetLockupsNamesToUserParams.userAddresses[i])).once();
+      }
+    });
+  });
+
   describe('verifyTransfer', () => {
     test('should verify Transfer', async () => {
       const statusCode = new BigNumber(2);
