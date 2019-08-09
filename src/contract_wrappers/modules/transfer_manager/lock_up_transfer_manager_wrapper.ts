@@ -159,7 +159,7 @@ interface VerifyTransferParams {
   data: string;
 }
 
-interface AddNewLockUpTypeParams extends TxParams {
+interface LockUpTypeParams extends TxParams {
   lockupAmount: BigNumber;
   startTime: Date;
   lockUpPeriodSeconds: BigNumber;
@@ -167,7 +167,7 @@ interface AddNewLockUpTypeParams extends TxParams {
   lockupName: string;
 }
 
-interface AddNewLockUpTypeMultiParams extends TxParams {
+interface LockUpTypeMultiParams extends TxParams {
   lockupAmounts: BigNumber[];
   startTimes: Date[];
   lockUpPeriodSeconds: BigNumber[];
@@ -212,6 +212,15 @@ interface RemoveLockUpFromUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
+
+interface RemoveLockUpTypeParams extends TxParams {
+  lockupName: string;
+}
+
+interface RemoveLockUpTypeMultiParams extends TxParams {
+  lockupNames: string[];
+}
+
 // // Return types ////
 interface LockUp {
   lockupAmount: BigNumber;
@@ -402,7 +411,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /*
    * addNewLockUpType
    */
-  public addNewLockUpType = async (params: AddNewLockUpTypeParams) => {
+  public addNewLockUpType = async (params: LockUpTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkAddNewLockUpType(params);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -420,7 +429,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /*
    * addNewLockUpTypeMulti
    */
-  public addNewLockUpTypeMulti = async (params: AddNewLockUpTypeMultiParams) => {
+  public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
     assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
     assert.areValidArrayLengths(
       [
@@ -603,6 +612,96 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /*
+   * removeLockUpType
+   */
+  public removeLockupType = async (params: RemoveLockUpTypeParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkRemoveLockUpType(params.lockupName);
+    return (await this.contract).removeLockupType.sendTransactionAsync(
+      stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * removeLockUpTypeMulti
+   */
+  public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams) => {
+    assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    const results = [];
+    for (let i = 0; i < params.lockupNames.length; i += 1) {
+      results.push(this.checkRemoveLockUpType(params.lockupNames[i]));
+    }
+    await Promise.all(results);
+    return (await this.contract).removeLockupTypeMulti.sendTransactionAsync(
+      stringArrayToBytes32Array(params.lockupNames),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * modifyLockUpType
+   */
+  public modifyLockUpType = async (params: LockUpTypeParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkModifyLockUpType(params);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return (await this.contract).modifyLockUpType.sendTransactionAsync(
+      valueToWei(params.lockupAmount, decimals),
+      dateToBigNumber(params.startTime),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequenciesSeconds,
+      stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * modifyLockUpTypeMulti
+   */
+  public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
+    assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
+    assert.areValidArrayLengths(
+      [
+        params.lockupAmounts,
+        params.lockupNames,
+        params.releaseFrequenciesSeconds,
+        params.lockUpPeriodSeconds,
+        params.startTimes,
+      ],
+      'Argument arrays length mismatch',
+    );
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    const results = [];
+    for (let i = 0; i < params.lockupNames.length; i += 1) {
+      results.push(
+        this.checkModifyLockUpType({
+          lockupAmount: params.lockupAmounts[i],
+          startTime: params.startTimes[i],
+          lockUpPeriodSeconds: params.lockUpPeriodSeconds[i],
+          releaseFrequenciesSeconds: params.releaseFrequenciesSeconds[i],
+          lockupName: params.lockupNames[i],
+        }),
+      );
+    }
+    await Promise.all(results);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return (await this.contract).modifyLockUpTypeMulti.sendTransactionAsync(
+      valueArrayToWeiArray(params.lockupAmounts, decimals),
+      dateArrayToBigNumberArray(params.startTimes),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequenciesSeconds,
+      stringArrayToBytes32Array(params.lockupNames),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
   /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
@@ -650,10 +749,20 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return logs;
   };
 
-  private checkAddNewLockUpType = async (params: AddNewLockUpTypeParams) => {
-    assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
+  private checkAddNewLockUpType = async (params: LockUpTypeParams) => {
+    await this.checkLockUpTypeInformation(params);
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isBigNumberZero(lockup.lockupAmount, 'LockUp already exists');
+  };
+
+  private checkModifyLockUpType = async (params: LockUpTypeParams) => {
+    await this.checkLockUpTypeInformation(params);
+    const lockup = await this.getLockUp({ lockupName: params.lockupName });
+    assert.isNotDateZero(lockup.startTime, 'LockUp already exists');
+  };
+
+  private checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
+    assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.isBigNumberGreaterThanZero(params.lockUpPeriodSeconds, 'Lockup period in seconds should be greater than 0');
     assert.isBigNumberGreaterThanZero(
@@ -679,6 +788,17 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.assert(
       lockupNames.includes(params.lockupName),
       'User not added to this lockup name, not included in lookup',
+    );
+  };
+
+  private checkRemoveLockUpType = async (lockupName: string) => {
+    assert.assert(lockupName.length > 0, 'Lockup Name cannot be empty string');
+    const lockup = await this.getLockUp({ lockupName });
+    assert.isNotDateZero(lockup.startTime, 'Lockup does not exist');
+    const lockupListOfAddresses = await this.getListOfAddresses({ lockupName });
+    assert.assert(
+      lockupListOfAddresses.length === 0,
+      'There are users attached to the lockup that must be removed before removing the lockup type',
     );
   };
 }
