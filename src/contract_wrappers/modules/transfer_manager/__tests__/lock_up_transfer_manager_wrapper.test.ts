@@ -1501,7 +1501,7 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedGetLockupMethod.callAsync(objectContaining(stringToBytes32(mockedGetLockupParams.lockupName))),
       ).thenResolve(expectedGetLockupResult);
 
-      const expectedListOfAddressesResult = [];
+      const expectedListOfAddressesResult: string[] = [];
 
       const mockedListOfAddressesParams = {
         lockupName,
@@ -1618,7 +1618,7 @@ describe('LockUpTransferManagerWrapper', () => {
       // Stub the method
       when(mockedContract.getLockUp).thenReturn(instance(mockedGetLockupMethod));
 
-      const expectedListOfAddressesResult = [];
+      const expectedListOfAddressesResult: string[] = [];
       // Mocked method
       const mockedListOfAddressesMethod = mock(MockedCallMethod);
       // Stub the method
