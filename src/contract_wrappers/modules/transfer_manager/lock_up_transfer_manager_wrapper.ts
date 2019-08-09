@@ -175,16 +175,43 @@ interface AddNewLockUpTypeMultiParams extends TxParams {
   lockupNames: string[];
 }
 
-interface AddLockUpByNameParams extends TxParams {
+interface LockUpByNameParams extends TxParams {
   userAddress: string;
   lockupName: string;
 }
 
-interface AddLockUpByNameMultiParams extends TxParams {
+interface LockUpByNameMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
 
+interface AddNewLockUpToUserParams extends TxParams {
+  userAddress: string;
+  lockupAmount: BigNumber;
+  startTime: Date;
+  lockUpPeriodSeconds: BigNumber;
+  releaseFrequenciesSeconds: BigNumber;
+  lockupName: string;
+}
+
+interface AddNewLockUpToUserMultiParams extends TxParams {
+  userAddresses: string[];
+  lockupAmounts: BigNumber[];
+  startTimes: Date[];
+  lockUpPeriodSeconds: BigNumber[];
+  releaseFrequenciesSeconds: BigNumber[];
+  lockupNames: string[];
+}
+
+interface RemoveLockUpFromUserParams extends TxParams {
+  userAddress: string;
+  lockupName: string;
+}
+
+interface RemoveLockUpFromUserMultiParams extends TxParams {
+  userAddresses: string[];
+  lockupNames: string[];
+}
 // // Return types ////
 interface LockUp {
   lockupAmount: BigNumber;
@@ -434,7 +461,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /*
    * addLockUpByName
    */
-  public addLockUpByName = async (params: AddLockUpByNameParams) => {
+  public addLockUpByName = async (params: LockUpByNameParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkAddLockUpByName(params);
     return (await this.contract).addLockUpByName.sendTransactionAsync(
@@ -448,7 +475,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /*
    * addLockUpByNameMulti
    */
-  public addLockUpByNameMulti = async (params: AddLockUpByNameMultiParams) => {
+  public addLockUpByNameMulti = async (params: LockUpByNameMultiParams) => {
     assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
     assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -463,6 +490,112 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     }
     await Promise.all(results);
     return (await this.contract).addLockUpByNameMulti.sendTransactionAsync(
+      params.userAddresses,
+      stringArrayToBytes32Array(params.lockupNames),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * addNewLockUpToUser
+   */
+  public addNewLockUpToUser = async (params: AddNewLockUpToUserParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.isNonZeroETHAddressHex('User Address', params.userAddress);
+    // CheckAddNewLockUpType only because no point checking a user that can't be added to lockup
+    await this.checkAddNewLockUpType(params);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return (await this.contract).addNewLockUpToUser.sendTransactionAsync(
+      params.userAddress,
+      valueToWei(params.lockupAmount, decimals),
+      dateToBigNumber(params.startTime),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequenciesSeconds,
+      stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * addNewLockUpToUserMulti
+   */
+  public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    params.userAddresses.map(address => {
+      return assert.isNonZeroETHAddressHex('User Address', address);
+    });
+    assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
+    assert.areValidArrayLengths(
+      [
+        params.userAddresses,
+        params.lockupAmounts,
+        params.lockupNames,
+        params.releaseFrequenciesSeconds,
+        params.lockUpPeriodSeconds,
+        params.startTimes,
+      ],
+      'Argument arrays length mismatch',
+    );
+    const results = [];
+    for (let i = 0; i < params.lockupNames.length; i += 1) {
+      results.push(
+        this.checkAddNewLockUpType({
+          lockupAmount: params.lockupAmounts[i],
+          startTime: params.startTimes[i],
+          lockUpPeriodSeconds: params.lockUpPeriodSeconds[i],
+          releaseFrequenciesSeconds: params.releaseFrequenciesSeconds[i],
+          lockupName: params.lockupNames[i],
+        }),
+      );
+    }
+    await Promise.all(results);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return (await this.contract).addNewLockUpToUserMulti.sendTransactionAsync(
+      params.userAddresses,
+      valueArrayToWeiArray(params.lockupAmounts, decimals),
+      dateArrayToBigNumberArray(params.startTimes),
+      params.lockUpPeriodSeconds,
+      params.releaseFrequenciesSeconds,
+      stringArrayToBytes32Array(params.lockupNames),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * removeLockUpFromUser
+   */
+  public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkRemoveLockUpFromUser(params);
+    return (await this.contract).removeLockUpFromUser.sendTransactionAsync(
+      params.userAddress,
+      stringToBytes32(params.lockupName),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /*
+   * removeLockUpFromUserMulti
+   */
+  public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams) => {
+    assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
+    assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    const results = [];
+    for (let i = 0; i < params.lockupNames.length; i += 1) {
+      results.push(
+        this.checkRemoveLockUpFromUser({
+          lockupName: params.lockupNames[i],
+          userAddress: params.userAddresses[i],
+        }),
+      );
+    }
+    await Promise.all(results);
+    return (await this.contract).removeLockUpFromUserMulti.sendTransactionAsync(
       params.userAddresses,
       stringArrayToBytes32Array(params.lockupNames),
       params.txData,
@@ -530,14 +663,22 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };
 
-  private checkAddLockUpByName = async (params: AddLockUpByNameParams) => {
+  private checkAddLockUpByName = async (params: LockUpByNameParams) => {
     assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
     assert.isNonZeroETHAddressHex('User Address', params.userAddress);
+    const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
+    assert.assert(!lockupNames.includes(params.lockupName), 'User already added to this lockup name');
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isFutureDate(lockup.startTime, 'Start time must be in the future');
+  };
+
+  private checkRemoveLockUpFromUser = async (params: LockUpByNameParams) => {
+    assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
+    assert.isNonZeroETHAddressHex('User Address', params.userAddress);
     const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
-    console.log(lockupNames);
-    console.log(params.lockupName);
-    assert.assert(!lockupNames.includes(params.lockupName), 'User already added to this lockup name');
+    assert.assert(
+      lockupNames.includes(params.lockupName),
+      'User not added to this lockup name, not included in lookup',
+    );
   };
 }
