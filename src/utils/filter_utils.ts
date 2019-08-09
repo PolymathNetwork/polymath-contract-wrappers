@@ -1,4 +1,4 @@
-import ethUtil from 'ethereumjs-util';
+import * as ethUtil from 'ethereumjs-util';
 import jsSHA3 from 'js-sha3';
 import _ from 'lodash';
 import uuid from 'uuid/v4';
