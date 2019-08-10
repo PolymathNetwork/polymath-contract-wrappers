@@ -92,6 +92,7 @@ export enum ModuleType {
   STO = 3,
   Dividends = 4,
   Burn = 5,
+  Wallet = 7,
 }
 
 export enum TransferType {
@@ -160,6 +161,7 @@ export enum ModuleName {
   UsdTieredSTO = 'USDTieredSTO',
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
+  VestingEscrowWallet = 'VestingEscrowWallet',
 }
 
 export enum TransferStatusCode {

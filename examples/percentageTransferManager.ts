@@ -1,9 +1,9 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType } from '../src';
-import { BigNumber } from '@polymathnetwork/abi-wrappers';
 
 // This file acts as a valid sandbox for using a percentage restriction transfer manager module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -40,11 +40,7 @@ window.addEventListener('load', async () => {
     names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
-
-  const finalNames = resultNames.map(name => {
-    return bytes32ToString(name);
-  });
-  const index = finalNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleStringName);
 
   // Call to add module
   await tickerSecurityTokenInstance.addModule({

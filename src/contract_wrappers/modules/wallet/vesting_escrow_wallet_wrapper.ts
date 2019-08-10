@@ -34,6 +34,7 @@ import {
   TransferResult,
   Perm,
   TransferStatusCode,
+  FULL_DECIMALS,
 } from '../../../types';
 import {
   numberToBigNumber,
@@ -43,6 +44,7 @@ import {
   bytes32ToString,
   bytes32ArrayToStringArray,
   bigNumberToDate,
+  stringToBytes32,
 } from '../../../utils/convert';
 
 const TRANSFER_SUCCESS = '0x51';
@@ -442,7 +444,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   public unassignedTokens = async () => {
-    return (await this.contract).unassignedTokens.callAsync();
+    const result = await (await this.contract).unassignedTokens.callAsync();
+    return result.toNumber();
   };
 
   public schedules = async (params: SchedulesParams) => {
@@ -484,13 +487,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
       await this.getCallerAddress(params.txData),
       await this.address(),
-      numberToBigNumber(params.numberOfTokens),
+      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
       '0x00',
     );
     assert.assert(canTransferFromResult[0] === TRANSFER_SUCCESS, 'Failed transferFrom');
 
     return (await this.contract).depositTokens.sendTransactionAsync(
-      numberToBigNumber(params.numberOfTokens),
+      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );
@@ -503,7 +506,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
     assert.assert(params.amount > 0, 'Amount cannot be zero');
 
-    const unassignedTokens = (await this.unassignedTokens()).toNumber();
+    const unassignedTokens = await this.unassignedTokens();
     assert.assert(params.amount <= unassignedTokens, 'Amount is greater than unassigned tokens');
 
     const canTransferResult = await (await this.securityTokenContract()).canTransfer.callAsync(
@@ -557,8 +560,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     return (await this.contract).addTemplate.sendTransactionAsync(
-      params.name,
-      numberToBigNumber(params.numberOfTokens),
+      stringToBytes32(params.name),
+      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       params.txData,
@@ -603,11 +606,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(params.templateName !== '', 'Invalid name');
     assert.assert(!(await this.getAllTemplateNames()).includes(params.templateName), 'Template name already exists');
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
-    await this.validateAddScheduleFromTemplate(params.beneficiary, params.templateName, params.startTime);
+    await this.validateAddSchedule(params.beneficiary, params.templateName, params.startTime);
     return (await this.contract).addSchedule.sendTransactionAsync(
       params.beneficiary,
-      params.templateName,
-      numberToBigNumber(params.numberOfTokens),
+      stringToBytes32(params.templateName),
+      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       dateToBigNumber(params.startTime),
@@ -624,7 +627,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     await this.validateAddScheduleFromTemplate(params.beneficiary, params.templateName, params.startTime);
     return (await this.contract).addScheduleFromTemplate.sendTransactionAsync(
       params.beneficiary,
-      params.templateName,
+      stringToBytes32(params.templateName),
       dateToBigNumber(params.startTime),
       params.txData,
       params.safetyFactor,
@@ -641,7 +644,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     // TODO: require(now < schedule.startTime, "Schedule started");
     return (await this.contract).modifySchedule.sendTransactionAsync(
       params.beneficiary,
-      params.templateName,
+      stringToBytes32(params.templateName),
       dateToBigNumber(params.startTime),
       params.txData,
       params.safetyFactor,
@@ -657,7 +660,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     // TODO: _sendTokensPerSchedule assert
     return (await this.contract).revokeSchedule.sendTransactionAsync(
       params.beneficiary,
-      params.templateName,
+      stringToBytes32(params.templateName),
       params.txData,
       params.safetyFactor,
     );
@@ -683,6 +686,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   public getSchedule = async (params: GetScheduleParams) => {
     this.checkSchedule(params.beneficiary, params.templateName);
     const result = await (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
+
     return {
       numberOfTokens: result[0].toNumber(),
       duration: result[1].toNumber(),
@@ -710,7 +714,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   public getScheduleCount = async (params: GetScheduleCountParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     const result = await (await this.contract).getScheduleCount.callAsync(params.beneficiary);
-    return result.toNumber();
+    return weiToValue(result, FULL_DECIMALS).toNumber();
   };
 
   /**
@@ -751,7 +755,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
         this.validateTemplate(params.numberOfTokens[i], params.durations[i], params.frequencies[i]),
       );
       resultValidateAddScheduleFromTemplate.push(
-        this.validateAddScheduleFromTemplate(params.beneficiaries[i], params.templateNames[i], params.startTimes[i]),
+        this.validateAddSchedule(params.beneficiaries[i], params.templateNames[i], params.startTimes[i]),
       );
     }
     const getAllTemplatesNames = await Promise.all(resultGetAllTemplatesNames);
@@ -763,9 +767,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
     return (await this.contract).addScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
-      params.templateNames,
+      params.templateNames.map(name => {
+        return stringToBytes32(name);
+      }),
       params.numberOfTokens.map(number => {
-        return numberToBigNumber(number);
+        return valueToWei(numberToBigNumber(number), FULL_DECIMALS);
       }),
       params.durations.map(duration => {
         return numberToBigNumber(duration);
@@ -795,7 +801,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     await Promise.all(resultsValidateAddScheduleFromTemplate);
     return (await this.contract).addScheduleFromTemplateMulti.sendTransactionAsync(
       params.beneficiaries,
-      params.templateNames,
+      params.templateNames.map(name => {
+        return stringToBytes32(name);
+      }),
       params.startTimes.map(startTime => {
         return dateToBigNumber(startTime);
       }),
@@ -837,7 +845,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
     return (await this.contract).modifyScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
-      params.templateNames,
+      params.templateNames.map(name => {
+        return stringToBytes32(name);
+      }),
       params.startTimes.map(startTime => {
         return dateToBigNumber(startTime);
       }),
@@ -853,7 +863,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(numberOfTokens % periodCount === 0, 'Invalid period count');
     const amountPerPeriod = numberOfTokens / periodCount;
     const granularity = await (await this.securityTokenContract()).granularity.callAsync();
-    assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
+    assert.assert(amountPerPeriod % weiToValue(granularity, FULL_DECIMALS).toNumber() === 0, 'Invalid granularity');
+  };
+
+  private validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {
+    assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
+    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, 'Already added');
+    assert.assert(startTime.getTime() > Date.now(), 'Date in the past');
   };
 
   private validateAddScheduleFromTemplate = async (beneficiary: string, templateName: string, startTime: Date) => {
