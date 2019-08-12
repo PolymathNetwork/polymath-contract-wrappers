@@ -24,6 +24,7 @@ import {
   PolyTokenFaucet,
   Module,
   ERC20Detailed,
+  VestingEscrowWallet,
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -175,6 +176,8 @@ export class PolymathAPI {
       PolyToken.abi,
       PolyTokenFaucet.abi,
       ISecurityToken.abi,
+      // Wallet
+      VestingEscrowWallet.abi,
     ];
 
     abiArray.forEach((abi): void => {
