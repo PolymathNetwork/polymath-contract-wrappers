@@ -108,6 +108,9 @@ window.addEventListener('load', async () => {
 
   const randomBeneficiary1 = '0x2222222222222222222222222222222222222222';
   const randomBeneficiary2 = '0x3333333333333333333333333333333333333333';
+  const firstLockUpName = 'Lockup1';
+  const secondLockUpName = 'Lockup2';
+  const thirdLockUpName = 'Lockup3';
 
   await generalTM.modifyKYCDataMulti({
     investors: [myAddress, randomBeneficiary1, randomBeneficiary2],
@@ -134,17 +137,61 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // Add new lock up to user multi
-  const startTime = new Date(Date.now() + 10000);
-
+  // Add new lock up to user multi, so we can test the lockup
   await lockUpTM.addNewLockUpToUserMulti({
     userAddresses: [myAddress, randomBeneficiary1, randomBeneficiary2],
+    startTimes: [new Date(2030, 1, 1), new Date(2030, 1, 1), new Date(2030, 1, 1)],
+    lockUpPeriodSeconds: [new BigNumber(5), new BigNumber(5), new BigNumber(5)],
+    releaseFrequenciesSeconds: [new BigNumber(1), new BigNumber(1), new BigNumber(1)],
+    lockupAmounts: [new BigNumber(100), new BigNumber(100), new BigNumber(100)],
+    lockupNames: [firstLockUpName, secondLockUpName, thirdLockUpName],
+  });
+
+  // Try out transfer above lockup, will fail
+  try {
+    await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(1) });
+  } catch (e) {
+    console.log('Transfer above lockup amount fails as expected');
+  }
+
+  // Subscribe to event of modify lock up type
+  await lockUpTM.subscribeAsync({
+    eventName: LockUpTransferManagerEvents.ModifyLockUpType,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Modify Lock Up Type', log);
+      }
+    },
+  });
+
+  const startTime = new Date(Date.now() + 10000);
+  // Modify the lockup types so that we can test in real time
+  await lockUpTM.modifyLockUpTypeMulti({
     startTimes: [startTime, startTime, startTime],
     lockUpPeriodSeconds: [new BigNumber(5), new BigNumber(5), new BigNumber(5)],
     releaseFrequenciesSeconds: [new BigNumber(1), new BigNumber(1), new BigNumber(1)],
     lockupAmounts: [new BigNumber(20), new BigNumber(10), new BigNumber(10)],
-    lockupNames: ['Lockup1', 'Lockup2', 'Lockup3'],
+    lockupNames: [firstLockUpName, secondLockUpName, thirdLockUpName],
   });
+
+  // Subscribe to event of remove lockup from user
+  await lockUpTM.subscribeAsync({
+    eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Remove lockup from user', log);
+      }
+    },
+  });
+  // Example removing lockup from beneficiary 2 and removing lockup type
+  await lockUpTM.removeLockUpFromUser({ userAddress: randomBeneficiary2, lockupName: thirdLockUpName });
+  await lockUpTM.removeLockupType({lockupName: thirdLockUpName});
 
   // Try to transfer 50, it is below lockup and will pass
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(50) });
@@ -178,7 +225,7 @@ window.addEventListener('load', async () => {
 
   // Transfer out the rest of tokens now that lockup is over
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(19) });
-  console.log('19 last tokens transferred to randomBeneficiary2');
+  console.log('19 more tokens transferred to randomBeneficiary2');
 
   tickerSecurityTokenInstance.unsubscribeAll();
 });
