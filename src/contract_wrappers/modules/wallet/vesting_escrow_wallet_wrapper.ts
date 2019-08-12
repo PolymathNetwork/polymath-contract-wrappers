@@ -400,6 +400,12 @@ interface GetSchedule {
   State: StateStatus;
 }
 
+interface Schedule {
+  templateName: string;
+  claimedTokens: number;
+  startTime: Date;
+}
+
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
@@ -449,19 +455,22 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   public schedules = async (params: SchedulesParams) => {
-    return (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
+    const result = await (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
+    const schedule: Schedule = {
+      templateName: bytes32ToString(result[0]),
+      claimedTokens: result[1].toNumber(),
+      startTime: bigNumberToDate(result[2]),
+    };
+    return schedule;
   };
 
   public templateNames = async (params: TemplateNamesParams) => {
-    return (await this.contract).templateNames.callAsync(numberToBigNumber(params.index));
+    const result = await (await this.contract).templateNames.callAsync(numberToBigNumber(params.index));
+    return bytes32ToString(result);
   };
 
   public beneficiaries = async (params: BeneficiariesParams) => {
     return (await this.contract).beneficiaries.callAsync(numberToBigNumber(params.index));
-  };
-
-  public getDataStore = async () => {
-    return (await this.contract).getDataStore.callAsync();
   };
 
   /**
@@ -685,7 +694,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public getSchedule = async (params: GetScheduleParams) => {
     this.checkSchedule(params.beneficiary, params.templateName);
-    const result = await (await this.contract).getSchedule.callAsync(params.beneficiary, params.templateName);
+    const result = await (await this.contract).getSchedule.callAsync(
+      params.beneficiary,
+      stringToBytes32(params.templateName),
+    );
 
     return {
       numberOfTokens: result[0].toNumber(),
@@ -693,7 +705,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       frequency: result[2].toNumber(),
       startTime: bigNumberToDate(result[3]),
       claimedTokens: result[4].toNumber(),
-      State: StateStatus[result[5].toNumber()],
+      state: StateStatus[result[5].toNumber()],
     };
   };
 
