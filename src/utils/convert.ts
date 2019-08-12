@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { Partition, Perm } from '../types';
+import { ModuleType, Partition, Perm } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -100,4 +100,20 @@ export function parsePermBytes32Value(value: string): Perm {
     default:
       throw new Error('Permission not recognized');
   }
+}
+  export function parseModuleTypeValue(value: BigNumber): ModuleType {
+    switch (value.toNumber()) {
+      case ModuleType.Dividends:
+        return ModuleType.Dividends;
+      case ModuleType.STO:
+        return ModuleType.STO;
+      case ModuleType.TransferManager:
+        return ModuleType.TransferManager;
+      case ModuleType.PermissionManager:
+        return ModuleType.PermissionManager;
+      case ModuleType.Burn:
+        return ModuleType.Burn;
+      default:
+        throw new Error('Module Type not recognized');
+    }
 }

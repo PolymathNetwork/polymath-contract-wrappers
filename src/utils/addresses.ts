@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { NetworkId } from '../types';
 
 const networkToAddresses: { [networkId: number]: string } = {

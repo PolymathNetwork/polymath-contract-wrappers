@@ -1,7 +1,7 @@
 import * as ethUtil from 'ethereumjs-util';
-import * as jsSHA3 from 'js-sha3';
-import * as _ from 'lodash';
-import * as uuid from 'uuid/v4';
+import jsSHA3 from 'js-sha3';
+import _ from 'lodash';
+import uuid from 'uuid/v4';
 
 import { ContractAbi, FilterObject, EventAbi, LogEntry } from '@polymathnetwork/abi-wrappers';
 import { BlockRange, ContractEvents, IndexedFilterValues } from '../types';

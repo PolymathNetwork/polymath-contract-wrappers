@@ -18,15 +18,65 @@ window.addEventListener('load', async () => {
   // Instantiate the API
   const polymathAPI = new PolymathAPI(params);
 
-  const ticker = 'TEST';
-  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker);
-  const TEST = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
-  const investorAddress = '<investor address>'.toLowerCase();
-  const generalTMAddress = (await TEST.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }))[0];
+  // Get some poly tokens in your account and the security token
+  const myAddress = await polymathAPI.getAccount();
+  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
+
+  // Prompt to setup your ticker and token name
+  const ticker = prompt('Ticker', '');
+  const tokenName = prompt('Token Name', '');
+
+  // Double check available
+  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+    ticker: ticker!,
+  });
+  // Get the ticker fee and approve the security token registry to spend
+  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: tickerFee,
+  });
+  // Register a ticker
+  await polymathAPI.securityTokenRegistry.registerTicker({
+    ticker: ticker!,
+    tokenName: tokenName!,
+  });
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  await polymathAPI.polyToken.approve({
+    spender: await polymathAPI.securityTokenRegistry.address(),
+    value: securityTokenLaunchFee,
+  });
+
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
+    name: tokenName!,
+    ticker: ticker!,
+    tokenDetails: 'details',
+    divisible: true,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
+  });
+
+  console.log('Security Token Generated');
+
+  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker!);
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
+
+  const investorAddress = '0x1111111111111111111111111111111111111111';
+  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.GeneralTransferManager,
+  }))[0];
 
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
     name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
+  });
+
+  await generalTM.modifyKYCData({
+    investor: investorAddress,
+    canReceiveAfter: new Date(),
+    canSendAfter: new Date(),
+    expiryTime: new Date(2035, 1),
   });
 
   const listInvestors = await generalTM.getAllKYCData();
@@ -34,7 +84,7 @@ window.addEventListener('load', async () => {
     return addr.investor == investorAddress;
   });
 
-  await TEST.subscribeAsync({
+  await tickerSecurityTokenInstance.subscribeAsync({
     eventName: SecurityTokenEvents.Issued,
     indexFilterValues: {},
     callback: async (error, log) => {
@@ -47,17 +97,20 @@ window.addEventListener('load', async () => {
   });
 
   if (found) {
-    await TEST.issue({
+    await tickerSecurityTokenInstance.issue({
       investor: investorAddress,
       value: new BigNumber(100),
-      data: '',
+      data: '0x51',
       txData: {
-        from: '<sto owner>'.toLowerCase(),
+        from: myAddress.toLowerCase(),
       },
     });
+    console.log('100 tokens issued');
   } else {
     console.log('Please make sure beneficiary address has been whitelisted');
   }
+  console.log('Balance of investor:');
+  console.log((await tickerSecurityTokenInstance.balanceOf({ owner: investorAddress })).toNumber());
 
-  TEST.unsubscribeAll();
+  tickerSecurityTokenInstance.unsubscribeAll();
 });

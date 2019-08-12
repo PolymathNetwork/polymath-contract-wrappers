@@ -1,6 +1,6 @@
 {
   "name": "@polymathnetwork/contract-wrappers",
-  "version": "2.0.0-beta.16",
+  "version": "2.0.0-beta.23",
   "description": "Smart TS wrappers for Polymath smart contracts",
   "keywords": [
     "polymath",
@@ -10,6 +10,7 @@
     "lib/**/*"
   ],
   "main": "lib/index.js",
+  "browser": "lib/index.browser.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config=webpack.config.dev.js",
@@ -83,12 +84,14 @@
     "@0x/subproviders": "^4.1.1",
     "@0x/types": "^2.4.0",
     "@0x/typescript-typings": "^4.2.3",
-    "@polymathnetwork/abi-wrappers": "3.0.0-beta.4",
+    "@polymathnetwork/abi-wrappers": "3.0.0-beta.6",
+    "@types/semver": "^6.0.1",
     "ethereumjs-blockstream": "6.0.0",
     "ethereumjs-util": "^6.1.0",
     "js-sha3": "^0.8.0",
     "lodash": "^4.17.5",
     "moment": "^2.24.0",
+    "semver": "^6.3.0",
     "uuid": "^3.3.2"
   },
   "publishConfig": {
