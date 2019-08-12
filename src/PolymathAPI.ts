@@ -5,15 +5,13 @@ import {
   providerUtils,
   Provider,
   PolymathRegistry,
-  SecurityToken,
-  SecurityTokenRegistry,
+  ISecurityTokenRegistry,
+  ISecurityToken,
   PolyToken,
   ModuleRegistry,
   CappedSTO,
-  CappedSTOFactory,
   ModuleFactory,
   USDTieredSTO,
-  USDTieredSTOFactory,
   FeatureRegistry,
   GeneralTransferManager,
   GeneralPermissionManager,
@@ -23,7 +21,10 @@ import {
   PercentageTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
-  PolyTokenFaucet, } from '@polymathnetwork/abi-wrappers';
+  PolyTokenFaucet,
+  Module,
+  ERC20Detailed,
+} from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
@@ -132,36 +133,55 @@ export class PolymathAPI {
       gasPrice: params.defaultGasPrice,
     });
 
-    const artifactsArray = [
-      PolymathRegistry,
-      SecurityToken,
-      SecurityTokenRegistry,
-      PolyToken,
-      ModuleRegistry,
-      CappedSTO,
-      CappedSTOFactory,
-      ModuleFactory,
-      USDTieredSTO,
-      USDTieredSTOFactory,
-      FeatureRegistry,
-      GeneralTransferManager,
-      GeneralPermissionManager,
-      ERC20DividendCheckpoint,
-      ManualApprovalTransferManager,
-      CountTransferManager,
-      PercentageTransferManager,
-      EtherDividendCheckpoint,
-      VolumeRestrictionTransferManager,
-      PolyTokenFaucet,
+    const abiArray = [
+      // Registries
+      FeatureRegistry.abi,
+      ModuleRegistry.abi,
+      PolymathRegistry.abi,
+      ISecurityTokenRegistry.abi.filter(
+        a =>
+          a.type !== 'event' &&
+          a.name !== 'RegisterTicker' &&
+          a.inputs ===
+            [
+              { indexed: true, name: '_owner', type: 'address' },
+              { indexed: false, name: '_ticker', type: 'string' },
+              { indexed: false, name: '_name', type: 'string' },
+              { indexed: true, name: '_registrationDate', type: 'uint256' },
+              { indexed: true, name: '_expiryDate', type: 'uint256' },
+              { indexed: false, name: '_fromAdmin', type: 'bool' },
+              { indexed: false, name: '_registrationFee', type: 'uint256' },
+            ],
+      ),
+      // Modules
+      ModuleFactory.abi,
+      Module.abi,
+      // Checkpoint
+      ERC20DividendCheckpoint.abi,
+      EtherDividendCheckpoint.abi,
+      // Permission
+      GeneralPermissionManager.abi,
+      // STO
+      CappedSTO.abi,
+      USDTieredSTO.abi,
+      // Transfer
+      CountTransferManager.abi,
+      GeneralTransferManager.abi,
+      ManualApprovalTransferManager.abi,
+      PercentageTransferManager.abi,
+      VolumeRestrictionTransferManager.abi,
+      // Tokens
+      ERC20Detailed.abi,
+      PolyToken.abi,
+      PolyTokenFaucet.abi,
+      ISecurityToken.abi,
     ];
 
-    artifactsArray.forEach(
-      (artifact): void => {
-        this.web3Wrapper.abiDecoder.addABI(artifact.abi);
-      },
-    );
+    abiArray.forEach((abi): void => {
+      this.web3Wrapper.abiDecoder.addABI(abi);
+    });
 
-    this.contractFactory = new ContractFactory(this.web3Wrapper, params.polymathRegistryAddress);
+    this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 
     this.polymathRegistry = new PolymathRegistryWrapper(
       this.web3Wrapper,
@@ -217,7 +237,7 @@ export class PolymathAPI {
    */
   public getERC20TokenWrapper = async (params: GetERC20WrapperParams): Promise<ERC20> => {
     return this.tokenFactory.getERC20TokenInstanceFromAddress(params.address);
-  }
+  };
 
   /**
    * Get the account currently used by PolymathAPI
