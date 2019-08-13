@@ -17,7 +17,9 @@ import {
   bytes32ToString,
   bigNumberToDate,
   dateToBigNumber,
+  valueToWei,
 } from '../../../../utils/convert';
+import { TransferStatusCode } from '../../../../types';
 
 describe('VestingEscrowWalletWrapper', () => {
   let target: VestingEscrowWalletWrapper;
@@ -458,6 +460,191 @@ describe('VestingEscrowWalletWrapper', () => {
       // Verifications
       verify(mockedContract.getTemplateNames).once();
       verify(mockedMethod.callAsync(mockedParams.beneficiary)).once();
+    });
+  });
+
+  describe('getScheduleCount', () => {
+    test('should call to getScheduleCount', async () => {
+      const mockedParams = {
+        beneficiary: '0x3333333333333333333333333333333333333333',
+      };
+      // Address expected
+      const expectedResult = new BigNumber(1);
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getScheduleCount).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.beneficiary)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getScheduleCount(mockedParams);
+      // Result expectation
+      expect(result).toEqual(expectedResult.toNumber());
+      // Verifications
+      verify(mockedContract.getScheduleCount).once();
+      verify(mockedMethod.callAsync(mockedParams.beneficiary)).once();
+    });
+  });
+
+  describe('changeTreasuryWallet', () => {
+    test('should changeTreasuryWallet', async () => {
+      const mockedParams = {
+        newTreasuryWallet: '0x4444444444444444444444444444444444444444',
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // isCallerTheSecurityTokenOwner
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeTreasuryWallet).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.newTreasuryWallet,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeTreasuryWallet(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeTreasuryWallet).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.newTreasuryWallet,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      // isCallerTheSecurityTokenOwner
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('depositTokens', () => {
+    test('should depositTokens', async () => {
+      const mockedParams = {
+        numberOfTokens: 100,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      // isCallerTheSecurityTokenOwner
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      // decimals
+      /*
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      */
+      // canTransferFrom
+      const expectedStatusCode = TransferStatusCode.TransferSuccess;
+      const expectedReasonCode = 'Reason';
+      const expectedCanTransferFromResult = [expectedStatusCode, stringToBytes32(expectedReasonCode)];
+      const mockedSecurityTokenCanTransferFromMethod = mock(MockedCallMethod);
+      const mockedCanTransferFromParams = {
+        from: '0x3433333333333333333333333333333333333333',
+        to: '0x4333333333333333333333333333333333333333',
+        data: 'data',
+      };
+      when(mockedSecurityTokenContract.canTransferFrom).thenReturn(instance(mockedSecurityTokenCanTransferFromMethod));
+      when(
+        mockedSecurityTokenCanTransferFromMethod.callAsync(
+          mockedCanTransferFromParams.from,
+          mockedCanTransferFromParams.to,
+          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)), // objectContaining(valueToWei(mockedCanTransferFromParams.value, expectedDecimalsResult)),
+          mockedCanTransferFromParams.data,
+        ),
+      ).thenResolve(expectedCanTransferFromResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.depositTokens).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.depositTokens(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // isCallerTheSecurityTokenOwner
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      // decimals
+      /*
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+      */
+      // canTransferFrom
+      verify(mockedSecurityTokenContract.canTransferFrom).once();
+      verify(
+        mockedSecurityTokenCanTransferFromMethod.callAsync(
+          mockedCanTransferFromParams.from,
+          mockedCanTransferFromParams.to,
+          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          mockedCanTransferFromParams.data,
+        ),
+      ).once();
+      // Verifications
+      verify(mockedContract.depositTokens).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
     });
   });
 

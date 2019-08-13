@@ -496,13 +496,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
       await this.getCallerAddress(params.txData),
       await this.address(),
-      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
+      numberToBigNumber(params.numberOfTokens),
       '0x00',
     );
     assert.assert(canTransferFromResult[0] === TRANSFER_SUCCESS, 'Failed transferFrom');
 
     return (await this.contract).depositTokens.sendTransactionAsync(
-      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
+      numberToBigNumber(params.numberOfTokens),
       params.txData,
       params.safetyFactor,
     );
@@ -726,7 +726,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   public getScheduleCount = async (params: GetScheduleCountParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     const result = await (await this.contract).getScheduleCount.callAsync(params.beneficiary);
-    return weiToValue(result, FULL_DECIMALS).toNumber();
+    return result.toNumber();
   };
 
   /**
