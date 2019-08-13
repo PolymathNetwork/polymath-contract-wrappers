@@ -17,6 +17,7 @@ import {
   ManualApprovalTransferManagerContract,
   PercentageTransferManagerContract,
   LockUpTransferManagerContract,
+  BlacklistTransferManagerContract,
   VolumeRestrictionTMContract,
   FeatureRegistryContract,
   ModuleRegistryContract,
@@ -167,7 +168,7 @@ export default class ContractFactory {
     );
     this.abiArray.forEach(
       (abi): void => {
-        
+
         contract.addABItoDecoder(abi);
       },
     );
@@ -267,18 +268,36 @@ export default class ContractFactory {
     assert.isETHAddressHex('address', address);
     const contract = new PercentageTransferManagerContract(address, this.provider, this.contractDefaults);
     this.abiArray.forEach(
-      (abi): void => {
-        contract.addABItoDecoder(abi);
-      },
+        (abi): void => {
+          contract.addABItoDecoder(abi);
+        },
     );
     return contract;
   }
 
+
   public async getLockUpTransferManagerContract(address: string): Promise<LockUpTransferManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new LockUpTransferManagerContract(address, this.provider, this.contractDefaults);
+    const contract = new LockUpTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach(
+        (abi): void => {
+          contract.addABItoDecoder(abi);
+        },
+    );
+    return contract;
   }
 
+  public async getBlacklistTransferManagerContract(address: string): Promise<BlacklistTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
+    const contract = new BlacklistTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach(
+        (abi): void => {
+          contract.addABItoDecoder(abi);
+        },
+    );
+    return contract;
+  }
+  
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
     assert.isETHAddressHex('address', address);
     const contract = new VolumeRestrictionTMContract(address, this.provider, this.contractDefaults);
