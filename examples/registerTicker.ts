@@ -75,9 +75,9 @@ window.addEventListener('load', async () => {
           spender,
           value: tickerFee,
         });
-      } else {
-        await registerTicker();
       }
+
+      await registerTicker();
     }
   }
 
