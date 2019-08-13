@@ -611,17 +611,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Stub the request
       when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
 
-      // Get Ticker Details
-      const expectedTickerDetailsResult = [
-        '0x0123456789012345678901234567890123456789',
-        new BigNumber(1735689600),
-        new BigNumber(1735689605),
-        'ticker',
-        false,
-      ];
-      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
-      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
-      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+      // Get Ticker Availability
+      const expectedTickerAvailability = true;
+      const mockedTickerAvailableMethod = mock(MockedCallMethod);
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedTickerAvailableMethod));
+      when(mockedTickerAvailableMethod.callAsync(ticker)).thenResolve(expectedTickerAvailability);
 
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -673,9 +667,8 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
-      ).once();
-      verify(mockedContract.getTickerDetails).once();
-      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
+      ).once();      
+      verify(mockedTickerAvailableMethod.callAsync(ticker)).once();
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedTickerRegistrationFeeMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
@@ -1187,17 +1180,11 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Stub the request
       when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
 
-      // Get Ticker Details
-      const expectedTickerDetailsResult = [
-        '0x0123456789012345678901234567890123456789',
-        new BigNumber(1735689600),
-        new BigNumber(1735689605),
-        'ticker',
-        false,
-      ];
-      const mockedGetTickerDetailsMethod = mock(MockedCallMethod);
-      when(mockedContract.getTickerDetails).thenReturn(instance(mockedGetTickerDetailsMethod));
-      when(mockedGetTickerDetailsMethod.callAsync(ticker)).thenResolve(expectedTickerDetailsResult);
+      // Get Ticker Availability
+      const expectedTickerAvailability = true;
+      const mockedTickerAvailableMethod = mock(MockedCallMethod);
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedTickerAvailableMethod));
+      when(mockedTickerAvailableMethod.callAsync(ticker)).thenResolve(expectedTickerAvailability);
 
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
@@ -1252,9 +1239,8 @@ describe('SecurityTokenRegistryWrapper', () => {
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
-      ).once();
-      verify(mockedContract.getTickerDetails).once();
-      verify(mockedGetTickerDetailsMethod.callAsync(ticker)).once();
+      ).once();  
+      verify(mockedTickerAvailableMethod.callAsync(ticker)).once();
       verify(mockedContract.getTickerRegistrationFee).once();
       verify(mockedTickerRegistrationFeeMethod.callAsync()).once();
       verify(mockedPolyTokenContract.balanceOf).once();
@@ -1489,7 +1475,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.getSecurityTokenAddress(ticker);
+      const result = await target.getSecurityTokenAddress({ ticker });
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
@@ -1500,39 +1486,33 @@ describe('SecurityTokenRegistryWrapper', () => {
 
   describe('TickerAvailable', () => {
     test('should return false as ticker is registered and deployed', async () => {
-      const expectedResult = [
-        '0x0123456789012345678901234567890123456789',
-        new BigNumber(1),
-        new BigNumber(1),
-        'tokenName',
-        true,
-      ];
+      const expectedResult = false;
       const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
-      // Real call
-      const result = await target.tickerAvailable({ ticker });
+      // Real call    
+      const result = await target.tickerAvailable({ ticker });      
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
-      verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.tickerAvailable).once();
       verify(mockedMethod.callAsync(ticker)).once();
     });
 
     test.todo('should return false as ticker is registered and not expired');
 
     test('should return true as ticker is not registered', async () => {
-      const expectedResult = ['', new BigNumber(0), new BigNumber(0), '', false];
+      const expectedResult = true;
       const ticker = 'TICK';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
@@ -1541,7 +1521,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
-      verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.tickerAvailable).once();
       verify(mockedMethod.callAsync(ticker)).once();
     });
 
@@ -1558,6 +1538,12 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Stub the method
       const expectedAddrResult = [ownerAddress];
 
+      // Get Ticker Availability
+      const expectedTickerAvailability = false;
+      const mockedTickerAvailableMethod = mock(MockedCallMethod);
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedTickerAvailableMethod));
+      when(mockedTickerAvailableMethod.callAsync(ticker)).thenResolve(expectedTickerAvailability);
+
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve(expectedAddrResult);
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
@@ -1569,7 +1555,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       expect(result).toEqual(true);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.tickerAvailable).once();
       verify(mockedMethod.callAsync(ticker)).once();
+      verify(mockedTickerAvailableMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
 
@@ -1588,6 +1576,12 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Stub the method
       const expectedAddrResult = ['0x1111111111111111111111111111111111111111'];
 
+      // Get Ticker Availability
+      const expectedTickerAvailability = false;
+      const mockedTickerAvailableMethod = mock(MockedCallMethod);
+      when(mockedContract.tickerAvailable).thenReturn(instance(mockedTickerAvailableMethod));
+      when(mockedTickerAvailableMethod.callAsync(ticker)).thenResolve(expectedTickerAvailability);
+
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve(expectedAddrResult);
 
       when(mockedContract.getTickerDetails).thenReturn(instance(mockedMethod));
@@ -1599,7 +1593,9 @@ describe('SecurityTokenRegistryWrapper', () => {
       expect(result).toEqual(false);
       // Verifications
       verify(mockedContract.getTickerDetails).once();
+      verify(mockedContract.tickerAvailable).once();
       verify(mockedMethod.callAsync(ticker)).once();
+      verify(mockedTickerAvailableMethod.callAsync(ticker)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });

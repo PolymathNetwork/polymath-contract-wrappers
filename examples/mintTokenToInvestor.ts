@@ -59,7 +59,7 @@ window.addEventListener('load', async () => {
 
   console.log('Security Token Generated');
 
-  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker!);
+  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress({ ticker: ticker! });
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
 
   const investorAddress = '0x1111111111111111111111111111111111111111';
