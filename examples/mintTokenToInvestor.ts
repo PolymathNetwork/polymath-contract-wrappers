@@ -27,7 +27,7 @@ window.addEventListener('load', async () => {
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
     ticker: ticker!,
   });
   // Get the ticker fee and approve the security token registry to spend

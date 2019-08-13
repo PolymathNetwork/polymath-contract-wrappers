@@ -1498,7 +1498,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     });
   });
 
-  describe('IsTickerAvailable', () => {
+  describe('TickerAvailable', () => {
     test('should return false as ticker is registered and deployed', async () => {
       const expectedResult = [
         '0x0123456789012345678901234567890123456789',
@@ -1516,7 +1516,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ ticker });
+      const result = await target.tickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(false);
       // Verifications
@@ -1537,7 +1537,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       when(mockedMethod.callAsync(ticker)).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.isTickerAvailable({ ticker });
+      const result = await target.tickerAvailable({ ticker });
       // Result expectation
       expect(result).toEqual(true);
       // Verifications
