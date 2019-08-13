@@ -867,7 +867,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public tickerAvailable = async (params: TickerParams) => {
-    return (await this.contract).tickerAvailable.callAsync(params.ticker);
+    return (await this.contract).tickerAvailable.callAsync(params.ticker.toUpperCase());
   }
 
   /**
