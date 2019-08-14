@@ -237,7 +237,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Real call
       const result = await target.unassignedTokens();
       // Result expectation
-      expect(result).toBe(expectedResult.toNumber());
+      expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.unassignedTokens).once();
       verify(mockedMethod.callAsync()).once();
@@ -425,7 +425,7 @@ describe('VestingEscrowWalletWrapper', () => {
       expect(result.frequency).toEqual((expectedResult[2] as BigNumber).toNumber());
       expect(result.startTime).toEqual(bigNumberToDate(expectedResult[3] as BigNumber));
       expect(result.claimedTokens).toEqual((expectedResult[4] as BigNumber).toNumber());
-      expect(result.state).toEqual('CREATED');
+      expect(result.state).toEqual(0);
 
       // Verifications
       verify(mockedContract.getSchedule).once();
@@ -550,7 +550,7 @@ describe('VestingEscrowWalletWrapper', () => {
   describe('depositTokens', () => {
     test('should depositTokens', async () => {
       const mockedParams = {
-        numberOfTokens: 10,
+        numberOfTokens: new BigNumber(10),
         txData: {},
         safetyFactor: 10,
       };
@@ -587,7 +587,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedSecurityTokenCanTransferFromMethod.callAsync(
           mockedCanTransferFromParams.from,
           mockedCanTransferFromParams.to,
-          objectContaining(numberToBigNumber(mockedCanTransferFromParams.value)),
+          objectContaining(mockedCanTransferFromParams.value),
           mockedCanTransferFromParams.data,
         ),
       ).thenResolve(expectedCanTransferFromResult);
@@ -600,7 +600,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -617,7 +617,7 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.depositTokens).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -635,7 +635,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedSecurityTokenCanTransferFromMethod.callAsync(
           mockedCanTransferFromParams.from,
           mockedCanTransferFromParams.to,
-          objectContaining(numberToBigNumber(mockedCanTransferFromParams.value)), // objectContaining(valueToWei(mockedCanTransferFromParams.value, expectedDecimalsResult)),
+          objectContaining(mockedCanTransferFromParams.value),
           mockedCanTransferFromParams.data,
         ),
       ).once();
@@ -645,7 +645,7 @@ describe('VestingEscrowWalletWrapper', () => {
   describe('sendToTreasury', () => {
     test('should sendToTreasury', async () => {
       const mockedParams = {
-        amount: 10,
+        amount: new BigNumber(10),
         txData: {},
         safetyFactor: 10,
       };
@@ -687,7 +687,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedSecurityTokenCanTransferMethod.callAsync(
           mockedCanTransferParams.to,
-          objectContaining(numberToBigNumber(mockedCanTransferParams.value)),
+          objectContaining(mockedCanTransferParams.value),
           mockedCanTransferParams.data,
         ),
       ).thenResolve(expectedCanTransferFromResult);
@@ -700,7 +700,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.amount)),
+          objectContaining(mockedParams.amount),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -716,7 +716,7 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.sendToTreasury).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(numberToBigNumber(mockedParams.amount)),
+          objectContaining(mockedParams.amount),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -739,7 +739,7 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedSecurityTokenCanTransferMethod.callAsync(
           mockedCanTransferParams.to,
-          objectContaining(numberToBigNumber(mockedCanTransferParams.value)),
+          objectContaining(mockedCanTransferParams.value),
           mockedCanTransferParams.data,
         ),
       ).once();
@@ -838,7 +838,7 @@ describe('VestingEscrowWalletWrapper', () => {
     test('should addTemplate', async () => {
       const mockedParams = {
         name: 'template',
-        numberOfTokens: 500,
+        numberOfTokens: new BigNumber(500),
         duration: 100,
         frequency: 10,
         txData: {},
@@ -879,7 +879,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           stringToBytes32(mockedParams.name),
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           mockedParams.txData,
@@ -897,7 +897,7 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           stringToBytes32(mockedParams.name),
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           mockedParams.txData,

@@ -67,7 +67,6 @@ window.addEventListener('load', async () => {
   console.log('ST address:', await tickerSecurityTokenInstance.address());
 
   // Get permission manager factory address
-  const moduleStringName = 'VestingEscrowWallet';
   const moduleName = ModuleName.VestingEscrowWallet;
 
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
@@ -85,7 +84,7 @@ window.addEventListener('load', async () => {
     names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
-  const index = resultNames.indexOf(moduleStringName);
+  const index = resultNames.indexOf(moduleName);
 
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
   const setupCost = await factory.setupCostInPoly();

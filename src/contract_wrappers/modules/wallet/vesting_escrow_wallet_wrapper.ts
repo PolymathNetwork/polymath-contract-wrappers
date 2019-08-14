@@ -21,6 +21,7 @@ import {
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
+import { StatusCodes } from '@0x/types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -46,8 +47,6 @@ import {
   bigNumberToDate,
   stringToBytes32,
 } from '../../../utils/convert';
-
-const TRANSFER_SUCCESS = '0x51';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents.AddSchedule;
@@ -215,14 +214,14 @@ interface ChangeTreasuryWalletParams extends TxParams {
  * @param numberOfTokens Number of tokens that should be deposited
  */
 interface DepositTokensParams extends TxParams {
-  numberOfTokens: number;
+  numberOfTokens: BigNumber;
 }
 
 /**
  * @param amount Amount of tokens that should be send to the treasury wallet
  */
 interface SendToTreasuryParams extends TxParams {
-  amount: number;
+  amount: BigNumber;
 }
 
 /**
@@ -240,7 +239,7 @@ interface PushAvailableTokensParams extends TxParams {
  */
 interface AddTemplateParams extends TxParams {
   name: string;
-  numberOfTokens: number;
+  numberOfTokens: BigNumber;
   duration: number;
   frequency: number;
 }
@@ -386,24 +385,24 @@ interface ModifyScheduleMultiParams extends TxParams {
 }
 
 enum StateStatus {
-  CREATED,
-  STARTED,
-  COMPLETED,
-}
-
-interface GetSchedule {
-  numberOfTokens: number;
-  duration: number;
-  frequency: number;
-  startTime: Date;
-  claimedTokens: number;
-  State: StateStatus;
+  Created,
+  Started,
+  Completed,
 }
 
 interface Schedule {
   templateName: string;
   claimedTokens: number;
   startTime: Date;
+}
+
+interface BeneficiarySchedule {
+  numberOfTokens: number;
+  duration: number;
+  frequency: number;
+  startTime: Date;
+  claimedTokens: number;
+  state: StateStatus;
 }
 
 /**
@@ -451,7 +450,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
   public unassignedTokens = async () => {
     const result = await (await this.contract).unassignedTokens.callAsync();
-    return result.toNumber();
+    return result;
   };
 
   public schedules = async (params: SchedulesParams) => {
@@ -491,18 +490,18 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   public depositTokens = async (params: DepositTokensParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
 
-    assert.assert(params.numberOfTokens > 0, 'Number of tokens should be > 0');
+    assert.assert(params.numberOfTokens.toNumber() > 0, 'Number of tokens should be > 0');
 
     const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
       await this.getCallerAddress(params.txData),
       await this.address(),
-      numberToBigNumber(params.numberOfTokens),
+      params.numberOfTokens,
       '0x00',
     );
-    assert.assert(canTransferFromResult[0] === TRANSFER_SUCCESS, 'Failed transferFrom');
+    assert.assert(canTransferFromResult[0] === TransferStatusCode.TransferSuccess, 'Failed transferFrom');
 
     return (await this.contract).depositTokens.sendTransactionAsync(
-      numberToBigNumber(params.numberOfTokens),
+      params.numberOfTokens,
       params.txData,
       params.safetyFactor,
     );
@@ -513,23 +512,19 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public sendToTreasury = async (params: SendToTreasuryParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
-    assert.assert(params.amount > 0, 'Amount cannot be zero');
+    assert.assert(params.amount.toNumber() > 0, 'Amount cannot be zero');
 
     const unassignedTokens = await this.unassignedTokens();
-    assert.assert(params.amount <= unassignedTokens, 'Amount is greater than unassigned tokens');
+    assert.assert(params.amount.isLessThanOrEqualTo(unassignedTokens), 'Amount is greater than unassigned tokens');
 
     const canTransferResult = await (await this.securityTokenContract()).canTransfer.callAsync(
       await this.getTreasuryWallet(),
-      numberToBigNumber(params.amount),
+      params.amount,
       '0x00',
     );
-    assert.assert(canTransferResult[0] === TRANSFER_SUCCESS, 'Transfer failed');
+    assert.assert(canTransferResult[0] === TransferStatusCode.TransferSuccess, 'Transfer failed');
 
-    return (await this.contract).sendToTreasury.sendTransactionAsync(
-      numberToBigNumber(params.amount),
-      params.txData,
-      params.safetyFactor,
-    );
+    return (await this.contract).sendToTreasury.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
   };
 
   /**
@@ -567,10 +562,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(params.name !== '', 'Invalid name');
     assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
-    await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
+    await this.validateTemplate(params.numberOfTokens.toNumber(), params.duration, params.frequency);
     return (await this.contract).addTemplate.sendTransactionAsync(
       stringToBytes32(params.name),
-      numberToBigNumber(params.numberOfTokens),
+      params.numberOfTokens,
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       params.txData,
@@ -594,8 +589,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Returns count of the templates those can be used for creating schedule
-   * @return Count of the templates
+   * Returns the amount of templates that can be used for creating schedules
+   * @return Amount of templates
    */
   public getTemplateCount = async () => {
     const result = await (await this.contract).getTemplateCount.callAsync();
@@ -603,8 +598,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Gets the list of the template names those can be used for creating schedule
-   * @return Array of all template names were created
+   * Gets the list of template names that can be used for creating schedules
+   * @return Array of all template names
    */
   public getAllTemplateNames = async () => {
     const results = await (await this.contract).getAllTemplateNames.callAsync();
@@ -612,7 +607,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Adds vesting schedules for each of the beneficiary's address
+   * Adds a vesting schedule for the beneficiary address
    */
   public addSchedule = async (params: AddScheduleParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -633,7 +628,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Adds vesting schedules from template for the beneficiary
+   * Adds a vesting schedule for the beneficiary address from a template
    */
   public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -648,7 +643,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Modifies vesting schedules for each of the beneficiary
+   * Modifies a vesting schedule for a beneficiary address
    */
   public modifySchedule = async (params: ModifyScheduleParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -665,7 +660,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Revokes vesting schedule with given template name for given beneficiary
+   * Revokes a vesting schedule with a given template name for a given beneficiary
    */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -680,7 +675,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Revokes all vesting schedules for given beneficiary's address
+   * Revokes all vesting schedules for a given beneficiary address
    */
   public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -693,8 +688,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Returns beneficiary's schedule created using template name
-   * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, State)
+   * Returns a schedule with a given template name for a given beneficiary address
+   * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, state)
    */
   public getSchedule = async (params: GetScheduleParams) => {
     this.checkSchedule(params.beneficiary, params.templateName);
@@ -703,19 +698,36 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       stringToBytes32(params.templateName),
     );
 
-    return {
+    let state: StateStatus = StateStatus.Created;
+    switch (StateStatus[result[5].toNumber()]) {
+      case 'Created':
+        state = StateStatus.Created;
+        break;
+      case 'Completed':
+        state = StateStatus.Completed;
+        break;
+      case 'Started':
+        state = StateStatus.Started;
+        break;
+      default:
+        break;
+    }
+
+    const response: BeneficiarySchedule = {
       numberOfTokens: result[0].toNumber(),
       duration: result[1].toNumber(),
       frequency: result[2].toNumber(),
       startTime: bigNumberToDate(result[3]),
       claimedTokens: result[4].toNumber(),
-      state: StateStatus[result[5].toNumber()],
+      state,
     };
+
+    return response;
   };
 
   /**
-   * Returns list of the template names for given beneficiary's address
-   * @return List of the template names that were used for schedule creation
+   * Returns a list of the template names for a given beneficiary address
+   * @return List of template names used for the beneficiary address' schedules
    */
   public getTemplateNames = async (params: GetTemplateNamesParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
@@ -724,8 +736,8 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Returns count of the schedules were created for given beneficiary
-   * @return Count of beneficiary's schedules
+   * Returns amount of schedules for a given beneficiary address
+   * @return Amount of schedules
    */
   public getScheduleCount = async (params: GetScheduleCountParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
@@ -734,7 +746,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Used to bulk send available tokens for each of the beneficiaries
+   * Used to bulk add vesting schedules for each of the beneficiaries
    */
   public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
@@ -804,7 +816,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Used to bulk add vesting schedules from template for each of the beneficiary
+   * Used to bulk add vesting schedules from templates for each of the beneficiary addresses
    */
   public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
