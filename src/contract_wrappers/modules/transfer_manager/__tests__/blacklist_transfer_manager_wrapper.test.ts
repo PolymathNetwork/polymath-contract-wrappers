@@ -264,6 +264,46 @@ describe('BlacklistTransferManagerWrapper', () => {
     });
   });
 
+  describe('blacklists', () => {
+    test.todo('should fail as blacklists name is an empty string');
+
+    test('should call to blacklists', async () => {
+      const startTime = new Date(2030, 1);
+      const expectedStartTime = dateToBigNumber(startTime);
+      const endTime = new Date(2031, 1);
+      const expectedEndTime = dateToBigNumber(endTime);
+      const expectedRepeatPeriodTime = new BigNumber(3600);
+      const expectedResult = [
+        expectedStartTime,
+        expectedEndTime,
+        expectedRepeatPeriodTime,
+      ];
+      const mockedParams = {
+        blacklistName: 'Blacklist',
+      };
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.blacklists).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.blacklistName)))).thenResolve(
+          expectedResult,
+      );
+
+      // Real call
+      const result = await target.blacklists(mockedParams);
+      // Result expectation
+      expect(result.startTime).toEqual(startTime);
+      expect(result.endTime).toEqual(endTime);
+      expect(result.repeatPeriodTime).toBe(expectedResult[2]);
+
+      // Verifications
+      verify(mockedContract.blacklists).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.blacklistName)))).once();
+    });
+  });
+
   describe('getListOfAddresses', () => {
     test.todo('should fail as blacklist name is an empty string');
 

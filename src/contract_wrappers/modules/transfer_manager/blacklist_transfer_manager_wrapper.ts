@@ -159,6 +159,11 @@ interface VerifyTransfer {
   address: string;
 }
 
+interface BlacklistsDetails {
+  startTime: Date;
+  endTime: Date;
+  repeatPeriodTime: BigNumber;
+}
 /**
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
  */
@@ -196,6 +201,19 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Return the blacklists
+   */
+  public blacklists = async (params: BlacklistParams): Promise<BlacklistsDetails> => {
+    assert.assert(params.blacklistName.length > 0, 'LockUp Details must not be an empty string');
+    const result = await (await this.contract).blacklists.callAsync(stringToBytes32(params.blacklistName));
+    return {
+      startTime: bigNumberToDate(result[0]),
+      endTime: bigNumberToDate(result[1]),
+      repeatPeriodTime: result[2],
+    };
   };
 
   /**
