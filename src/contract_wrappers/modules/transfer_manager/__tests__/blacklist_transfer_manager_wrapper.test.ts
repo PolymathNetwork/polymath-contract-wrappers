@@ -12,8 +12,14 @@ import BlacklistTransferManagerWrapper from '../blacklist_transfer_manager_wrapp
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
+  bytes32ArrayToStringArray, dateToBigNumber,
+  parsePermBytes32Value,
+  stringArrayToBytes32Array,
+  stringToBytes32,
   valueToWei,
+  weiToValue,
 } from '../../../../utils/convert';
+import { Partition, Perm } from '../../../../types';
 
 describe('BlacklistTransferManagerWrapper', () => {
   let target: BlacklistTransferManagerWrapper;
@@ -196,7 +202,6 @@ describe('BlacklistTransferManagerWrapper', () => {
     });
   });
 
-
   describe('verifyTransfer', () => {
     test('should verify Transfer', async () => {
       const statusCode = new BigNumber(2);
@@ -256,6 +261,163 @@ describe('BlacklistTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
+    });
+  });
+
+  describe('getListOfAddresses', () => {
+    test.todo('should fail as blacklist name is an empty string');
+
+    test('should call to getListOfAddresses', async () => {
+      const expectedResult = [
+        '0x8888888888888888888888888888888888888888',
+        '0x9999999999999999999999999999999999999999',
+      ];
+      const mockedParams = {
+        blacklistName: 'Blacklist1',
+      };
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getListOfAddresses).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.blacklistName)))).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.getListOfAddresses(mockedParams);
+      // Result expectation
+      expect(result).toEqual(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getListOfAddresses).once();
+      verify(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.blacklistName)))).once();
+    });
+  });
+
+  describe('getBlacklistNamesToUser', () => {
+    test('should call to getBlacklistNamesToUser', async () => {
+      const expectedResult = stringArrayToBytes32Array(['Blacklist1', 'Blacklist2']);
+      const mockedParams = {
+        user: '0x8888888888888888888888888888888888888888',
+      };
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(mockedParams.user)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getBlacklistNamesToUser(mockedParams);
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+
+      // Verifications
+      verify(mockedContract.getBlacklistNamesToUser).once();
+      verify(mockedMethod.callAsync(mockedParams.user)).once();
+    });
+  });
+
+  describe('getAllBlacklists', () => {
+    test('should call to getAllBlacklists', async () => {
+      const expectedResult = stringArrayToBytes32Array(['Blacklist1', 'Blacklist2']);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getAllBlacklists).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getAllBlacklists();
+      // Result expectation
+      expect(result).toEqual(bytes32ArrayToStringArray(expectedResult));
+
+      // Verifications
+      verify(mockedContract.getAllBlacklists).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('getTokensByPartition', () => {
+    test('should call to getTokensByPartition', async () => {
+      const expectedDecimalsResult = new BigNumber(18);
+      const expectedResult = valueToWei(new BigNumber(100), expectedDecimalsResult);
+      const mockedParams = {
+        partition: Partition.Unlocked,
+        tokenHolder: '0x8888888888888888888888888888888888888888',
+        additionalBalance: new BigNumber(10),
+      };
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getTokensByPartition).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.callAsync(
+          mockedParams.partition,
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getTokensByPartition(mockedParams);
+      // Result expectation
+      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
+
+      // Verifications
+      verify(mockedContract.getTokensByPartition).once();
+      verify(
+        mockedMethod.callAsync(
+          mockedParams.partition,
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+    });
+  });
+
+  describe('getPermissions', () => {
+    test('should call to getPermissions', async () => {
+      const expectedResult = stringArrayToBytes32Array([Perm.Admin]);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getPermissions).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getPermissions();
+      // Result expectation
+      expect(result).toEqual(expectedResult.map(parsePermBytes32Value));
+      // Verifications
+      verify(mockedContract.getPermissions).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 

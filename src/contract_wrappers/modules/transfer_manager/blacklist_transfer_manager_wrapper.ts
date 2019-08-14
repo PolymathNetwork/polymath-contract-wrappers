@@ -23,11 +23,22 @@ import {
   EventCallback,
   GetLogs,
   GetLogsAsyncParams,
+  Partition,
+  Perm,
   Subscribe,
-  SubscribeAsyncParams, TransferResult,
+  SubscribeAsyncParams,
+  TransferResult,
   TxParams,
 } from '../../../types';
-import {parseTransferResult, valueToWei} from '../../../utils/convert';
+import {
+  bigNumberToDate,
+  bytes32ArrayToStringArray,
+  parsePermBytes32Value,
+  parseTransferResult,
+  stringToBytes32,
+  valueToWei,
+  weiToValue,
+} from '../../../utils/convert';
 
 interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: BlacklistTransferManagerEvents.DeleteInvestorFromBlacklist;
@@ -104,10 +115,18 @@ interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetAddBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
-  (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
-  (params: GetDeleteBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
-  (params: GetAddInvestorToBlacklistLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
-  (params: GetDeleteInvestorFromBlacklistLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
+  (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+  >;
+  (params: GetDeleteBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+  >;
+  (params: GetAddInvestorToBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+  >;
+  (params: GetDeleteInvestorFromBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+  >;
   (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs>[]>;
 }
@@ -117,6 +136,20 @@ interface VerifyTransferParams {
   to: string;
   amount: BigNumber;
   data: string;
+}
+
+interface GetTokensByPartitionParams {
+  partition: Partition;
+  tokenHolder: string;
+  additionalBalance: BigNumber;
+}
+
+interface BlacklistParams extends TxParams {
+  blacklistName: string;
+}
+
+interface UserAddressParams {
+  user: string;
 }
 
 // Return Types
@@ -165,18 +198,65 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * getListOfAddresses
+   */
+  public getListOfAddresses = async (params: BlacklistParams): Promise<string[]> => {
+    assert.assert(params.blacklistName.length > 0, 'LockUp Details must not be an empty string');
+    return (await this.contract).getListOfAddresses.callAsync(stringToBytes32(params.blacklistName));
+  };
+
+  /**
+   * getBlacklistNamesToUser
+   */
+  public getBlacklistNamesToUser = async (params: UserAddressParams): Promise<string[]> => {
+    assert.isNonZeroETHAddressHex('User Address', params.user);
+    return bytes32ArrayToStringArray(await (await this.contract).getBlacklistNamesToUser.callAsync(params.user));
+  };
+
+  /**
+   * getAllBlacklists
+   */
+  public getAllBlacklists = async (): Promise<string[]> => {
+    return bytes32ArrayToStringArray(await (await this.contract).getAllBlacklists.callAsync());
+  };
+
+  /**
+   * getTokensByPartition
+   */
+  public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
+    assert.isNonZeroETHAddressHex('Token Holder', params.tokenHolder);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return weiToValue(
+      await (await this.contract).getTokensByPartition.callAsync(
+        params.partition,
+        params.tokenHolder,
+        valueToWei(params.additionalBalance, decimals),
+      ),
+      decimals,
+    );
+  };
+
+  /**
+   * getPermissions
+   */
+  public getPermissions = async (): Promise<Perm[]> => {
+    const permissions = await (await this.contract).getPermissions.callAsync();
+    return permissions.map(parsePermBytes32Value);
+  };
+
   /*
- * verifyTransfer
- */
+   * verifyTransfer
+   */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).verifyTransfer.callAsync(
-        params.from,
-        params.to,
-        valueToWei(params.amount, decimals),
-        params.data,
+      params.from,
+      params.to,
+      valueToWei(params.amount, decimals),
+      params.data,
     );
     const transferResult = parseTransferResult(result[0]);
     return {
@@ -227,7 +307,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-        BlacklistTransferManager.abi,
+      BlacklistTransferManager.abi,
     );
     return logs;
   };
