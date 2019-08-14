@@ -570,7 +570,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     return (await this.contract).addTemplate.sendTransactionAsync(
       stringToBytes32(params.name),
-      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
+      numberToBigNumber(params.numberOfTokens),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       params.txData,
@@ -586,7 +586,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(params.name !== '', 'Invalid name');
     assert.assert((await this.getAllTemplateNames()).includes(params.name), 'Template not found');
     // TODO 3.1: require(templateToUsers[_name].length == 0, "Template is used");
-    return (await this.contract).removeTemplate.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
+    return (await this.contract).removeTemplate.sendTransactionAsync(
+      stringToBytes32(params.name),
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
@@ -619,7 +623,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return (await this.contract).addSchedule.sendTransactionAsync(
       params.beneficiary,
       stringToBytes32(params.templateName),
-      valueToWei(numberToBigNumber(params.numberOfTokens), FULL_DECIMALS),
+      numberToBigNumber(params.numberOfTokens),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       dateToBigNumber(params.startTime),
@@ -783,7 +787,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
         return stringToBytes32(name);
       }),
       params.numberOfTokens.map(number => {
-        return valueToWei(numberToBigNumber(number), FULL_DECIMALS);
+        return numberToBigNumber(number);
       }),
       params.durations.map(duration => {
         return numberToBigNumber(duration);
@@ -875,7 +879,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(numberOfTokens % periodCount === 0, 'Invalid period count');
     const amountPerPeriod = numberOfTokens / periodCount;
     const granularity = await (await this.securityTokenContract()).granularity.callAsync();
-    assert.assert(amountPerPeriod % weiToValue(granularity, FULL_DECIMALS).toNumber() === 0, 'Invalid granularity');
+    assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
   };
 
   private validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {
