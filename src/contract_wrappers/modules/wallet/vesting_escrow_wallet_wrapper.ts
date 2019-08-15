@@ -234,8 +234,8 @@ interface PushAvailableTokensParams extends TxParams {
 /**
  * @param name Name of the template will be created
  * @param numberOfTokens Number of tokens that should be assigned to schedule
- * @param duration Duration of the vesting schedule
- * @param frequency Frequency of the vesting schedule
+ * @param duration Duration of the vesting schedule in seconds
+ * @param frequency Frequency of the vesting schedule in seconds
  */
 interface AddTemplateParams extends TxParams {
   name: string;
@@ -262,7 +262,7 @@ interface RemoveTemplateParams extends TxParams {
 interface AddScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
-  numberOfTokens: number;
+  numberOfTokens: BigNumber;
   duration: number;
   frequency: number;
   startTime: Date;
@@ -349,7 +349,7 @@ interface PushAvailableTokensMultiParams extends TxParams {
 interface AddScheduleMultiParams extends TxParams {
   beneficiaries: string[];
   templateNames: string[];
-  numberOfTokens: number[];
+  numberOfTokens: BigNumber[];
   durations: number[];
   frequencies: number[];
   startTimes: Date[];
@@ -397,7 +397,7 @@ interface Schedule {
 }
 
 interface BeneficiarySchedule {
-  numberOfTokens: number;
+  numberOfTokens: BigNumber;
   duration: number;
   frequency: number;
   startTime: Date;
@@ -562,7 +562,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(params.name !== '', 'Invalid name');
     assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
-    await this.validateTemplate(params.numberOfTokens.toNumber(), params.duration, params.frequency);
+    await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     return (await this.contract).addTemplate.sendTransactionAsync(
       stringToBytes32(params.name),
       params.numberOfTokens,
@@ -618,7 +618,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return (await this.contract).addSchedule.sendTransactionAsync(
       params.beneficiary,
       stringToBytes32(params.templateName),
-      numberToBigNumber(params.numberOfTokens),
+      params.numberOfTokens,
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       dateToBigNumber(params.startTime),
@@ -714,7 +714,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     }
 
     const response: BeneficiarySchedule = {
-      numberOfTokens: result[0].toNumber(),
+      numberOfTokens: result[0],
       duration: result[1].toNumber(),
       frequency: result[2].toNumber(),
       startTime: bigNumberToDate(result[3]),
@@ -798,9 +798,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.templateNames.map(name => {
         return stringToBytes32(name);
       }),
-      params.numberOfTokens.map(number => {
-        return numberToBigNumber(number);
-      }),
+      params.numberOfTokens,
       params.durations.map(duration => {
         return numberToBigNumber(duration);
       }),
@@ -884,12 +882,12 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
-  private validateTemplate = async (numberOfTokens: number, duration: number, frequency: number) => {
-    assert.assert(numberOfTokens > 0, 'Zero amount');
+  private validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
+    assert.assert(numberOfTokens.toNumber() > 0, 'Zero amount');
     assert.assert(duration % frequency === 0, 'Invalid frequency');
     const periodCount = duration / frequency;
-    assert.assert(numberOfTokens % periodCount === 0, 'Invalid period count');
-    const amountPerPeriod = numberOfTokens / periodCount;
+    assert.assert(numberOfTokens.toNumber() % periodCount === 0, 'Invalid period count');
+    const amountPerPeriod = numberOfTokens.toNumber() / periodCount;
     const granularity = await (await this.securityTokenContract()).granularity.callAsync();
     assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
   };

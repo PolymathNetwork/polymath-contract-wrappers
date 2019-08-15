@@ -420,7 +420,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Real call
       const result = await target.getSchedule(mockedParams);
       // Result expectation
-      expect(result.numberOfTokens).toEqual((expectedResult[0] as BigNumber).toNumber());
+      expect(result.numberOfTokens).toEqual(expectedResult[0]);
       expect(result.duration).toEqual((expectedResult[1] as BigNumber).toNumber());
       expect(result.frequency).toEqual((expectedResult[2] as BigNumber).toNumber());
       expect(result.startTime).toEqual(bigNumberToDate(expectedResult[3] as BigNumber));
@@ -994,7 +994,7 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedParams = {
         beneficiary: '0x5555555555555555555555555555555555555555',
         templateName: 'template',
-        numberOfTokens: 500,
+        numberOfTokens: new BigNumber(500),
         duration: 100,
         frequency: 10,
         startTime: new Date(2020, 10),
@@ -1044,7 +1044,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
           stringToBytes32(mockedParams.templateName),
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
@@ -1064,7 +1064,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
           stringToBytes32(mockedParams.templateName),
-          objectContaining(numberToBigNumber(mockedParams.numberOfTokens)),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
@@ -1424,7 +1424,7 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedParams = {
         beneficiaries: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
         templateNames: ['test 1', 'test 2'],
-        numberOfTokens: [500, 1000],
+        numberOfTokens: [new BigNumber(500), new BigNumber(1000)],
         durations: [100, 200],
         frequencies: [10, 20],
         startTimes: [new Date(2020, 10), new Date(2022, 10)],
@@ -1477,9 +1477,7 @@ describe('VestingEscrowWalletWrapper', () => {
           objectContaining(mockedParams.templateNames.map(name => {
             return stringToBytes32(name);
           })),
-          objectContaining(mockedParams.numberOfTokens.map(number => {
-            return numberToBigNumber(number);
-          })),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(mockedParams.durations.map(duration => {
             return numberToBigNumber(duration);
           })),
@@ -1507,9 +1505,7 @@ describe('VestingEscrowWalletWrapper', () => {
           objectContaining(mockedParams.templateNames.map(name => {
             return stringToBytes32(name);
           })),
-          objectContaining(mockedParams.numberOfTokens.map(number => {
-            return numberToBigNumber(number);
-          })),
+          objectContaining(mockedParams.numberOfTokens),
           objectContaining(mockedParams.durations.map(duration => {
             return numberToBigNumber(duration);
           })),
