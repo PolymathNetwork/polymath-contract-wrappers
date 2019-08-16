@@ -33,6 +33,7 @@ import {
 import {
   bigNumberToDate,
   bytes32ArrayToStringArray,
+  dateToBigNumber,
   parsePermBytes32Value,
   parseTransferResult,
   stringToBytes32,
@@ -152,6 +153,13 @@ interface UserAddressParams {
   user: string;
 }
 
+interface BlacklistTypeParams extends TxParams {
+  startTime: Date;
+  endTime: Date;
+  blacklistName: string;
+  repeatPeriodTime: number;
+}
+
 // Return Types
 
 interface VerifyTransfer {
@@ -162,7 +170,7 @@ interface VerifyTransfer {
 interface BlacklistsDetails {
   startTime: Date;
   endTime: Date;
-  repeatPeriodTime: BigNumber;
+  repeatPeriodTime: number;
 }
 /**
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
@@ -212,8 +220,24 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     return {
       startTime: bigNumberToDate(result[0]),
       endTime: bigNumberToDate(result[1]),
-      repeatPeriodTime: result[2],
+      repeatPeriodTime: result[2].toNumber(),
     };
+  };
+
+  /*
+   * addBlacklistType
+   */
+  public addBlacklistType = async (params: BlacklistTypeParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkAddNewBlacklistType(params);
+    return (await this.contract).addBlacklistType.sendTransactionAsync(
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
+      stringToBytes32(params.blacklistName),
+      new BigNumber(params.repeatPeriodTime),
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
@@ -328,5 +352,24 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       BlacklistTransferManager.abi,
     );
     return logs;
+  };
+
+  private checkAddNewBlacklistType = async (params: BlacklistTypeParams) => {
+    const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
+    assert.assert(dateToBigNumber(blacklistInfo.endTime).isZero(), 'Blacklist already exists');
+    await this.checkBlacklistTypeDetails(params);
+  };
+
+  private checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
+    assert.assert(params.blacklistName.length > 0, 'Lockup Name cannot be empty string');
+    assert.isFutureDate(params.startTime, 'Start time must be in the future');
+    assert.assert(params.startTime < params.endTime, 'Start time must be before the end time');
+    if (params.repeatPeriodTime !== 0) {
+      const blacklistDays = (params.endTime.getTime() - params.startTime.getTime()) / (1000 * 60 * 60 * 24);
+      assert.assert(
+        blacklistDays <= params.repeatPeriodTime,
+        'The repeat period time in days must be greater than or equal to the difference between start and end time',
+      );
+    }
   };
 }

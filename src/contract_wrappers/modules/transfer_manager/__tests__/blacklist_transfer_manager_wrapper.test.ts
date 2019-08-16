@@ -12,7 +12,8 @@ import BlacklistTransferManagerWrapper from '../blacklist_transfer_manager_wrapp
 import ContractFactory from '../../../../factories/contractFactory';
 import ModuleWrapper from '../../module_wrapper';
 import {
-  bytes32ArrayToStringArray, dateToBigNumber,
+  bytes32ArrayToStringArray,
+  dateToBigNumber,
   parsePermBytes32Value,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -272,12 +273,8 @@ describe('BlacklistTransferManagerWrapper', () => {
       const expectedStartTime = dateToBigNumber(startTime);
       const endTime = new Date(2031, 1);
       const expectedEndTime = dateToBigNumber(endTime);
-      const expectedRepeatPeriodTime = new BigNumber(3600);
-      const expectedResult = [
-        expectedStartTime,
-        expectedEndTime,
-        expectedRepeatPeriodTime,
-      ];
+      const expectedRepeatPeriodTime = new BigNumber(100);
+      const expectedResult = [expectedStartTime, expectedEndTime, expectedRepeatPeriodTime];
       const mockedParams = {
         blacklistName: 'Blacklist',
       };
@@ -288,7 +285,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.blacklists).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(objectContaining(stringToBytes32(mockedParams.blacklistName)))).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -296,7 +293,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Result expectation
       expect(result.startTime).toEqual(startTime);
       expect(result.endTime).toEqual(endTime);
-      expect(result.repeatPeriodTime).toBe(expectedResult[2]);
+      expect(result.repeatPeriodTime).toEqual(expectedResult[2].toNumber());
 
       // Verifications
       verify(mockedContract.blacklists).once();
@@ -304,6 +301,99 @@ describe('BlacklistTransferManagerWrapper', () => {
     });
   });
 
+  describe('addBlacklistType', () => {
+    test('should call addBlacklistType', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const blacklistName = 'Blacklist1';
+      const expectedStartTime = new BigNumber(0);
+      const expectedEndTime = new BigNumber(0);
+      const expectedRepeatPeriodTime = new BigNumber(0);
+      const expectedGetBlacklistResult = [expectedStartTime, expectedEndTime, expectedRepeatPeriodTime];
+      const mockedGetBlacklistParams = {
+        blacklistName,
+      };
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked method
+      const mockedGetBlacklistMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.blacklists).thenReturn(instance(mockedGetBlacklistMethod));
+      // Stub the request
+      when(
+        mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+      ).thenResolve(expectedGetBlacklistResult);
+
+      const mockedParams = {
+        startTime: new Date(2030, 1),
+        endTime: new Date(2031, 1),
+        blacklistName,
+        repeatPeriodTime: 366,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addBlacklistType).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.addBlacklistType(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addBlacklistType).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.blacklists).once();
+      verify(
+        mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+      ).once();
+    });
+  });
+  
   describe('getListOfAddresses', () => {
     test.todo('should fail as blacklist name is an empty string');
 
