@@ -180,6 +180,16 @@ interface DeleteBlacklistTypeMultiParams extends TxParams {
   blacklistNames: string[];
 }
 
+interface InvestorAndBlacklistParams extends TxParams {
+  userAddress: string;
+  blacklistName: string;
+}
+
+interface InvestorAndBlacklistMultiParams extends TxParams {
+  userAddresses: string[];
+  blacklistName: string;
+}
+
 // Return Types
 
 interface VerifyTransfer {
@@ -235,7 +245,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * Return the blacklists
    */
   public blacklists = async (params: BlacklistParams): Promise<BlacklistsDetails> => {
-    assert.assert(params.blacklistName.length > 0, 'LockUp Details must not be an empty string');
+    assert.assert(params.blacklistName.length > 0, 'Blacklist Details must not be an empty string');
     const result = await (await this.contract).blacklists.callAsync(stringToBytes32(params.blacklistName));
     return {
       startTime: bigNumberToDate(result[0]),
@@ -268,7 +278,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
       'Argument arrays length mismatch',
     );
-    assert.assert(params.startTimes.length > 0, 'Empty lockup information');
+    assert.assert(params.startTimes.length > 0, 'Empty blacklist information');
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const results = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
@@ -316,7 +326,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
         [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
         'Argument arrays length mismatch',
     );
-    assert.assert(params.startTimes.length > 0, 'Empty lockup information');
+    assert.assert(params.startTimes.length > 0, 'Empty blacklist information');
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const results = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
@@ -358,7 +368,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * deleteBlacklistTypeMulti
    */
   public deleteBlacklistTypeMulti = async (params: DeleteBlacklistTypeMultiParams) => {
-    assert.assert(params.blacklistNames.length > 0, 'Empty lockup information');
+    assert.assert(params.blacklistNames.length > 0, 'Empty blacklist information');
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const results = [];
     for (let i = 0; i < params.blacklistNames.length; i += 1) {
@@ -372,11 +382,50 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+
+  /*
+   * addInvestorToBlacklist
+   */
+  public addInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    await this.checkAddInvestorToBlacklist(params);
+    return (await this.contract).addInvestorToBlacklist.sendTransactionAsync(
+        params.userAddress,
+        stringToBytes32(params.blacklistName),
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
+  /*
+   * addInvestorToBlacklistMulti
+   */
+  public addInvestorToBlacklistMulti = async (params: InvestorAndBlacklistMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(params.userAddresses.length > 0, 'Empty user address information');
+    const results = [];
+    for (let i = 0; i < params.userAddresses.length; i += 1) {
+      results.push(
+          this.checkAddInvestorToBlacklist({
+            userAddress: params.userAddresses[i],
+            blacklistName: params.blacklistName,
+          }),
+      );
+    }
+    await Promise.all(results);
+    return (await this.contract).addInvestorToBlacklistMulti.sendTransactionAsync(
+        params.userAddresses,
+        stringToBytes32(params.blacklistName),
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
   /**
    * getListOfAddresses
    */
   public getListOfAddresses = async (params: BlacklistParams): Promise<string[]> => {
-    assert.assert(params.blacklistName.length > 0, 'LockUp Details must not be an empty string');
+    assert.assert(params.blacklistName.length > 0, 'Blacklist details must not be an empty string');
     return (await this.contract).getListOfAddresses.callAsync(stringToBytes32(params.blacklistName));
   };
 
@@ -499,7 +548,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   private checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
-    assert.assert(params.blacklistName.length > 0, 'Lockup Name cannot be empty string');
+    assert.assert(params.blacklistName.length > 0, 'Blacklist Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.assert(params.startTime < params.endTime, 'Start time must be before the end time');
     if (params.repeatPeriodTime !== 0) {
@@ -512,13 +561,26 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   private checkDeleteBlacklistType = async (blacklistName: string) => {
-    assert.assert(blacklistName.length > 0, 'Lockup Name cannot be empty string');
+    assert.assert(blacklistName.length > 0, 'Blacklist Name cannot be empty string');
     const blacklistsDetails = await this.blacklists({ blacklistName });
-    assert.isNotDateZero(blacklistsDetails.endTime, 'Lockup does not exist');
+    assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
     const lookupListOfAddresses = await this.getListOfAddresses({ blacklistName });
     assert.assert(
         lookupListOfAddresses.length === 0,
-        'There are users attached to the lockup that must be removed before removing the lockup type',
+        'There are users attached to the blacklist that must be removed before removing the blacklist type',
     );
+  };
+
+  private checkBlacklistToModifyInvestors = async (params: InvestorAndBlacklistParams) => {
+    assert.assert(params.blacklistName.length > 0, 'Blacklist name cannot be empty string');
+    assert.isNonZeroETHAddressHex('User Address', params.userAddress);
+    const blacklistsDetails = await this.blacklists({ blacklistName: params.blacklistName });
+    assert.isNotDateZero(blacklistsDetails.endTime, 'Lockup does not exist');
+  };
+
+  private checkAddInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
+    await this.checkBlacklistToModifyInvestors(params);
+    const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
+    assert.assert(!currentBlacklistNames.includes(params.blacklistName), 'User already added to this blacklist name');
   };
 }
