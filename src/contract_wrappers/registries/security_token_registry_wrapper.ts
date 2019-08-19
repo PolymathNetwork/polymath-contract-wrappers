@@ -588,7 +588,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     });
     assert.assert(tickerDetails.status, 'Not deployed');
     const isFrozen = await (await this.securityTokenContract(
-      await this.getSecurityTokenAddress(params.ticker),
+      await this.getSecurityTokenAddress({ ticker: params.ticker }),
     )).transfersFrozen.callAsync();
     assert.assert(isFrozen, 'Transfers not frozen');
     return (await this.contract).refreshSecurityToken.sendTransactionAsync(
@@ -724,7 +724,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(params.registrationDate.getTime() > new Date(0).getTime(), 'Bad registration date');
     assert.isNonZeroETHAddressHex('owner', params.owner);
     if (params.status) {
-      const address = await this.getSecurityTokenAddress(params.ticker);
+      const address = await this.getSecurityTokenAddress({ ticker: params.ticker });
       assert.isNonZeroETHAddressHex('address', address);
     }
     return (await this.contract).modifyExistingTicker.sendTransactionAsync(
@@ -799,7 +799,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.assert(functionsUtils.checksumAddressComparision(address, tickerDetails.owner), 'Not authorised');
     if (tickerDetails.status) {
       const securityTokenOwner = await (await this.securityTokenContract(
-        await this.getSecurityTokenAddress(params.ticker),
+        await this.getSecurityTokenAddress({ ticker: params.ticker }),
       )).owner.callAsync();
       assert.assert(securityTokenOwner === params.newOwner, 'New owner does not match token owner');
     }
@@ -855,22 +855,20 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * Returns the security token address by ticker symbol
-   * @param ticker is the ticker of the security token
+   * Returns the security token address by ticker symbol   
    * @return address string
    */
-  public getSecurityTokenAddress = async (ticker: string) => {
-    return (await this.contract).getSecurityTokenAddress.callAsync(ticker);
-  };
+  public getSecurityTokenAddress = async (params: TickerParams) => {
+    return (await this.contract).getSecurityTokenAddress.callAsync(params.ticker);
+  };  
 
   /**
    * Gets ticker availability
    * @return boolean
    */
-  public isTickerAvailable = async (params: TickerParams) => {
-    const result = await this.getTickerDetailsInternal(params.ticker);
-    return this.isTickerAvailableInternal(result.registrationDate, result.expiryDate, result.status);
-  };
+  public tickerAvailable = async (params: TickerParams) => {
+    return (await this.contract).tickerAvailable.callAsync(params.ticker.toUpperCase());
+  }
 
   /**
    * Knows if the ticker was registered by the user
@@ -878,7 +876,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public isTickerRegisteredByCurrentIssuer = async (params: TickerParams) => {
     const result = await this.getTickerDetailsInternal(params.ticker);
-    if (this.isTickerAvailableInternal(result.registrationDate, result.expiryDate, result.status)) {
+    if (await this.tickerAvailable({ ticker: params.ticker  })) {
       return false;
     }
     return result.owner === (await this.getDefaultFromAddress());
@@ -906,7 +904,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
     assert.isETHAddressHex('owner', params.owner);
     if (params.status) {
-      const address = await this.getSecurityTokenAddress(params.ticker);
+      const address = await this.getSecurityTokenAddress({ ticker: params.ticker });
       assert.isNonZeroETHAddressHex('address', address);
     }
     return (await this.contract).modifyTicker.sendTransactionAsync(
@@ -1216,16 +1214,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private isTickerAvailableInternal = (registrationDate: Date, expiryDate: Date, isDeployed: boolean) => {
-    if (registrationDate.getTime() === new Date(0).getTime()) {
-      return true;
-    }
-    if (!isDeployed && expiryDate.getTime() > Date.now()) {
-      return true;
-    }
-    return false;
-  };
-
   private getTickerDetailsInternal = async (ticker: string) => {
     const result = await (await this.contract).getTickerDetails.callAsync(ticker);
     const typedResult: TickerDetails = {
@@ -1263,7 +1251,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isETHAddressHex('owner', owner);
     assert.assert(ticker.length > 0 && ticker.length <= 10, 'Bad ticker, must be 1 to 10 characters');
     assert.assert(
-      await this.isTickerAvailable({
+      await this.tickerAvailable({
         ticker,
       }),
       'Ticker is not available',
@@ -1285,7 +1273,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.isNonZeroETHAddressHex('securityToken', securityToken);
     assert.isNonZeroETHAddressHex(
       'Security token not registered for ticker',
-      await this.getSecurityTokenAddress(ticker),
+      await this.getSecurityTokenAddress({ ticker }),
     );
   };
 }
