@@ -1183,6 +1183,473 @@ describe('BlacklistTransferManagerWrapper', () => {
     });
   });
 
+  describe('addInvestorToNewBlacklist', () => {
+    test('should call addInvestorToNewBlacklist', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const investor = '0x9999999999999999999999999999999999999999';
+      const blacklistName = 'Blacklist1';
+      const expectedStartTime = new BigNumber(0);
+      const expectedEndTime = new BigNumber(0);
+      const expectedRepeatPeriodTime = new BigNumber(0);
+      const expectedGetBlacklistResult = [expectedStartTime, expectedEndTime, expectedRepeatPeriodTime];
+      const mockedGetBlacklistParams = {
+        blacklistName,
+      };
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked method
+      const mockedGetBlacklistMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.blacklists).thenReturn(instance(mockedGetBlacklistMethod));
+      // Stub the request
+      when(
+          mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+      ).thenResolve(expectedGetBlacklistResult);
+
+      const mockedParams = {
+        startTime: new Date(2030, 1),
+        endTime: new Date(2031, 1),
+        blacklistName,
+        repeatPeriodTime: 366,
+        investor,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addInvestorToNewBlacklist).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              objectContaining(dateToBigNumber(mockedParams.startTime)),
+              objectContaining(dateToBigNumber(mockedParams.endTime)),
+              objectContaining(stringToBytes32(mockedParams.blacklistName)),
+              objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+              mockedParams.investor,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.addInvestorToNewBlacklist(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addInvestorToNewBlacklist).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              objectContaining(dateToBigNumber(mockedParams.startTime)),
+              objectContaining(dateToBigNumber(mockedParams.endTime)),
+              objectContaining(stringToBytes32(mockedParams.blacklistName)),
+              objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+              mockedParams.investor,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.blacklists).once();
+      verify(
+          mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+      ).once();
+    });
+  });
+
+
+  describe('deleteInvestorFromBlacklist', () => {
+    test('should call deleteInvestorFromBlacklist', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const expectedBlacklistInvestorAddress = '0x4444444444444444444444444444444444444444';
+      const blacklistName = 'Blacklist1';
+      const expectedStartTime = dateToBigNumber(new Date(2030, 1));
+      const expectedEndTime = dateToBigNumber(new Date(2031, 1));
+      const expectedRepeatPeriodTime = new BigNumber(366);
+      const expectedGetBlacklistResult = [expectedStartTime, expectedEndTime, expectedRepeatPeriodTime];
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked method
+      const mockedBlacklistsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.blacklists).thenReturn(instance(mockedBlacklistsMethod));
+      // Stub the request
+      when(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistName)))).thenResolve(
+          expectedGetBlacklistResult,
+      );
+
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1', 'Blacklist2']);
+      const mockedGetBlacklistNamesToUserParams = {
+        user: expectedBlacklistInvestorAddress,
+      };
+      // Mocked method
+      const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
+      // Stub the request
+      when(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).thenResolve(
+          expectedGetBlacklistNamesToUserResult,
+      );
+
+      const mockedParams = {
+        userAddress: expectedBlacklistInvestorAddress,
+        blacklistName,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.deleteInvestorFromBlacklist).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.userAddress,
+              objectContaining(stringToBytes32(mockedParams.blacklistName)),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.deleteInvestorFromBlacklist(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.deleteInvestorFromBlacklist).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.userAddress,
+              objectContaining(stringToBytes32(mockedParams.blacklistName)),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.blacklists).once();
+      verify(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistName)))).once();
+      verify(mockedContract.getBlacklistNamesToUser).once();
+      verify(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).once();
+    });
+  });
+
+  describe('deleteMultiInvestorsFromBlacklistMulti', () => {
+    test('should call deleteMultiInvestorsFromBlacklistMulti', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const expectedBlacklistInvestorAddresses = [
+        '0x0123456789012345678901234567890123456789',
+        '0x2222222222222222222222222222222222222222',
+        '0x9999999999999999999999999999999999999999',
+      ];
+      const blacklistNames = ['Blacklist1', 'Blacklist2', 'Blacklist3'];
+      const expectedStartTime = dateToBigNumber(new Date(2030, 1));
+      const expectedEndTime = dateToBigNumber(new Date(2031, 1));
+      const expectedRepeatPeriodTime = new BigNumber(366);
+      const expectedGetBlacklistResult = [expectedStartTime, expectedEndTime, expectedRepeatPeriodTime];
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked method
+      const mockedBlacklistsMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.blacklists).thenReturn(instance(mockedBlacklistsMethod));
+      for (let i = 0; i < blacklistNames.length; i += 1) {
+        when(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistNames[i])))).thenResolve(
+            expectedGetBlacklistResult,
+        );
+      }
+
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1','Blacklist2', 'Blacklist3']);
+      // Mocked method
+      const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
+      // Stub the request
+
+      for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
+        when(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).thenResolve(
+            expectedGetBlacklistNamesToUserResult,
+        );
+      }
+
+      const mockedParams = {
+        userAddresses: expectedBlacklistInvestorAddresses,
+        blacklistNames,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.deleteMultiInvestorsFromBlacklistMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.userAddresses,
+              objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.deleteMultiInvestorsFromBlacklistMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.deleteMultiInvestorsFromBlacklistMulti).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.userAddresses,
+              objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.blacklists).times(expectedBlacklistInvestorAddresses.length);
+      for (let i = 0; i < blacklistNames.length; i += 1) {
+        verify(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistNames[i])))).once();
+      }
+      verify(mockedContract.getBlacklistNamesToUser).times(expectedBlacklistInvestorAddresses.length);
+      for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
+        verify(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).once();
+      }
+    });
+  });
+
+  describe('deleteInvestorFromAllBlacklist', () => {
+    test('should call deleteInvestorFromBlacklist', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const expectedBlacklistInvestorAddress = '0x4444444444444444444444444444444444444444';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1', 'Blacklist2']);
+      const mockedGetBlacklistNamesToUserParams = {
+        user: expectedBlacklistInvestorAddress,
+      };
+      // Mocked method
+      const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
+      // Stub the request
+      when(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).thenResolve(
+          expectedGetBlacklistNamesToUserResult,
+      );
+
+      const mockedParams = {
+        investor: expectedBlacklistInvestorAddress,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.deleteInvestorFromAllBlacklist).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investor,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.deleteInvestorFromAllBlacklist(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.deleteInvestorFromAllBlacklist).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investor,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getBlacklistNamesToUser).once();
+      verify(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).once();
+    });
+  });
+
+  describe('deleteInvestorsFromAllBlacklistMulti', () => {
+    test('should call deleteInvestorsFromAllBlacklistMulti', async () => {
+      const expectedOwnerResult = '0x8888888888888888888888888888888888888888';
+      const expectedBlacklistInvestorAddresses = [
+        '0x0123456789012345678901234567890123456789',
+        '0x2222222222222222222222222222222222222222',
+        '0x9999999999999999999999999999999999999999',
+      ];
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+          instance(mockedSecurityTokenContract),
+      );
+
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1','Blacklist2', 'Blacklist3']);
+      // Mocked method
+      const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
+      // Stub the request
+
+      for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
+        when(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).thenResolve(
+            expectedGetBlacklistNamesToUserResult,
+        );
+      }
+
+      const mockedParams = {
+        investors: expectedBlacklistInvestorAddresses,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.deleteInvestorFromAllBlacklistMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investors,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.deleteInvestorFromAllBlacklistMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.deleteInvestorFromAllBlacklistMulti).once();
+      verify(
+          mockedMethod.sendTransactionAsync(
+              mockedParams.investors,
+              mockedParams.txData,
+              mockedParams.safetyFactor,
+          ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getBlacklistNamesToUser).times(expectedBlacklistInvestorAddresses.length);
+      for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
+        verify(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).once();
+      }
+    });
+  });
+
   describe('getListOfAddresses', () => {
     test.todo('should fail as blacklist name is an empty string');
 
