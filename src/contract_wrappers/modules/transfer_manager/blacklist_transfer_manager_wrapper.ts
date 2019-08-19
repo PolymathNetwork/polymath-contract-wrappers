@@ -185,9 +185,14 @@ interface InvestorAndBlacklistParams extends TxParams {
   blacklistName: string;
 }
 
-interface InvestorAndBlacklistMultiParams extends TxParams {
+interface InvestorMultiAndBlacklistParams extends TxParams {
   userAddresses: string[];
   blacklistName: string;
+}
+
+interface InvestorMultiAndBlacklistMultiParams extends TxParams {
+  userAddresses: string[];
+  blacklistNames: string[];
 }
 
 // Return Types
@@ -400,7 +405,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /*
    * addInvestorToBlacklistMulti
    */
-  public addInvestorToBlacklistMulti = async (params: InvestorAndBlacklistMultiParams) => {
+  public addInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.assert(params.userAddresses.length > 0, 'Empty user address information');
     const results = [];
@@ -416,6 +421,37 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).addInvestorToBlacklistMulti.sendTransactionAsync(
         params.userAddresses,
         stringToBytes32(params.blacklistName),
+        params.txData,
+        params.safetyFactor,
+    );
+  };
+
+  /*
+   * addMultiInvestorToBlacklistMulti
+   */
+  public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
+    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.areValidArrayLengths(
+        [
+          params.userAddresses,
+          params.blacklistNames
+        ],
+        'Argument arrays length mismatch',
+    );
+    assert.assert(params.userAddresses.length > 0, 'Empty user address information');
+    const results = [];
+    for (let i = 0; i < params.userAddresses.length; i += 1) {
+      results.push(
+          this.checkAddInvestorToBlacklist({
+            userAddress: params.userAddresses[i],
+            blacklistName: params.blacklistNames[i],
+          }),
+      );
+    }
+    await Promise.all(results);
+    return (await this.contract).addMultiInvestorToBlacklistMulti.sendTransactionAsync(
+        params.userAddresses,
+        stringArrayToBytes32Array(params.blacklistNames),
         params.txData,
         params.safetyFactor,
     );
