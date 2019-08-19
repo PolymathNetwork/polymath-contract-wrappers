@@ -134,11 +134,69 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // TODO add blacklistTM method examples
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  console.log(' No blacklist, 10 tokens transferred to randomBeneficiary2');
 
-  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(50) });
+  const startTime = new Date(Date.now() + 10000);
+  const endTime = new Date(Date.now() + 20000);
+  await blacklistTM.addInvestorToNewBlacklist({
+    investor: myAddress,
+    startTime,
+    endTime,
+    repeatPeriodTime: 1,
+    blacklistName: 'ExampleBlacklist',
+  });
 
-  console.log('50 tokens transferred to randomBeneficiary2');
+  console.log('Blacklist starts in 10 seconds');
+  const sleep = (milliseconds: number) => {
+    console.log(`Sleeping ${milliseconds / 1000} seconds`);
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  };
+  await sleep(15000);
+
+  // Try out transfer 10 above lockup, will fail
+  try {
+    await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  } catch (e) {
+    console.log('Transfer of 10 tokens during blacklist period amount fails as expected');
+  }
+
+  console.log('Blacklist ends in 5 seconds');
+  await sleep(10000);
+
+  // Blacklist now over
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  console.log('10 more tokens transferred to randomBeneficiary2');
+
+  const newStartTime = new Date(Date.now() + 10000);
+  const newEndTime = new Date(Date.now() + 3600000);
+  const testBlacklistNames = ['TestBlacklist1', 'TestBlacklist2', 'TestBlacklist3'];
+  await blacklistTM.addNewBlacklistTypeMulti({
+    blacklistNames: testBlacklistNames,
+    startTimes: [newStartTime, newStartTime, newStartTime],
+    endTimes: [newEndTime, newEndTime, newEndTime],
+    repeatPeriodTimes: [1, 2, 3]
+  });
+  console.log('Many more example blacklists created');
+
+  await blacklistTM.addMultiInvestorToBlacklistMulti({blacklistNames: testBlacklistNames, userAddresses: [myAddress, randomBeneficiary1, randomBeneficiary2]});
+  console.log('Multi investors added to multi blacklists');
+
+  await sleep(15000);
+
+  // Try out transfer 10 during blacklist, will fail
+  try {
+    await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  } catch (e) {
+    console.log('Transfer of 10 tokens during new blacklist period amount fails as expected');
+  }
+
+  await blacklistTM.deleteInvestorFromAllBlacklistMulti({investors: [myAddress, randomBeneficiary1, randomBeneficiary2]});
+  console.log('Multi investors deleted from all blacklists they are part of');
+
+  // Transfer out more tokens now that the investor has been removed from the new blacklist
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  console.log('10 more tokens were successfully transferred to randomBeneficiary2');
 
   tickerSecurityTokenInstance.unsubscribeAll();
 });
