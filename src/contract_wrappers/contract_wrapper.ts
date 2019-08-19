@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
 import _ from 'lodash';
+import { schemas } from '@0x/json-schemas';
 import {
   BaseContract,
   Web3Wrapper,
@@ -64,12 +65,9 @@ export default abstract class ContractWrapper {
    */
   public unsubscribeAll = (): void => {
     const filterTokens = _.keys(this._filterCallbacks);
-    _.each(
-      filterTokens,
-      (filterToken): void => {
-        this.unsubscribeInternal(filterToken);
-      },
-    );
+    _.each(filterTokens, (filterToken): void => {
+      this.unsubscribeInternal(filterToken);
+    });
   };
 
   private _blockAndLogStreamerIfExists: BlockAndLogStreamer<Block, Log> | undefined;
@@ -138,11 +136,18 @@ export default abstract class ContractWrapper {
   protected async getLogsAsyncInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
-    blockRange: BlockRange,
-    indexFilterValues: IndexedFilterValues,
     abi: ContractAbi,
+    blockRange?: BlockRange,
+    indexFilterValues?: IndexedFilterValues,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> {
-    const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi, blockRange);
+    const _blockRange = blockRange || {
+      fromBlock: BlockParamLiteral.Earliest,
+      toBlock: BlockParamLiteral.Latest,
+    };
+    const _indexFilterValues = indexFilterValues || {};
+    assert.doesConformToSchema('blockRange', _blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', _indexFilterValues, schemas.indexFilterValuesSchema);
+    const filter = filterUtils.getFilter(address, eventName, _indexFilterValues, abi, _blockRange);
     const logs = await this.web3Wrapper.getLogsAsync(filter);
     const logsWithDecodedArguments = _.map(logs, this.tryToDecodeLogOrNoopInternal.bind(this));
     return logsWithDecodedArguments as LogWithDecodedArgs<ArgsType>[];
@@ -158,19 +163,16 @@ export default abstract class ContractWrapper {
 
   private _onLogStateChanged<ArgsType extends ContractEventArgs>(isRemoved: boolean, rawLog: Log): void {
     const log: LogEntry = marshaller.unmarshalLog(rawLog as RawLogEntry);
-    _.forEach(
-      this._filters,
-      (filter: FilterObject, filterToken: string): void => {
-        if (filterUtils.matchesFilter(log, filter)) {
-          const decodedLog = this.tryToDecodeLogOrNoopInternal(log) as LogWithDecodedArgs<ArgsType>;
-          const logEvent = {
-            log: decodedLog,
-            isRemoved,
-          };
-          this._filterCallbacks[filterToken](null, logEvent);
-        }
-      },
-    );
+    _.forEach(this._filters, (filter: FilterObject, filterToken: string): void => {
+      if (filterUtils.matchesFilter(log, filter)) {
+        const decodedLog = this.tryToDecodeLogOrNoopInternal(log) as LogWithDecodedArgs<ArgsType>;
+        const logEvent = {
+          log: decodedLog,
+          isRemoved,
+        };
+        this._filterCallbacks[filterToken](null, logEvent);
+      }
+    });
   }
 
   private _startBlockAndLogStream(isVerbose: boolean): void {

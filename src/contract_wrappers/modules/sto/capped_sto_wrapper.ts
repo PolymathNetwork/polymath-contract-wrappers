@@ -300,16 +300,8 @@ export default class CappedSTOWrapper extends STOWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
-      CappedSTO.abi,
-    );
+    const logs = await this.getLogsAsyncInternal<ArgsType>(normalizedContractAddress, params.eventName, CappedSTO.abi);
     return logs;
   };
 }

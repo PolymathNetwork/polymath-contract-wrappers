@@ -73,7 +73,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   CappedSTOFundRaiseType,
-  TransferStatusCode
+  TransferStatusCode,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -1224,9 +1224,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const canTransfer = await this.canTransfer({
       to: params.investor,
       value: params.value,
-      data: params.data || '0x00'
+      data: params.data || '0x00',
     });
-    assert.assert(canTransfer.statusCode !== TransferStatusCode.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
+    assert.assert(
+      canTransfer.statusCode !== TransferStatusCode.TransferFailure,
+      `Transfer Status: ${canTransfer.statusCode}`,
+    );
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
@@ -1351,8 +1354,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
     assert.assert(
-        (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
-        'Checkpoint id must be less than or equal to currentCheckpoint',
+      (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      'Checkpoint id must be less than or equal to currentCheckpoint',
     );
     return weiToValue(
       await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
@@ -1580,49 +1583,49 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private getTransferStatusCode = (result: string) => {
     let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
-    switch(result) {
+    switch (result) {
       case TransferStatusCode.TransferFailure: {
         status = TransferStatusCode.TransferFailure;
-        break
+        break;
       }
       case TransferStatusCode.TransferSuccess: {
         status = TransferStatusCode.TransferSuccess;
-        break
+        break;
       }
       case TransferStatusCode.InsufficientBalance: {
         status = TransferStatusCode.InsufficientBalance;
-        break
+        break;
       }
       case TransferStatusCode.InsufficientAllowance: {
         status = TransferStatusCode.InsufficientAllowance;
-        break
+        break;
       }
       case TransferStatusCode.TransfersHalted: {
         status = TransferStatusCode.TransfersHalted;
-        break
+        break;
       }
       case TransferStatusCode.FundsLocked: {
         status = TransferStatusCode.FundsLocked;
-        break
+        break;
       }
       case TransferStatusCode.InvalidSender: {
         status = TransferStatusCode.InvalidSender;
-        break
+        break;
       }
       case TransferStatusCode.InvalidReceiver: {
         status = TransferStatusCode.InvalidReceiver;
-        break
+        break;
       }
       case TransferStatusCode.InvalidOperator: {
         status = TransferStatusCode.InvalidOperator;
-        break
+        break;
       }
       default: {
-        break
+        break;
       }
     }
-    return status
-  }
+    return status;
+  };
 
   /**
    * Validates if can transfer
@@ -1758,14 +1761,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
       ISecurityToken.abi,
     );
     return logs;
@@ -1890,7 +1889,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, 'End time not valid');
-    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');    
+    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
   };
 
   private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {

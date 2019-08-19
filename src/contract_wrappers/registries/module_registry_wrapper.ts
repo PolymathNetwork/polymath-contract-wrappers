@@ -431,14 +431,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
       ModuleRegistry.abi,
     );
     return logs;
@@ -484,27 +480,24 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
-        !(await this.isPaused()) ||
+      !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
-        'Contract is either paused or the calling address is not the owner',
+      'Contract is either paused or the calling address is not the owner',
     );
   };
 
   private checkModuleNotPaused = async () => {
-    assert.assert(
-        !(await this.isPaused()),
-        'Contract is currently paused',
-    );
+    assert.assert(!(await this.isPaused()), 'Contract is currently paused');
   };
 
-  private checkIsOwnerOrModuleFactoryOwner = async(moduleFactoryAddress: string) => {
+  private checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
     const callerAddress = await this.getCallerAddress(undefined);
     const owner = await this.owner();
     const factoryOwner = await (await this.moduleFactoryContract(moduleFactoryAddress)).owner.callAsync();
     assert.assert(
-        functionsUtils.checksumAddressComparision(callerAddress, owner) ||
+      functionsUtils.checksumAddressComparision(callerAddress, owner) ||
         functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
-        'Calling address must be owner or factory owner ',
+      'Calling address must be owner or factory owner ',
     );
-  }
+  };
 }

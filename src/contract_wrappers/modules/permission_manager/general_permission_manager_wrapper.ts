@@ -237,16 +237,13 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
       return value[0];
     }); // [module1: [[module1, perm1], [module1, perm2]], ...]
     const typedResult: PermissionsPerModule[] = [];
-    _.forEach(
-      groupedResult,
-      (value, key): void => {
-        const permissionsPerModule: PermissionsPerModule = {
-          module: key,
-          permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
-        };
-        typedResult.push(permissionsPerModule);
-      },
-    );
+    _.forEach(groupedResult, (value, key): void => {
+      const permissionsPerModule: PermissionsPerModule = {
+        module: key,
+        permissions: value.map(pair => parsePermBytes32Value(pair[1] as string)),
+      };
+      typedResult.push(permissionsPerModule);
+    });
     return typedResult;
   };
 
@@ -288,14 +285,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
       GeneralPermissionManager.abi,
     );
     return logs;
