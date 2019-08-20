@@ -242,16 +242,25 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  check if the module is paused
+   */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
@@ -259,7 +268,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Return the blacklists
+   * Return the different blacklist details corresponding to a blacklists name
    */
   public blacklists = async (params: BlacklistParams): Promise<BlacklistsDetails> => {
     assert.assert(params.blacklistName.length > 0, 'Blacklist Details must not be an empty string');
@@ -272,7 +281,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addBlacklistType
+   * @notice Used to add the blacklist type
+   * @param _startTime Start date of the blacklist type
+   * @param _endTime End date of the blacklist type
+   * @param _blacklistName Name of the blacklist type
+   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
    */
   public addBlacklistType = async (params: BlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -288,7 +301,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addNewBlacklistTypeMulti
+   * @notice Used to add multiple blacklist types
+   * @param _startTimes Start dates of the blacklist types
+   * @param _endTimes End dates of the blacklist types
+   * @param _blacklistNames Names of the blacklist types
+   * @param _repeatPeriodTimes Repeat periods of the blacklist type (in days)
    */
   public addNewBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
     assert.areValidArrayLengths(
@@ -320,7 +337,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * modifyBlacklistType
+   * @notice Used to modify the details of a given blacklist type
+   * @param _startTime Start date of the blacklist type
+   * @param _endTime End date of the blacklist type
+   * @param _blacklistName Name of the blacklist type
+   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
    */
   public modifyBlacklistType = async (params: BlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -336,53 +357,58 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * modifyBlacklistTypeMulti
+   * @notice Used to modify the details of given multiple blacklist types
+   * @param _startTimes Start date of the blacklist type
+   * @param _endTimes End date of the blacklist type
+   * @param _blacklistNames Name of the blacklist type
+   * @param _repeatPeriodTimes Repeat period of the blacklist type (in days)
    */
   public modifyBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
     assert.areValidArrayLengths(
-        [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
-        'Argument arrays length mismatch',
+      [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
+      'Argument arrays length mismatch',
     );
     assert.assert(params.startTimes.length > 0, 'Empty blacklist information');
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const results = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
       results.push(
-          this.checkModifyBlacklistType({
-            startTime: params.startTimes[i],
-            endTime: params.endTimes[i],
-            blacklistName: params.blacklistNames[i],
-            repeatPeriodTime: params.repeatPeriodTimes[i],
-          }),
+        this.checkModifyBlacklistType({
+          startTime: params.startTimes[i],
+          endTime: params.endTimes[i],
+          blacklistName: params.blacklistNames[i],
+          repeatPeriodTime: params.repeatPeriodTimes[i],
+        }),
       );
     }
     await Promise.all(results);
     return (await this.contract).modifyBlacklistTypeMulti.sendTransactionAsync(
-        dateArrayToBigNumberArray(params.startTimes),
-        dateArrayToBigNumberArray(params.endTimes),
-        stringArrayToBytes32Array(params.blacklistNames),
-        numberArrayToBigNumberArray(params.repeatPeriodTimes),
-        params.txData,
-        params.safetyFactor,
+      dateArrayToBigNumberArray(params.startTimes),
+      dateArrayToBigNumberArray(params.endTimes),
+      stringArrayToBytes32Array(params.blacklistNames),
+      numberArrayToBigNumberArray(params.repeatPeriodTimes),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
-
   /*
-   * deleteBlacklistType
+   * @notice Used to delete the blacklist type
+   * @param _blacklistName Name of the blacklist type
    */
   public deleteBlacklistType = async (params: DeleteBlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkDeleteBlacklistType(params.blacklistName);
     return (await this.contract).deleteBlacklistType.sendTransactionAsync(
-        stringToBytes32(params.blacklistName),
-        params.txData,
-        params.safetyFactor,
+      stringToBytes32(params.blacklistName),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * deleteBlacklistTypeMulti
+   * @notice Used to delete the multiple blacklist types
+   * @param _blacklistNames Names of the blacklist types
    */
   public deleteBlacklistTypeMulti = async (params: DeleteBlacklistTypeMultiParams) => {
     assert.assert(params.blacklistNames.length > 0, 'Empty blacklist information');
@@ -393,28 +419,32 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     }
     await Promise.all(results);
     return (await this.contract).deleteBlacklistTypeMulti.sendTransactionAsync(
-        stringArrayToBytes32Array(params.blacklistNames),
-        params.txData,
-        params.safetyFactor,
+      stringArrayToBytes32Array(params.blacklistNames),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * addInvestorToBlacklist
+   * @notice Used to assign the blacklist type to the investor
+   * @param _investor Address of the investor
+   * @param _blacklistName Name of the blacklist
    */
   public addInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkAddInvestorToBlacklist(params);
     return (await this.contract).addInvestorToBlacklist.sendTransactionAsync(
-        params.userAddress,
-        stringToBytes32(params.blacklistName),
-        params.txData,
-        params.safetyFactor,
+      params.userAddress,
+      stringToBytes32(params.blacklistName),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * addInvestorToBlacklistMulti
+   * @notice Used to assign a single blacklist type to multiple investors
+   * @param _investors Address of the investor
+   * @param _blacklistName Name of the blacklist
    */
   public addInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -422,150 +452,153 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     const results = [];
     for (let i = 0; i < params.userAddresses.length; i += 1) {
       results.push(
-          this.checkAddInvestorToBlacklist({
-            userAddress: params.userAddresses[i],
-            blacklistName: params.blacklistName,
-          }),
+        this.checkAddInvestorToBlacklist({
+          userAddress: params.userAddresses[i],
+          blacklistName: params.blacklistName,
+        }),
       );
     }
     await Promise.all(results);
     return (await this.contract).addInvestorToBlacklistMulti.sendTransactionAsync(
-        params.userAddresses,
-        stringToBytes32(params.blacklistName),
-        params.txData,
-        params.safetyFactor,
+      params.userAddresses,
+      stringToBytes32(params.blacklistName),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * addMultiInvestorToBlacklistMulti
+   * @notice Used to assign multiple specific blacklist types to multiple investors
+   * @param _investors Address of the investor
+   * @param _blacklistNames Name of the blacklist
    */
   public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    assert.areValidArrayLengths(
-        [
-          params.userAddresses,
-          params.blacklistNames
-        ],
-        'Argument arrays length mismatch',
-    );
+    assert.areValidArrayLengths([params.userAddresses, params.blacklistNames], 'Argument arrays length mismatch');
     assert.assert(params.userAddresses.length > 0, 'Empty user address information');
     const results = [];
     for (let i = 0; i < params.userAddresses.length; i += 1) {
       results.push(
-          this.checkAddInvestorToBlacklist({
-            userAddress: params.userAddresses[i],
-            blacklistName: params.blacklistNames[i],
-          }),
+        this.checkAddInvestorToBlacklist({
+          userAddress: params.userAddresses[i],
+          blacklistName: params.blacklistNames[i],
+        }),
       );
     }
     await Promise.all(results);
     return (await this.contract).addMultiInvestorToBlacklistMulti.sendTransactionAsync(
-        params.userAddresses,
-        stringArrayToBytes32Array(params.blacklistNames),
-        params.txData,
-        params.safetyFactor,
+      params.userAddresses,
+      stringArrayToBytes32Array(params.blacklistNames),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * addInvestorToNewBlacklist
+   * @notice Used to create a new blacklist type and add it to the investor
+   * @param _startTime Start date of the blacklist type
+   * @param _endTime End date of the blacklist type
+   * @param _blacklistName Name of the blacklist type
+   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
+   * @param _investor Address of the investor
    */
   public addInvestorToNewBlacklist = async (params: AddNewInvestorToNewBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkAddBlacklistType(params);
     return (await this.contract).addInvestorToNewBlacklist.sendTransactionAsync(
-        dateToBigNumber(params.startTime),
-        dateToBigNumber(params.endTime),
-        stringToBytes32(params.blacklistName),
-        numberToBigNumber(params.repeatPeriodTime),
-        params.investor,
-        params.txData,
-        params.safetyFactor,
+      dateToBigNumber(params.startTime),
+      dateToBigNumber(params.endTime),
+      stringToBytes32(params.blacklistName),
+      numberToBigNumber(params.repeatPeriodTime),
+      params.investor,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * deleteInvestorFromBlacklist
+   * @notice Used to delete the investor from the blacklist
+   * @param _investor Address of the investor
+   * @param _blacklistName Name of the blacklist
    */
   public deleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkDeleteInvestorFromBlacklist(params);
     return (await this.contract).deleteInvestorFromBlacklist.sendTransactionAsync(
-        params.userAddress,
-        stringToBytes32(params.blacklistName),
-        params.txData,
-        params.safetyFactor,
+      params.userAddress,
+      stringToBytes32(params.blacklistName),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * deleteMultiInvestorsFromBlacklistMulti
+   * @notice Used to delete the multiple investors from multiple specific blacklists
+   * @param _investors addresses of the investors
+   * @param _blacklistNames names of the blacklists
    */
   public deleteMultiInvestorsFromBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    assert.areValidArrayLengths(
-        [
-          params.userAddresses,
-          params.blacklistNames
-        ],
-        'Argument arrays length mismatch',
-    );
+    assert.areValidArrayLengths([params.userAddresses, params.blacklistNames], 'Argument arrays length mismatch');
     assert.assert(params.userAddresses.length > 0, 'Empty user address information');
     const results = [];
     for (let i = 0; i < params.userAddresses.length; i += 1) {
       results.push(
-          this.checkDeleteInvestorFromBlacklist({
-            userAddress: params.userAddresses[i],
-            blacklistName: params.blacklistNames[i],
-          }),
+        this.checkDeleteInvestorFromBlacklist({
+          userAddress: params.userAddresses[i],
+          blacklistName: params.blacklistNames[i],
+        }),
       );
     }
     await Promise.all(results);
     return (await this.contract).deleteMultiInvestorsFromBlacklistMulti.sendTransactionAsync(
-        params.userAddresses,
-        stringArrayToBytes32Array(params.blacklistNames),
-        params.txData,
-        params.safetyFactor,
+      params.userAddresses,
+      stringArrayToBytes32Array(params.blacklistNames),
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * deleteInvestorFromAllBlacklist
+   * @notice Used to delete the investor from all the associated blacklist types
+   * @param _investor Address of the investor
    */
   public deleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await this.checkDeleteInvestorFromAllBlacklist(params);
     return (await this.contract).deleteInvestorFromAllBlacklist.sendTransactionAsync(
-        params.investor,
-        params.txData,
-        params.safetyFactor,
+      params.investor,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /*
-   * deleteInvestorFromAllBlacklistMulti
+   * @notice Used to delete multiple investors from multiple associated blacklist types
+   * @param _investor Addresses of the investors
    */
   public deleteInvestorFromAllBlacklistMulti = async (params: DeleteInvestorFromAllBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const results = [];
     for (let i = 0; i < params.investors.length; i += 1) {
       results.push(
-          this.checkDeleteInvestorFromAllBlacklist({
-            investor: params.investors[i],
-          }),
+        this.checkDeleteInvestorFromAllBlacklist({
+          investor: params.investors[i],
+        }),
       );
     }
     await Promise.all(results);
     return (await this.contract).deleteInvestorFromAllBlacklistMulti.sendTransactionAsync(
-        params.investors,
-        params.txData,
-        params.safetyFactor,
+      params.investors,
+      params.txData,
+      params.safetyFactor,
     );
   };
 
   /**
-   * getListOfAddresses
+   * @notice get the list of the investors that correspond to a blacklist type
+   * @param _blacklistName Name of the blacklist type
+   * @return address List of investors associated with the blacklist
    */
   public getListOfAddresses = async (params: BlacklistParams): Promise<string[]> => {
     assert.assert(params.blacklistName.length > 0, 'Blacklist details must not be an empty string');
@@ -573,7 +606,9 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getBlacklistNamesToUser
+   * @notice get the list of blacklists associated with a particular investor
+   * @param _user Address of the user
+   * @return bytes32 List of blacklist names associated with the given address
    */
   public getBlacklistNamesToUser = async (params: UserAddressParams): Promise<string[]> => {
     assert.isNonZeroETHAddressHex('User Address', params.user);
@@ -581,14 +616,18 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getAllBlacklists
+   * @notice get the list of blacklist names
+   * @return bytes32 Array of blacklist names
    */
   public getAllBlacklists = async (): Promise<string[]> => {
     return bytes32ArrayToStringArray(await (await this.contract).getAllBlacklists.callAsync());
   };
 
   /**
-   * getTokensByPartition
+   * @notice return the amount of tokens for a given user as per the partition
+   * @param _partition Identifier
+   * @param _tokenHolder Whom token amount need to query
+   * @param _additionalBalance It is the `_value` that transfers during transfer/transferFrom function call
    */
   public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
     assert.isNonZeroETHAddressHex('Token Holder', params.tokenHolder);
@@ -604,7 +643,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getPermissions
+   * @notice Return the permissions flags that are associated with blacklist transfer manager
    */
   public getPermissions = async (): Promise<Perm[]> => {
     const permissions = await (await this.contract).getPermissions.callAsync();
@@ -612,7 +651,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * verifyTransfer
+   * @notice Used to verify the transfer transaction (View)
+   * @param _from Address of the sender
+   * @dev Restrict the blacklist address to transfer tokens
+   * if the current time is between the timeframe define for the
+   * blacklist type associated with the _from address
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
@@ -709,8 +752,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
     const lookupListOfAddresses = await this.getListOfAddresses({ blacklistName });
     assert.assert(
-        lookupListOfAddresses.length === 0,
-        'There are users attached to the blacklist that must be removed before removing the blacklist type',
+      lookupListOfAddresses.length === 0,
+      'There are users attached to the blacklist that must be removed before removing the blacklist type',
     );
   };
 
@@ -735,6 +778,6 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   private checkDeleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
     assert.isNonZeroETHAddressHex('Investor Address', params.investor);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.investor });
-    assert.assert(currentBlacklistNames.length > 0, 'Investor is not currently present on any blacklists')
+    assert.assert(currentBlacklistNames.length > 0, 'Investor is not currently present on any blacklists');
   };
 }
