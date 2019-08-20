@@ -61,7 +61,6 @@ import {
   VolumeRestrictionTMEventArgs,
   VestingEscrowWalletContract,
   VestingEscrowWalletEvents,
-  VestingEscrowWalletUnpauseEventArgs,
   LockUpTransferManagerEventArgs,
   LockUpTransferManagerContract,
   LockUpTransferManagerEvents,
@@ -264,7 +263,7 @@ export type ContractEvents =
   | CountTransferManagerEvents
   | PercentageTransferManagerEvents
   | VolumeRestrictionTMEvents
-  | VestingEscrowWalletEvents;
+  | VestingEscrowWalletEvents
   | LockUpTransferManagerEvents
   | VolumeRestrictionTMEvents;
 
@@ -319,7 +318,7 @@ export type GenericModuleContract =
   | CountTransferManagerContract
   | PercentageTransferManagerContract
   | VolumeRestrictionTMContract
-  | VestingEscrowWalletContract;
+  | VestingEscrowWalletContract
   | LockUpTransferManagerContract
   | VolumeRestrictionTMContract;
 
