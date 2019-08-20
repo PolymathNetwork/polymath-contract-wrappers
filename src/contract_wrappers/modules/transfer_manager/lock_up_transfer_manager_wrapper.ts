@@ -265,16 +265,25 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  check if the module is paused
+   */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
@@ -282,7 +291,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Return the lockups
+   *  mapping used to store the lockup details corresponds to lockup name
    */
   public lockups = async (params: LockupsParams): Promise<LockUp> => {
     assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
@@ -297,7 +306,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getLockup
+   * @notice Get a specific element in a user's lockups array given the user's address and the element index
+   * @param _lockupName The name of the lockup
    */
   public getLockUp = async (params: LockupsParams): Promise<LockUpWithAmount> => {
     assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
@@ -313,7 +323,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getAllLockupData
+   * @notice Return the data of all the lockups
    */
   public getAllLockupData = async (): Promise<LockUpData[]> => {
     const result = await (await this.contract).getAllLockupData.callAsync();
@@ -333,7 +343,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getListOfAddresses
+   * @notice get the list of user addresses of a specific lockup type by name
+   * @param _lockupName Name of the lockup type
+   * @return address List of users associated with the given lockup name
    */
   public getListOfAddresses = async (params: LockupsParams): Promise<string[]> => {
     assert.assert(params.lockupName.length > 0, 'LockUp name must not be an empty string');
@@ -341,14 +353,17 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getAllLockups
+   * @notice get the list of all lockups names
+   * @return bytes32 Array of lockups names
    */
   public getAllLockups = async (): Promise<string[]> => {
     return bytes32ArrayToStringArray(await (await this.contract).getAllLockups.callAsync());
   };
 
   /**
-   * getLockupsNamesToUser
+   * @notice get the list of the lockups for a given user
+   * @param _user Address of the user
+   * @return bytes32 List of lockups names associated with the given address
    */
   public getLockupsNamesToUser = async (params: UserAddressParams): Promise<string[]> => {
     assert.isNonZeroETHAddressHex('User Address', params.user);
@@ -356,7 +371,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getLockedTokenToUser
+   * @notice Use to get the total locked tokens for a given user
+   * @param _userAddress Address of the user
+   * @return uint256 Total locked tokens amount
    */
   public getLockedTokenToUser = async (params: UserAddressParams): Promise<BigNumber> => {
     assert.isNonZeroETHAddressHex('User Address', params.user);
@@ -365,7 +382,10 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getTokensByPartition
+   * @notice return the amount of tokens for a given user as per the partition
+   * @param _partition Identifier
+   * @param _tokenHolder Whom token amount need to query
+   * @param _additionalBalance It is the `_value` that transfer during transfer/transferFrom function call
    */
   public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
     assert.isNonZeroETHAddressHex('Token Holder', params.tokenHolder);
@@ -381,7 +401,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getPermissions
+   * @notice Returns the permissions flags that are associated with Percentage transfer Manager
    */
   public getPermissions = async (): Promise<Perm[]> => {
     const permissions = await (await this.contract).getPermissions.callAsync();
@@ -389,7 +409,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * verifyTransfer
+   * @notice Used to verify the transfer transaction and prevent locked up tokens from being transferred
+   * @param _from Address of the sender
+   * @param _amount The amount of tokens to transfer
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
@@ -409,7 +431,12 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addNewLockUpType
+   * @notice Use to add the new lockup type
+   * @param _lockupAmount Amount of tokens that need to be locked.
+   * @param _startTime When this lockup starts (seconds)
+   * @param _lockUpPeriodSeconds Total period of lockup (seconds)
+   * @param _releaseFrequencySeconds How often to release a tranche of tokens (seconds)
+   * @param _lockupName Name of the lockup
    */
   public addNewLockUpType = async (params: LockUpTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -427,7 +454,12 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addNewLockUpTypeMulti
+   * @notice Use to add multiple new lockup types
+   * @param _lockupAmounts Array of amount of tokens that need to lock.
+   * @param _startTimes Array of startTimes when this lockup starts (seconds)
+   * @param _lockUpPeriodsSeconds Array of total period of lockup (seconds)
+   * @param _releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
+   * @param _lockupNames Array of names of the lockup
    */
   public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
     assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
@@ -468,7 +500,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addLockUpByName
+   * @notice Add a lockup to a specific user
+   * @param _userAddress Address of the user
+   * @param _lockupName Name of the lockup
    */
   public addLockUpByName = async (params: LockUpByNameParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -482,7 +516,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addLockUpByNameMulti
+   * @notice Add multiple lockups to multiple users
+   * @param _userAddresses Array of addresses of the users
+   * @param _lockupNames Array of names of the lockups
    */
   public addLockUpByNameMulti = async (params: LockUpByNameMultiParams) => {
     assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
@@ -507,7 +543,13 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addNewLockUpToUser
+   * @notice Lets the admin create a volume restriction lockup for a given address.
+   * @param _userAddress Address of the user whose tokens should be locked up
+   * @param _lockupAmount Amount of tokens that need to lock.
+   * @param _startTime When this lockup starts (seconds)
+   * @param _lockUpPeriodSeconds Total period of lockup (seconds)
+   * @param _releaseFrequencySeconds How often to release a tranche of tokens (seconds)
+   * @param _lockupName Name of the lockup
    */
   public addNewLockUpToUser = async (params: AddNewLockUpToUserParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -528,7 +570,13 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * addNewLockUpToUserMulti
+   * @notice Lets the admin create multiple volume restriction lockups for multiple given addresses.
+   * @param _userAddresses Array of address of the user whose tokens should be locked up
+   * @param _lockupAmounts Array of the amounts that need to be locked for the different addresses.
+   * @param _startTimes Array of When this lockup starts (seconds)
+   * @param _lockUpPeriodsSeconds Array of total periods of lockup (seconds)
+   * @param _releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
+   * @param _lockupNames Array of names of the lockup
    */
   public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -574,7 +622,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * removeLockUpFromUser
+   * @notice Lets the admin remove a user from a lock up
+   * @param _userAddress Address of the user whose tokens are locked up
+   * @param _lockupName Name of the lockup need to be removed.
    */
   public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -588,7 +638,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * removeLockUpFromUserMulti
+   * @notice Use to remove the lockup for multiple users
+   * @param _userAddresses Array of addresses of the user whose tokens are locked up
+   * @param _lockupNames Array of the names of the lockup that needs to be removed.
    */
   public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams) => {
     assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
@@ -613,7 +665,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * removeLockUpType
+   * @notice Used to remove the lockup type
+   * @param _lockupName Name of the lockup
    */
   public removeLockupType = async (params: RemoveLockUpTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -626,7 +679,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * removeLockUpTypeMulti
+   * @notice Used to remove the multiple lockup type
+   * @param _lockupNames Array of the lockup names.
    */
   public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams) => {
     assert.assert(params.lockupNames.length > 0, 'Empty lockup information');
@@ -644,7 +698,12 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * modifyLockUpType
+   * @notice Lets the admin modify a lockup.
+   * @param _lockupAmount Amount of tokens that needs to be locked
+   * @param _startTime When this lockup starts (seconds)
+   * @param _lockUpPeriodSeconds Total period of lockup (seconds)
+   * @param _releaseFrequencySeconds How often to release a tranche of tokens (seconds)
+   * @param _lockupName name of the lockup that needs to be modified.
    */
   public modifyLockUpType = async (params: LockUpTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -662,7 +721,12 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /*
-   * modifyLockUpTypeMulti
+   * @notice Lets the admin modify a volume restriction lockup for multiple addresses.
+   * @param _lockupAmounts Array of the amount of tokens that needs to be locked for the respective addresses.
+   * @param _startTimes Array of the start time of the lockups (seconds)
+   * @param _lockUpPeriodsSeconds Array of unix timestamp for the list of lockups (seconds).
+   * @param _releaseFrequenciesSeconds How often to release a tranche of tokens (seconds)
+   * @param _lockupNames Array of the lockup names that needs to be modified
    */
   public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
     assert.assert(params.lockupAmounts.length > 0, 'Empty lockup information');
