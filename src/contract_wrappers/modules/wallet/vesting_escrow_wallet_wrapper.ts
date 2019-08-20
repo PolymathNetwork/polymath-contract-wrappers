@@ -21,7 +21,6 @@ import {
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import { StatusCodes } from '@0x/types';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -32,10 +31,8 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  TransferResult,
   Perm,
   TransferStatusCode,
-  FULL_DECIMALS,
 } from '../../../types';
 import {
   numberToBigNumber,
@@ -450,14 +447,16 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
   public unassignedTokens = async () => {
     const result = await (await this.contract).unassignedTokens.callAsync();
-    return result;
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return weiToValue(result, decimals);
   };
 
   public schedules = async (params: SchedulesParams) => {
     const result = await (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const schedule: Schedule = {
       templateName: bytes32ToString(result[0]),
-      claimedTokens: result[1].toNumber(),
+      claimedTokens: weiToValue(result[1], decimals).toNumber(),
       startTime: bigNumberToDate(result[2]),
     };
     return schedule;
@@ -491,17 +490,17 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
 
     assert.assert(params.numberOfTokens.toNumber() > 0, 'Number of tokens should be > 0');
-
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
       await this.getCallerAddress(params.txData),
       await this.address(),
-      params.numberOfTokens,
+      valueToWei(params.numberOfTokens, decimals),
       '0x00',
     );
     assert.assert(canTransferFromResult[0] === TransferStatusCode.TransferSuccess, 'Failed transferFrom');
 
     return (await this.contract).depositTokens.sendTransactionAsync(
-      params.numberOfTokens,
+      valueToWei(params.numberOfTokens, decimals),
       params.txData,
       params.safetyFactor,
     );
@@ -515,16 +514,24 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(params.amount.toNumber() > 0, 'Amount cannot be zero');
 
     const unassignedTokens = await this.unassignedTokens();
-    assert.assert(params.amount.isLessThanOrEqualTo(unassignedTokens), 'Amount is greater than unassigned tokens');
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    assert.assert(
+      params.amount.isLessThanOrEqualTo(valueToWei(unassignedTokens, decimals)),
+      'Amount is greater than unassigned tokens',
+    );
 
     const canTransferResult = await (await this.securityTokenContract()).canTransfer.callAsync(
       await this.getTreasuryWallet(),
-      params.amount,
+      valueToWei(params.amount, decimals),
       '0x00',
     );
     assert.assert(canTransferResult[0] === TransferStatusCode.TransferSuccess, 'Transfer failed');
 
-    return (await this.contract).sendToTreasury.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
+    return (await this.contract).sendToTreasury.sendTransactionAsync(
+      valueToWei(params.amount, decimals),
+      params.txData,
+      params.safetyFactor,
+    );
   };
 
   /**
@@ -563,9 +570,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(params.name !== '', 'Invalid name');
     assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addTemplate.sendTransactionAsync(
       stringToBytes32(params.name),
-      params.numberOfTokens,
+      valueToWei(params.numberOfTokens, decimals),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       params.txData,
@@ -615,10 +623,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(!(await this.getAllTemplateNames()).includes(params.templateName), 'Template name already exists');
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     await this.validateAddSchedule(params.beneficiary, params.templateName, params.startTime);
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addSchedule.sendTransactionAsync(
       params.beneficiary,
       stringToBytes32(params.templateName),
-      params.numberOfTokens,
+      valueToWei(params.numberOfTokens, decimals),
       numberToBigNumber(params.duration),
       numberToBigNumber(params.frequency),
       dateToBigNumber(params.startTime),
@@ -699,22 +708,24 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
 
     let state: StateStatus = StateStatus.Created;
-    switch (StateStatus[result[5].toNumber()]) {
-      case 'Created':
+    switch (result[5].toNumber()) {
+      case 0:
         state = StateStatus.Created;
         break;
-      case 'Completed':
+      case 1:
         state = StateStatus.Completed;
         break;
-      case 'Started':
+      case 2:
         state = StateStatus.Started;
         break;
       default:
         break;
     }
 
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+
     const response: BeneficiarySchedule = {
-      numberOfTokens: result[0],
+      numberOfTokens: weiToValue(result[0], decimals),
       duration: result[1].toNumber(),
       frequency: result[2].toNumber(),
       startTime: bigNumberToDate(result[3]),
@@ -792,13 +803,15 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     });
     await Promise.all(resultValidateTemplate);
     await Promise.all(resultValidateAddScheduleFromTemplate);
-
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addScheduleMulti.sendTransactionAsync(
       params.beneficiaries,
       params.templateNames.map(name => {
         return stringToBytes32(name);
       }),
-      params.numberOfTokens,
+      params.numberOfTokens.map(tokens => {
+        return valueToWei(tokens, decimals);
+      }),
       params.durations.map(duration => {
         return numberToBigNumber(duration);
       }),

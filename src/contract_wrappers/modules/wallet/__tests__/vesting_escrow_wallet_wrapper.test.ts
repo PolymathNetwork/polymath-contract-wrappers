@@ -18,6 +18,7 @@ import {
   bigNumberToDate,
   dateToBigNumber,
   valueToWei,
+  weiToValue,
 } from '../../../../utils/convert';
 import { TransferStatusCode } from '../../../../types';
 
@@ -229,6 +230,20 @@ describe('VestingEscrowWalletWrapper', () => {
       const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
+
+      // decimals
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Stub the method
       when(mockedContract.unassignedTokens).thenReturn(instance(mockedMethod));
       // Stub the request
@@ -237,10 +252,16 @@ describe('VestingEscrowWalletWrapper', () => {
       // Real call
       const result = await target.unassignedTokens();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(valueToWei(result, expectedDecimalsResult)).toEqual(expectedResult);
       // Verifications
       verify(mockedContract.unassignedTokens).once();
       verify(mockedMethod.callAsync()).once();
+      // decimals
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -252,6 +273,20 @@ describe('VestingEscrowWalletWrapper', () => {
         beneficiary: '0x3333333333333333333333333333333333333333',
         index: 1,
       };
+
+      // decimals
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -265,7 +300,9 @@ describe('VestingEscrowWalletWrapper', () => {
       const result = await target.schedules(mockedParams);
       // Result expectation
       expect(result.templateName).toEqual(bytes32ToString(expectedResult[0] as string));
-      expect(result.claimedTokens).toEqual((expectedResult[1] as BigNumber).toNumber());
+      expect(result.claimedTokens).toEqual(
+        weiToValue(expectedResult[1] as BigNumber, expectedDecimalsResult).toNumber(),
+      );
       expect(result.startTime).toEqual(bigNumberToDate(expectedResult[2] as BigNumber));
 
       // Verifications
@@ -273,6 +310,12 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.callAsync(mockedParams.beneficiary, objectContaining(numberToBigNumber(mockedParams.index))),
       ).once();
+      // decimals
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -408,6 +451,20 @@ describe('VestingEscrowWalletWrapper', () => {
         beneficiary: '0x3333333333333333333333333333333333333333',
         templateName: 'test',
       };
+
+      // decimals
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -420,7 +477,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Real call
       const result = await target.getSchedule(mockedParams);
       // Result expectation
-      expect(result.numberOfTokens).toEqual(expectedResult[0]);
+      expect(valueToWei(result.numberOfTokens, expectedDecimalsResult)).toEqual(expectedResult[0]);
       expect(result.duration).toEqual((expectedResult[1] as BigNumber).toNumber());
       expect(result.frequency).toEqual((expectedResult[2] as BigNumber).toNumber());
       expect(result.startTime).toEqual(bigNumberToDate(expectedResult[3] as BigNumber));
@@ -432,6 +489,12 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.callAsync(mockedParams.beneficiary, objectContaining(stringToBytes32(mockedParams.templateName))),
       ).once();
+      // decimals
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -571,6 +634,11 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      // decimals
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
       // canTransferFrom
       const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
@@ -579,7 +647,7 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedCanTransferFromParams = {
         from: expectedOwnerResult,
         to: expectedAddress,
-        value: mockedParams.numberOfTokens,
+        value: valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult),
         data: '0x00',
       };
       when(mockedSecurityTokenContract.canTransferFrom).thenReturn(instance(mockedSecurityTokenCanTransferFromMethod));
@@ -600,7 +668,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -617,18 +685,21 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.depositTokens).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
       // isCallerTheSecurityTokenOwner
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      // decimals
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       // canTransferFrom
       verify(mockedSecurityTokenContract.canTransferFrom).once();
       verify(
@@ -673,6 +744,11 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedTreasuryMethod = mock(MockedCallMethod);
       when(mockedContract.getTreasuryWallet).thenReturn(instance(mockedTreasuryMethod));
       when(mockedTreasuryMethod.callAsync()).thenResolve(expectedTreasuryResult);
+      // decimals
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
       // canTransfer
       const expectedStatusCode = TransferStatusCode.TransferSuccess;
       const expectedReasonCode = 'Reason';
@@ -680,7 +756,7 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedSecurityTokenCanTransferMethod = mock(MockedCallMethod);
       const mockedCanTransferParams = {
         to: expectedTreasuryResult,
-        value: mockedParams.amount,
+        value: valueToWei(mockedParams.amount, expectedDecimalsResult),
         data: '0x00',
       };
       when(mockedSecurityTokenContract.canTransfer).thenReturn(instance(mockedSecurityTokenCanTransferMethod));
@@ -700,7 +776,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -716,17 +792,17 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.sendToTreasury).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          objectContaining(mockedParams.amount),
+          objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
       // isCallerTheSecurityTokenOwner
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).times(4);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       // unassignedTokens
       verify(mockedContract.unassignedTokens).once();
@@ -734,6 +810,9 @@ describe('VestingEscrowWalletWrapper', () => {
       // getTreasuryWallet
       verify(mockedContract.getTreasuryWallet).once();
       verify(mockedTreasuryMethod.callAsync()).once();
+      // decimals
+      verify(mockedSecurityTokenContract.decimals).times(2);
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).times(2);
       // canTransfer
       verify(mockedSecurityTokenContract.canTransfer).once();
       verify(
@@ -869,6 +948,11 @@ describe('VestingEscrowWalletWrapper', () => {
       const mockedSecurityTokenGranularityMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenGranularityMethod.callAsync()).thenResolve(expectedGranularityResult);
       when(mockedSecurityTokenContract.granularity).thenReturn(instance(mockedSecurityTokenGranularityMethod));
+      // decimals
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -879,7 +963,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           stringToBytes32(mockedParams.name),
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           mockedParams.txData,
@@ -897,7 +981,7 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           stringToBytes32(mockedParams.name),
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           mockedParams.txData,
@@ -908,15 +992,18 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.getAllTemplateNames).once();
       verify(mockedPausedMethod.callAsync()).once();
       // isCallerAllowed
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       // granurality
       verify(mockedSecurityTokenGranularityMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.granularity).once();
+      // decimals
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1034,6 +1121,12 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
+      // decimals
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -1044,7 +1137,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
           stringToBytes32(mockedParams.templateName),
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
@@ -1064,7 +1157,7 @@ describe('VestingEscrowWalletWrapper', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
           stringToBytes32(mockedParams.templateName),
-          objectContaining(mockedParams.numberOfTokens),
+          objectContaining(valueToWei(mockedParams.numberOfTokens, expectedDecimalsResult)),
           objectContaining(numberToBigNumber(mockedParams.duration)),
           objectContaining(numberToBigNumber(mockedParams.frequency)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
@@ -1079,15 +1172,18 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContract.getAllTemplateNames).once();
       verify(mockedPausedMethod.callAsync()).once();
       // isCallerAllowed
-      verify(mockedContract.securityToken).twice();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).times(3);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       // granurality
       verify(mockedSecurityTokenGranularityMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.granularity).once();
+      // decimals
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
     });
   });
 
@@ -1465,6 +1561,12 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
+      // decimals
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedSecurityTokenDecimalsMethod));
+      when(mockedSecurityTokenDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
@@ -1474,19 +1576,31 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.numberOfTokens),
-          objectContaining(mockedParams.durations.map(duration => {
-            return numberToBigNumber(duration);
-          })),
-          objectContaining(mockedParams.frequencies.map(frequency => {
-            return numberToBigNumber(frequency);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.numberOfTokens.map(tokens => {
+              return valueToWei(tokens, expectedDecimalsResult);
+            }),
+          ),
+          objectContaining(
+            mockedParams.durations.map(duration => {
+              return numberToBigNumber(duration);
+            }),
+          ),
+          objectContaining(
+            mockedParams.frequencies.map(frequency => {
+              return numberToBigNumber(frequency);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1502,19 +1616,31 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.numberOfTokens),
-          objectContaining(mockedParams.durations.map(duration => {
-            return numberToBigNumber(duration);
-          })),
-          objectContaining(mockedParams.frequencies.map(frequency => {
-            return numberToBigNumber(frequency);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.numberOfTokens.map(tokens => {
+              return valueToWei(tokens, expectedDecimalsResult);
+            }),
+          ),
+          objectContaining(
+            mockedParams.durations.map(duration => {
+              return numberToBigNumber(duration);
+            }),
+          ),
+          objectContaining(
+            mockedParams.frequencies.map(frequency => {
+              return numberToBigNumber(frequency);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1530,12 +1656,15 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedScheduleCountMethod.callAsync(mockedParams.beneficiaries[0])).once();
       verify(mockedScheduleCountMethod.callAsync(mockedParams.beneficiaries[1])).once();
       // isCallerAllowed
-      verify(mockedContract.securityToken).times(3);
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(3);
+      verify(mockedContract.securityToken).times(4);
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).times(4);
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(3);
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).times(4);
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      // decimals
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
     });
   });
 
@@ -1585,12 +1714,16 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1606,12 +1739,16 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1662,11 +1799,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedContract.revokeSchedulesMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.beneficiaries,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+        mockedMethod.sendTransactionAsync(mockedParams.beneficiaries, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1677,11 +1810,7 @@ describe('VestingEscrowWalletWrapper', () => {
       // Verifications
       verify(mockedContract.revokeSchedulesMulti).once();
       verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.beneficiaries,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
+        mockedMethod.sendTransactionAsync(mockedParams.beneficiaries, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       // isCallerAllowed
       verify(mockedContract.securityToken).once();
@@ -1726,12 +1855,16 @@ describe('VestingEscrowWalletWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1747,12 +1880,16 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiaries,
-          objectContaining(mockedParams.templateNames.map(name => {
-            return stringToBytes32(name);
-          })),
-          objectContaining(mockedParams.startTimes.map(startTime => {
-            return dateToBigNumber(startTime);
-          })),
+          objectContaining(
+            mockedParams.templateNames.map(name => {
+              return stringToBytes32(name);
+            }),
+          ),
+          objectContaining(
+            mockedParams.startTimes.map(startTime => {
+              return dateToBigNumber(startTime);
+            }),
+          ),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
