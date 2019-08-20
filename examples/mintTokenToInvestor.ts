@@ -27,7 +27,7 @@ window.addEventListener('load', async () => {
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
     ticker: ticker!,
   });
   // Get the ticker fee and approve the security token registry to spend
@@ -59,7 +59,7 @@ window.addEventListener('load', async () => {
 
   console.log('Security Token Generated');
 
-  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress(ticker!);
+  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress({ ticker: ticker! });
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
 
   const investorAddress = '0x1111111111111111111111111111111111111111';
