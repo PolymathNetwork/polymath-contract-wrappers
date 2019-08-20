@@ -229,11 +229,11 @@ interface LockUp {
   releaseFrequencySeconds: BigNumber;
 }
 
-interface GetLockUp extends LockUp {
+interface LockUpWithAmount extends LockUp {
   unlockedAmount: BigNumber;
 }
 
-interface GetLockupData extends GetLockUp {
+interface LockUpData extends LockUpWithAmount {
   lockupName: string;
 }
 
@@ -297,9 +297,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * getLockups
+   * getLockup
    */
-  public getLockUp = async (params: LockupsParams): Promise<GetLockUp> => {
+  public getLockUp = async (params: LockupsParams): Promise<LockUpWithAmount> => {
     assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
     const result = await (await this.contract).getLockUp.callAsync(stringToBytes32(params.lockupName));
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -315,10 +315,10 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * getAllLockupData
    */
-  public getAllLockupData = async (): Promise<GetLockupData[]> => {
+  public getAllLockupData = async (): Promise<LockUpData[]> => {
     const result = await (await this.contract).getAllLockupData.callAsync();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    const typedResult: GetLockupData[] = [];
+    const typedResult: LockUpData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
       typedResult.push({
         lockupName: bytes32ToString(result[0][i]),
@@ -336,7 +336,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
    * getListOfAddresses
    */
   public getListOfAddresses = async (params: LockupsParams): Promise<string[]> => {
-    assert.assert(params.lockupName.length > 0, 'LockUp Details must not be an empty string');
+    assert.assert(params.lockupName.length > 0, 'LockUp name must not be an empty string');
     return (await this.contract).getListOfAddresses.callAsync(stringToBytes32(params.lockupName));
   };
 
