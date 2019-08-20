@@ -19,6 +19,7 @@ import {
   ManualApprovalTransferManager,
   CountTransferManager,
   PercentageTransferManager,
+  LockUpTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
   PolyTokenFaucet,
@@ -26,6 +27,7 @@ import {
   ERC20Detailed,
   VestingEscrowWallet,
 } from '@polymathnetwork/abi-wrappers';
+import _ from 'lodash';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
@@ -137,14 +139,26 @@ export class PolymathAPI {
     const abiArray = [
       // Registries
       FeatureRegistry.abi,
-      ModuleRegistry.abi,
+      ModuleRegistry.abi.filter(
+        a =>
+          !(
+            a.type === 'function' &&
+            a.name === 'useModule' &&
+            _.isEqual(a.inputs, [
+              {
+                name: '_moduleFactory',
+                type: 'address',
+              },
+            ])
+          ),
+      ),
       PolymathRegistry.abi,
       ISecurityTokenRegistry.abi.filter(
         a =>
-          a.type !== 'event' &&
-          a.name !== 'RegisterTicker' &&
-          a.inputs ===
-            [
+          !(
+            a.type === 'event' &&
+            a.name === 'RegisterTicker' &&
+            _.isEqual(a.inputs, [
               { indexed: true, name: '_owner', type: 'address' },
               { indexed: false, name: '_ticker', type: 'string' },
               { indexed: false, name: '_name', type: 'string' },
@@ -152,7 +166,8 @@ export class PolymathAPI {
               { indexed: true, name: '_expiryDate', type: 'uint256' },
               { indexed: false, name: '_fromAdmin', type: 'bool' },
               { indexed: false, name: '_registrationFee', type: 'uint256' },
-            ],
+            ])
+          ),
       ),
       // Modules
       ModuleFactory.abi,
@@ -170,6 +185,7 @@ export class PolymathAPI {
       GeneralTransferManager.abi,
       ManualApprovalTransferManager.abi,
       PercentageTransferManager.abi,
+      LockUpTransferManager.abi,
       VolumeRestrictionTransferManager.abi,
       // Tokens
       ERC20Detailed.abi,

@@ -748,7 +748,8 @@ interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.GeneralPermissionManager
     | ModuleName.GeneralTransferManager
     | ModuleName.ManualApprovalTransferManager
-    | ModuleName.VolumeRestrictionTM;
+    | ModuleName.VolumeRestrictionTM
+    | ModuleName.LockUpTransferManager;
   data?: undefined;
 }
 

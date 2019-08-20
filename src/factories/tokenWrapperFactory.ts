@@ -77,7 +77,7 @@ export default class TokenWrapperFactory {
    * @memberof SecurityTokenWrapperFactory
    */
   public getSecurityTokenInstanceFromTicker = async (ticker: string): Promise<SecurityTokenWrapper> => {
-    const address = await this.securityTokenRegistry.getSecurityTokenAddress(ticker);
+    const address = await this.securityTokenRegistry.getSecurityTokenAddress({ ticker });
     assert.isNonZeroETHAddressHex('address', address);
     return new SecurityTokenWrapper(
       this.web3Wrapper,

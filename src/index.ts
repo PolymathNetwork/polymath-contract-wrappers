@@ -35,6 +35,9 @@ export {
   default as PercentageTransferManager,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
+  default as LockUpTransferManager,
+} from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export * from './types';
@@ -196,6 +199,16 @@ export {
   PercentageTransferManagerPauseEventArgs,
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs,
   PercentageTransferManagerUnpauseEventArgs,
+  LockUpTransferManagerContract,
+  LockUpTransferManagerEventArgs,
+  LockUpTransferManagerEvents,
+  LockUpTransferManagerAddLockUpToUserEventArgs,
+  LockUpTransferManagerRemoveLockUpFromUserEventArgs,
+  LockUpTransferManagerModifyLockUpTypeEventArgs,
+  LockUpTransferManagerAddNewLockUpTypeEventArgs,
+  LockUpTransferManagerRemoveLockUpTypeEventArgs,
+  LockUpTransferManagerPauseEventArgs,
+  LockUpTransferManagerUnpauseEventArgs,
   CountTransferManagerContract,
   CountTransferManagerEventArgs,
   CountTransferManagerEvents,
