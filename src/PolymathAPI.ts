@@ -19,6 +19,7 @@ import {
   ManualApprovalTransferManager,
   CountTransferManager,
   PercentageTransferManager,
+  LockUpTransferManager,
   EtherDividendCheckpoint,
   VolumeRestrictionTransferManager,
   PolyTokenFaucet,
@@ -183,6 +184,7 @@ export class PolymathAPI {
       GeneralTransferManager.abi,
       ManualApprovalTransferManager.abi,
       PercentageTransferManager.abi,
+      LockUpTransferManager.abi,
       VolumeRestrictionTransferManager.abi,
       // Tokens
       ERC20Detailed.abi,

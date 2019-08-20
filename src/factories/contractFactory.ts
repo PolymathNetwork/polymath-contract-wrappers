@@ -16,6 +16,7 @@ import {
   GeneralTransferManagerContract,
   ManualApprovalTransferManagerContract,
   PercentageTransferManagerContract,
+  LockUpTransferManagerContract,
   VolumeRestrictionTMContract,
   FeatureRegistryContract,
   ModuleRegistryContract,
@@ -271,6 +272,11 @@ export default class ContractFactory {
       },
     );
     return contract;
+  }
+
+  public async getLockUpTransferManagerContract(address: string): Promise<LockUpTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
+    return new LockUpTransferManagerContract(address, this.provider, this.contractDefaults);
   }
 
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {

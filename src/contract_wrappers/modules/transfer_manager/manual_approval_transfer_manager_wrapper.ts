@@ -24,7 +24,6 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  TransferResult,
   Perm,
 } from '../../../types';
 import {
@@ -38,6 +37,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  parseTransferResult,
 } from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -251,28 +251,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
