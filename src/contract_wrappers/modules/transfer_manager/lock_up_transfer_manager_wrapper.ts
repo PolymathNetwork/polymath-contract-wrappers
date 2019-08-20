@@ -1,7 +1,5 @@
 import {
   BigNumber,
-  ContractAbi,
-  LockUpTransferManager,
   LockUpTransferManagerAddLockUpToUserEventArgs,
   LockUpTransferManagerAddNewLockUpTypeEventArgs,
   LockUpTransferManagerContract,
@@ -246,8 +244,6 @@ interface VerifyTransfer {
  * This class includes the functionality related to interacting with the LockUp Transfer Manager contract.
  */
 export default class LockUpTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = LockUpTransferManager.abi;
-
   protected contract: Promise<LockUpTransferManagerContract>;
 
   /**
@@ -715,11 +711,10 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      LockUpTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -744,7 +739,6 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      LockUpTransferManager.abi,
     );
     return logs;
   };

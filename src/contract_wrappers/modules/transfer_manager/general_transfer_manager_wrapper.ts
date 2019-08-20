@@ -9,9 +9,7 @@ import {
   GeneralTransferManagerChangeDefaultsEventArgs,
   GeneralTransferManagerPauseEventArgs,
   GeneralTransferManagerUnpauseEventArgs,
-  GeneralTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -324,8 +322,6 @@ interface KYCDataWithInvestor extends KYCData {
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
 export default class GeneralTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = GeneralTransferManager.abi;
-
   protected contract: Promise<GeneralTransferManagerContract>;
 
   /**
@@ -763,11 +759,10 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      GeneralTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -792,7 +787,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      GeneralTransferManager.abi,
     );
     return logs;
   };

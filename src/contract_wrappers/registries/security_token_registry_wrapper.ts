@@ -19,9 +19,7 @@ import {
   ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
   ISecurityTokenContract,
   PolyTokenContract,
-  ISecurityTokenRegistry,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -494,8 +492,6 @@ interface TickerDetails {
  * This class includes the functionality related to interacting with the ISecurityTokenRegistry contract.
  */
 export default class SecurityTokenRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = ISecurityTokenRegistry.abi;
-
   protected contract: Promise<ISecurityTokenRegistryContract>;
 
   protected contractFactory: ContractFactory;
@@ -855,12 +851,12 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * Returns the security token address by ticker symbol   
+   * Returns the security token address by ticker symbol
    * @return address string
    */
   public getSecurityTokenAddress = async (params: TickerParams) => {
     return (await this.contract).getSecurityTokenAddress.callAsync(params.ticker);
-  };  
+  };
 
   /**
    * Gets ticker availability
@@ -868,7 +864,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public tickerAvailable = async (params: TickerParams) => {
     return (await this.contract).tickerAvailable.callAsync(params.ticker.toUpperCase());
-  }
+  };
 
   /**
    * Knows if the ticker was registered by the user
@@ -876,7 +872,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public isTickerRegisteredByCurrentIssuer = async (params: TickerParams) => {
     const result = await this.getTickerDetailsInternal(params.ticker);
-    if (await this.tickerAvailable({ ticker: params.ticker  })) {
+    if (await this.tickerAvailable({ ticker: params.ticker })) {
       return false;
     }
     return result.owner === (await this.getDefaultFromAddress());
@@ -1184,11 +1180,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ISecurityTokenRegistry.abi,
       params.callback,
       params.isVerbose,
     );
@@ -1213,7 +1208,6 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ISecurityTokenRegistry.abi,
     );
     return logs;
   };

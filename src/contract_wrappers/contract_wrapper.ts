@@ -5,7 +5,6 @@ import {
   BaseContract,
   Web3Wrapper,
   marshaller,
-  AbiDecoder,
   intervalUtils,
   logUtils,
   BlockParamLiteral,
@@ -33,8 +32,6 @@ const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
 const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
 
 export default abstract class ContractWrapper {
-  public abstract abi: ContractAbi;
-
   protected contract: Promise<BaseContract>;
 
   protected web3Wrapper: Web3Wrapper;
@@ -42,6 +39,13 @@ export default abstract class ContractWrapper {
   public abstract getLogsAsync: GetLogs | undefined;
 
   public abstract subscribeAsync: Subscribe | undefined;
+
+  /**
+   * Returns the contract ABI
+   */
+  public abi = async (): Promise<ContractAbi> => {
+    return (await this.contract).abi;
+  };
 
   /**
    * Returns the contract address
@@ -64,12 +68,9 @@ export default abstract class ContractWrapper {
    */
   public unsubscribeAll = (): void => {
     const filterTokens = _.keys(this._filterCallbacks);
-    _.each(
-      filterTokens,
-      (filterToken): void => {
-        this.unsubscribeInternal(filterToken);
-      },
-    );
+    _.each(filterTokens, (filterToken): void => {
+      this.unsubscribeInternal(filterToken);
+    });
   };
 
   private _blockAndLogStreamerIfExists: BlockAndLogStreamer<Block, Log> | undefined;
@@ -117,14 +118,14 @@ export default abstract class ContractWrapper {
     }
   }
 
-  protected subscribeInternal<ArgsType extends ContractEventArgs>(
+  protected async subscribeInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
     indexFilterValues: IndexedFilterValues,
-    abi: ContractAbi,
     callback: EventCallback<ArgsType>,
     isVerbose: boolean = false,
-  ): string {
+  ): Promise<string> {
+    const { abi } = await this.contract;
     const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi);
     if (_.isUndefined(this._blockAndLogStreamerIfExists)) {
       this._startBlockAndLogStream(isVerbose);
@@ -140,8 +141,8 @@ export default abstract class ContractWrapper {
     eventName: ContractEvents,
     blockRange: BlockRange,
     indexFilterValues: IndexedFilterValues,
-    abi: ContractAbi,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> {
+    const { abi } = await this.contract;
     const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi, blockRange);
     const logs = await this.web3Wrapper.getLogsAsync(filter);
     const logsWithDecodedArguments = _.map(logs, this.tryToDecodeLogOrNoopInternal.bind(this));
@@ -151,26 +152,23 @@ export default abstract class ContractWrapper {
   protected tryToDecodeLogOrNoopInternal<ArgsType extends ContractEventArgs>(
     log: LogEntry,
   ): LogWithDecodedArgs<ArgsType> | RawLog {
-    const abiDecoder = new AbiDecoder([this.abi]);
+    const { abiDecoder } = this.web3Wrapper;
     const logWithDecodedArgs = abiDecoder.tryToDecodeLogOrNoop(log);
     return logWithDecodedArgs;
   }
 
   private _onLogStateChanged<ArgsType extends ContractEventArgs>(isRemoved: boolean, rawLog: Log): void {
     const log: LogEntry = marshaller.unmarshalLog(rawLog as RawLogEntry);
-    _.forEach(
-      this._filters,
-      (filter: FilterObject, filterToken: string): void => {
-        if (filterUtils.matchesFilter(log, filter)) {
-          const decodedLog = this.tryToDecodeLogOrNoopInternal(log) as LogWithDecodedArgs<ArgsType>;
-          const logEvent = {
-            log: decodedLog,
-            isRemoved,
-          };
-          this._filterCallbacks[filterToken](null, logEvent);
-        }
-      },
-    );
+    _.forEach(this._filters, (filter: FilterObject, filterToken: string): void => {
+      if (filterUtils.matchesFilter(log, filter)) {
+        const decodedLog = this.tryToDecodeLogOrNoopInternal(log) as LogWithDecodedArgs<ArgsType>;
+        const logEvent = {
+          log: decodedLog,
+          isRemoved,
+        };
+        this._filterCallbacks[filterToken](null, logEvent);
+      }
+    });
   }
 
   private _startBlockAndLogStream(isVerbose: boolean): void {

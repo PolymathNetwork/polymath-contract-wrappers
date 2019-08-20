@@ -2,10 +2,8 @@ import {
   ERC20DetailedContract,
   ERC20DetailedEventArgs,
   ERC20DetailedEvents,
-  ERC20Detailed,
   LogWithDecodedArgs,
   Web3Wrapper,
-  ContractAbi,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import ERC20TokenWrapper from './erc20_wrapper';
@@ -13,14 +11,10 @@ import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams } from '..
 
 import assert from '../../utils/assert';
 
-import _ = require('lodash');
-
 /**
  * This class includes the functionality related to interacting with the AlternativeERC20 contract.
  */
 export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = ERC20Detailed.abi;
-
   protected contract: Promise<ERC20DetailedContract>;
 
   /**
@@ -40,13 +34,12 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ERC20Detailed.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
@@ -63,7 +56,6 @@ export default class ERC20DetailedWrapper extends ERC20TokenWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ERC20Detailed.abi,
     );
     return logs;
   };

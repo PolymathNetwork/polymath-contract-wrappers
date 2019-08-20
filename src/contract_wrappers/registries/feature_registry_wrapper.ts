@@ -4,9 +4,7 @@ import {
   FeatureRegistryEvents,
   FeatureRegistryChangeFeatureStatusEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs,
-  FeatureRegistry,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
@@ -75,8 +73,6 @@ interface SetFeatureStatusParams extends TxParams {
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
 export default class FeatureRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = FeatureRegistry.abi;
-
   protected contract: Promise<FeatureRegistryContract>;
 
   /**
@@ -146,11 +142,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      FeatureRegistry.abi,
       params.callback,
       params.isVerbose,
     );
@@ -173,7 +168,6 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      FeatureRegistry.abi,
     );
     return logs;
   };
