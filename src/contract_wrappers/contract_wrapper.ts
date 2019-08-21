@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Block, BlockAndLogStreamer, Log } from 'ethereumjs-blockstream';
 import _ from 'lodash';
+import { schemas } from '@0x/json-schemas';
 import {
   BaseContract,
   Web3Wrapper,
@@ -139,11 +140,18 @@ export default abstract class ContractWrapper {
   protected async getLogsAsyncInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
-    blockRange: BlockRange,
-    indexFilterValues: IndexedFilterValues,
+    blockRange?: BlockRange,
+    indexFilterValues?: IndexedFilterValues,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> {
     const { abi } = await this.contract;
-    const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi, blockRange);
+    const _blockRange = blockRange || {
+      fromBlock: BlockParamLiteral.Earliest,
+      toBlock: BlockParamLiteral.Latest,
+    };
+    const _indexFilterValues = indexFilterValues || {};
+    assert.doesConformToSchema('blockRange', _blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', _indexFilterValues, schemas.indexFilterValuesSchema);
+    const filter = filterUtils.getFilter(address, eventName, _indexFilterValues, abi, _blockRange);
     const logs = await this.web3Wrapper.getLogsAsync(filter);
     const logsWithDecodedArguments = _.map(logs, this.tryToDecodeLogOrNoopInternal.bind(this));
     return logsWithDecodedArguments as LogWithDecodedArgs<ArgsType>[];
