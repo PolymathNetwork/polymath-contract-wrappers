@@ -4,13 +4,10 @@ import {
   PolyTokenEvents,
   PolyTokenTransferEventArgs,
   PolyTokenApprovalEventArgs,
-  PolyToken,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import assert from '../../utils/assert';
@@ -58,8 +55,6 @@ interface ChangeApprovalParams extends TxParams {
  * This class includes the functionality related to interacting with the PolyToken contract.
  */
 export default class PolyTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = PolyToken.abi;
-
   protected contract: Promise<PolyTokenContract>;
 
   /**
@@ -108,13 +103,12 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PolyToken.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
@@ -127,15 +121,12 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PolyToken.abi,
     );
     return logs;
   };

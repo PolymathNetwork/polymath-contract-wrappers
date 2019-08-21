@@ -7,9 +7,7 @@ import {
   ManualApprovalTransferManagerRevokeManualApprovalEventArgs,
   ManualApprovalTransferManagerPauseEventArgs,
   ManualApprovalTransferManagerUnpauseEventArgs,
-  ManualApprovalTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -190,8 +188,6 @@ interface Approval {
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
 export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = ManualApprovalTransferManager.abi;
-
   protected contract: Promise<ManualApprovalTransferManagerContract>;
 
   /**
@@ -456,11 +452,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ManualApprovalTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -477,15 +472,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ManualApprovalTransferManager.abi,
     );
     return logs;
   };

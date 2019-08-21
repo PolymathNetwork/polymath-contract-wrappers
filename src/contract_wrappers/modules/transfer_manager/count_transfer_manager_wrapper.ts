@@ -5,9 +5,7 @@ import {
   CountTransferManagerModifyHolderCountEventArgs,
   CountTransferManagerPauseEventArgs,
   CountTransferManagerUnpauseEventArgs,
-  CountTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -82,8 +80,6 @@ interface ChangeHolderCountParams extends TxParams {
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = CountTransferManager.abi;
-
   protected contract: Promise<CountTransferManagerContract>;
 
   /**
@@ -160,11 +156,10 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      CountTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -179,15 +174,12 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      CountTransferManager.abi,
     );
     return logs;
   };

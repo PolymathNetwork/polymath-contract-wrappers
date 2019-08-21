@@ -4,9 +4,7 @@ import {
   PolymathRegistryEvents,
   PolymathRegistryChangeAddressEventArgs,
   PolymathRegistryOwnershipTransferredEventArgs,
-  PolymathRegistry,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
@@ -73,8 +71,6 @@ interface ChangeAddressParams extends TxParams {
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
  */
 export default class PolymathRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = PolymathRegistry.abi;
-
   protected contract: Promise<PolymathRegistryContract>;
 
   /**
@@ -175,11 +171,10 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PolymathRegistry.abi,
       params.callback,
       params.isVerbose,
     );
@@ -194,15 +189,12 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PolymathRegistry.abi,
     );
     return logs;
   };

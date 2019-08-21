@@ -2,25 +2,18 @@ import {
   ERC20DetailedContract,
   ERC20DetailedEventArgs,
   ERC20DetailedEvents,
-  ERC20Detailed,
   LogWithDecodedArgs,
   Web3Wrapper,
-  ContractAbi,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import { bytes32ToString } from '../../utils/convert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams } from '../../types';
 import assert from '../../utils/assert';
-
-import _ = require('lodash');
-
 /**
  * This class includes the functionality related to interacting with the AlternativeERC20 contract.
  */
 export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = ERC20Detailed.abi;
-
   protected contract: Promise<ERC20DetailedContract>;
 
   /**
@@ -71,13 +64,12 @@ export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ERC20Detailed.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
@@ -86,15 +78,12 @@ export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DetailedEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ERC20Detailed.abi,
     );
     return logs;
   };

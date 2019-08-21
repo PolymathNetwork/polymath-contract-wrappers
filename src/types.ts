@@ -59,6 +59,7 @@ import {
   VolumeRestrictionTMContract,
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
+  VestingEscrowWalletEventArgs,
   VestingEscrowWalletContract,
   VestingEscrowWalletEvents,
   LockUpTransferManagerEventArgs,
@@ -237,7 +238,7 @@ export type ContractEventArgs =
   | PercentageTransferManagerEventArgs
   | LockUpTransferManagerEventArgs
   | VolumeRestrictionTMEventArgs
-  | LockUpTransferManagerEventArgs;
+  | VestingEscrowWalletEventArgs;
 
 export type ContractEvents =
   | PolyTokenEvents
@@ -262,7 +263,6 @@ export type ContractEvents =
   | STOEvents
   | CountTransferManagerEvents
   | PercentageTransferManagerEvents
-  | VolumeRestrictionTMEvents
   | VestingEscrowWalletEvents
   | LockUpTransferManagerEvents
   | VolumeRestrictionTMEvents;
@@ -275,8 +275,8 @@ export type ContractEvents =
  */
 export interface GetLogsAsyncParams {
   eventName: ContractEvents;
-  blockRange: BlockRange;
-  indexFilterValues: IndexedFilterValues;
+  blockRange?: BlockRange;
+  indexFilterValues?: IndexedFilterValues;
 }
 
 /**

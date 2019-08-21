@@ -17,9 +17,7 @@ import {
   VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs,
   VolumeRestrictionTMPauseEventArgs,
   VolumeRestrictionTMUnpauseEventArgs,
-  VolumeRestrictionTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -339,8 +337,6 @@ interface IndividualRestriction {
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.
  */
 export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = VolumeRestrictionTransferManager.abi;
-
   protected contract: Promise<VolumeRestrictionTMContract>;
 
   /**
@@ -925,11 +921,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      VolumeRestrictionTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -946,15 +941,12 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      VolumeRestrictionTransferManager.abi,
     );
     return logs;
   };

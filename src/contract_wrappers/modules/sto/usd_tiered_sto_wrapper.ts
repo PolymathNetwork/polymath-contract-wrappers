@@ -16,10 +16,8 @@ import {
   USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
-  USDTieredSTO,
   Web3Wrapper,
   BigNumber,
-  ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
@@ -394,8 +392,6 @@ interface MintedByTier {
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
 export default class USDTieredSTOWrapper extends STOWrapper {
-  public abi: ContractAbi = USDTieredSTO.abi;
-
   protected contract: Promise<USDTieredSTOContract>;
 
   protected generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract> => {
@@ -924,11 +920,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      USDTieredSTO.abi,
       params.callback,
       params.isVerbose,
     );
@@ -943,15 +938,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      USDTieredSTO.abi,
     );
     return logs;
   };

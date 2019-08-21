@@ -14,9 +14,7 @@ import {
   VestingEscrowWalletTreasuryWalletChangedEventArgs,
   VestingEscrowWalletPauseEventArgs,
   VestingEscrowWalletUnpauseEventArgs,
-  VestingEscrowWallet,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -406,8 +404,6 @@ interface BeneficiarySchedule {
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
 export default class VestingEscrowWalletWrapper extends ModuleWrapper {
-  public abi: ContractAbi = VestingEscrowWallet.abi;
-
   protected contract: Promise<VestingEscrowWalletContract>;
 
   /**
@@ -656,7 +652,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public modifySchedule = async (params: ModifyScheduleParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    this.checkSchedule(params.beneficiary, params.templateName);
+    this.checkSchedule(params.beneficiary);
     assert.assert(params.startTime.getTime() > Date.now(), 'Date in the past');
     // TODO: require(now < schedule.startTime, "Schedule started");
     return (await this.contract).modifySchedule.sendTransactionAsync(
@@ -673,7 +669,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    this.checkSchedule(params.beneficiary, params.templateName);
+    this.checkSchedule(params.beneficiary);
     // TODO: _sendTokensPerSchedule assert
     return (await this.contract).revokeSchedule.sendTransactionAsync(
       params.beneficiary,
@@ -701,7 +697,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, state)
    */
   public getSchedule = async (params: GetScheduleParams) => {
-    this.checkSchedule(params.beneficiary, params.templateName);
+    this.checkSchedule(params.beneficiary);
     const result = await (await this.contract).getSchedule.callAsync(
       params.beneficiary,
       stringToBytes32(params.templateName),
@@ -878,7 +874,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
 
     for (let i = 0; i < params.beneficiaries.length; i += 1) {
-      this.checkSchedule(params.beneficiaries[i], params.templateNames[i]);
+      this.checkSchedule(params.beneficiaries[i]);
       assert.assert(params.startTimes[i].getTime() > Date.now(), 'Date in the past');
     }
 
@@ -918,7 +914,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(startTime.getTime() > Date.now(), 'Date in the past');
   };
 
-  private checkSchedule = (beneficiary: string, templateName: string) => {
+  private checkSchedule = (beneficiary: string) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
     // TODO: userToTemplateIndex[_beneficiary][_templateName]
   };
@@ -940,7 +936,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      VestingEscrowWallet.abi,
       params.callback,
       params.isVerbose,
     );
@@ -963,7 +958,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      VestingEscrowWallet.abi,
     );
     return logs;
   };
