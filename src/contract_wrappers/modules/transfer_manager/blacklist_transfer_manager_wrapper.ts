@@ -1,7 +1,5 @@
 import {
   BigNumber,
-  ContractAbi,
-  BlacklistTransferManager,
   BlacklistTransferManagerContract,
   BlacklistTransferManagerEventArgs,
   BlacklistTransferManagerEvents,
@@ -223,8 +221,6 @@ interface BlacklistsDetails {
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
  */
 export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = BlacklistTransferManager.abi;
-
   protected contract: Promise<BlacklistTransferManagerContract>;
 
   /**
@@ -687,11 +683,10 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      BlacklistTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -716,7 +711,6 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      BlacklistTransferManager.abi,
     );
     return logs;
   };
