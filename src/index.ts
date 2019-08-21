@@ -1,5 +1,10 @@
 /* istanbul ignore file */
 import * as conversionUtils from './utils/convert';
+import { FeatureRegistryTransactionParams} from './contract_wrappers/registries/feature_registry_wrapper';
+
+export namespace TransactionParams {
+  export import FeatureRegistry = FeatureRegistryTransactionParams;
+}
 
 export { conversionUtils };
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
