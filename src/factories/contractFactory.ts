@@ -22,6 +22,7 @@ import {
   ModuleRegistryContract,
   ISecurityTokenRegistryContract,
   PolymathRegistryContract,
+  VestingEscrowWalletContract,
   Web3Wrapper,
   CallData,
   Provider,
@@ -110,6 +111,11 @@ export default class ContractFactory {
       },
     );
     return contract;
+  }
+
+  public async getVestingEscrowWalletContract(address: string): Promise<VestingEscrowWalletContract> {
+    assert.isETHAddressHex('address', address);
+    return new VestingEscrowWalletContract(address, this.provider, this.contractDefaults);
   }
 
   public async getERC20DetailedContract(address: string): Promise<ERC20DetailedContract> {

@@ -11,6 +11,7 @@ import USDTieredSTOWrapper from '../contract_wrappers/modules/sto/usd_tiered_sto
 import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
+import VestingEscrowWalletWrapper from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName } from '../types';
@@ -18,6 +19,10 @@ import { ModuleName } from '../types';
 interface GetModuleParams {
   address: string;
   name: ModuleName;
+}
+
+interface GetVestingEscrowWallet extends GetModuleParams {
+  name: ModuleName.VestingEscrowWallet;
 }
 
 interface GetGeneralPermissionManager extends GetModuleParams {
@@ -76,6 +81,7 @@ interface GetModuleInstance {
   (params: GetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
   (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpointWrapper>;
   (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpointWrapper>;
+  (params: GetVestingEscrowWallet): Promise<VestingEscrowWalletWrapper>;
 }
 
 /**
@@ -168,6 +174,13 @@ export default class ModuleWrapperFactory {
         return new EtherDividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
+          this.contractFactory,
+        );
+      // Wallet
+      case ModuleName.VestingEscrowWallet:
+        return new VestingEscrowWalletWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getVestingEscrowWalletContract(params.address),
           this.contractFactory,
         );
       // Burn
