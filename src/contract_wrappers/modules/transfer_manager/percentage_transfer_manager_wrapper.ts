@@ -7,9 +7,7 @@ import {
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs,
   PercentageTransferManagerPauseEventArgs,
   PercentageTransferManagerUnpauseEventArgs,
-  PercentageTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -27,7 +25,7 @@ import {
   Perm,
   PERCENTAGE_DECIMALS,
 } from '../../../types';
-import {parseTransferResult, valueToWei, weiToValue} from '../../../utils/convert';
+import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -129,8 +127,6 @@ interface SetAllowPrimaryIssuanceParams extends TxParams {
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
 export default class PercentageTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = PercentageTransferManager.abi;
-
   protected contract: Promise<PercentageTransferManagerContract>;
 
   /**
@@ -256,11 +252,10 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PercentageTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -285,7 +280,6 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PercentageTransferManager.abi,
     );
     return logs;
   };

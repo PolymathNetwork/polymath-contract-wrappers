@@ -27,7 +27,6 @@ import {
   Module,
   ERC20Detailed,
 } from '@polymathnetwork/abi-wrappers';
-import _ from 'lodash';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
@@ -138,61 +137,34 @@ export class PolymathAPI {
 
     const abiArray = [
       // Registries
-      FeatureRegistry.abi,
-      ModuleRegistry.abi.filter(
-        a =>
-          !(
-            a.type === 'function' &&
-            a.name === 'useModule' &&
-            _.isEqual(a.inputs, [
-              {
-                name: '_moduleFactory',
-                type: 'address',
-              },
-            ])
-          ),
-      ),
-      PolymathRegistry.abi,
-      ISecurityTokenRegistry.abi.filter(
-        a =>
-          !(
-            a.type === 'event' &&
-            a.name === 'RegisterTicker' &&
-            _.isEqual(a.inputs, [
-              { indexed: true, name: '_owner', type: 'address' },
-              { indexed: false, name: '_ticker', type: 'string' },
-              { indexed: false, name: '_name', type: 'string' },
-              { indexed: true, name: '_registrationDate', type: 'uint256' },
-              { indexed: true, name: '_expiryDate', type: 'uint256' },
-              { indexed: false, name: '_fromAdmin', type: 'bool' },
-              { indexed: false, name: '_registrationFee', type: 'uint256' },
-            ])
-          ),
-      ),
+      FeatureRegistryContract.ABI(),
+      ModuleRegistryContract.ABI(),
+      PolymathRegistryContract.ABI(),
+      ISecurityTokenRegistryContract.ABI(),
       // Modules
-      ModuleFactory.abi,
-      Module.abi,
+      ModuleFactoryContract.ABI(),
+      ModuleContract.ABI(),
       // Checkpoint
-      ERC20DividendCheckpoint.abi,
-      EtherDividendCheckpoint.abi,
+      ERC20DividendCheckpointContract.ABI(),
+      EtherDividendCheckpointContract.ABI(),
       // Permission
-      GeneralPermissionManager.abi,
+      GeneralPermissionManagerContract.ABI(),
       // STO
-      CappedSTO.abi,
-      USDTieredSTO.abi,
+      CappedSTOContract.ABI(),
+      USDTieredSTOContract.ABI(),
       // Transfer
-      CountTransferManager.abi,
-      GeneralTransferManager.abi,
-      ManualApprovalTransferManager.abi,
-      PercentageTransferManager.abi,
-      LockUpTransferManager.abi,
-      BlacklistTransferManager.abi,
-      VolumeRestrictionTransferManager.abi,
+      CountTransferManagerContract.ABI(),
+      GeneralTransferManagerContract.ABI(),
+      ManualApprovalTransferManagerContract.ABI(),
+      PercentageTransferManagerContract.ABI(),
+      LockUpTransferManagerContract.ABI(),
+      BlacklistTransferManagerContract.ABI(),
+      VolumeRestrictionTMContract.ABI(),
       // Tokens
-      ERC20Detailed.abi,
-      PolyToken.abi,
-      PolyTokenFaucet.abi,
-      ISecurityToken.abi,
+      ERC20DetailedContract.ABI(),
+      PolyTokenContract.ABI(),
+      PolyTokenFaucetContract.ABI(),
+      ISecurityTokenContract.ABI(),
     ];
 
     abiArray.forEach((abi): void => {

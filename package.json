@@ -1,6 +1,6 @@
 {
   "name": "@polymathnetwork/contract-wrappers",
-  "version": "2.0.0-beta.27",
+  "version": "2.0.0-beta.28",
   "description": "Smart TS wrappers for Polymath smart contracts",
   "keywords": [
     "polymath",
@@ -84,7 +84,7 @@
     "@0x/subproviders": "^4.1.1",
     "@0x/types": "^2.4.0",
     "@0x/typescript-typings": "^4.2.3",
-    "@polymathnetwork/abi-wrappers": "3.0.0-beta.7",
+    "@polymathnetwork/abi-wrappers": "3.0.0-beta.8",
     "@types/semver": "^6.0.1",
     "ethereumjs-blockstream": "6.0.0",
     "ethereumjs-util": "^6.1.0",
