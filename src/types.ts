@@ -205,8 +205,8 @@ export interface IndexedFilterValues {
 }
 
 export interface BlockRange {
-  fromBlock?: BlockParam;
-  toBlock?: BlockParam;
+  fromBlock: BlockParam;
+  toBlock: BlockParam;
 }
 
 export type ContractEventArgs =
