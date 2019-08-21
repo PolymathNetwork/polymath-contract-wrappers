@@ -17,9 +17,7 @@ import {
   VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs,
   VolumeRestrictionTMPauseEventArgs,
   VolumeRestrictionTMUnpauseEventArgs,
-  VolumeRestrictionTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -33,6 +31,7 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
+  parseTransferResult,
   valueToWei,
   weiToValue,
 } from '../../../utils/convert';
@@ -46,7 +45,6 @@ import {
   Perm,
   RestrictionType,
   PERCENTAGE_DECIMALS,
-  TransferResult,
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -339,8 +337,6 @@ interface IndividualRestriction {
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.
  */
 export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = VolumeRestrictionTransferManager.abi;
-
   protected contract: Promise<VolumeRestrictionTMContract>;
 
   /**
@@ -383,28 +379,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
@@ -946,11 +921,10 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      VolumeRestrictionTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -971,7 +945,8 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      VolumeRestrictionTransferManager.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

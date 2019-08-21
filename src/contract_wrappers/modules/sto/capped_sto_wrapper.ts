@@ -7,9 +7,7 @@ import {
   CappedSTOSetFundRaiseTypesEventArgs,
   CappedSTOPauseEventArgs,
   CappedSTOUnpauseEventArgs,
-  CappedSTO,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -135,8 +133,6 @@ interface CappedSTODetails {
  * This class includes the functionality related to interacting with the CappedSTO contract.
  */
 export default class CappedSTOWrapper extends STOWrapper {
-  public abi: ContractAbi = CappedSTO.abi;
-
   protected contract: Promise<CappedSTOContract>;
 
   /**
@@ -281,11 +277,10 @@ export default class CappedSTOWrapper extends STOWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      CappedSTO.abi,
       params.callback,
       params.isVerbose,
     );
@@ -301,7 +296,12 @@ export default class CappedSTOWrapper extends STOWrapper {
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CappedSTOEvents);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const logs = await this.getLogsAsyncInternal<ArgsType>(normalizedContractAddress, params.eventName, CappedSTO.abi);
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
     return logs;
   };
 }

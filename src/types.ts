@@ -59,6 +59,9 @@ import {
   VolumeRestrictionTMContract,
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
+  LockUpTransferManagerEventArgs,
+  LockUpTransferManagerContract,
+  LockUpTransferManagerEvents,
   PolyTokenFaucetContract,
   TxData,
   BigNumber,
@@ -157,6 +160,7 @@ export enum ModuleName {
   GeneralTransferManager = 'GeneralTransferManager',
   ManualApprovalTransferManager = 'ManualApprovalTransferManager',
   PercentageTransferManager = 'PercentageTransferManager',
+  LockUpTransferManager = 'LockUpTransferManager',
   VolumeRestrictionTM = 'VolumeRestrictionTM',
   CappedSTO = 'CappedSTO',
   UsdTieredSTO = 'USDTieredSTO',
@@ -227,7 +231,9 @@ export type ContractEventArgs =
   | STOEventArgs
   | CountTransferManagerEventArgs
   | PercentageTransferManagerEventArgs
-  | VolumeRestrictionTMEventArgs;
+  | LockUpTransferManagerEventArgs
+  | VolumeRestrictionTMEventArgs
+  | LockUpTransferManagerEventArgs;
 
 export type ContractEvents =
   | PolyTokenEvents
@@ -252,6 +258,7 @@ export type ContractEvents =
   | STOEvents
   | CountTransferManagerEvents
   | PercentageTransferManagerEvents
+  | LockUpTransferManagerEvents
   | VolumeRestrictionTMEvents;
 
 /**
@@ -304,6 +311,7 @@ export type GenericModuleContract =
   | ManualApprovalTransferManagerContract
   | CountTransferManagerContract
   | PercentageTransferManagerContract
+  | LockUpTransferManagerContract
   | VolumeRestrictionTMContract;
 
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;

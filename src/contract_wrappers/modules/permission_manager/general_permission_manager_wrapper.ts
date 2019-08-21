@@ -4,9 +4,7 @@ import {
   GeneralPermissionManagerEvents,
   GeneralPermissionManagerChangePermissionEventArgs,
   GeneralPermissionManagerAddDelegateEventArgs,
-  GeneralPermissionManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
@@ -120,8 +118,6 @@ interface PermissionsPerModule {
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = GeneralPermissionManager.abi;
-
   protected contract: Promise<GeneralPermissionManagerContract>;
 
   /**
@@ -264,11 +260,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      GeneralPermissionManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -289,7 +284,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      GeneralPermissionManager.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

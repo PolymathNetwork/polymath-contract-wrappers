@@ -5,9 +5,7 @@ import {
   CountTransferManagerModifyHolderCountEventArgs,
   CountTransferManagerPauseEventArgs,
   CountTransferManagerUnpauseEventArgs,
-  CountTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -22,10 +20,9 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  TransferResult,
   Perm,
 } from '../../../types';
-import { numberToBigNumber, valueToWei } from '../../../utils/convert';
+import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CountTransferManagerEvents.ModifyHolderCount;
@@ -83,8 +80,6 @@ interface ChangeHolderCountParams extends TxParams {
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = CountTransferManager.abi;
-
   protected contract: Promise<CountTransferManagerContract>;
 
   /**
@@ -132,28 +127,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
@@ -182,11 +156,10 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      CountTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -205,7 +178,8 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      CountTransferManager.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

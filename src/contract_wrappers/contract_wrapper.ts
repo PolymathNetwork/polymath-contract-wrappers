@@ -6,7 +6,6 @@ import {
   BaseContract,
   Web3Wrapper,
   marshaller,
-  AbiDecoder,
   intervalUtils,
   logUtils,
   BlockParamLiteral,
@@ -34,8 +33,6 @@ const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
 const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
 
 export default abstract class ContractWrapper {
-  public abstract abi: ContractAbi;
-
   protected contract: Promise<BaseContract>;
 
   protected web3Wrapper: Web3Wrapper;
@@ -43,6 +40,13 @@ export default abstract class ContractWrapper {
   public abstract getLogsAsync: GetLogs | undefined;
 
   public abstract subscribeAsync: Subscribe | undefined;
+
+  /**
+   * Returns the contract ABI
+   */
+  public abi = async (): Promise<ContractAbi> => {
+    return (await this.contract).abi;
+  };
 
   /**
    * Returns the contract address
@@ -115,14 +119,14 @@ export default abstract class ContractWrapper {
     }
   }
 
-  protected subscribeInternal<ArgsType extends ContractEventArgs>(
+  protected async subscribeInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
     indexFilterValues: IndexedFilterValues,
-    abi: ContractAbi,
     callback: EventCallback<ArgsType>,
     isVerbose: boolean = false,
-  ): string {
+  ): Promise<string> {
+    const { abi } = await this.contract;
     const filter = filterUtils.getFilter(address, eventName, indexFilterValues, abi);
     if (_.isUndefined(this._blockAndLogStreamerIfExists)) {
       this._startBlockAndLogStream(isVerbose);
@@ -136,10 +140,10 @@ export default abstract class ContractWrapper {
   protected async getLogsAsyncInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
-    abi: ContractAbi,
     blockRange?: BlockRange,
     indexFilterValues?: IndexedFilterValues,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> {
+    const { abi } = await this.contract;
     const _blockRange = blockRange || {
       fromBlock: BlockParamLiteral.Earliest,
       toBlock: BlockParamLiteral.Latest,
@@ -156,7 +160,7 @@ export default abstract class ContractWrapper {
   protected tryToDecodeLogOrNoopInternal<ArgsType extends ContractEventArgs>(
     log: LogEntry,
   ): LogWithDecodedArgs<ArgsType> | RawLog {
-    const abiDecoder = new AbiDecoder([this.abi]);
+    const { abiDecoder } = this.web3Wrapper;
     const logWithDecodedArgs = abiDecoder.tryToDecodeLogOrNoop(log);
     return logWithDecodedArgs;
   }

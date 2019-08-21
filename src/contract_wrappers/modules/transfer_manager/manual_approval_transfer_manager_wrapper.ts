@@ -7,9 +7,7 @@ import {
   ManualApprovalTransferManagerRevokeManualApprovalEventArgs,
   ManualApprovalTransferManagerPauseEventArgs,
   ManualApprovalTransferManagerUnpauseEventArgs,
-  ManualApprovalTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -24,7 +22,6 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
-  TransferResult,
   Perm,
 } from '../../../types';
 import {
@@ -38,6 +35,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  parseTransferResult,
 } from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -190,8 +188,6 @@ interface Approval {
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
 export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = ManualApprovalTransferManager.abi;
-
   protected contract: Promise<ManualApprovalTransferManagerContract>;
 
   /**
@@ -251,28 +247,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
@@ -477,11 +452,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ManualApprovalTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -502,7 +476,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      ManualApprovalTransferManager.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

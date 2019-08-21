@@ -1,10 +1,4 @@
-import {
-  PolyTokenFaucetContract,
-  PolyTokenFaucet,
-  Web3Wrapper,
-  ContractAbi,
-  BigNumber,
-} from '@polymathnetwork/abi-wrappers';
+import { PolyTokenFaucetContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams } from '../../types';
 import assert from '../../utils/assert';
@@ -21,8 +15,6 @@ interface GetTokensParams extends TxParams {
  * This class includes the functionality related to interacting with the PolyTokenFaucet contract.
  */
 export default class PolyTokenFaucetWrapper extends ContractWrapper {
-  public abi: ContractAbi = PolyTokenFaucet.abi;
-
   protected contract: Promise<PolyTokenFaucetContract>;
 
   /**

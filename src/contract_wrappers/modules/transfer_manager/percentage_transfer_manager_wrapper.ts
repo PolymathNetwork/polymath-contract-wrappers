@@ -7,9 +7,7 @@ import {
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs,
   PercentageTransferManagerPauseEventArgs,
   PercentageTransferManagerUnpauseEventArgs,
-  PercentageTransferManager,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -26,9 +24,8 @@ import {
   GetLogs,
   Perm,
   PERCENTAGE_DECIMALS,
-  TransferResult,
 } from '../../../types';
-import { valueToWei, weiToValue } from '../../../utils/convert';
+import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -130,8 +127,6 @@ interface SetAllowPrimaryIssuanceParams extends TxParams {
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
 export default class PercentageTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = PercentageTransferManager.abi;
-
   protected contract: Promise<PercentageTransferManagerContract>;
 
   /**
@@ -188,28 +183,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
       valueToWei(params.amount, decimals),
       params.data,
     );
-    let transferResult: TransferResult = TransferResult.NA;
-    switch (result[0].toNumber()) {
-      case 0: {
-        transferResult = TransferResult.INVALID;
-        break;
-      }
-      case 1: {
-        transferResult = TransferResult.NA;
-        break;
-      }
-      case 2: {
-        transferResult = TransferResult.VALID;
-        break;
-      }
-      case 3: {
-        transferResult = TransferResult.FORCE_VALID;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    const transferResult = parseTransferResult(result[0]);
     return {
       transferResult,
       address: result[1],
@@ -278,11 +252,10 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PercentageTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -303,7 +276,8 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      PercentageTransferManager.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

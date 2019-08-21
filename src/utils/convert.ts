@@ -1,5 +1,5 @@
 import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ModuleType, Partition, Perm } from '../types';
+import { ModuleType, Partition, Perm, TransferResult } from '../types';
 
 const BASE = new BigNumber(10);
 
@@ -101,19 +101,44 @@ export function parsePermBytes32Value(value: string): Perm {
       throw new Error('Permission not recognized');
   }
 }
-  export function parseModuleTypeValue(value: BigNumber): ModuleType {
-    switch (value.toNumber()) {
-      case ModuleType.Dividends:
-        return ModuleType.Dividends;
-      case ModuleType.STO:
-        return ModuleType.STO;
-      case ModuleType.TransferManager:
-        return ModuleType.TransferManager;
-      case ModuleType.PermissionManager:
-        return ModuleType.PermissionManager;
-      case ModuleType.Burn:
-        return ModuleType.Burn;
-      default:
-        throw new Error('Module Type not recognized');
+export function parseModuleTypeValue(value: BigNumber): ModuleType {
+  switch (value.toNumber()) {
+    case ModuleType.Dividends:
+      return ModuleType.Dividends;
+    case ModuleType.STO:
+      return ModuleType.STO;
+    case ModuleType.TransferManager:
+      return ModuleType.TransferManager;
+    case ModuleType.PermissionManager:
+      return ModuleType.PermissionManager;
+    case ModuleType.Burn:
+      return ModuleType.Burn;
+    default:
+      throw new Error('Module Type not recognized');
+  }
+}
+export function parseTransferResult(value: BigNumber): TransferResult {
+  let transferResult: TransferResult = TransferResult.NA;
+  switch (value.toNumber()) {
+    case 0: {
+      transferResult = TransferResult.INVALID;
+      break;
     }
+    case 1: {
+      transferResult = TransferResult.NA;
+      break;
+    }
+    case 2: {
+      transferResult = TransferResult.VALID;
+      break;
+    }
+    case 3: {
+      transferResult = TransferResult.FORCE_VALID;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return transferResult;
 }

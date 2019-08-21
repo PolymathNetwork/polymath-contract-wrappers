@@ -10,12 +10,12 @@ import {
   ethers,
   BigNumber,
   Web3Wrapper,
-  CountTransferManager,
-  ERC20DividendCheckpoint,
-  CappedSTO,
-  USDTieredSTO,
-  PercentageTransferManager,
-  EtherDividendCheckpoint,
+  CountTransferManagerContract,
+  ERC20DividendCheckpointContract,
+  CappedSTOContract,
+  USDTieredSTOContract,
+  PercentageTransferManagerContract,
+  EtherDividendCheckpointContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import {
@@ -3569,7 +3569,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManager.abi);
+      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3762,7 +3762,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManager.abi);
+      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3950,7 +3950,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iPtmFace = new ethers.utils.Interface(PercentageTransferManager.abi);
+      const iPtmFace = new ethers.utils.Interface(PercentageTransferManagerContract.ABI());
       const ptmData = iPtmFace.functions.configure.encode([
         valueToWei(mockedPtmParams.data.maxHolderPercentage, PERCENTAGE_DECIMALS).toString(),
         mockedPtmParams.data.allowPrimaryIssuance,
@@ -4146,7 +4146,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCappedFace = new ethers.utils.Interface(CappedSTO.abi);
+      const iCappedFace = new ethers.utils.Interface(CappedSTOContract.ABI());
       const cappedData = iCappedFace.functions.configure.encode([
         dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
@@ -4356,7 +4356,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iUsdTieredStoFace = new ethers.utils.Interface(USDTieredSTO.abi);
+      const iUsdTieredStoFace = new ethers.utils.Interface(USDTieredSTOContract.ABI());
       const usdTieredStoData = iUsdTieredStoFace.functions.configure.encode([
         dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
         dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
@@ -4575,7 +4575,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iErc20DividendFace = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+      const iErc20DividendFace = new ethers.utils.Interface(ERC20DividendCheckpointContract.ABI());
       const erc20DividendData = iErc20DividendFace.functions.configure.encode([mockedErc20DividendParams.data.wallet]);
 
       when(
@@ -4762,7 +4762,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iEtherDividendFace = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+      const iEtherDividendFace = new ethers.utils.Interface(EtherDividendCheckpointContract.ABI());
       const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
 
       when(

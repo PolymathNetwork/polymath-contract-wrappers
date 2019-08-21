@@ -13,9 +13,7 @@ import {
   ISecurityTokenRegistryContract,
   FeatureRegistryContract,
   ModuleFactoryContract,
-  ModuleRegistry,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
@@ -183,8 +181,6 @@ interface FactoryDetails {
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
  */
 export default class ModuleRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = ModuleRegistry.abi;
-
   protected contract: Promise<ModuleRegistryContract>;
 
   protected contractFactory: ContractFactory;
@@ -412,13 +408,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ModuleRegistry.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
@@ -435,7 +430,8 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      ModuleRegistry.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

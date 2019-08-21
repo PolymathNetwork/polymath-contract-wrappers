@@ -3,9 +3,7 @@ import {
   ModuleFactoryContract,
   PolyTokenContract,
   ERC20DetailedContract,
-  Module,
   Web3Wrapper,
-  ContractAbi,
   TxData,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
@@ -23,8 +21,6 @@ interface ReclaimERC20Params extends TxParams {
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class ModuleWrapper extends ContractWrapper {
-  public abi: ContractAbi = Module.abi;
-
   protected contract: Promise<GenericModuleContract>;
 
   protected contractFactory: ContractFactory;

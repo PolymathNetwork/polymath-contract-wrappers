@@ -1,8 +1,6 @@
 import {
   BigNumber,
-  ContractAbi,
   LogWithDecodedArgs,
-  ModuleFactory,
   ModuleFactoryChangeSTVersionBoundEventArgs,
   ModuleFactoryContract,
   ModuleFactoryEventArgs,
@@ -112,8 +110,6 @@ interface ChangeSTVersionBoundsParams extends TxParams {
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
 export default class ModuleFactoryWrapper extends ContractWrapper {
-  public abi: ContractAbi = ModuleFactory.abi;
-
   protected contract: Promise<ModuleFactoryContract>;
 
   /**
@@ -334,11 +330,10 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ModuleFactory.abi,
       params.callback,
       params.isVerbose,
     );
@@ -357,7 +352,8 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      ModuleFactory.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };

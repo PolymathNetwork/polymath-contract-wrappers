@@ -39,19 +39,17 @@ import {
   SecurityTokenTreasuryWalletChangedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
   SecurityTokenUpdateTokenNameEventArgs,
-  CappedSTO,
-  CountTransferManager,
-  ERC20DividendCheckpoint,
-  EtherDividendCheckpoint,
-  ISecurityToken,
-  PercentageTransferManager,
-  USDTieredSTO,
   TxData,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
   ethers,
+  EtherDividendCheckpointContract,
+  CountTransferManagerContract,
+  PercentageTransferManagerContract,
+  CappedSTOContract,
+  USDTieredSTOContract,
+  ERC20DividendCheckpointContract,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -746,7 +744,8 @@ interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.GeneralPermissionManager
     | ModuleName.GeneralTransferManager
     | ModuleName.ManualApprovalTransferManager
-    | ModuleName.VolumeRestrictionTM;
+    | ModuleName.VolumeRestrictionTM
+    | ModuleName.LockUpTransferManager;
   data?: undefined;
 }
 
@@ -864,8 +863,6 @@ interface CanTransferByPartitionData extends CanTransferFromData {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = ISecurityToken.abi;
-
   protected contract: Promise<ISecurityTokenContract>;
 
   protected contractFactory: ContractFactory;
@@ -1742,11 +1739,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ISecurityToken.abi,
       params.callback,
       params.isVerbose,
     );
@@ -1765,7 +1761,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
-      ISecurityToken.abi,
+      params.blockRange,
+      params.indexFilterValues,
     );
     return logs;
   };
@@ -1927,11 +1924,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let data: string;
     switch (params.moduleName) {
       case ModuleName.CountTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManager.abi);
+        iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
       case ModuleName.PercentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManager.abi);
+        iface = new ethers.utils.Interface(PercentageTransferManagerContract.ABI());
         data = iface.functions.configure.encode([
           valueToWei(
             (params.data as PercentageTransferManagerData).maxHolderPercentage,
@@ -1942,7 +1939,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTO.abi);
+        iface = new ethers.utils.Interface(CappedSTOContract.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -1954,7 +1951,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTO.abi);
+        iface = new ethers.utils.Interface(USDTieredSTOContract.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
@@ -1980,12 +1977,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+        iface = new ethers.utils.Interface(EtherDividendCheckpointContract.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       default:
