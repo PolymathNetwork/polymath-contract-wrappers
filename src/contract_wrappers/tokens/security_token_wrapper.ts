@@ -39,19 +39,17 @@ import {
   SecurityTokenTreasuryWalletChangedEventArgs,
   SecurityTokenUpdateTokenDetailsEventArgs,
   SecurityTokenUpdateTokenNameEventArgs,
-  CappedSTO,
-  CountTransferManager,
-  ERC20DividendCheckpoint,
-  EtherDividendCheckpoint,
-  ISecurityToken,
-  PercentageTransferManager,
-  USDTieredSTO,
   TxData,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
   ethers,
+  EtherDividendCheckpointContract,
+  CountTransferManagerContract,
+  PercentageTransferManagerContract,
+  CappedSTOContract,
+  USDTieredSTOContract,
+  ERC20DividendCheckpointContract,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -73,7 +71,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   CappedSTOFundRaiseType,
-  TransferStatusCode
+  TransferStatusCode,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -865,8 +863,6 @@ interface CanTransferByPartitionData extends CanTransferFromData {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = ISecurityToken.abi;
-
   protected contract: Promise<ISecurityTokenContract>;
 
   protected contractFactory: ContractFactory;
@@ -1225,9 +1221,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const canTransfer = await this.canTransfer({
       to: params.investor,
       value: params.value,
-      data: params.data || '0x00'
+      data: params.data || '0x00',
     });
-    assert.assert(canTransfer.statusCode !== TransferStatusCode.TransferFailure, `Transfer Status: ${canTransfer.statusCode}`)
+    assert.assert(
+      canTransfer.statusCode !== TransferStatusCode.TransferFailure,
+      `Transfer Status: ${canTransfer.statusCode}`,
+    );
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
@@ -1352,8 +1351,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public totalSupplyAt = async (params: CheckpointIdParams) => {
     assert.assert(
-        (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
-        'Checkpoint id must be less than or equal to currentCheckpoint',
+      (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      'Checkpoint id must be less than or equal to currentCheckpoint',
     );
     return weiToValue(
       await (await this.contract).totalSupplyAt.callAsync(numberToBigNumber(params.checkpointId)),
@@ -1581,49 +1580,49 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   private getTransferStatusCode = (result: string) => {
     let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
-    switch(result) {
+    switch (result) {
       case TransferStatusCode.TransferFailure: {
         status = TransferStatusCode.TransferFailure;
-        break
+        break;
       }
       case TransferStatusCode.TransferSuccess: {
         status = TransferStatusCode.TransferSuccess;
-        break
+        break;
       }
       case TransferStatusCode.InsufficientBalance: {
         status = TransferStatusCode.InsufficientBalance;
-        break
+        break;
       }
       case TransferStatusCode.InsufficientAllowance: {
         status = TransferStatusCode.InsufficientAllowance;
-        break
+        break;
       }
       case TransferStatusCode.TransfersHalted: {
         status = TransferStatusCode.TransfersHalted;
-        break
+        break;
       }
       case TransferStatusCode.FundsLocked: {
         status = TransferStatusCode.FundsLocked;
-        break
+        break;
       }
       case TransferStatusCode.InvalidSender: {
         status = TransferStatusCode.InvalidSender;
-        break
+        break;
       }
       case TransferStatusCode.InvalidReceiver: {
         status = TransferStatusCode.InvalidReceiver;
-        break
+        break;
       }
       case TransferStatusCode.InvalidOperator: {
         status = TransferStatusCode.InvalidOperator;
-        break
+        break;
       }
       default: {
-        break
+        break;
       }
     }
-    return status
-  }
+    return status;
+  };
 
   /**
    * Validates if can transfer
@@ -1740,11 +1739,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ISecurityToken.abi,
       params.callback,
       params.isVerbose,
     );
@@ -1767,7 +1765,6 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ISecurityToken.abi,
     );
     return logs;
   };
@@ -1891,7 +1888,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, 'End time not valid');
-    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');    
+    assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
   };
 
   private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
@@ -1929,11 +1926,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let data: string;
     switch (params.moduleName) {
       case ModuleName.CountTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManager.abi);
+        iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
       case ModuleName.PercentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManager.abi);
+        iface = new ethers.utils.Interface(PercentageTransferManagerContract.ABI());
         data = iface.functions.configure.encode([
           valueToWei(
             (params.data as PercentageTransferManagerData).maxHolderPercentage,
@@ -1944,7 +1941,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTO.abi);
+        iface = new ethers.utils.Interface(CappedSTOContract.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -1956,7 +1953,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTO.abi);
+        iface = new ethers.utils.Interface(USDTieredSTOContract.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
@@ -1982,12 +1979,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpoint.abi);
+        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpoint.abi);
+        iface = new ethers.utils.Interface(EtherDividendCheckpointContract.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       default:

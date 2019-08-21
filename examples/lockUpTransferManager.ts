@@ -1,8 +1,8 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { BigNumber, LockUpTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
-import { BigNumber, ModuleRegistryEvents, LockUpTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 
 // This file acts as a valid sandbox for using a lockup restriction transfer manager module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -27,7 +27,7 @@ window.addEventListener('load', async () => {
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
     ticker: ticker!,
   });
   // Get the ticker fee and approve the security token registry to spend
@@ -191,7 +191,7 @@ window.addEventListener('load', async () => {
   });
   // Example removing lockup from beneficiary 2 and removing lockup type
   await lockUpTM.removeLockUpFromUser({ userAddress: randomBeneficiary2, lockupName: thirdLockUpName });
-  await lockUpTM.removeLockupType({lockupName: thirdLockUpName});
+  await lockUpTM.removeLockupType({ lockupName: thirdLockUpName });
 
   // Try to transfer 50, it is below lockup and will pass
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(50) });

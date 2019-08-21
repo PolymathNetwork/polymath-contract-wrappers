@@ -11,11 +11,8 @@ import {
   ERC20DividendCheckpointSetWithholdingFixedEventArgs,
   ERC20DetailedContract,
   BigNumber,
-  ContractAbi,
   LogWithDecodedArgs,
-  TxData,
   Web3Wrapper,
-  ERC20DividendCheckpoint,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -31,8 +28,6 @@ import {
   Perm,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
-
-const EXCLUDED_ADDRESS_LIMIT = 150;
 
 interface ERC20DividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ERC20DividendCheckpointEvents.ERC20DividendDeposited;
@@ -160,8 +155,6 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
  * This class includes the functionality related to interacting with the ERC20DividendCheckpoint contract.
  */
 export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWrapper {
-  public abi: ContractAbi = ERC20DividendCheckpoint.abi;
-
   protected contract: Promise<ERC20DividendCheckpointContract>;
 
   protected erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract> => {
@@ -307,11 +300,10 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ERC20DividendCheckpoint.abi,
       params.callback,
       params.isVerbose,
     );
@@ -336,7 +328,6 @@ export default class ERC20DividendCheckpointWrapper extends DividendCheckpointWr
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ERC20DividendCheckpoint.abi,
     );
     return logs;
   };

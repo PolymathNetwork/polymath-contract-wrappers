@@ -14,9 +14,7 @@ import {
   EtherDividendCheckpointUpdateDividendDatesEventArgs,
   EtherDividendCheckpointPauseEventArgs,
   EtherDividendCheckpointUnpauseEventArgs,
-  EtherDividendCheckpoint,
   Web3Wrapper,
-  ContractAbi,
   LogWithDecodedArgs,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
@@ -34,8 +32,6 @@ import {
   Perm,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
-
-const EXCLUDED_ADDRESS_LIMIT = 150;
 
 interface EtherDividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: EtherDividendCheckpointEvents.EtherDividendDeposited;
@@ -229,8 +225,6 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends TxParams {
  * This class includes the functionality related to interacting with the EtherDividendCheckpoint contract.
  */
 export default class EtherDividendCheckpointWrapper extends DividendCheckpointWrapper {
-  public abi: ContractAbi = EtherDividendCheckpoint.abi;
-
   protected contract: Promise<EtherDividendCheckpointContract>;
 
   protected getDecimals = async (): Promise<BigNumber> => {
@@ -367,11 +361,10 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      EtherDividendCheckpoint.abi,
       params.callback,
       params.isVerbose,
     );
@@ -396,7 +389,6 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      EtherDividendCheckpoint.abi,
     );
     return logs;
   };
