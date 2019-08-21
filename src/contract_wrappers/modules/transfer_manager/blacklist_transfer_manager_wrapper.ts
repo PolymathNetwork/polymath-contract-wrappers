@@ -39,7 +39,6 @@ import {
   parseTransferResult,
   stringArrayToBytes32Array,
   stringToBytes32,
-  valueArrayToWeiArray,
   valueToWei,
   weiToValue,
 } from '../../../utils/convert';
@@ -135,6 +134,12 @@ interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs>[]>;
 }
 
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount
+ * @param data
+ */
 interface VerifyTransferParams {
   from: string;
   to: string;
@@ -142,20 +147,37 @@ interface VerifyTransferParams {
   data: string;
 }
 
+/**
+ * @param partition Identifier
+ * @param tokenHolder Whom token amount need to query
+ * @param additionalBalance It is the `value` that transfers during transfer/transferFrom function call
+ */
 interface GetTokensByPartitionParams {
   partition: Partition;
   tokenHolder: string;
   additionalBalance: BigNumber;
 }
 
+/**
+ * @param blacklistName Name of the blacklist type
+ */
 interface BlacklistParams extends TxParams {
   blacklistName: string;
 }
 
+/**
+ * @param user Address of the user
+ */
 interface UserAddressParams {
   user: string;
 }
 
+/**
+ * @param startTime Start date of the blacklist type
+ * @param endTime End date of the blacklist type
+ * @param blacklistName Name of the blacklist type
+ * @param repeatPeriodTime Repeat period of the blacklist type (in days)
+ */
 interface BlacklistTypeParams extends TxParams {
   startTime: Date;
   endTime: Date;
@@ -163,10 +185,23 @@ interface BlacklistTypeParams extends TxParams {
   repeatPeriodTime: number;
 }
 
+/**
+ * @param startTime Start date of the blacklist type
+ * @param endTime End date of the blacklist type
+ * @param blacklistName Name of the blacklist type
+ * @param repeatPeriodTime Repeat period of the blacklist type (in days)
+ * @param investor Address of the investor
+ */
 interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
   investor: string;
 }
 
+/**
+ * @param startTimes Start dates of the blacklist types
+ * @param endTimes End dates of the blacklist types
+ * @param blacklistNames Names of the blacklist types
+ * @param repeatPeriodTimes Repeat periods of the blacklist type (in days)
+ */
 interface BlacklistTypeMultiParams extends TxParams {
   startTimes: Date[];
   endTimes: Date[];
@@ -174,32 +209,61 @@ interface BlacklistTypeMultiParams extends TxParams {
   repeatPeriodTimes: number[];
 }
 
+/**
+ * Used to delete the blacklist type
+ * @param blacklistName Name of the blacklist type
+ */
 interface DeleteBlacklistTypeParams extends TxParams {
   blacklistName: string;
 }
 
+/**
+ * Used to delete the multiple blacklist types
+ * @param blacklistNames Names of the blacklist types
+ */
 interface DeleteBlacklistTypeMultiParams extends TxParams {
   blacklistNames: string[];
 }
 
+/**
+ * Used to assign the blacklist type to the investor
+ * @param investor Address of the investor
+ * @param blacklistName Name of the blacklist
+ */
 interface InvestorAndBlacklistParams extends TxParams {
   userAddress: string;
   blacklistName: string;
 }
 
+/**
+ * Used to delete the investor from all the associated blacklist types
+ * @param investor Address of the investor
+ */
 interface DeleteInvestorFromAllBlacklistParams extends TxParams {
   investor: string;
 }
 
+/**
+ * @param investor Addresses of the investors
+ */
 interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
   investors: string[];
 }
 
+/**
+ * Used to assign a single blacklist type to multiple investors
+ * @param investors Address of the investor
+ * @param blacklistName Name of the blacklist
+ */
 interface InvestorMultiAndBlacklistParams extends TxParams {
   userAddresses: string[];
   blacklistName: string;
 }
 
+/**
+ * @param investors Address of the investor
+ * @param blacklistNames Name of the blacklist
+ */
 interface InvestorMultiAndBlacklistMultiParams extends TxParams {
   userAddresses: string[];
   blacklistNames: string[];
@@ -207,11 +271,20 @@ interface InvestorMultiAndBlacklistMultiParams extends TxParams {
 
 // Return Types
 
+/**
+ * @param transferResult
+ * @param address
+ */
 interface VerifyTransfer {
   transferResult: TransferResult;
   address: string;
 }
 
+/**
+ * @param startTime Date of start for blacklist
+ * @param endTime Date of end for blacklist
+ * @param repeatPeriodTime Days until it is repeated (0 if it is not repeated)
+ */
 interface BlacklistsDetails {
   startTime: Date;
   endTime: Date;
@@ -276,12 +349,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     };
   };
 
-  /*
-   * @notice Used to add the blacklist type
-   * @param _startTime Start date of the blacklist type
-   * @param _endTime End date of the blacklist type
-   * @param _blacklistName Name of the blacklist type
-   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
+  /**
+   * Used to add the blacklist type
    */
   public addBlacklistType = async (params: BlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -296,12 +365,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to add multiple blacklist types
-   * @param _startTimes Start dates of the blacklist types
-   * @param _endTimes End dates of the blacklist types
-   * @param _blacklistNames Names of the blacklist types
-   * @param _repeatPeriodTimes Repeat periods of the blacklist type (in days)
+  /**
+   * Used to add multiple blacklist types
    */
   public addNewBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
     assert.areValidArrayLengths(
@@ -332,12 +397,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to modify the details of a given blacklist type
-   * @param _startTime Start date of the blacklist type
-   * @param _endTime End date of the blacklist type
-   * @param _blacklistName Name of the blacklist type
-   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
+  /**
+   * Used to modify the details of a given blacklist type
    */
   public modifyBlacklistType = async (params: BlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -352,12 +413,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to modify the details of given multiple blacklist types
-   * @param _startTimes Start date of the blacklist type
-   * @param _endTimes End date of the blacklist type
-   * @param _blacklistNames Name of the blacklist type
-   * @param _repeatPeriodTimes Repeat period of the blacklist type (in days)
+  /**
+   * Used to modify the details of given multiple blacklist types
    */
   public modifyBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
     assert.areValidArrayLengths(
@@ -388,9 +445,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete the blacklist type
-   * @param _blacklistName Name of the blacklist type
+  /**
+   * Used to delete the blacklist type
    */
   public deleteBlacklistType = async (params: DeleteBlacklistTypeParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -402,9 +458,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete the multiple blacklist types
-   * @param _blacklistNames Names of the blacklist types
+  /**
+   * Used to delete the multiple blacklist types
    */
   public deleteBlacklistTypeMulti = async (params: DeleteBlacklistTypeMultiParams) => {
     assert.assert(params.blacklistNames.length > 0, 'Empty blacklist information');
@@ -421,10 +476,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to assign the blacklist type to the investor
-   * @param _investor Address of the investor
-   * @param _blacklistName Name of the blacklist
+  /**
+   * Used to assign the blacklist type to the investor
    */
   public addInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -437,10 +490,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to assign a single blacklist type to multiple investors
-   * @param _investors Address of the investor
-   * @param _blacklistName Name of the blacklist
+  /**
+   * Used to assign a single blacklist type to multiple investors
    */
   public addInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -463,10 +514,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to assign multiple specific blacklist types to multiple investors
-   * @param _investors Address of the investor
-   * @param _blacklistNames Name of the blacklist
+  /**
+   * Used to assign multiple specific blacklist types to multiple investors
    */
   public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -490,13 +539,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to create a new blacklist type and add it to the investor
-   * @param _startTime Start date of the blacklist type
-   * @param _endTime End date of the blacklist type
-   * @param _blacklistName Name of the blacklist type
-   * @param _repeatPeriodTime Repeat period of the blacklist type (in days)
-   * @param _investor Address of the investor
+  /**
+   * Used to create a new blacklist type and add it to the investor
    */
   public addInvestorToNewBlacklist = async (params: AddNewInvestorToNewBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -512,10 +556,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete the investor from the blacklist
-   * @param _investor Address of the investor
-   * @param _blacklistName Name of the blacklist
+  /**
+   * Used to delete the investor from the blacklist
    */
   public deleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -528,10 +570,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete the multiple investors from multiple specific blacklists
-   * @param _investors addresses of the investors
-   * @param _blacklistNames names of the blacklists
+  /**
+   * Used to delete the multiple investors from multiple specific blacklists
    */
   public deleteMultiInvestorsFromBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -555,9 +595,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete the investor from all the associated blacklist types
-   * @param _investor Address of the investor
+  /**
+   * Used to delete the investor from all the associated blacklist types
    */
   public deleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -569,9 +608,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  /*
-   * @notice Used to delete multiple investors from multiple associated blacklist types
-   * @param _investor Addresses of the investors
+  /**
+   * Used to delete multiple investors from multiple associated blacklist types
    */
   public deleteInvestorFromAllBlacklistMulti = async (params: DeleteInvestorFromAllBlacklistMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -592,8 +630,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * @notice get the list of the investors that correspond to a blacklist type
-   * @param _blacklistName Name of the blacklist type
+   * get the list of the investors that correspond to a blacklist type
    * @return address List of investors associated with the blacklist
    */
   public getListOfAddresses = async (params: BlacklistParams): Promise<string[]> => {
@@ -602,9 +639,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * @notice get the list of blacklists associated with a particular investor
-   * @param _user Address of the user
-   * @return bytes32 List of blacklist names associated with the given address
+   * get the list of blacklists associated with a particular investor
+   * @return List of blacklist names associated with the given address
    */
   public getBlacklistNamesToUser = async (params: UserAddressParams): Promise<string[]> => {
     assert.isNonZeroETHAddressHex('User Address', params.user);
@@ -612,7 +648,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * @notice get the list of blacklist names
+   * get the list of blacklist names
    * @return bytes32 Array of blacklist names
    */
   public getAllBlacklists = async (): Promise<string[]> => {
@@ -620,10 +656,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * @notice return the amount of tokens for a given user as per the partition
-   * @param _partition Identifier
-   * @param _tokenHolder Whom token amount need to query
-   * @param _additionalBalance It is the `_value` that transfers during transfer/transferFrom function call
+   * return the amount of tokens for a given user as per the partition
+   * @param partition Identifier
+   * @param tokenHolder Whom token amount need to query
+   * @param additionalBalance It is the `value` that transfers during transfer/transferFrom function call
+   * @return amount of tokens
    */
   public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
     assert.isNonZeroETHAddressHex('Token Holder', params.tokenHolder);
@@ -639,19 +676,19 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * @notice Return the permissions flags that are associated with blacklist transfer manager
+   * Return the permissions flags that are associated with blacklist transfer manager
    */
   public getPermissions = async (): Promise<Perm[]> => {
     const permissions = await (await this.contract).getPermissions.callAsync();
     return permissions.map(parsePermBytes32Value);
   };
 
-  /*
-   * @notice Used to verify the transfer transaction (View)
-   * @param _from Address of the sender
-   * @dev Restrict the blacklist address to transfer tokens
+  /**
+   * Used to verify the transfer transaction (View)
+   * Restrict the blacklist address to transfer tokens
    * if the current time is between the timeframe define for the
-   * blacklist type associated with the _from address
+   * blacklist type associated with the from address
+   * @return Parse transfer result
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
