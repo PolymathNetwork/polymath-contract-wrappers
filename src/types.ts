@@ -274,8 +274,8 @@ export type ContractEvents =
  */
 export interface GetLogsAsyncParams {
   eventName: ContractEvents;
-  blockRange: BlockRange;
-  indexFilterValues: IndexedFilterValues;
+  blockRange?: BlockRange;
+  indexFilterValues?: IndexedFilterValues;
 }
 
 /**

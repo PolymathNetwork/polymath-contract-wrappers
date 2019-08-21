@@ -25,6 +25,7 @@ module.exports = {
     'jest/expect-expect': 'error',
     'jest/no-empty-title': 'warn',
     'jest/no-truthy-falsy': 'warn',
+    'import/prefer-default-export': 'off',
   },
   settings: {
     'import/resolver': {
