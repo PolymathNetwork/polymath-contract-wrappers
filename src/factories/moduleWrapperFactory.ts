@@ -3,6 +3,7 @@ import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_m
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import ERC20DividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import EtherDividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
@@ -49,6 +50,10 @@ interface GetLockUpTransferManager extends GetModuleParams {
   name: ModuleName.LockUpTransferManager;
 }
 
+interface GetBlacklistTransferManager extends GetModuleParams {
+  name: ModuleName.BlacklistTransferManager;
+}
+
 interface GetVolumeRestrictionTransferManager extends GetModuleParams {
   name: ModuleName.VolumeRestrictionTM;
 }
@@ -76,6 +81,7 @@ interface GetModuleInstance {
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
+  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTOWrapper>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
@@ -142,6 +148,12 @@ export default class ModuleWrapperFactory {
         return new LockUpTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getLockUpTransferManagerContract(params.address),
+          this.contractFactory,
+        );
+      case ModuleName.BlacklistTransferManager:
+        return new BlacklistTransferManagerWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getBlacklistTransferManagerContract(params.address),
           this.contractFactory,
         );
       case ModuleName.VolumeRestrictionTM:

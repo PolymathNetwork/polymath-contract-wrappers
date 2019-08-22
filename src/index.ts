@@ -43,6 +43,9 @@ export {
   default as LockUpTransferManager,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
+  default as BlacklistTransferManager,
+} from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
+export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export * from './types';
@@ -214,6 +217,16 @@ export {
   LockUpTransferManagerRemoveLockUpTypeEventArgs,
   LockUpTransferManagerPauseEventArgs,
   LockUpTransferManagerUnpauseEventArgs,
+  BlacklistTransferManagerContract,
+  BlacklistTransferManagerEventArgs,
+  BlacklistTransferManagerEvents,
+  BlacklistTransferManagerAddBlacklistTypeEventArgs,
+  BlacklistTransferManagerModifyBlacklistTypeEventArgs,
+  BlacklistTransferManagerDeleteBlacklistTypeEventArgs,
+  BlacklistTransferManagerAddInvestorToBlacklistEventArgs,
+  BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs,
+  BlacklistTransferManagerPauseEventArgs,
+  BlacklistTransferManagerUnpauseEventArgs,
   CountTransferManagerContract,
   CountTransferManagerEventArgs,
   CountTransferManagerEvents,
