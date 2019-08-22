@@ -50,6 +50,7 @@ import {
   CappedSTOContract,
   USDTieredSTOContract,
   ERC20DividendCheckpointContract,
+  VestingEscrowWalletContract,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -730,7 +731,8 @@ interface AddModuleParams extends TxParams {
     | PercentageTransferManagerData
     | DividendCheckpointData
     | CappedSTOData
-    | USDTieredSTOData;
+    | USDTieredSTOData
+    | VestingEscrowWalletData;
 }
 
 interface ProduceAddModuleInformation {
@@ -748,6 +750,11 @@ interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.LockUpTransferManager
     | ModuleName.BlacklistTransferManager;
   data?: undefined;
+}
+
+interface AddVestingEscrowWalletParams extends AddModuleParams {
+  moduleName: ModuleName.VestingEscrowWallet;
+  data: VestingEscrowWalletData;
 }
 
 interface AddCountTransferManagerParams extends AddModuleParams {
@@ -777,6 +784,10 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
 
 interface CountTransferManagerData {
   maxHolderCount: number;
+}
+
+interface VestingEscrowWalletData {
+  treasuryWallet: string;
 }
 
 interface PercentageTransferManagerData {
@@ -823,6 +834,7 @@ interface AddModuleInterface {
   (params: AddCappedSTOParams): Promise<PolyResponse>;
   (params: AddUSDTieredSTOParams): Promise<PolyResponse>;
   (params: AddNoDataModuleParams): Promise<PolyResponse>;
+  (params: AddVestingEscrowWalletParams): Promise<PolyResponse>;
 }
 
 // // Return types ////
@@ -1853,6 +1865,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       await moduleRegistry.getModulesByType.callAsync(ModuleType.Burn),
       await moduleRegistry.getModulesByType.callAsync(ModuleType.Dividends),
       await moduleRegistry.getModulesByType.callAsync(ModuleType.TransferManager),
+      await moduleRegistry.getModulesByType.callAsync(ModuleType.Wallet),
     ];
     const allModules = await Promise.all(
       allModulesTypes.map(myPromise => {
@@ -1924,6 +1937,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let iface: ethers.utils.Interface;
     let data: string;
     switch (params.moduleName) {
+      case ModuleName.VestingEscrowWallet:
+          iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+          data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet])
+        break;
       case ModuleName.CountTransferManager:
         iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);

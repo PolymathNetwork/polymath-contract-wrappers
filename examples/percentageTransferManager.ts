@@ -1,8 +1,8 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { BigNumber, ModuleRegistryEvents, PercentageTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
-import { BigNumber, ModuleRegistryEvents, PercentageTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
 
 // This file acts as a valid sandbox for using a percentage restriction transfer manager module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -177,7 +177,7 @@ window.addEventListener('load', async () => {
 
   // Try out transfer below 25% to beneficiary 2, should pass
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(5) });
-  
+
   console.log('Tokens transferred to beneficiaries');
 
   tickerSecurityTokenInstance.unsubscribeAll();

@@ -26,6 +26,7 @@ import {
   PolyTokenFaucetContract,
   USDTieredSTOContract,
   VolumeRestrictionTMContract,
+  VestingEscrowWalletContract,
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -165,6 +166,8 @@ export class PolymathAPI {
       PolyTokenContract.ABI(),
       PolyTokenFaucetContract.ABI(),
       ISecurityTokenContract.ABI(),
+      // Wallet
+      VestingEscrowWalletContract.ABI(),
     ];
 
     abiArray.forEach((abi): void => {

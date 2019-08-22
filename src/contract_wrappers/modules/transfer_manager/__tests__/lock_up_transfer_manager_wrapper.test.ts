@@ -16,6 +16,8 @@ import {
   bytes32ToString,
   dateArrayToBigNumberArray,
   dateToBigNumber,
+  numberArrayToBigNumberArray,
+  numberToBigNumber,
   parsePermBytes32Value,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -253,8 +255,8 @@ describe('LockUpTransferManagerWrapper', () => {
       // Result expectation
       expect(result.lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
       expect(result.startTime).toEqual(startTime);
-      expect(result.lockUpPeriodSeconds).toBe(expectedResult[2]);
-      expect(result.releaseFrequencySeconds).toBe(expectedResult[3]);
+      expect(result.lockUpPeriodSeconds).toBe(expectedResult[2].toNumber());
+      expect(result.releaseFrequencySeconds).toBe(expectedResult[3].toNumber());
 
       // Verifications
       verify(mockedContract.lockups).once();
@@ -316,8 +318,8 @@ describe('LockUpTransferManagerWrapper', () => {
       // Result expectation
       expect(result.lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
       expect(result.startTime).toEqual(startTime);
-      expect(result.lockUpPeriodSeconds).toBe(expectedResult[2]);
-      expect(result.releaseFrequencySeconds).toBe(expectedResult[3]);
+      expect(result.lockUpPeriodSeconds).toBe(expectedResult[2].toNumber());
+      expect(result.releaseFrequencySeconds).toBe(expectedResult[3].toNumber());
       expect(result.unlockedAmount).toEqual(weiToValue(expectedUnlockedAmount, expectedDecimalsResult));
 
       // Verifications
@@ -377,8 +379,8 @@ describe('LockUpTransferManagerWrapper', () => {
         expect(result[i].lockupName).toEqual(bytes32ToString(expectedNames[i]));
         expect(result[i].lockupAmount).toEqual(weiToValue(expectedLockupAmount, expectedDecimalsResult));
         expect(result[i].startTime).toEqual(startTime);
-        expect(result[i].lockUpPeriodSeconds).toBe(expectedResult[3][i]);
-        expect(result[i].releaseFrequencySeconds).toBe(expectedResult[4][i]);
+        expect(result[i].lockUpPeriodSeconds).toBe(expectedLockUpPeriodSeconds.toNumber());
+        expect(result[i].releaseFrequencySeconds).toBe(expectedReleaseFrequencySeconds.toNumber());
         expect(result[i].unlockedAmount).toEqual(weiToValue(expectedUnlockedAmount, expectedDecimalsResult));
       }
 
@@ -646,8 +648,8 @@ describe('LockUpTransferManagerWrapper', () => {
       const mockedParams = {
         lockupAmount: new BigNumber(100),
         startTime: new Date(2030, 1),
-        lockUpPeriodSeconds: new BigNumber(3600),
-        releaseFrequenciesSeconds: new BigNumber(60),
+        lockUpPeriodSeconds: 3600,
+        releaseFrequenciesSeconds: 60,
         lockupName,
         txData: {},
         safetyFactor: 10,
@@ -662,8 +664,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -681,8 +683,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -757,8 +759,8 @@ describe('LockUpTransferManagerWrapper', () => {
       const mockedParams = {
         lockupAmounts: [new BigNumber(100), new BigNumber(200)],
         startTimes: [new Date(2030, 1), new Date(2030, 1)],
-        lockUpPeriodSeconds: [new BigNumber(3600), new BigNumber(3600)],
-        releaseFrequenciesSeconds: [new BigNumber(60), new BigNumber(60)],
+        lockUpPeriodSeconds: [3600, 3600],
+        releaseFrequenciesSeconds: [60, 60],
         lockupNames,
         txData: {},
         safetyFactor: 10,
@@ -773,8 +775,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -792,8 +794,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1106,8 +1108,8 @@ describe('LockUpTransferManagerWrapper', () => {
         userAddress: '0x5555555555555555555555555555555555555555',
         lockupAmount: new BigNumber(100),
         startTime: new Date(2030, 1),
-        lockUpPeriodSeconds: new BigNumber(3600),
-        releaseFrequenciesSeconds: new BigNumber(60),
+        lockUpPeriodSeconds: 3600,
+        releaseFrequenciesSeconds: 60,
         lockupName,
         txData: {},
         safetyFactor: 10,
@@ -1123,8 +1125,8 @@ describe('LockUpTransferManagerWrapper', () => {
           mockedParams.userAddress,
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1143,8 +1145,8 @@ describe('LockUpTransferManagerWrapper', () => {
           mockedParams.userAddress,
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1220,8 +1222,8 @@ describe('LockUpTransferManagerWrapper', () => {
         userAddresses: ['0x5555555555555555555555555555555555555555', '0x6666666666666666666666666666666666666666'],
         lockupAmounts: [new BigNumber(100), new BigNumber(200)],
         startTimes: [new Date(2030, 1), new Date(2030, 1)],
-        lockUpPeriodSeconds: [new BigNumber(3600), new BigNumber(3600)],
-        releaseFrequenciesSeconds: [new BigNumber(60), new BigNumber(60)],
+        lockUpPeriodSeconds: [3600, 3600],
+        releaseFrequenciesSeconds: [60, 60],
         lockupNames,
         txData: {},
         safetyFactor: 10,
@@ -1237,8 +1239,8 @@ describe('LockUpTransferManagerWrapper', () => {
           mockedParams.userAddresses,
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1257,8 +1259,8 @@ describe('LockUpTransferManagerWrapper', () => {
           mockedParams.userAddresses,
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1635,10 +1637,6 @@ describe('LockUpTransferManagerWrapper', () => {
       }
 
       const mockedParams = {
-        lockupAmounts: [new BigNumber(100), new BigNumber(200)],
-        startTimes: [new Date(2030, 1), new Date(2030, 1)],
-        lockUpPeriodSeconds: [new BigNumber(3600), new BigNumber(3600)],
-        releaseFrequenciesSeconds: [new BigNumber(60), new BigNumber(60)],
         lockupNames,
         txData: {},
         safetyFactor: 10,
@@ -1740,8 +1738,8 @@ describe('LockUpTransferManagerWrapper', () => {
       const mockedParams = {
         lockupAmount: new BigNumber(200),
         startTime: new Date(2031, 1),
-        lockUpPeriodSeconds: new BigNumber(3600),
-        releaseFrequenciesSeconds: new BigNumber(60),
+        lockUpPeriodSeconds: 3600,
+        releaseFrequenciesSeconds: 60,
         lockupName,
         txData: {},
         safetyFactor: 10,
@@ -1756,8 +1754,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1775,8 +1773,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueToWei(mockedParams.lockupAmount, expectedDecimalsResult)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberToBigNumber(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberToBigNumber(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringToBytes32(mockedParams.lockupName)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1851,8 +1849,8 @@ describe('LockUpTransferManagerWrapper', () => {
       const mockedParams = {
         lockupAmounts: [new BigNumber(200), new BigNumber(400)],
         startTimes: [new Date(2031, 1), new Date(2031, 1)],
-        lockUpPeriodSeconds: [new BigNumber(3600), new BigNumber(3600)],
-        releaseFrequenciesSeconds: [new BigNumber(60), new BigNumber(60)],
+        lockUpPeriodSeconds: [3600, 3600],
+        releaseFrequenciesSeconds: [60, 60],
         lockupNames,
         txData: {},
         safetyFactor: 10,
@@ -1867,8 +1865,9 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1886,8 +1885,8 @@ describe('LockUpTransferManagerWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(valueArrayToWeiArray(mockedParams.lockupAmounts, expectedDecimalsResult)),
           objectContaining(dateArrayToBigNumberArray(mockedParams.startTimes)),
-          objectContaining(mockedParams.lockUpPeriodSeconds),
-          objectContaining(mockedParams.releaseFrequenciesSeconds),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.lockUpPeriodSeconds)),
+          objectContaining(numberArrayToBigNumberArray(mockedParams.releaseFrequenciesSeconds)),
           objectContaining(stringArrayToBytes32Array(mockedParams.lockupNames)),
           mockedParams.txData,
           mockedParams.safetyFactor,

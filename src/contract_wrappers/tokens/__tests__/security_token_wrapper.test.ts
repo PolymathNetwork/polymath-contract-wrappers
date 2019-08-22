@@ -16,6 +16,7 @@ import {
   USDTieredSTOContract,
   PercentageTransferManagerContract,
   EtherDividendCheckpointContract,
+  VestingEscrowWalletContract,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import {
@@ -3516,6 +3517,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -3628,12 +3630,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -3710,6 +3713,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -3820,12 +3824,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -3898,6 +3903,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -4012,12 +4018,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -4081,6 +4088,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -4216,12 +4224,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -4294,6 +4303,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -4446,12 +4456,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -4524,6 +4535,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -4633,12 +4645,13 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
@@ -4711,6 +4724,7 @@ describe('SecurityTokenWrapper', () => {
       when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
       when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
 
       // Mock getVersion
       const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
@@ -4820,12 +4834,202 @@ describe('SecurityTokenWrapper', () => {
       verify(mockedModuleFactoryContract.owner).once();
       verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
       verify(mockedContractFactory.getModuleRegistryContract()).once();
-      verify(mockedModuleRegistryContract.getModulesByType).times(5);
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
       verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
       verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
+      verify(mockedContract.getVersion).once();
+      verify(mockedGetVersionMethod.callAsync()).once();
+      verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
+      verify(mockedModuleFactoryContract.getLowerSTVersionBounds).once();
+      verify(mockedGetUpperBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedGetLowerBoundsSTVersionMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleFactoryContract(ADDRESS)).times(4);
+      verify(mockedContractFactory.getPolyTokenContract()).once();
+      verify(mockedContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContract.address).once();
+    });
+
+    test('should send the transaction to addModule for VestingEscrowWallet', async () => {
+      const ADDRESS = '0x1111111111111111111111111111111111111111';
+      const OWNER = '0x5555555555555555555555555555555555555555';
+      const expectedResult = getMockedPolyResponse();
+      const mockedMethod = mock(MockedSendMethod);
+      when(mockedContract.addModule).thenReturn(instance(mockedMethod));
+
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // checkOnlyOwner
+      const expectedOwnerResult = OWNER;
+      const mockedOwnerMethod = mock(MockedCallMethod);
+      when(mockedContract.owner).thenReturn(instance(mockedOwnerMethod));
+      when(mockedOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // checkModuleCostBelowMaxCost
+      when(mockedContractFactory.getModuleFactoryContract(ADDRESS)).thenResolve(instance(mockedModuleFactoryContract));
+      const mockedSetupCostInPolyMethod = mock(MockedSendMethod);
+      const moduleResult = new BigNumber(1);
+      when(mockedModuleFactoryContract.setupCostInPoly).thenReturn(instance(mockedSetupCostInPolyMethod));
+      when(mockedSetupCostInPolyMethod.callAsync()).thenResolve(moduleResult);
+
+      const stAddressResult = '0x7777777777777777777777777777777777777777';
+      when(mockedContract.address).thenReturn(stAddressResult);
+
+      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
+      const mockedBalanceMethod = mock(MockedCallMethod);
+      const balanceResult = new BigNumber(1);
+      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceMethod));
+      when(mockedBalanceMethod.callAsync(stAddressResult)).thenResolve(balanceResult);
+
+      // Setup mocked Get Feature registry contract
+      when(mockedContractFactory.getFeatureRegistryContract()).thenResolve(instance(mockedFeatureRegistryContract));
+      const mockedGetFeatureStatusMethod = mock(MockedCallMethod);
+      const currentFeatureStatus = true;
+      when(mockedFeatureRegistryContract.getFeatureStatus).thenReturn(instance(mockedGetFeatureStatusMethod));
+      when(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).thenResolve(currentFeatureStatus);
+
+      // Setup mocked contractFactory owner
+      const mockedModuleFactoryOwnerMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.owner).thenReturn(instance(mockedModuleFactoryOwnerMethod));
+      when(mockedModuleFactoryOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+
+      const expectedAlreadyRegisteredResult = [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ];
+      when(mockedContractFactory.getModuleRegistryContract()).thenResolve(instance(mockedModuleRegistryContract));
+      const mockedGetModulesMethod = mock(MockedCallMethod);
+      when(mockedModuleRegistryContract.getModulesByType).thenReturn(instance(mockedGetModulesMethod));
+      when(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.STO)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Burn)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).thenResolve(expectedAlreadyRegisteredResult);
+      when(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).thenResolve(expectedAlreadyRegisteredResult);
+
+      // Mock getVersion
+      const expectedGetVersionResult = [new BigNumber(3), new BigNumber(4), new BigNumber(5)];
+      const mockedGetVersionMethod = mock(MockedCallMethod);
+      when(mockedContract.getVersion).thenReturn(instance(mockedGetVersionMethod));
+      when(mockedGetVersionMethod.callAsync()).thenResolve(expectedGetVersionResult);
+
+      // Mock getUpperBoundsSTVersion
+      const expectedGetUpperBoundsSTVersionResult = [new BigNumber(4), new BigNumber(5), new BigNumber(6)];
+      const mockedGetUpperBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getUpperSTVersionBounds).thenReturn(
+        instance(mockedGetUpperBoundsSTVersionMethod),
+      );
+      when(mockedGetUpperBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetUpperBoundsSTVersionResult);
+
+      // Mock getLowerBoundsSTVersion
+      const expectedGetLowerBoundsSTVersionResult = [new BigNumber(1), new BigNumber(2), new BigNumber(3)];
+      const mockedGetLowerBoundsSTVersionMethod = mock(MockedCallMethod);
+      when(mockedModuleFactoryContract.getLowerSTVersionBounds).thenReturn(
+        instance(mockedGetLowerBoundsSTVersionMethod),
+      );
+      when(mockedGetLowerBoundsSTVersionMethod.callAsync()).thenResolve(expectedGetLowerBoundsSTVersionResult);
+
+      // checkModuleStructAddressIsEmpty
+      const expectedModuleResult = [
+        stringToBytes32('VestingEscrowWallet'),
+        '0x0000000000000000000000000000000000000000',
+        '0x5555555555555555555555555555555555555555',
+        false,
+        [new BigNumber(1), new BigNumber(2)],
+        stringToBytes32('Label'),
+      ];
+      const mockedModuleMethod = mock(MockedCallMethod);
+      when(mockedContract.getModule).thenReturn(instance(mockedModuleMethod));
+      when(mockedModuleMethod.callAsync(ADDRESS)).thenResolve(expectedModuleResult);
+
+      // === Start VestingEscrowWallet test ===
+      const etherDividendParams = {
+        wallet: '0x1111111111111111111111111111111111111111',
+      };
+      const mockedEtherDividendParams = {
+        moduleName: ModuleName.VestingEscrowWallet,
+        address: ADDRESS,
+        maxCost: new BigNumber(1),
+        budget: new BigNumber(1),
+        archived: false,
+        data: etherDividendParams,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const iEtherDividendFace = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+      const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
+
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedEtherDividendParams.address,
+          objectContaining(etherDividendData),
+          objectContaining(valueToWei(mockedEtherDividendParams.maxCost, expectedDecimalsResult)),
+          objectContaining(valueToWei(mockedEtherDividendParams.budget, expectedDecimalsResult)),
+          mockedEtherDividendParams.archived,
+          mockedEtherDividendParams.txData,
+          mockedEtherDividendParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      const vestingEscrowWalletResult = await target.addModule({
+        moduleName: ModuleName.EtherDividendCheckpoint,
+        address: mockedEtherDividendParams.address,
+        maxCost: mockedEtherDividendParams.maxCost,
+        budget: mockedEtherDividendParams.budget,
+        archived: mockedEtherDividendParams.archived,
+        data: {
+          wallet: etherDividendParams.wallet,
+        },
+        txData: mockedEtherDividendParams.txData,
+        safetyFactor: mockedEtherDividendParams.safetyFactor,
+      });
+
+      expect(vestingEscrowWalletResult).toBe(expectedResult);
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedEtherDividendParams.address,
+          objectContaining(etherDividendData),
+          objectContaining(valueToWei(mockedEtherDividendParams.maxCost, expectedDecimalsResult)),
+          objectContaining(valueToWei(mockedEtherDividendParams.budget, expectedDecimalsResult)),
+          mockedEtherDividendParams.archived,
+          mockedEtherDividendParams.txData,
+          mockedEtherDividendParams.safetyFactor,
+        ),
+      ).once();
+      // === End EtherDividendCheckpoint test ===
+
+      verify(mockedContract.addModule).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedModuleFactoryContract.setupCostInPoly).once();
+      verify(mockedSetupCostInPolyMethod.callAsync()).once();
+      verify(mockedPolyTokenContract.balanceOf).once();
+      verify(mockedBalanceMethod.callAsync(stAddressResult)).once();
+      verify(mockedContract.getModule).once();
+      verify(mockedModuleMethod.callAsync(ADDRESS)).once();
+      verify(mockedContractFactory.getFeatureRegistryContract()).once();
+      verify(mockedFeatureRegistryContract.getFeatureStatus).once();
+      verify(mockedGetFeatureStatusMethod.callAsync(Feature.CustomModulesAllowed)).once();
+      verify(mockedModuleFactoryContract.owner).once();
+      verify(mockedModuleFactoryOwnerMethod.callAsync()).once();
+      verify(mockedContractFactory.getModuleRegistryContract()).once();
+      verify(mockedModuleRegistryContract.getModulesByType).times(6);
+      verify(mockedGetModulesMethod.callAsync(ModuleType.PermissionManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.STO)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Burn)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Dividends)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.TransferManager)).once();
+      verify(mockedGetModulesMethod.callAsync(ModuleType.Wallet)).once();
       verify(mockedContract.getVersion).once();
       verify(mockedGetVersionMethod.callAsync()).once();
       verify(mockedModuleFactoryContract.getUpperSTVersionBounds).once();
