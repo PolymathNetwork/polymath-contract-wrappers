@@ -8,6 +8,8 @@ import { DividendCheckpointTransactionParams } from './contract_wrappers/modules
 import { ERC20DividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import {GeneralPermissionManagerTransactionParams} from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
+import {CappedSTOTransactionParams} from './contract_wrappers/modules/sto/capped_sto_wrapper';
+import {USDTieredSTOTransactionParams} from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 
 export namespace TransactionParams {
   export import FeatureRegistry = FeatureRegistryTransactionParams;
@@ -17,7 +19,9 @@ export namespace TransactionParams {
   export import DividendCheckpoint = DividendCheckpointTransactionParams;
   export import ERC20DividendCheckpoint = ERC20DividendCheckpointTransactionParams;
   export import EtherDividendCheckpoint = EtherDividendCheckpointTransactionParams;
-  export import GeneralPermissionManagerTransaction = GeneralPermissionManagerTransactionParams;
+  export import GeneralPermissionManager = GeneralPermissionManagerTransactionParams;
+  export import CappedSTO = CappedSTOTransactionParams;
+  export import USDTieredSTO = USDTieredSTOTransactionParams;
 }
 
 export { conversionUtils };
