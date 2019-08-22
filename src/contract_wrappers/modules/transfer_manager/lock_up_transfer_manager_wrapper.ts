@@ -34,6 +34,8 @@ import {
   bytes32ToString,
   dateArrayToBigNumberArray,
   dateToBigNumber,
+  numberArrayToBigNumberArray,
+  numberToBigNumber,
   parsePermBytes32Value,
   parseTransferResult,
   stringArrayToBytes32Array,
@@ -160,16 +162,16 @@ interface VerifyTransferParams {
 interface LockUpTypeParams extends TxParams {
   lockupAmount: BigNumber;
   startTime: Date;
-  lockUpPeriodSeconds: BigNumber;
-  releaseFrequenciesSeconds: BigNumber;
+  lockUpPeriodSeconds: number;
+  releaseFrequenciesSeconds: number;
   lockupName: string;
 }
 
 interface LockUpTypeMultiParams extends TxParams {
   lockupAmounts: BigNumber[];
   startTimes: Date[];
-  lockUpPeriodSeconds: BigNumber[];
-  releaseFrequenciesSeconds: BigNumber[];
+  lockUpPeriodSeconds: number[];
+  releaseFrequenciesSeconds: number[];
   lockupNames: string[];
 }
 
@@ -187,8 +189,8 @@ interface AddNewLockUpToUserParams extends TxParams {
   userAddress: string;
   lockupAmount: BigNumber;
   startTime: Date;
-  lockUpPeriodSeconds: BigNumber;
-  releaseFrequenciesSeconds: BigNumber;
+  lockUpPeriodSeconds: number;
+  releaseFrequenciesSeconds: number;
   lockupName: string;
 }
 
@@ -196,8 +198,8 @@ interface AddNewLockUpToUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupAmounts: BigNumber[];
   startTimes: Date[];
-  lockUpPeriodSeconds: BigNumber[];
-  releaseFrequenciesSeconds: BigNumber[];
+  lockUpPeriodSeconds: number[];
+  releaseFrequenciesSeconds: number[];
   lockupNames: string[];
 }
 
@@ -223,8 +225,8 @@ interface RemoveLockUpTypeMultiParams extends TxParams {
 interface LockUp {
   lockupAmount: BigNumber;
   startTime: Date;
-  lockUpPeriodSeconds: BigNumber;
-  releaseFrequencySeconds: BigNumber;
+  lockUpPeriodSeconds: number;
+  releaseFrequencySeconds: number;
 }
 
 interface LockUpWithAmount extends LockUp {
@@ -287,8 +289,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return {
       lockupAmount: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      lockUpPeriodSeconds: result[2],
-      releaseFrequencySeconds: result[3],
+      lockUpPeriodSeconds: result[2].toNumber(),
+      releaseFrequencySeconds: result[3].toNumber(),
     };
   };
 
@@ -302,8 +304,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return {
       lockupAmount: weiToValue(result[0], decimals),
       startTime: bigNumberToDate(result[1]),
-      lockUpPeriodSeconds: result[2],
-      releaseFrequencySeconds: result[3],
+      lockUpPeriodSeconds: result[2].toNumber(),
+      releaseFrequencySeconds: result[3].toNumber(),
       unlockedAmount: weiToValue(result[4], decimals),
     };
   };
@@ -320,8 +322,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
         lockupName: bytes32ToString(result[0][i]),
         lockupAmount: weiToValue(result[1][i], decimals),
         startTime: bigNumberToDate(result[2][i]),
-        lockUpPeriodSeconds: result[3][i],
-        releaseFrequencySeconds: result[4][i],
+        lockUpPeriodSeconds: result[3][i].toNumber(),
+        releaseFrequencySeconds: result[4][i].toNumber(),
         unlockedAmount: weiToValue(result[5][i], decimals),
       });
     }
@@ -414,8 +416,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).addNewLockUpType.sendTransactionAsync(
       valueToWei(params.lockupAmount, decimals),
       dateToBigNumber(params.startTime),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberToBigNumber(params.lockUpPeriodSeconds),
+      numberToBigNumber(params.releaseFrequenciesSeconds),
       stringToBytes32(params.lockupName),
       params.txData,
       params.safetyFactor,
@@ -455,8 +457,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).addNewLockUpTypeMulti.sendTransactionAsync(
       valueArrayToWeiArray(params.lockupAmounts, decimals),
       dateArrayToBigNumberArray(params.startTimes),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberArrayToBigNumberArray(params.lockUpPeriodSeconds),
+      numberArrayToBigNumberArray(params.releaseFrequenciesSeconds),
       stringArrayToBytes32Array(params.lockupNames),
       params.txData,
       params.safetyFactor,
@@ -515,8 +517,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       params.userAddress,
       valueToWei(params.lockupAmount, decimals),
       dateToBigNumber(params.startTime),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberToBigNumber(params.lockUpPeriodSeconds),
+      numberToBigNumber(params.releaseFrequenciesSeconds),
       stringToBytes32(params.lockupName),
       params.txData,
       params.safetyFactor,
@@ -561,8 +563,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       params.userAddresses,
       valueArrayToWeiArray(params.lockupAmounts, decimals),
       dateArrayToBigNumberArray(params.startTimes),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberArrayToBigNumberArray(params.lockUpPeriodSeconds),
+      numberArrayToBigNumberArray(params.releaseFrequenciesSeconds),
       stringArrayToBytes32Array(params.lockupNames),
       params.txData,
       params.safetyFactor,
@@ -649,8 +651,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).modifyLockUpType.sendTransactionAsync(
       valueToWei(params.lockupAmount, decimals),
       dateToBigNumber(params.startTime),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberToBigNumber(params.lockUpPeriodSeconds),
+      numberToBigNumber(params.releaseFrequenciesSeconds),
       stringToBytes32(params.lockupName),
       params.txData,
       params.safetyFactor,
@@ -690,8 +692,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return (await this.contract).modifyLockUpTypeMulti.sendTransactionAsync(
       valueArrayToWeiArray(params.lockupAmounts, decimals),
       dateArrayToBigNumberArray(params.startTimes),
-      params.lockUpPeriodSeconds,
-      params.releaseFrequenciesSeconds,
+      numberArrayToBigNumberArray(params.lockUpPeriodSeconds),
+      numberArrayToBigNumberArray(params.releaseFrequenciesSeconds),
       stringArrayToBytes32Array(params.lockupNames),
       params.txData,
       params.safetyFactor,
@@ -758,11 +760,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   private checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
     assert.assert(params.lockupName.length > 0, 'Lockup Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
-    assert.isBigNumberGreaterThanZero(params.lockUpPeriodSeconds, 'Lockup period in seconds should be greater than 0');
-    assert.isBigNumberGreaterThanZero(
-      params.releaseFrequenciesSeconds,
-      'Release frequency in seconds should be greater than 0',
-    );
+    assert.assert(params.lockUpPeriodSeconds > 0, 'Lockup period in seconds should be greater than 0');
+    assert.assert(params.releaseFrequenciesSeconds > 0, 'Release frequency in seconds should be greater than 0');
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };
 
