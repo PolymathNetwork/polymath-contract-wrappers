@@ -54,7 +54,6 @@ interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
 }
 
 export namespace FeatureRegistryTransactionParams {
-  export interface GetFeatureStatus extends GetFeatureStatusParams {}
   export interface SetFeatureStatus extends SetFeatureStatusParams {}
 }
 
