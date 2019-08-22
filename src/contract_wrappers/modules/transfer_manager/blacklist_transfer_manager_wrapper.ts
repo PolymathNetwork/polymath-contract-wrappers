@@ -176,7 +176,7 @@ interface UserAddressParams {
  * @param startTime Start date of the blacklist type
  * @param endTime End date of the blacklist type
  * @param blacklistName Name of the blacklist type
- * @param repeatPeriodTime Repeat period of the blacklist type (in days)
+ * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  */
 interface BlacklistTypeParams extends TxParams {
   startTime: Date;
@@ -189,7 +189,7 @@ interface BlacklistTypeParams extends TxParams {
  * @param startTime Start date of the blacklist type
  * @param endTime End date of the blacklist type
  * @param blacklistName Name of the blacklist type
- * @param repeatPeriodTime Repeat period of the blacklist type (in days)
+ * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  * @param investor Address of the investor
  */
 interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
@@ -200,7 +200,7 @@ interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
  * @param startTimes Start dates of the blacklist types
  * @param endTimes End dates of the blacklist types
  * @param blacklistNames Names of the blacklist types
- * @param repeatPeriodTimes Repeat periods of the blacklist type (in days)
+ * @param repeatPeriodTimes Repeat periods of the blacklist type (measured in days)
  */
 interface BlacklistTypeMultiParams extends TxParams {
   startTimes: Date[];
@@ -210,7 +210,6 @@ interface BlacklistTypeMultiParams extends TxParams {
 }
 
 /**
- * Used to delete the blacklist type
  * @param blacklistName Name of the blacklist type
  */
 interface DeleteBlacklistTypeParams extends TxParams {
@@ -218,7 +217,6 @@ interface DeleteBlacklistTypeParams extends TxParams {
 }
 
 /**
- * Used to delete the multiple blacklist types
  * @param blacklistNames Names of the blacklist types
  */
 interface DeleteBlacklistTypeMultiParams extends TxParams {
@@ -226,7 +224,6 @@ interface DeleteBlacklistTypeMultiParams extends TxParams {
 }
 
 /**
- * Used to assign the blacklist type to the investor
  * @param investor Address of the investor
  * @param blacklistName Name of the blacklist
  */
@@ -236,7 +233,6 @@ interface InvestorAndBlacklistParams extends TxParams {
 }
 
 /**
- * Used to delete the investor from all the associated blacklist types
  * @param investor Address of the investor
  */
 interface DeleteInvestorFromAllBlacklistParams extends TxParams {
@@ -251,7 +247,6 @@ interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
 }
 
 /**
- * Used to assign a single blacklist type to multiple investors
  * @param investors Address of the investor
  * @param blacklistName Name of the blacklist
  */
@@ -283,7 +278,7 @@ interface VerifyTransfer {
 /**
  * @param startTime Date of start for blacklist
  * @param endTime Date of end for blacklist
- * @param repeatPeriodTime Days until it is repeated (0 if it is not repeated)
+ * @param repeatPeriodTime Time until it is repeated (Measured in days) (0 if it is not repeated)
  */
 interface BlacklistsDetails {
   startTime: Date;
@@ -340,7 +335,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * Return the different blacklist details corresponding to a blacklists name
    */
   public blacklists = async (params: BlacklistParams): Promise<BlacklistsDetails> => {
-    assert.assert(params.blacklistName.length > 0, 'Blacklist Details must not be an empty string');
+    assert.assert(params.blacklistName.length > 0, 'Blacklist name must not be an empty string');
     const result = await (await this.contract).blacklists.callAsync(stringToBytes32(params.blacklistName));
     return {
       startTime: bigNumberToDate(result[0]),
