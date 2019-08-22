@@ -141,8 +141,8 @@ window.addEventListener('load', async () => {
   await lockUpTM.addNewLockUpToUserMulti({
     userAddresses: [myAddress, randomBeneficiary1, randomBeneficiary2],
     startTimes: [new Date(2030, 1, 1), new Date(2030, 1, 1), new Date(2030, 1, 1)],
-    lockUpPeriodSeconds: [new BigNumber(5), new BigNumber(5), new BigNumber(5)],
-    releaseFrequenciesSeconds: [new BigNumber(1), new BigNumber(1), new BigNumber(1)],
+    lockUpPeriodSeconds: [5, 5, 5],
+    releaseFrequenciesSeconds: [1, 1, 1],
     lockupAmounts: [new BigNumber(100), new BigNumber(100), new BigNumber(100)],
     lockupNames: [firstLockUpName, secondLockUpName, thirdLockUpName],
   });
@@ -171,8 +171,8 @@ window.addEventListener('load', async () => {
   // Modify the lockup types so that we can test in real time
   await lockUpTM.modifyLockUpTypeMulti({
     startTimes: [startTime, startTime, startTime],
-    lockUpPeriodSeconds: [new BigNumber(5), new BigNumber(5), new BigNumber(5)],
-    releaseFrequenciesSeconds: [new BigNumber(1), new BigNumber(1), new BigNumber(1)],
+    lockUpPeriodSeconds: [5, 5, 5],
+    releaseFrequenciesSeconds: [1, 1, 1],
     lockupAmounts: [new BigNumber(20), new BigNumber(10), new BigNumber(10)],
     lockupNames: [firstLockUpName, secondLockUpName, thirdLockUpName],
   });
