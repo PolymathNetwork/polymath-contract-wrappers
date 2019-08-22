@@ -1,9 +1,15 @@
 /* istanbul ignore file */
 import * as conversionUtils from './utils/convert';
 import { FeatureRegistryTransactionParams} from './contract_wrappers/registries/feature_registry_wrapper';
+import {ModuleRegistryTransactionParams} from './contract_wrappers/registries/module_registry_wrapper';
+import {PolymathRegistryTransactionParams} from './contract_wrappers/registries/polymath_registry_wrapper';
+import {SecurityTokenRegistryTransactionParams} from './contract_wrappers/registries/security_token_registry_wrapper';
 
 export namespace TransactionParams {
   export import FeatureRegistry = FeatureRegistryTransactionParams;
+  export import ModuleRegistry = ModuleRegistryTransactionParams;
+  export import PolymathRegistry = PolymathRegistryTransactionParams;
+  export import SecurityTokenRegistry = SecurityTokenRegistryTransactionParams;
 }
 
 export { conversionUtils };

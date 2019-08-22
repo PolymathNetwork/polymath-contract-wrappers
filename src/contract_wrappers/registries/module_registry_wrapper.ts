@@ -130,6 +130,12 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace ModuleRegistryTransactionParams {
+  export interface ModuleFactory extends ModuleFactoryParams {}
+  export interface ReclaimERC20 extends ReclaimERC20Params {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+}
+
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
