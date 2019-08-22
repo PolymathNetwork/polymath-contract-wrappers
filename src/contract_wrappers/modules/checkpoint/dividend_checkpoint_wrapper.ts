@@ -14,6 +14,17 @@ import {
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
+export namespace DividendCheckpointTransactionParams {
+  export interface ChangeWallet extends ChangeWalletParams {}
+  export interface SetDefaultExcluded extends SetDefaultExcludedParams {}
+  export interface SetWithholding extends SetWithholdingParams {}
+  export interface SetWithholdingFixed extends SetWithholdingFixedParams {}
+  export interface PushDividendPaymentToAddresses extends PushDividendPaymentToAddressesParams {}
+  export interface PushDividendPayment extends PushDividendPaymentParams {}
+  export interface DividendIndexTx extends DividendIndexTxParams {}
+  export interface UpdateDividendDates extends UpdateDividendDatesParams {}
+}
+
 interface DividendIndexParams {
   dividendIndex: number;
 }

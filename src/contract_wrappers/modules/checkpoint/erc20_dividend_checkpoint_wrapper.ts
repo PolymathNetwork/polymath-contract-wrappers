@@ -126,6 +126,13 @@ interface GetERC20DividendCheckpointLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace ERC20DividendCheckpointTransactionParams {
+  export interface CreateDividend extends CreateDividendParams {}
+  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
+  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
+  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
+}
+
 interface DividendIndexParams {
   dividendIndex: number;
 }

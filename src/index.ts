@@ -1,15 +1,23 @@
 /* istanbul ignore file */
 import * as conversionUtils from './utils/convert';
-import { FeatureRegistryTransactionParams} from './contract_wrappers/registries/feature_registry_wrapper';
-import {ModuleRegistryTransactionParams} from './contract_wrappers/registries/module_registry_wrapper';
-import {PolymathRegistryTransactionParams} from './contract_wrappers/registries/polymath_registry_wrapper';
-import {SecurityTokenRegistryTransactionParams} from './contract_wrappers/registries/security_token_registry_wrapper';
+import { FeatureRegistryTransactionParams } from './contract_wrappers/registries/feature_registry_wrapper';
+import { ModuleRegistryTransactionParams } from './contract_wrappers/registries/module_registry_wrapper';
+import { PolymathRegistryTransactionParams } from './contract_wrappers/registries/polymath_registry_wrapper';
+import { SecurityTokenRegistryTransactionParams } from './contract_wrappers/registries/security_token_registry_wrapper';
+import { DividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/dividend_checkpoint_wrapper';
+import { ERC20DividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
+import { EtherDividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
+import {GeneralPermissionManagerTransactionParams} from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 
 export namespace TransactionParams {
   export import FeatureRegistry = FeatureRegistryTransactionParams;
   export import ModuleRegistry = ModuleRegistryTransactionParams;
   export import PolymathRegistry = PolymathRegistryTransactionParams;
   export import SecurityTokenRegistry = SecurityTokenRegistryTransactionParams;
+  export import DividendCheckpoint = DividendCheckpointTransactionParams;
+  export import ERC20DividendCheckpoint = ERC20DividendCheckpointTransactionParams;
+  export import EtherDividendCheckpoint = EtherDividendCheckpointTransactionParams;
+  export import GeneralPermissionManagerTransaction = GeneralPermissionManagerTransactionParams;
 }
 
 export { conversionUtils };
