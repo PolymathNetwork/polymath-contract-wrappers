@@ -102,7 +102,7 @@ export default class ModuleWrapper extends ContractWrapper {
     const moduleFactoryContract = await this.moduleFactoryContract();
     const getTypes = await moduleFactoryContract.getTypes.callAsync();
     const types = getTypes.filter(type => {
-      // type '6' is valid but it is not mapped, so we must filter this kind of scenarios
+      // type '6' and '8' are valid but they are not mapped, so we must filter them
       try {
         parseModuleTypeValue(new BigNumber(type));
         return true;
@@ -110,12 +110,8 @@ export default class ModuleWrapper extends ContractWrapper {
         return false;
       }
     });
-    // if empty, module type is invalid
-    if (!types.length) {
-      return false;
-      // if types has more than one element, prevent further errors
-    }
-    if (types.length > 1) {
+    // prevent invalid scenarios
+    if (!types.length || types.length > 1) {
       return false;
     }
     const address = await this.address();

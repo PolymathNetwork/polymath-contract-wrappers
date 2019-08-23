@@ -747,7 +747,8 @@ interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.GeneralTransferManager
     | ModuleName.ManualApprovalTransferManager
     | ModuleName.VolumeRestrictionTM
-    | ModuleName.LockUpTransferManager;
+    | ModuleName.LockUpTransferManager
+    | ModuleName.BlacklistTransferManager;
   data?: undefined;
 }
 
