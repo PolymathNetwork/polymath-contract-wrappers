@@ -189,6 +189,12 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
+/**
+ * @param maturity Time from which dividend can be paid
+ * @param expiry Time until dividend can no longer be paid, and can be reclaimed by issuer
+ * @param name Name/title for identification
+ * @param value Value of ether to contribute towards dividend
+ */
 interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
@@ -196,29 +202,25 @@ interface CreateDividendParams extends TxParams {
   value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithCheckpointParams extends CreateDividendParams {
   checkpointId: number;
-  name: string;
-  value: BigNumber;
 }
 
-interface CreateDividendWithExclusionsParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithExclusionsParams extends CreateDividendParams {
   excluded: string[];
-  name: string;
-  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointAndExclusionsParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividendWithExclusionsParams {
   checkpointId: number;
-  excluded: string[];
-  name: string;
-  value: BigNumber;
 }
 
 /**
@@ -245,6 +247,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     this.contract = contract;
   }
 
+  /**
+   * Creates a dividend and checkpoint for the dividend
+   */
   public createDividend = async (params: CreateDividendParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const txPayableData = {
@@ -268,6 +273,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend with a provided checkpoint
+   */
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const txPayableData = {
@@ -293,6 +301,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend and checkpoint for the dividend with excluded addresses
+   */
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     const txPayableData = {
@@ -319,6 +330,9 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend with a provided checkpoint and with excluded addresses
+   */
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
