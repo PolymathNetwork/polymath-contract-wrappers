@@ -272,7 +272,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
    *  check withholding tax for an investor
    *  @return amount of withholding tax
    */
-  public withholdingTax = async (params: InvestorParams) => {
+  public withholdingTax = async (params: InvestorParams): Promise<BigNumber> => {
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).withholdingTax.callAsync(params.investor);
   };
@@ -595,7 +595,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
    * @return investor balances
    * @return investor withheld percentages
    */
-  public getCheckpointData = async (params: CheckpointIdParams) => {
+  public getCheckpointData = async (params: CheckpointIdParams): Promise<CheckpointData[]> => {
     const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
     assert.assert(params.checkpointId <= new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
     const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
@@ -622,7 +622,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
    * Checks whether an address has claimed a dividend
    * @return bool whether the address has claimed
    */
-  public isClaimed = async (params: InvestorStatus) => {
+  public isClaimed = async (params: InvestorStatus): Promise<boolean> => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
     return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
@@ -632,7 +632,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
    * Checks whether an address is excluded from claiming a dividend
    * @return bool whether the address is excluded
    */
-  public isExcluded = async (params: InvestorStatus) => {
+  public isExcluded = async (params: InvestorStatus): Promise<boolean> => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
