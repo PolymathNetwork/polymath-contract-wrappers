@@ -134,6 +134,20 @@ interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace BlacklistTransferManagerTransactionParams {
+  export interface Blacklist extends BlacklistParams {}
+  export interface BlacklistType extends BlacklistTypeParams {}
+  export interface AddNewInvestorToNewBlacklist extends AddNewInvestorToNewBlacklistParams {}
+  export interface BlacklistTypeMulti extends BlacklistTypeMultiParams {}
+  export interface DeleteBlacklistType extends DeleteBlacklistTypeParams {}
+  export interface DeleteBlacklistTypeMulti extends DeleteBlacklistTypeMultiParams {}
+  export interface InvestorAndBlacklist extends InvestorAndBlacklistParams {}
+  export interface DeleteInvestorFromAllBlacklist extends DeleteInvestorFromAllBlacklistParams {}
+  export interface DeleteInvestorFromAllBlacklistMulti extends DeleteInvestorFromAllBlacklistMultiParams {}
+  export interface InvestorMultiAndBlacklist extends InvestorMultiAndBlacklistParams {}
+  export interface InvestorMultiAndBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
+}
+
 /**
  * @param from Address of the sender
  * @param to Address of the receiver

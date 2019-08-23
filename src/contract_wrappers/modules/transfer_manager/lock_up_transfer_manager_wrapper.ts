@@ -138,6 +138,20 @@ interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace LockUpTransferManagerTransactionParams {
+  export interface Lockups extends LockupsParams {}
+  export interface LockUpType extends LockUpTypeParams {}
+  export interface LockUpTypeMulti extends LockUpTypeMultiParams {}
+  export interface LockUpByName extends LockUpByNameParams {}
+  export interface LockUpByNameMulti extends LockUpByNameMultiParams {}
+  export interface AddNewLockUpToUser extends AddNewLockUpToUserParams {}
+  export interface AddNewLockUpToUserMulti extends AddNewLockUpToUserMultiParams {}
+  export interface RemoveLockUpFromUser extends RemoveLockUpFromUserParams {}
+  export interface RemoveLockUpFromUserMulti extends RemoveLockUpFromUserMultiParams {}
+  export interface RemoveLockUpType extends RemoveLockUpTypeParams {}
+  export interface RemoveLockUpTypeMulti extends RemoveLockUpTypeMultiParams {}
+}
+
 /**
  * @param lockupName The name of the lockup
  */

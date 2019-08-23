@@ -7,9 +7,21 @@ import { SecurityTokenRegistryTransactionParams } from './contract_wrappers/regi
 import { DividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/dividend_checkpoint_wrapper';
 import { ERC20DividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
-import {GeneralPermissionManagerTransactionParams} from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
-import {CappedSTOTransactionParams} from './contract_wrappers/modules/sto/capped_sto_wrapper';
-import {USDTieredSTOTransactionParams} from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
+import { GeneralPermissionManagerTransactionParams } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
+import { CappedSTOTransactionParams } from './contract_wrappers/modules/sto/capped_sto_wrapper';
+import { USDTieredSTOTransactionParams } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
+import { BlacklistTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
+import { CountTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
+import { GeneralTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
+import { LockUpTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+import { ManualApprovalTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
+import { PercentageTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import { VolumeRestrictionTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+import { VestingEscrowWalletTransactionParams } from './contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
+import { ERC20TransactionParams } from './contract_wrappers/tokens/erc20_wrapper';
+import { PolyTokenFaucetTransactionParams } from './contract_wrappers/tokens/poly_token_faucet_wrapper';
+import { PolyTokenTransactionParams } from './contract_wrappers/tokens/poly_token_wrapper';
+import { SecurityTokenTransactionParams } from './contract_wrappers/tokens/security_token_wrapper';
 
 export namespace TransactionParams {
   export import FeatureRegistry = FeatureRegistryTransactionParams;
@@ -22,6 +34,18 @@ export namespace TransactionParams {
   export import GeneralPermissionManager = GeneralPermissionManagerTransactionParams;
   export import CappedSTO = CappedSTOTransactionParams;
   export import USDTieredSTO = USDTieredSTOTransactionParams;
+  export import BlacklistTransferManager = BlacklistTransferManagerTransactionParams;
+  export import CountTransferManager = CountTransferManagerTransactionParams;
+  export import GeneralTransferManager = GeneralTransferManagerTransactionParams;
+  export import LockUpTransferManager = LockUpTransferManagerTransactionParams;
+  export import ManualApprovalTransferManager = ManualApprovalTransferManagerTransactionParams;
+  export import PercentageTransferManager = PercentageTransferManagerTransactionParams;
+  export import VolumeRestrictionTransferManager = VolumeRestrictionTransferManagerTransactionParams;
+  export import VestingEscrowWallet = VestingEscrowWalletTransactionParams;
+  export import ERC20 = ERC20TransactionParams;
+  export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
+  export import PolyToken = PolyTokenTransactionParams;
+  export import SecurityToken = SecurityTokenTransactionParams;
 }
 
 export { conversionUtils };
