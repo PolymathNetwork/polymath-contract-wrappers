@@ -105,88 +105,109 @@ export default class ModuleWrapperFactory {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public getModuleInstance: GetModuleInstance = async (params: GetModuleParams): Promise<any> => {
     assert.isETHAddressHex('address', params.address);
+    let moduleWrapper;
     switch (params.name) {
       // Permission
       case ModuleName.GeneralPermissionManager:
-        return new GeneralPermissionManagerWrapper(
+        moduleWrapper = new GeneralPermissionManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralPermissionManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       // TMs
       case ModuleName.CountTransferManager:
-        return new CountTransferManagerWrapper(
+        moduleWrapper = new CountTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getCountTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.GeneralTransferManager:
-        return new GeneralTransferManagerWrapper(
+        moduleWrapper = new GeneralTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.ManualApprovalTransferManager:
-        return new ManualApprovalTransferManagerWrapper(
+        moduleWrapper = new ManualApprovalTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getManualApprovalTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.PercentageTransferManager:
-        return new PercentageTransferManagerWrapper(
+        moduleWrapper = new PercentageTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.LockUpTransferManager:
-        return new LockUpTransferManagerWrapper(
+        moduleWrapper = new LockUpTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getLockUpTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.VolumeRestrictionTM:
-        return new VolumeRestrictionTransferManagerWrapper(
+        moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,
         );
+        break;
       // STOs
       case ModuleName.CappedSTO:
-        return new CappedSTOWrapper(
+        moduleWrapper = new CappedSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getCappedSTOContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.UsdTieredSTO:
-        return new USDTieredSTOWrapper(
+        moduleWrapper = new USDTieredSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getUSDTieredSTOContract(params.address),
           this.contractFactory,
         );
+        break;
       // Checkpoint
       case ModuleName.ERC20DividendCheckpoint:
-        return new ERC20DividendCheckpointWrapper(
+        moduleWrapper = new ERC20DividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getERC20DividendCheckpointContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.EtherDividendCheckpoint:
-        return new EtherDividendCheckpointWrapper(
+        moduleWrapper = new EtherDividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
           this.contractFactory,
         );
+        break;
       // Wallet
       case ModuleName.VestingEscrowWallet:
-        return new VestingEscrowWalletWrapper(
+        moduleWrapper = new VestingEscrowWalletWrapper(
           this.web3Wrapper,
           this.contractFactory.getVestingEscrowWalletContract(params.address),
           this.contractFactory,
         );
+        break;
       // Burn
       default:
         // TODO: Typed error here
         throw new Error();
     }
+
+    // validate module
+    if (await moduleWrapper.isValidModule()) {
+      return moduleWrapper;
+    }
+
+    // TODO: Typed error here
+    throw new Error('Invalid module');
   };
 }

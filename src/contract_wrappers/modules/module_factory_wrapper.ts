@@ -170,7 +170,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public getTypes = async (): Promise<ModuleType[]> => {
     return (await (await this.contract).getTypes.callAsync()).map(type => {
-      return parseModuleTypeValue(type);
+      return parseModuleTypeValue(new BigNumber(type));
     });
   };
 
