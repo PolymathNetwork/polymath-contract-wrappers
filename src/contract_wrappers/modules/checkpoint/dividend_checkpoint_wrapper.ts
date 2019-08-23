@@ -62,7 +62,7 @@ interface PushDividendPaymentToAddressesParams extends TxParams {
 interface PushDividendPaymentParams extends TxParams {
   dividendIndex: number;
   start: Date;
-  iterations: number;
+  end: Date;
 }
 
 interface DividendIndexTxParams extends TxParams {

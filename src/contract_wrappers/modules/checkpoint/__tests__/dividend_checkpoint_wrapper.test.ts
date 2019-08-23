@@ -17,6 +17,7 @@ import {
   valueArrayToWeiArray,
   weiToValue,
   valueToWei,
+  numberArrayToBigNumberArray,
 } from '../../../../utils/convert';
 import ModuleWrapper from '../../module_wrapper';
 
@@ -954,7 +955,7 @@ describe('DividendCheckpointWrapper', () => {
       const mockedParams = {
         dividendIndex,
         start: new Date(2030, 1),
-        iterations: 3,
+        end: new Date(2030, 2),
         txData: {},
         safetyFactor: 10,
       };
@@ -968,7 +969,7 @@ describe('DividendCheckpointWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
           objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(numberToBigNumber(mockedParams.iterations)),
+          objectContaining(dateToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -985,7 +986,7 @@ describe('DividendCheckpointWrapper', () => {
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
           objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(numberToBigNumber(mockedParams.iterations)),
+          objectContaining(dateToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1337,7 +1338,7 @@ describe('DividendCheckpointWrapper', () => {
       const result = await target.getDividendIndex(mockedParams);
 
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(numberArrayToBigNumberArray(result)).toEqual(expectedResult);
 
       // Verifications
       verify(mockedContract.getDividendIndex).once();
