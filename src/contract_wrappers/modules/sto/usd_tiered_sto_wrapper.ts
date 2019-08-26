@@ -203,27 +203,47 @@ interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>[]>;
 }
 
+/**
+ * tier Index of Tier
+ */
 interface TierIndexParams {
   tier: number;
 }
 
+/**
+ * @param fundRaiseType Currency key
+ * @param amount Value to convert from USD
+ */
 interface ConvertToOrFromUSDParams {
   fundRaiseType: FundRaiseType;
   amount: BigNumber;
 }
 
+/**
+ * @param fundRaiseType Fund raise type to get rate of
+ */
 interface FundRaiseTypeParams {
   fundRaiseType: FundRaiseType;
 }
 
+/**
+ * @param stableCoinAddress Address of USD Stable Coin
+ */
 interface StableCoinParams {
   stableCoinAddress: string;
 }
 
+/**
+ * @param investorAddress Address of Investor
+ */
 interface InvestorAddressParams {
   investorAddress: string;
 }
 
+/**
+ * @param investorAddress Address of Investor
+ * @param fundRaiseType
+ */
 interface InvestorInvestedParams {
   investorAddress: string;
   fundRaiseType: FundRaiseType;
@@ -255,6 +275,7 @@ interface ModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
+
 /**
  * @param nonAccreditedLimitUSD max non accredited invets limit
  * @param minimumInvestmentUSD overall minimum investment limit
@@ -295,34 +316,59 @@ interface ModifyTiersParams extends TxParams {
   tokensPerTierDiscountPoly: BigNumber[];
 }
 
+/**
+ * @param allowBeneficialInvestments Boolean to allow or disallow beneficial investments
+ */
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
+/**
+ * @param beneficiary Address of beneficiary for tokens
+ * @param ETH value used to buy
+ */
 interface BuyWithETHParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
 }
 
+/**
+ * @param minTokens Minimum amount of tokens to buy else revert
+ */
 interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
   minTokens: BigNumber;
 }
 
+/**
+ * @param beneficiary Address of beneficiary for tokens
+ * @param investedPOLY Value of poly invested
+ */
 interface BuyWithPOLYParams extends TxParams {
   beneficiary: string;
   investedPOLY: BigNumber;
 }
 
+/**
+ * @param minTokens Minimum amount of tokens to buy else revert
+ */
 interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
   minTokens: BigNumber;
 }
 
+/**
+ * @param beneficiary Address of beneficiary for tokens
+ * @param investedSC Amount of stable coin invested
+ * @param usdToken USD stable coin address to buy tokens with
+ */
 interface BuyWithUSDParams extends TxParams {
   beneficiary: string;
   investedSC: BigNumber;
   usdToken: string;
 }
 
+/**
+ * @param minTokens Minimum amount of tokens to buy else revert
+ */
 interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
   minTokens: BigNumber;
 }
@@ -412,21 +458,37 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     this.contract = contract;
   }
 
-  public allowBeneficialInvestments = async () => {
+  /**
+   * Determine whether users can invest on behalf of a beneficiary
+   * @return boolean status
+   */
+  public allowBeneficialInvestments = async (): Promise<boolean> => {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
 
-  public paused = async () => {
+  /**
+   *  check if the module is paused
+   *  @return boolean if paused
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
-  public finalAmountReturned = async () => {
+  /**
+   * Final amount of tokens returned to the issuer
+   * @return amount of tokens
+   */
+  public finalAmountReturned = async (): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).finalAmountReturned.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
 
+  /**
+   * Amount in fund raise type invested by each investor
+   * @return amount invested
+   */
   public investorInvested = async (params: InvestorInvestedParams) => {
     assert.isETHAddressHex('investorAddress', params.investorAddress);
     return weiToValue(
@@ -435,11 +497,18 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
-  public investorInvestedUSD = async (params: InvestorAddressParams) => {
+  /**
+   * Amount in USD invested by each address
+   * @return invested amount
+   */
+  public investorInvestedUSD = async (params: InvestorAddressParams): Promise<BigNumber> => {
     assert.isETHAddressHex('investorAddress', params.investorAddress);
     return weiToValue(await (await this.contract).investorInvestedUSD.callAsync(params.investorAddress), FULL_DECIMALS);
   };
 
+  /**
+   * Function to set allowBeneficialInvestments (allow beneficiary to be different to funder)
+   */
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
     assert.assert(
@@ -453,6 +522,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy with eth without rate restriction
+   */
   public buyWithETH = async (params: BuyWithETHParams) => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     const investmentValue = valueToWei(params.value, FULL_DECIMALS);
@@ -473,6 +545,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy with poly without rate restriction
+   */
   public buyWithPOLY = async (params: BuyWithPOLYParams) => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     const investmentValue = valueToWei(params.investedPOLY, FULL_DECIMALS);
@@ -490,6 +565,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy with USD stable coin without rate restriction
+   */
   public buyWithUSD = async (params: BuyWithUSDParams) => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
@@ -510,6 +588,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy tokens with eth and with rate restriction
+   */
   public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
     const investmentValue = valueToWei(params.value, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
@@ -530,6 +611,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy tokens with poly and with rate restriction
+   */
   public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
     const investmentValue = valueToWei(params.investedPOLY, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
@@ -547,6 +631,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Buy tokens with usd stable coin and with rate restriction
+   */
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
     const investmentValue = valueToWei(params.investedSC, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
@@ -566,18 +653,34 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
-  public isOpen = async () => {
+  /**
+   * This function returns whether or not the STO is in fundraising mode (open)
+   * @return bool Whether the STO is accepting investments
+   */
+  public isOpen = async (): Promise<boolean> => {
     return (await this.contract).isOpen.callAsync();
   };
 
-  public capReached = async () => {
+  /**
+   * Checks whether the cap has been reached.
+   * @return bool Whether the cap was reached
+   */
+  public capReached = async (): Promise<boolean> => {
     return (await this.contract).capReached.callAsync();
   };
 
-  public getRate = async (params: FundRaiseTypeParams) => {
+  /**
+   * returns current conversion rate of funds
+   * @return rate value
+   */
+  public getRate = async (params: FundRaiseTypeParams): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).getRate.callAsync(params.fundRaiseType), FULL_DECIMALS);
   };
 
+  /**
+   * This function converts from USD to ETH or POLY
+   * @return Value in ETH or POLY
+   */
   public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
     return weiToValue(
       await (await this.contract).convertFromUSD.callAsync(
@@ -588,13 +691,21 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
-  public getTokensMinted = async () => {
+  /**
+   * Return the total no. of tokens minted
+   * @return Total number of tokens minted
+   */
+  public getTokensMinted = async (): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).getTokensMinted.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
 
+  /**
+   * Return the total number of tokens sold in a given tier
+   * @return Total amount of tokens sold in the tier
+   */
   public getTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
     assert.assert(params.tier < new BigNumber(tiers).toNumber(), 'Invalid tier');
@@ -604,7 +715,19 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     );
   };
 
-  public getSTODetails = async () => {
+  /**
+   * Return the STO details
+   * @return Unixtimestamp at which offering gets start.
+   * @return Unixtimestamp at which offering ends.
+   * @return Currently active tier
+   * @return Array of Number of tokens this STO will be allowed to sell at different tiers.
+   * @return Array rate at which tokens are sold at different tiers
+   * @return Amount of funds raised
+   * @return Number of individual investors this STO have.
+   * @return Amount of tokens sold.
+   * @return Array of booleans to show if funding is allowed in ETH, POLY, SC respectively
+   */
+  public getSTODetails = async (): Promise<USDTieredSTOData> => {
     const result = await (await this.contract).getSTODetails.callAsync();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: USDTieredSTOData = {
@@ -624,28 +747,32 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   /**
-   * Current tier
+   * Get current tier
+   * @returns current tier number
    */
-  public currentTier = async () => {
-    return (await this.contract).currentTier.callAsync();
+  public currentTier = async (): Promise<number> => {
+    return (await (await this.contract).currentTier.callAsync()).toNumber();
   };
 
   /**
    * Get the limit in USD for non-accredited investors
+   * @returns non accredited limit usd value
    */
-  public nonAccreditedLimitUSD = async () => {
+  public nonAccreditedLimitUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).nonAccreditedLimitUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * Get the minimun investment in USD
+   * @return minimumInvestmentUSD value
    */
-  public minimumInvestmentUSD = async () => {
+  public minimumInvestmentUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).minimumInvestmentUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * Ethereum account address to receive unsold tokens
+   * @return wallet address
    */
   public treasuryWallet = async () => {
     return (await this.contract).treasuryWallet.callAsync();
@@ -653,8 +780,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Return the total no. of tokens sold
+   * @return token sold amount
    */
-  public getTokensSold = async () => {
+  public getTokensSold = async (): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).getTokensSold.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
@@ -663,36 +791,46 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Whether or not the STO has been finalized
+   * @return isFinalized boolean
    */
-  public isFinalized = async () => {
+  public isFinalized = async (): Promise<boolean> => {
     return (await this.contract).isFinalized.callAsync();
   };
 
   /**
    * Return the total no. of tiers
+   * @return tier count
    */
-  public getNumberOfTiers = async () => {
-    return (await this.contract).getNumberOfTiers.callAsync();
+  public getNumberOfTiers = async (): Promise<number> => {
+    return (await (await this.contract).getNumberOfTiers.callAsync()).toNumber();
   };
 
   /**
    * Return the usd tokens accepted by the STO
+   * @return list of usd token addresses
    */
-  public getUsdTokens = async () => {
+  public getUsdTokens = async (): Promise<string[]> => {
     return (await this.contract).getUsdTokens.callAsync();
   };
 
   /**
    * Amount of USD funds raised
+   * @return value usd funds
    */
-  public fundsRaisedUSD = async () => {
+  public fundsRaisedUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).fundsRaisedUSD.callAsync(), FULL_DECIMALS);
   };
 
   /**
-   * Get specific tier
+   * Return tiers
+   * @return rate
+   * @return rateDiscountPoly
+   * @return tokensTotal
+   * @return tokensDiscountPoly
+   * @return mintedTotal
+   * @return mintedDiscountPoly
    */
-  public tiers = async (params: TierIndexParams) => {
+  public tiers = async (params: TierIndexParams): Promise<Tier> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).tiers.callAsync(numberToBigNumber(params.tier));
     const typedResult: Tier = {
@@ -708,10 +846,11 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Return array of minted tokens in each fund raise type for given tier
+   * @return tokens amount by tier
    */
   public getTokensMintedByTier = async (params: TierIndexParams) => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    assert.assert(params.tier < (await this.getNumberOfTiers()).toNumber(), 'Invalid tier');
+    assert.assert(params.tier < (await this.getNumberOfTiers()), 'Invalid tier');
     const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: weiToValue(result[0], decimals),
@@ -747,9 +886,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   /**
-   * Amount of stable coins raised
+   * Amount of stable coin raised
+   * @return stable coin amount
    */
-  public stableCoinsRaised = async (params: StableCoinParams) => {
+  public stableCoinsRaised = async (params: StableCoinParams): Promise<BigNumber> => {
     assert.isETHAddressHex('stableCoinAddress', params.stableCoinAddress);
     return weiToValue(await (await this.contract).stableCoinsRaised.callAsync(params.stableCoinAddress), FULL_DECIMALS);
   };
@@ -814,7 +954,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   /**
-   * Modifies max non accredited invets limit and overall minimum investment limit
+   * Modifies max non accredited investment limit and overall minimum investment limit
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
@@ -891,9 +1031,12 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   /**
-   * Returns investor accredited & non-accredited override informatiomn
+   * Returns investor accredited & non-accredited override information
+   * @return investor[]
+   * @return accredited data value
+   * @return nonAccreditedLimitUSDOverride value
    */
-  public getAccreditedData = async () => {
+  public getAccreditedData = async (): Promise<AccreditedData[]> => {
     const result = await (await this.contract).getAccreditedData.callAsync();
     const typedResult: AccreditedData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
