@@ -785,7 +785,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyTimes = async (params: ModifyTimesParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
+    assert.isFutureDate(await this.startTime(), 'STO already started');
     assert.assert(params.endTime > params.startTime, 'Start date must be greater than end time');
     assert.isFutureDate(params.startTime, 'Start date must be in the future');
     return (await this.contract).modifyTimes.sendTransactionAsync(
@@ -818,7 +818,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyLimits = async (params: ModifyLimitsParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
+    assert.isFutureDate(await this.startTime(), 'STO already started');
     return (await this.contract).modifyLimits.sendTransactionAsync(
       valueToWei(params.nonAccreditedLimitUSD, FULL_DECIMALS),
       valueToWei(params.minimumInvestmentUSD, FULL_DECIMALS),
@@ -832,7 +832,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyFunding = async (params: ModifyFundingParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
+    assert.isFutureDate(await this.startTime(), 'STO already started');
     return (await this.contract).modifyFunding.sendTransactionAsync(
       params.fundRaiseTypes,
       params.txData,
@@ -862,7 +862,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public modifyTiers = async (params: ModifyTiersParams) => {
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
-    assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
+    assert.isFutureDate(await this.startTime(), 'STO already started');
     assert.assert(params.tokensPerTierTotal.length > 0, 'No tiers provided');
     assert.assert(
       params.ratePerTier.length === params.tokensPerTierTotal.length &&

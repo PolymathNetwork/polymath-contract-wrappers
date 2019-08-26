@@ -205,8 +205,8 @@ export default class CappedSTOWrapper extends STOWrapper {
         'Beneficiary address does not match msg.sender',
       );
     }
-    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
-    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
+    assert.isPastDate(await this.startTime(), 'Offering is not yet started');
+    assert.isFutureDate(await this.endTime(), 'Offering is closed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, FULL_DECIMALS),
@@ -230,8 +230,8 @@ export default class CappedSTOWrapper extends STOWrapper {
       polyTokenBalance.isGreaterThanOrEqualTo(valueToWei(params.investedPOLY, FULL_DECIMALS)),
       'Budget less than amount unable to transfer fee',
     );
-    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
-    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
+    assert.isPastDate(await this.startTime(), 'Offering is not yet started');
+    assert.isFutureDate(await this.endTime(), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
       valueToWei(params.investedPOLY, FULL_DECIMALS),
       params.txData,
