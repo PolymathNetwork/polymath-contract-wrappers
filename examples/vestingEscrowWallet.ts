@@ -28,7 +28,7 @@ window.addEventListener('load', async () => {
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
     ticker: ticker!,
   });
 
@@ -154,7 +154,7 @@ window.addEventListener('load', async () => {
   // Add Template
   await VEW.addTemplate({
     name: TEMPLATE_NAME,
-    numberOfTokens,
+    numberOfTokens: new BigNumber(numberOfTokens),
     duration: 100,
     frequency: 10,
   });
