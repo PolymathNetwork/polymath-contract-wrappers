@@ -356,4 +356,5 @@ export enum ErrorCode {
   InvalidCheckpoint = 'InvalidCheckpoint',
   InvalidLenghtLimit = 'InvalidLenghtLimit',
   InvalidBound = 'InvalidBound',
+  InvalidDelegate = 'InvalidDelegate',
 }
