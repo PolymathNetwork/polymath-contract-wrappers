@@ -33,7 +33,7 @@ const assert = {
     this.assert(result, ErrorCode.DuplicatedStrings, `There are duplicates in ${variableName} array.`);
   },
   isLessThanMax64BytesDate(variableName: string, value: Date): void {
-    this.assert(value <= MAX_64_BYTES_DATE, ErrorCode.TooFar, `${variableName} date is too far in the future`);
+    this.assert(value <= MAX_64_BYTES_DATE, ErrorCode.TooLate, `${variableName} date is too far in the future`);
   },
   isPercentage(variableName: string, value: BigNumber): void {
     this.assert(
@@ -46,7 +46,7 @@ const assert = {
     this.assert(value >= new Date(), ErrorCode.TooEarly, message);
   },
   isPastDate(value: Date, message: string): void {
-    this.assert(value <= new Date(), ErrorCode.TooFar, message);
+    this.assert(value <= new Date(), ErrorCode.TooLate, message);
   },
   isNotDateZero(value: Date, message: string): void {
     this.assert(value !== new Date(0), ErrorCode.InvalidData, message);

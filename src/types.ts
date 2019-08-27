@@ -337,15 +337,22 @@ export const PERCENTAGE_DECIMALS = new BigNumber(16);
 export const FULL_DECIMALS = new BigNumber(18);
 
 export enum ErrorCode {
-  UserDeniedAccess = 'UserDeniedAccess',
+  Unauthorized = 'Unauthorized',
   InvalidAddress = 'InvalidAddress',
   InsufficientBalance = 'InsufficientBalance',
   InvalidSubscriptionToken = 'InvalidSubscriptionToken',
   DuplicatedStrings = 'DuplicatedStrings',
-  TooFar = 'TooFar',
+  TooLate = 'TooLate',
   TooEarly = 'TooEarly',
   InvalidData = 'InvalidData',
   MismatchedArrayLength = 'MismatchedArrayLength',
   InvalidVersion = 'InvalidVersion',
   InvalidPartition = 'InvalidPartition',
+  ContractPaused = 'ContractPaused',
+  PreconditionRequired = 'PreconditionRequired',
+  AlreadyClaimed = 'AlreadyClaimed',
+  AddressExcluded = 'AddressExcluded',
+  InvalidDividend = 'InvalidDividend',
+  InvalidCheckpoint = 'InvalidCheckpoint',
+  InvalidLenghtLimit = 'InvalidLenghtLimit',
 }
