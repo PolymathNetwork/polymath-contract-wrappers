@@ -355,4 +355,5 @@ export enum ErrorCode {
   InvalidDividend = 'InvalidDividend',
   InvalidCheckpoint = 'InvalidCheckpoint',
   InvalidLenghtLimit = 'InvalidLenghtLimit',
+  InvalidBound = 'InvalidBound',
 }
