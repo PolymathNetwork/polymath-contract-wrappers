@@ -313,10 +313,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   /**
    * Used to verify the transfer transaction (View)
-   * Restrict the blacklist address to transfer tokens
-   * if the current time is between the time frame define for the
-   * blacklist type associated with the from address
-   * @return Parse transfer result
+   *  @return boolean transfer result
+   *  @return address
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);

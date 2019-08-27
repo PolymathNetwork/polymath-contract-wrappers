@@ -487,7 +487,9 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Used to verify the transfer transaction and prevent locked up tokens from being transferred
+   *  Used to verify the transfer transaction and prevent locked up tokens from being transferred
+   *  @return boolean transfer result
+   *  @return address
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);

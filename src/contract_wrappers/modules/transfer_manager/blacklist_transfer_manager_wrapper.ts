@@ -683,7 +683,8 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * Restrict the blacklist address to transfer tokens
    * if the current time is between the timeframe define for the
    * blacklist type associated with the from address
-   * @return Parse transfer result
+   *  @return boolean transfer result
+   *  @return address
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
