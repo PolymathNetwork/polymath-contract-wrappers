@@ -65,6 +65,12 @@ interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
 }
 
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount Amount to send
+ * @param data Data value
+ */
 interface VerifyTransferParams {
   from: string;
   to: string;
@@ -72,6 +78,9 @@ interface VerifyTransferParams {
   data: string;
 }
 
+/**
+ * @param maxHolderCount is the new maximum amount of token holders
+ */
 interface ChangeHolderCountParams extends TxParams {
   maxHolderCount: number;
 }
@@ -97,26 +106,47 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  check if module paused
+   */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public maxHolderCount = async () => {
-    return (await this.contract).maxHolderCount.callAsync();
+  /**
+   *The maximum number of concurrent token holders
+   */
+  public maxHolderCount = async (): Promise<number> => {
+    return (await (await this.contract).maxHolderCount.callAsync()).toNumber();
   };
 
+  /**
+   *Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
+   * @dev module.verifyTransfer is called by SecToken.canTransfer and does not receive the updated holderCount therefore
+   *      verifyTransfer has to manually account for pot. tokenholder changes (by mimicking TokenLib.adjustInvestorCount).
+   *      module.executeTransfer is called by SecToken.transfer|issue|others and receives an updated holderCount
+   *      as sectoken calls TokenLib.adjustInvestorCount before executeTransfer.
+   *      @return boolean transfer result
+   *      @return address
+   */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
@@ -134,6 +164,9 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     };
   };
 
+  /**
+   * Sets the cap for the amount of token holders there can be
+   */
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeHolderCount.sendTransactionAsync(

@@ -208,7 +208,7 @@ describe('CountTransferManagerWrapper', () => {
       // Real call
       const result = await target.maxHolderCount();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.maxHolderCount).once();
       verify(mockedMethod.callAsync()).once();

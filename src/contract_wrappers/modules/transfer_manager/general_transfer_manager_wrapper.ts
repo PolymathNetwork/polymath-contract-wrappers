@@ -134,20 +134,37 @@ interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
   >;
 }
 
+/**
+ * @param address Address noncemap related to
+ * @param nonce Nonce of the signature
+ */
 interface NonceMapParams {
   address: string;
   nonce: number;
 }
 
+/**
+ * @param defaultCanSendAfter default for zero canSendAfter
+ * @param defaultCanReceiveAfter default for zero canReceiveAfter
+ */
 interface ChangeDefaultsParams extends TxParams {
   defaultFromTime: Date;
   defaultToTime: Date;
 }
 
+/**
+ * @param issuanceAddress new address for the issuance
+ */
 interface ChangeIssuanceAddressParams extends TxParams {
   issuanceAddress: string;
 }
 
+/**
+ * @param investor is the address to whitelist
+ * @param canSendAfter is the moment when the sale lockup period ends and the investor can freely sell or transfer their tokens
+ * @param canReceiveAfter is the moment when the purchase lockup period ends and the investor can freely purchase or receive tokens from others
+ * @param expiryTime is the moment till investors KYC will be validated. After that investor need to do re-KYC
+ */
 interface ModifyKYCDataParams extends TxParams {
   investor: string;
   canSendAfter: Date;
@@ -176,15 +193,25 @@ interface ModifyKYCDataSignedParams extends TxParams {
   signature: string;
 }
 
+/**
+ * @param investor Address
+ * @param flag FlagsType
+ */
 interface GetInvestorFlag {
   investor: string;
   flag: FlagsType;
 }
 
+/**
+ * @param investor Address
+ */
 interface GetInvestorFlags {
   investor: string;
 }
 
+/**
+ * @param investors Address array
+ */
 interface GetKYCDataParams {
   investors: string[];
 }
@@ -214,6 +241,7 @@ interface ModifyInvestorFlagMulti extends TxParams {
 /**
  * @param from Address of the sender
  * @param to Address of the receiver
+ * @param data Data value
  */
 interface ExecuteTransfer extends TxParams {
   from: string;
@@ -285,6 +313,10 @@ interface ModifyKYCDataSignedMulti extends TxParams {
   signature: string;
 }
 
+/**
+ * @param fromIndex From index in range
+ * @param toIndex To index in range
+ */
 interface GetInvestors {
   fromIndex: number;
   toIndex: number;
@@ -339,32 +371,53 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  check if the module is paused
+   */
   public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public nonceMap = async (params: NonceMapParams) => {
+  /**
+   *  Map of used nonces by customer
+   *  @return boolean result
+   */
+  public nonceMap = async (params: NonceMapParams): Promise<boolean> => {
     assert.isETHAddressHex('address', params.address);
     return (await this.contract).nonceMap.callAsync(params.address, numberToBigNumber(params.nonce));
   };
 
-  public issuanceAddress = async () => {
+  /**
+   * Address from which issuances arrive
+   */
+  public issuanceAddress = async (): Promise<string> => {
     return (await this.contract).issuanceAddress.callAsync();
   };
 
-  public defaults = async () => {
+  /**
+   *  Offset to be applied to all timings (except KYC expiry)
+   *  @return canSendAfter
+   *  @return canReceiveAfter
+   */
+  public defaults = async (): Promise<Defaults> => {
     const result = await (await this.contract).defaults.callAsync();
     const typedResult: Defaults = {
       canSendAfter: bigNumberToDate(result[0]),
@@ -373,6 +426,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return typedResult;
   };
 
+  /**
+   * Used to change the default times used when canSendAfter / canReceiveAfter are zero
+   */
   public changeDefaults = async (params: ChangeDefaultsParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     return (await this.contract).changeDefaults.sendTransactionAsync(
@@ -383,6 +439,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to change the Issuance Address
+   */
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -393,6 +452,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Add or remove KYC info of an investor.
+   */
   public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -409,7 +471,10 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public getInvestorFlag = async (params: GetInvestorFlag) => {
+  /**
+   * Gets the investor flag
+   */
+  public getInvestorFlag = async (params: GetInvestorFlag): Promise<boolean> => {
     const result = await (await this.contract).getInvestorFlag.callAsync(params.investor, params.flag);
     return result;
   };
@@ -462,6 +527,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     };
   };
 
+  /**
+   * Get all investor flags
+   */
   public getAllInvestorFlags = async () => {
     const result = await (await this.contract).getAllInvestorFlags.callAsync();
     const [investors, flags] = result;
@@ -472,13 +540,19 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return investorFlags;
   };
 
+  /**
+   * Gets the investor flags
+   */
   public getInvestorFlags = async (params: GetInvestorFlags) => {
     const { investor } = params;
     const flags = await (await this.contract).getInvestorFlags.callAsync(investor);
     return this.unpackFlags(investor, flags);
   };
 
-  public getAllKYCData = async () => {
+  /**
+   * Returns list of all investors data
+   */
+  public getAllKYCData = async (): Promise<KYCDataWithInvestor[]> => {
     const result = await (await this.contract).getAllKYCData.callAsync();
     const typedResult: KYCDataWithInvestor[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
@@ -493,7 +567,13 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return typedResult;
   };
 
-  public getKYCData = async (params: GetKYCDataParams) => {
+  /**
+   * Returns list of specified investors data
+   * @returns canSendAfter array
+   * @returns canReceiveAfter array
+   * @returns expiryTime array
+   */
+  public getKYCData = async (params: GetKYCDataParams): Promise<KYCData[]> => {
     const result = await (await this.contract).getKYCData.callAsync(params.investors);
     const typedResult: KYCData[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
@@ -520,6 +600,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return weiToValue(result, decimals);
   };
 
+  /**
+   * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
+   */
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -700,16 +783,18 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   /**
    * Returns list of all investors
+   * @return investor array
    */
-  public getAllInvestors = async () => {
+  public getAllInvestors = async (): Promise<string[]> => {
     const result = await (await this.contract).getAllInvestors.callAsync();
     return result;
   };
 
   /**
    * Returns list of investors in a range
+   * @return investor array
    */
-  public getInvestors = async (params: GetInvestors) => {
+  public getInvestors = async (params: GetInvestors): Promise<string[]> => {
     const result = await (await this.contract).getInvestors.callAsync(
       new BigNumber(params.fromIndex),
       new BigNumber(params.toIndex),
@@ -719,8 +804,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   /**
    * Return the permissions flags that are associated with general transfer manager
+   * @return array of Perm type
    */
-  public getPermissions = async () => {
+  public getPermissions = async (): Promise<Perm[]> => {
     const call = await (await this.contract).getPermissions.callAsync();
     const result: Perm[] = [];
     for (let i = 0; i < call.length; i += 1) {
@@ -741,7 +827,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return result;
   };
 
-  public getAddressBytes32 = async () => {
+  /**
+   * Get Address bytes32 string value
+   * @return bytes32 to string representation
+   */
+  public getAddressBytes32 = async (): Promise<string> => {
     const result = await (await this.contract).getAddressBytes32.callAsync();
     return bytes32ToString(result);
   };
