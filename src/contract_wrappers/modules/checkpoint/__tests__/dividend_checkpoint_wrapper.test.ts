@@ -12,7 +12,6 @@ import ContractFactory from '../../../../factories/contractFactory';
 import {
   bytes32ToString,
   dateToBigNumber,
-  numberToBigNumber,
   stringToBytes32,
   valueArrayToWeiArray,
   weiToValue,
