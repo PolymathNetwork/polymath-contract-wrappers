@@ -335,3 +335,17 @@ export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | E
 
 export const PERCENTAGE_DECIMALS = new BigNumber(16);
 export const FULL_DECIMALS = new BigNumber(18);
+
+export enum ErrorCode {
+  UserDeniedAccess = 'UserDeniedAccess',
+  InvalidAddress = 'InvalidAddress',
+  InsufficientBalance = 'InsufficientBalance',
+  InvalidSubscriptionToken = 'InvalidSubscriptionToken',
+  DuplicatedStrings = 'DuplicatedStrings',
+  TooFar = 'TooFar',
+  TooEarly = 'TooEarly',
+  InvalidData = 'InvalidData',
+  MismatchedArrayLength = 'MismatchedArrayLength',
+  InvalidVersion = 'InvalidVersion',
+  InvalidPartition = 'InvalidPartition',
+}
