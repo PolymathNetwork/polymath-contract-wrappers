@@ -85,7 +85,11 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
-  public owner = async () => {
+  /**
+   * Get owner of contract
+   * @return address
+   */
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
@@ -93,7 +97,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public getFeatureStatus = async (params: GetFeatureStatusParams) => {
+  public getFeatureStatus = async (params: GetFeatureStatusParams): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(params.nameKey);
   };
 
@@ -119,7 +123,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the CustomModulesAllowed status
    * @return bool
    */
-  public getCustomModulesAllowedStatus = async () => {
+  public getCustomModulesAllowedStatus = async (): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(Feature.CustomModulesAllowed);
   };
 
@@ -127,7 +131,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the FreezeMintingAllowed status
    * @return bool
    */
-  public getFreezeMintingAllowedStatus = async () => {
+  public getFreezeMintingAllowedStatus = async (): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed);
   };
 

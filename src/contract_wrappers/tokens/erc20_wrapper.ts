@@ -68,8 +68,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token name
+   * @return name
    */
-  public name = async () => {
+  public name = async (): Promise<string> => {
     return (await this.contract).name.callAsync();
   };
 
@@ -88,8 +89,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token total supply
+   * @return total supply amount
    */
-  public totalSupply = async () => {
+  public totalSupply = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).totalSupply.callAsync(), await this.decimals());
   };
 
@@ -110,8 +112,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the setted decimals
+   * @return decimal amount
    */
-  public decimals = async () => {
+  public decimals = async (): Promise<BigNumber> => {
     return (await this.contract).decimals.callAsync();
   };
 
@@ -119,7 +122,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public balanceOf = async (params?: GetBalanceOfParams) => {
+  public balanceOf = async (params?: GetBalanceOfParams): Promise<BigNumber> => {
     const address =
       !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', address);
@@ -128,8 +131,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token symbol
+   * @return symbol
    */
-  public symbol = async () => {
+  public symbol = async (): Promise<string> => {
     return (await this.contract).symbol.callAsync();
   };
 

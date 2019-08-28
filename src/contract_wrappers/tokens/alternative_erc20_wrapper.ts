@@ -28,21 +28,23 @@ export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
 
   /**
    * Returns the token name
+   * @return name
    */
-  public name = async () => {
+  public name = async (): Promise<string> => {
     const name = (await this.contract).name.callAsync();
     return bytes32ToString(await name);
   };
 
   /**
    * Returns the token symbol
+   * @return symbol
    */
-  public symbol = async () => {
+  public symbol = async (): Promise<string> => {
     const symbol = (await this.contract).symbol.callAsync();
     return bytes32ToString(await symbol);
   };
 
-  public async isValidContract() {
+  public async isValidContract(): Promise<boolean> {
     try {
       const contract = await this.contract;
       const totalSupply = await contract.totalSupply.callAsync();

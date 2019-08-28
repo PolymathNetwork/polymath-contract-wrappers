@@ -6,6 +6,10 @@ import { valueToWei } from '../../utils/convert';
 
 const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
 
+/**
+ * amount Amount of tokens to get from faucet
+ * recipient Address to transfer to
+ */
 interface GetTokensParams extends TxParams {
   amount: BigNumber;
   recipient: string;
@@ -27,6 +31,9 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
+  /**
+   * Used to get tokens from faucet
+   */
   public getTokens = async (params: GetTokensParams) => {
     assert.isNonZeroETHAddressHex('recipient', params.recipient);
     assert.assert(params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT), 'Amount cannot exceed 1 million tokens');

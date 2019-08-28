@@ -622,7 +622,7 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       const result = await target.getInvestorCount();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.getInvestorCount).once();
       verify(mockedMethod.callAsync()).once();
@@ -642,7 +642,7 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       const result = await target.holderCount();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.holderCount).once();
       verify(mockedMethod.callAsync()).once();
@@ -2594,7 +2594,7 @@ describe('SecurityTokenWrapper', () => {
       // Stub the request
       when(mockedIsIssuableMethod.callAsync()).thenResolve(expectedIsIssuableResult);
       // Real call
-      const result = await target.issue(mockedParams);    
+      const result = await target.issue(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);

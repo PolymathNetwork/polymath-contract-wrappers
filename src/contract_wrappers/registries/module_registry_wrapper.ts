@@ -130,6 +130,9 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
+/**
+ * @param moduleFactory is the address of the module factory
+ */
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -143,23 +146,39 @@ interface TypeAndTokenParams {
   securityToken: string;
 }
 
+/**
+ * @param moduleType is the module type to look for
+ */
 interface ModuleTypeParams {
   moduleType: ModuleType;
 }
 
+/**
+ * @param moduleFactory is the address of the relevant module factory
+ * @param securityToken is the address of the relevant security token
+ */
 interface IsCompatibleModuleParams {
   moduleFactoryAddress: string;
   securityTokenAddress: string;
 }
 
+/**
+ * @param factoryAddress
+ */
 interface GetFactoryDetailsParams {
   factoryAddress: string;
 }
 
+/**
+ * @param tokenContract ERC20 token contract address
+ */
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
 
+/**
+ * @param newOwner The address to transfer ownership to
+ */
 interface TransferOwnershipParams extends TxParams {
   newOwner: string;
 }
@@ -213,10 +232,17 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     this.contractFactory = contractFactory;
   }
 
+  /**
+   *  Check that a module and its factory are compatible
+   * @return bool whether module and token are compatible
+   */
   public isCompatibleModule = async (params: IsCompatibleModuleParams): Promise<boolean> => {
     return (await this.contract).isCompatibleModule.callAsync(params.moduleFactoryAddress, params.securityTokenAddress);
   };
 
+  /**
+   *  Called by the ModuleFactory owner to register new modules for SecurityTokens to use
+   */
   public registerModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkModuleNotPausedOrOwner();
@@ -249,6 +275,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   * Called by the ModuleFactory owner or registry curator to delete a ModuleFactory from the registry
+   */
   public removeModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkModuleNotPaused();
@@ -261,6 +290,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   * Called by Polymath to verify Module Factories for SecurityTokens to use.
+   * A module can not be used by an ST unless first approved/verified by Polymath
+   * (The only exception to this is that the author of the module is the owner of the ST)
+   * -> Only if Polymath enabled the feature.
+   */
   public verifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
@@ -272,6 +307,12 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   * Called by Polymath to verify Module Factories for SecurityTokens to use.
+   * A module can not be used by an ST unless first approved/verified by Polymath
+   * (The only exception to this is that the author of the module is the owner of the ST)
+   * -> Only if Polymath enabled the feature.
+   */
   public unverifyModule = async (params: ModuleFactoryParams) => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkIsOwnerOrModuleFactoryOwner(params.moduleFactory);
@@ -283,6 +324,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   * Returns all the tags related to the a module type which are valid for the given token
+   * @return list of tags
+   * @return corresponding list of module factories
+   */
   public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
     assert.isETHAddressHex('securityToken', params.securityToken);
     const result = await (await this.contract).getTagsByTypeAndToken.callAsync(params.moduleType, params.securityToken);
@@ -303,6 +349,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return typedResult;
   };
 
+  /**
+   * Returns all the tags related to the a module type which are valid for the given token
+   * @return list of tags
+   * @return corresponding list of module factories
+   */
   public getTagsByType = async (params: ModuleTypeParams) => {
     const result = await (await this.contract).getTagsByType.callAsync(params.moduleType);
     // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
@@ -323,6 +374,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   /**
+   * Gets the factory details
    * @returns Returns factoryIsVerified, factoryOwnerAddress, listSecurityTokens
    */
   public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
@@ -335,10 +387,18 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return typedResult;
   };
 
+  /**
+   * Returns the list of addresses of verified Module Factory of a particular type
+   * @return address array that contains the list of addresses of module factory contracts.
+   */
   public getModulesByType = async (params: ModuleTypeParams) => {
     return (await this.contract).getModulesByType.callAsync(params.moduleType);
   };
 
+  /**
+   * Returns the list of addresses of all Module Factory of a particular type
+   * @return address array that contains the list of addresses of module factory contracts.
+   */
   public getAllModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return (await this.contract).getAllModulesByType.callAsync(params.moduleType);
   };
@@ -352,6 +412,9 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return (await this.contract).getModulesByTypeAndToken.callAsync(params.moduleType, params.securityToken);
   };
 
+  /**
+   * Reclaim ERC20 tokens from contract
+   */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     await this.checkMsgSenderIsOwner();
@@ -362,23 +425,35 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   * Pause the module
+   */
   public pause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
     assert.assert(!(await this.isPaused()), 'Contract is paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Unpause the module
+   */
   public unpause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
     assert.assert(await this.isPaused(), 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * @Stores the contract addresses of other key contracts from the PolymathRegistry
+   */
   public updateFromRegistry = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
     return (await this.contract).updateFromRegistry.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Allows the current owner to transfer control of the contract to a newOwner.
+   */
   public transferOwnership = async (params: TransferOwnershipParams) => {
     assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     await this.checkMsgSenderIsOwner();
@@ -389,11 +464,19 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  public owner = async () => {
+  /**
+   * Get owner address
+   * @return address
+   */
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
-  public isPaused = async () => {
+  /**
+   * Check is paused
+   * @return boolean isPaused
+   */
+  public isPaused = async (): Promise<boolean> => {
     return (await this.contract).isPaused.callAsync();
   };
 
