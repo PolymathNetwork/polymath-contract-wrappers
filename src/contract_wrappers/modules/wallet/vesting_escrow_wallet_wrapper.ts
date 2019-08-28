@@ -185,6 +185,25 @@ interface GetVestingEscrowWalletLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletUnpauseEventArgs>[]>;
 }
 
+export namespace VestingEscrowWalletTransactionParams {
+  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
+  export interface DepositTokens extends DepositTokensParams {}
+  export interface SendToTreasury extends SendToTreasuryParams {}
+  export interface PushAvailableTokens extends PushAvailableTokensParams {}
+  export interface AddTemplate extends AddTemplateParams {}
+  export interface RemoveTemplate extends RemoveTemplateParams {}
+  export interface AddSchedule extends AddScheduleParams {}
+  export interface AddScheduleFromTemplate extends AddScheduleFromTemplateParams {}
+  export interface ModifySchedule extends ModifyScheduleParams {}
+  export interface RevokeSchedule extends RevokeScheduleParams {}
+  export interface RevokeAllSchedules extends RevokeAllSchedulesParams {}
+  export interface PushAvailableTokensMulti extends PushAvailableTokensMultiParams {}
+  export interface AddScheduleMulti extends AddScheduleMultiParams {}
+  export interface AddScheduleFromTemplateMulti extends AddScheduleFromTemplateMultiParams {}
+  export interface RevokeSchedulesMulti extends RevokeSchedulesMultiParams {}
+  export interface ModifyScheduleMulti extends ModifyScheduleMultiParams {}
+}
+
 /**
  * @param beneficiary Beneficiary
  * @param index Index of schedule

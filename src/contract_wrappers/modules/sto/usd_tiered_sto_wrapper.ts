@@ -203,6 +203,23 @@ interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>[]>;
 }
 
+export namespace USDTieredSTOTransactionParams {
+  export interface ChangeNonAccreditedLimit extends ChangeNonAccreditedLimitParams {}
+  export interface ModifyTimes extends ModifyTimesParams {}
+  export interface ModifyLimits extends ModifyLimitsParams {}
+  export interface ModifyOracle extends ModifyOracleParams {}
+  export interface ModifyFunding extends ModifyFundingParams {}
+  export interface ModifyAddresses extends ModifyAddressesParams {}
+  export interface ModifyTiers extends ModifyTiersParams {}
+  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
+  export interface BuyWithETH extends BuyWithETHParams {}
+  export interface BuyWithETHRateLimited extends BuyWithETHRateLimitedParams {}
+  export interface BuyWithPOLY extends BuyWithPOLYParams {}
+  export interface BuyWithPOLYRateLimited extends BuyWithPOLYRateLimitedParams {}
+  export interface BuyWithUSD extends BuyWithUSDParams {}
+  export interface BuyWithUSDRateLimited extends BuyWithUSDRateLimitedParams {}
+}
+
 /**
  * tier Index of Tier
  */

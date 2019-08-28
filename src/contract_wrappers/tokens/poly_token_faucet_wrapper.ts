@@ -6,6 +6,10 @@ import { valueToWei } from '../../utils/convert';
 
 const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
 
+export namespace PolyTokenFaucetTransactionParams {
+  export interface GetTokens extends GetTokensParams {}
+}
+
 /**
  * amount Amount of tokens to get from faucet
  * recipient Address to transfer to

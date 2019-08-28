@@ -5,6 +5,12 @@ import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
 import { valueToWei, weiToValue } from '../../utils/convert';
 
+export namespace ERC20TransactionParams {
+  export interface Approve extends ApproveParams {}
+  export interface TransferFrom extends TransferFromParams {}
+  export interface Transfer extends TransferParams {}
+}
+
 /**
  * @param spender The address which will spend the funds
  * @param value The amount of tokens to be spent

@@ -247,6 +247,27 @@ interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs>[]>;
 }
 
+export namespace SecurityTokenRegistryTransactionParams {
+  export interface RegisterTicker extends RegisterTickerParams {}
+  export interface TransferTickerOwnership extends TransferTickerOwnershipParams {}
+  export interface GenerateSecurityToken extends GenerateSecurityTokenParams {}
+  export interface ModifyTicker extends ModifyTickerParams {}
+  export interface RemoveTicker extends RemoveTickerParams {}
+  export interface ChangeExpiryLimit extends ChangeExpiryLimitParams {}
+  export interface NewSecurityToken extends NewSecurityTokenParams {}
+  export interface ChangeFeesAmountAndCurrency extends ChangeFeesAmountAndCurrencyParams {}
+  export interface RefreshSecurityToken extends RefreshSecurityTokenParams {}
+  export interface ModifyExistingSecurityToken extends ModifyExistingSecurityTokenParams {}
+  export interface ModifySecurityToken extends ModifySecurityTokenParams {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+  export interface ChangeFee extends ChangeFeeParams {}
+  export interface ReclaimERC20 extends ReclaimERC20Params {}
+  export interface PackageVersion extends PackageVersionParams {}
+  export interface ModifyExistingTicker extends ModifyExistingTickerParams {}
+  export interface SetProtocolFactory extends SetProtocolFactoryParams {}
+  export interface RegisterNewTicker extends RegisterNewTickerParams {}
+}
+
 /**
  * @param securityToken is the address of the security token.
  */
@@ -1148,23 +1169,15 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Get the fees
    * @return the [usd & poly] fee for a particular feetype
    */
-  public getFees = async (params: GetFeesParams): Promise<[BigNumber, BigNumber]> => {
-    let feeType = '';
-    switch (params.feeType) {
-      case FeeType.stLaunchFee: {
-        feeType = stringToBytes32('stLaunchFee');
-        break;
-      }
-      case FeeType.tickerRegFee: {
-        feeType = stringToBytes32('tickerRegFee');
-        break;
-      }
-      default: {
-        assert.assert(false, 'Missing fee type');
-        break;
-      }
+
+  public getFees = async (params: GetFeesParams) => {
+    const { feeType } = params;
+
+    if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
+      assert.assert(false, 'Incorrect fee type');
     }
-    return (await this.contract).getFees.callAsync(feeType);
+    const feeTypeBytes32 = stringToBytes32(params.feeType);
+    return (await this.contract).getFees.callAsync(feeTypeBytes32);
   };
 
   /**

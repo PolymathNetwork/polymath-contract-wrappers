@@ -58,6 +58,13 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
   (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>[]>;
 }
 
+export namespace GeneralPermissionManagerTransactionParams {
+  export interface DeleteDelegate extends DelegateTxParams {}
+  export interface AddDelegate extends AddDelegateParams {}
+  export interface ChangePermission extends ChangePermissionParams {}
+  export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
+}
+
 /**
  * @param delegate Ethereum address of the delegate
  * @param module Ethereum contract address of the module

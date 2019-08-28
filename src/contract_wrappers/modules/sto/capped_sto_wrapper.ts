@@ -91,6 +91,12 @@ interface GetCappedSTOLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CappedSTOUnpauseEventArgs>[]>;
 }
 
+export namespace CappedSTOTransactionParams {
+  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
+  export interface BuyTokens extends BuyTokensParams {}
+  export interface BuyTokensWithPoly extends BuyTokensWithPolyParams {}
+}
+
 /**
  * @param investorAddress Address of the investor
  */

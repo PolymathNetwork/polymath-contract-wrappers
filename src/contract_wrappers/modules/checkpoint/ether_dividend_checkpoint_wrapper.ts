@@ -189,6 +189,13 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
+export namespace EtherDividendCheckpointTransactionParams {
+  export interface CreateDividend extends CreateDividendParams {}
+  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
+  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
+  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
+}
+
 /**
  * @param maturity Time from which dividend can be paid
  * @param expiry Time until dividend can no longer be paid, and can be reclaimed by issuer
