@@ -358,4 +358,6 @@ export enum ErrorCode {
   InvalidBound = 'InvalidBound',
   InvalidDelegate = 'InvalidDelegate',
   InsufficientAllowance = 'InsufficientAllowance',
+  DifferentMode = 'DifferentMode',
+  InvalidTransfer = 'InvalidTransfer',
 }
