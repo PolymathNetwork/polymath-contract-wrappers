@@ -1133,22 +1133,13 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Returns the usd & poly fee for a particular feetype
    */
   public getFees = async (params: GetFeesParams) => {
-    let feeType = '';
-    switch (params.feeType) {
-      case FeeType.stLaunchFee: {
-        feeType = stringToBytes32('stLaunchFee');
-        break;
-      }
-      case FeeType.tickerRegFee: {
-        feeType = stringToBytes32('tickerRegFee');
-        break;
-      }
-      default: {
-        assert.assert(false, 'Missing fee type');
-        break;
-      }
+    const { feeType } = params;
+    
+    if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
+      assert.assert(false, 'Incorrect fee type');
     }
-    return (await this.contract).getFees.callAsync(feeType);
+    const feeTypeBytes32 = stringToBytes32(params.feeType);    
+    return (await this.contract).getFees.callAsync(feeTypeBytes32);
   };
 
   /**
