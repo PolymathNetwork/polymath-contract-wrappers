@@ -23,6 +23,7 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode
 } from '../../../types';
 import {
   bigNumberToDate,
