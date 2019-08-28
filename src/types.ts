@@ -360,4 +360,8 @@ export enum ErrorCode {
   InsufficientAllowance = 'InsufficientAllowance',
   DifferentMode = 'DifferentMode',
   InvalidTransfer = 'InvalidTransfer',
+  InvalidDiscount = 'InvalidDiscount',
+  STOClosed = 'STOClosed',
+  CoinNotAllowed = 'CoinNotAllowed',
+  ErrorLimit = 'ErrorLimit',
 }
