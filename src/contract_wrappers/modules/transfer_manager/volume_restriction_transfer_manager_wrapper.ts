@@ -244,6 +244,12 @@ interface GetVolumeRestrictionTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMUnpauseEventArgs>[]>;
 }
 
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount
+ * @param data
+ */
 interface VerifyTransferParams extends TxParams {
   from: string;
   to: string;
@@ -251,15 +257,29 @@ interface VerifyTransferParams extends TxParams {
   data: string;
 }
 
+/**
+ * @param investor Address of the user
+ */
 interface HolderIndividualRestrictionParams extends TxParams {
   investor: string;
 }
 
+/**
+ * @param wallet Ethereum wallet/contract address that need to be exempted
+ * @param exempted Boolean value used to add (i.e true) or remove (i.e false) from the list
+ */
 interface ChangeExemptWalletListParams extends TxParams {
   wallet: string;
   change: boolean;
 }
 
+/**
+ * @param allowedTokens Amount of tokens allowed to be traded for all token holder.
+ * @param startTime Unix timestamp at which restriction get into effect
+ * @param endTime Unix timestamp at which restriction effects will gets end.
+ * @param restrictionType Whether it will be `Fixed` (fixed no. of tokens allowed to transact)
+ * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
+ */
 interface DailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber;
   startTime: Date;
@@ -267,22 +287,48 @@ interface DailyRestrictionParams extends TxParams {
   restrictionType: RestrictionType;
 }
 
+/**
+ * @param holder Address of the token holder, whom restriction will be implied
+ */
 interface IndividualDailyRestrictionParams extends DailyRestrictionParams {
   holder: string;
 }
 
+/**
+ * @param rollingPeriodInDays Rolling period in days (Minimum value should be 1 day)
+ */
 interface RestrictionParams extends DailyRestrictionParams {
   rollingPeriodInDays: number;
 }
 
+/**
+ * @param holders Array of address of the token holders, whom restriction will be implied
+ * @param allowedTokens Array of amount of tokens allowed to be trade for a given address.
+ * @param startTimes Array of unix timestamps at which restrictions get into effect
+ * @param rollingPeriodInDays Array of rolling period in days (Minimum value should be 1 day)
+ * @param endTimes Array of unix timestamps at which restriction effects will gets end.
+ * @param restrictionTypes Array of restriction types value whether it will be `Fixed` (fixed no. of tokens allowed to transact)
+ * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
+ */
 interface IndividualRestrictionParams extends RestrictionParams {
   holder: string;
 }
 
+/**
+ * @param holders Array of address of the user
+ */
 interface RemoveIndividualRestrictionMultiParams extends TxParams {
   holders: string[];
 }
 
+/**
+ * @param holders Array of address of the token holders, whom restriction will be implied
+ * @param allowedTokens Array of amount of tokens allowed to be trade for a given address.
+ * @param startTimes Array of unix timestamps at which restrictions get into effect
+ * @param endTimes Array of unix timestamps at which restriction effects will gets end.
+ * @param restrictionTypes Array of restriction types value whether it will be `Fixed` (fixed no. of tokens allowed to transact)
+ * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
+ */
 interface IndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[];
   allowedTokens: BigNumber[];
@@ -291,14 +337,24 @@ interface IndividualDailyRestrictionMultiParams extends TxParams {
   restrictionTypes: RestrictionType[];
 }
 
+/**
+ * @param rollingPeriodInDays Array of rolling period in days (Minimum value should be 1 day)
+ */
 interface IndividualRestrictionMultiParams extends IndividualDailyRestrictionMultiParams {
   rollingPeriodInDays: number[];
 }
 
+/**
+ * @param user Address of the token holder for whom the bucket details has queried
+ */
 interface GetIndividualBucketDetailsToUserParams {
   user: string;
 }
 
+/**
+ * @param user Address of the token holder
+ * @param at Timestamp
+ */
 interface GetTotalTradedByUserParams {
   user: string;
   at: Date;
@@ -353,22 +409,37 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     this.contract = contract;
   }
 
+  /**
+   *  Unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public paused = async () => {
+  /**
+   *  Check if module paused
+   *  @return boolean value
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  Pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Used to verify the transfer transaction (View)
+   *  @return boolean transfer result
+   *  @return address
+   */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
@@ -386,7 +457,17 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     };
   };
 
-  public getIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
+  /**
+   * Gets individual restriction for investor
+   * @return allowedTokens
+   * @return startTime
+   * @return rollingPeriodInDays
+   * @return endTime
+   * @return restrictionType
+   */
+  public getIndividualRestriction = async (
+    params: HolderIndividualRestrictionParams,
+  ): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getIndividualRestriction.callAsync(params.investor);
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionType.Fixed : RestrictionType.Percentage;
@@ -401,7 +482,15 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public getDefaultRestriction = async () => {
+  /**
+   * Gets default restriction value
+   * @return allowedTokens
+   * @return startTime
+   * @return rollingPeriodInDays
+   * @return endTime
+   * @return restrictionType
+   */
+  public getDefaultRestriction = async (): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getDefaultRestriction.callAsync();
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionType.Fixed : RestrictionType.Percentage;
@@ -416,7 +505,15 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public getDefaultDailyRestriction = async () => {
+  /**
+   * Gets default daily restriction value
+   * @return allowedTokens
+   * @return startTime
+   * @return rollingPeriodInDays
+   * @return endTime
+   * @return restrictionType
+   */
+  public getDefaultDailyRestriction = async (): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getDefaultDailyRestriction.callAsync();
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionType.Fixed : RestrictionType.Percentage;
@@ -431,11 +528,24 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public getExemptAddress = async () => {
+  /**
+   * Use to return the list of exempted addresses
+   */
+  public getExemptAddress = async (): Promise<string[]> => {
     return (await this.contract).getExemptAddress.callAsync();
   };
 
-  public getIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
+  /**
+   * Gets individual daily restriction value
+   * @return allowedTokens
+   * @return startTime
+   * @return rollingPeriodInDays
+   * @return endTime
+   * @return restrictionType
+   */
+  public getIndividualDailyRestriction = async (
+    params: HolderIndividualRestrictionParams,
+  ): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getIndividualDailyRestriction.callAsync(params.investor);
     const restrictionType =
       new BigNumber(result[4]).toNumber() === 0 ? RestrictionType.Fixed : RestrictionType.Percentage;
@@ -450,6 +560,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
+  /**
+   * Add/Remove wallet address from the exempt list
+   */
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
     assert.assert(
@@ -464,6 +577,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new individual restriction for multiple token holders
+   */
   public addIndividualRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
@@ -488,6 +604,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new individual daily restriction for all token holder
+   */
   public addIndividualDailyRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
@@ -504,6 +623,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new individual daily restriction for multiple token holders
+   */
   public addIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
@@ -541,6 +663,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new individual restriction for multiple token holders
+   */
   public addIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
@@ -585,6 +710,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new default restriction for all token holder
+   */
   public addDefaultRestriction = async (params: RestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(
@@ -606,6 +734,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to add the new default daily restriction for all token holder
+   */
   public addDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
@@ -620,6 +751,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to remove the individual restriction for a given address
+   */
   public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
@@ -634,6 +768,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to remove the individual restriction for a given address
+   */
   public removeIndividualRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
@@ -652,6 +789,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to remove the individual daily restriction for a given address
+   */
   public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
@@ -666,6 +806,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to remove the individual daily restriction for a given address
+   */
   public removeIndividualDailyRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     await Promise.all(
@@ -684,12 +827,18 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to remove the default restriction
+   */
   public removeDefaultRestriction = async (params: TxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNotDateZero((await this.getDefaultRestriction()).endTime, 'Individual Restriction not set with end time');
     return (await this.contract).removeDefaultRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Use to remove the daily default restriction
+   */
   public removeDefaultDailyRestriction = async (params: TxParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNotDateZero(
@@ -699,6 +848,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return (await this.contract).removeDefaultDailyRestriction.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Use to modify the existing individual restriction for a given token holder
+   */
   public modifyIndividualRestriction = async (params: IndividualRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
@@ -722,6 +874,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to modify the existing individual daily restriction for a given token holder
+   */
   public modifyIndividualDailyRestriction = async (params: IndividualDailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     assert.isNonZeroETHAddressHex('holder', params.holder);
@@ -738,6 +893,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to modify the existing individual daily restriction for multiple token holders
+   */
   public modifyIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
@@ -775,6 +933,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to modify the existing individual restriction for multiple token holders
+   */
   public modifyIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     params.holders.forEach(address => assert.isNonZeroETHAddressHex('holders', address));
@@ -814,6 +975,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to modify the global restriction for all token holders
+   */
   public modifyDefaultRestriction = async (params: RestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(
@@ -835,6 +999,9 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
+  /**
+   * Use to modify the daily default restriction for all token holders
+   */
   public modifyDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
     this.checkRestrictionInputParams(params.startTime, params.endTime, params.allowedTokens, params.restrictionType, 1);
@@ -849,7 +1016,17 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
-  public getIndividualBucketDetailsToUser = async (params: GetIndividualBucketDetailsToUserParams) => {
+  /**
+   * Use to get the bucket details for a given address
+   * @return lastTradedDayTime
+   * @return sumOfLastPeriod
+   * @return days covered
+   * @return date lastTradedDayTime
+   * @return timestamp at which last transaction get executed
+   */
+  public getIndividualBucketDetailsToUser = async (
+    params: GetIndividualBucketDetailsToUserParams,
+  ): Promise<GetIndividualBucketDetails> => {
     assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getIndividualBucketDetailsToUser.callAsync(params.user);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -863,7 +1040,17 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public getDefaultBucketDetailsToUser = async (params: GetIndividualBucketDetailsToUserParams) => {
+  /**
+   * Use to get the bucket details for a given address
+   * @return lastTradedDayTime
+   * @return sumOfLastPeriod
+   * @return days covered
+   * @return date lastTradedDayTime
+   * @return timestamp at which last transaction get executed
+   */
+  public getDefaultBucketDetailsToUser = async (
+    params: GetIndividualBucketDetailsToUserParams,
+  ): Promise<GetIndividualBucketDetails> => {
     assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getDefaultBucketDetailsToUser.callAsync(params.user);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -877,15 +1064,35 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return typedResult;
   };
 
-  public getTotalTradedByUser = async (params: GetTotalTradedByUserParams) => {
-    return (await this.contract).getTotalTradedByUser.callAsync(params.user, dateToBigNumber(params.at));
+  /**
+   * Use to get the volume of token that being traded at a particular day (`at` + 24 hours) for a given user
+   */
+  public getTotalTradedByUser = async (params: GetTotalTradedByUserParams): Promise<BigNumber> => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    return weiToValue(
+      await (await this.contract).getTotalTradedByUser.callAsync(params.user, dateToBigNumber(params.at)),
+      decimals,
+    );
   };
 
-  public getInitFunction = async () => {
+  /**
+   * This function returns the signature of configure function
+   */
+  public getInitFunction = async (): Promise<string> => {
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public getRestrictionData = async () => {
+  /**
+   * Provide the restriction details of all the restricted addresses
+   * @return List of the restricted addresses
+   * @return List of the tokens allowed to the restricted addresses corresponds to restricted address
+   * @return List of the start time of the restriction corresponds to restricted address
+   * @return List of the rolling period in days for a restriction corresponds to restricted address.
+   * @return List of the end time of the restriction corresponds to restricted address.
+   * @return List of the type of restriction to validate the value of the `allowedTokens`
+   * of the restriction corresponds to restricted address
+   */
+  public getRestrictionData = async (): Promise<GetRestrictedData[]> => {
     const result = await (await this.contract).getRestrictionData.callAsync();
     const restrictionType = [];
     for (let i = 0; i < result[0].length; i += 1) {
