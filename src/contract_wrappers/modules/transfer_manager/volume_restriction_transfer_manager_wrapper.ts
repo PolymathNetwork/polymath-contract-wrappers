@@ -245,7 +245,6 @@ interface GetVolumeRestrictionTransferManagerLogsAsyncParams extends GetLogs {
 }
 
 export namespace VolumeRestrictionTransferManagerTransactionParams {
-  export interface VerifyTransfer extends VerifyTransferParams {}
   export interface RemoveIndividualRestriction extends HolderIndividualRestrictionParams {}
   export interface RemoveIndividualDailyRestriction extends HolderIndividualRestrictionParams {}
   export interface ChangeExemptWalletList extends ChangeExemptWalletListParams {}
