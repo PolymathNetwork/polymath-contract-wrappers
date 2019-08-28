@@ -190,7 +190,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     assert.assert(
       await (await this.contract).checkDelegate.callAsync(params.delegate),
-      ErrorCode.InvalidDelegate,
+      ErrorCode.NotFound,
       'Delegate does not exist',
     );
     return (await this.contract).deleteDelegate.sendTransactionAsync(

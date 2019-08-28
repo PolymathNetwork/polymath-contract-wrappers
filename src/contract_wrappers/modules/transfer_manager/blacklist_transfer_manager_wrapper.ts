@@ -820,7 +820,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
     assert.assert(
       dateToBigNumber(blacklistInfo.endTime).isZero(),
-      ErrorCode.BacklistAlreadyExist,
+      ErrorCode.AlreadyExists,
       'Blacklist you are trying to add already exists',
     );
     await this.checkBlacklistTypeDetails(params);
@@ -840,7 +840,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       const blacklistDays = (params.endTime.getTime() - params.startTime.getTime()) / (1000 * 60 * 60 * 24);
       assert.assert(
         blacklistDays <= params.repeatPeriodTime,
-        ErrorCode.TooEarly,
+        ErrorCode.InvalidData,
         'The repeat period time in days must be greater than or equal to the difference between start and end time',
       );
     }
@@ -869,7 +869,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
       !currentBlacklistNames.includes(params.blacklistName),
-      ErrorCode.AlreadyAdded,
+      ErrorCode.AlreadyExists,
       'User already added to this blacklist name',
     );
   };

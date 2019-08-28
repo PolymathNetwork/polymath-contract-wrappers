@@ -555,7 +555,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(params.validTo, 'ValidTo date must be in the future');
     assert.assert(
       !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
-      ErrorCode.AlreadyAdded,
+      ErrorCode.AlreadyExists,
       'Already used signature of investor address and nonce',
     );
     return (await this.contract).modifyKYCDataSigned.sendTransactionAsync(

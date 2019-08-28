@@ -770,7 +770,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       ErrorCode.Unauthorized,
       'The caller must be the ST owner',
     );
-    assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is finalized');
+    assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
     // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -906,7 +906,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       'The caller must be the ST owner',
     );
     assert.isFutureDate(bigNumberToDate(await this.startTime()), 'STO already started');
-    assert.assert(params.tokensPerTierTotal.length > 0, ErrorCode.MismatchedArrayLength, 'No tiers provided');
+    assert.assert(params.tokensPerTierTotal.length > 0, ErrorCode.InvalidData, 'No tiers provided');
     assert.assert(
       params.ratePerTier.length === params.tokensPerTierTotal.length &&
         params.ratePerTierDiscountPoly.length === params.tokensPerTierTotal.length &&
@@ -1052,7 +1052,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
       assert.assert(
         functionsUtils.checksumAddressComparision(beneficiary, from),
         ErrorCode.Unauthorized,
-        'Beneficiary != funder',
+        'Beneficiary address must be the same as sender',
       );
     }
     const rate = await this.getRate({
@@ -1065,8 +1065,8 @@ export default class USDTieredSTOWrapper extends STOWrapper {
     const minimumInvestmentUSD = await this.minimumInvestmentUSD();
     assert.assert(
       investedUSD.plus(investorInvestedUSD).isGreaterThan(minimumInvestmentUSD),
-      ErrorCode.InsufficientBalance,
-      'Investment < min',
+      ErrorCode.PreconditionRequired,
+      'Investment amount must be greater than the minimum investment amount',
     );
 
     const generalTMAddress = await (await this.securityTokenContract()).getModulesByName.callAsync(
@@ -1089,7 +1089,11 @@ export default class USDTieredSTOWrapper extends STOWrapper {
         !nonAccreditedLimit || nonAccreditedLimit.isEqualTo(BIG_NUMBER_ZERO)
           ? await this.nonAccreditedLimitUSD()
           : nonAccreditedLimit;
-      assert.assert(investorInvestedUSD.isLessThan(nonAccreditedLimitUSD), ErrorCode.ErrorLimit, 'Over investor limit');
+      assert.assert(
+        investorInvestedUSD.isLessThan(nonAccreditedLimitUSD),
+        ErrorCode.PreconditionRequired,
+        'Over investor limit',
+      );
     }
   };
 }
