@@ -244,7 +244,27 @@ interface GetVolumeRestrictionTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMUnpauseEventArgs>[]>;
 }
 
-interface VerifyTransferParams extends TxParams {
+export namespace VolumeRestrictionTransferManagerTransactionParams {
+  export interface RemoveIndividualRestriction extends HolderIndividualRestrictionParams {}
+  export interface RemoveIndividualDailyRestriction extends HolderIndividualRestrictionParams {}
+  export interface ChangeExemptWalletList extends ChangeExemptWalletListParams {}
+  export interface AddDefaultDailyRestriction extends DailyRestrictionParams {}
+  export interface ModifyDefaultDailyRestriction extends DailyRestrictionParams {}
+  export interface ModifyIndividualDailyRestriction extends IndividualDailyRestrictionParams {}
+  export interface AddDefaultRestriction extends RestrictionParams {}
+  export interface ModifyDefaultRestriction extends RestrictionParams {}
+  export interface AddIndividualDailyRestriction extends IndividualRestrictionParams {}
+  export interface AddIndividualRestriction extends IndividualRestrictionParams {}
+  export interface ModifyIndividualRestriction extends IndividualRestrictionParams {}
+  export interface RemoveIndividualRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
+  export interface RemoveIndividualDailyRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
+  export interface AddIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
+  export interface ModifyIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
+  export interface AddIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
+  export interface ModifyIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
+}
+
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;

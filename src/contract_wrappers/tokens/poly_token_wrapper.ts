@@ -42,6 +42,10 @@ interface GetPolyTokenLogsAsyncParams extends GetLogs {
   (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<PolyTokenTransferEventArgs>[]>;
 }
 
+export namespace PolyTokenTransactionParams {
+  export interface ChangeApproval extends ChangeApprovalParams {}
+}
+
 /**
  * @param spender The address which will spend the funds.
  * @param value The amount of tokens to increase the allowance by.
