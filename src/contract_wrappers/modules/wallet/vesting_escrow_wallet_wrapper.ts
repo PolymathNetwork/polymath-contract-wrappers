@@ -185,15 +185,25 @@ interface GetVestingEscrowWalletLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletUnpauseEventArgs>[]>;
 }
 
+/**
+ * @param beneficiary Beneficiary
+ * @param index Index of schedule
+ */
 interface SchedulesParams {
   beneficiary: string;
   index: number;
 }
 
+/**
+ * @param index Index of template
+ */
 interface TemplateNamesParams {
   index: number;
 }
 
+/**
+ * @param index Index of beneficiary
+ */
 interface BeneficiariesParams {
   index: number;
 }
@@ -385,6 +395,8 @@ enum StateStatus {
   Completed,
 }
 
+// RETURN TYPES
+
 interface Schedule {
   templateName: string;
   claimedTokens: number;
@@ -421,33 +433,57 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  Unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public paused = async () => {
+  /**
+   *  Check if module paused
+   *  @return boolean is paused
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  Pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
     assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public treasuryWallet = async () => {
+  /**
+   * Address of the Treasury wallet. All of the unassigned token will transfer to that address.
+   * @return address
+   */
+  public treasuryWallet = async (): Promise<string> => {
     return (await this.contract).treasuryWallet.callAsync();
   };
 
-  public unassignedTokens = async () => {
+  /**
+   * Number of tokens that are hold by the `this` contract but are unassigned to any schedule
+   * @return unassigned token value
+   */
+  public unassignedTokens = async (): Promise<BigNumber> => {
     const result = await (await this.contract).unassignedTokens.callAsync();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return weiToValue(result, decimals);
   };
 
-  public schedules = async (params: SchedulesParams) => {
+  /**
+   * Holds schedules array corresponds to the affiliate/employee address
+   * @return templateName
+   * @return claimedTokens amount
+   * @return startTime date
+   */
+  public schedules = async (params: SchedulesParams): Promise<Schedule> => {
     const result = await (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const schedule: Schedule = {
@@ -458,12 +494,20 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     return schedule;
   };
 
-  public templateNames = async (params: TemplateNamesParams) => {
+  /**
+   * List of all template names
+   * @return name string
+   */
+  public templateNames = async (params: TemplateNamesParams): Promise<string> => {
     const result = await (await this.contract).templateNames.callAsync(numberToBigNumber(params.index));
     return bytes32ToString(result);
   };
 
-  public beneficiaries = async (params: BeneficiariesParams) => {
+  /**
+   * List of all beneficiaries who have the schedules running/completed/created
+   * @return  beneficiary address
+   */
+  public beneficiaries = async (params: BeneficiariesParams): Promise<string> => {
     return (await this.contract).beneficiaries.callAsync(numberToBigNumber(params.index));
   };
 
@@ -532,8 +576,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
   /**
    * Returns the treasury wallet address
+   * @return treasury wallet address
    */
-  public getTreasuryWallet = async () => {
+  public getTreasuryWallet = async (): Promise<string> => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
@@ -596,7 +641,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Returns the amount of templates that can be used for creating schedules
    * @return Amount of templates
    */
-  public getTemplateCount = async () => {
+  public getTemplateCount = async (): Promise<number> => {
     const result = await (await this.contract).getTemplateCount.callAsync();
     return result.toNumber();
   };
@@ -605,7 +650,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Gets the list of template names that can be used for creating schedules
    * @return Array of all template names
    */
-  public getAllTemplateNames = async () => {
+  public getAllTemplateNames = async (): Promise<string[]> => {
     const results = await (await this.contract).getAllTemplateNames.callAsync();
     return bytes32ArrayToStringArray(results);
   };
@@ -696,7 +741,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Returns a schedule with a given template name for a given beneficiary address
    * @return beneficiary's schedule data (numberOfTokens, duration, frequency, startTime, claimedTokens, state)
    */
-  public getSchedule = async (params: GetScheduleParams) => {
+  public getSchedule = async (params: GetScheduleParams): Promise<BeneficiarySchedule> => {
     this.checkSchedule(params.beneficiary);
     const result = await (await this.contract).getSchedule.callAsync(
       params.beneficiary,
@@ -736,7 +781,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Returns a list of the template names for a given beneficiary address
    * @return List of template names used for the beneficiary address' schedules
    */
-  public getTemplateNames = async (params: GetTemplateNamesParams) => {
+  public getTemplateNames = async (params: GetTemplateNamesParams): Promise<string[]> => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     const result = await (await this.contract).getTemplateNames.callAsync(params.beneficiary);
     return bytes32ArrayToStringArray(result);
@@ -746,7 +791,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Returns amount of schedules for a given beneficiary address
    * @return Amount of schedules
    */
-  public getScheduleCount = async (params: GetScheduleCountParams) => {
+  public getScheduleCount = async (params: GetScheduleCountParams): Promise<number> => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     const result = await (await this.contract).getScheduleCount.callAsync(params.beneficiary);
     return result.toNumber();
