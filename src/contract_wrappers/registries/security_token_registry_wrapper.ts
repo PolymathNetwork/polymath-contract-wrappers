@@ -247,6 +247,27 @@ interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs>[]>;
 }
 
+export namespace SecurityTokenRegistryTransactionParams {
+  export interface RegisterTicker extends RegisterTickerParams {}
+  export interface TransferTickerOwnership extends TransferTickerOwnershipParams {}
+  export interface GenerateSecurityToken extends GenerateSecurityTokenParams {}
+  export interface ModifyTicker extends ModifyTickerParams {}
+  export interface RemoveTicker extends RemoveTickerParams {}
+  export interface ChangeExpiryLimit extends ChangeExpiryLimitParams {}
+  export interface NewSecurityToken extends NewSecurityTokenParams {}
+  export interface ChangeFeesAmountAndCurrency extends ChangeFeesAmountAndCurrencyParams {}
+  export interface RefreshSecurityToken extends RefreshSecurityTokenParams {}
+  export interface ModifyExistingSecurityToken extends ModifyExistingSecurityTokenParams {}
+  export interface ModifySecurityToken extends ModifySecurityTokenParams {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+  export interface ChangeFee extends ChangeFeeParams {}
+  export interface ReclaimERC20 extends ReclaimERC20Params {}
+  export interface PackageVersion extends PackageVersionParams {}
+  export interface ModifyExistingTicker extends ModifyExistingTickerParams {}
+  export interface SetProtocolFactory extends SetProtocolFactoryParams {}
+  export interface RegisterNewTicker extends RegisterNewTickerParams {}
+}
+
 /**
  * @param securityToken is the address of the security token.
  */
