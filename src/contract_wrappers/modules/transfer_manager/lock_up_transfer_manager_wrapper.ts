@@ -139,11 +139,12 @@ interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
 }
 
 export namespace LockUpTransferManagerTransactionParams {
-  export interface Lockups extends LockupsParams {}
-  export interface LockUpType extends LockUpTypeParams {}
-  export interface LockUpTypeMulti extends LockUpTypeMultiParams {}
-  export interface LockUpByName extends LockUpByNameParams {}
-  export interface LockUpByNameMulti extends LockUpByNameMultiParams {}
+  export interface AddNewLockUpType extends LockUpTypeParams {}
+  export interface ModifyLockUpType extends LockUpTypeParams {}
+  export interface AddNewLockUpTypeMulti extends LockUpTypeMultiParams {}
+  export interface ModifyLockUpTypeMulti extends LockUpTypeMultiParams {}
+  export interface AddLockUpByName extends LockUpByNameParams {}
+  export interface AddLockUpByNameMulti extends LockUpByNameMultiParams {}
   export interface AddNewLockUpToUser extends AddNewLockUpToUserParams {}
   export interface AddNewLockUpToUserMulti extends AddNewLockUpToUserMultiParams {}
   export interface RemoveLockUpFromUser extends RemoveLockUpFromUserParams {}
@@ -155,7 +156,7 @@ export namespace LockUpTransferManagerTransactionParams {
 /**
  * @param lockupName The name of the lockup
  */
-interface LockupsParams extends TxParams {
+interface LockupsParams {
   lockupName: string;
 }
 

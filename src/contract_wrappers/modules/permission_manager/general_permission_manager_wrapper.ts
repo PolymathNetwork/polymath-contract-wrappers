@@ -59,7 +59,7 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
 }
 
 export namespace GeneralPermissionManagerTransactionParams {
-  export interface DelegateTx extends DelegateTxParams {}
+  export interface DeleteDelegate extends DelegateTxParams {}
   export interface AddDelegate extends AddDelegateParams {}
   export interface ChangePermission extends ChangePermissionParams {}
   export interface ChangePermissionMulti extends ChangePermissionMultiParams {}

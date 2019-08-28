@@ -470,10 +470,14 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
 
 export namespace SecurityTokenTransactionParams {
   export interface FreezeIssuance extends FreezeIssuanceParams {}
-  export interface ModuleAddressTx extends ModuleAddressTxParams {}
-  export interface DataStoreAddress extends DataStoreAddressParams {}
+  export interface ArchiveModule extends ModuleAddressTxParams {}
+  export interface UnarchiveModule extends ModuleAddressTxParams {}
+  export interface RemoveModule extends ModuleAddressTxParams {}
+  export interface UpgradeModule extends ModuleAddressTxParams {}
+  export interface ChangeDataStore extends DataStoreAddressParams {}
   export interface SetDocument extends SetDocumentParams {}
-  export interface Document extends DocumentParams {}
+  export interface GetDocument extends DocumentParams {}
+  export interface RemoveDocument extends DocumentParams {}
   export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
   export interface ChangeApproval extends ChangeApprovalParams {}
   export interface TransferOwnership extends TransferOwnershipParams {}

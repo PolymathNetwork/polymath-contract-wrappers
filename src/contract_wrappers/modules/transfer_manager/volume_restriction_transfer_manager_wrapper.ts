@@ -246,18 +246,26 @@ interface GetVolumeRestrictionTransferManagerLogsAsyncParams extends GetLogs {
 
 export namespace VolumeRestrictionTransferManagerTransactionParams {
   export interface VerifyTransfer extends VerifyTransferParams {}
-  export interface HolderIndividualRestriction extends HolderIndividualRestrictionParams {}
+  export interface RemoveIndividualRestriction extends HolderIndividualRestrictionParams {}
+  export interface RemoveIndividualDailyRestriction extends HolderIndividualRestrictionParams {}
   export interface ChangeExemptWalletList extends ChangeExemptWalletListParams {}
-  export interface DailyRestriction extends DailyRestrictionParams {}
-  export interface IndividualDailyRestriction extends IndividualDailyRestrictionParams {}
-  export interface Restriction extends RestrictionParams {}
-  export interface IndividualRestriction extends IndividualRestrictionParams {}
+  export interface AddDefaultDailyRestriction extends DailyRestrictionParams {}
+  export interface ModifyDefaultDailyRestriction extends DailyRestrictionParams {}
+  export interface ModifyIndividualDailyRestriction extends IndividualDailyRestrictionParams {}
+  export interface AddDefaultRestriction extends RestrictionParams {}
+  export interface ModifyDefaultRestriction extends RestrictionParams {}
+  export interface AddIndividualDailyRestriction extends IndividualRestrictionParams {}
+  export interface AddIndividualRestriction extends IndividualRestrictionParams {}
+  export interface ModifyIndividualRestriction extends IndividualRestrictionParams {}
   export interface RemoveIndividualRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
-  export interface IndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
-  export interface IndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
+  export interface RemoveIndividualDailyRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
+  export interface AddIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
+  export interface ModifyIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
+  export interface AddIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
+  export interface ModifyIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
 }
 
-interface VerifyTransferParams extends TxParams {
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;

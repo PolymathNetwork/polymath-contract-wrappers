@@ -21,7 +21,9 @@ export namespace DividendCheckpointTransactionParams {
   export interface SetWithholdingFixed extends SetWithholdingFixedParams {}
   export interface PushDividendPaymentToAddresses extends PushDividendPaymentToAddressesParams {}
   export interface PushDividendPayment extends PushDividendPaymentParams {}
-  export interface DividendIndexTx extends DividendIndexTxParams {}
+  export interface PullDividendPayment extends DividendIndexTxParams {}
+  export interface ReclaimDividend extends DividendIndexTxParams {}
+  export interface WithdrawWithholding extends DividendIndexTxParams {}
   export interface UpdateDividendDates extends UpdateDividendDatesParams {}
 }
 

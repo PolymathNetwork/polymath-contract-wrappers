@@ -93,7 +93,6 @@ interface GetCappedSTOLogsAsyncParams extends GetLogs {
 
 export namespace CappedSTOTransactionParams {
   export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
-  export interface Investors extends InvestorsParams {}
   export interface BuyTokens extends BuyTokensParams {}
   export interface BuyTokensWithPoly extends BuyTokensWithPolyParams {}
 }
