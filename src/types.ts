@@ -364,4 +364,6 @@ export enum ErrorCode {
   STOClosed = 'STOClosed',
   CoinNotAllowed = 'CoinNotAllowed',
   ErrorLimit = 'ErrorLimit',
+  BacklistAlreadyExist = 'BacklistAlreadyExist',
+  AlreadyAdded = 'AlreadyAdded',
 }
