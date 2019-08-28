@@ -583,11 +583,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   ) => {
     excluded.forEach(address => assert.isNonZeroETHAddressHex('Excluded address', address));
     assert.areThereDuplicatedStrings('Excluded addresses', excluded);
-    assert.assert(
-      excluded.length <= EXCLUDED_ADDRESS_LIMIT,
-      ErrorCode.InvalidLenghtLimit,
-      'Too many addresses excluded',
-    );
+    assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, ErrorCode.ArrayTooLarge, 'Too many addresses excluded');
     assert.assert(expiry > maturity, ErrorCode.TooLate, 'Expiry before maturity');
     assert.isFutureDate(expiry, 'Expiry in past');
     assert.isBigNumberGreaterThanZero(amount, 'No dividend sent');
@@ -608,12 +604,12 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
       const erc20TokenAllowance = await erc20Detailed.allowance.callAsync(callerAddress, await this.address());
       assert.assert(
         erc20TokenAllowance.isGreaterThanOrEqualTo(amount),
-        ErrorCode.InvalidData,
+        ErrorCode.InsufficientAllowance,
         'Your allowance is less than dividend amount',
       );
       assert.assert(
         erc20TokenBalance.isGreaterThanOrEqualTo(amount),
-        ErrorCode.InvalidData,
+        ErrorCode.InsufficientBalance,
         'Your balance is less than dividend amount',
       );
     } else {

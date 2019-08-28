@@ -354,7 +354,8 @@ export enum ErrorCode {
   AddressExcluded = 'AddressExcluded',
   InvalidDividend = 'InvalidDividend',
   InvalidCheckpoint = 'InvalidCheckpoint',
-  InvalidLenghtLimit = 'InvalidLenghtLimit',
+  ArrayTooLarge = 'ArrayTooLarge',
   InvalidBound = 'InvalidBound',
   InvalidDelegate = 'InvalidDelegate',
+  InsufficientAllowance = 'InsufficientAllowance',
 }
