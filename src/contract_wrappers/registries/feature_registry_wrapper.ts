@@ -54,6 +54,10 @@ interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace FeatureRegistryTransactionParams {
+  export interface SetFeatureStatus extends SetFeatureStatusParams {}
+}
+
 /**
  * @param nameKey is the key for the feature status mapping
  */

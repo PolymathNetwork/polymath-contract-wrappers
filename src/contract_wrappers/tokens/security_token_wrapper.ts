@@ -469,6 +469,53 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTokenUpgradedEventArgs>[]>;
 }
 
+export namespace SecurityTokenTransactionParams {
+  export interface FreezeIssuance extends FreezeIssuanceParams {}
+  export interface ArchiveModule extends ModuleAddressTxParams {}
+  export interface UnarchiveModule extends ModuleAddressTxParams {}
+  export interface RemoveModule extends ModuleAddressTxParams {}
+  export interface UpgradeModule extends ModuleAddressTxParams {}
+  export interface ChangeDataStore extends DataStoreAddressParams {}
+  export interface SetDocument extends SetDocumentParams {}
+  export interface GetDocument extends DocumentParams {}
+  export interface RemoveDocument extends DocumentParams {}
+  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
+  export interface ChangeApproval extends ChangeApprovalParams {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+  export interface WithdrawERC20 extends WithdrawERC20Params {}
+  export interface ChangeModuleBudget extends ChangeModuleBudgetParams {}
+  export interface UpdateTokenDetails extends UpdateTokenDetailsParams {}
+  export interface ChangeGranularity extends ChangeGranularityParams {}
+  export interface ChangeName extends ChangeNameParams {}
+  export interface TransferWithData extends TransferWithDataParams {}
+  export interface TransferFromWithData extends TransferFromWithDataParams {}
+  export interface Issue extends IssueParams {}
+  export interface IssueByPartition extends IssueByPartitionParams {}
+  export interface IssueMulti extends IssueMultiParams {}
+  export interface Redeem extends RedeemParams {}
+  export interface RedeemByPartition extends RedeemByPartitionParams {}
+  export interface OperatorRedeemByPartition extends OperatorRedeemByPartitionParams {}
+  export interface RedeemFrom extends RedeemFromParams {}
+  export interface TransferByPartition extends TransferByPartitionParams {}
+  export interface AuthorizeOperator extends AuthorizeOperatorParams {}
+  export interface AuthorizeOperatorByPartition extends AuthorizeOperatorByPartitionParams {}
+  export interface RevokeOperator extends RevokeOperatorParams {}
+  export interface RevokeOperatorByPartition extends RevokeOperatorByPartitionParams {}
+  export interface OperatorTransferByPartition extends OperatorTransferByPartitionParams {}
+  export interface SetController extends SetControllerParams {}
+  export interface DisableController extends DisableControllerParams {}
+  export interface ControllerTransfer extends ControllerTransferParams {}
+  export interface ControllerRedeem extends ControllerRedeemParams {}
+  export interface AddModule extends AddModuleParams {}
+  export interface AddNoDataModule extends AddNoDataModuleParams {}
+  export interface AddVestingEscrowWallet extends AddVestingEscrowWalletParams {}
+  export interface AddCountTransferManager extends AddCountTransferManagerParams {}
+  export interface AddPercentageTransferManager extends AddPercentageTransferManagerParams {}
+  export interface AddDividendCheckpoint extends AddDividendCheckpointParams {}
+  export interface AddCappedSTO extends AddCappedSTOParams {}
+  export interface AddUSDTieredSTO extends AddUSDTieredSTOParams {}
+}
+
 interface IsOperatorParams {
   operator: string;
   tokenHolder: string;
@@ -1954,8 +2001,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let data: string;
     switch (params.moduleName) {
       case ModuleName.VestingEscrowWallet:
-          iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
-          data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet])
+        iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+        data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet]);
         break;
       case ModuleName.CountTransferManager:
         iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
