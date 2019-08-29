@@ -1,5 +1,6 @@
 import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ModuleType, Partition, Perm, TransferResult } from '../types';
+import { ModuleType, Partition, Perm, TransferResult, ErrorCode } from '../types';
+import { PolymathError } from '../PolymathError';
 
 const BASE = new BigNumber(10);
 
@@ -88,7 +89,7 @@ export function parsePartitionBytes32Value(value: string): Partition {
     case '0':
       return Partition.Undefined;
     default:
-      throw new Error('Partition not recognized');
+      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parsePermBytes32Value(value: string): Perm {
@@ -98,7 +99,7 @@ export function parsePermBytes32Value(value: string): Perm {
     case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new Error('Permission not recognized');
+      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parseModuleTypeValue(value: BigNumber): ModuleType {
@@ -114,7 +115,7 @@ export function parseModuleTypeValue(value: BigNumber): ModuleType {
     case ModuleType.Burn:
       return ModuleType.Burn;
     default:
-      throw new Error('Module Type not recognized');
+      throw new PolymathError({ message: 'Module Type not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parseTransferResult(value: BigNumber): TransferResult {

@@ -366,4 +366,5 @@ export enum ErrorCode {
   NotFound = 'NotFound',
   MismatchedLength = 'MismatchedLength',
   TickerExpired = 'TickerExpired',
+  UnknownNetwork = 'UnknownNetwork',
 }

@@ -15,7 +15,8 @@ import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wr
 import VestingEscrowWalletWrapper from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
-import { ModuleName } from '../types';
+import { ModuleName, ErrorCode } from '../types';
+import { PolymathError } from '../PolymathError';
 
 interface GetModuleParams {
   address: string;
@@ -198,7 +199,7 @@ export default class ModuleWrapperFactory {
       // Burn
       default:
         // TODO: Typed error here
-        throw new Error();
+        throw new PolymathError({ code: ErrorCode.NotFound });
     }
   };
 }

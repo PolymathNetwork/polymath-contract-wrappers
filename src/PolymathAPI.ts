@@ -39,6 +39,8 @@ import ERC20 from './contract_wrappers/tokens/erc20_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
 import ContractFactory from './factories/contractFactory';
+import { ErrorCode } from './types';
+import { PolymathError } from './PolymathError';
 
 /**
  * @param provider The web3 provider
@@ -213,7 +215,7 @@ export class PolymathAPI {
   public getPolyTokens = async (params: GetTokensParams): Promise<PolyResponse> => {
     const networkId = await this.web3Wrapper.getNetworkIdAsync();
     if (networkId === 1) {
-      throw new Error('Only for testnet');
+      throw new PolymathError({ message: 'Only for testnet', code: ErrorCode.PreconditionRequired });
     }
     const address = params.address !== undefined ? params.address : await this.getAccount();
     assert.isETHAddressHex('address', address);
