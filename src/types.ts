@@ -365,4 +365,5 @@ export enum ErrorCode {
   AlreadyExists = 'AlreadyExists',
   NotFound = 'NotFound',
   MismatchedLength = 'MismatchedLength',
+  TickerExpired = 'TickerExpired',
 }
