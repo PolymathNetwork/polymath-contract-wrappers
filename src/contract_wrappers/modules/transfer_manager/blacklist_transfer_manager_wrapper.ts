@@ -879,7 +879,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
       currentBlacklistNames.includes(params.blacklistName),
-      ErrorCode.PreconditionRequired,
+      ErrorCode.NotFound,
       'User is not added to this blacklist name',
     );
   };
@@ -889,7 +889,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.investor });
     assert.assert(
       currentBlacklistNames.length > 0,
-      ErrorCode.PreconditionRequired,
+      ErrorCode.NotFound,
       'Investor is not currently present on any blacklists',
     );
   };

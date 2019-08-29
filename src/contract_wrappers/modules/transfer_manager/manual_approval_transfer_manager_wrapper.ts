@@ -300,7 +300,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     params.allowances.forEach(allowance =>
@@ -360,7 +360,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     const approvals = [];
@@ -408,7 +408,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params.to.forEach(address => assert.isETHAddressHex('to', address));
     assert.assert(
       params.to.length === params.from.length,
-      ErrorCode.MismatchedLength,
+      ErrorCode.MismatchedArrayLength,
       'To and From address arrays must have the same length',
     );
     const approvals = [];

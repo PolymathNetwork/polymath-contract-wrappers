@@ -244,7 +244,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     if (getTypesResult.length > 1) {
       assert.assert(
         getTypesResult.length === new Set(getTypesResult).size,
-        ErrorCode.MismatchedLength,
+        ErrorCode.MismatchedArrayLength,
         'Type mismatch',
       );
     }

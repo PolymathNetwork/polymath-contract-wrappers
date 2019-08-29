@@ -539,7 +539,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.holders.length &&
         params.startTimes.length === params.endTimes.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
@@ -588,7 +588,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.holders.length &&
         params.startTimes.length === params.endTimes.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
@@ -824,7 +824,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.holders.length &&
         params.startTimes.length === params.endTimes.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {
@@ -867,7 +867,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
         params.startTimes.length === params.holders.length &&
         params.startTimes.length === params.endTimes.length,
       ErrorCode.MismatchedArrayLength,
-      'Array lengths missmatch',
+      'Array lengths mismatch',
     );
     let restrictions = [];
     for (let i = 0; i < params.startTimes.length; i += 1) {

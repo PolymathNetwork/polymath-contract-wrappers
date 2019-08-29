@@ -170,7 +170,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     assert.assert(params.details.length > 0, ErrorCode.InvalidData, '0 value not allowed');
     assert.assert(
       !(await (await this.contract).checkDelegate.callAsync(params.delegate)),
-      ErrorCode.PreconditionRequired,
+      ErrorCode.AlreadyExists,
       'Delegate already present',
     );
     return (await this.contract).addDelegate.sendTransactionAsync(

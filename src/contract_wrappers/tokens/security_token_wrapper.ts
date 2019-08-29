@@ -1271,7 +1271,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
       params.investors.length === params.values.length,
-      ErrorCode.MismatchedLength,
+      ErrorCode.MismatchedArrayLength,
       'Number of investors passed in must be equivalent to number of values',
     );
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
