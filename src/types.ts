@@ -364,4 +364,5 @@ export enum ErrorCode {
   CoinNotAllowed = 'CoinNotAllowed',
   AlreadyExists = 'AlreadyExists',
   NotFound = 'NotFound',
+  MismatchedLength = 'MismatchedLength',
 }

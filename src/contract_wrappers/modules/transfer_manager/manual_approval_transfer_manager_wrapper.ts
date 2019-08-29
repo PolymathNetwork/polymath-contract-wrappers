@@ -23,7 +23,7 @@ import {
   Subscribe,
   GetLogs,
   Perm,
-  ErrorCode
+  ErrorCode,
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -206,8 +206,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   }
 
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -216,8 +220,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -256,7 +264,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApproval = async (params: AddManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -275,7 +287,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -283,6 +299,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.allowances.length &&
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
+      ErrorCode.MismatchedArrayLength,
       'Array lengths missmatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
@@ -307,7 +324,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -326,7 +347,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -334,6 +359,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.changedAllowances.length &&
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
+      ErrorCode.MismatchedArrayLength,
       'Array lengths missmatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
@@ -356,7 +382,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     await this.checkApprovalDoesExist(params.from, params.to);
@@ -369,10 +399,18 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isETHAddressHex('to', address));
-    assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
+    assert.assert(
+      params.to.length === params.from.length,
+      ErrorCode.MismatchedLength,
+      'To and From address arrays must have the same length',
+    );
     const approvals = [];
     for (let i = 0; i < params.to.length; i += 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
