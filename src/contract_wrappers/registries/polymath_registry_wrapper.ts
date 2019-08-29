@@ -52,6 +52,10 @@ interface GetPolymathRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace PolymathRegistryTransactionParams {
+  export interface ChangeAddress extends ChangeAddressParams {}
+}
+
 /**
  * @param contractName is the key for the contract address mapping
  */

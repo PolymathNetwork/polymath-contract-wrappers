@@ -135,6 +135,20 @@ interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace GeneralTransferManagerTransactionParams {
+  export interface ChangeDefaults extends ChangeDefaultsParams {}
+  export interface ChangeIssuanceAddress extends ChangeIssuanceAddressParams {}
+  export interface ModifyKYCData extends ModifyKYCDataParams {}
+  export interface ModifyKYCDataSigned extends ModifyKYCDataSignedParams {}
+  export interface ModifyInvestorFlag extends ModifyInvestorFlagParams {}
+  export interface ModifyInvestorFlagMulti extends ModifyInvestorFlagMultiParams {}
+  export interface ExecuteTransfer extends ExecuteTransferParams {}
+  export interface ModifyTransferRequirements extends ModifyTransferRequirementsParams {}
+  export interface ModifyTransferRequirementsMulti extends ModifyTransferRequirementsMultiParams {}
+  export interface ModifyKYCDataMulti extends ModifyKYCDataMultiParams {}
+  export interface ModifyKYCDataSignedMulti extends ModifyKYCDataSignedMultiParams {}
+}
+
 interface NonceMapParams {
   address: string;
   nonce: number;
@@ -195,7 +209,7 @@ interface GetKYCDataParams {
  * @param flag index of flag to change. flag is used to know specifics about investor like isAccredited.
  * @param value value of the flag. a flag can be true or false.
  */
-interface ModifyInvestorFlag extends TxParams {
+interface ModifyInvestorFlagParams extends TxParams {
   investor: string;
   flag: FlagsType;
   value: boolean;
@@ -206,7 +220,7 @@ interface ModifyInvestorFlag extends TxParams {
  * @param flag list of flag indexes to change. Flags are used to know specifics about investor like isAccredited.
  * @param value list of flag values to set. A flag can be true or false.
  */
-interface ModifyInvestorFlagMulti extends TxParams {
+interface ModifyInvestorFlagMultiParams extends TxParams {
   investors: string[];
   flag: FlagsType[];
   value: boolean[];
@@ -216,7 +230,7 @@ interface ModifyInvestorFlagMulti extends TxParams {
  * @param from Address of the sender
  * @param to Address of the receiver
  */
-interface ExecuteTransfer extends TxParams {
+interface ExecuteTransferParams extends TxParams {
   from: string;
   to: string;
   data: string;
@@ -229,7 +243,7 @@ interface ExecuteTransfer extends TxParams {
  * @param fromRestricted defines if transfer time restriction is checked for the sender
  * @param toRestricted defines if transfer time restriction is checked for the receiver
  */
-interface ModifyTransferRequirements extends TxParams {
+interface ModifyTransferRequirementsParams extends TxParams {
   transferType: TransferType;
   fromValidKYC: boolean;
   toValidKYC: boolean;
@@ -244,7 +258,7 @@ interface ModifyTransferRequirements extends TxParams {
  * @param fromRestricted is a list that defines if transfer time restriction is checked for each sender
  * @param toRestricted is a list that defines if transfer time restriction is checked for each receiver
  */
-interface ModifyTransferRequirementsMulti extends TxParams {
+interface ModifyTransferRequirementsMultiParams extends TxParams {
   transferTypes: TransferType[];
   fromValidKYC: boolean[];
   toValidKYC: boolean[];
@@ -258,7 +272,7 @@ interface ModifyTransferRequirementsMulti extends TxParams {
  * @param canReceiveAfter is a list of the moments when the purchase lockup period ends and each investor can freely purchase tokens from others
  * @param expiryTime is a list of the moments up to which each investor's KYC will be validated. After that investor needs to re-do KYC
  */
-interface ModifyKYCDataMulti extends TxParams {
+interface ModifyKYCDataMultiParams extends TxParams {
   investors: string[];
   canSendAfter: Date[];
   canReceiveAfter: Date[];
@@ -275,7 +289,7 @@ interface ModifyKYCDataMulti extends TxParams {
  * @param nonce nonce of signature (avoid replay attack)
  * @param signature issuer signature
  */
-interface ModifyKYCDataSignedMulti extends TxParams {
+interface ModifyKYCDataSignedMultiParams extends TxParams {
   investors: string[];
   canSendAfter: Date[];
   canReceiveAfter: Date[];
@@ -575,7 +589,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify investor Flag.
    */
-  public modifyInvestorFlag = async (params: ModifyInvestorFlag) => {
+  public modifyInvestorFlag = async (params: ModifyInvestorFlagParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -594,7 +608,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify investor data.
    */
-  public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMulti) => {
+  public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMultiParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -622,7 +636,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * b) Seller's sale lockup period is over
    * c) Buyer's purchase lockup is over
    */
-  public executeTransfer = async (params: ExecuteTransfer) => {
+  public executeTransfer = async (params: ExecuteTransferParams) => {
     return (await this.contract).executeTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -636,7 +650,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Default implementation of verifyTransfer used by SecurityToken
    */
-  public verifyTransfer = async (params: ExecuteTransfer) => {
+  public verifyTransfer = async (params: ExecuteTransferParams) => {
     const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
@@ -649,7 +663,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Modifies the successful checks required for a transfer to be deemed valid.
    */
-  public modifyTransferRequirements = async (params: ModifyTransferRequirements) => {
+  public modifyTransferRequirements = async (params: ModifyTransferRequirementsParams) => {
     const result = await (await this.contract).modifyTransferRequirements.sendTransactionAsync(
       params.transferType,
       params.fromValidKYC,
@@ -665,7 +679,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Modifies the successful checks required for transfers.
    */
-  public modifyTransferRequirementsMulti = async (params: ModifyTransferRequirementsMulti) => {
+  public modifyTransferRequirementsMulti = async (params: ModifyTransferRequirementsMultiParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -693,7 +707,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add or remove KYC info of an investor.
    */
-  public modifyKYCDataMulti = async (params: ModifyKYCDataMulti) => {
+  public modifyKYCDataMulti = async (params: ModifyKYCDataMultiParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -724,7 +738,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
    */
-  public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMulti) => {
+  public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMultiParams) => {
     const canSendAfter = params.canSendAfter.map(dateToBigNumber);
     const canReceiveAfter = params.canReceiveAfter.map(dateToBigNumber);
     const expiryTime = params.expiryTime.map(dateToBigNumber);

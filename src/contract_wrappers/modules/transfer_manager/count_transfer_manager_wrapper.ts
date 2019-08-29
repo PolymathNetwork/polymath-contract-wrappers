@@ -66,6 +66,10 @@ interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace CountTransferManagerTransactionParams {
+  export interface ChangeHolderCount extends ChangeHolderCountParams {}
+}
+
 interface VerifyTransferParams {
   from: string;
   to: string;

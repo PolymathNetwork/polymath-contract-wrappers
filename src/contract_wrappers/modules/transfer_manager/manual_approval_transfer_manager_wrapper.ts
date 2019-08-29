@@ -106,6 +106,15 @@ interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace ManualApprovalTransferManagerTransactionParams {
+  export interface AddManualApproval extends AddManualApprovalParams {}
+  export interface AddManualApprovalMulti extends AddManualApprovalMultiParams {}
+  export interface ModifyManualApproval extends ModifyManualApprovalParams {}
+  export interface ModifyManualApprovalMulti extends ModifyManualApprovalMultiParams {}
+  export interface RevokeManualApproval extends RevokeManualApprovalParams {}
+  export interface RevokeManualApprovalMulti extends RevokeManualApprovalMultiParams {}
+}
+
 interface ApprovalsParams {
   index: number;
 }

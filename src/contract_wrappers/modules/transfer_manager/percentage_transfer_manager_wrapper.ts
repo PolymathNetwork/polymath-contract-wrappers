@@ -95,6 +95,13 @@ interface GetPercentageTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<PercentageTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace PercentageTransferManagerTransactionParams {
+  export interface ChangeHolderPercentage extends ChangeHolderPercentageParams {}
+  export interface ModifyWhitelist extends ModifyWhitelistParams {}
+  export interface ModifyWhitelistMulti extends ModifyWhitelistMultiParams {}
+  export interface SetAllowPrimaryIssuance extends SetAllowPrimaryIssuanceParams {}
+}
+
 interface InvestorAddressParams {
   investorAddress: string;
 }

@@ -132,8 +132,8 @@ export enum TransferResult {
 }
 
 export enum FeeType {
-  tickerRegFee,
-  stLaunchFee,
+  TickerRegFee = 'tickerRegFee',
+  StLaunchFee = 'stLaunchFee',
 }
 
 export enum Feature {

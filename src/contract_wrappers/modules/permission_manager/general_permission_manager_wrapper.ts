@@ -59,6 +59,13 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
   (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>[]>;
 }
 
+export namespace GeneralPermissionManagerTransactionParams {
+  export interface DeleteDelegate extends DelegateTxParams {}
+  export interface AddDelegate extends AddDelegateParams {}
+  export interface ChangePermission extends ChangePermissionParams {}
+  export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
+}
+
 interface PermParams {
   module: string;
   delegate: string;
