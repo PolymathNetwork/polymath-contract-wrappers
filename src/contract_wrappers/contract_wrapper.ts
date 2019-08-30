@@ -26,11 +26,10 @@ import {
   EventCallback,
   GetLogs,
   Subscribe,
+  ErrorCode,
 } from '../types';
+import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
-
-const SUBSCRIPTION_NOT_FOUND = 'SUBSCRIPTION_NOT_FOUND';
-const SUBSCRIPTION_ALREADY_PRESENT = 'SUBSCRIPTION_ALREADY_PRESENT';
 
 export default abstract class ContractWrapper {
   protected contract: Promise<BaseContract>;
@@ -106,7 +105,7 @@ export default abstract class ContractWrapper {
 
   protected unsubscribeInternal(filterToken: string, err?: Error): void {
     if (_.isUndefined(this._filters[filterToken])) {
-      throw new Error(SUBSCRIPTION_NOT_FOUND);
+      throw new PolymathError({ code: ErrorCode.NotFound });
     }
     if (!_.isUndefined(err)) {
       const callback = this._filterCallbacks[filterToken];
@@ -181,7 +180,7 @@ export default abstract class ContractWrapper {
 
   private _startBlockAndLogStream(isVerbose: boolean): void {
     if (!_.isUndefined(this._blockAndLogStreamerIfExists)) {
-      throw new Error(SUBSCRIPTION_ALREADY_PRESENT);
+      throw new PolymathError({ code: ErrorCode.AlreadyExists });
     }
     this._blockAndLogStreamerIfExists = new BlockAndLogStreamer(
       this._blockstreamGetBlockOrNullAsync.bind(this),
@@ -227,7 +226,7 @@ export default abstract class ContractWrapper {
 
   private _stopBlockAndLogStream(): void {
     if (_.isUndefined(this._blockAndLogStreamerIfExists)) {
-      throw new Error(SUBSCRIPTION_NOT_FOUND);
+      throw new PolymathError({ code: ErrorCode.NotFound });
     }
     this._blockAndLogStreamerIfExists.unsubscribeFromOnLogAdded(this._onLogAddedSubscriptionToken as string);
     this._blockAndLogStreamerIfExists.unsubscribeFromOnLogRemoved(this._onLogRemovedSubscriptionToken as string);

@@ -5,6 +5,8 @@ import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
 import ERC20DetailedTokenWrapper from '../contract_wrappers/tokens/erc20_detailed_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
+import { ErrorCode } from '../types';
+import { PolymathError } from '../PolymathError';
 
 /**
  * The SecurityTokenFactory class is a factory to generate new SecurityTokenWrappers.
@@ -48,9 +50,7 @@ export default class TokenWrapperFactory {
     if (await token.isValidContract()) {
       return token;
     }
-
-    // TODO: Replace this for a typed Error
-    throw new Error();
+    throw new PolymathError({ code: ErrorCode.NotFound });
   };
 
   /**
@@ -67,8 +67,7 @@ export default class TokenWrapperFactory {
         this.contractFactory,
       );
     }
-    // TODO: Replace this for a typed Error
-    throw new Error();
+    throw new PolymathError({ code: ErrorCode.NotFound });
   };
 
   /**

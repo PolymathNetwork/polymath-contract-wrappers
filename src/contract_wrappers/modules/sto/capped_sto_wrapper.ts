@@ -24,6 +24,7 @@ import {
   GetLogs,
   FundRaiseType,
   FULL_DECIMALS,
+  ErrorCode,
 } from '../../../types';
 import { bigNumberToDate, valueToWei, weiToValue } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
@@ -181,9 +182,14 @@ export default class CappedSTOWrapper extends STOWrapper {
   };
 
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     assert.assert(
       (await this.allowBeneficialInvestments()) !== params.allowBeneficialInvestments,
+      ErrorCode.PreconditionRequired,
       'Does not change value',
     );
     return (await this.contract).changeAllowBeneficialInvestments.sendTransactionAsync(
@@ -195,19 +201,25 @@ export default class CappedSTOWrapper extends STOWrapper {
 
   public buyTokens = async (params: BuyTokensParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
-    assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
     assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
     const weiBalance = await this.web3Wrapper.getBalanceInWeiAsync(await this.getCallerAddress(params.txData));
-    assert.assert(weiBalance.isGreaterThan(valueToWei(params.value, FULL_DECIMALS)), 'Insufficient ETH funds');
+    assert.assert(
+      weiBalance.isGreaterThan(valueToWei(params.value, FULL_DECIMALS)),
+      ErrorCode.InsufficientBalance,
+      'Insufficient ETH funds',
+    );
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.ETH,
       }),
+      ErrorCode.DifferentMode,
       'Mode of investment is not ETH',
     );
     if (await this.allowBeneficialInvestments()) {
       assert.assert(
         functionsUtils.checksumAddressComparision(params.beneficiary, await this.getCallerAddress(params.txData)),
+        ErrorCode.Unauthorized,
         'Beneficiary address does not match msg.sender',
       );
     }
@@ -222,11 +234,12 @@ export default class CappedSTOWrapper extends STOWrapper {
 
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
     assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
-    assert.assert(!(await this.paused()), 'Should not be paused');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
     assert.assert(
       await this.fundRaiseTypes({
         type: FundRaiseType.POLY,
       }),
+      ErrorCode.DifferentMode,
       'Mode of investment is not POLY',
     );
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(
@@ -234,6 +247,7 @@ export default class CappedSTOWrapper extends STOWrapper {
     );
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(valueToWei(params.investedPOLY, FULL_DECIMALS)),
+      ErrorCode.InvalidTransfer,
       'Budget less than amount unable to transfer fee',
     );
     assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');

@@ -1,4 +1,4 @@
-import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS } from '../../../types';
+import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { weiToValue } from '../../../utils/convert';
@@ -82,14 +82,22 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Contract already paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Contract already paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Contract is not paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Contract is not paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 }

@@ -8,7 +8,7 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
-import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
+import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode } from '../../types';
 import { stringToBytes32 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
@@ -83,12 +83,20 @@ export default class ModuleWrapper extends ContractWrapper {
   };
 
   public reclaimETH = async (params: TxParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
       params.tokenContract,
