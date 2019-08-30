@@ -191,7 +191,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
@@ -200,14 +200,14 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  check if module is paused
+   *  Check if module is paused
    */
   public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
@@ -226,8 +226,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
 
   /**
    * Used to verify the transfer transaction (View)
-   *  @return boolean transfer result
-   *  @return address
+   * @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
@@ -247,7 +246,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * sets the maximum percentage that an individual token holder can hold
+   * Sets the maximum percentage that an individual token holder can hold
    */
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');

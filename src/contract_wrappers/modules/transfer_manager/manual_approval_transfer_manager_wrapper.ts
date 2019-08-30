@@ -271,7 +271,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   }
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
@@ -280,14 +280,14 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
@@ -322,8 +322,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   /**
    * Used to verify the transfer transaction (View)
-   *  @return boolean transfer result
-   *  @return address
+   *  @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
@@ -493,11 +492,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   /**
    * Returns the all active approvals corresponds to an address
-   * @return addresses from
-   * @return addresses to
-   * @return allowances provided to the approvals
-   * @return expiry times provided to the approvals
-   * @return descriptions provided to the approvals
+   * @return addresses from, addresses to, allowances provided to the approvals, expiry times provided to the
+   * approvals, descriptions provided to the approvals
    */
   public getActiveApprovalsToUser = async (params: GetActiveApprovalsToUserParams): Promise<Approval[]> => {
     assert.isETHAddressHex('user', params.user);
@@ -519,9 +515,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   /**
    * Get the details of the approval corresponds to from & to addresses
-   * @return expiryTime of the approval
-   * @return allowance provided to the approval
-   * @return Description provided to the approval
+   * @return expiryTime of the approval, allowance provided to the approval, Description provided to the approval
    */
   public getApprovalDetails = async (params: GetApprovalDetailsParams): Promise<Approval> => {
     assert.isETHAddressHex('from', params.from);
@@ -547,11 +541,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
 
   /**
    * Get the details of all approvals
-   * @return addresses from
-   * @return addresses to
-   * @return allowances provided to the approvals
-   * @return expiry times provided to the approvals
-   * @return descriptions provided to the approvals
+   * @return addresses from, addresses to, allowances provided to the approvals, expiry times provided to the
+   * approvals, descriptions provided to the approvals
    */
   public getAllApprovals = async (): Promise<Approval[]> => {
     const result = await (await this.contract).getAllApprovals.callAsync();

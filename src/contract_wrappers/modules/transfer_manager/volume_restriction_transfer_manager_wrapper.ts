@@ -457,8 +457,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Used to verify the transfer transaction (View)
-   *  @return boolean transfer result
-   *  @return address
+   * @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
@@ -479,11 +478,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Gets individual restriction for investor
-   * @return allowedTokens
-   * @return startTime
-   * @return rollingPeriodInDays
-   * @return endTime
-   * @return restrictionType
+   * @return allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType
    */
   public getIndividualRestriction = async (
     params: HolderIndividualRestrictionParams,
@@ -504,11 +499,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Gets default restriction value
-   * @return allowedTokens
-   * @return startTime
-   * @return rollingPeriodInDays
-   * @return endTime
-   * @return restrictionType
+   * @return allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType
    */
   public getDefaultRestriction = async (): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getDefaultRestriction.callAsync();
@@ -527,11 +518,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Gets default daily restriction value
-   * @return allowedTokens
-   * @return startTime
-   * @return rollingPeriodInDays
-   * @return endTime
-   * @return restrictionType
+   * @return allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType
    */
   public getDefaultDailyRestriction = async (): Promise<IndividualRestriction> => {
     const result = await (await this.contract).getDefaultDailyRestriction.callAsync();
@@ -557,11 +544,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Gets individual daily restriction value
-   * @return allowedTokens
-   * @return startTime
-   * @return rollingPeriodInDays
-   * @return endTime
-   * @return restrictionType
+   * @return allowedTokens, startTime, rollingPeriodInDays, endTime, restrictionType
    */
   public getIndividualDailyRestriction = async (
     params: HolderIndividualRestrictionParams,
@@ -1038,11 +1021,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Use to get the bucket details for a given address
-   * @return lastTradedDayTime
-   * @return sumOfLastPeriod
-   * @return days covered
-   * @return date lastTradedDayTime
-   * @return timestamp at which last transaction get executed
+   * @return lastTradedDayTime, sumOfLastPeriod, days covered, date lastTradedDayTime, timestamp at which last transaction get executed
    */
   public getIndividualBucketDetailsToUser = async (
     params: GetIndividualBucketDetailsToUserParams,
@@ -1062,11 +1041,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Use to get the bucket details for a given address
-   * @return lastTradedDayTime
-   * @return sumOfLastPeriod
-   * @return days covered
-   * @return date lastTradedDayTime
-   * @return timestamp at which last transaction get executed
+   * @return lastTradedDayTime, sumOfLastPeriod, days covered, date lastTradedDayTime, timestamp at which last transaction get executed
    */
   public getDefaultBucketDetailsToUser = async (
     params: GetIndividualBucketDetailsToUserParams,
@@ -1104,13 +1079,13 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
 
   /**
    * Provide the restriction details of all the restricted addresses
-   * @return List of the restricted addresses
-   * @return List of the tokens allowed to the restricted addresses corresponds to restricted address
-   * @return List of the start time of the restriction corresponds to restricted address
-   * @return List of the rolling period in days for a restriction corresponds to restricted address.
-   * @return List of the end time of the restriction corresponds to restricted address.
-   * @return List of the type of restriction to validate the value of the `allowedTokens`
-   * of the restriction corresponds to restricted address
+   * @return List of the restricted addresses,
+   * List of the tokens allowed to the restricted addresses corresponds to restricted address,
+   * List of the start time of the restriction corresponds to restricted address,
+   * List of the rolling period in days for a restriction corresponds to restricted address,
+   * List of the end time of the restriction corresponds to restricted address,
+   * List of the type of restriction to validate the value of the `allowedTokens`
+   * of the restriction corresponds to restricted address,
    */
   public getRestrictionData = async (): Promise<GetRestrictedData[]> => {
     const result = await (await this.contract).getRestrictionData.callAsync();

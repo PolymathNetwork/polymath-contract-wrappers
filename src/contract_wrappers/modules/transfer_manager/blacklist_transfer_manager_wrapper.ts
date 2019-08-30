@@ -324,7 +324,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   }
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
@@ -333,14 +333,14 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
@@ -669,9 +669,6 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
 
   /**
    * return the amount of tokens for a given user as per the partition
-   * @param partition Identifier
-   * @param tokenHolder Whom token amount need to query
-   * @param additionalBalance It is the `value` that transfers during transfer/transferFrom function call
    * @return amount of tokens
    */
   public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
@@ -700,8 +697,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * Restrict the blacklist address to transfer tokens
    * if the current time is between the timeframe define for the
    * blacklist type associated with the from address
-   *  @return boolean transfer result
-   *  @return address
+   * @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);

@@ -386,7 +386,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   }
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
@@ -395,14 +395,14 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    */
   public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
@@ -428,8 +428,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   /**
    *  Offset to be applied to all timings (except KYC expiry)
-   *  @return canSendAfter
-   *  @return canReceiveAfter
+   *  @return canSendAfter, canReceiveAfter
    */
   public defaults = async (): Promise<Defaults> => {
     const result = await (await this.contract).defaults.callAsync();
@@ -583,9 +582,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
 
   /**
    * Returns list of specified investors data
-   * @returns canSendAfter array
-   * @returns canReceiveAfter array
-   * @returns expiryTime array
+   * @returns canSendAfter array, canReceiveAfter array, expiryTime array
    */
   public getKYCData = async (params: GetKYCDataParams): Promise<KYCData[]> => {
     const result = await (await this.contract).getKYCData.callAsync(params.investors);

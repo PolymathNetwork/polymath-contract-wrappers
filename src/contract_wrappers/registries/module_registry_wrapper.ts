@@ -163,8 +163,8 @@ interface ModuleTypeParams {
 }
 
 /**
- * @param moduleFactory is the address of the relevant module factory
- * @param securityToken is the address of the relevant security token
+ * @param moduleFactoryAddress is the address of the relevant module factory
+ * @param securityTokenAddress is the address of the relevant security token
  */
 interface IsCompatibleModuleParams {
   moduleFactoryAddress: string;
@@ -335,8 +335,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   /**
    * Returns all the tags related to the a module type which are valid for the given token
-   * @return list of tags
-   * @return corresponding list of module factories
+   * @return list of tags, corresponding list of module factories
    */
   public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
     assert.isETHAddressHex('securityToken', params.securityToken);
@@ -360,8 +359,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   /**
    * Returns all the tags related to the a module type which are valid for the given token
-   * @return list of tags
-   * @return corresponding list of module factories
+   * @return list of tags, corresponding list of module factories
    */
   public getTagsByType = async (params: ModuleTypeParams) => {
     const result = await (await this.contract).getTagsByType.callAsync(params.moduleType);
@@ -384,7 +382,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   /**
    * Gets the factory details
-   * @returns Returns factoryIsVerified, factoryOwnerAddress, listSecurityTokens
+   * @return factoryIsVerified, factoryOwnerAddress, listSecurityTokens
    */
   public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
     const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
@@ -453,7 +451,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * @Stores the contract addresses of other key contracts from the PolymathRegistry
+   * Stores the contract addresses of other key contracts from the PolymathRegistry
    */
   public updateFromRegistry = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();

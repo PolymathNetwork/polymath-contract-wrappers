@@ -11,8 +11,8 @@ export namespace PolyTokenFaucetTransactionParams {
 }
 
 /**
- * amount Amount of tokens to get from faucet
- * recipient Address to transfer to
+ * @param amount Amount of tokens to get from faucet
+ * @param recipient Address to transfer to
  */
 interface GetTokensParams extends TxParams {
   amount: BigNumber;

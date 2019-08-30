@@ -626,8 +626,8 @@ interface CanTransferByPartitionParams extends CanTransferFromParams {
 }
 
 /**
- * spender Address spending tokens
- * value Value associated to approval
+ * @param spender Address spending tokens
+ * @param value Value associated to approval
  */
 interface ChangeApprovalParams extends TxParams {
   spender: string;
@@ -635,7 +635,7 @@ interface ChangeApprovalParams extends TxParams {
 }
 
 /**
- * newOwner Address to transfer ownership to
+ * @param newOwner Address to transfer ownership to
  */
 interface TransferOwnershipParams extends TxParams {
   newOwner: string;
@@ -696,7 +696,6 @@ interface CheckpointIdParams {
 }
 
 /**
- * @param checkpointId Checkpoint id at which investor list is to be populated
  * @param start Position of investor to start iteration from
  * @param end Position of investor to stop iteration at
  */
@@ -739,7 +738,7 @@ interface TransferFromWithDataParams extends TxParams {
 }
 
 /**
- * @param tokenHolder The account that will receive the created tokens (account should be whitelisted or KYCed).
+ * @param investor The account that will receive the created tokens (account should be whitelisted or KYCed).
  * @param value The amount of tokens need to be issued
  * @param data The `bytes data` allows arbitrary data to be submitted alongside the transfer.
  */
@@ -751,16 +750,13 @@ interface IssueParams extends TxParams {
 
 /**
  * @param partition The partition to allocate the increase in balance
- * @param tokenHolder The token holder whose balance should be increased
- * @param value The amount by which to increase the balance
- * @param data Additional data attached to the minting of tokens
  */
 interface IssueByPartitionParams extends IssueParams {
   partition: Partition;
 }
 
 /**
- * @param tokenHolders A list of addresses to whom the minted tokens will be dilivered
+ * @param investors A list of addresses to whom the minted tokens will be dilivered
  * @param values A list of number of tokens get minted and transfer to corresponding address of the investor from tokenHolders[] list
  */
 interface IssueMultiParams extends TxParams {
@@ -769,9 +765,9 @@ interface IssueMultiParams extends TxParams {
 }
 
 /**
- * @param delegate address of delegate
- * @param module address of PermissionManager module
- * @param perm the permissions
+ * @param delegateAddress address of delegate
+ * @param moduleAddress address of PermissionManager module
+ * @param permission the permissions
  */
 interface CheckPermissionParams {
   delegateAddress: string;
@@ -790,18 +786,13 @@ interface RedeemParams extends TxParams {
 
 /**
  * @param partition The partition to allocate the decrease in balance
- * @param value The amount by which to decrease the balance
- * @param data Additional data attached to the burning of tokens
  */
 interface RedeemByPartitionParams extends RedeemParams {
   partition: Partition;
 }
 
 /**
- * @param partition The partition to allocate the decrease in balance.
  * @param tokenHolder The token holder whose balance should be decreased
- * @param value The amount by which to decrease the balance
- * @param data Additional data attached to the burning of tokens
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
 interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
@@ -810,7 +801,7 @@ interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
 }
 
 /**
- * @param tokenHolder The account whose tokens gets redeemed.
+ * @param from The account whose tokens gets redeemed.
  * @param value The amount of tokens need to be redeemed
  * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
  */
@@ -860,7 +851,6 @@ interface AuthorizeOperatorParams extends TxParams {
 
 /**
  * @param partition The partition to which the operator is authorised
- * @param operator An address which is being authorised
  */
 interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
   partition: Partition;
@@ -881,11 +871,7 @@ interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
 }
 
 /**
- * @param partition The partition from which to transfer tokens.
  * @param from The address from which to transfer tokens from
- * @param to The address to which to transfer tokens to
- * @param value The amount of tokens to transfer from `partition`
- * @param data Additional data attached to the transfer of tokens
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
 interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
@@ -910,7 +896,7 @@ interface DisableControllerParams extends TxParams {
 /**
  * @param from Address The address which you want to send tokens from
  * @param to Address The address which you want to transfer to
- * @param value uint256 the amount of tokens to be transferred
+ * @param value the amount of tokens to be transferred
  * @param data data to validate the transfer. (It is not used in this reference implementation
  * because use of `data` parameter is implementation specific).
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
@@ -925,7 +911,7 @@ interface ControllerTransferParams extends TxParams {
 }
 
 /**
- * @param tokenHolder The account whose tokens will be redeemed.
+ * @param from The account whose tokens will be redeemed.
  * @param value uint256 the amount of tokens need to be redeemed.
  * @param data data to validate the transfer. (It is not used in this reference implementation
  * because use of `data` parameter is implementation specific).
@@ -940,11 +926,13 @@ interface ControllerRedeemParams extends TxParams {
 }
 
 /**
- * @param moduleFactory is the address of the module factory to be added
- * @param data is data packed into bytes used to further configure the module (See STO usage)
+ * @param moduleName is the address of the module factory to be added
+ * @param address Address of the module
+ * @param archived whether to add the module as an archived module
  * @param maxCost max amount of POLY willing to pay to module. (WIP)
  * @param budget max amount of ongoing POLY willing to assign to the module.
- * @param archived whether to add the module as an archived module
+ * @param label is the label of the module
+ * @param data is data packed into bytes used to further configure the module (See STO usage)
  */
 interface AddModuleParams extends TxParams {
   moduleName: ModuleName;
@@ -961,6 +949,11 @@ interface AddModuleParams extends TxParams {
     | USDTieredSTOData
     | VestingEscrowWalletData;
 }
+
+/**
+ * @param moduleName is the address of the module factory to be added
+ * @param data is data packed into bytes used to further configure the module (here no data)
+ */
 
 interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
@@ -1485,7 +1478,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * returns an array of investors
+   * Returns an array of investors
    * @return list of addresses
    */
   public getInvestors = async (): Promise<string[]> => {
@@ -1493,7 +1486,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * returns an array of investors at a given checkpoint
+   * Returns an array of investors at a given checkpoint
    * @return list of investors
    */
   public getInvestorsAt = async (params: CheckpointIdParams): Promise<string[]> => {
@@ -1501,7 +1494,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * returns an array of investors with non zero balance at a given checkpoint
+   * Returns an array of investors with non zero balance at a given checkpoint
    * @return list of investors
    */
   public getInvestorsSubsetAt = async (params: GetInvestorsSubsetAtParams): Promise<string[]> => {
@@ -1513,7 +1506,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * generates subset of investors
+   * Generates subset of investors
    * @return list of investors
    */
   public iterateInvestors = async (params: IterateInvestorsParams): Promise<string[]> => {
@@ -2017,7 +2010,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * use to return the global treasury wallet
+   * Use to return the global treasury wallet
    */
   public getTreasuryWallet = async (): Promise<string> => {
     return (await this.contract).getTreasuryWallet.callAsync();
@@ -2045,8 +2038,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   /**
-   * Attachs a module to the SecurityToken
-   *  E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
+   * Attaches a module to the SecurityToken
+   * E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
    * to control restrictions on transfers.
    */
   public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams) => {

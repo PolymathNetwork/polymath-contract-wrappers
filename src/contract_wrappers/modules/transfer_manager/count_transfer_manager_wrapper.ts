@@ -111,7 +111,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   }
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), 'Controller not currently paused');
@@ -120,14 +120,14 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  check if module paused
+   *  Check if module paused
    */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), 'Controller currently paused');
@@ -143,9 +143,8 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
-   *  @return boolean transfer result
-   *  @return address
+   * Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
+   * @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);

@@ -498,9 +498,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
 
   /**
    * Holds schedules array corresponds to the affiliate/employee address
-   * @return templateName
-   * @return claimedTokens amount
-   * @return startTime date
+   * @return templateName, claimedTokens amount, startTime date
    */
   public schedules = async (params: SchedulesParams): Promise<Schedule> => {
     const result = await (await this.contract).schedules.callAsync(params.beneficiary, numberToBigNumber(params.index));
