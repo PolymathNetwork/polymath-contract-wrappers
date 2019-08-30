@@ -114,8 +114,8 @@ interface PushDividendPaymentToAddressesParams extends TxParams {
  */
 interface PushDividendPaymentParams extends TxParams {
   dividendIndex: number;
-  start: Date;
-  end: Date;
+  start: number;
+  end: number;
 }
 
 /**
@@ -400,8 +400,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     await this.checkValidDividend(params.dividendIndex);
     return (await this.contract).pushDividendPayment.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
-      dateToBigNumber(params.start),
-      dateToBigNumber(params.end),
+      numberToBigNumber(params.start),
+      numberToBigNumber(params.end),
       params.txData,
       params.safetyFactor,
     );

@@ -17,6 +17,7 @@ import {
   weiToValue,
   valueToWei,
   numberArrayToBigNumberArray,
+  numberToBigNumber,
 } from '../../../../utils/convert';
 import ModuleWrapper from '../../module_wrapper';
 
@@ -953,8 +954,8 @@ describe('DividendCheckpointWrapper', () => {
 
       const mockedParams = {
         dividendIndex,
-        start: new Date(2030, 1),
-        end: new Date(2030, 2),
+        start: 1,
+        end: 4,
         txData: {},
         safetyFactor: 10,
       };
@@ -967,8 +968,8 @@ describe('DividendCheckpointWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(dateToBigNumber(mockedParams.end)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -984,8 +985,8 @@ describe('DividendCheckpointWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(dateToBigNumber(mockedParams.end)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
