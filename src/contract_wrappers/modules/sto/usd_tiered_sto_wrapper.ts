@@ -221,7 +221,7 @@ export namespace USDTieredSTOTransactionParams {
 }
 
 /**
- * tier Index of Tier
+ * @param tier Index of Tier
  */
 interface TierIndexParams {
   tier: number;
@@ -484,7 +484,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   };
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    *  @return boolean if paused
    */
   public paused = async (): Promise<boolean> => {
@@ -734,15 +734,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Return the STO details
-   * @return Unixtimestamp at which offering gets start.
-   * @return Unixtimestamp at which offering ends.
-   * @return Currently active tier
-   * @return Array of Number of tokens this STO will be allowed to sell at different tiers.
-   * @return Array rate at which tokens are sold at different tiers
-   * @return Amount of funds raised
-   * @return Number of individual investors this STO have.
-   * @return Amount of tokens sold.
-   * @return Array of booleans to show if funding is allowed in ETH, POLY, SC respectively
+   * @return Unixtimestamp at which offering gets start., Unixtimestamp at which offering ends., Currently active tier,
+   * Array of Number of tokens this STO will be allowed to sell at different tiers., Array rate at which tokens are
+   * sold at different tiers, Amount of funds raised, Number of individual investors this STO have., Amount of tokens
+   * sold., Array of booleans to show if funding is allowed in ETH, POLY, SC respectively
    */
   public getSTODetails = async (): Promise<USDTieredSTOData> => {
     const result = await (await this.contract).getSTODetails.callAsync();
@@ -840,12 +835,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Return tiers
-   * @return rate
-   * @return rateDiscountPoly
-   * @return tokensTotal
-   * @return tokensDiscountPoly
-   * @return mintedTotal
-   * @return mintedDiscountPoly
+   * @return rate, rateDiscountPoly, tokensTotal, tokensDiscountPoly, mintedTotal, mintedDiscountPoly
    */
   public tiers = async (params: TierIndexParams): Promise<Tier> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -1049,9 +1039,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Returns investor accredited & non-accredited override information
-   * @return investor[]
-   * @return accredited data value
-   * @return nonAccreditedLimitUSDOverride value
+   * @return investor[], accredited data value, nonAccreditedLimitUSDOverride value
    */
   public getAccreditedData = async (): Promise<AccreditedData[]> => {
     const result = await (await this.contract).getAccreditedData.callAsync();

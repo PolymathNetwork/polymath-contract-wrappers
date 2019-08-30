@@ -219,8 +219,6 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   /**
    * Used to add a delegate
-   * @param delegate Ethereum address of the delegate
-   * @param details Details about the delegate i.e `Belongs to financial firm`
    */
   public addDelegate = async (params: AddDelegateParams) => {
     assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
@@ -306,8 +304,8 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   /**
    * Used to return all permission of a single or multiple module
-   * @return address[] the address array of Modules this delegate has permission
-   * @return bytes32[] the permission array of the corresponding Modules
+   * @return address[] the address array of Modules this delegate has permission, bytes32[]
+   * the permission array of the corresponding Modules
    */
   public getAllModulesAndPermsFromTypes = async (
     params: GetAllModulesAndPermsFromTypesParams,

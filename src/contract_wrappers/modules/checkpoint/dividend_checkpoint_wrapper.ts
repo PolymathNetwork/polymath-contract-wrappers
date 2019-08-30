@@ -513,12 +513,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   /**
    * Get static dividend data
-   * @return timestamp of dividends creation
-   * @return timestamp of dividends maturity
-   * @return timestamp of dividends expiry
-   * @return amount of dividends
-   * @return claimed amount of dividends
-   * @return name of dividends
+   * @return timestamp of dividends creation, timestamp of dividends maturity, timestamp of dividends expiry, amount
+   * of dividends, claimed amount of dividends, name of dividends
    */
   public getDividendsData = async () => {
     const result = await (await this.contract).getDividendsData.callAsync();
@@ -546,12 +542,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   /**
    * Get static dividend data
-   * @return timestamp of dividend creation
-   * @return timestamp of dividend maturity
-   * @return timestamp of dividend expiry
-   * @return amount of dividend
-   * @return claimed amount of dividend
-   * @return name of dividend
+   * @return timestamp of dividend creation, timestamp of dividend maturity, timestamp of dividend expiry, amount of
+   * dividend, claimed amount of dividend, name of dividend
    */
   public getDividendData = async (params: DividendIndexParams) => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -569,12 +561,8 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   /**
    * Retrieves list of investors, their claim status and whether they are excluded
-   * @return list of investors
-   * @return whether investor has claimed
-   * @return whether investor is excluded
-   * @return amount of withheld tax (estimate if not claimed)
-   * @return amount of claim (estimate if not claimeed)
-   * @return investor balance
+   * @return list of investors, whether investor has claimed, whether investor is excluded, amount of withheld tax
+   * (estimate if not claimed), amount of claim (estimate if not claimeed), investor balance
    */
   public getDividendProgress = async (params: DividendIndexParams) => {
     assert.assert(await this.isValidDividendIndex(params.dividendIndex), 'Invalid dividend index');
@@ -604,9 +592,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   /**
    * Retrieves list of investors, their balances, and their current withholding tax percentage
-   * @return list of investors
-   * @return investor balances
-   * @return investor withheld percentages
+   * @return list of investors, investor balances, investor withheld percentages
    */
   public getCheckpointData = async (params: CheckpointIdParams): Promise<CheckpointData[]> => {
     const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();

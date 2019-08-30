@@ -301,15 +301,11 @@ export default class CappedSTOWrapper extends STOWrapper {
 
   /**
    * Return the STO details
-   * @return Date at which offering gets start.
-   * @return Date at which offering ends.
-   * @return Number of token base units this STO will be allowed to sell to investors.
-   * @return Token units a buyer gets as the rate
-   * @return Amount of funds raised
-   * @return Number of individual investors this STO have.
-   * @return Amount of tokens get sold.
-   * @return Boolean value to justify whether the fund raise type is POLY or not, i.e true for POLY.
-   * @return Boolean value to know the nature of the STO Whether it is pre-mint or mint on buying type sto.
+   * @return Date at which offering gets start., Date at which offering ends., Number of token base units this STO will
+   * be allowed to sell to investors., Token units a buyer gets as the rate, Amount of funds raised, Number of
+   * individual investors this STO have., Amount of tokens get sold., Boolean value to justify whether the fund raise
+   * type is POLY or not, i.e true for POLY., Boolean value to know the nature of the STO Whether it is pre-mint or
+   * mint on buying type sto.
    */
   public getSTODetails = async (): Promise<CappedSTODetails> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();

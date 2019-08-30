@@ -156,7 +156,7 @@ interface CreateDividendParams extends TxParams {
 }
 
 /**
- * @param _checkpointId Checkpoint id from which to create dividends
+ * @param checkpointId Checkpoint id from which to create dividends
  */
 interface CreateDividendWithCheckpointParams extends CreateDividendParams {
   checkpointId: number;
