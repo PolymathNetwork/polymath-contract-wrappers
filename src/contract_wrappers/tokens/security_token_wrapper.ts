@@ -1248,7 +1248,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * A security token issuer can specify that issuance has finished for the token
    * (i.e. no new tokens can be minted or issued).
-   * @dev If a token returns FALSE for `isIssuable()` then it MUST always return FALSE in the future.
+   * If a token returns FALSE for `isIssuable()` then it MUST always return FALSE in the future.
    * If a token returns FALSE for `isIssuable()` then it MUST never allow additional tokens to be issued.
    * @return bool `true` signifies the minting is allowed. While `false` denotes the end of minting
    */
@@ -1267,7 +1267,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * In order to provide transparency over whether `controllerTransfer` / `controllerRedeem` are useable
    * or not `isControllable` function will be used.
-   * @dev If `isControllable` returns `false` then it always return `false` and
+   * If `isControllable` returns `false` then it always return `false` and
    * `controllerTransfer` / `controllerRedeem` will always revert.
    * @return bool `true` when controller address is non-zero otherwise return `false`.
    */
@@ -1395,7 +1395,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Allows the owner to withdraw unspent POLY stored by them on the ST or any ERC20 token.
-   * @dev Owner can transfer POLY to the ST which will be used to pay for modules that require a POLY fee.
+   * Owner can transfer POLY to the ST which will be used to pay for modules that require a POLY fee.
    */
   public withdrawERC20 = async (params: WithdrawERC20Params) => {
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
@@ -1590,7 +1590,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Permanently freeze issuance of this security token.
-   * @dev It MUST NOT be possible to increase `totalSupply` after this function is called.
+   * It MUST NOT be possible to increase `totalSupply` after this function is called.
    */
   public freezeIssuance = async (params: FreezeIssuanceParams) => {
     assert.assert(await this.isIssuable(), 'Issuance frozen');
@@ -1610,7 +1610,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * This function must be called to increase the total supply (Corresponds to mint function of ERC20).
-   * @dev It is only be called by the token issuer or the operator defined by the issuer. ERC1594 doesn't have
+   * It is only be called by the token issuer or the operator defined by the issuer. ERC1594 doesn't have
    * have the any logic related to operator but its superset ERC1400 have the operator logic and this function
    * is allowed to call by the operator.
    */
@@ -1676,8 +1676,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Validate permissions with PermissionManager if it exists, If no Permission return false
-   * @dev Note that IModule withPerm will allow ST owner all permissions anyway
-   * @dev this allows individual modules to override this logic if needed (to not allow ST owner all permissions)
+   * Note that IModule withPerm will allow ST owner all permissions anyway
+   * this allows individual modules to override this logic if needed (to not allow ST owner all permissions)
    * @return success
    */
   public checkPermission = async (params: CheckPermissionParams): Promise<boolean> => {
@@ -1722,7 +1722,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Decreases totalSupply and the corresponding amount of the specified partition of tokenHolder
-   * @dev This function can only be called by the authorised operator.
+   * This function can only be called by the authorised operator.
    * @param partition The partition to allocate the decrease in balance.
    * @param tokenHolder The token holder whose balance should be decreased
    * @param value The amount by which to decrease the balance
@@ -1749,7 +1749,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * This function redeem an amount of the token of a msg.sender. For doing so msg.sender may incentivize
    * using different ways that could be implemented with in the `redeem` function definition. But those implementations
    * are out of the scope of the ERC1594.
-   * @dev It is analogy to `transferFrom`
+   * It is analogy to `transferFrom`
    */
   public redeemFrom = async (params: RedeemFromParams) => {
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
@@ -1946,7 +1946,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Used by the issuer to permanently disable controller functionality
-   * @dev enabled via feature switch "disableControllerAllowed"
+   * enabled via feature switch "disableControllerAllowed"
    */
   public disableController = async (params: DisableControllerParams) => {
     await this.checkOnlyOwner(params.txData);
@@ -1962,7 +1962,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * This function allows an authorised address to transfer tokens between any two token holders.
    * The transfer must still respect the balances of the token holders (so the transfer must be for at most
    * `balanceOf(_from)` tokens) and potentially also need to respect other transfer restrictions.
-   * @dev This function can only be executed by the `controller` address.
+   * This function can only be executed by the `controller` address.
    */
   public controllerTransfer = async (params: ControllerTransferParams) => {
     assert.isETHAddressHex('from', params.from);
@@ -1985,7 +1985,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * This function allows an authorised address to redeem tokens for any token holder.
    * The redemption must still respect the balances of the token holder (so the redemption must be for at most
    * `balanceOf(tokenHolder)` tokens) and potentially also need to respect other transfer restrictions.
-   * @dev This function can only be executed by the `controller` address.
+   * This function can only be executed by the `controller` address.
    */
   public controllerRedeem = async (params: ControllerRedeemParams) => {
     assert.isETHAddressHex('from', params.from);
@@ -2025,11 +2025,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Function used to attach a module to the security token
-   * @dev  E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
-   * @dev to control restrictions on transfers.
-   * @dev You are allowed to add a new moduleType if:
-   * @dev - there is no existing module of that type yet added
-   * @dev - the last member of the module list is replacable
+   *  E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
+   * to control restrictions on transfers.
+   * You are allowed to add a new moduleType if:
+   * - there is no existing module of that type yet added
+   * - the last member of the module list is replacable
    */
   public addModule: AddModuleInterface = async (params: AddModuleParams) => {
     const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
@@ -2046,8 +2046,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Attachs a module to the SecurityToken
-   * @dev  E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
-   * @dev to control restrictions on transfers.
+   *  E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
+   * to control restrictions on transfers.
    */
   public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams) => {
     const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
@@ -2214,7 +2214,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Used to attach a new document to the contract, or update the URI or hash of an existing attached document
-   * @dev Can only be executed by the owner of the contract.
+   * Can only be executed by the owner of the contract.
    */
   public setDocument = async (params: SetDocumentParams) => {
     assert.assert(params.name.length > 0, 'Bad name, cannot be empty');
@@ -2231,7 +2231,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   /**
    * Used to remove an existing document from the contract by giving the name of the document.
-   * @dev Can only be executed by the owner of the contract.
+   * Can only be executed by the owner of the contract.
    */
   public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
