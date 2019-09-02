@@ -9,6 +9,7 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
+import { PolymathError } from '../../PolymathError';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode } from '../../types';
 import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
@@ -120,7 +121,7 @@ export default class ModuleWrapper extends ContractWrapper {
     });
     // prevent invalid scenarios
     if (!types.length || types.length > 1) {
-      return false;
+      throw new PolymathError({ code: ErrorCode.InvalidData });
     }
     const address = await this.address();
     const result = await (await this.securityTokenContract()).isModule.callAsync(address, types[0]);

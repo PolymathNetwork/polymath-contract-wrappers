@@ -222,6 +222,6 @@ export default class ModuleWrapperFactory {
     }
 
     // TODO: Typed error here
-    throw new Error('Invalid module');
+    throw new PolymathError({ code: ErrorCode.InvalidData, message: 'Invalid module' });
   };
 }
