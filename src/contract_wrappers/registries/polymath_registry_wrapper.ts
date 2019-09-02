@@ -18,6 +18,7 @@ import {
   PolymathContract,
   GetLogs,
   Subscribe,
+  ErrorCode,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -49,6 +50,10 @@ interface GetPolymathRegistryLogsAsyncParams extends GetLogs {
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>[]
   >;
+}
+
+export namespace PolymathRegistryTransactionParams {
+  export interface ChangeAddress extends ChangeAddressParams {}
 }
 
 /**
@@ -149,6 +154,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
   public changeAddress = async (params: ChangeAddressParams) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
+      ErrorCode.Unauthorized,
       'Form sender must be owner',
     );
     assert.isETHAddressHex('newAddress', params.newAddress);

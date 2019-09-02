@@ -132,8 +132,8 @@ export enum TransferResult {
 }
 
 export enum FeeType {
-  tickerRegFee,
-  stLaunchFee,
+  TickerRegFee = 'tickerRegFee',
+  StLaunchFee = 'stLaunchFee',
 }
 
 export enum Feature {
@@ -335,3 +335,35 @@ export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | E
 
 export const PERCENTAGE_DECIMALS = new BigNumber(16);
 export const FULL_DECIMALS = new BigNumber(18);
+
+export enum ErrorCode {
+  Unauthorized = 'Unauthorized',
+  InvalidAddress = 'InvalidAddress',
+  InsufficientBalance = 'InsufficientBalance',
+  InvalidSubscriptionToken = 'InvalidSubscriptionToken',
+  DuplicatedStrings = 'DuplicatedStrings',
+  TooLate = 'TooLate',
+  TooEarly = 'TooEarly',
+  InvalidData = 'InvalidData',
+  MismatchedArrayLength = 'MismatchedArrayLength',
+  InvalidVersion = 'InvalidVersion',
+  InvalidPartition = 'InvalidPartition',
+  ContractPaused = 'ContractPaused',
+  PreconditionRequired = 'PreconditionRequired',
+  AlreadyClaimed = 'AlreadyClaimed',
+  AddressExcluded = 'AddressExcluded',
+  InvalidDividend = 'InvalidDividend',
+  InvalidCheckpoint = 'InvalidCheckpoint',
+  ArrayTooLarge = 'ArrayTooLarge',
+  InvalidBound = 'InvalidBound',
+  InsufficientAllowance = 'InsufficientAllowance',
+  DifferentMode = 'DifferentMode',
+  InvalidTransfer = 'InvalidTransfer',
+  InvalidDiscount = 'InvalidDiscount',
+  STOClosed = 'STOClosed',
+  CoinNotAllowed = 'CoinNotAllowed',
+  AlreadyExists = 'AlreadyExists',
+  NotFound = 'NotFound',
+  TickerExpired = 'TickerExpired',
+  UnknownNetwork = 'UnknownNetwork',
+}

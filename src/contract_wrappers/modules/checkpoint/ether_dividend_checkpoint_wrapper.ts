@@ -30,6 +30,7 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
 
@@ -189,6 +190,13 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
+export namespace EtherDividendCheckpointTransactionParams {
+  export interface CreateDividend extends CreateDividendParams {}
+  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
+  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
+  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
+}
+
 interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
@@ -246,7 +254,11 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   }
 
   public createDividend = async (params: CreateDividendParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -269,7 +281,11 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -294,7 +310,11 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   };
 
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
@@ -322,7 +342,11 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),

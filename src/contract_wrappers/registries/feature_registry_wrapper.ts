@@ -18,6 +18,7 @@ import {
   Feature,
   Subscribe,
   GetLogs,
+  ErrorCode,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -51,6 +52,10 @@ interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]
   >;
+}
+
+export namespace FeatureRegistryTransactionParams {
+  export interface SetFeatureStatus extends SetFeatureStatusParams {}
 }
 
 /**
@@ -103,10 +108,11 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
+      ErrorCode.Unauthorized,
       'From sender must be owner',
     );
     const currentStatus = await this.getFeatureStatus({ nameKey: params.nameKey });
-    assert.assert(currentStatus !== params.newStatus, 'FeatureStatus must change');
+    assert.assert(currentStatus !== params.newStatus, ErrorCode.PreconditionRequired, 'FeatureStatus must change');
     return (await this.contract).setFeatureStatus.sendTransactionAsync(
       params.nameKey,
       params.newStatus,

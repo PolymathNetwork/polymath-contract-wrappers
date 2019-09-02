@@ -30,6 +30,7 @@ import {
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
+  ErrorCode,
 } from '../../types';
 import { bytes32ArrayToStringArray } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
@@ -130,6 +131,15 @@ interface GetModuleRegistryLogsAsyncParams extends GetLogs {
   >;
 }
 
+export namespace ModuleRegistryTransactionParams {
+  export interface RegisterModule extends ModuleFactoryParams {}
+  export interface RemoveModule extends ModuleFactoryParams {}
+  export interface UnverifyModule extends ModuleFactoryParams {}
+  export interface VerifyModule extends ModuleFactoryParams {}
+  export interface ReclaimERC20 extends ReclaimERC20Params {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+}
+
 interface ModuleFactoryParams extends TxParams {
   moduleFactory: string;
 }
@@ -228,20 +238,26 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
       assert.assert(
         functionsUtils.checksumAddressComparision(callerAddress, owner) ||
           functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
+        ErrorCode.Unauthorized,
         'Calling address must be owner or factory owner with custom modules allowed feature status',
       );
     } else {
       assert.assert(
         functionsUtils.checksumAddressComparision(callerAddress, owner),
+        ErrorCode.Unauthorized,
         'Calling address must be owner without custom modules allowed feature status',
       );
     }
     const getTypesResult = await (await this.moduleFactoryContract(params.moduleFactory)).getTypes.callAsync();
     // Check for duplicates
     if (getTypesResult.length > 1) {
-      assert.assert(getTypesResult.length === new Set(getTypesResult).size, 'Type mismatch');
+      assert.assert(
+        getTypesResult.length === new Set(getTypesResult).size,
+        ErrorCode.MismatchedArrayLength,
+        'Type mismatch',
+      );
     }
-    assert.assert(getTypesResult.length > 0, 'Factory must have type');
+    assert.assert(getTypesResult.length > 0, ErrorCode.InvalidData, 'Factory must have type');
     return (await this.contract).registerModule.sendTransactionAsync(
       params.moduleFactory,
       params.txData,
@@ -364,13 +380,13 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
 
   public pause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
-    assert.assert(!(await this.isPaused()), 'Contract is paused');
+    assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unpause = async (params: TxParams) => {
     await this.checkMsgSenderIsOwner();
-    assert.assert(await this.isPaused(), 'Contract is already not paused');
+    assert.assert(await this.isPaused(), ErrorCode.PreconditionRequired, 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -462,28 +478,38 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
         await this.owner(),
         (await this.web3Wrapper.getAvailableAddressesAsync())[0],
       ),
+      ErrorCode.Unauthorized,
       'Msg sender must be owner',
     );
   };
 
   private checkModuleRegistered = async (moduleFactory: string) => {
-    assert.assert(await this.checkForRegisteredModule(moduleFactory), 'Module is not registered');
+    assert.assert(
+      await this.checkForRegisteredModule(moduleFactory),
+      ErrorCode.PreconditionRequired,
+      'Module is not registered',
+    );
   };
 
   private checkModuleNotRegistered = async (moduleFactory: string) => {
-    assert.assert(!(await this.checkForRegisteredModule(moduleFactory)), 'Module is already registered');
+    assert.assert(
+      !(await this.checkForRegisteredModule(moduleFactory)),
+      ErrorCode.AlreadyExists,
+      'Module is already registered',
+    );
   };
 
   private checkModuleNotPausedOrOwner = async () => {
     assert.assert(
       !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
+      ErrorCode.Unauthorized,
       'Contract is either paused or the calling address is not the owner',
     );
   };
 
   private checkModuleNotPaused = async () => {
-    assert.assert(!(await this.isPaused()), 'Contract is currently paused');
+    assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is currently paused');
   };
 
   private checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
@@ -493,6 +519,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     assert.assert(
       functionsUtils.checksumAddressComparision(callerAddress, owner) ||
         functionsUtils.checksumAddressComparision(callerAddress, factoryOwner),
+      ErrorCode.Unauthorized,
       'Calling address must be owner or factory owner ',
     );
   };

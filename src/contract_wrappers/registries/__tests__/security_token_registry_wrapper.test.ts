@@ -879,7 +879,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Params and result expected
       const expectedResult = [new BigNumber(10), new BigNumber(10)];
       const mockedParams = {
-        feeType: FeeType.tickerRegFee,
+        feeType: FeeType.TickerRegFee,
       };
       const bytes32 = stringToBytes32('tickerRegFee');
       // Mocked method

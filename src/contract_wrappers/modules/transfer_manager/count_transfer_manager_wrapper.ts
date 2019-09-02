@@ -21,6 +21,7 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode,
 } from '../../../types';
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
@@ -65,6 +66,10 @@ interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace CountTransferManagerTransactionParams {
+  export interface ChangeHolderCount extends ChangeHolderCountParams {}
+}
+
 interface VerifyTransferParams {
   from: string;
   to: string;
@@ -98,8 +103,12 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   }
 
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -108,8 +117,12 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -135,7 +148,11 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   };
 
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,

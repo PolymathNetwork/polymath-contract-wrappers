@@ -73,6 +73,7 @@ import {
   TxParams,
   CappedSTOFundRaiseType,
   TransferStatusCode,
+  ErrorCode
 } from '../../types';
 import {
   bigNumberToDate,
@@ -466,6 +467,53 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
     LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>[]
   >;
   (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTokenUpgradedEventArgs>[]>;
+}
+
+export namespace SecurityTokenTransactionParams {
+  export interface FreezeIssuance extends FreezeIssuanceParams {}
+  export interface ArchiveModule extends ModuleAddressTxParams {}
+  export interface UnarchiveModule extends ModuleAddressTxParams {}
+  export interface RemoveModule extends ModuleAddressTxParams {}
+  export interface UpgradeModule extends ModuleAddressTxParams {}
+  export interface ChangeDataStore extends DataStoreAddressParams {}
+  export interface SetDocument extends SetDocumentParams {}
+  export interface GetDocument extends DocumentParams {}
+  export interface RemoveDocument extends DocumentParams {}
+  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
+  export interface ChangeApproval extends ChangeApprovalParams {}
+  export interface TransferOwnership extends TransferOwnershipParams {}
+  export interface WithdrawERC20 extends WithdrawERC20Params {}
+  export interface ChangeModuleBudget extends ChangeModuleBudgetParams {}
+  export interface UpdateTokenDetails extends UpdateTokenDetailsParams {}
+  export interface ChangeGranularity extends ChangeGranularityParams {}
+  export interface ChangeName extends ChangeNameParams {}
+  export interface TransferWithData extends TransferWithDataParams {}
+  export interface TransferFromWithData extends TransferFromWithDataParams {}
+  export interface Issue extends IssueParams {}
+  export interface IssueByPartition extends IssueByPartitionParams {}
+  export interface IssueMulti extends IssueMultiParams {}
+  export interface Redeem extends RedeemParams {}
+  export interface RedeemByPartition extends RedeemByPartitionParams {}
+  export interface OperatorRedeemByPartition extends OperatorRedeemByPartitionParams {}
+  export interface RedeemFrom extends RedeemFromParams {}
+  export interface TransferByPartition extends TransferByPartitionParams {}
+  export interface AuthorizeOperator extends AuthorizeOperatorParams {}
+  export interface AuthorizeOperatorByPartition extends AuthorizeOperatorByPartitionParams {}
+  export interface RevokeOperator extends RevokeOperatorParams {}
+  export interface RevokeOperatorByPartition extends RevokeOperatorByPartitionParams {}
+  export interface OperatorTransferByPartition extends OperatorTransferByPartitionParams {}
+  export interface SetController extends SetControllerParams {}
+  export interface DisableController extends DisableControllerParams {}
+  export interface ControllerTransfer extends ControllerTransferParams {}
+  export interface ControllerRedeem extends ControllerRedeemParams {}
+  export interface AddModule extends AddModuleParams {}
+  export interface AddNoDataModule extends AddNoDataModuleParams {}
+  export interface AddVestingEscrowWallet extends AddVestingEscrowWalletParams {}
+  export interface AddCountTransferManager extends AddCountTransferManagerParams {}
+  export interface AddPercentageTransferManager extends AddPercentageTransferManagerParams {}
+  export interface AddDividendCheckpoint extends AddDividendCheckpointParams {}
+  export interface AddCappedSTO extends AddCappedSTOParams {}
+  export interface AddUSDTieredSTO extends AddUSDTieredSTOParams {}
 }
 
 interface IsOperatorParams {
@@ -1120,7 +1168,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public changeName = async (params: ChangeNameParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(params.name.length > 0, 'Name required');
+    assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name required');
     return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
   };
 
@@ -1177,13 +1225,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
 
   public freezeTransfers = async (params: TxParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(!(await this.transfersFrozen()), 'Transfers already frozen');
+    assert.assert(!(await this.transfersFrozen()), ErrorCode.PreconditionRequired, 'Transfers already frozen');
     return (await this.contract).freezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   public unfreezeTransfers = async (params: TxParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(await this.transfersFrozen(), 'Transfers are not frozen');
+    assert.assert(await this.transfersFrozen(), ErrorCode.PreconditionRequired, 'Transfers are not frozen');
     return (await this.contract).unfreezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -1212,12 +1260,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public freezeIssuance = async (params: FreezeIssuanceParams) => {
-    assert.assert(await this.isIssuable(), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
         (await this.web3Wrapper.getAvailableAddressesAsync())[0],
       ),
+      ErrorCode.Unauthorized,
       'Msg sender must be owner',
     );
     return (await this.contract).freezeIssuance.sendTransactionAsync(
@@ -1230,7 +1279,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public issue = async (params: IssueParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
-    assert.assert(await this.isIssuable(), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     const canTransfer = await this.canTransfer({
       to: params.investor,
       value: params.value,
@@ -1238,6 +1287,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     });
     assert.assert(
       canTransfer.statusCode !== TransferStatusCode.TransferFailure,
+      ErrorCode.InvalidTransfer,
       `Transfer Status: ${canTransfer.statusCode}`,
     );
     return (await this.contract).issue.sendTransactionAsync(
@@ -1252,7 +1302,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public issueByPartition = async (params: IssueByPartitionParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
-    assert.assert(await this.isIssuable(), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     assert.isValidPartition(params.partition);
     return (await this.contract).issueByPartition.sendTransactionAsync(
       params.partition,
@@ -1268,9 +1318,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
       params.investors.length === params.values.length,
+      ErrorCode.MismatchedArrayLength,
       'Number of investors passed in must be equivalent to number of values',
     );
-    assert.assert(await this.isIssuable(), 'Issuance frozen');
+    assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).issueMulti.sendTransactionAsync(
       params.investors,
@@ -1315,7 +1366,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
-    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
+    assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
       params.partition,
@@ -1335,6 +1386,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         owner: params.from,
         spender: (await this.web3Wrapper.getAvailableAddressesAsync())[0],
       })).isGreaterThanOrEqualTo(params.value),
+      ErrorCode.InsufficientAllowance,
       'Insufficient allowance for inputted burn value',
     );
     assert.isETHAddressHex('from', params.from);
@@ -1351,6 +1403,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     assert.assert(
       (await this.currentCheckpointId()).isLessThan(MAX_CHECKPOINT_NUMBER),
+      ErrorCode.PreconditionRequired,
       'Reached maximum checkpoint number',
     );
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1365,6 +1418,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public totalSupplyAt = async (params: CheckpointIdParams) => {
     assert.assert(
       (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      ErrorCode.InvalidData,
       'Checkpoint id must be less than or equal to currentCheckpoint',
     );
     return weiToValue(
@@ -1377,6 +1431,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(
       (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
+      ErrorCode.InvalidData,
       'Checkpoint id must be less than or equal to currentCheckpoint',
     );
     return weiToValue(
@@ -1449,7 +1504,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
     assert.isETHAddressHex('To', params.to);
     assert.isETHAddressHex('From', params.from);
-    assert.assert(params.operatorData.length > 0, 'Operator data cannot be 0');
+    assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
     return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
@@ -1701,8 +1756,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public setDocument = async (params: SetDocumentParams) => {
-    assert.assert(params.name.length > 0, 'Bad name, cannot be empty');
-    assert.assert(params.uri.length > 0, 'Bad uri, cannot be empty');
+    assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Bad name, cannot be empty');
+    assert.assert(params.uri.length > 0, ErrorCode.InvalidData, 'Bad uri, cannot be empty');
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).setDocument.sendTransactionAsync(
       stringToBytes32(params.name),
@@ -1716,7 +1771,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public removeDocument = async (params: DocumentParams) => {
     await this.checkOnlyOwner(params.txData);
     const document = await this.getDocument({ name: params.name });
-    assert.assert(document.documentUri.length !== 0, 'Document does not exist');
+    assert.assert(document.documentUri.length !== 0, ErrorCode.NotFound, 'Document does not exist');
     return (await this.contract).removeDocument.sendTransactionAsync(
       stringToBytes32(params.name),
       params.txData,
@@ -1781,15 +1836,15 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkModuleExists = async (moduleAddress: string) => {
-    assert.assert((await this.getModule({ moduleAddress })).name !== '', 'Module does not exist');
+    assert.assert((await this.getModule({ moduleAddress })).name !== '', ErrorCode.NotFound, 'Module does not exist');
   };
 
   private checkIsArchived = async (moduleAddress: string) => {
-    assert.assert((await this.getModule({ moduleAddress })).archived, 'Module is not yet archived');
+    assert.assert((await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is not yet archived');
   };
 
   private checkIsNotArchived = async (moduleAddress: string) => {
-    assert.assert(!(await this.getModule({ moduleAddress })).archived, 'Module is archived');
+    assert.assert(!(await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is archived');
   };
 
   private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
@@ -1802,17 +1857,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         (await this.getModule({ moduleAddress })).address,
         '0x0000000000000000000000000000000000000000',
       ),
+      ErrorCode.AlreadyExists,
       'Module already exists at that address',
     );
   };
 
   private checkIsControllable = async () => {
-    assert.assert(await this.isControllable(), 'Controller currently disabled');
+    assert.assert(await this.isControllable(), ErrorCode.PreconditionRequired, 'Controller currently disabled');
   };
 
   private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
     assert.assert(
       (await this.balanceOf({ owner: from })).isGreaterThanOrEqualTo(value),
+      ErrorCode.InsufficientBalance,
       'Insufficient balance for inputted value',
     );
   };
@@ -1821,11 +1878,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).setupCostInPoly.callAsync();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
+      ErrorCode.InsufficientBalance,
       'Insufficient max cost to cover module factory setup cost',
     );
     const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.address());
     assert.assert(
       polyTokenBalance.isGreaterThanOrEqualTo(moduleCost),
+      ErrorCode.InsufficientBalance,
       'Insufficient poly token balance for module cost',
     );
   };
@@ -1833,6 +1892,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
+      ErrorCode.Unauthorized,
       'Msg sender must be owner',
     );
   };
@@ -1840,6 +1900,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       (await this.isControllable()) && (await this.controller()) === (await this.getCallerAddress(txData)),
+      ErrorCode.Unauthorized,
       'Msg sender must be controller',
     );
   };
@@ -1849,12 +1910,13 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
       assert.assert(
         (await this.checkForRegisteredModule(address)) || isOwner,
+        ErrorCode.Unauthorized,
         'ModuleFactory must be verified or SecurityToken owner must be ModuleFactory owner',
       );
     } else {
-      assert.assert(await this.checkForRegisteredModule(address), 'ModuleFactory must be verified');
+      assert.assert(await this.checkForRegisteredModule(address), ErrorCode.Unauthorized, 'ModuleFactory must be verified');
     }
-    assert.assert(await this.isCompatibleModule(address), 'Version should within the compatible range of ST');
+    assert.assert(await this.isCompatibleModule(address), ErrorCode.InvalidVersion, 'Version should within the compatible range of ST');
   };
 
   private checkForRegisteredModule = async (moduleAddress: string) => {
@@ -1899,14 +1961,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
-    assert.assert(data.endTime > data.startTime, 'End time not valid');
+    assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
   };
 
   private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
     assert.isFutureDate(data.startTime, 'Start time date not valid');
-    assert.assert(data.endTime > data.startTime, 'End time not valid');
-    assert.assert(data.tokensPerTierTotal.length > 0, 'No tiers provided');
+    assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
+    assert.assert(data.tokensPerTierTotal.length > 0, ErrorCode.InvalidData, 'No tiers provided');
     assert.areValidArrayLengths(
       [data.ratePerTier, data.tokensPerTierTotal, data.ratePerTierDiscountPoly, data.tokensPerTierDiscountPoly],
       'Tier data length mismatch',
@@ -1916,11 +1978,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
       assert.isBigNumberGreaterThanZero(data.tokensPerTierTotal[i], 'Invalid token amount');
       assert.assert(
         data.tokensPerTierDiscountPoly[i].isLessThanOrEqualTo(data.tokensPerTierTotal[i]),
+        ErrorCode.InvalidData,
         'Too many discounted tokens',
       );
-      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), 'Invalid discount');
+      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), ErrorCode.InvalidData, 'Invalid discount');
     }
-    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, 'Raise type is not specified');
+    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, ErrorCode.InvalidData, 'Raise type is not specified');
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };
@@ -1938,8 +2001,8 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let data: string;
     switch (params.moduleName) {
       case ModuleName.VestingEscrowWallet:
-          iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
-          data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet])
+        iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+        data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet]);
         break;
       case ModuleName.CountTransferManager:
         iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
