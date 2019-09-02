@@ -5,11 +5,13 @@ import {
   ERC20DetailedContract,
   Web3Wrapper,
   TxData,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
+import { PolymathError } from '../../PolymathError';
 import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode } from '../../types';
-import { stringToBytes32 } from '../../utils/convert';
+import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
 
@@ -132,6 +134,27 @@ export default class ModuleWrapper extends ContractWrapper {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  public isValidModule = async () => {
+    const moduleFactoryContract = await this.moduleFactoryContract();
+    const getTypes = await moduleFactoryContract.getTypes.callAsync();
+    const types = getTypes.filter(type => {
+      // type '6' and '8' are valid but they are not mapped, so we must filter them
+      try {
+        parseModuleTypeValue(new BigNumber(type));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    });
+    // prevent invalid scenarios
+    if (!types.length || types.length > 1) {
+      throw new PolymathError({ code: ErrorCode.InvalidData });
+    }
+    const address = await this.address();
+    const result = await (await this.securityTokenContract()).isModule.callAsync(address, types[0]);
+    return result;
   };
 
   protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
