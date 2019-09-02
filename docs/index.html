@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Polymath API</title>
+	<title>@polymathnetwork/contract-wrappers</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">Polymath API</a>
+					<a href="index.html" class="title">@polymathnetwork/contract-wrappers</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -38,6 +38,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 							<input type="checkbox" id="tsd-filter-only-exported" />
 							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
@@ -54,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> Polymath API</h1>
+			<h1> @polymathnetwork/contract-wrappers</h1>
 		</div>
 	</div>
 </header>
@@ -62,40 +64,170 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<h2 id="polymath-contract-wrappers">polymath-contract-wrappers</h2>
+				<a href="#polymathnetworkcontract-wrappers" id="polymathnetworkcontract-wrappers" style="color: inherit; text-decoration: none;">
+					<h2>@polymathnetwork/contract-wrappers</h2>
+				</a>
+				<p>Version 3.0.0 of the Polymath-Core Ethereum Smart Contracts</p>
 				<p>Smart TS wrappers for Polymath smart contracts.</p>
-				<h2 id="installation">Installation</h2>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
 				<p><strong>Install</strong></p>
-				<pre><code class="language-bash">npm install polymath-contract-wrappers --save</code></pre>
+				<pre><code class="language-bash">npm install @polymathnetwork/contract-wrappers --save</code></pre>
 				<p><strong>Import</strong></p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { PolymathAPI } <span class="hljs-keyword">from</span> <span class="hljs-string">'polymath-contract-wrappers'</span>;</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { PolymathAPI } <span class="hljs-keyword">from</span> <span class="hljs-string">'@polymathnetwork/contract-wrappers'</span>;</code></pre>
 				<p>If your project is in <a href="https://www.typescriptlang.org/">TypeScript</a>, add the following to your <code>tsconfig.json</code>:</p>
 				<pre><code class="language-json">&quot;compilerOptions&quot;: {
     &quot;typeRoots&quot;: [&quot;node_modules/@0x/typescript-typings/types&quot;, &quot;node_modules/@types&quot;],
 }</code></pre>
-				<h2 id="sandbox">Sandbox</h2>
-				<p>We provide a sandbox dev server to manually play with the package in the browser</p>
-				<p>To boot it up:</p>
-				<pre><code>yarn <span class="hljs-literal">start</span></code></pre><p>This will generate a git-ignored sandbox.ts file you can edit locally
-				to start playing around with the code</p>
-				<h2 id="contributing">Contributing</h2>
+				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+					<h2>Documentation</h2>
+				</a>
+				<p>This project uses typedoc documentation style.</p>
+				<p>You can access these docs by cloning this repo and opening <code>docs/index.html</code> in the browser.</p>
+				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+					<h2>Contributing</h2>
+				</a>
 				<p>We strongly recommend that the community help us make improvements and determine the future direction of the protocol. To report bugs within this package, please create an issue in this repository.</p>
-				<h3 id="install-dependencies">Install dependencies</h3>
+				<p>Commits should follow the <a href="https://www.conventionalcommits.org">conventional commits</a> standard. You can use <code>yarn commit</code> which will launch <a href="https://github.com/commitizen/cz-cli">commitizen</a> to help you format commit messages in the correct manner</p>
+				<a href="#a-note-on-breaking-changes" id="a-note-on-breaking-changes" style="color: inherit; text-decoration: none;">
+					<h3>A note on breaking changes</h3>
+				</a>
+				<p><em>Anything</em> that forcefully changes the way the client interacts with the package is considered a breaking change and should be described in the <code>BREAKING CHANGE</code> section of the corresponding commit.  This includes (but is not limited to):</p>
+				<ul>
+					<li>Renaming a public function/class/interface/type</li>
+					<li>Deleting a public function/class/interface/type</li>
+					<li>Changing a public function&#39;s argument list in a way that the user needs to rewrite existing calls to it</li>
+					<li>Changing a public function&#39;s return type</li>
+				</ul>
+				<p>Whatever is written under <code>BREAKING CHANGES</code> is literally what will go into the changelog, so please be clear on the messages. For example, if I change the return type of a function called  <code>foo</code> in class <code>Bar</code>, the <code>BREAKING CHANGE</code> section of my commit should say something like</p>
+				<pre><code>change <span class="hljs-keyword">return</span> type of the `Bar` <span class="hljs-keyword">class</span>'<span class="hljs-symbol">s</span> `<span class="hljs-symbol">foo</span>` <span class="hljs-symbol">function</span> <span class="hljs-symbol">from</span> `<span class="hljs-symbol">string</span>` <span class="hljs-symbol">to</span> `<span class="hljs-symbol">number</span>`</code></pre>
+				<a href="#install-dependencies" id="install-dependencies" style="color: inherit; text-decoration: none;">
+					<h3>Install dependencies</h3>
+				</a>
 				<p>If you don&#39;t have yarn workspaces enabled (Yarn &lt; v1.0) - enable them:</p>
 				<pre><code class="language-bash">yarn config <span class="hljs-built_in">set</span> workspaces-experimental <span class="hljs-literal">true</span></code></pre>
 				<p>Then install dependencies</p>
 				<pre><code class="language-bash">yarn install</code></pre>
-				<h3 id="build">Build</h3>
+				<a href="#build" id="build" style="color: inherit; text-decoration: none;">
+					<h3>Build</h3>
+				</a>
 				<p>To build this package and all other monorepo packages that it depends on, run the following from the monorepo root directory:</p>
 				<pre><code class="language-bash">yarn build</code></pre>
 				<p>or continuously rebuild on change:</p>
 				<pre><code class="language-bash">yarn watch</code></pre>
-				<h3 id="clean">Clean</h3>
+				<a href="#clean" id="clean" style="color: inherit; text-decoration: none;">
+					<h3>Clean</h3>
+				</a>
 				<pre><code class="language-bash">yarn clean</code></pre>
-				<h3 id="lint">Lint</h3>
+				<a href="#lint" id="lint" style="color: inherit; text-decoration: none;">
+					<h3>Lint</h3>
+				</a>
 				<pre><code class="language-bash">yarn lint</code></pre>
-				<h2 id="deployment">Deployment</h2>
-				<p>** Pending, should run a prepublish script on CI or use Semantic Releases**</p>
+				<a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
+					<h3>Testing</h3>
+				</a>
+				<p>This project uses Jest to do unit testing on the contract wrappers.</p>
+				<pre><code class="language-bash">yarn jest</code></pre>
+				<a href="#deployment" id="deployment" style="color: inherit; text-decoration: none;">
+					<h2>Deployment</h2>
+				</a>
+				<p>This package has automatic publishing and versioning via <a href="https://github.com/semantic-release/semantic-release">semantic-release</a> and forceful use of <a href="https://www.conventionalcommits.org">conventional commits</a> </p>
+				<a href="#sandbox" id="sandbox" style="color: inherit; text-decoration: none;">
+					<h2>Sandbox</h2>
+				</a>
+				<p>We provide a sandbox dev server to manually play with the package in the browser</p>
+				<p>To boot it up:</p>
+				<pre><code>yarn <span class="hljs-literal">start</span></code></pre><p>This will generate a git-ignored sandbox.ts file you can edit locally
+				to start playing around with the code</p>
+				<a href="#starting-up--code-examples" id="starting-up--code-examples" style="color: inherit; text-decoration: none;">
+					<h2>Starting up- Code Examples</h2>
+				</a>
+				<p>In order to setup the Polymath API included in these contract wrappers, you must first establish a blockchain provider.</p>
+				<p>Ethereum providers are important in both reading and writing from an Ethereum RPC Node.</p>
+				<p>The API must be provided with the network id you would like to use, or RPC Node. The provider may exist on a node, on the browser as an injected provider (like Metamask), or both.</p>
+				<p>In order to configure the provider use the following code samples to set up the Project. Follow one of the following examples to set this up in your sandbox, dapp or node server, dependent on the situation.</p>
+				<p>For cases (1) and (2) you will need to set up an Injected Web3 Provider (Metamask). An example of doing so is below. More info on new and legacy metamask providers here: <a href="https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8">Metamask Medium Post</a></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getInjectedProviderIfExists</span>(<span class="hljs-params"></span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">Provider</span>&gt; </span>{
+  <span class="hljs-comment">// New Metamask Version</span>
+  <span class="hljs-keyword">let</span> injectedProviderIfExists = (<span class="hljs-built_in">window</span> <span class="hljs-keyword">as</span> any).ethereum;
+  <span class="hljs-keyword">if</span> (injectedProviderIfExists !== <span class="hljs-literal">undefined</span>) {
+    <span class="hljs-keyword">if</span> (injectedProviderIfExists.enable !== <span class="hljs-literal">undefined</span>) {
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">await</span> injectedProviderIfExists.enable();
+      } <span class="hljs-keyword">catch</span> (err) {
+        <span class="hljs-comment">// Error with Enabling Metamask</span>
+      }
+    }
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// Legacy Metamask Version</span>
+    <span class="hljs-keyword">const</span> injectedWeb3IfExists = (<span class="hljs-built_in">window</span> <span class="hljs-keyword">as</span> any).web3;
+    <span class="hljs-keyword">if</span> (injectedWeb3IfExists !== <span class="hljs-literal">undefined</span> &amp;&amp; injectedWeb3IfExists.currentProvider !== <span class="hljs-literal">undefined</span>) {
+      injectedProviderIfExists = injectedWeb3IfExists.currentProvider;
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-comment">// Error with legacy metamask</span>
+    }
+  }
+  <span class="hljs-keyword">return</span> injectedProviderIfExists;
+}</code></pre>
+				<p><em>Setting up Polymath API for 4 different cases</em></p>
+				<p>(1) Using Injected Provider (Metamask) to read from the blockchain and publish transactions on the blockchain.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> injectedProviderIfExists = <span class="hljs-keyword">await</span> getInjectedProviderIfExists();
+<span class="hljs-comment">// Setup API</span>
+<span class="hljs-keyword">const</span> params: ApiConstructorParams = {
+  <span class="hljs-attr">provider</span>: <span class="hljs-keyword">new</span> MetamaskSubprovider(injectedProviderIfExists),
+  <span class="hljs-attr">polymathRegistryAddress</span>: <span class="hljs-string">'&lt;Deployed Polymath Registry Address&gt;'</span>,
+};
+<span class="hljs-keyword">const</span> polymathAPI = <span class="hljs-keyword">new</span> PolymathAPI(params);</code></pre>
+				<p>(2) Using a Redundant Provider on node to read from the blokchain and Injected Provider (Metamask) to publish transactions.</p>
+				<pre><code class="language-javascript"><span class="hljs-comment">// Instantiate a provider engine</span>
+<span class="hljs-keyword">const</span> providerEngine = <span class="hljs-keyword">new</span> Web3ProviderEngine();
+
+<span class="hljs-keyword">const</span> injectedProviderIfExists = <span class="hljs-keyword">await</span> getInjectedProviderIfExists();
+providerEngine.addProvider(<span class="hljs-keyword">new</span> MetamaskSubprovider(injectedProviderIfExists));
+
+<span class="hljs-comment">// Add Redundant Subprovider</span>
+providerEngine.addProvider(<span class="hljs-keyword">new</span> RedundantSubprovider([<span class="hljs-keyword">new</span> RPCSubprovider(<span class="hljs-string">'&lt;http://examplenoderpc:port&gt;'</span>)]));
+providerEngine.start();
+
+<span class="hljs-comment">// Setup API</span>
+<span class="hljs-keyword">const</span> params: ApiConstructorParams = {
+  <span class="hljs-attr">provider</span>: providerEngine,
+  <span class="hljs-attr">polymathRegistryAddress</span>: <span class="hljs-string">'&lt;Deployed Polymath Registry Address&gt;'</span>,
+};
+<span class="hljs-keyword">const</span> polymathAPI = <span class="hljs-keyword">new</span> PolymathAPI(params);</code></pre>
+				<p>(3) Using a Redundant Provider on a node to read from the blockchain and publish transactions on an unlocked blockchain node (No Private Key Required).</p>
+				<pre><code class="language-javascript"><span class="hljs-comment">// Instantiate Provider Engine</span>
+<span class="hljs-keyword">const</span> providerEngine = <span class="hljs-keyword">new</span> Web3ProviderEngine();
+providerEngine.addProvider(<span class="hljs-keyword">new</span> RedundantSubprovider([<span class="hljs-keyword">new</span> RPCSubprovider(<span class="hljs-string">'&lt;http://examplenoderpc:port&gt;'</span>)]));
+providerEngine.start();
+
+<span class="hljs-comment">// Setup API</span>
+<span class="hljs-keyword">const</span> params: ApiConstructorParams = {
+  <span class="hljs-attr">provider</span>: providerEngine,
+  <span class="hljs-attr">polymathRegistryAddress</span>: <span class="hljs-string">'&lt;Deployed Polymath Registry Address&gt;'</span>,
+};
+<span class="hljs-keyword">const</span> polymathAPI = <span class="hljs-keyword">new</span> PolymathAPI(params);</code></pre>
+				<p>(4) Using a PrivateKeyWalletSubProvider to sign transactions being published on a normal blockchain node, and using Redundant Provider to read from blockchain.</p>
+				<pre><code class="language-javascript"><span class="hljs-comment">// Instantiate Provider Engine</span>
+<span class="hljs-keyword">const</span> providerEngine = <span class="hljs-keyword">new</span> Web3ProviderEngine();
+providerEngine.addProvider(<span class="hljs-keyword">new</span> PrivateKeyWalletSubprovider(<span class="hljs-string">'&lt;Private Key Here&gt;'</span>));
+providerEngine.addProvider(<span class="hljs-keyword">new</span> RedundantSubprovider([<span class="hljs-keyword">new</span> RPCSubprovider(<span class="hljs-string">'&lt;http://examplenoderpc:port&gt;'</span>)]));
+providerEngine.start();
+
+<span class="hljs-comment">// Setup API</span>
+<span class="hljs-keyword">const</span> params: ApiConstructorParams = {
+  <span class="hljs-attr">provider</span>: providerEngine,
+  <span class="hljs-attr">polymathRegistryAddress</span>: <span class="hljs-string">'&lt;Deployed Polymath Registry Address&gt;'</span>,
+};
+<span class="hljs-keyword">const</span> polymathAPI = <span class="hljs-keyword">new</span> PolymathAPI(params);</code></pre>
+				<a href="#module-code-examples" id="module-code-examples" style="color: inherit; text-decoration: none;">
+					<h3>Module code examples</h3>
+				</a>
+				<p>In the <code>/examples</code> directory there are several examples to help developers understand how to use the API within the sandbox.</p>
+				<p>These examples demonstrate the use of the project&#39;s PolymathAPI to get data and publish transactions with Polymath&#39;s smart contracts. Register a ticker, generate a new security token and then you can add a module.</p>
+				<p>When a security token has a module successfully attached, the examples demonstrate how one can work with sto creation, transfer restrictions, permissioning, and directly with the security token. </p>
+				<p>The sandbox code included in the examples demonstrates how to subscribe to events fired from the smart contracts. It also demonstrates how to better catch issues when they happen, during token transfers for instance.</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -105,58 +237,202 @@
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_addresses_.html">"addresses"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_capped_sto_factory_wrapper_.html">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>factory_<wbr>wrapper"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_capped_sto_wrapper_.html">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>wrapper"</a>
+						<a href="modules/_polymathapi_.html">"<wbr>PolymathAPI"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_contract_wrappers_contract_wrapper_.html">"contract_<wbr>wrappers/contract_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_module_factory_wrapper_.html">"contract_<wbr>wrappers/module_<wbr>factory_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules___tests___module_factory_wrapper_test_.html">"contract_<wbr>wrappers/modules/__tests__/module_<wbr>factory_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_module_registry_wrapper_.html">"contract_<wbr>wrappers/module_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_poly_token_wrapper_.html">"contract_<wbr>wrappers/poly_<wbr>token_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___erc20_dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_polymath_registry_wrapper_.html">"contract_<wbr>wrappers/polymath_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___ether_dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_security_token_registry_wrapper_.html">"contract_<wbr>wrappers/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_security_token_wrapper_.html">"contract_<wbr>wrappers/security_<wbr>token_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_erc20_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_usd_tiered_sto_factory_wrapper_.html">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>factory_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_ether_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_usd_tiered_sto_wrapper_.html">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_module_factory_wrapper_.html">"contract_<wbr>wrappers/modules/module_<wbr>factory_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_module_wrapper_.html">"contract_<wbr>wrappers/modules/module_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_permission_manager___tests___general_permission_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/permission_<wbr>manager/__tests__/general_<wbr>permission_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_permission_manager_general_permission_manager_wrapper_.html">"contract_<wbr>wrappers/modules/permission_<wbr>manager/general_<wbr>permission_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___capped_sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/capped_<wbr>sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___usd_tiered_sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_capped_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/capped_<wbr>sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_usd_tiered_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___blacklist_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___count_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/count_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___general_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/general_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___lock_up_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___manual_approval_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___percentage_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___volume_restriction_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_blacklist_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_count_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/count_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_general_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/general_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_lock_up_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_manual_approval_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_percentage_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_volume_restriction_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_wallet___tests___vesting_escrow_wallet_wrapper_test_.html">"contract_<wbr>wrappers/modules/wallet/__tests__/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_wallet_vesting_escrow_wallet_wrapper_.html">"contract_<wbr>wrappers/modules/wallet/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___feature_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/feature_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___module_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/module_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___polymath_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/polymath_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___security_token_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/security_<wbr>token_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_feature_registry_wrapper_.html">"contract_<wbr>wrappers/registries/feature_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_module_registry_wrapper_.html">"contract_<wbr>wrappers/registries/module_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_polymath_registry_wrapper_.html">"contract_<wbr>wrappers/registries/polymath_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_security_token_registry_wrapper_.html">"contract_<wbr>wrappers/registries/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___alternative_erc20_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/alternative_<wbr>erc20_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___erc20_detailed_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>detailed_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___erc20_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___poly_token_faucet_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>faucet_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___poly_token_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___security_token_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/security_<wbr>token_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_alternative_erc20_wrapper_.html">"contract_<wbr>wrappers/tokens/alternative_<wbr>erc20_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_erc20_detailed_wrapper_.html">"contract_<wbr>wrappers/tokens/erc20_<wbr>detailed_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_erc20_wrapper_.html">"contract_<wbr>wrappers/tokens/erc20_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_poly_token_faucet_wrapper_.html">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>faucet_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_poly_token_wrapper_.html">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_security_token_wrapper_.html">"contract_<wbr>wrappers/tokens/security_<wbr>token_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_contractfactory_.html">"factories/contract<wbr>Factory"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_modulewrapperfactory_.html">"factories/module<wbr>Wrapper<wbr>Factory"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_tokenwrapperfactory_.html">"factories/token<wbr>Wrapper<wbr>Factory"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_index_.html">"index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_schemas_contract_wrappers_config_schema_.html">"schemas/contract_<wbr>wrappers_<wbr>config_<wbr>schema"</a>
+						<a href="modules/_test_utils_mocked_methods_.html">"test_<wbr>utils/mocked_<wbr>methods"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_types_.html">"types"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="modules/_utils_addresses_.html">"utils/addresses"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_utils_assert_.html">"utils/assert"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_utils_contract_addresses_.html">"utils/contract_<wbr>addresses"</a>
+						<a href="modules/_utils_convert_.html">"utils/convert"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_utils_transactions_.html">"utils/transactions"</a>
+						<a href="modules/_utils_filter_utils_.html">"utils/filter_<wbr>utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_utils_functions_utils_.html">"utils/functions_<wbr>utils"</a>
 					</li>
 				</ul>
 			</nav>
@@ -179,6 +455,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -227,7 +504,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>

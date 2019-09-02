@@ -27,61 +27,109 @@ export namespace DividendCheckpointTransactionParams {
   export interface UpdateDividendDates extends UpdateDividendDatesParams {}
 }
 
+/**
+ * @param dividendIndex Index of the dividend
+ */
 interface DividendIndexParams {
   dividendIndex: number;
 }
 
+/**
+ * @param checkpointId Checkpoint identifier
+ */
 interface CheckpointIdParams {
   checkpointId: number;
 }
 
+/**
+ * @param investor Address of the investor
+ */
 interface InvestorParams {
   investor: string;
 }
 
+/**
+ * @param dividendIndex Dividend to calculate
+ * @param payee Affected investor address
+ */
 interface CalculateDividendParams {
   dividendIndex: number;
   payee: string;
 }
 
+/**
+ * @param investor Investor address to check
+ * @param dividendIndex Dividend to withdraw from
+ */
 interface InvestorStatus {
   investor: string;
   dividendIndex: number;
 }
 
+/**
+ * @param wallet Ethereum account address to receive reclaimed dividends and tax
+ */
 interface ChangeWalletParams extends TxParams {
   wallet: string;
 }
 
+/**
+ * @param excluded Addresses of investors
+ */
 interface SetDefaultExcludedParams extends TxParams {
   excluded: string[];
 }
 
+/**
+ * @param investors Addresses of investors
+ * @param withholding Withholding tax array for individual investors
+ */
 interface SetWithholdingParams extends TxParams {
   investors: string[];
   withholding: BigNumber[];
 }
 
+/**
+ * @param investors Addresses of investor
+ * @param withholding Single withholding tax for all investors
+ */
 interface SetWithholdingFixedParams extends TxParams {
   investors: string[];
   withholding: BigNumber;
 }
 
+/**
+ * @param dividendIndex Dividend index to push
+ * @param payees Addresses to which to push the dividend
+ */
 interface PushDividendPaymentToAddressesParams extends TxParams {
   dividendIndex: number;
   payees: string[];
 }
 
+/**
+ * @param dividendIndex Dividend to push
+ * @param start Index in investor list at which to start pushing dividends
+ * @param end Index in investor list at which to stop pushing dividends
+ */
 interface PushDividendPaymentParams extends TxParams {
   dividendIndex: number;
-  start: Date;
-  iterations: number;
+  start: number;
+  end: number;
 }
 
+/**
+ * @param dividendIndex Dividend index to use
+ */
 interface DividendIndexTxParams extends TxParams {
   dividendIndex: number;
 }
 
+/**
+ * @param dividendIndex Dividend to withdraw from
+ * @param maturity Updated maturity date
+ * @param expiry Updated expiry date
+ */
 interface UpdateDividendDatesParams extends TxParams {
   dividendIndex: number;
   maturity: Date;
@@ -179,19 +227,34 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
 
   protected abstract getDecimals(dividendIndex: number): Promise<BigNumber>;
 
-  public wallet = async () => {
+  /**
+   *  wallet
+   */
+  public wallet = async (): Promise<string> => {
     return (await this.contract).wallet.callAsync();
   };
 
+  /**
+   *  get the treasury wallet
+   */
   public getTreasuryWallet = async (): Promise<string> => {
     return (await this.contract).getTreasuryWallet.callAsync();
   };
 
-  public paused = async () => {
+  /**
+   *  check if the module is paused
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
-  public dividends = async (params: DividendIndexParams) => {
+  /**
+   *  check dividend information at a specific dividend index
+   *  @return checkpointId, created, maturity, expiry, token amount,
+   *  claimedAmount, totalSupply, reclaimed tokens, total withheld,
+   *  total withdrawn and name of dividend
+   */
+  public dividends = async (params: DividendIndexParams): Promise<Dividend> => {
     const decimals = await this.getDecimals(params.dividendIndex);
     const result = await (await this.contract).dividends.callAsync(numberToBigNumber(params.dividendIndex));
     const typedResult: Dividend = {
@@ -210,15 +273,26 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return typedResult;
   };
 
-  public excluded = async (params: DividendIndexParams) => {
+  /**
+   *  check excluded address at a specific dividend index
+   *  @return excluded address
+   */
+  public excluded = async (params: DividendIndexParams): Promise<string> => {
     return (await this.contract).excluded.callAsync(numberToBigNumber(params.dividendIndex));
   };
 
-  public withholdingTax = async (params: InvestorParams) => {
+  /**
+   *  check withholding tax for an investor
+   *  @return amount of withholding tax
+   */
+  public withholdingTax = async (params: InvestorParams): Promise<BigNumber> => {
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).withholdingTax.callAsync(params.investor);
   };
 
+  /**
+   *  pause the module
+   */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
     assert.assert(
@@ -229,6 +303,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  unpause the module
+   */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Contract currently not paused');
     assert.assert(
@@ -239,6 +316,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Function used to change wallet address
+   */
   public changeWallet = async (params: ChangeWalletParams) => {
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
     assert.assert(
@@ -249,10 +329,17 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).changeWallet.sendTransactionAsync(params.wallet, params.txData, params.safetyFactor);
   };
 
-  public getDefaultExcluded = async () => {
+  /**
+   * Return the default excluded addresses
+   * @return List of excluded addresses
+   */
+  public getDefaultExcluded = async (): Promise<string[]> => {
     return (await this.contract).getDefaultExcluded.callAsync();
   };
 
+  /**
+   * Creates a checkpoint on the security token
+   */
   public createCheckpoint = async (params: TxParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
@@ -262,6 +349,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).createCheckpoint.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Function to clear and set list of excluded addresses used for future dividends
+   */
   public setDefaultExcluded = async (params: SetDefaultExcludedParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -282,6 +372,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Function to set withholding tax rates for investors
+   */
   public setWithholding = async (params: SetWithholdingParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -302,6 +395,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Function to set withholding tax rates for investors
+   */
   public setWithholdingFixed = async (params: SetWithholdingFixedParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -317,6 +413,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Issuer can push dividends to provided addresses
+   */
   public pushDividendPaymentToAddresses = async (params: PushDividendPaymentToAddressesParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
@@ -333,6 +432,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Issuer can push dividends using the investor list from the security token
+   */
   public pushDividendPayment = async (params: PushDividendPaymentParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
@@ -342,13 +444,16 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     await this.checkValidDividend(params.dividendIndex);
     return (await this.contract).pushDividendPayment.sendTransactionAsync(
       numberToBigNumber(params.dividendIndex),
-      dateToBigNumber(params.start),
-      numberToBigNumber(params.iterations),
+      numberToBigNumber(params.start),
+      numberToBigNumber(params.end),
       params.txData,
       params.safetyFactor,
     );
   };
 
+  /**
+   * Investors can pull their own dividends
+   */
   public pullDividendPayment = async (params: DividendIndexTxParams) => {
     await this.checkValidDividend(params.dividendIndex);
     assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Contract currently paused');
@@ -370,6 +475,9 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Issuer can reclaim remaining unclaimed dividend amounts, for expired dividends
+   */
   public reclaimDividend = async (params: DividendIndexTxParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
@@ -391,6 +499,10 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Calculate amount of dividends claimable
+   * @return claim, withheld amounts
+   */
   public calculateDividend = async (params: CalculateDividendParams) => {
     assert.assert(
       await this.isValidDividendIndex(params.dividendIndex),
@@ -409,10 +521,22 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return typedResult;
   };
 
-  public getDividendIndex = async (params: CheckpointIdParams) => {
-    return (await this.contract).getDividendIndex.callAsync(numberToBigNumber(params.checkpointId));
+  /**
+   * Get the index according to the checkpoint id
+   * @return dividend index
+   */
+  public getDividendIndex = async (params: CheckpointIdParams): Promise<number[]> => {
+    const dividendIndex = await (await this.contract).getDividendIndex.callAsync(
+      numberToBigNumber(params.checkpointId),
+    );
+    return dividendIndex.map(index => {
+      return index.toNumber();
+    });
   };
 
+  /**
+   * Allows issuer to withdraw withheld tax
+   */
   public withdrawWithholding = async (params: DividendIndexTxParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
@@ -431,6 +555,13 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Allows issuer to change maturity / expiry dates for dividends
+   * NB - setting the maturity of a currently matured dividend to a future date
+   * will effectively refreeze claims on that dividend until the new maturity date passes
+   * @ dev NB - setting the expiry date to a past date will mean no more payments can be pulled
+   * or pushed out of a dividend
+   */
   public updateDividendDates = async (params: UpdateDividendDatesParams) => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -452,6 +583,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Get static dividend data
+   * @return timestamp of dividends creation, timestamp of dividends maturity, timestamp of dividends expiry, amount
+   * of dividends, claimed amount of dividends, name of dividends
+   */
   public getDividendsData = async () => {
     const result = await (await this.contract).getDividendsData.callAsync();
     const typedResult: Promise<DividendData>[] = [];
@@ -476,6 +612,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     };
   };
 
+  /**
+   * Get static dividend data
+   * @return timestamp of dividend creation, timestamp of dividend maturity, timestamp of dividend expiry, amount of
+   * dividend, claimed amount of dividend, name of dividend
+   */
   public getDividendData = async (params: DividendIndexParams) => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getDividendData.callAsync(numberToBigNumber(params.dividendIndex));
@@ -490,6 +631,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return typedResult;
   };
 
+  /**
+   * Retrieves list of investors, their claim status and whether they are excluded
+   * @return list of investors, whether investor has claimed, whether investor is excluded, amount of withheld tax
+   * (estimate if not claimed), amount of claim (estimate if not claimeed), investor balance
+   */
   public getDividendProgress = async (params: DividendIndexParams) => {
     assert.assert(
       await this.isValidDividendIndex(params.dividendIndex),
@@ -520,7 +666,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     };
   };
 
-  public getCheckpointData = async (params: CheckpointIdParams) => {
+  /**
+   * Retrieves list of investors, their balances, and their current withholding tax percentage
+   * @return list of investors, investor balances, investor withheld percentages
+   */
+  public getCheckpointData = async (params: CheckpointIdParams): Promise<CheckpointData[]> => {
     const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
     assert.assert(
       params.checkpointId <= new BigNumber(currentCheckpointId).toNumber(),
@@ -547,7 +697,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     };
   };
 
-  public isClaimed = async (params: InvestorStatus) => {
+  /**
+   * Checks whether an address has claimed a dividend
+   * @return bool whether the address has claimed
+   */
+  public isClaimed = async (params: InvestorStatus): Promise<boolean> => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(
       await this.isValidDividendIndex(params.dividendIndex),
@@ -557,7 +711,11 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).isClaimed.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
-  public isExcluded = async (params: InvestorStatus) => {
+  /**
+   * Checks whether an address is excluded from claiming a dividend
+   * @return bool whether the address is excluded
+   */
+  public isExcluded = async (params: InvestorStatus): Promise<boolean> => {
     assert.isETHAddressHex('investor', params.investor);
     assert.assert(
       await this.isValidDividendIndex(params.dividendIndex),

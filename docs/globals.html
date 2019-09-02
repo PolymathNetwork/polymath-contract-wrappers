@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Polymath API</title>
+	<title>@polymathnetwork/contract-wrappers</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">Polymath API</a>
+					<a href="index.html" class="title">@polymathnetwork/contract-wrappers</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -38,6 +38,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 							<input type="checkbox" id="tsd-filter-only-exported" />
 							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
@@ -54,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> Polymath API</h1>
+			<h1> @polymathnetwork/contract-wrappers</h1>
 		</div>
 	</div>
 </header>
@@ -68,24 +70,72 @@
 						<section class="tsd-index-section ">
 							<h3>External modules</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-external-module"><a href="modules/_addresses_.html" class="tsd-kind-icon">"addresses"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_capped_sto_factory_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>factory_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_capped_sto_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_polymathapi_.html" class="tsd-kind-icon">"<wbr>PolymathAPI"</a></li>
 								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_contract_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/contract_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_module_factory_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/module_<wbr>factory_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_module_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/module_<wbr>registry_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_poly_token_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/poly_<wbr>token_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_polymath_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/polymath_<wbr>registry_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_security_token_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_security_token_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/security_<wbr>token_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_usd_tiered_sto_factory_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>factory_<wbr>wrapper"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_usd_tiered_sto_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules___tests___module_factory_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/__tests__/module_<wbr>factory_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint___tests___dividend_checkpoint_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/__tests__/dividend_<wbr>checkpoint_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint___tests___erc20_dividend_checkpoint_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/__tests__/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint___tests___ether_dividend_checkpoint_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/__tests__/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint_dividend_checkpoint_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/dividend_<wbr>checkpoint_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint_erc20_dividend_checkpoint_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_checkpoint_ether_dividend_checkpoint_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/checkpoint/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_module_factory_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/module_<wbr>factory_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_module_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/module_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_permission_manager___tests___general_permission_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/permission_<wbr>manager/__tests__/general_<wbr>permission_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_permission_manager_general_permission_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/permission_<wbr>manager/general_<wbr>permission_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto___tests___capped_sto_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/__tests__/capped_<wbr>sto_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto___tests___sto_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/__tests__/sto_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto___tests___usd_tiered_sto_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/__tests__/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto_capped_sto_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/capped_<wbr>sto_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto_sto_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/sto_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_sto_usd_tiered_sto_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/sto/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___blacklist_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___count_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/count_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___general_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/general_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___lock_up_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___manual_approval_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___percentage_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager___tests___volume_restriction_transfer_manager_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_blacklist_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_count_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/count_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_general_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/general_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_lock_up_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_manual_approval_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_percentage_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_transfer_manager_volume_restriction_transfer_manager_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_wallet___tests___vesting_escrow_wallet_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/wallet/__tests__/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_modules_wallet_vesting_escrow_wallet_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/modules/wallet/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries___tests___feature_registry_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/__tests__/feature_<wbr>registry_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries___tests___module_registry_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/__tests__/module_<wbr>registry_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries___tests___polymath_registry_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/__tests__/polymath_<wbr>registry_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries___tests___security_token_registry_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/__tests__/security_<wbr>token_<wbr>registry_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries_feature_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/feature_<wbr>registry_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries_module_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/module_<wbr>registry_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries_polymath_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/polymath_<wbr>registry_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_registries_security_token_registry_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/registries/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___alternative_erc20_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/alternative_<wbr>erc20_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___erc20_detailed_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>detailed_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___erc20_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___poly_token_faucet_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>faucet_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___poly_token_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens___tests___security_token_wrapper_test_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/__tests__/security_<wbr>token_<wbr>wrapper.test"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_alternative_erc20_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/alternative_<wbr>erc20_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_erc20_detailed_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/erc20_<wbr>detailed_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_erc20_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/erc20_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_poly_token_faucet_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>faucet_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_poly_token_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_contract_wrappers_tokens_security_token_wrapper_.html" class="tsd-kind-icon">"contract_<wbr>wrappers/tokens/security_<wbr>token_<wbr>wrapper"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_factories_contractfactory_.html" class="tsd-kind-icon">"factories/contract<wbr>Factory"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_factories_modulewrapperfactory_.html" class="tsd-kind-icon">"factories/module<wbr>Wrapper<wbr>Factory"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_factories_tokenwrapperfactory_.html" class="tsd-kind-icon">"factories/token<wbr>Wrapper<wbr>Factory"</a></li>
 								<li class="tsd-kind-external-module"><a href="modules/_index_.html" class="tsd-kind-icon">"index"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_schemas_contract_wrappers_config_schema_.html" class="tsd-kind-icon">"schemas/contract_<wbr>wrappers_<wbr>config_<wbr>schema"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_test_utils_mocked_methods_.html" class="tsd-kind-icon">"test_<wbr>utils/mocked_<wbr>methods"</a></li>
 								<li class="tsd-kind-external-module"><a href="modules/_types_.html" class="tsd-kind-icon">"types"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_utils_addresses_.html" class="tsd-kind-icon">"utils/addresses"</a></li>
 								<li class="tsd-kind-external-module"><a href="modules/_utils_assert_.html" class="tsd-kind-icon">"utils/assert"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_utils_contract_addresses_.html" class="tsd-kind-icon">"utils/contract_<wbr>addresses"</a></li>
-								<li class="tsd-kind-external-module"><a href="modules/_utils_transactions_.html" class="tsd-kind-icon">"utils/transactions"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_utils_convert_.html" class="tsd-kind-icon">"utils/convert"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_utils_filter_utils_.html" class="tsd-kind-icon">"utils/filter_<wbr>utils"</a></li>
+								<li class="tsd-kind-external-module"><a href="modules/_utils_functions_utils_.html" class="tsd-kind-icon">"utils/functions_<wbr>utils"</a></li>
 							</ul>
 						</section>
 					</div>
@@ -99,58 +149,202 @@
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_addresses_.html">"addresses"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_capped_sto_factory_wrapper_.html">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>factory_<wbr>wrapper"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_capped_sto_wrapper_.html">"contract_<wbr>wrappers/capped_<wbr>sto_<wbr>wrapper"</a>
+						<a href="modules/_polymathapi_.html">"<wbr>PolymathAPI"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_contract_wrappers_contract_wrapper_.html">"contract_<wbr>wrappers/contract_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_module_factory_wrapper_.html">"contract_<wbr>wrappers/module_<wbr>factory_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules___tests___module_factory_wrapper_test_.html">"contract_<wbr>wrappers/modules/__tests__/module_<wbr>factory_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_module_registry_wrapper_.html">"contract_<wbr>wrappers/module_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_poly_token_wrapper_.html">"contract_<wbr>wrappers/poly_<wbr>token_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___erc20_dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_polymath_registry_wrapper_.html">"contract_<wbr>wrappers/polymath_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint___tests___ether_dividend_checkpoint_wrapper_test_.html">"contract_<wbr>wrappers/modules/checkpoint/__tests__/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper.test"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_security_token_registry_wrapper_.html">"contract_<wbr>wrappers/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_security_token_wrapper_.html">"contract_<wbr>wrappers/security_<wbr>token_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_erc20_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/erc20_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_usd_tiered_sto_factory_wrapper_.html">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>factory_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_checkpoint_ether_dividend_checkpoint_wrapper_.html">"contract_<wbr>wrappers/modules/checkpoint/ether_<wbr>dividend_<wbr>checkpoint_<wbr>wrapper"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_contract_wrappers_usd_tiered_sto_wrapper_.html">"contract_<wbr>wrappers/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a>
+						<a href="modules/_contract_wrappers_modules_module_factory_wrapper_.html">"contract_<wbr>wrappers/modules/module_<wbr>factory_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_module_wrapper_.html">"contract_<wbr>wrappers/modules/module_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_permission_manager___tests___general_permission_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/permission_<wbr>manager/__tests__/general_<wbr>permission_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_permission_manager_general_permission_manager_wrapper_.html">"contract_<wbr>wrappers/modules/permission_<wbr>manager/general_<wbr>permission_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___capped_sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/capped_<wbr>sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto___tests___usd_tiered_sto_wrapper_test_.html">"contract_<wbr>wrappers/modules/sto/__tests__/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_capped_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/capped_<wbr>sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_sto_usd_tiered_sto_wrapper_.html">"contract_<wbr>wrappers/modules/sto/usd_<wbr>tiered_<wbr>sto_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___blacklist_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___count_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/count_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___general_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/general_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___lock_up_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___manual_approval_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___percentage_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager___tests___volume_restriction_transfer_manager_wrapper_test_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/__tests__/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_blacklist_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/blacklist_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_count_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/count_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_general_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/general_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_lock_up_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/lock_<wbr>up_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_manual_approval_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/manual_<wbr>approval_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_percentage_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/percentage_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_transfer_manager_volume_restriction_transfer_manager_wrapper_.html">"contract_<wbr>wrappers/modules/transfer_<wbr>manager/volume_<wbr>restriction_<wbr>transfer_<wbr>manager_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_wallet___tests___vesting_escrow_wallet_wrapper_test_.html">"contract_<wbr>wrappers/modules/wallet/__tests__/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_modules_wallet_vesting_escrow_wallet_wrapper_.html">"contract_<wbr>wrappers/modules/wallet/vesting_<wbr>escrow_<wbr>wallet_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___feature_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/feature_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___module_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/module_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___polymath_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/polymath_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries___tests___security_token_registry_wrapper_test_.html">"contract_<wbr>wrappers/registries/__tests__/security_<wbr>token_<wbr>registry_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_feature_registry_wrapper_.html">"contract_<wbr>wrappers/registries/feature_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_module_registry_wrapper_.html">"contract_<wbr>wrappers/registries/module_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_polymath_registry_wrapper_.html">"contract_<wbr>wrappers/registries/polymath_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_registries_security_token_registry_wrapper_.html">"contract_<wbr>wrappers/registries/security_<wbr>token_<wbr>registry_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___alternative_erc20_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/alternative_<wbr>erc20_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___erc20_detailed_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>detailed_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___erc20_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/erc20_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___poly_token_faucet_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>faucet_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___poly_token_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/poly_<wbr>token_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens___tests___security_token_wrapper_test_.html">"contract_<wbr>wrappers/tokens/__tests__/security_<wbr>token_<wbr>wrapper.test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_alternative_erc20_wrapper_.html">"contract_<wbr>wrappers/tokens/alternative_<wbr>erc20_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_erc20_detailed_wrapper_.html">"contract_<wbr>wrappers/tokens/erc20_<wbr>detailed_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_erc20_wrapper_.html">"contract_<wbr>wrappers/tokens/erc20_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_poly_token_faucet_wrapper_.html">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>faucet_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_poly_token_wrapper_.html">"contract_<wbr>wrappers/tokens/poly_<wbr>token_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_contract_wrappers_tokens_security_token_wrapper_.html">"contract_<wbr>wrappers/tokens/security_<wbr>token_<wbr>wrapper"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_contractfactory_.html">"factories/contract<wbr>Factory"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_modulewrapperfactory_.html">"factories/module<wbr>Wrapper<wbr>Factory"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_factories_tokenwrapperfactory_.html">"factories/token<wbr>Wrapper<wbr>Factory"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_index_.html">"index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_schemas_contract_wrappers_config_schema_.html">"schemas/contract_<wbr>wrappers_<wbr>config_<wbr>schema"</a>
+						<a href="modules/_test_utils_mocked_methods_.html">"test_<wbr>utils/mocked_<wbr>methods"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_types_.html">"types"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
+						<a href="modules/_utils_addresses_.html">"utils/addresses"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
 						<a href="modules/_utils_assert_.html">"utils/assert"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_utils_contract_addresses_.html">"utils/contract_<wbr>addresses"</a>
+						<a href="modules/_utils_convert_.html">"utils/convert"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_utils_transactions_.html">"utils/transactions"</a>
+						<a href="modules/_utils_filter_utils_.html">"utils/filter_<wbr>utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_utils_functions_utils_.html">"utils/functions_<wbr>utils"</a>
 					</li>
 				</ul>
 			</nav>
@@ -173,6 +367,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -221,7 +416,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>

@@ -12,11 +12,12 @@ import ContractFactory from '../../../../factories/contractFactory';
 import {
   bytes32ToString,
   dateToBigNumber,
-  numberToBigNumber,
   stringToBytes32,
   valueArrayToWeiArray,
   weiToValue,
   valueToWei,
+  numberArrayToBigNumberArray,
+  numberToBigNumber,
 } from '../../../../utils/convert';
 import ModuleWrapper from '../../module_wrapper';
 
@@ -953,8 +954,8 @@ describe('DividendCheckpointWrapper', () => {
 
       const mockedParams = {
         dividendIndex,
-        start: new Date(2030, 1),
-        iterations: 3,
+        start: 1,
+        end: 4,
         txData: {},
         safetyFactor: 10,
       };
@@ -967,8 +968,8 @@ describe('DividendCheckpointWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(numberToBigNumber(mockedParams.iterations)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -984,8 +985,8 @@ describe('DividendCheckpointWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           objectContaining(new BigNumber(mockedParams.dividendIndex)),
-          objectContaining(dateToBigNumber(mockedParams.start)),
-          objectContaining(numberToBigNumber(mockedParams.iterations)),
+          objectContaining(numberToBigNumber(mockedParams.start)),
+          objectContaining(numberToBigNumber(mockedParams.end)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -1337,7 +1338,7 @@ describe('DividendCheckpointWrapper', () => {
       const result = await target.getDividendIndex(mockedParams);
 
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(numberArrayToBigNumberArray(result)).toEqual(expectedResult);
 
       // Verifications
       verify(mockedContract.getDividendIndex).once();

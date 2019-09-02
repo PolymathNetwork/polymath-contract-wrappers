@@ -66,39 +66,71 @@ export namespace GeneralPermissionManagerTransactionParams {
   export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ * @param module Ethereum contract address of the module
+ * @param perm Permission flag
+ */
 interface PermParams {
   module: string;
   delegate: string;
   permission: Perm;
 }
 
+/**
+ * @param delegateIndex Index of the delegate
+ */
 interface DelegateIndexParams {
   delegateIndex: number;
 }
 
+/**
+ * @param delegate the address of potential delegate
+ */
 interface DelegateParams {
   delegate: string;
 }
 
+/**
+ * @param module Ethereum contract address of the module
+ * @param perm Permission flag
+ */
 interface GetAllDelegatesWithPermParams {
   module: string;
   perm: Perm;
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ * @param types Array of types
+ */
 interface GetAllModulesAndPermsFromTypesParams {
   delegate: string;
   types: number[];
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ */
 interface DelegateTxParams extends TxParams {
   delegate: string;
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ * @param details Details about the delegate i.e `Belongs to financial firm`
+ */
 interface AddDelegateParams extends TxParams {
   delegate: string;
   details: string;
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ * @param module Ethereum contract address of the module
+ * @param perm Permission flag
+ * @param valid Bool flag use to switch on/off the permission
+ */
 interface ChangePermissionParams extends TxParams {
   delegate: string;
   module: string;
@@ -106,6 +138,12 @@ interface ChangePermissionParams extends TxParams {
   valid: boolean;
 }
 
+/**
+ * @param delegate Ethereum address of the delegate
+ * @param modules Multiple module matching the multiple perms, needs to be same length
+ * @param perms Multiple permission flag needs to be changed
+ * @param valids Bool array consist the flag to switch on/off the permission
+ */
 interface ChangePermissionMultiParams extends TxParams {
   delegate: string;
   modules: string[];
@@ -142,22 +180,35 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   * Mapping used to hold the permissions on the modules provided to delegate
+   */
   public perms = async (params: PermParams) => {
     assert.isETHAddressHex('module', params.module);
     assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).perms.callAsync(params.module, params.delegate, stringToBytes32(params.permission));
   };
 
-  public allDelegates = async (params: DelegateIndexParams) => {
+  /**
+   * Array to track all delegates
+   */
+  public allDelegates = async (params: DelegateIndexParams): Promise<string> => {
     return (await this.contract).allDelegates.callAsync(numberToBigNumber(params.delegateIndex));
   };
 
-  public delegateDetails = async (params: DelegateParams) => {
+  /**
+   * Mapping to hold the delegate details
+   */
+  public delegateDetails = async (params: DelegateParams): Promise<string> => {
     assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).delegateDetails.callAsync(params.delegate);
   };
 
-  public checkPermission = async (params: PermParams) => {
+  /**
+   * Used to check the permission on delegate corresponds to module contract address
+   * @return bool if permission is valid
+   */
+  public checkPermission = async (params: PermParams): Promise<boolean> => {
     assert.isETHAddressHex('delegate', params.delegate);
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).checkPermission.callAsync(
@@ -167,6 +218,9 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to add a delegate
+   */
   public addDelegate = async (params: AddDelegateParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -188,6 +242,9 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to delete a delegate
+   */
   public deleteDelegate = async (params: DelegateTxParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -207,11 +264,18 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public checkDelegate = async (params: DelegateParams) => {
+  /**
+   * Used to check if an address is a delegate or not
+   * @return boolean if address is delegate
+   */
+  public checkDelegate = async (params: DelegateParams): Promise<boolean> => {
     assert.isNonZeroETHAddressHex('delegate', params.delegate);
     return (await this.contract).checkDelegate.callAsync(params.delegate);
   };
 
+  /**
+   * Used to provide/change the permission to the delegate corresponds to the module contract
+   */
   public changePermission = async (params: ChangePermissionParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -230,6 +294,9 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Used to change one or more permissions for a single delegate at once
+   */
   public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -259,12 +326,22 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
   };
 
-  public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams) => {
+  /**
+   * Used to return all delegates with a given permission and module
+   * @return delegates address array
+   */
+  public getAllDelegatesWithPerm = async (params: GetAllDelegatesWithPermParams): Promise<string[]> => {
     assert.isETHAddressHex('module', params.module);
     return (await this.contract).getAllDelegatesWithPerm.callAsync(params.module, stringToBytes32(params.perm));
   };
 
-  public getAllModulesAndPermsFromTypes = async (params: GetAllModulesAndPermsFromTypesParams) => {
+  /**
+   * Used to return all permission of a single or multiple module
+   * @return The address array of Modules this delegate has permission, the permission array of the corresponding Modules
+   */
+  public getAllModulesAndPermsFromTypes = async (
+    params: GetAllModulesAndPermsFromTypesParams,
+  ): Promise<PermissionsPerModule[]> => {
     assert.isETHAddressHex('delegate', params.delegate);
     const result = await (await this.contract).getAllModulesAndPermsFromTypes.callAsync(params.delegate, params.types);
     // [module1, module1, module2, module3, module3], [perm1, perm2, perm1, perm2, perm3]
@@ -283,6 +360,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     return typedResult;
   };
 
+  /**
+   * Used to get all delegates
+   * @return delegate addresses array
+   */
   public getAllDelegates = async () => {
     return (await this.contract).getAllDelegates.callAsync();
   };
