@@ -1,7 +1,9 @@
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import ERC20DividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import EtherDividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
@@ -10,13 +12,19 @@ import USDTieredSTOWrapper from '../contract_wrappers/modules/sto/usd_tiered_sto
 import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
+import VestingEscrowWalletWrapper from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
-import { ModuleName } from '../types';
+import { ModuleName, ErrorCode } from '../types';
+import { PolymathError } from '../PolymathError';
 
 interface GetModuleParams {
   address: string;
   name: ModuleName;
+}
+
+interface GetVestingEscrowWallet extends GetModuleParams {
+  name: ModuleName.VestingEscrowWallet;
 }
 
 interface GetGeneralPermissionManager extends GetModuleParams {
@@ -37,6 +45,14 @@ interface GetManualApprovalTransferManager extends GetModuleParams {
 
 interface GetPercentageTransferManager extends GetModuleParams {
   name: ModuleName.PercentageTransferManager;
+}
+
+interface GetLockUpTransferManager extends GetModuleParams {
+  name: ModuleName.LockUpTransferManager;
+}
+
+interface GetBlacklistTransferManager extends GetModuleParams {
+  name: ModuleName.BlacklistTransferManager;
 }
 
 interface GetVolumeRestrictionTransferManager extends GetModuleParams {
@@ -65,11 +81,14 @@ interface GetModuleInstance {
   (params: GetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
+  (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
+  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTOWrapper>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
   (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpointWrapper>;
   (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpointWrapper>;
+  (params: GetVestingEscrowWallet): Promise<VestingEscrowWalletWrapper>;
 }
 
 /**
@@ -93,75 +112,116 @@ export default class ModuleWrapperFactory {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public getModuleInstance: GetModuleInstance = async (params: GetModuleParams): Promise<any> => {
     assert.isETHAddressHex('address', params.address);
+    let moduleWrapper;
     switch (params.name) {
       // Permission
       case ModuleName.GeneralPermissionManager:
-        return new GeneralPermissionManagerWrapper(
+        moduleWrapper = new GeneralPermissionManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralPermissionManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       // TMs
       case ModuleName.CountTransferManager:
-        return new CountTransferManagerWrapper(
+        moduleWrapper = new CountTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getCountTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.GeneralTransferManager:
-        return new GeneralTransferManagerWrapper(
+        moduleWrapper = new GeneralTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getGeneralTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.ManualApprovalTransferManager:
-        return new ManualApprovalTransferManagerWrapper(
+        moduleWrapper = new ManualApprovalTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getManualApprovalTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.PercentageTransferManager:
-        return new PercentageTransferManagerWrapper(
+        moduleWrapper = new PercentageTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
         );
+        break;
+      case ModuleName.LockUpTransferManager:
+        moduleWrapper = new LockUpTransferManagerWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getLockUpTransferManagerContract(params.address),
+          this.contractFactory,
+        );
+        break;
+      case ModuleName.BlacklistTransferManager:
+        moduleWrapper = new BlacklistTransferManagerWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getBlacklistTransferManagerContract(params.address),
+          this.contractFactory,
+        );
+        break;
       case ModuleName.VolumeRestrictionTM:
-        return new VolumeRestrictionTransferManagerWrapper(
+        moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,
         );
+        break;
       // STOs
       case ModuleName.CappedSTO:
-        return new CappedSTOWrapper(
+        moduleWrapper = new CappedSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getCappedSTOContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.UsdTieredSTO:
-        return new USDTieredSTOWrapper(
+        moduleWrapper = new USDTieredSTOWrapper(
           this.web3Wrapper,
           this.contractFactory.getUSDTieredSTOContract(params.address),
           this.contractFactory,
         );
+        break;
       // Checkpoint
       case ModuleName.ERC20DividendCheckpoint:
-        return new ERC20DividendCheckpointWrapper(
+        moduleWrapper = new ERC20DividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getERC20DividendCheckpointContract(params.address),
           this.contractFactory,
         );
+        break;
       case ModuleName.EtherDividendCheckpoint:
-        return new EtherDividendCheckpointWrapper(
+        moduleWrapper = new EtherDividendCheckpointWrapper(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
           this.contractFactory,
         );
+        break;
+      // Wallet
+      case ModuleName.VestingEscrowWallet:
+        moduleWrapper = new VestingEscrowWalletWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getVestingEscrowWalletContract(params.address),
+          this.contractFactory,
+        );
+        break;
       // Burn
       default:
         // TODO: Typed error here
-        throw new Error();
+        throw new PolymathError({ code: ErrorCode.NotFound });
     }
+
+    // validate module
+    if (await moduleWrapper.isValidModule()) {
+      return moduleWrapper;
+    }
+
+    // TODO: Typed error here
+    throw new PolymathError({ code: ErrorCode.InvalidData, message: 'Invalid module' });
   };
 }

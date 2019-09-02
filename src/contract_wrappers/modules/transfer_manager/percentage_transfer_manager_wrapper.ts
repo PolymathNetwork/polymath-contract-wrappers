@@ -7,11 +7,10 @@ import {
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs,
   PercentageTransferManagerPauseEventArgs,
   PercentageTransferManagerUnpauseEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { PercentageTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
@@ -25,8 +24,9 @@ import {
   GetLogs,
   Perm,
   PERCENTAGE_DECIMALS,
+  ErrorCode,
 } from '../../../types';
-import { valueToWei, weiToValue } from '../../../utils/convert';
+import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents.ModifyHolderPercentage;
@@ -95,32 +95,61 @@ interface GetPercentageTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<PercentageTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace PercentageTransferManagerTransactionParams {
+  export interface ChangeHolderPercentage extends ChangeHolderPercentageParams {}
+  export interface ModifyWhitelist extends ModifyWhitelistParams {}
+  export interface ModifyWhitelistMulti extends ModifyWhitelistMultiParams {}
+  export interface SetAllowPrimaryIssuance extends SetAllowPrimaryIssuanceParams {}
+}
+
+/**
+ * @param investorAddress Address of the investor
+ */
 interface InvestorAddressParams {
   investorAddress: string;
 }
 
-interface VerifyTransferParams extends TxParams {
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount
+ * @param data
+ */
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
+/**
+ * @param maxHolderPercentage is the new maximum percentage
+ */
 interface ChangeHolderPercentageParams extends TxParams {
   maxHolderPercentage: BigNumber;
 }
 
+/**
+ * @param investor is the address to whitelist
+ * @param valid whether or not the address it to be added or removed from the whitelist
+ */
 interface ModifyWhitelistParams extends TxParams {
   investor: string;
   valid: boolean;
 }
 
+/**
+ * @param investors Array of the addresses to whitelist
+ * @param valids Array of boolean value to decide whether or not the address it to be added or removed from the whitelist
+ */
 interface ModifyWhitelistMultiParams extends TxParams {
   investors: string[];
   valids: boolean[];
 }
 
+/**
+ * @param allowPrimaryIssuance whether to allow all primary issuance transfers
+ */
 interface SetAllowPrimaryIssuanceParams extends TxParams {
   allowPrimaryIssuance: boolean;
 }
@@ -129,8 +158,6 @@ interface SetAllowPrimaryIssuanceParams extends TxParams {
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
 export default class PercentageTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = PercentageTransferManager.abi;
-
   protected contract: Promise<PercentageTransferManagerContract>;
 
   /**
@@ -147,53 +174,95 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
-  public allowPrimaryIssuance = async () => {
+  /**
+   * Ignore transactions which are part of the primary issuance
+   * @return boolean allowed
+   */
+  public allowPrimaryIssuance = async (): Promise<boolean> => {
     return (await this.contract).allowPrimaryIssuance.callAsync();
   };
 
-  public maxHolderPercentage = async () => {
+  /**
+   * Maximum percentage that any holder can have, multiplied by 10**16
+   * @return percentage value
+   */
+  public maxHolderPercentage = async (): Promise<BigNumber> => {
     const result = await (await this.contract).maxHolderPercentage.callAsync();
     return weiToValue(result, PERCENTAGE_DECIMALS);
   };
 
+  /**
+   *  Unpause the module
+   */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public paused = async () => {
+  /**
+   *  Check if module is paused
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  Pause the module
+   */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public whitelist = async (params: InvestorAddressParams) => {
+  /**
+   * Addresses on this list are always able to send / receive tokens
+   * @return boolean on whitelist
+   */
+  public whitelist = async (params: InvestorAddressParams): Promise<boolean> => {
     assert.isETHAddressHex('investorAddress', params.investorAddress);
     return (await this.contract).whitelist.callAsync(params.investorAddress);
   };
 
+  /**
+   * Used to verify the transfer transaction (View)
+   * @return boolean transfer result, address
+   */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
     );
+    const transferResult = parseTransferResult(result[0]);
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
+  /**
+   * Sets the maximum percentage that an individual token holder can hold
+   */
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       valueToWei(params.maxHolderPercentage, PERCENTAGE_DECIMALS),
@@ -202,8 +271,15 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Adds or removes single addresses from the whitelist.
+   */
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -213,10 +289,18 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Adds or removes addresses from the whitelist.
+   */
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Whitelist), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.investors.length === params.valids.length,
+      ErrorCode.MismatchedArrayLength,
       'Array lengths are not equal for investors and valids',
     );
     params.investors.forEach(address => assert.isETHAddressHex('investors', address));
@@ -228,10 +312,18 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Sets whether or not to consider primary issuance transfers
+   */
   public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       (await this.allowPrimaryIssuance()) !== params.allowPrimaryIssuance,
+      ErrorCode.PreconditionRequired,
       'AllowPrimaryIssuance value must change ',
     );
     return (await this.contract).setAllowPrimaryIssuance.sendTransactionAsync(
@@ -254,11 +346,10 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PercentageTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -275,15 +366,12 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PercentageTransferManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PercentageTransferManager.abi,
     );
     return logs;
   };

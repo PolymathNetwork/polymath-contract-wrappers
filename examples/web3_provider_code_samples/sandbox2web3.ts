@@ -1,7 +1,7 @@
-import {Provider} from 'ethereum-types';
 import { MetamaskSubprovider, RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { ApiConstructorParams } from '../../src/PolymathAPI';
 import { PolymathAPI } from '../../src';
+import { Provider } from '@polymathnetwork/abi-wrappers';
 
 
 // Setup redundant subprovider to read and metamask to publish transactions

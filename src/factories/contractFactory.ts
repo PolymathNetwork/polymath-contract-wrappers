@@ -1,11 +1,10 @@
-import { TxData, Provider } from 'ethereum-types';
 import {
   ERC20DividendCheckpointContract,
   ModuleContract,
   ModuleFactoryContract,
   EtherDividendCheckpointContract,
-  DetailedERC20Contract,
-  SecurityTokenContract,
+  ERC20DetailedContract,
+  ISecurityTokenContract,
   PolyTokenContract,
   GeneralPermissionManagerContract,
   PolyTokenFaucetContract,
@@ -17,45 +16,25 @@ import {
   GeneralTransferManagerContract,
   ManualApprovalTransferManagerContract,
   PercentageTransferManagerContract,
+  LockUpTransferManagerContract,
+  BlacklistTransferManagerContract,
   VolumeRestrictionTMContract,
   FeatureRegistryContract,
   ModuleRegistryContract,
-  SecurityTokenRegistryContract,
+  ISecurityTokenRegistryContract,
   PolymathRegistryContract,
+  VestingEscrowWalletContract,
+  Web3Wrapper,
+  CallData,
+  Provider,
+  ContractAbi,
 } from '@polymathnetwork/abi-wrappers';
-import {
-  ERC20DividendCheckpoint,
-  Module,
-  ModuleFactory,
-  EtherDividendCheckpoint,
-  DetailedERC20,
-  AlternativeERC20,
-  SecurityToken,
-  PolyToken,
-  GeneralPermissionManager,
-  PolyTokenFaucet,
-  CappedSTO,
-  CappedSTOFactory,
-  USDTieredSTOFactory,
-  USDTieredSTO,
-  CountTransferManager,
-  GeneralTransferManager,
-  ManualApprovalTransferManager,
-  PercentageTransferManager,
-  VolumeRestrictionTransferManager,
-  FeatureRegistry,
-  ModuleRegistry,
-  SecurityTokenRegistry,
-  PolymathRegistry,
-} from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolymathContract, NetworkId } from '../types';
 import assert from '../utils/assert';
 import getDefaultContractAddresses from '../utils/addresses';
+import { PolymathContract, NetworkId } from '../types';
 
 async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: string) {
   return new PolymathRegistryContract(
-    PolymathRegistry.abi,
     address || (await getDefaultContractAddresses((await web3Wrapper.getNetworkIdAsync()) as NetworkId)), // for optional address
     web3Wrapper.getProvider(),
     web3Wrapper.getContractDefaults(),
@@ -65,14 +44,17 @@ async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: s
 export default class ContractFactory {
   private web3Wrapper: Web3Wrapper;
 
+  private abiArray: ContractAbi[];
+
   private provider: Provider;
 
   private polymathRegistry: Promise<PolymathRegistryContract>;
 
-  private contractDefaults: Partial<TxData>;
+  private contractDefaults: Partial<CallData> | undefined;
 
-  public constructor(web3Wrapper: Web3Wrapper, polymathRegistryAddress?: string) {
+  public constructor(web3Wrapper: Web3Wrapper, abiArray: ContractAbi[], polymathRegistryAddress?: string) {
     this.web3Wrapper = web3Wrapper;
+    this.abiArray = abiArray;
     this.provider = web3Wrapper.getProvider() as Provider;
     this.contractDefaults = this.web3Wrapper.getContractDefaults();
     this.polymathRegistry = getPolymathRegistryContract(web3Wrapper, polymathRegistryAddress);
@@ -80,171 +62,250 @@ export default class ContractFactory {
 
   public async getModuleContract(address: string): Promise<ModuleContract> {
     assert.isETHAddressHex('address', address);
-    return new ModuleContract(Module.abi, address, this.provider, this.contractDefaults);
+    const contract = new ModuleContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getERC20DividendCheckpointContract(address: string): Promise<ERC20DividendCheckpointContract> {
     assert.isETHAddressHex('address', address);
-    return new ERC20DividendCheckpointContract(
-      ERC20DividendCheckpoint.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new ERC20DividendCheckpointContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getPolymathRegistryContract(): Promise<PolymathRegistryContract> {
-    return this.polymathRegistry;
+    const contract = await this.polymathRegistry;
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getModuleFactoryContract(address: string): Promise<ModuleFactoryContract> {
     assert.isETHAddressHex('address', address);
-    return new ModuleFactoryContract(ModuleFactory.abi, address, this.provider, this.contractDefaults);
+    const contract = new ModuleFactoryContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getEtherDividendCheckpointContract(address: string): Promise<EtherDividendCheckpointContract> {
     assert.isETHAddressHex('address', address);
-    return new EtherDividendCheckpointContract(
-      EtherDividendCheckpoint.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new EtherDividendCheckpointContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
-  public async getDetailedERC20Contract(address: string): Promise<DetailedERC20Contract> {
+  public async getVestingEscrowWalletContract(address: string): Promise<VestingEscrowWalletContract> {
     assert.isETHAddressHex('address', address);
-    return new DetailedERC20Contract(DetailedERC20.abi, address, this.provider, this.contractDefaults);
+    const contract = new VestingEscrowWalletContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
-  public async getAlternativeERC20Contract(address: string): Promise<DetailedERC20Contract> {
+  public async getERC20DetailedContract(address: string): Promise<ERC20DetailedContract> {
     assert.isETHAddressHex('address', address);
-    return new DetailedERC20Contract(AlternativeERC20.abi, address, this.provider, this.contractDefaults);
+    const contract = new ERC20DetailedContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
-  public async getSecurityTokenContract(address: string): Promise<SecurityTokenContract> {
+  public async getAlternativeERC20Contract(address: string): Promise<ERC20DetailedContract> {
     assert.isETHAddressHex('address', address);
-    return new SecurityTokenContract(SecurityToken.abi, address, this.provider, this.contractDefaults);
+    const contract = new ERC20DetailedContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
+  public async getSecurityTokenContract(address: string): Promise<ISecurityTokenContract> {
+    assert.isETHAddressHex('address', address);
+    const contract = new ISecurityTokenContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getPolyTokenFaucetContract(): Promise<PolyTokenFaucetContract> {
-    return new PolyTokenFaucetContract(
-      PolyTokenFaucet.abi,
+    const contract = new PolyTokenFaucetContract(
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.PolyToken),
       this.provider,
       this.contractDefaults,
     );
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getPolyTokenContract(): Promise<PolyTokenContract> {
-    return new PolyTokenContract(
-      PolyToken.abi,
+    const contract = new PolyTokenContract(
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.PolyToken),
       this.provider,
       this.contractDefaults,
     );
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getGeneralPermissionManagerContract(address: string): Promise<GeneralPermissionManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new GeneralPermissionManagerContract(
-      GeneralPermissionManager.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new GeneralPermissionManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getCappedSTOFactoryContract(address: string): Promise<CappedSTOFactoryContract> {
-    return new CappedSTOFactoryContract(CappedSTOFactory.abi, address, this.provider, this.contractDefaults);
+    const contract = new CappedSTOFactoryContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getCappedSTOContract(address: string): Promise<CappedSTOContract> {
     assert.isETHAddressHex('address', address);
-    return new CappedSTOContract(CappedSTO.abi, address, this.provider, this.contractDefaults);
+    const contract = new CappedSTOContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getUSDTieredSTOFactoryContract(address: string): Promise<USDTieredSTOFactoryContract> {
     assert.isETHAddressHex('address', address);
-    return new USDTieredSTOFactoryContract(USDTieredSTOFactory.abi, address, this.provider, this.contractDefaults);
+    const contract = new USDTieredSTOFactoryContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract> {
     assert.isETHAddressHex('address', address);
-    return new USDTieredSTOContract(USDTieredSTO.abi, address, this.provider, this.contractDefaults);
+    const contract = new USDTieredSTOContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getCountTransferManagerContract(address: string): Promise<CountTransferManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new CountTransferManagerContract(CountTransferManager.abi, address, this.provider, this.contractDefaults);
+    const contract = new CountTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getGeneralTransferManagerContract(address: string): Promise<GeneralTransferManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new GeneralTransferManagerContract(
-      GeneralTransferManager.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new GeneralTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getManualApprovalTransferManagerContract(
     address: string,
   ): Promise<ManualApprovalTransferManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new ManualApprovalTransferManagerContract(
-      ManualApprovalTransferManager.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new ManualApprovalTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getPercentageTransferManagerContract(address: string): Promise<PercentageTransferManagerContract> {
     assert.isETHAddressHex('address', address);
-    return new PercentageTransferManagerContract(
-      PercentageTransferManager.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new PercentageTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
+  public async getLockUpTransferManagerContract(address: string): Promise<LockUpTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
+    const contract = new LockUpTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
+  public async getBlacklistTransferManagerContract(address: string): Promise<BlacklistTransferManagerContract> {
+    assert.isETHAddressHex('address', address);
+    const contract = new BlacklistTransferManagerContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
     assert.isETHAddressHex('address', address);
-    return new VolumeRestrictionTMContract(
-      VolumeRestrictionTransferManager.abi,
-      address,
-      this.provider,
-      this.contractDefaults,
-    );
+    const contract = new VolumeRestrictionTMContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getFeatureRegistryContract(): Promise<FeatureRegistryContract> {
-    return new FeatureRegistryContract(
-      FeatureRegistry.abi,
+    const contract = new FeatureRegistryContract(
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.FeatureRegistry),
       this.provider,
       this.contractDefaults,
     );
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
   public async getModuleRegistryContract(): Promise<ModuleRegistryContract> {
-    return new ModuleRegistryContract(
-      ModuleRegistry.abi,
+    const contract = new ModuleRegistryContract(
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.ModuleRegistry),
       this.provider,
       this.contractDefaults,
     );
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 
-  public async getSecurityTokenRegistryContract(): Promise<SecurityTokenRegistryContract> {
-    return new SecurityTokenRegistryContract(
-      SecurityTokenRegistry.abi,
+  public async getSecurityTokenRegistryContract(): Promise<ISecurityTokenRegistryContract> {
+    const contract = new ISecurityTokenRegistryContract(
       await (await this.polymathRegistry).getAddress.callAsync(PolymathContract.SecurityTokenRegistry),
       this.provider,
       this.contractDefaults,
     );
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
   }
 }

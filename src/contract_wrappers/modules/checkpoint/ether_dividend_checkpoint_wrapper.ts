@@ -14,11 +14,10 @@ import {
   EtherDividendCheckpointUpdateDividendDatesEventArgs,
   EtherDividendCheckpointPauseEventArgs,
   EtherDividendCheckpointUnpauseEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { EtherDividendCheckpoint } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import DividendCheckpointWrapper from './dividend_checkpoint_wrapper';
@@ -31,10 +30,9 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
-
-const EXCLUDED_ADDRESS_LIMIT = 150;
 
 interface EtherDividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: EtherDividendCheckpointEvents.EtherDividendDeposited;
@@ -192,6 +190,19 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs>[]>;
 }
 
+export namespace EtherDividendCheckpointTransactionParams {
+  export interface CreateDividend extends CreateDividendParams {}
+  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
+  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
+  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
+}
+
+/**
+ * @param maturity Time from which dividend can be paid
+ * @param expiry Time until dividend can no longer be paid, and can be reclaimed by issuer
+ * @param name Name/title for identification
+ * @param value Value of ether to contribute towards dividend
+ */
 interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
@@ -199,37 +210,31 @@ interface CreateDividendParams extends TxParams {
   value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithCheckpointParams extends CreateDividendParams {
   checkpointId: number;
-  name: string;
-  value: BigNumber;
 }
 
-interface CreateDividendWithExclusionsParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithExclusionsParams extends CreateDividendParams {
   excluded: string[];
-  name: string;
-  value: BigNumber;
 }
 
-interface CreateDividendWithCheckpointAndExclusionsParams extends TxParams {
-  maturity: Date;
-  expiry: Date;
+/**
+ * @param checkpointId The identifier for the checkpoint
+ */
+interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividendWithExclusionsParams {
   checkpointId: number;
-  excluded: string[];
-  name: string;
-  value: BigNumber;
 }
 
 /**
  * This class includes the functionality related to interacting with the EtherDividendCheckpoint contract.
  */
 export default class EtherDividendCheckpointWrapper extends DividendCheckpointWrapper {
-  public abi: ContractAbi = EtherDividendCheckpoint.abi;
-
   protected contract: Promise<EtherDividendCheckpointContract>;
 
   protected getDecimals = async (): Promise<BigNumber> => {
@@ -250,13 +255,27 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     this.contract = contract;
   }
 
+  /**
+   * Creates a dividend and checkpoint for the dividend
+   */
   public createDividend = async (params: CreateDividendParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name);
+    await this.checkIfDividendCreationIsValid(
+      params.expiry,
+      params.maturity,
+      params.value,
+      params.name,
+      undefined,
+      txPayableData,
+    );
     return (await this.contract).createDividend.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -266,13 +285,28 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend with a provided checkpoint
+   */
   public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(params.value, params.expiry, params.maturity, params.name, params.checkpointId);
+    await this.checkIfDividendCreationIsValid(
+      params.expiry,
+      params.maturity,
+      params.value,
+      params.name,
+      undefined,
+      txPayableData,
+      params.checkpointId,
+    );
     return (await this.contract).createDividendWithCheckpoint.sendTransactionAsync(
       dateToBigNumber(params.maturity),
       dateToBigNumber(params.expiry),
@@ -283,17 +317,26 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend and checkpoint for the dividend with excluded addresses
+   */
   public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(
-      params.value,
+    await this.checkIfDividendCreationIsValid(
       params.expiry,
       params.maturity,
+      params.value,
       params.name,
+      undefined,
+      txPayableData,
       undefined,
       params.excluded,
     );
@@ -307,19 +350,28 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     );
   };
 
+  /**
+   * Creates a dividend with a provided checkpoint and with excluded addresses
+   */
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
   ) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Manage), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, await this.getDecimals()),
     };
-    await this.checkIfDividendIsValid(
-      params.value,
+    await this.checkIfDividendCreationIsValid(
       params.expiry,
       params.maturity,
+      params.value,
       params.name,
+      undefined,
+      txPayableData,
       params.checkpointId,
       params.excluded,
     );
@@ -347,11 +399,10 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      EtherDividendCheckpoint.abi,
       params.callback,
       params.isVerbose,
     );
@@ -368,39 +419,13 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, EtherDividendCheckpointEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      EtherDividendCheckpoint.abi,
     );
     return logs;
-  };
-
-  private checkIfDividendIsValid = async (
-    value: BigNumber,
-    expiry: Date,
-    maturity: Date,
-    name: string,
-    checkpointId?: number,
-    excluded?: string[],
-  ) => {
-    if (excluded !== undefined) {
-      excluded.forEach(address => assert.isNonZeroETHAddressHex('excluded', address));
-      assert.areThereDuplicatedStrings('excluded', excluded);
-      assert.assert(excluded.length <= EXCLUDED_ADDRESS_LIMIT, 'Too many addresses excluded');
-    }
-    assert.assert(expiry > maturity, 'Expiry before maturity');
-    assert.isFutureDate(expiry, 'Expiry in past');
-    assert.isBigNumberGreaterThanZero(value, 'No dividend sent');
-    if (checkpointId !== undefined) {
-      const currentCheckpointId = await (await this.securityTokenContract()).currentCheckpointId.callAsync();
-      assert.assert(checkpointId < new BigNumber(currentCheckpointId).toNumber(), 'Invalid checkpoint');
-    }
-    assert.assert(name.length > 0, 'The name can not be empty');
   };
 }

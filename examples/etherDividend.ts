@@ -1,13 +1,10 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EtherDividendCheckpointEvents, ModuleFactoryContract } from '@polymathnetwork/abi-wrappers/lib/src';
+import { EtherDividendCheckpointEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString, valueToWei, weiToValue } from '../src/utils/convert';
-import { FULL_DECIMALS, ModuleName, ModuleType } from '../src';
+import { ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 
-// This file acts as a valid sandbox for adding a etherDividend  module on an unlocked node (like ganache)
+// This file acts as a valid sandbox for adding a etherDividend module on an unlocked node (like ganache)
 
 window.addEventListener('load', async () => {
   // Setup the redundant provider
@@ -25,14 +22,13 @@ window.addEventListener('load', async () => {
   // Get some poly tokens in your account and the security token
   const myAddress = await polymathAPI.getAccount();
   await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
   // Prompt to setup your ticker and token name
   const ticker = prompt('Ticker', '');
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
+    ticker: ticker!,
   });
 
   // Get the ticker fee and approve the security token registry to spend
@@ -43,9 +39,10 @@ window.addEventListener('load', async () => {
   });
 
   // Register a ticker
-  await polymathAPI.securityTokenRegistry.registerTicker({
+  console.log('Ticker is:' + ticker);
+  await polymathAPI.securityTokenRegistry.registerNewTicker({
+    owner: myAddress,
     ticker: ticker!,
-    tokenName: tokenName!,
   });
 
   // Get the st launch fee and approve the security token registry to spend
@@ -56,15 +53,21 @@ window.addEventListener('load', async () => {
   });
 
   // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateSecurityToken({
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
     name: tokenName!,
     ticker: ticker!,
-    details: 'http://',
-    divisible: false,
+    tokenDetails: 'details',
+    divisible: true,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
   });
 
-  const moduleStringName = 'EtherDividendCheckpoint';
-  const moduleName = ModuleName.etherDividendCheckpoint;
+  console.log('Security token has been generated');
+
+  // Create a Security Token Instance
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
+
+  const moduleName = ModuleName.EtherDividendCheckpoint;
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType: ModuleType.Dividends,
   });
@@ -80,21 +83,11 @@ window.addEventListener('load', async () => {
     names.push(instanceFactory.name());
   });
   const resultNames = await Promise.all(names);
+  const index = resultNames.indexOf(moduleName);
 
-  const finalNames = resultNames.map(name => {
-    return bytes32ToString(name);
-  });
-  const index = finalNames.indexOf(moduleStringName);
-
-  // Create a Security Token Instance
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-
+  // Get setup cost
   const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.getSetupCost();
-
-  // Create 2 checkpoints
-  await tickerSecurityTokenInstance.createCheckpoint({});
-  await tickerSecurityTokenInstance.createCheckpoint({});
+  const setupCost = await factory.setupCostInPoly();
 
   // Call to add etherdividend module
   await tickerSecurityTokenInstance.addModule({
@@ -102,6 +95,7 @@ window.addEventListener('load', async () => {
     address: modules[index],
     maxCost: setupCost,
     budget: setupCost,
+    archived: false,
     data: {
       wallet: '0x3333333333333333333333333333333333333333',
     },
@@ -109,46 +103,83 @@ window.addEventListener('load', async () => {
 
   // Get module for ether dividend checkpoint and address for module
   const etherDividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.etherDividendCheckpoint,
+    moduleName: ModuleName.EtherDividendCheckpoint,
   }))[0];
   console.log(etherDividendAddress);
   const etherDividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.etherDividendCheckpoint,
+    name: ModuleName.EtherDividendCheckpoint,
     address: etherDividendAddress,
   });
 
-  //Create Dividends
+  // Get General TM Address to whitelist transfers
+  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.GeneralTransferManager,
+  }))[0];
+  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.GeneralTransferManager,
+    address: generalTMAddress,
+  });
+
+  const randomInvestors = [
+    '0x1111111111111111111111111111111111111111',
+    '0x2222222222222222222222222222222222222222',
+    '0x3333333333333333333333333333333333333333',
+  ];
+
+  // Add beneficiaries address to whitelist
+  await generalTM.modifyKYCDataMulti({
+    investors: randomInvestors,
+    canSendAfter: [new Date(), new Date(), new Date()],
+    canReceiveAfter: [new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2020, 0), new Date(2020, 0), new Date(2020, 0)],
+  });
+
+  // Issue some tokens for investors
+  await tickerSecurityTokenInstance.issueMulti({
+    investors: randomInvestors,
+    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20)],
+  });
+
+  // Create Dividends
+  // A checkpoint is created behind the scenes.
   await etherDividendCheckpoint.createDividendWithExclusions({
-    name: 'MyDividend2',
+    name: 'MyDividend1',
     value: new BigNumber(1),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+    excluded: [randomInvestors[1], randomInvestors[2]],
   });
 
+  // Create another checkpoint
+  await tickerSecurityTokenInstance.createCheckpoint({});
+
+  // Using the most recent checkpoint
   await etherDividendCheckpoint.createDividendWithCheckpointAndExclusions({
     name: 'MyDividend2',
     value: new BigNumber(1),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    checkpointId: 1,
-    excluded: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+    checkpointId: 2,
+    excluded: [randomInvestors[0], randomInvestors[1]],
   });
 
   await etherDividendCheckpoint.createDividend({
-    name: 'MyDividend',
+    name: 'MyDividend3',
     value: new BigNumber(1),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
   });
 
+  // Another checkpoint was created behind the scenes.
   await etherDividendCheckpoint.createDividendWithCheckpoint({
-    name: 'MyDividend2',
+    name: 'MyDividend4',
     value: new BigNumber(1),
     expiry: new Date(2035, 2),
     maturity: new Date(2018, 1),
-    checkpointId: 0,
+    checkpointId: 3,
   });
+
+  console.log('4 types of ether dividends created');
 
   // Subscribe to event of update dividend dates
   await etherDividendCheckpoint.subscribeAsync({
@@ -165,7 +196,7 @@ window.addEventListener('load', async () => {
 
   // Update dividend dates
   await etherDividendCheckpoint.updateDividendDates({
-    dividendIndex: 0,
+    dividendIndex: 1,
     expiry: new Date(2038, 2),
     maturity: new Date(2037, 4),
   });

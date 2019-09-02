@@ -1,12 +1,12 @@
 // CappedSTOWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   CappedSTOContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenContract,
   PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
@@ -21,14 +21,14 @@ describe('CappedSTOWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
   let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(CappedSTOContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
     mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
@@ -139,7 +139,7 @@ describe('CappedSTOWrapper', () => {
         investorAddress,
       };
       // Address expected
-      const expectedResult = true;
+      const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -570,7 +570,7 @@ describe('CappedSTOWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'SetFundRaiseTypes', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
         ),
       );
     });

@@ -1,8 +1,12 @@
 // EtherDividendCheckpointWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EtherDividendCheckpointContract, SecurityTokenContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import {
+  EtherDividendCheckpointContract,
+  ISecurityTokenContract,
+  PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
+} from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import EtherDividendCheckpointWrapper from '../ether_dividend_checkpoint_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -15,13 +19,13 @@ describe('EtherDividendCheckpointWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: EtherDividendCheckpointContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(EtherDividendCheckpointContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new EtherDividendCheckpointWrapper(
@@ -61,8 +65,14 @@ describe('EtherDividendCheckpointWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
+      const expectedTotalSupplyResult = new BigNumber(1000);
+      const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(expectedTotalSupplyResult);
+      when(mockedSecurityTokenContract.totalSupply).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
+
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       const mockedParams = {
         maturity: new Date(2030, 1),
@@ -111,10 +121,13 @@ describe('EtherDividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
+      verify(mockedSecurityTokenTotalSupplyMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.totalSupply).once();
     });
   });
 
@@ -137,8 +150,16 @@ describe('EtherDividendCheckpointWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
+      const expectedTotalSupplyResult = new BigNumber(1000);
+      const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).thenResolve(
+        expectedTotalSupplyResult,
+      );
+      when(mockedSecurityTokenContract.totalSupplyAt).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
+
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       // Mock security token currentCheckpointId
       const expectedCurrentCheckpointResult = new BigNumber(checkpointId + 1);
@@ -203,7 +224,10 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
+      verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
+      verify(mockedSecurityTokenContract.totalSupplyAt).once();
     });
   });
 
@@ -226,8 +250,27 @@ describe('EtherDividendCheckpointWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
+      const excluded = ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'];
+      const expectedTotalSupplyResult = new BigNumber(1000);
+      const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).thenResolve(
+        expectedTotalSupplyResult,
+      );
+      when(mockedSecurityTokenContract.totalSupplyAt).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
+
+      const expectedSecurityTokenBalanceOfResult = new BigNumber(10);
+      const mockedSecurityTokenBalanceOfMethod = mock(MockedCallMethod);
+      function whenBalanceOf(addr: string) {
+        when(
+          mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+        ).thenResolve(expectedSecurityTokenBalanceOfResult);
+      }
+      when(mockedSecurityTokenContract.balanceOfAt).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
+      excluded.map(whenBalanceOf);
+
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       // Mock security token currentCheckpointId
       const expectedCurrentCheckpointResult = new BigNumber(checkpointId + 1);
@@ -295,7 +338,17 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedContract.securityToken).twice();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
+      verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
+      verify(mockedSecurityTokenContract.totalSupplyAt).once();
+      function verifyBalanceOf(addr: string) {
+        verify(
+          mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+        ).once();
+      }
+      excluded.map(verifyBalanceOf);
+      verify(mockedSecurityTokenContract.balanceOfAt).times(excluded.length);
     });
   });
 
@@ -317,8 +370,23 @@ describe('EtherDividendCheckpointWrapper', () => {
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
 
+      const excluded = ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'];
+      const expectedTotalSupplyResult = new BigNumber(1000);
+      const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(expectedTotalSupplyResult);
+      when(mockedSecurityTokenContract.totalSupply).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
+
+      const expectedSecurityTokenBalanceOfResult = new BigNumber(10);
+      const mockedSecurityTokenBalanceOfMethod = mock(MockedCallMethod);
+      function whenBalanceOf(addr: string) {
+        when(mockedSecurityTokenBalanceOfMethod.callAsync(addr)).thenResolve(expectedSecurityTokenBalanceOfResult);
+      }
+      when(mockedSecurityTokenContract.balanceOf).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
+      excluded.map(whenBalanceOf);
+
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+      when(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).thenResolve(new BigNumber(200));
 
       const mockedParams = {
         maturity: new Date(2030, 1),
@@ -370,10 +438,18 @@ describe('EtherDividendCheckpointWrapper', () => {
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
+      verify(mockedWrapper.getAvailableAddressesAsync()).twice();
+      verify(mockedWrapper.getBalanceInWeiAsync(expectedOwnerResult)).once();
+      verify(mockedSecurityTokenTotalSupplyMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.totalSupply).once();
+      function verifyBalanceOf(addr: string) {
+        verify(mockedSecurityTokenBalanceOfMethod.callAsync(addr)).once();
+      }
+      verify(mockedSecurityTokenContract.balanceOf).times(excluded.length);
+      excluded.map(verifyBalanceOf);
     });
   });
 

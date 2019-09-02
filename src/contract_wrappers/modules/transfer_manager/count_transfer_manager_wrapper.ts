@@ -5,11 +5,10 @@ import {
   CountTransferManagerModifyHolderCountEventArgs,
   CountTransferManagerPauseEventArgs,
   CountTransferManagerUnpauseEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { CountTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
@@ -22,8 +21,9 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode,
 } from '../../../types';
-import { numberToBigNumber, valueToWei } from '../../../utils/convert';
+import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CountTransferManagerEvents.ModifyHolderCount;
@@ -66,14 +66,26 @@ interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
 }
 
-interface VerifyTransferParams extends TxParams {
+export namespace CountTransferManagerTransactionParams {
+  export interface ChangeHolderCount extends ChangeHolderCountParams {}
+}
+
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount Amount to send
+ * @param data Data value
+ */
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
-  isTransfer: boolean;
 }
 
+/**
+ * @param maxHolderCount is the new maximum amount of token holders
+ */
 interface ChangeHolderCountParams extends TxParams {
   maxHolderCount: number;
 }
@@ -82,8 +94,6 @@ interface ChangeHolderCountParams extends TxParams {
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = CountTransferManager.abi;
-
   protected contract: Promise<CountTransferManagerContract>;
 
   /**
@@ -101,43 +111,76 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     this.contract = contract;
   }
 
+  /**
+   *  Unpause the module
+   */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  Check if module paused
+   */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  Pause the module
+   */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
-  public maxHolderCount = async () => {
-    return (await this.contract).maxHolderCount.callAsync();
+  /**
+   *The maximum number of concurrent token holders
+   */
+  public maxHolderCount = async (): Promise<number> => {
+    return (await (await this.contract).maxHolderCount.callAsync()).toNumber();
   };
 
+  /**
+   * Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
+   * @return boolean transfer result, address
+   */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      params.isTransfer,
-      params.txData,
-      params.safetyFactor,
     );
+    const transferResult = parseTransferResult(result[0]);
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
+  /**
+   * Sets the cap for the amount of token holders there can be
+   */
   public changeHolderCount = async (params: ChangeHolderCountParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     return (await this.contract).changeHolderCount.sendTransactionAsync(
       numberToBigNumber(params.maxHolderCount),
       params.txData,
@@ -158,11 +201,10 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      CountTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -177,15 +219,12 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      CountTransferManager.abi,
     );
     return logs;
   };

@@ -1,7 +1,6 @@
 // FeatureRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { FeatureRegistryContract, PolyTokenEvents } from '@polymathnetwork/abi-wrappers';
+import { FeatureRegistryContract, PolyTokenEvents, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { Feature } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
@@ -176,7 +175,7 @@ describe('FeatureRegistryWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ChangeFeatureStatus', 'OwnershipRenounced', 'OwnershipTransferred', encountered: Transfer`,
+          `Expected eventName to be one of: 'OwnershipTransferred', 'ChangeFeatureStatus', encountered: Transfer`,
         ),
       );
     });

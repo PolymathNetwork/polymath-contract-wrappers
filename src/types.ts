@@ -1,15 +1,10 @@
-import { TxData } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import { ContractEventArg, DecodedLogArgs, LogWithDecodedArgs, BlockParam } from 'ethereum-types';
 import {
   PolyTokenEventArgs,
   PolyTokenEvents,
   CappedSTOFactoryEventArgs,
   CappedSTOEventArgs,
-  DetailedERC20EventArgs,
-  DetailedERC20Events,
-  AlternativeERC20EventArgs,
-  AlternativeERC20Events,
+  ERC20DetailedEventArgs,
+  ERC20DetailedEvents,
   ERC20DividendCheckpointEventArgs,
   EtherDividendCheckpointEventArgs,
   FeatureRegistryEventArgs,
@@ -35,6 +30,7 @@ import {
   PolyTokenFaucetEvents,
   PolymathRegistryEvents,
   SecurityTokenRegistryEvents,
+  ISecurityTokenRegistryEvents,
   SecurityTokenEvents,
   USDTieredSTOFactoryEvents,
   USDTieredSTOEvents,
@@ -49,9 +45,9 @@ import {
   STOContract,
   STOEvents,
   STOEventArgs,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
   PolyTokenContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   EtherDividendCheckpointContract,
   ManualApprovalTransferManagerContract,
   CountTransferManagerContract,
@@ -63,7 +59,22 @@ import {
   VolumeRestrictionTMContract,
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
+  VestingEscrowWalletEventArgs,
+  VestingEscrowWalletContract,
+  VestingEscrowWalletEvents,
+  LockUpTransferManagerEventArgs,
+  LockUpTransferManagerContract,
+  LockUpTransferManagerEvents,
+  BlacklistTransferManagerEventArgs,
+  BlacklistTransferManagerContract,
+  BlacklistTransferManagerEvents,
   PolyTokenFaucetContract,
+  TxData,
+  BigNumber,
+  ContractEventArg,
+  DecodedLogArgs,
+  LogWithDecodedArgs,
+  BlockParam,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -87,6 +98,13 @@ export enum ModuleType {
   STO = 3,
   Dividends = 4,
   Burn = 5,
+  Wallet = 7,
+}
+
+export enum TransferType {
+  General,
+  Issuance,
+  Redemption,
 }
 
 export enum FundRaiseType {
@@ -95,9 +113,43 @@ export enum FundRaiseType {
   StableCoin = 2,
 }
 
+export enum CappedSTOFundRaiseType {
+  ETH = 0,
+  POLY = 1,
+}
+
+export enum FlagsType {
+  IsAccredited,
+  CanNotBuyFromSto,
+  IsVolRestricted,
+}
+
+export enum TransferResult {
+  INVALID,
+  NA,
+  VALID,
+  FORCE_VALID,
+}
+
+export enum FeeType {
+  TickerRegFee = 'tickerRegFee',
+  StLaunchFee = 'stLaunchFee',
+}
+
 export enum Feature {
   CustomModulesAllowed = 'customModulesAllowed',
   FreezeMintingAllowed = 'freezeMintingAllowed',
+}
+
+export enum Partition {
+  Unlocked = 'UNLOCKED',
+  Locked = 'LOCKED',
+  Undefined = 'UNDEFINED',
+}
+
+export enum BoundType {
+  LowerBound = 'lowerBound',
+  UpperBound = 'upperBound',
 }
 
 export enum PolymathContract {
@@ -115,24 +167,31 @@ export enum ModuleName {
   GeneralTransferManager = 'GeneralTransferManager',
   ManualApprovalTransferManager = 'ManualApprovalTransferManager',
   PercentageTransferManager = 'PercentageTransferManager',
+  LockUpTransferManager = 'LockUpTransferManager',
+  BlacklistTransferManager = 'BlacklistTransferManager',
   VolumeRestrictionTM = 'VolumeRestrictionTM',
   CappedSTO = 'CappedSTO',
   UsdTieredSTO = 'USDTieredSTO',
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
+  VestingEscrowWallet = 'VestingEscrowWallet',
+}
+
+export enum TransferStatusCode {
+  TransferFailure = '0x50',
+  TransferSuccess = '0x51',
+  InsufficientBalance = '0x52',
+  InsufficientAllowance = '0x53',
+  TransfersHalted = '0x54',
+  FundsLocked = '0x55',
+  InvalidSender = '0x56',
+  InvalidReceiver = '0x57',
+  InvalidOperator = '0x58',
 }
 
 export enum Perm {
-  ChangePermission = 'CHANGE_PERMISSION',
   Admin = 'ADMIN',
-  Flags = 'FLAGS',
-  Whitelist = 'WHITELIST',
-  TransferApproval = 'TRANSFER_APPROVAL',
-  Checkpoint = 'CHECKPOINT',
-  Manage = 'MANAGE',
-  Distribute = 'DISTRIBUTE',
-  FeeAdmin = 'FEE_ADMIN',
-  PreSaleAdmin = 'PRE_SALE_ADMIN',
+  Operator = 'OPERATOR',
 }
 
 export enum RestrictionType {
@@ -163,8 +222,7 @@ export type ContractEventArgs =
   | PolyTokenEventArgs
   | CappedSTOFactoryEventArgs
   | CappedSTOEventArgs
-  | DetailedERC20EventArgs
-  | AlternativeERC20EventArgs
+  | ERC20DetailedEventArgs
   | ERC20DividendCheckpointEventArgs
   | EtherDividendCheckpointEventArgs
   | FeatureRegistryEventArgs
@@ -182,14 +240,16 @@ export type ContractEventArgs =
   | STOEventArgs
   | CountTransferManagerEventArgs
   | PercentageTransferManagerEventArgs
-  | VolumeRestrictionTMEventArgs;
+  | LockUpTransferManagerEventArgs
+  | VolumeRestrictionTMEventArgs
+  | BlacklistTransferManagerEventArgs
+  | VestingEscrowWalletEventArgs;
 
 export type ContractEvents =
   | PolyTokenEvents
   | CappedSTOFactoryEvents
   | CappedSTOEvents
-  | DetailedERC20Events
-  | AlternativeERC20Events
+  | ERC20DetailedEvents
   | ERC20DividendCheckpointEvents
   | EtherDividendCheckpointEvents
   | FeatureRegistryEvents
@@ -201,12 +261,16 @@ export type ContractEvents =
   | PolyTokenFaucetEvents
   | PolymathRegistryEvents
   | SecurityTokenRegistryEvents
+  | ISecurityTokenRegistryEvents
   | SecurityTokenEvents
   | USDTieredSTOFactoryEvents
   | USDTieredSTOEvents
   | STOEvents
   | CountTransferManagerEvents
   | PercentageTransferManagerEvents
+  | VestingEscrowWalletEvents
+  | LockUpTransferManagerEvents
+  | BlacklistTransferManagerEvents
   | VolumeRestrictionTMEvents;
 
 /**
@@ -217,8 +281,8 @@ export type ContractEvents =
  */
 export interface GetLogsAsyncParams {
   eventName: ContractEvents;
-  blockRange: BlockRange;
-  indexFilterValues: IndexedFilterValues;
+  blockRange?: BlockRange;
+  indexFilterValues?: IndexedFilterValues;
 }
 
 /**
@@ -244,7 +308,11 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract = DetailedERC20Contract | SecurityTokenContract | PolyTokenContract | PolyTokenFaucetContract;
+export type ERC20Contract =
+  | ERC20DetailedContract
+  | ISecurityTokenContract
+  | PolyTokenContract
+  | PolyTokenFaucetContract;
 
 export type GenericModuleContract =
   | ModuleContract
@@ -255,6 +323,10 @@ export type GenericModuleContract =
   | ManualApprovalTransferManagerContract
   | CountTransferManagerContract
   | PercentageTransferManagerContract
+  | VolumeRestrictionTMContract
+  | VestingEscrowWalletContract
+  | LockUpTransferManagerContract
+  | BlacklistTransferManagerContract
   | VolumeRestrictionTMContract;
 
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
@@ -263,3 +335,35 @@ export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | E
 
 export const PERCENTAGE_DECIMALS = new BigNumber(16);
 export const FULL_DECIMALS = new BigNumber(18);
+
+export enum ErrorCode {
+  Unauthorized = 'Unauthorized',
+  InvalidAddress = 'InvalidAddress',
+  InsufficientBalance = 'InsufficientBalance',
+  InvalidSubscriptionToken = 'InvalidSubscriptionToken',
+  DuplicatedStrings = 'DuplicatedStrings',
+  TooLate = 'TooLate',
+  TooEarly = 'TooEarly',
+  InvalidData = 'InvalidData',
+  MismatchedArrayLength = 'MismatchedArrayLength',
+  InvalidVersion = 'InvalidVersion',
+  InvalidPartition = 'InvalidPartition',
+  ContractPaused = 'ContractPaused',
+  PreconditionRequired = 'PreconditionRequired',
+  AlreadyClaimed = 'AlreadyClaimed',
+  AddressExcluded = 'AddressExcluded',
+  InvalidDividend = 'InvalidDividend',
+  InvalidCheckpoint = 'InvalidCheckpoint',
+  ArrayTooLarge = 'ArrayTooLarge',
+  InvalidBound = 'InvalidBound',
+  InsufficientAllowance = 'InsufficientAllowance',
+  DifferentMode = 'DifferentMode',
+  InvalidTransfer = 'InvalidTransfer',
+  InvalidDiscount = 'InvalidDiscount',
+  STOClosed = 'STOClosed',
+  CoinNotAllowed = 'CoinNotAllowed',
+  AlreadyExists = 'AlreadyExists',
+  NotFound = 'NotFound',
+  TickerExpired = 'TickerExpired',
+  UnknownNetwork = 'UnknownNetwork',
+}

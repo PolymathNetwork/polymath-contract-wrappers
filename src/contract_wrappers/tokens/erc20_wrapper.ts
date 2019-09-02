@@ -1,10 +1,15 @@
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
+import { BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
 import assert from '../../utils/assert';
 import { valueToWei, weiToValue } from '../../utils/convert';
+
+export namespace ERC20TransactionParams {
+  export interface Approve extends ApproveParams {}
+  export interface TransferFrom extends TransferFromParams {}
+  export interface Transfer extends TransferParams {}
+}
 
 /**
  * @param spender The address which will spend the funds
@@ -69,8 +74,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token name
+   * @return name
    */
-  public name = async () => {
+  public name = async (): Promise<string> => {
     return (await this.contract).name.callAsync();
   };
 
@@ -89,8 +95,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token total supply
+   * @return total supply amount
    */
-  public totalSupply = async () => {
+  public totalSupply = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).totalSupply.callAsync(), await this.decimals());
   };
 
@@ -111,8 +118,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the setted decimals
+   * @return decimal amount
    */
-  public decimals = async () => {
+  public decimals = async (): Promise<BigNumber> => {
     return (await this.contract).decimals.callAsync();
   };
 
@@ -120,7 +128,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Returns the balance of the specified address
    * @return A BigNumber representing the amount owned by the passed address
    */
-  public balanceOf = async (params?: GetBalanceOfParams) => {
+  public balanceOf = async (params?: GetBalanceOfParams): Promise<BigNumber> => {
     const address =
       !_.isUndefined(params) && !_.isUndefined(params.owner) ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', address);
@@ -129,8 +137,9 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
 
   /**
    * Returns the token symbol
+   * @return symbol
    */
-  public symbol = async () => {
+  public symbol = async (): Promise<string> => {
     return (await this.contract).symbol.callAsync();
   };
 

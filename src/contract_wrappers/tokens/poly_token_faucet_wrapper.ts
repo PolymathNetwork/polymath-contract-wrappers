@@ -1,15 +1,19 @@
-import { PolyTokenFaucetContract } from '@polymathnetwork/abi-wrappers';
-import { PolyTokenFaucet } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
+import { PolyTokenFaucetContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
-import { TxParams } from '../../types';
+import { TxParams, ErrorCode } from '../../types';
 import assert from '../../utils/assert';
-import {valueToWei} from '../../utils/convert';
+import { valueToWei } from '../../utils/convert';
 
 const MAX_TOKEN_AMOUNT = new BigNumber(1000000e18);
 
+export namespace PolyTokenFaucetTransactionParams {
+  export interface GetTokens extends GetTokensParams {}
+}
+
+/**
+ * @param amount Amount of tokens to get from faucet
+ * @param recipient Address to transfer to
+ */
 interface GetTokensParams extends TxParams {
   amount: BigNumber;
   recipient: string;
@@ -19,8 +23,6 @@ interface GetTokensParams extends TxParams {
  * This class includes the functionality related to interacting with the PolyTokenFaucet contract.
  */
 export default class PolyTokenFaucetWrapper extends ContractWrapper {
-  public abi: ContractAbi = PolyTokenFaucet.abi;
-
   protected contract: Promise<PolyTokenFaucetContract>;
 
   /**
@@ -33,9 +35,16 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
+  /**
+   * Used to get tokens from faucet
+   */
   public getTokens = async (params: GetTokensParams) => {
     assert.isNonZeroETHAddressHex('recipient', params.recipient);
-    assert.assert(params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT), 'Amount cannot exceed 1 million tokens');
+    assert.assert(
+      params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT),
+      ErrorCode.InvalidData,
+      'Amount cannot exceed 1 million tokens',
+    );
 
     return (await this.contract).getTokens.sendTransactionAsync(
       valueToWei(params.amount, await (await this.contract).decimals.callAsync()),

@@ -7,11 +7,10 @@ import {
   ManualApprovalTransferManagerRevokeManualApprovalEventArgs,
   ManualApprovalTransferManagerPauseEventArgs,
   ManualApprovalTransferManagerUnpauseEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { ManualApprovalTransferManager } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
@@ -24,6 +23,7 @@ import {
   Subscribe,
   GetLogs,
   Perm,
+  ErrorCode,
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -36,6 +36,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
+  parseTransferResult,
 } from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -105,17 +106,42 @@ interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs>[]>;
 }
 
+export namespace ManualApprovalTransferManagerTransactionParams {
+  export interface AddManualApproval extends AddManualApprovalParams {}
+  export interface AddManualApprovalMulti extends AddManualApprovalMultiParams {}
+  export interface ModifyManualApproval extends ModifyManualApprovalParams {}
+  export interface ModifyManualApprovalMulti extends ModifyManualApprovalMultiParams {}
+  export interface RevokeManualApproval extends RevokeManualApprovalParams {}
+  export interface RevokeManualApprovalMulti extends RevokeManualApprovalMultiParams {}
+}
+
+/**
+ * @param index
+ */
 interface ApprovalsParams {
   index: number;
 }
 
-interface VerifyTransferParams extends TxParams {
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param amount
+ * @param data
+ */
+interface VerifyTransferParams {
   from: string;
   to: string;
   amount: BigNumber;
   data: string;
 }
 
+/**
+ * @param from is the address from which transfers are approved
+ * @param to is the address to which transfers are approved
+ * @param allowance is the approved amount of tokens
+ * @param expiryTime is the time until which the transfer is allowed
+ * @param description Description about the manual approval
+ */
 interface AddManualApprovalParams extends TxParams {
   from: string;
   to: string;
@@ -124,6 +150,13 @@ interface AddManualApprovalParams extends TxParams {
   description: string;
 }
 
+/**
+ * @param from is the address array from which transfers are approved
+ * @param to is the address array to which transfers are approved
+ * @param allowances is the array of approved amounts
+ * @param expiryTimes is the array of the times until which eath transfer is allowed
+ * @param descriptions is the description array for these manual approvals
+ */
 interface AddManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
@@ -132,6 +165,15 @@ interface AddManualApprovalMultiParams extends TxParams {
   descriptions: string[];
 }
 
+/**
+ * @param from is the address from which transfers are approved
+ * @param to is the address to which transfers are approved
+ * @param expiryTime is the time until which the transfer is allowed
+ * @param changeInAllowance is the change in allowance
+ * @param description Description about the manual approval
+ * @param increase tells whether the allowances will be increased (true) or decreased (false).
+ * or any value when there is no change in allowances
+ */
 interface ModifyManualApprovalParams extends TxParams {
   from: string;
   to: string;
@@ -141,6 +183,15 @@ interface ModifyManualApprovalParams extends TxParams {
   increase: boolean;
 }
 
+/**
+ * @param from is the address array from which transfers are approved
+ * @param to is the address array to which transfers are approved
+ * @param expiryTimes is the array of the times until which each transfer is allowed
+ * @param changeInAllowance is the array of change in allowances
+ * @param descriptions is the description array for these manual approvals
+ * @param increase Array of bools that tells whether the allowances will be increased (true) or decreased (false).
+ * or any value when there is no change in allowances
+ */
 interface ModifyManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
@@ -150,20 +201,36 @@ interface ModifyManualApprovalMultiParams extends TxParams {
   increase: boolean[];
 }
 
+/**
+ * @param from is the address from which transfers are approved
+ * @param to is the address to which transfers are approved
+ */
 interface RevokeManualApprovalParams extends TxParams {
   from: string;
   to: string;
 }
 
+/**
+ * @param from is the address array from which transfers are approved
+ * @param to is the address array to which transfers are approved
+ */
 interface RevokeManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
 }
 
+/**
+ * @param user Address of the holder corresponds to whom list of manual approvals
+ * need to return
+ */
 interface GetActiveApprovalsToUserParams {
   user: string;
 }
 
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ */
 interface GetApprovalDetailsParams {
   from: string;
   to: string;
@@ -188,8 +255,6 @@ interface Approval {
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
 export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
-  public abi: ContractAbi = ManualApprovalTransferManager.abi;
-
   protected contract: Promise<ManualApprovalTransferManagerContract>;
 
   /**
@@ -206,22 +271,44 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     this.contract = contract;
   }
 
+  /**
+   *  Unpause the module
+   */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  Check if the module is paused
+   */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
+  /**
+   *  Pause the module
+   */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   *  An array to track all approvals. It is an unbounded array but it's not a problem as
+   * it is never looped through in an on chain call. It is defined as an Array instead of mapping
+   * just to make it easier for users to fetch list of all approvals through constant functions.
+   */
   public approvals = async (params: ApprovalsParams) => {
     const result = await (await this.contract).approvals.callAsync(numberToBigNumber(params.index));
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -235,29 +322,43 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return typedResult;
   };
 
-  public getInitFunction = async () => {
+  /**
+   * This function returns the signature of configure function
+   */
+  public getInitFunction = async (): Promise<string> => {
     return (await this.contract).getInitFunction.callAsync();
   };
 
+  /**
+   * Used to verify the transfer transaction (View)
+   *  @return boolean transfer result, address
+   */
   public verifyTransfer = async (params: VerifyTransferParams) => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
-    // SC: require(_isTransfer == false || msg.sender == securityToken,...
-    // _isTransfer is hardcoded to false as an end user cannot act as securityToken
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return (await this.contract).verifyTransfer.sendTransactionAsync(
+    const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       valueToWei(params.amount, decimals),
       params.data,
-      false,
-      params.txData,
-      params.safetyFactor,
     );
+    const transferResult = parseTransferResult(result[0]);
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
+  /**
+   * Adds a pair of addresses to manual approvals
+   */
   public addManualApproval = async (params: AddManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -275,8 +376,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
+  /**
+   * Adds multiple manual approvals in batch
+   */
   public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -284,7 +392,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.allowances.length &&
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
-      'Array lengths missmatch',
+      ErrorCode.MismatchedArrayLength,
+      'Array lengths mismatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     params.allowances.forEach(allowance =>
@@ -307,8 +416,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
+  /**
+   * Modify the existing manual approvals
+   */
   public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     assert.isFutureDate(params.expiryTime, 'ExpiryTime must be in the future');
@@ -326,8 +442,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
+  /**
+   * Adds multiple manual approvals in batch
+   */
   public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isNonZeroETHAddressHex('to', address));
     assert.assert(
@@ -335,7 +458,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
         params.from.length === params.changedAllowances.length &&
         params.from.length === params.expiryTimes.length &&
         params.from.length === params.descriptions.length,
-      'Array lengths missmatch',
+      ErrorCode.MismatchedArrayLength,
+      'Array lengths mismatch',
     );
     params.expiryTimes.forEach(expiry => assert.isFutureDate(expiry, 'ExpiryTime must be in the future'));
     const approvals = [];
@@ -356,8 +480,15 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
+  /**
+   * Removes pairs of addresses from manual approvals
+   */
   public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     await this.checkApprovalDoesExist(params.from, params.to);
@@ -369,11 +500,22 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
+  /**
+   * Removes multiple pairs of addresses from manual approvals
+   */
   public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.TransferApproval), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.from.forEach(address => assert.isETHAddressHex('from', address));
     params.to.forEach(address => assert.isETHAddressHex('to', address));
-    assert.assert(params.to.length === params.from.length, 'To and From address arrays must have the same length');
+    assert.assert(
+      params.to.length === params.from.length,
+      ErrorCode.MismatchedArrayLength,
+      'To and From address arrays must have the same length',
+    );
     const approvals = [];
     for (let i = 0; i < params.to.length; i += 1) {
       approvals.push(this.checkApprovalDoesExist(params.from[i], params.to[i]));
@@ -387,7 +529,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     );
   };
 
-  public getActiveApprovalsToUser = async (params: GetActiveApprovalsToUserParams) => {
+  /**
+   * Returns the all active approvals corresponds to an address
+   * @return addresses from, addresses to, allowances provided to the approvals, expiry times provided to the
+   * approvals, descriptions provided to the approvals
+   */
+  public getActiveApprovalsToUser = async (params: GetActiveApprovalsToUserParams): Promise<Approval[]> => {
     assert.isETHAddressHex('user', params.user);
     const result = await (await this.contract).getActiveApprovalsToUser.callAsync(params.user);
     const typedResult: Approval[] = [];
@@ -405,7 +552,11 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return typedResult;
   };
 
-  public getApprovalDetails = async (params: GetApprovalDetailsParams) => {
+  /**
+   * Get the details of the approval corresponds to from & to addresses
+   * @return expiryTime of the approval, allowance provided to the approval, Description provided to the approval
+   */
+  public getApprovalDetails = async (params: GetApprovalDetailsParams): Promise<Approval> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).getApprovalDetails.callAsync(params.from, params.to);
@@ -420,11 +571,19 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return typedResult;
   };
 
-  public getTotalApprovalsLength = async () => {
-    return (await this.contract).getTotalApprovalsLength.callAsync();
+  /**
+   * Returns the current number of active approvals
+   */
+  public getTotalApprovalsLength = async (): Promise<number> => {
+    return (await (await this.contract).getTotalApprovalsLength.callAsync()).toNumber();
   };
 
-  public getAllApprovals = async () => {
+  /**
+   * Get the details of all approvals
+   * @return addresses from, addresses to, allowances provided to the approvals, expiry times provided to the
+   * approvals, descriptions provided to the approvals
+   */
+  public getAllApprovals = async (): Promise<Approval[]> => {
     const result = await (await this.contract).getAllApprovals.callAsync();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: Approval[] = [];
@@ -454,11 +613,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      ManualApprovalTransferManager.abi,
       params.callback,
       params.isVerbose,
     );
@@ -475,15 +633,12 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      ManualApprovalTransferManager.abi,
     );
     return logs;
   };

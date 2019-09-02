@@ -1,29 +1,33 @@
 import {
-  PolymathRegistry,
-  SecurityToken,
-  SecurityTokenRegistry,
-  PolyToken,
-  ModuleRegistry,
-  CappedSTO,
-  CappedSTOFactory,
-  ModuleFactory,
-  USDTieredSTO,
-  USDTieredSTOFactory,
-  FeatureRegistry,
-  GeneralTransferManager,
-  GeneralPermissionManager,
-  ERC20DividendCheckpoint,
-  ManualApprovalTransferManager,
-  CountTransferManager,
-  PercentageTransferManager,
-  EtherDividendCheckpoint,
-  VolumeRestrictionTransferManager,
-  PolyTokenFaucet,
-} from '@polymathnetwork/contract-artifacts';
-import { PolyResponse } from '@polymathnetwork/abi-wrappers';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { BigNumber, providerUtils } from '@0x/utils';
-import { Provider } from 'ethereum-types';
+  PolyResponse,
+  Web3Wrapper,
+  BigNumber,
+  providerUtils,
+  Provider,
+  BlacklistTransferManagerContract,
+  CappedSTOContract,
+  CountTransferManagerContract,
+  ERC20DetailedContract,
+  ERC20DividendCheckpointContract,
+  EtherDividendCheckpointContract,
+  FeatureRegistryContract,
+  GeneralPermissionManagerContract,
+  GeneralTransferManagerContract,
+  ISecurityTokenContract,
+  ISecurityTokenRegistryContract,
+  LockUpTransferManagerContract,
+  ManualApprovalTransferManagerContract,
+  ModuleContract,
+  ModuleFactoryContract,
+  ModuleRegistryContract,
+  PercentageTransferManagerContract,
+  PolymathRegistryContract,
+  PolyTokenContract,
+  PolyTokenFaucetContract,
+  USDTieredSTOContract,
+  VolumeRestrictionTMContract,
+  VestingEscrowWalletContract,
+} from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
 import PolyTokenWrapper from './contract_wrappers/tokens/poly_token_wrapper';
@@ -35,6 +39,8 @@ import ERC20 from './contract_wrappers/tokens/erc20_wrapper';
 import assert from './utils/assert';
 import PolyTokenFaucetWrapper from './contract_wrappers/tokens/poly_token_faucet_wrapper';
 import ContractFactory from './factories/contractFactory';
+import { ErrorCode } from './types';
+import { PolymathError } from './PolymathError';
 
 /**
  * @param provider The web3 provider
@@ -132,36 +138,45 @@ export class PolymathAPI {
       gasPrice: params.defaultGasPrice,
     });
 
-    const artifactsArray = [
-      PolymathRegistry,
-      SecurityToken,
-      SecurityTokenRegistry,
-      PolyToken,
-      ModuleRegistry,
-      CappedSTO,
-      CappedSTOFactory,
-      ModuleFactory,
-      USDTieredSTO,
-      USDTieredSTOFactory,
-      FeatureRegistry,
-      GeneralTransferManager,
-      GeneralPermissionManager,
-      ERC20DividendCheckpoint,
-      ManualApprovalTransferManager,
-      CountTransferManager,
-      PercentageTransferManager,
-      EtherDividendCheckpoint,
-      VolumeRestrictionTransferManager,
-      PolyTokenFaucet,
+    const abiArray = [
+      // Registries
+      FeatureRegistryContract.ABI(),
+      ModuleRegistryContract.ABI(),
+      PolymathRegistryContract.ABI(),
+      ISecurityTokenRegistryContract.ABI(),
+      // Modules
+      ModuleFactoryContract.ABI(),
+      ModuleContract.ABI(),
+      // Checkpoint
+      ERC20DividendCheckpointContract.ABI(),
+      EtherDividendCheckpointContract.ABI(),
+      // Permission
+      GeneralPermissionManagerContract.ABI(),
+      // STO
+      CappedSTOContract.ABI(),
+      USDTieredSTOContract.ABI(),
+      // Transfer
+      CountTransferManagerContract.ABI(),
+      GeneralTransferManagerContract.ABI(),
+      ManualApprovalTransferManagerContract.ABI(),
+      PercentageTransferManagerContract.ABI(),
+      LockUpTransferManagerContract.ABI(),
+      BlacklistTransferManagerContract.ABI(),
+      VolumeRestrictionTMContract.ABI(),
+      // Tokens
+      ERC20DetailedContract.ABI(),
+      PolyTokenContract.ABI(),
+      PolyTokenFaucetContract.ABI(),
+      ISecurityTokenContract.ABI(),
+      // Wallet
+      VestingEscrowWalletContract.ABI(),
     ];
 
-    artifactsArray.forEach(
-      (artifact): void => {
-        this.web3Wrapper.abiDecoder.addABI(artifact.abi);
-      },
-    );
+    abiArray.forEach((abi): void => {
+      this.web3Wrapper.abiDecoder.addABI(abi);
+    });
 
-    this.contractFactory = new ContractFactory(this.web3Wrapper, params.polymathRegistryAddress);
+    this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 
     this.polymathRegistry = new PolymathRegistryWrapper(
       this.web3Wrapper,
@@ -200,7 +215,7 @@ export class PolymathAPI {
   public getPolyTokens = async (params: GetTokensParams): Promise<PolyResponse> => {
     const networkId = await this.web3Wrapper.getNetworkIdAsync();
     if (networkId === 1) {
-      throw new Error('Only for testnet');
+      throw new PolymathError({ message: 'Only for testnet', code: ErrorCode.PreconditionRequired });
     }
     const address = params.address !== undefined ? params.address : await this.getAccount();
     assert.isETHAddressHex('address', address);
@@ -217,7 +232,7 @@ export class PolymathAPI {
    */
   public getERC20TokenWrapper = async (params: GetERC20WrapperParams): Promise<ERC20> => {
     return this.tokenFactory.getERC20TokenInstanceFromAddress(params.address);
-  }
+  };
 
   /**
    * Get the account currently used by PolymathAPI

@@ -4,12 +4,10 @@ import {
   PolyTokenEvents,
   PolyTokenTransferEventArgs,
   PolyTokenApprovalEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import { PolyToken } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
-import * as _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
 import assert from '../../utils/assert';
@@ -44,6 +42,10 @@ interface GetPolyTokenLogsAsyncParams extends GetLogs {
   (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<PolyTokenTransferEventArgs>[]>;
 }
 
+export namespace PolyTokenTransactionParams {
+  export interface ChangeApproval extends ChangeApprovalParams {}
+}
+
 /**
  * @param spender The address which will spend the funds.
  * @param value The amount of tokens to increase the allowance by.
@@ -57,8 +59,6 @@ interface ChangeApprovalParams extends TxParams {
  * This class includes the functionality related to interacting with the PolyToken contract.
  */
 export default class PolyTokenWrapper extends ERC20TokenWrapper {
-  public abi: ContractAbi = PolyToken.abi;
-
   protected contract: Promise<PolyTokenContract>;
 
   /**
@@ -72,6 +72,9 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     this.contract = contract;
   }
 
+  /**
+   * Use to increase approval
+   */
   public increaseApproval = async (params: ChangeApprovalParams) => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
@@ -82,6 +85,9 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
+  /**
+   * Use to decrease approval
+   */
   public decreaseApproval = async (params: ChangeApprovalParams) => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
@@ -92,7 +98,11 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  public decimalFactor = async () => {
+  /**
+   * Get decimal factor
+   * @return factor
+   */
+  public decimalFactor = async (): Promise<BigNumber> => {
     return (await this.contract).decimalFactor.callAsync();
   };
 
@@ -107,13 +117,12 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PolyToken.abi,
       params.callback,
-      !_.isUndefined(params.isVerbose),
+      params.isVerbose,
     );
     return subscriptionToken;
   };
@@ -126,15 +135,12 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolyTokenEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PolyToken.abi,
     );
     return logs;
   };

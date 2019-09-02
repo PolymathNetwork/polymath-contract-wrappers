@@ -3,12 +3,10 @@ import {
   PolymathRegistryEventArgs,
   PolymathRegistryEvents,
   PolymathRegistryChangeAddressEventArgs,
-  PolymathRegistryOwnershipRenouncedEventArgs,
   PolymathRegistryOwnershipTransferredEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
 import ContractWrapper from '../contract_wrapper';
@@ -20,6 +18,7 @@ import {
   PolymathContract,
   GetLogs,
   Subscribe,
+  ErrorCode,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -30,15 +29,6 @@ interface ChangeAddressSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetChangeAddressLogsAsyncParams extends GetLogsAsyncParams {
   eventName: PolymathRegistryEvents.ChangeAddress;
-}
-
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<PolymathRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PolymathRegistryEvents.OwnershipRenounced;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -52,18 +42,18 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface PolymathRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeAddressSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetPolymathRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeAddressLogsAsyncParams): Promise<LogWithDecodedArgs<PolymathRegistryChangeAddressEventArgs>[]>;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PolymathRegistryOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<PolymathRegistryOwnershipTransferredEventArgs>[]
   >;
+}
+
+export namespace PolymathRegistryTransactionParams {
+  export interface ChangeAddress extends ChangeAddressParams {}
 }
 
 /**
@@ -86,8 +76,6 @@ interface ChangeAddressParams extends TxParams {
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
  */
 export default class PolymathRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = PolymathRegistry.abi;
-
   protected contract: Promise<PolymathRegistryContract>;
 
   /**
@@ -100,7 +88,11 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
-  public owner = async () => {
+  /**
+   * Get owner of contract
+   * @return address
+   */
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
@@ -108,7 +100,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public getAddress = async (params: GetAddressParams) => {
+  public getAddress = async (params: GetAddressParams): Promise<string> => {
     return this.getAddressInternal(params.contractName);
   };
 
@@ -116,7 +108,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyToken contract address
    * @return address string
    */
-  public getPolyTokenAddress = async () => {
+  public getPolyTokenAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.PolyToken);
   };
 
@@ -124,7 +116,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the ModuleRegistry contract address
    * @return address string
    */
-  public getModuleRegistryAddress = async () => {
+  public getModuleRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.ModuleRegistry);
   };
 
@@ -132,7 +124,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the FeatureRegistry contract address
    * @return address string
    */
-  public getFeatureRegistryAddress = async () => {
+  public getFeatureRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.FeatureRegistry);
   };
 
@@ -140,7 +132,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the SecurityTokenRegistry contract address
    * @return address string
    */
-  public getSecurityTokenRegistryAddress = async () => {
+  public getSecurityTokenRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.SecurityTokenRegistry);
   };
 
@@ -148,7 +140,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyUsdOracle contract address
    * @return address string
    */
-  public getPolyUsdOracleAddress = async () => {
+  public getPolyUsdOracleAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.PolyUsdOracle);
   };
 
@@ -156,7 +148,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the EthUsdOracle contract address
    * @return address string
    */
-  public getEthUsdOracleAddress = async () => {
+  public getEthUsdOracleAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.EthUsdOracle);
   };
 
@@ -166,6 +158,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
   public changeAddress = async (params: ChangeAddressParams) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
+      ErrorCode.Unauthorized,
       'Form sender must be owner',
     );
     assert.isETHAddressHex('newAddress', params.newAddress);
@@ -188,11 +181,10 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      PolymathRegistry.abi,
       params.callback,
       params.isVerbose,
     );
@@ -207,15 +199,12 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, PolymathRegistryEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      PolymathRegistry.abi,
     );
     return logs;
   };

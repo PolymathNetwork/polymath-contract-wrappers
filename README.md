@@ -1,6 +1,6 @@
 ## @polymathnetwork/contract-wrappers
 
-Version 2.1.0 of the Polymath-Core contracts
+Version 3.0.0 of the Polymath-Core Ethereum Smart Contracts
 
 Smart TS wrappers for Polymath smart contracts.
 
@@ -25,6 +25,11 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
     "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"],
 }
 ```
+
+## Documentation
+This project uses typedoc documentation style.
+
+You can access these docs by cloning this repo and opening `docs/index.html` in the browser.
 
 ## Contributing
 
@@ -215,3 +220,12 @@ const params: ApiConstructorParams = {
 };
 const polymathAPI = new PolymathAPI(params);
 ```
+
+### Module code examples
+In the `/examples` directory there are several examples to help developers understand how to use the API within the sandbox.
+
+These examples demonstrate the use of the project's PolymathAPI to get data and publish transactions with Polymath's smart contracts. Register a ticker, generate a new security token and then you can add a module.
+
+When a security token has a module successfully attached, the examples demonstrate how one can work with sto creation, transfer restrictions, permissioning, and directly with the security token. 
+
+The sandbox code included in the examples demonstrates how to subscribe to events fired from the smart contracts. It also demonstrates how to better catch issues when they happen, during token transfers for instance.

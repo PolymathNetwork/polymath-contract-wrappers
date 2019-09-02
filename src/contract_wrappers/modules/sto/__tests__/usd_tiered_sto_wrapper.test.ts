@@ -1,13 +1,14 @@
 // USDTieredSTOWrapper test
 import { instance, mock, objectContaining, reset, verify, when } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   PolyTokenEvents,
-  SecurityTokenContract,
-  DetailedERC20Contract,
+  ISecurityTokenContract,
+  ERC20DetailedContract,
   USDTieredSTOContract,
+  GeneralTransferManagerContract,
   PolyTokenContract,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../usd_tiered_sto_wrapper';
@@ -15,13 +16,13 @@ import ContractFactory from '../../../../factories/contractFactory';
 import STOWrapper from '../sto_wrapper';
 import {
   dateToBigNumber,
-  numberToBigNumber,
+  stringToBytes32,
   valueArrayToWeiArray,
   valueToWei,
   weiArrayToValueArray,
   weiToValue,
 } from '../../../../utils/convert';
-import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
+import { FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../types';
 
 describe('USDTieredSTOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -29,16 +30,18 @@ describe('USDTieredSTOWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
-  let mockedDetailedERC20Contract: DetailedERC20Contract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedGeneralTransferManagerContract: GeneralTransferManagerContract;
+  let mockedDetailedERC20Contract: ERC20DetailedContract;
   let mockedPolyTokenContract: PolyTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(USDTieredSTOContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
-    mockedDetailedERC20Contract = mock(DetailedERC20Contract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedGeneralTransferManagerContract = mock(GeneralTransferManagerContract);
+    mockedDetailedERC20Contract = mock(ERC20DetailedContract);
     mockedPolyTokenContract = mock(PolyTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
@@ -49,6 +52,7 @@ describe('USDTieredSTOWrapper', () => {
     reset(mockedWrapper);
     reset(mockedContract);
     reset(mockedSecurityTokenContract);
+    reset(mockedGeneralTransferManagerContract);
     reset(mockedContractFactory);
     reset(mockedDetailedERC20Contract);
     reset(mockedPolyTokenContract);
@@ -57,30 +61,6 @@ describe('USDTieredSTOWrapper', () => {
   describe('Types', () => {
     test('should extend STOWrapper', async () => {
       expect(target instanceof STOWrapper).toBe(true);
-    });
-  });
-
-  describe('InvestorsList', () => {
-    test('should get address in investors list', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      const params = { investorIndex: 1 };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investorsList).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.investorIndex)))).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.investorsList(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.investorsList).once();
-      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.investorIndex)))).once();
     });
   });
 
@@ -145,29 +125,6 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('Investors', () => {
-    test('should get investor info', async () => {
-      const investorAddress = '0x1111111111111111111111111111111111111111';
-      const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(1)];
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(investorAddress)).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.investors({ investorAddress });
-      // Result expectation
-      expect(result.accredited).toEqual(!expectedResult[0].isZero());
-      expect(result.nonAccreditedLimitUSDOverride).toEqual(weiToValue(expectedResult[2], FULL_DECIMALS));
-
-      // Verifications
-      verify(mockedContract.investors).once();
-      verify(mockedMethod.callAsync(investorAddress)).once();
-    });
-  });
-
   describe('InvestorInvested', () => {
     test('should get amount of investorInvested', async () => {
       // Address expected
@@ -193,56 +150,8 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('USDTokenEnabled', () => {
-    test('should get boolean of usdTokenEnabled', async () => {
-      // Result expected
-      const expectedResult = true;
-      const params = {
-        stableCoinAddress: '0x1111111111111111111111111111111111111111',
-      };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.usdTokenEnabled).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(params.stableCoinAddress)).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.usdTokenEnabled(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.usdTokenEnabled).once();
-      verify(mockedMethod.callAsync(params.stableCoinAddress)).once();
-    });
-  });
-
-  describe('USDTokens', () => {
-    test('should get address in USDTokens', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      const params = { usdTokenIndex: 1 };
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.usdTokens).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.usdTokens(params);
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.usdTokens).once();
-      verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.usdTokenIndex)))).once();
-    });
-  });
-
   describe('InvestorInvestedUSD', () => {
-    test('should get address in USDTokens', async () => {
+    test('should get InvestorInvestedUSD', async () => {
       // Address expected
       const expectedResult = new BigNumber(1);
       const params = { investorAddress: '0x1111111111111111111111111111111111111111' };
@@ -367,7 +276,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -390,15 +299,6 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedContract.minimumInvestmentUSD).thenReturn(instance(mockedMinimumInvestmentUSDMethod));
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
-
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(100);
@@ -451,6 +351,43 @@ describe('USDTieredSTOWrapper', () => {
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -510,15 +447,20 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -551,7 +493,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -575,14 +517,42 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
 
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(100);
@@ -700,17 +670,19 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -743,7 +715,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(10);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -767,14 +739,42 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
 
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(10), new BigNumber(0), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(50000);
@@ -835,7 +835,7 @@ describe('USDTieredSTOWrapper', () => {
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -897,17 +897,19 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedDetailedERC20Contract.balanceOf).once();
-      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -942,7 +944,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -966,14 +968,42 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
 
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(100);
@@ -1082,15 +1112,20 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedWrapper.getBalanceInWeiAsync(investorAddress)).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -1123,7 +1158,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(1);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -1147,14 +1182,42 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
 
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(100);
@@ -1270,17 +1333,19 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getPolyTokenContract()).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
+      verify(mockedContract.securityToken).twice();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -1313,7 +1378,7 @@ describe('USDTieredSTOWrapper', () => {
       // Mock getRate
       const expectedGetRateResult = new BigNumber(10);
       // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
+      const mockedGetRateMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
       // Stub the request
@@ -1337,14 +1402,42 @@ describe('USDTieredSTOWrapper', () => {
       // Stub the request
       when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
 
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(10), new BigNumber(0), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
+      const expectedGeneralTMAddress = '0x3333333333333333333333333333333333333333';
+      const expectedGetModulesByNameAddress = [expectedGeneralTMAddress];
+      const mockedGetModulesByNameMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.getModulesByName).thenReturn(instance(mockedGetModulesByNameMethod));
+      when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
+        expectedGetModulesByNameAddress,
+      );
+      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
+        instance(mockedGeneralTransferManagerContract),
+      );
+
+      const expectedInvestorFlagResult = true;
+      const mockedInvestorFlagMethod = mock(MockedCallMethod);
+      when(mockedGeneralTransferManagerContract.getInvestorFlag).thenReturn(instance(mockedInvestorFlagMethod));
+      when(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).thenResolve(expectedInvestorFlagResult);
+
+      const nonAccreditedLimits = [new BigNumber(100), new BigNumber(0), new BigNumber(300)];
+      const expectedGetAccreditedDataAmount = [
+        ['0x1111111111111111111111111111111111111111', investorAddress, '0x3333333333333333333333333333333333333333'],
+        [true, true, true],
+        nonAccreditedLimits,
+      ];
+      const typedExpectedGetAccreditedDataResult = [];
+      for (let i = 0; i < expectedGetAccreditedDataAmount[0].length; i += 1) {
+        const accreditedData = {
+          investor: expectedGetAccreditedDataAmount[0][i],
+          accreditedData: {
+            accredited: expectedGetAccreditedDataAmount[1][i],
+            nonAccreditedLimitUSDOverride: weiToValue(nonAccreditedLimits[i], FULL_DECIMALS),
+          },
+        };
+        typedExpectedGetAccreditedDataResult.push(accreditedData);
+      }
+      const mockedGetAccreditedDataMethod = mock(MockedCallMethod);
+      when(mockedContract.getAccreditedData).thenReturn(instance(mockedGetAccreditedDataMethod));
+      when(mockedGetAccreditedDataMethod.callAsync()).thenResolve(expectedGetAccreditedDataAmount);
 
       // Mock nonAccreditedLimitUSD
       const expectedNonAccreditedLimitUSDResult = new BigNumber(50000);
@@ -1405,7 +1498,7 @@ describe('USDTieredSTOWrapper', () => {
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getDetailedERC20Contract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
+      when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
 
       const mockedParams = {
         beneficiary: investorAddress,
@@ -1464,204 +1557,19 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
       verify(mockedContract.nonAccreditedLimitUSD).once();
       verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedDetailedERC20Contract.balanceOf).once();
-      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getDetailedERC20Contract(usdToken)).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
-    });
-  });
-
-  describe('BuyTokensView', () => {
-    test('should get buyTokensView values', async () => {
-      const investorAddress = '0x1111111111111111111111111111111111111111';
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([investorAddress]);
-
-      // Security Token, its address, and decimals mocked
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
-      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-
-      // Pause Address expected
-      const expectedPausedResult = false;
-      // Mocked method
-      const mockedPausedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.paused).thenReturn(instance(mockedPausedMethod));
-      // Stub the request
-      when(mockedPausedMethod.callAsync()).thenResolve(expectedPausedResult);
-
-      // Mock isOpen
-      const expectedIsOpenResult = true;
-      // Mocked method
-      const mockedIsOpenMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.isOpen).thenReturn(instance(mockedIsOpenMethod));
-      // Stub the request
-      when(mockedIsOpenMethod.callAsync()).thenResolve(expectedIsOpenResult);
-
-      // Mock STO Details
-      const expectedStartTime = new Date(2025, 1);
-      const expectedEndTime = new Date(2026, 1);
-      const expectedSTODetailsResult = [
-        dateToBigNumber(expectedStartTime),
-        dateToBigNumber(expectedEndTime),
-        new BigNumber(1),
-        [new BigNumber(1), new BigNumber(1)],
-        [new BigNumber(1), new BigNumber(1)],
-        new BigNumber(1),
-        new BigNumber(1),
-        new BigNumber(1),
-        [false, true, false],
-      ];
-      // Mocked method
-      const mockedSTODetailsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getSTODetails).thenReturn(instance(mockedSTODetailsMethod));
-      // Stub the request
-      when(mockedSTODetailsMethod.callAsync()).thenResolve(expectedSTODetailsResult);
-
-      // Mock getRate
-      const expectedGetRateResult = new BigNumber(1);
-      // Mocked method
-      const mockedGetRateMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getRate).thenReturn(instance(mockedGetRateMethod));
-      // Stub the request
-      when(mockedGetRateMethod.callAsync(FundRaiseType.POLY)).thenResolve(expectedGetRateResult);
-
-      // Mock investorInvestedUSD
-      const expectedInvestorInvestedUSDResult = new BigNumber(1);
-      // Mocked method
-      const mockedInvestorInvestedUSDMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investorInvestedUSD).thenReturn(instance(mockedInvestorInvestedUSDMethod));
-      // Stub the request
-      when(mockedInvestorInvestedUSDMethod.callAsync(investorAddress)).thenResolve(expectedInvestorInvestedUSDResult);
-
-      // Mock minimumInvestmentUSD
-      const expectedMinimumInvestmentUSDResult = new BigNumber(1);
-      // Mocked method
-      const mockedMinimumInvestmentUSDMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.minimumInvestmentUSD).thenReturn(instance(mockedMinimumInvestmentUSDMethod));
-      // Stub the request
-      when(mockedMinimumInvestmentUSDMethod.callAsync()).thenResolve(expectedMinimumInvestmentUSDResult);
-
-      // Mock investors
-      const expectedInvestorsResult = [new BigNumber(1), new BigNumber(1), new BigNumber(0)];
-      // Mocked method
-      const mockedInvestorsMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investors).thenReturn(instance(mockedInvestorsMethod));
-      // Stub the request
-      when(mockedInvestorsMethod.callAsync(investorAddress)).thenResolve(expectedInvestorsResult);
-
-      // Mock nonAccreditedLimitUSD
-      const expectedNonAccreditedLimitUSDResult = new BigNumber(10);
-      // Mocked method
-      const mockedNonAccreditedLimitUSDMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.nonAccreditedLimitUSD).thenReturn(instance(mockedNonAccreditedLimitUSDMethod));
-      // Stub the request
-      when(mockedNonAccreditedLimitUSDMethod.callAsync()).thenResolve(expectedNonAccreditedLimitUSDResult);
-
-      // Balance expected
-      const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
-      // Setup get Security Token Address
-      const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
-      when(mockedPolyTokenContract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
-      when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
-      when(mockedContractFactory.getPolyTokenContract()).thenResolve(instance(mockedPolyTokenContract));
-
-      // Result expected
-      const expectedAllowBeneficialInvestmentResult = false;
-      // Mocked method
-      const mockedAllowBeneficialInvestmentMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.allowBeneficialInvestments).thenReturn(instance(mockedAllowBeneficialInvestmentMethod));
-      // Stub the request
-      when(mockedAllowBeneficialInvestmentMethod.callAsync()).thenResolve(expectedAllowBeneficialInvestmentResult);
-
-      // Mock buyTokensView
-      const params = {
-        beneficiary: investorAddress,
-        investmentValue: new BigNumber(2),
-        fundRaiseType: FundRaiseType.POLY,
-      };
-      const expectedResult = [new BigNumber(1), new BigNumber(1), new BigNumber(1)];
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.buyTokensView).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.callAsync(
-          params.beneficiary,
-          objectContaining(valueToWei(params.investmentValue, FULL_DECIMALS)),
-          params.fundRaiseType,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.buyTokensView(params);
-      // Result expectation
-      expect(result.spentUSD).toEqual(weiToValue(expectedResult[0], FULL_DECIMALS));
-      expect(result.spentValue).toEqual(weiToValue(expectedResult[1], FULL_DECIMALS));
-      expect(result.tokensMinted).toEqual(weiToValue(expectedResult[2], expectedDecimalsResult));
-
-      // Verifications
-      verify(mockedContract.paused).once();
-      verify(mockedPausedMethod.callAsync()).once();
-      verify(mockedContract.isOpen).once();
-      verify(mockedIsOpenMethod.callAsync()).once();
-      verify(mockedContract.getSTODetails).once();
-      verify(mockedSTODetailsMethod.callAsync()).once();
-      verify(mockedContract.getRate).once();
-      verify(mockedGetRateMethod.callAsync(FundRaiseType.POLY)).once();
-      verify(mockedContract.investorInvestedUSD).once();
-      verify(mockedInvestorInvestedUSDMethod.callAsync(investorAddress)).once();
-      verify(mockedContract.minimumInvestmentUSD).once();
-      verify(mockedMinimumInvestmentUSDMethod.callAsync()).once();
-      verify(mockedContract.nonAccreditedLimitUSD).once();
-      verify(mockedNonAccreditedLimitUSDMethod.callAsync()).once();
-      verify(mockedContract.investors).once();
-      verify(mockedInvestorsMethod.callAsync(investorAddress)).once();
-      verify(mockedContract.buyTokensView).once();
-      verify(
-        mockedMethod.callAsync(
-          params.beneficiary,
-          objectContaining(valueToWei(params.investmentValue, FULL_DECIMALS)),
-          params.fundRaiseType,
-        ),
-      ).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedPolyTokenContract.balanceOf).once();
-      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
-      verify(mockedContractFactory.getPolyTokenContract()).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).twice();
       verify(mockedContract.securityToken).twice();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
-      verify(mockedSecurityTokenContract.decimals).twice();
-      verify(mockedDecimalsMethod.callAsync()).twice();
-      verify(mockedContract.allowBeneficialInvestments).once();
-      verify(mockedAllowBeneficialInvestmentMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(mockedSecurityTokenContract.getModulesByName).once();
+      verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
+      verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
+      verify(mockedInvestorFlagMethod.callAsync(investorAddress, 0)).once();
+      verify(mockedContract.getAccreditedData).once();
+      verify(mockedGetAccreditedDataMethod.callAsync()).once();
     });
   });
 
@@ -1696,11 +1604,13 @@ describe('USDTieredSTOWrapper', () => {
         amount: new BigNumber(2),
       };
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.convertFromUSD).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).thenResolve(expectedAmount);
+      when(
+        mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS))),
+      ).thenResolve(expectedAmount);
 
       // Real call
       const result = await target.convertFromUSD(params);
@@ -1708,7 +1618,9 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toEqual(weiToValue(expectedAmount, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.convertFromUSD).once();
-      verify(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).once();
+      verify(
+        mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS))),
+      ).once();
     });
   });
 
@@ -1888,7 +1800,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       const result = await target.currentTier();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.currentTier).once();
       verify(mockedMethod.callAsync()).once();
@@ -1921,7 +1833,7 @@ describe('USDTieredSTOWrapper', () => {
       // Result expected
       const expectedResult = new BigNumber(1);
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getRate).thenReturn(instance(mockedMethod));
       // Stub the request
@@ -1979,23 +1891,23 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('ReserveWallet', () => {
-    test('should get address from reserveWallet', async () => {
+  describe('TreasuryWallet', () => {
+    test('should get address from treasuryWallet', async () => {
       // Address expected
       const expectedResult = '0x1111111111111111111111111111111111111111';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.reserveWallet).thenReturn(instance(mockedMethod));
+      when(mockedContract.treasuryWallet).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.reserveWallet();
+      const result = await target.treasuryWallet();
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.reserveWallet).once();
+      verify(mockedContract.treasuryWallet).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
@@ -2230,11 +2142,13 @@ describe('USDTieredSTOWrapper', () => {
         amount: new BigNumber(2),
       };
       // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
+      const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.convertToUSD).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).thenResolve(expectedAmount);
+      when(
+        mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS))),
+      ).thenResolve(expectedAmount);
 
       // Real call
       const result = await target.convertToUSD(params);
@@ -2242,7 +2156,9 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toEqual(weiToValue(expectedAmount, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.convertToUSD).once();
-      verify(mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS)))).once();
+      verify(
+        mockedMethod.callAsync(FundRaiseType.ETH, objectContaining(valueToWei(params.amount, FULL_DECIMALS))),
+      ).once();
     });
   });
 
@@ -2373,71 +2289,6 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.isFinalized).once();
       verify(mockedIsFinalizedMethod.callAsync()).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
-  describe('ChangeAccredited', () => {
-    test('should change accredited investors', async () => {
-      // Mock Only Owner and Security Token
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        investors: ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'],
-        accredited: [true, true],
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.changeAccredited).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investors,
-          mockedParams.accredited,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.changeAccredited(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.changeAccredited).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.investors,
-          mockedParams.accredited,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -2579,6 +2430,72 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.startTime).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('ModifyOracle', () => {
+    test('should modifyOracle', async () => {
+      // Mock Only Owner and Security Token
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        oracleAddress: '0x1111111111111111111111111111111111111111',
+        fundRaiseType: FundRaiseType.ETH,
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.modifyOracle).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.fundRaiseType,
+          mockedParams.oracleAddress,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyOracle(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.modifyOracle).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.fundRaiseType,
+          mockedParams.oracleAddress,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
@@ -2754,7 +2671,7 @@ describe('USDTieredSTOWrapper', () => {
 
       const mockedParams = {
         wallet: '0x1234567890123456789012345678901234567890',
-        reserveWallet: '0x0987654321098765432109876543210987654321',
+        treasuryWallet: '0x0987654321098765432109876543210987654321',
         usdTokens: ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'],
         txData: {},
         safetyFactor: 10,
@@ -2768,7 +2685,7 @@ describe('USDTieredSTOWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.reserveWallet,
+          mockedParams.treasuryWallet,
           mockedParams.usdTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -2785,7 +2702,7 @@ describe('USDTieredSTOWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.reserveWallet,
+          mockedParams.treasuryWallet,
           mockedParams.usdTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -2946,7 +2863,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       const result = await target.getNumberOfTiers();
       // Result expectation
-      expect(result).toBe(expectedAmount);
+      expect(result).toBe(expectedAmount.toNumber());
       // Verifications
       verify(mockedContract.getNumberOfTiers).once();
       verify(mockedMethod.callAsync()).once();
@@ -2966,7 +2883,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'SetAccredited', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetFundRaiseTypes', 'Pause', 'Unpause', encountered: Transfer`,
+          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetTreasuryWallet', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
         ),
       );
     });

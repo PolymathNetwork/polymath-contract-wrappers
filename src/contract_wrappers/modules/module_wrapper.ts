@@ -1,35 +1,36 @@
-import { Module } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, TxData } from 'ethereum-types';
-import { BigNumber } from '@0x/utils';
 import {
-  SecurityTokenContract,
+  ISecurityTokenContract,
   ModuleFactoryContract,
   PolyTokenContract,
-  DetailedERC20Contract,
+  ERC20DetailedContract,
+  Web3Wrapper,
+  TxData,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
-import { TxParams, GenericModuleContract, GetLogs, Subscribe } from '../../types';
-import { stringToBytes32 } from '../../utils/convert';
+import { PolymathError } from '../../PolymathError';
+import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode } from '../../types';
+import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
 
-interface TakeFeeParams extends TxParams {
-  amount: BigNumber;
+/**
+ * @param tokenContract ERC20 Token Contract Address
+ */
+interface ReclaimERC20Params extends TxParams {
+  tokenContract: string;
 }
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class ModuleWrapper extends ContractWrapper {
-  public abi: ContractAbi = Module.abi;
-
   protected contract: Promise<GenericModuleContract>;
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (): Promise<SecurityTokenContract> => {
+  protected securityTokenContract = async (): Promise<ISecurityTokenContract> => {
     const address = await (await this.contract).securityToken.callAsync();
     return this.contractFactory.getSecurityTokenContract(address);
   };
@@ -38,8 +39,8 @@ export default class ModuleWrapper extends ContractWrapper {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected detailedERC20TokenContract = async (address: string): Promise<DetailedERC20Contract> => {
-    return this.contractFactory.getDetailedERC20Contract(address);
+  protected detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract> => {
+    return this.contractFactory.getERC20DetailedContract(address);
   };
 
   protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
@@ -66,33 +67,94 @@ export default class ModuleWrapper extends ContractWrapper {
     this.contractFactory = contractFactory;
   }
 
-  public getInitFunction = async () => {
+  /**
+   * Return init function result
+   * @return init function string
+   */
+  public getInitFunction = async (): Promise<string> => {
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public polyToken = async () => {
+  /**
+   * Return poly token address
+   * @return address
+   */
+  public polyToken = async (): Promise<string> => {
     return (await this.contract).polyToken.callAsync();
   };
 
-  public securityToken = async () => {
+  /**
+   * Return security token address
+   * @return address
+   */
+  public securityToken = async (): Promise<string> => {
     return (await this.contract).securityToken.callAsync();
   };
 
-  public getPermissions = async () => {
+  /**
+   * Return permissions
+   * @return list of permissions
+   */
+  public getPermissions = async (): Promise<string[]> => {
     return (await this.contract).getPermissions.callAsync();
   };
 
-  public factory = async () => {
+  /**
+   * Return factory address
+   * @return address
+   */
+  public factory = async (): Promise<string> => {
     return (await this.contract).factory.callAsync();
   };
 
-  public takeFee = async (params: TakeFeeParams) => {
-    const polyTokenBalance = await (await this.polyTokenContract()).balanceOf.callAsync(await this.securityToken());
+  /**
+   * Reclaim ETH from contract
+   */
+  public reclaimETH = async (params: TxParams) => {
     assert.assert(
-      polyTokenBalance.isGreaterThanOrEqualTo(params.amount),
-      'Allowance less than amount unable to take fee',
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
     );
-    return (await this.contract).takeFee.sendTransactionAsync(params.amount, params.txData, params.safetyFactor);
+    return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Reclaim ERC20 tokens from contract
+   */
+  public reclaimERC20 = async (params: ReclaimERC20Params) => {
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
+    assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
+    return (await this.contract).reclaimERC20.sendTransactionAsync(
+      params.tokenContract,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  public isValidModule = async () => {
+    const moduleFactoryContract = await this.moduleFactoryContract();
+    const getTypes = await moduleFactoryContract.getTypes.callAsync();
+    const types = getTypes.filter(type => {
+      // type '6' and '8' are valid but they are not mapped, so we must filter them
+      try {
+        parseModuleTypeValue(new BigNumber(type));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    });
+    // prevent invalid scenarios
+    if (!types.length || types.length > 1) {
+      throw new PolymathError({ code: ErrorCode.InvalidData });
+    }
+    const address = await this.address();
+    const result = await (await this.securityTokenContract()).isModule.callAsync(address, types[0]);
+    return result;
   };
 
   protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {

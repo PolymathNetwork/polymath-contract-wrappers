@@ -1,10 +1,7 @@
-import { BigNumber } from '@0x/utils';
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { GeneralTransferManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { valueToWei, weiToValue } from '../src/utils/convert';
-import { ModuleName } from '../src';
-import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers/lib/src';
+import { ModuleName, TransferType } from '../src';
 
 // This file acts as a valid sandbox for using a general transfer manager  module on an unlocked node (like ganache)
 
@@ -30,8 +27,8 @@ window.addEventListener('load', async () => {
   const tokenName = prompt('Token Name', '');
 
   // Double check available
-  await polymathAPI.securityTokenRegistry.isTickerAvailable({
-    tokenName: ticker!,
+  await polymathAPI.securityTokenRegistry.tickerAvailable({
+    ticker: ticker!,
   });
 
   // Get the ticker fee and approve the security token registry to spend
@@ -55,11 +52,13 @@ window.addEventListener('load', async () => {
   });
 
   // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateSecurityToken({
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
     name: tokenName!,
     ticker: ticker!,
-    details: 'http://',
+    tokenDetails: 'http://',
     divisible: false,
+    treasuryWallet: myAddress,
+    protocolVersion: '0',
   });
 
   // Create a Security Token Instance
@@ -67,19 +66,19 @@ window.addEventListener('load', async () => {
 
   // Get General TM Address
   const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.generalTransferManager,
+    moduleName: ModuleName.GeneralTransferManager,
   }))[0];
 
   // Get general TM module instance
   const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.generalTransferManager,
+    name: ModuleName.GeneralTransferManager,
     address: generalTMAddress,
   });
 
-  // Allow all transfers
-  // Subscribe to event of allow all transfers
+  // Modify transfer requirements
+  // Subscribe to event of modify transfer requirements
   await generalTM.subscribeAsync({
-    eventName: GeneralTransferManagerEvents.AllowAllTransfers,
+    eventName: GeneralTransferManagerEvents.ModifyTransferRequirements,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -89,52 +88,66 @@ window.addEventListener('load', async () => {
       }
     },
   });
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: true });
+
+  // Add owner address in the whitelist to allow mint tokens
+  await generalTM.modifyKYCData({
+    investor: myAddress,
+    canSendAfter: new Date(),
+    canReceiveAfter: new Date(),
+    expiryTime: new Date(2020, 0),
+    txData: {
+      from: await polymathAPI.getAccount(),
+    },
+  });
+
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
   const randomBeneficiary2 = '0x5544444444444444444444444444444444444444';
 
-  // Mint yourself some tokens and transfer them around, check balances
-  await tickerSecurityTokenInstance.mint({ investor: myAddress, value: new BigNumber(200) });
-  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(50) });
-  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
-  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
+  // Add beneficiaries in the whitelist with distant dates to send and receive
+  const delay = 10000000000;
 
-  // Disallow all transfers between token holders
-  await generalTM.changeAllowAllTransfers({ allowAllTransfers: false });
-
-  // Add whitelist special users
-  await generalTM.modifyWhitelistMulti({
-    investors: [randomBeneficiary1, randomBeneficiary2, myAddress],
-    canBuyFromSTO: [true, true, true],
-    canReceiveAfters: [new Date(2018, 1), new Date(2018, 1), new Date(2018, 1)],
-    canSendAfters: [new Date(), new Date(), new Date(2018, 2)],
-    expiryTimes: [new Date(2035, 1), new Date(2035, 1), new Date(2035, 1)],
+  await generalTM.modifyKYCDataMulti({
+    investors: [randomBeneficiary1, randomBeneficiary2],
+    canSendAfter: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    canReceiveAfter: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
+    expiryTime: [new Date(Date.now().valueOf() + delay), new Date(Date.now().valueOf() + delay)],
   });
 
-  // Change allow all whitelist transfers
-  await generalTM.changeAllowAllWhitelistTransfers({ allowAllWhitelistTransfers: true });
+  // Mint yourself some tokens
+  await tickerSecurityTokenInstance.issue({ investor: myAddress, value: new BigNumber(200), data: '0x00' });
 
-  // Verify we can make transfers
+  // No one can receive tokens
   console.log(
-    await tickerSecurityTokenInstance.verifyTransfer({
-      from: myAddress,
+    await tickerSecurityTokenInstance.canTransfer({
       to: randomBeneficiary1,
       data: '0x00',
       value: new BigNumber(10),
     }),
   );
+
+  // Allow all transfers between token holders
+  await generalTM.modifyTransferRequirementsMulti({
+    transferTypes: [TransferType.General, TransferType.Issuance, TransferType.Redemption],
+    fromValidKYC: [false, false, false],
+    toValidKYC: [false, false, false],
+    fromRestricted: [false, false, false],
+    toRestricted: [false, false, false],
+  });
+
+  // Now we can transfer to all
   console.log(
-    await tickerSecurityTokenInstance.verifyTransfer({
-      from: myAddress,
-      to: randomBeneficiary2,
+    await tickerSecurityTokenInstance.canTransfer({
+      to: randomBeneficiary1,
       data: '0x00',
       value: new BigNumber(10),
     }),
   );
 
-  // Make the transfers
-  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(10) });
+  await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary1, value: new BigNumber(50) });
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiary2, value: new BigNumber(10) });
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: myAddress }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary1 }));
+  console.log(await tickerSecurityTokenInstance.balanceOf({ owner: randomBeneficiary2 }));
   console.log('Funds transferred');
 
   generalTM.unsubscribeAll();

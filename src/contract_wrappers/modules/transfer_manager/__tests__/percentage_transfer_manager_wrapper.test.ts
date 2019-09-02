@@ -1,11 +1,11 @@
 // PercentageTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
 import {
   PercentageTransferManagerContract,
-  SecurityTokenContract,
+  ISecurityTokenContract,
   PolyTokenEvents,
+  BigNumber,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import PercentageTransferManagerWrapper from '../percentage_transfer_manager_wrapper';
@@ -19,13 +19,13 @@ describe('PercentageTransferManagerWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: PercentageTransferManagerContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(PercentageTransferManagerContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new PercentageTransferManagerWrapper(
@@ -262,7 +262,9 @@ describe('PercentageTransferManagerWrapper', () => {
   });
 
   describe('verifyTransfer', () => {
-    test('should verifyTransfer', async () => {
+    test('should verify Transfer', async () => {
+      const statusCode = new BigNumber(2);
+      const expectedResult = [statusCode, '0x1111111111111111111111111111111111111111'];
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
       // Setup get Security Token Address
@@ -282,25 +284,18 @@ describe('PercentageTransferManagerWrapper', () => {
         to: '0x2222222222222222222222222222222222222222',
         amount: new BigNumber(10),
         data: 'Data',
-        isTransfer: true,
-        txData: {},
-        safetyFactor: 10,
       };
-      const expectedResult = getMockedPolyResponse();
       // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
+      const mockedMethod = mock(MockedCallMethod);
       // Stub the method
       when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(
+        mockedMethod.callAsync(
           mockedParams.from,
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.isTransfer,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
         ),
       ).thenResolve(expectedResult);
 
@@ -308,18 +303,16 @@ describe('PercentageTransferManagerWrapper', () => {
       const result = await target.verifyTransfer(mockedParams);
 
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result.transferResult).toBe(statusCode.toNumber());
+      expect(result.address).toBe(expectedResult[1]);
       // Verifications
       verify(mockedContract.verifyTransfer).once();
       verify(
-        mockedMethod.sendTransactionAsync(
+        mockedMethod.callAsync(
           mockedParams.from,
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.amount, expectedDecimalsResult)),
           mockedParams.data,
-          mockedParams.isTransfer,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
         ),
       ).once();
       verify(mockedContract.securityToken).once();

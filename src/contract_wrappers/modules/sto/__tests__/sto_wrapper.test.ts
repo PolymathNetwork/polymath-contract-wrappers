@@ -1,14 +1,12 @@
 // STOWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { BigNumber } from '@0x/utils';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { CappedSTOContract, SecurityTokenContract } from '@polymathnetwork/abi-wrappers';
+import { CappedSTOContract, ISecurityTokenContract, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
-import { weiToValue } from '../../../../utils/convert';
+import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 describe('STOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -16,13 +14,13 @@ describe('STOWrapper', () => {
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: SecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
     mockedContract = mock(CappedSTOContract);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(SecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -118,7 +116,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.startTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.startTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -139,7 +137,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.endTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.endTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -160,7 +158,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.pausedTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.pausedTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -181,7 +179,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.investorCount();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.investorCount).once();
       verify(mockedMethod.callAsync()).once();

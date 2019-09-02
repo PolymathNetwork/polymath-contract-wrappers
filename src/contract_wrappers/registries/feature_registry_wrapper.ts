@@ -3,12 +3,10 @@ import {
   FeatureRegistryEventArgs,
   FeatureRegistryEvents,
   FeatureRegistryChangeFeatureStatusEventArgs,
-  FeatureRegistryOwnershipRenouncedEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs,
+  Web3Wrapper,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
-import { FeatureRegistry } from '@polymathnetwork/contract-artifacts';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { ContractAbi, LogWithDecodedArgs } from 'ethereum-types';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
 import assert from '../../utils/assert';
@@ -20,6 +18,7 @@ import {
   Feature,
   Subscribe,
   GetLogs,
+  ErrorCode,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -30,15 +29,6 @@ interface ChangeFeatureStatusSubscribeAsyncParams extends SubscribeAsyncParams {
 
 interface GetChangeFeatureStatusLogsAsyncParams extends GetLogsAsyncParams {
   eventName: FeatureRegistryEvents.ChangeFeatureStatus;
-}
-
-interface OwnershipRenouncedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
-  callback: EventCallback<FeatureRegistryOwnershipRenouncedEventArgs>;
-}
-
-interface GetOwnershipRenouncedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipRenounced;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -52,7 +42,6 @@ interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
 
 interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
   (params: ChangeFeatureStatusSubscribeAsyncParams): Promise<string>;
-  (params: OwnershipRenouncedSubscribeAsyncParams): Promise<string>;
   (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
 }
 
@@ -60,12 +49,13 @@ interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeatureStatusLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>[]
   >;
-  (params: GetOwnershipRenouncedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<FeatureRegistryOwnershipRenouncedEventArgs>[]
-  >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]
   >;
+}
+
+export namespace FeatureRegistryTransactionParams {
+  export interface SetFeatureStatus extends SetFeatureStatusParams {}
 }
 
 /**
@@ -88,8 +78,6 @@ interface SetFeatureStatusParams extends TxParams {
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
 export default class FeatureRegistryWrapper extends ContractWrapper {
-  public abi: ContractAbi = FeatureRegistry.abi;
-
   protected contract: Promise<FeatureRegistryContract>;
 
   /**
@@ -102,7 +90,11 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
-  public owner = async () => {
+  /**
+   * Get owner of contract
+   * @return address
+   */
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
@@ -110,7 +102,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the status of a feature
    * @return bool
    */
-  public getFeatureStatus = async (params: GetFeatureStatusParams) => {
+  public getFeatureStatus = async (params: GetFeatureStatusParams): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(params.nameKey);
   };
 
@@ -120,10 +112,11 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
   public setFeatureStatus = async (params: SetFeatureStatusParams) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
+      ErrorCode.Unauthorized,
       'From sender must be owner',
     );
     const currentStatus = await this.getFeatureStatus({ nameKey: params.nameKey });
-    assert.assert(currentStatus !== params.newStatus, 'FeatureStatus must change');
+    assert.assert(currentStatus !== params.newStatus, ErrorCode.PreconditionRequired, 'FeatureStatus must change');
     return (await this.contract).setFeatureStatus.sendTransactionAsync(
       params.nameKey,
       params.newStatus,
@@ -136,7 +129,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the CustomModulesAllowed status
    * @return bool
    */
-  public getCustomModulesAllowedStatus = async () => {
+  public getCustomModulesAllowedStatus = async (): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(Feature.CustomModulesAllowed);
   };
 
@@ -144,7 +137,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Get the FreezeMintingAllowed status
    * @return bool
    */
-  public getFreezeMintingAllowedStatus = async () => {
+  public getFreezeMintingAllowedStatus = async (): Promise<boolean> => {
     return (await this.contract).getFeatureStatus.callAsync(Feature.FreezeMintingAllowed);
   };
 
@@ -159,11 +152,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = this.subscribeInternal<ArgsType>(
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.indexFilterValues,
-      FeatureRegistry.abi,
       params.callback,
       params.isVerbose,
     );
@@ -178,15 +170,12 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
-    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
-      FeatureRegistry.abi,
     );
     return logs;
   };

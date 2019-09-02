@@ -1,8 +1,6 @@
 // PolymathRegistryWrapper test
-import { BigNumber } from '@0x/utils';
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { PolyTokenFaucetContract } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenFaucetContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import PolyTokenFaucetWrapper from '../poly_token_faucet_wrapper';
 import { MockedSendMethod, getMockedPolyResponse, MockedCallMethod } from '../../../test_utils/mocked_methods';
