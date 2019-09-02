@@ -304,8 +304,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
 
   /**
    * Used to return all permission of a single or multiple module
-   * @return address[] the address array of Modules this delegate has permission, bytes32[]
-   * the permission array of the corresponding Modules
+   * @return The address array of Modules this delegate has permission, the permission array of the corresponding Modules
    */
   public getAllModulesAndPermsFromTypes = async (
     params: GetAllModulesAndPermsFromTypesParams,

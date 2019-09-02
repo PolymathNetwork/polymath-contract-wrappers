@@ -734,10 +734,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
 
   /**
    * Return the STO details
-   * @return Unixtimestamp at which offering gets start., Unixtimestamp at which offering ends., Currently active tier,
-   * Array of Number of tokens this STO will be allowed to sell at different tiers., Array rate at which tokens are
-   * sold at different tiers, Amount of funds raised, Number of individual investors this STO have., Amount of tokens
-   * sold., Array of booleans to show if funding is allowed in ETH, POLY, SC respectively
+   * @return Unixtimestamp at which offering gets start, Unixtimestamp at which offering ends, Currently active tier,
+   * Array of Number of tokens this STO will be allowed to sell at different tiers, Array rate at which tokens are
+   * sold at different tiers, Amount of funds raised, Number of individual investors this STO have, Amount of tokens
+   * solo, Array of booleans to show if funding is allowed in ETH, POLY, SC respectively
    */
   public getSTODetails = async (): Promise<USDTieredSTOData> => {
     const result = await (await this.contract).getSTODetails.callAsync();
