@@ -24,6 +24,7 @@ import {
   GetLogs,
   Perm,
   PERCENTAGE_DECIMALS,
+  ErrorCode,
 } from '../../../types';
 import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
 
@@ -194,8 +195,12 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -210,8 +215,12 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    *  Pause the module
    */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -249,7 +258,11 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    * Sets the maximum percentage that an individual token holder can hold
    */
   public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isPercentage('maxHolderPercentage', params.maxHolderPercentage);
     return (await this.contract).changeHolderPercentage.sendTransactionAsync(
       valueToWei(params.maxHolderPercentage, PERCENTAGE_DECIMALS),
@@ -262,7 +275,11 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    * Adds or removes single addresses from the whitelist.
    */
   public modifyWhitelist = async (params: ModifyWhitelistParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isETHAddressHex('investor', params.investor);
     return (await this.contract).modifyWhitelist.sendTransactionAsync(
       params.investor,
@@ -276,9 +293,14 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    * Adds or removes addresses from the whitelist.
    */
   public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.investors.length === params.valids.length,
+      ErrorCode.MismatchedArrayLength,
       'Array lengths are not equal for investors and valids',
     );
     params.investors.forEach(address => assert.isETHAddressHex('investors', address));
@@ -294,9 +316,14 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    * Sets whether or not to consider primary issuance transfers
    */
   public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       (await this.allowPrimaryIssuance()) !== params.allowPrimaryIssuance,
+      ErrorCode.PreconditionRequired,
       'AllowPrimaryIssuance value must change ',
     );
     return (await this.contract).setAllowPrimaryIssuance.sendTransactionAsync(

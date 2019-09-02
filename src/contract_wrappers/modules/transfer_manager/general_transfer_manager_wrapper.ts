@@ -37,6 +37,7 @@ import {
   Perm,
   TransferType,
   Partition,
+  ErrorCode,
 } from '../../../types';
 
 const ONE_HUNDRED = new BigNumber(100);
@@ -389,8 +390,12 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -405,8 +410,12 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    *  Pause the module
    */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -443,7 +452,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Used to change the default times used when canSendAfter / canReceiveAfter are zero
    */
   public changeDefaults = async (params: ChangeDefaultsParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     return (await this.contract).changeDefaults.sendTransactionAsync(
       dateToBigNumber(params.defaultFromTime),
       dateToBigNumber(params.defaultToTime),
@@ -457,7 +470,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    */
   public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     return (await this.contract).changeIssuanceAddress.sendTransactionAsync(
       params.issuanceAddress,
       params.txData,
@@ -470,7 +487,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    */
   public modifyKYCData = async (params: ModifyKYCDataParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -616,7 +637,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    */
   public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isLessThanMax64BytesDate('canSendAfter', params.canSendAfter);
     assert.isLessThanMax64BytesDate('canReceiveAfter', params.canReceiveAfter);
     assert.isLessThanMax64BytesDate('expiryTime', params.expiryTime);
@@ -624,6 +649,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(params.validTo, 'ValidTo date must be in the future');
     assert.assert(
       !(await this.nonceMap({ address: params.investor, nonce: params.nonce })),
+      ErrorCode.AlreadyExists,
       'Already used signature of investor address and nonce',
     );
     return (await this.contract).modifyKYCDataSigned.sendTransactionAsync(
@@ -644,7 +670,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Used to modify investor Flag.
    */
   public modifyInvestorFlag = async (params: ModifyInvestorFlagParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isNonZeroETHAddressHex('investor', params.investor);
     return (await this.contract).modifyInvestorFlag.sendTransactionAsync(
       params.investor,
@@ -659,9 +689,14 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Used to modify investor data.
    */
   public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.investors.length === params.flag.length && params.flag.length === params.value.length,
+      ErrorCode.MismatchedArrayLength,
       'Mismatched input lengths',
     );
     return (await this.contract).modifyInvestorFlagMulti.sendTransactionAsync(
@@ -725,12 +760,17 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Modifies the successful checks required for transfers.
    */
   public modifyTransferRequirementsMulti = async (params: ModifyTransferRequirementsMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.transferTypes.length === params.fromValidKYC.length &&
         params.fromValidKYC.length === params.toValidKYC.length &&
         params.toValidKYC.length === params.fromRestricted.length &&
         params.fromRestricted.length === params.toRestricted.length,
+      ErrorCode.MismatchedArrayLength,
       'Mismatched input lengths',
     );
     return (await this.contract).modifyTransferRequirementsMulti.sendTransactionAsync(
@@ -748,11 +788,16 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * Add or remove KYC info of an investor.
    */
   public modifyKYCDataMulti = async (params: ModifyKYCDataMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.investors.length === params.canSendAfter.length &&
         params.canSendAfter.length === params.canReceiveAfter.length &&
         params.canReceiveAfter.length === params.expiryTime.length,
+      ErrorCode.MismatchedArrayLength,
       'Mismatched input lengths',
     );
 

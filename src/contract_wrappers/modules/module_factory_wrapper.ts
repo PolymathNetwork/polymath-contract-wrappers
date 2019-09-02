@@ -24,6 +24,7 @@ import {
   Subscribe,
   SubscribeAsyncParams,
   TxParams,
+  ErrorCode,
 } from '../../types';
 import {
   bytes32ArrayToStringArray,
@@ -241,7 +242,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public changeTitle = async (params: ChangeTitleParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(params.title.length > 0, 'Invalid title');
+    assert.assert(params.title.length > 0, ErrorCode.InvalidData, 'Invalid title');
     return (await this.contract).changeTitle.sendTransactionAsync(params.title, params.txData, params.safetyFactor);
   };
 
@@ -250,7 +251,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public changeDescription = async (params: ChangeDescriptionParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(params.description.length > 0, 'Invalid description');
+    assert.assert(params.description.length > 0, ErrorCode.InvalidData, 'Invalid description');
     return (await this.contract).changeDescription.sendTransactionAsync(
       params.description,
       params.txData,
@@ -263,7 +264,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public changeName = async (params: ChangeNameParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(params.name.length > 0, 'Invalid name');
+    assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Invalid name');
     return (await this.contract).changeName.sendTransactionAsync(
       stringToBytes32(params.name),
       params.txData,
@@ -276,7 +277,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    */
   public changeTags = async (params: ChangeTagsParams) => {
     await this.checkOnlyOwner(params.txData);
-    assert.assert(params.tags.length > 0, 'Invalid, must provide one or more tags');
+    assert.assert(params.tags.length > 0, ErrorCode.InvalidData, 'Invalid, must provide one or more tags');
     return (await this.contract).changeTags.sendTransactionAsync(
       stringArrayToBytes32Array(params.tags),
       params.txData,
@@ -291,9 +292,14 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     await this.checkOnlyOwner(params.txData);
     assert.assert(
       params.boundType === BoundType.LowerBound || params.boundType === BoundType.UpperBound,
+      ErrorCode.InvalidBound,
       'Invalid bound type',
     );
-    assert.assert(params.newVersion.length === 3, 'Invalid version, number array must have 3 elements');
+    assert.assert(
+      params.newVersion.length === 3,
+      ErrorCode.InvalidVersion,
+      'Invalid version, number array must have 3 elements',
+    );
     const currentBound =
       BoundType.LowerBound === params.boundType
         ? await this.getLowerSTVersionBounds()
@@ -303,11 +309,13 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     if (params.boundType === BoundType.LowerBound) {
       assert.assert(
         semver.lte(newBoundVer, currentBoundVer),
+        ErrorCode.InvalidBound,
         'New Lower ST Bounds must be less than or equal to current',
       );
     } else {
       assert.assert(
         semver.gte(newBoundVer, currentBoundVer),
+        ErrorCode.InvalidBound,
         'New Upper ST Bounds must be greater than or equal to current',
       );
     }
@@ -395,6 +403,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
+      ErrorCode.Unauthorized,
       'Msg sender must be owner',
     );
   };

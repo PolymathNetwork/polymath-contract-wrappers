@@ -31,6 +31,7 @@ import {
   GetLogs,
   Perm,
   TransferStatusCode,
+  ErrorCode,
 } from '../../../types';
 import {
   numberToBigNumber,
@@ -456,8 +457,12 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Controller not currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -473,8 +478,12 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    *  Pause the module
    */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Controller currently paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'Sender is not owner');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -532,7 +541,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to change the treasury wallet address
    */
   public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
       params.newTreasuryWallet,
       params.txData,
@@ -544,9 +557,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to deposit tokens from treasury wallet to the vesting escrow wallet
    */
   public depositTokens = async (params: DepositTokensParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
 
-    assert.assert(params.numberOfTokens.toNumber() > 0, 'Number of tokens should be > 0');
+    assert.assert(params.numberOfTokens.toNumber() > 0, ErrorCode.InvalidData, 'Number of tokens should be > 0');
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const canTransferFromResult = await (await this.securityTokenContract()).canTransferFrom.callAsync(
       await this.getCallerAddress(params.txData),
@@ -554,7 +571,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       valueToWei(params.numberOfTokens, decimals),
       '0x00',
     );
-    assert.assert(canTransferFromResult[0] === TransferStatusCode.TransferSuccess, 'Failed transferFrom');
+    assert.assert(
+      canTransferFromResult[0] === TransferStatusCode.TransferSuccess,
+      ErrorCode.InvalidTransfer,
+      'Failed transferFrom',
+    );
 
     return (await this.contract).depositTokens.sendTransactionAsync(
       valueToWei(params.numberOfTokens, decimals),
@@ -567,13 +588,18 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Sends unassigned tokens to the treasury wallet
    */
   public sendToTreasury = async (params: SendToTreasuryParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
-    assert.assert(params.amount.toNumber() > 0, 'Amount cannot be zero');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Operator),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+    assert.assert(params.amount.toNumber() > 0, ErrorCode.InvalidData, 'Amount cannot be zero');
 
     const unassignedTokens = await this.unassignedTokens();
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     assert.assert(
       params.amount.isLessThanOrEqualTo(valueToWei(unassignedTokens, decimals)),
+      ErrorCode.InvalidData,
       'Amount is greater than unassigned tokens',
     );
 
@@ -582,7 +608,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       valueToWei(params.amount, decimals),
       '0x00',
     );
-    assert.assert(canTransferResult[0] === TransferStatusCode.TransferSuccess, 'Transfer failed');
+    assert.assert(
+      canTransferResult[0] === TransferStatusCode.TransferSuccess,
+      ErrorCode.InvalidTransfer,
+      'Transfer failed',
+    );
 
     return (await this.contract).sendToTreasury.sendTransactionAsync(
       valueToWei(params.amount, decimals),
@@ -603,7 +633,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Pushes available tokens to the beneficiary's address
    */
   public pushAvailableTokens = async (params: PushAvailableTokensParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Operator),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
 
     return (await this.contract).pushAvailableTokens.sendTransactionAsync(
       params.beneficiary,
@@ -616,7 +650,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to withdraw available tokens by beneficiary
    */
   public pullAvailableTokens = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Contract currently paused');
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
     return (await this.contract).pullAvailableTokens.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -624,9 +658,17 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Adds template that can be used for creating schedule
    */
   public addTemplate = async (params: AddTemplateParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    assert.assert(params.name !== '', 'Invalid name');
-    assert.assert(!(await this.getAllTemplateNames()).includes(params.name), 'Template name already exists');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+    assert.assert(params.name !== '', ErrorCode.InvalidData, 'Invalid name');
+    assert.assert(
+      !(await this.getAllTemplateNames()).includes(params.name),
+      ErrorCode.AlreadyExists,
+      'Template name already exists',
+    );
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     return (await this.contract).addTemplate.sendTransactionAsync(
@@ -643,9 +685,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Removes template with a given name
    */
   public removeTemplate = async (params: RemoveTemplateParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    assert.assert(params.name !== '', 'Invalid name');
-    assert.assert((await this.getAllTemplateNames()).includes(params.name), 'Template not found');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+    assert.assert(params.name !== '', ErrorCode.InvalidData, 'Invalid name');
+    assert.assert((await this.getAllTemplateNames()).includes(params.name), ErrorCode.NotFound, 'Template not found');
     // TODO 3.1: require(templateToUsers[_name].length == 0, "Template is used");
     return (await this.contract).removeTemplate.sendTransactionAsync(
       stringToBytes32(params.name),
@@ -676,9 +722,17 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Adds a vesting schedule for the beneficiary address
    */
   public addSchedule = async (params: AddScheduleParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
-    assert.assert(params.templateName !== '', 'Invalid name');
-    assert.assert(!(await this.getAllTemplateNames()).includes(params.templateName), 'Template name already exists');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+    assert.assert(params.templateName !== '', ErrorCode.InvalidData, 'Invalid name');
+    assert.assert(
+      !(await this.getAllTemplateNames()).includes(params.templateName),
+      ErrorCode.AlreadyExists,
+      'Template name already exists',
+    );
     await this.validateTemplate(params.numberOfTokens, params.duration, params.frequency);
     await this.validateAddSchedule(params.beneficiary, params.templateName, params.startTime);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -698,7 +752,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Adds a vesting schedule for the beneficiary address from a template
    */
   public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     await this.validateAddScheduleFromTemplate(params.beneficiary, params.templateName, params.startTime);
     return (await this.contract).addScheduleFromTemplate.sendTransactionAsync(
       params.beneficiary,
@@ -713,9 +771,13 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Modifies a vesting schedule for a beneficiary address
    */
   public modifySchedule = async (params: ModifyScheduleParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     this.checkSchedule(params.beneficiary);
-    assert.assert(params.startTime.getTime() > Date.now(), 'Date in the past');
+    assert.assert(params.startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
     // TODO: require(now < schedule.startTime, "Schedule started");
     return (await this.contract).modifySchedule.sendTransactionAsync(
       params.beneficiary,
@@ -730,7 +792,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Revokes a vesting schedule with a given template name for a given beneficiary
    */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     this.checkSchedule(params.beneficiary);
     // TODO: _sendTokensPerSchedule assert
     return (await this.contract).revokeSchedule.sendTransactionAsync(
@@ -745,7 +811,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Revokes all vesting schedules for a given beneficiary address
    */
   public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     return (await this.contract).revokeAllSchedules.sendTransactionAsync(
       params.beneficiary,
@@ -818,7 +888,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk add vesting schedules for each of the beneficiaries
    */
   public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Operator), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Operator),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     // TODO: require(_toIndex < beneficiaries.length, "Array out of bound");
     return (await this.contract).pushAvailableTokensMulti.sendTransactionAsync(
       numberToBigNumber(params.fromIndex),
@@ -832,13 +906,18 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk add vesting schedules for each of beneficiary
    */
   public addScheduleMulti = async (params: AddScheduleMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.beneficiaries.length === params.templateNames.length &&
         params.beneficiaries.length === params.numberOfTokens.length &&
         params.beneficiaries.length === params.durations.length &&
         params.beneficiaries.length === params.frequencies.length &&
         params.beneficiaries.length === params.startTimes.length,
+      ErrorCode.MismatchedArrayLength,
       'Arrays sizes mismatch',
     );
 
@@ -846,7 +925,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     const resultValidateTemplate = [];
     const resultValidateAddScheduleFromTemplate = [];
     for (let i = 0; i < params.beneficiaries.length; i += 1) {
-      assert.assert(params.templateNames[i] !== '', 'Invalid name');
+      assert.assert(params.templateNames[i] !== '', ErrorCode.InvalidData, 'Invalid name');
       resultGetAllTemplatesNames.push(this.getAllTemplateNames());
       resultValidateTemplate.push(
         this.validateTemplate(params.numberOfTokens[i], params.durations[i], params.frequencies[i]),
@@ -857,7 +936,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     }
     const getAllTemplatesNames = await Promise.all(resultGetAllTemplatesNames);
     getAllTemplatesNames.forEach((templateName, i) => {
-      assert.assert(!templateName.includes(params.templateNames[i]), 'Template name already exists');
+      assert.assert(
+        !templateName.includes(params.templateNames[i]),
+        ErrorCode.AlreadyExists,
+        'Template name already exists',
+      );
     });
     await Promise.all(resultValidateTemplate);
     await Promise.all(resultValidateAddScheduleFromTemplate);
@@ -888,7 +971,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk add vesting schedules from templates for each of the beneficiary addresses
    */
   public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     const resultsValidateAddScheduleFromTemplate = [];
     for (let i = 0; i < params.beneficiaries.length; i += 1) {
       resultsValidateAddScheduleFromTemplate.push(
@@ -913,7 +1000,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk revoke vesting schedules for each of the beneficiaries
    */
   public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     params.beneficiaries.forEach(beneficiary => {
       assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
     });
@@ -928,16 +1019,21 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Used to bulk modify vesting schedules for each of the beneficiaries
    */
   public modifyScheduleMulti = async (params: ModifyScheduleMultiParams) => {
-    assert.assert(await this.isCallerAllowed(params.txData, Perm.Admin), 'Caller is not allowed');
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
     assert.assert(
       params.beneficiaries.length === params.templateNames.length &&
         params.beneficiaries.length === params.startTimes.length,
+      ErrorCode.MismatchedArrayLength,
       'Arrays sizes mismatch',
     );
 
     for (let i = 0; i < params.beneficiaries.length; i += 1) {
       this.checkSchedule(params.beneficiaries[i]);
-      assert.assert(params.startTimes[i].getTime() > Date.now(), 'Date in the past');
+      assert.assert(params.startTimes[i].getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
     }
 
     return (await this.contract).modifyScheduleMulti.sendTransactionAsync(
@@ -954,26 +1050,26 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   private validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
-    assert.assert(numberOfTokens.toNumber() > 0, 'Zero amount');
-    assert.assert(duration % frequency === 0, 'Invalid frequency');
+    assert.assert(numberOfTokens.toNumber() > 0, ErrorCode.InvalidData, 'Zero amount');
+    assert.assert(duration % frequency === 0, ErrorCode.InvalidData, 'Invalid frequency');
     const periodCount = duration / frequency;
-    assert.assert(numberOfTokens.toNumber() % periodCount === 0, 'Invalid period count');
+    assert.assert(numberOfTokens.toNumber() % periodCount === 0, ErrorCode.InvalidData, 'Invalid period count');
     const amountPerPeriod = numberOfTokens.toNumber() / periodCount;
     const granularity = await (await this.securityTokenContract()).granularity.callAsync();
-    assert.assert(amountPerPeriod % granularity.toNumber() === 0, 'Invalid granularity');
+    assert.assert(amountPerPeriod % granularity.toNumber() === 0, ErrorCode.InvalidData, 'Invalid granularity');
   };
 
   private validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
-    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, 'Already added');
-    assert.assert(startTime.getTime() > Date.now(), 'Date in the past');
+    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, ErrorCode.AlreadyExists, 'Already added');
+    assert.assert(startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
   };
 
   private validateAddScheduleFromTemplate = async (beneficiary: string, templateName: string, startTime: Date) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
-    assert.assert((await this.getAllTemplateNames()).includes(templateName), 'Template not found');
-    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, 'Already added');
-    assert.assert(startTime.getTime() > Date.now(), 'Date in the past');
+    assert.assert((await this.getAllTemplateNames()).includes(templateName), ErrorCode.NotFound, 'Template not found');
+    assert.assert((await this.getScheduleCount({ beneficiary })) === 0, ErrorCode.AlreadyExists, 'Already added');
+    assert.assert(startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
   };
 
   private checkSchedule = (beneficiary: string) => {

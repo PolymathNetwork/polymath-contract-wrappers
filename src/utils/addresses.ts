@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { NetworkId } from '../types';
+import { NetworkId, ErrorCode } from '../types';
+import { PolymathError } from '../PolymathError';
 
 const networkToAddresses: { [networkId: number]: string } = {
   1: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
@@ -9,10 +10,10 @@ const networkToAddresses: { [networkId: number]: string } = {
 
 function getContractAddressesForNetworkOrThrow(networkId: NetworkId): string {
   if (_.isUndefined(networkToAddresses[networkId])) {
-    throw new Error(
-      `Unknown network id (${networkId}).
-      No known Polymath contracts have been deployed on this network.`,
-    );
+    throw new PolymathError({
+      message: `Unknown network id (${networkId}). No known Polymath contracts have been deployed on this network.`,
+      code: ErrorCode.UnknownNetwork,
+    });
   }
   return networkToAddresses[networkId];
 }
@@ -23,11 +24,12 @@ function getContractAddressesForNetworkOrThrow(networkId: NetworkId): string {
  */
 export default function getDefaultContractAddresses(networkId: NetworkId): string {
   if (!(networkId in NetworkId)) {
-    throw new Error(
-      `No default contract addresses found for the given network id (${networkId}).
-      If you want to use ContractWrappers on this network,
-      you must manually pass in the contract address(es) to the constructor.`,
-    );
+    throw new PolymathError({
+      message: `No default contract addresses found for the given network id (${networkId}).
+    If you want to use ContractWrappers on this network,
+    you must manually pass in the contract address(es) to the constructor.`,
+      code: ErrorCode.NotFound,
+    });
   }
   return getContractAddressesForNetworkOrThrow(networkId);
 }

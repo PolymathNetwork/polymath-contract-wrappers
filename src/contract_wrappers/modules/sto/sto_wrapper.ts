@@ -1,5 +1,5 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS } from '../../../types';
+import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { bigNumberToDate, weiToValue } from '../../../utils/convert';
@@ -64,7 +64,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   public endTime = async (): Promise<Date> => {
     return bigNumberToDate(await (await this.contract).endTime.callAsync());
   };
-  
+
   /**
    * End time of the Capped STO
    * @returns pausedTime
@@ -110,8 +110,12 @@ export default abstract class STOWrapper extends ModuleWrapper {
    *  pause the module
    */
   public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), 'Contract already paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Contract already paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
@@ -119,8 +123,12 @@ export default abstract class STOWrapper extends ModuleWrapper {
    *  unpause the module
    */
   public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), 'Contract is not paused');
-    assert.assert(await this.isCallerTheSecurityTokenOwner(params.txData), 'The caller must be the ST owner');
+    assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Contract is not paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 }

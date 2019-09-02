@@ -1,6 +1,6 @@
 import { PolyTokenFaucetContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
-import { TxParams } from '../../types';
+import { TxParams, ErrorCode } from '../../types';
 import assert from '../../utils/assert';
 import { valueToWei } from '../../utils/convert';
 
@@ -40,7 +40,11 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
    */
   public getTokens = async (params: GetTokensParams) => {
     assert.isNonZeroETHAddressHex('recipient', params.recipient);
-    assert.assert(params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT), 'Amount cannot exceed 1 million tokens');
+    assert.assert(
+      params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT),
+      ErrorCode.InvalidData,
+      'Amount cannot exceed 1 million tokens',
+    );
 
     return (await this.contract).getTokens.sendTransactionAsync(
       valueToWei(params.amount, await (await this.contract).decimals.callAsync()),
