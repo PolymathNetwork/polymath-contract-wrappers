@@ -950,7 +950,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       // Real call
       const result = await target.getTotalApprovalsLength();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.getTotalApprovalsLength).once();
       verify(mockedMethod.callAsync()).once();

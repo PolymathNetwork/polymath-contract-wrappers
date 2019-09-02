@@ -543,9 +543,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   }
 
   /**
+   * Gets tickers by owner
    * @returns Returns the list of tickers owned by the selected address
    */
-  public getTickersByOwner = async (params?: OwnerParams) => {
+  public getTickersByOwner = async (params?: OwnerParams): Promise<string[]> => {
     const owner =
       params !== undefined && params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('owner', owner);
@@ -554,9 +555,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
+   * Get the security token data
    * @returns Returns the security token data by address
    */
-  public getSecurityTokenData = async (params: SecurityTokenAddressParams) => {
+  public getSecurityTokenData = async (params: SecurityTokenAddressParams): Promise<SecurityTokenData> => {
     assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     const result = await (await this.contract).getSecurityTokenData.callAsync(params.securityTokenAddress);
     const typedResult: SecurityTokenData = {
@@ -569,10 +571,10 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * Gets the fee currency
+   * Whether the fee's currency is in poly
    * @returns true = poly, false = usd
    */
-  public getIsFeeInPoly = async () => {
+  public getIsFeeInPoly = async (): Promise<boolean> => {
     const result = await (await this.contract).getIsFeeInPoly.callAsync();
     return result;
   };
@@ -648,16 +650,17 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   /**
    * Returns the list of tokens to which the delegate has some access
+   * @return list token addresses
    */
-  public getTokensByDelegate = async (delegate: string) => {
-    const result = await (await this.contract).getTokensByDelegate.callAsync(delegate);
-    return result;
+  public getTokensByDelegate = async (delegate: string): Promise<string[]> => {
+    return (await this.contract).getTokensByDelegate.callAsync(delegate);
   };
 
   /**
-   * Returns the STFactory Address of a particular version
+   * Get the STFactory address of version
+   * @return the STFactory Address of a particular version
    */
-  public getSTFactoryAddressOfVersion = async (params: PackageVersionParams) => {
+  public getSTFactoryAddressOfVersion = async (params: PackageVersionParams): Promise<string> => {
     assert.isValidVersion(params.version);
     const splitVersion = params.version.split('.');
     const pack = packVersion(splitVersion[0], splitVersion[1], splitVersion[2]);
@@ -666,16 +669,19 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
+   * Get tokens by owner address
    * @returns Returns the list of tokens owned by the selected address
    */
-  public getTokensByOwner = async (params?: OwnerParams) => {
+  public getTokensByOwner = async (params?: OwnerParams): Promise<string[]> => {
     const owner =
       params !== undefined && params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     assert.isETHAddressHex('ownerAddress', owner);
-    const tokens = await (await this.contract).getTokensByOwner.callAsync(owner);
-    return tokens;
+    return (await this.contract).getTokensByOwner.callAsync(owner);
   };
 
+  /**
+   * Deploys an instance of a new Security Token and records it to the registry
+   */
   public generateNewSecurityToken = async (params: NewSecurityTokenParams) => {
     assert.assert(params.ticker.length > 0, ErrorCode.InvalidData, 'Ticker cannot be an empty string');
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name cannot be an empty string');
@@ -793,16 +799,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
+   * Get the ticker details
    * @returns Returns the owner and timestamp for a given ticker
    */
-  public getTickerDetails = async (params: TickerParams) => {
+  public getTickerDetails = async (params: TickerParams): Promise<TickerDetails> => {
     return this.getTickerDetailsInternal(params.ticker);
   };
 
   /**
-   * @return Gets the ticker registration fee
+   * Get value of ticker registration fee
+   * @return Ticker registration fee
    */
-  public getTickerRegistrationFee = async () => {
+  public getTickerRegistrationFee = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).getTickerRegistrationFee.callAsync(), FULL_DECIMALS);
   };
 
@@ -904,7 +912,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets the security token launch fee
    * @return Fee amount
    */
-  public getSecurityTokenLaunchFee = async () => {
+  public getSecurityTokenLaunchFee = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).getSecurityTokenLaunchFee.callAsync(), FULL_DECIMALS);
   };
 
@@ -912,7 +920,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Returns the security token address by ticker symbol
    * @return address string
    */
-  public getSecurityTokenAddress = async (params: TickerParams) => {
+  public getSecurityTokenAddress = async (params: TickerParams): Promise<string> => {
     return (await this.contract).getSecurityTokenAddress.callAsync(params.ticker);
   };
 
@@ -920,7 +928,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets ticker availability
    * @return boolean
    */
-  public tickerAvailable = async (params: TickerParams) => {
+  public tickerAvailable = async (params: TickerParams): Promise<boolean> => {
     return (await this.contract).tickerAvailable.callAsync(params.ticker.toUpperCase());
   };
 
@@ -928,7 +936,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Knows if the ticker was registered by the user
    * @return boolean
    */
-  public isTickerRegisteredByCurrentIssuer = async (params: TickerParams) => {
+  public isTickerRegisteredByCurrentIssuer = async (params: TickerParams): Promise<boolean> => {
     const result = await this.getTickerDetailsInternal(params.ticker);
     if (await this.tickerAvailable({ ticker: params.ticker })) {
       return false;
@@ -940,7 +948,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Knows if the ticker was launched
    * @return boolean
    */
-  public isTokenLaunched = async (params: TickerParams) => {
+  public isTokenLaunched = async (params: TickerParams): Promise<boolean> => {
     const result = await this.getTickerDetailsInternal(params.ticker);
     return result.status;
   };
@@ -1018,8 +1026,9 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   /**
    * Checks that Security Token is registered
+   * @return boolean
    */
-  public isSecurityToken = async (params: SecurityTokenAddressParams) => {
+  public isSecurityToken = async (params: SecurityTokenAddressParams): Promise<boolean> => {
     assert.isETHAddressHex('securityTokenAddress', params.securityTokenAddress);
     return (await this.contract).isSecurityToken.callAsync(params.securityTokenAddress);
   };
@@ -1118,16 +1127,18 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * Returns the current STFactory Address
+   * Get STFactory Address
+   * @return the current STFactory Address
    */
-  public getSTFactoryAddress = async () => {
+  public getSTFactoryAddress = async (): Promise<string> => {
     return (await this.contract).getSTFactoryAddress.callAsync();
   };
 
   /**
    * Gets Protocol version
+   * @return version array
    */
-  public getLatestProtocolVersion = async () => {
+  public getLatestProtocolVersion = async (): Promise<BigNumber[]> => {
     return (await this.contract).getLatestProtocolVersion.callAsync();
   };
 
@@ -1141,29 +1152,33 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
 
   /**
    * Gets the expiry limit
+   * @return expiry limit
    */
-  public getExpiryLimit = async () => {
+  public getExpiryLimit = async (): Promise<BigNumber> => {
     return (await this.contract).getExpiryLimit.callAsync();
   };
 
   /**
    * Check whether the registry is paused or not
+   * @return boolean
    */
-  public isPaused = async () => {
+  public isPaused = async (): Promise<boolean> => {
     return (await this.contract).isPaused.callAsync();
   };
 
   /**
    * Gets the owner of the contract
+   * @return owner address
    */
-  public owner = async () => {
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
   /**
    * Returns the list of all tokens
+   * @return token address list
    */
-  public getTokens = async () => {
+  public getTokens = async (): Promise<string[]> => {
     return (await this.contract).getTokens.callAsync();
   };
 
@@ -1189,14 +1204,16 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   };
 
   /**
-   * Returns the usd & poly fee for a particular feetype
+   * Get the fees
+   * @return the [usd & poly] fee for a particular feetype
    */
+
   public getFees = async (params: GetFeesParams) => {
     const { feeType } = params;
     if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
       assert.assert(false, ErrorCode.InvalidData, 'Incorrect fee type');
     }
-    const feeTypeBytes32 = stringToBytes32(params.feeType);    
+    const feeTypeBytes32 = stringToBytes32(params.feeType);
     return (await this.contract).getFees.callAsync(feeTypeBytes32);
   };
 
@@ -1204,7 +1221,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets the status of the ticker
    * @return bool
    */
-  public getTickerStatus = async (params: TickerParams) => {
+  public getTickerStatus = async (params: TickerParams): Promise<boolean> => {
     return (await this.contract).getTickerStatus.callAsync(params.ticker);
   };
 
@@ -1212,7 +1229,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Gets the owner of the ticker
    * @return address Address of the owner
    */
-  public getTickerOwner = async (params: TickerParams) => {
+  public getTickerOwner = async (params: TickerParams): Promise<string> => {
     return (await this.contract).getTickerOwner.callAsync(params.ticker);
   };
 

@@ -98,19 +98,32 @@ export namespace CappedSTOTransactionParams {
   export interface BuyTokensWithPoly extends BuyTokensWithPolyParams {}
 }
 
+/**
+ * @param investorAddress Address of the investor
+ */
 interface InvestorsParams extends TxParams {
   investorAddress: string;
 }
 
+/**
+ * @param allowBeneficicalInvestments Boolean to allow or disallow beneficial investments
+ */
 interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
+/**
+ * @param beneficiary Address performing the token purchase
+ * @param value Value of investment
+ */
 interface BuyTokensParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
 }
 
+/**
+ * @param investedPOLY Amount of POLY invested
+ */
 interface BuyTokensWithPolyParams extends TxParams {
   investedPOLY: BigNumber;
 }
@@ -154,33 +167,50 @@ export default class CappedSTOWrapper extends STOWrapper {
 
   /**
    * How many token units a buyer gets (multiplied by 10^18) per wei / base unit of POLY
+   * @return rate
    */
-  public rate = async () => {
+  public rate = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).rate.callAsync(), FULL_DECIMALS);
   };
 
   /**
    * How many token base units this STO will be allowed to sell to investors
+   * @return cap amount
    */
-  public cap = async () => {
+  public cap = async (): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).cap.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
 
-  public allowBeneficialInvestments = async () => {
+  /**
+   * Determine whether users can invest on behalf of a beneficiary
+   * @return boolean status
+   */
+  public allowBeneficialInvestments = async (): Promise<boolean> => {
     return (await this.contract).allowBeneficialInvestments.callAsync();
   };
 
-  public paused = async () => {
+  /**
+   *  check if the module is paused
+   *  @return boolean if paused
+   */
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
-  public investors = async (params: InvestorsParams) => {
+  /**
+   * Access mapping of Capped STO investors
+   * @return amount of investor investment
+   */
+  public investors = async (params: InvestorsParams): Promise<BigNumber> => {
     return (await this.contract).investors.callAsync(params.investorAddress);
   };
 
+  /**
+   * Function to set allowBeneficialInvestments (allow beneficiary to be different to funder)
+   */
   public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -199,6 +229,9 @@ export default class CappedSTOWrapper extends STOWrapper {
     );
   };
 
+  /**
+   * Low level token purchase
+   */
   public buyTokens = async (params: BuyTokensParams) => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
@@ -223,8 +256,8 @@ export default class CappedSTOWrapper extends STOWrapper {
         'Beneficiary address does not match msg.sender',
       );
     }
-    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
-    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
+    assert.isPastDate(await this.startTime(), 'Offering is not yet started');
+    assert.isFutureDate(await this.endTime(), 'Offering is closed');
     const txPayableData = {
       ...params.txData,
       value: valueToWei(params.value, FULL_DECIMALS),
@@ -232,6 +265,9 @@ export default class CappedSTOWrapper extends STOWrapper {
     return (await this.contract).buyTokens.sendTransactionAsync(params.beneficiary, txPayableData, params.safetyFactor);
   };
 
+  /**
+   * Low level token purchase for poly
+   */
   public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
     assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
@@ -250,8 +286,8 @@ export default class CappedSTOWrapper extends STOWrapper {
       ErrorCode.InvalidTransfer,
       'Budget less than amount unable to transfer fee',
     );
-    assert.isPastDate(bigNumberToDate(await this.startTime()), 'Offering is not yet started');
-    assert.isFutureDate(bigNumberToDate(await this.endTime()), 'Offering is closed');
+    assert.isPastDate(await this.startTime(), 'Offering is not yet started');
+    assert.isFutureDate(await this.endTime(), 'Offering is closed');
     return (await this.contract).buyTokensWithPoly.sendTransactionAsync(
       valueToWei(params.investedPOLY, FULL_DECIMALS),
       params.txData,
@@ -259,18 +295,33 @@ export default class CappedSTOWrapper extends STOWrapper {
     );
   };
 
-  public capReached = async () => {
+  /**
+   * Checks whether the cap has been reached.
+   * @return bool Whether the cap was reached
+   */
+  public capReached = async (): Promise<boolean> => {
     return (await this.contract).capReached.callAsync();
   };
 
-  public getTokensSold = async () => {
+  /**
+   * Return the total no. of tokens sold
+   */
+  public getTokensSold = async (): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).getTokensSold.callAsync(),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
 
-  public getSTODetails = async () => {
+  /**
+   * Return the STO details
+   * @return Date at which offering gets start, Date at which offering ends, Number of token base units this STO will
+   * be allowed to sell to investors, Token units a buyer gets as the rate, Amount of funds raised, Number of
+   * individual investors this STO have, Amount of tokens get sold, Boolean value to justify whether the fund raise
+   * type is POLY or not, ie true for POLY, Boolean value to know the nature of the STO Whether it is pre-mint or
+   * mint on buying type sto
+   */
+  public getSTODetails = async (): Promise<CappedSTODetails> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getSTODetails.callAsync();
     const typedResult: CappedSTODetails = {

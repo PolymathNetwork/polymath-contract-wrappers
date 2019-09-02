@@ -88,7 +88,11 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
-  public owner = async () => {
+  /**
+   * Get owner of contract
+   * @return address
+   */
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
@@ -96,7 +100,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the contract address
    * @return address string
    */
-  public getAddress = async (params: GetAddressParams) => {
+  public getAddress = async (params: GetAddressParams): Promise<string> => {
     return this.getAddressInternal(params.contractName);
   };
 
@@ -104,7 +108,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyToken contract address
    * @return address string
    */
-  public getPolyTokenAddress = async () => {
+  public getPolyTokenAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.PolyToken);
   };
 
@@ -112,7 +116,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the ModuleRegistry contract address
    * @return address string
    */
-  public getModuleRegistryAddress = async () => {
+  public getModuleRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.ModuleRegistry);
   };
 
@@ -120,7 +124,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the FeatureRegistry contract address
    * @return address string
    */
-  public getFeatureRegistryAddress = async () => {
+  public getFeatureRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.FeatureRegistry);
   };
 
@@ -128,7 +132,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the SecurityTokenRegistry contract address
    * @return address string
    */
-  public getSecurityTokenRegistryAddress = async () => {
+  public getSecurityTokenRegistryAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.SecurityTokenRegistry);
   };
 
@@ -136,7 +140,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the PolyUsdOracle contract address
    * @return address string
    */
-  public getPolyUsdOracleAddress = async () => {
+  public getPolyUsdOracleAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.PolyUsdOracle);
   };
 
@@ -144,7 +148,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
    * Gets the EthUsdOracle contract address
    * @return address string
    */
-  public getEthUsdOracleAddress = async () => {
+  public getEthUsdOracleAddress = async (): Promise<string> => {
     return this.getAddressInternal(PolymathContract.EthUsdOracle);
   };
 

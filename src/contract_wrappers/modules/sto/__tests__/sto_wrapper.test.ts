@@ -6,7 +6,7 @@ import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
-import { weiToValue } from '../../../../utils/convert';
+import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 describe('STOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
@@ -116,7 +116,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.startTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.startTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -137,7 +137,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.endTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.endTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -158,7 +158,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.pausedTime();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(bigNumberToDate(expectedResult));
       // Verifications
       verify(mockedContract.pausedTime).once();
       verify(mockedMethod.callAsync()).once();
@@ -179,7 +179,7 @@ describe('STOWrapper', () => {
       // Real call
       const result = await target.investorCount();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toEqual(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.investorCount).once();
       verify(mockedMethod.callAsync()).once();

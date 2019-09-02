@@ -1800,7 +1800,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       const result = await target.currentTier();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(expectedResult.toNumber());
       // Verifications
       verify(mockedContract.currentTier).once();
       verify(mockedMethod.callAsync()).once();
@@ -2863,7 +2863,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       const result = await target.getNumberOfTiers();
       // Result expectation
-      expect(result).toBe(expectedAmount);
+      expect(result).toBe(expectedAmount.toNumber());
       // Verifications
       verify(mockedContract.getNumberOfTiers).once();
       verify(mockedMethod.callAsync()).once();

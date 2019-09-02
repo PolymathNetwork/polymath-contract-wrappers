@@ -139,7 +139,7 @@ describe('CappedSTOWrapper', () => {
         investorAddress,
       };
       // Address expected
-      const expectedResult = true;
+      const expectedResult = new BigNumber(1);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method

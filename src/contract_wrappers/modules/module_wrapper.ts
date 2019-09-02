@@ -13,6 +13,9 @@ import { stringToBytes32 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
 
+/**
+ * @param tokenContract ERC20 Token Contract Address
+ */
 interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
@@ -62,26 +65,49 @@ export default class ModuleWrapper extends ContractWrapper {
     this.contractFactory = contractFactory;
   }
 
-  public getInitFunction = async () => {
+  /**
+   * Return init function result
+   * @return init function string
+   */
+  public getInitFunction = async (): Promise<string> => {
     return (await this.contract).getInitFunction.callAsync();
   };
 
-  public polyToken = async () => {
+  /**
+   * Return poly token address
+   * @return address
+   */
+  public polyToken = async (): Promise<string> => {
     return (await this.contract).polyToken.callAsync();
   };
 
-  public securityToken = async () => {
+  /**
+   * Return security token address
+   * @return address
+   */
+  public securityToken = async (): Promise<string> => {
     return (await this.contract).securityToken.callAsync();
   };
 
-  public getPermissions = async () => {
+  /**
+   * Return permissions
+   * @return list of permissions
+   */
+  public getPermissions = async (): Promise<string[]> => {
     return (await this.contract).getPermissions.callAsync();
   };
 
-  public factory = async () => {
+  /**
+   * Return factory address
+   * @return address
+   */
+  public factory = async (): Promise<string> => {
     return (await this.contract).factory.callAsync();
   };
 
+  /**
+   * Reclaim ETH from contract
+   */
   public reclaimETH = async (params: TxParams) => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -91,6 +117,9 @@ export default class ModuleWrapper extends ContractWrapper {
     return (await this.contract).reclaimETH.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
+  /**
+   * Reclaim ERC20 tokens from contract
+   */
   public reclaimERC20 = async (params: ReclaimERC20Params) => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),

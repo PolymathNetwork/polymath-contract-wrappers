@@ -10,6 +10,10 @@ export namespace PolyTokenFaucetTransactionParams {
   export interface GetTokens extends GetTokensParams {}
 }
 
+/**
+ * @param amount Amount of tokens to get from faucet
+ * @param recipient Address to transfer to
+ */
 interface GetTokensParams extends TxParams {
   amount: BigNumber;
   recipient: string;
@@ -31,6 +35,9 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
     this.contract = contract;
   }
 
+  /**
+   * Used to get tokens from faucet
+   */
   public getTokens = async (params: GetTokensParams) => {
     assert.isNonZeroETHAddressHex('recipient', params.recipient);
     assert.assert(

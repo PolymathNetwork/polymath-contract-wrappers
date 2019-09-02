@@ -366,7 +366,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   }
 
   /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Controller not currently paused');
@@ -379,14 +379,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    */
   public paused = async () => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
-   *  pause the module
+   *  Pause the module
    */
   public pause = async (params: TxParams) => {
     assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Controller currently paused');
@@ -511,7 +511,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Used to verify the transfer transaction and prevent locked up tokens from being transferred
+   *  Used to verify the transfer transaction and prevent locked up tokens from being transferred
+   *  @return boolean transfer result, address
    */
   public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);

@@ -78,30 +78,52 @@ interface ModuleFactorySubscribeAsyncParams extends Subscribe {
   >;
 }
 
+/**
+ * @param setupCost Cost to setup module
+ */
 interface ChangeSetupCostParams extends TxParams {
   setupCost: BigNumber;
 }
 
+/**
+ * @param isCostInPoly Boolean if cost is in poly
+ */
 interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
   isCostInPoly: boolean;
 }
 
+/**
+ * @param title New title
+ */
 interface ChangeTitleParams extends TxParams {
   title: string;
 }
 
+/**
+ * @param description New description
+ */
 interface ChangeDescriptionParams extends TxParams {
   description: string;
 }
 
+/**
+ * @param name New name
+ */
 interface ChangeNameParams extends TxParams {
   name: string;
 }
 
+/**
+ * @param tag New tag
+ */
 interface ChangeTagsParams extends TxParams {
   tags: string[];
 }
 
+/**
+ * @param boundType Type of STVersionBound
+ * @param newVersion New version
+ */
 interface ChangeSTVersionBoundsParams extends TxParams {
   boundType: BoundType;
   newVersion: number[];
@@ -125,13 +147,15 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the owner of the Module Factory
+   * @return owner address
    */
-  public owner = async () => {
+  public owner = async (): Promise<string> => {
     return (await this.contract).owner.callAsync();
   };
 
   /**
    * Get the name of the Module
+   * @return name
    */
   public name = async (): Promise<string> => {
     const name = await (await this.contract).name.callAsync();
@@ -140,6 +164,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the title of the Module
+   * @return title
    */
   public title = async (): Promise<string> => {
     return (await this.contract).title.callAsync();
@@ -147,6 +172,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get isCostInPoly
+   * @return boolean
    */
   public isCostInPoly = async (): Promise<boolean> => {
     return (await this.contract).isCostInPoly.callAsync();
@@ -154,6 +180,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the description of the Module
+   * @return description string
    */
   public description = async (): Promise<string> => {
     return (await this.contract).description.callAsync();
@@ -161,6 +188,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the version of the Module
+   * @return version string
    */
   public version = async (): Promise<string> => {
     return (await this.contract).version.callAsync();
@@ -168,6 +196,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the types
+   * @return list of module types
    */
   public getTypes = async (): Promise<ModuleType[]> => {
     return (await (await this.contract).getTypes.callAsync()).map(type => {
@@ -177,6 +206,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get the tags
+   * @return tags list
    */
   public getTags = async (): Promise<string[]> => {
     return bytes32ArrayToStringArray(await (await this.contract).getTags.callAsync());
@@ -299,6 +329,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get setup cost
+   * @return setupCost value
    */
   public setupCost = async (): Promise<BigNumber> => {
     const value = await (await this.contract).setupCost.callAsync();
@@ -307,6 +338,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get upper ST version bounds
+   * @return upper bounds list
    */
   public getUpperSTVersionBounds = async (): Promise<BigNumber[]> => {
     return (await (await this.contract).getUpperSTVersionBounds.callAsync()).map(v => new BigNumber(v));
@@ -314,6 +346,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get lower ST version bounds
+   * @return lower bounds list
    */
   public getLowerSTVersionBounds = async (): Promise<BigNumber[]> => {
     return (await (await this.contract).getLowerSTVersionBounds.callAsync()).map(v => new BigNumber(v));
@@ -321,6 +354,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
 
   /**
    * Get setup cost in poly
+   * @return cost in poly
    */
   public setupCostInPoly = async (): Promise<BigNumber> => {
     const value = await (await this.contract).setupCostInPoly.callAsync();
