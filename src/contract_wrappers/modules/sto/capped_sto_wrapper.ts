@@ -10,6 +10,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -211,7 +212,9 @@ export default class CappedSTOWrapper extends STOWrapper {
   /**
    * Function to set allowBeneficialInvestments (allow beneficiary to be different to funder)
    */
-  public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+  public changeAllowBeneficialInvestments = async (
+    params: ChangeAllowBeneficialInvestmentsParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -232,7 +235,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   /**
    * Low level token purchase
    */
-  public buyTokens = async (params: BuyTokensParams) => {
+  public buyTokens = async (params: BuyTokensParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
     assert.isBigNumberGreaterThanZero(params.value, 'Amount invested should not be equal to 0');
@@ -268,7 +271,7 @@ export default class CappedSTOWrapper extends STOWrapper {
   /**
    * Low level token purchase for poly
    */
-  public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
+  public buyTokensWithPoly = async (params: BuyTokensWithPolyParams): Promise<PolyResponse> => {
     assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
     assert.assert(
