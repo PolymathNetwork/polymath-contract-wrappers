@@ -12,6 +12,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -363,6 +364,14 @@ interface KYCData {
 interface KYCDataWithInvestor extends KYCData {
   investor: string;
 }
+
+interface InvestorFlag {
+  investor: string;
+  isAccredited: boolean;
+  canNotBuyFromSTO: boolean;
+  isVolRestricted: boolean;
+}
+
 // // End of return types ////
 
 /**
@@ -389,7 +398,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -409,7 +418,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -451,7 +460,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to change the default times used when canSendAfter / canReceiveAfter are zero
    */
-  public changeDefaults = async (params: ChangeDefaultsParams) => {
+  public changeDefaults = async (params: ChangeDefaultsParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -468,7 +477,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to change the Issuance Address
    */
-  public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams) => {
+  public changeIssuanceAddress = async (params: ChangeIssuanceAddressParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('issuanceAddress', params.issuanceAddress);
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -485,7 +494,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add or remove KYC info of an investor.
    */
-  public modifyKYCData = async (params: ModifyKYCDataParams) => {
+  public modifyKYCData = async (params: ModifyKYCDataParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -564,7 +573,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Get all investor flags
    */
-  public getAllInvestorFlags = async () => {
+  public getAllInvestorFlags = async (): Promise<InvestorFlag[]> => {
     const result = await (await this.contract).getAllInvestorFlags.callAsync();
     const [investors, flags] = result;
     const investorFlags = [];
@@ -577,7 +586,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Gets the investor flags
    */
-  public getInvestorFlags = async (params: GetInvestorFlags) => {
+  public getInvestorFlags = async (params: GetInvestorFlags): Promise<InvestorFlag> => {
     const { investor } = params;
     const flags = await (await this.contract).getInvestorFlags.callAsync(investor);
     return this.unpackFlags(investor, flags);
@@ -622,7 +631,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Return the amount of tokens for a given user as per the partition
    */
-  public getTokensByPartition = async (params: GetTokensByPartitionParams) => {
+  public getTokensByPartition = async (params: GetTokensByPartitionParams): Promise<BigNumber> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const result = await (await this.contract).getTokensByPartition.callAsync(
       stringToBytes32(params.partition),
@@ -635,7 +644,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
    */
-  public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams) => {
+  public modifyKYCDataSigned = async (params: ModifyKYCDataSignedParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -669,7 +678,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify investor Flag.
    */
-  public modifyInvestorFlag = async (params: ModifyInvestorFlagParams) => {
+  public modifyInvestorFlag = async (params: ModifyInvestorFlagParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -688,7 +697,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify investor data.
    */
-  public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMultiParams) => {
+  public modifyInvestorFlagMulti = async (params: ModifyInvestorFlagMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -716,7 +725,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * b) Seller's sale lockup period is over
    * c) Buyer's purchase lockup is over
    */
-  public executeTransfer = async (params: ExecuteTransferParams) => {
+  public executeTransfer = async (params: ExecuteTransferParams): Promise<PolyResponse> => {
     return (await this.contract).executeTransfer.sendTransactionAsync(
       params.from,
       params.to,
@@ -730,7 +739,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Default implementation of verifyTransfer used by SecurityToken
    */
-  public verifyTransfer = async (params: ExecuteTransferParams) => {
+  public verifyTransfer = async (params: ExecuteTransferParams): Promise<[BigNumber, string]> => {
     const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
@@ -743,7 +752,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Modifies the successful checks required for a transfer to be deemed valid.
    */
-  public modifyTransferRequirements = async (params: ModifyTransferRequirementsParams) => {
+  public modifyTransferRequirements = async (params: ModifyTransferRequirementsParams): Promise<PolyResponse> => {
     const result = await (await this.contract).modifyTransferRequirements.sendTransactionAsync(
       params.transferType,
       params.fromValidKYC,
@@ -759,7 +768,9 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Modifies the successful checks required for transfers.
    */
-  public modifyTransferRequirementsMulti = async (params: ModifyTransferRequirementsMultiParams) => {
+  public modifyTransferRequirementsMulti = async (
+    params: ModifyTransferRequirementsMultiParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -787,7 +798,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add or remove KYC info of an investor.
    */
-  public modifyKYCDataMulti = async (params: ModifyKYCDataMultiParams) => {
+  public modifyKYCDataMulti = async (params: ModifyKYCDataMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -818,7 +829,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Adds or removes addresses from the whitelist - can be called by anyone with a valid signature
    */
-  public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMultiParams) => {
+  public modifyKYCDataSignedMulti = async (params: ModifyKYCDataSignedMultiParams): Promise<PolyResponse> => {
     const canSendAfter = params.canSendAfter.map(dateToBigNumber);
     const canReceiveAfter = params.canReceiveAfter.map(dateToBigNumber);
     const expiryTime = params.expiryTime.map(dateToBigNumber);
