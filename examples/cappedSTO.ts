@@ -136,6 +136,7 @@ window.addEventListener('load', async () => {
       rate: new BigNumber(10),
       fundRaiseType: CappedSTOFundRaiseType.ETH,
       fundsReceiver: await polymathAPI.getAccount(),
+      treasuryWallet: myAddress
     },
   });
 
