@@ -245,37 +245,4 @@ export default class RestrictedPartialSaleTransferManagerWrapper extends ModuleW
     );
     return logs;
   };
-
-  private checkRestrictionInputParams = (
-    startTime: Date,
-    endTime: Date,
-    allowedTokens: BigNumber,
-    restrictionType: RestrictionType,
-    rollingPeriodInDays: number,
-  ): void => {
-    assert.isFutureDate(startTime, 'Start time must be in the future');
-    assert.isBigNumberGreaterThanZero(allowedTokens, 'Allowed Tokens must be greater than 0');
-    if (restrictionType === RestrictionType.Percentage) {
-      assert.isPercentage('allowed tokens', allowedTokens);
-    }
-    assert.assert(
-      rollingPeriodInDays <= 365 && rollingPeriodInDays >= 1,
-      ErrorCode.InvalidData,
-      'Invalid number of days in rolling period',
-    );
-    const diffDays = Math.ceil(Math.abs(endTime.getTime() - startTime.getTime()) / (1000 * 3600 * 24));
-    assert.assert(
-      new BigNumber(diffDays).isGreaterThanOrEqualTo(rollingPeriodInDays),
-      ErrorCode.InvalidData,
-      'Invalid times, rollingPeriodInDays must have less days than the duration',
-    );
-  };
-
-  private decimalsByRestrictionType = async (restrictionType: RestrictionType): Promise<BigNumber> => {
-    let decimals = PERCENTAGE_DECIMALS;
-    if (restrictionType === RestrictionType.Fixed) {
-      decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    }
-    return decimals;
-  };
 }
