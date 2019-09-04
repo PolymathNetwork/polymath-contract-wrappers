@@ -729,11 +729,11 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return the total number of tokens sold in a given tier
    * @return Total amount of tokens sold in the tier
    */
-  public getTokensSoldByTier = async (params: TierIndexParams) => {
+  public getTotalTokensSoldByTier = async (params: TierIndexParams) => {
     const tiers = await this.getNumberOfTiers();
     assert.assert(params.tier < new BigNumber(tiers).toNumber(), ErrorCode.InvalidData, 'Invalid tier');
     return weiToValue(
-      await (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier)),
+      await (await this.contract).getTotalTokensSoldByTier.callAsync(numberToBigNumber(params.tier)),
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
@@ -786,14 +786,6 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public minimumInvestmentUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).minimumInvestmentUSD.callAsync(), FULL_DECIMALS);
-  };
-
-  /**
-   * Ethereum account address to receive unsold tokens
-   * @return wallet address
-   */
-  public treasuryWallet = async () => {
-    return (await this.contract).treasuryWallet.callAsync();
   };
 
   /**
@@ -861,10 +853,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    * @return tokens amount by tier
    */
-  public getTokensMintedByTier = async (params: TierIndexParams) => {
+  public getTokensSoldByTier = async (params: TierIndexParams) => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     assert.assert(params.tier < (await this.getNumberOfTiers()), ErrorCode.InvalidData, 'Invalid tier');
-    const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
+    const result = await (await this.contract).getTokensSoldByTier.callAsync(numberToBigNumber(params.tier));
     const typedResult: MintedByTier = {
       mintedInETH: weiToValue(result[0], decimals),
       mintedInPOLY: weiToValue(result[1], decimals),

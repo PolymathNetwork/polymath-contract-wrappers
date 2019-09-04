@@ -1730,8 +1730,8 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('GetTokensSoldByTier', () => {
-    test('should get value of getTokensSoldByTier', async () => {
+  describe('GetTotalTokensSoldByTier', () => {
+    test('should get value of getTotalTokensSoldByTier', async () => {
       // TokensSoldByTier value expected
       const expectedAmount = new BigNumber(100);
       // Params
@@ -1765,18 +1765,18 @@ describe('USDTieredSTOWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.getTokensSoldByTier).thenReturn(instance(mockedMethod));
+      when(mockedContract.getTotalTokensSoldByTier).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(objectContaining(params.tier))).thenResolve(expectedAmount);
 
       // Real call
-      const result = await target.getTokensSoldByTier(params);
+      const result = await target.getTotalTokensSoldByTier(params);
       // Result expectation
       expect(result).toEqual(weiToValue(expectedAmount, expectedDecimalsResult));
       // Verifications
       verify(mockedContract.getNumberOfTiers).once();
       verify(mockedGetNumberOfTiersMethod.callAsync()).once();
-      verify(mockedContract.getTokensSoldByTier).once();
+      verify(mockedContract.getTotalTokensSoldByTier).once();
       verify(mockedMethod.callAsync(objectContaining(params.tier))).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContract.securityToken).once();
@@ -1887,27 +1887,6 @@ describe('USDTieredSTOWrapper', () => {
       expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
       // Verifications
       verify(mockedContract.minimumInvestmentUSD).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('TreasuryWallet', () => {
-    test('should get address from treasuryWallet', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.treasuryWallet).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.treasuryWallet();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.treasuryWallet).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
@@ -2073,8 +2052,8 @@ describe('USDTieredSTOWrapper', () => {
     });
   });
 
-  describe('GetTokensMintedByTier', () => {
-    test('should get value of getTokensMintedByTier', async () => {
+  describe('GetTokensSoldByTier', () => {
+    test('should get value of getTokensSoldByTier', async () => {
       // TokensSoldByTier value expected
       const expectedAmount = [new BigNumber(100), new BigNumber(200), new BigNumber(300)];
       // Params
@@ -2108,12 +2087,12 @@ describe('USDTieredSTOWrapper', () => {
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.getTokensMintedByTier).thenReturn(instance(mockedMethod));
+      when(mockedContract.getTokensSoldByTier).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.callAsync(objectContaining(params.tier))).thenResolve(expectedAmount);
 
       // Real call
-      const result = await target.getTokensMintedByTier(params);
+      const result = await target.getTokensSoldByTier(params);
       // Result expectation
       expect(result.mintedInETH).toEqual(weiToValue(expectedAmount[0], expectedDecimalsResult));
       expect(result.mintedInPOLY).toEqual(weiToValue(expectedAmount[1], expectedDecimalsResult));
@@ -2122,7 +2101,7 @@ describe('USDTieredSTOWrapper', () => {
       // Verifications
       verify(mockedContract.getNumberOfTiers).once();
       verify(mockedGetNumberOfTiersMethod.callAsync()).once();
-      verify(mockedContract.getTokensMintedByTier).once();
+      verify(mockedContract.getTokensSoldByTier).once();
       verify(mockedMethod.callAsync(objectContaining(params.tier))).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContract.securityToken).once();
@@ -2883,7 +2862,7 @@ describe('USDTieredSTOWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetTreasuryWallet', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
+          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'ReserveTokenTransfer', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetTreasuryWallet', 'Pause', 'Unpause', 'SetFundRaiseTypes', 'RevokePreMintFlag', 'AllowPreMintFlag', encountered: Transfer`,
         ),
       );
     });

@@ -1025,6 +1025,7 @@ interface CappedSTOData {
    */
   fundRaiseType: CappedSTOFundRaiseType;
   fundsReceiver: string;
+  treasuryWallet: string;
 }
 
 interface USDTieredSTOData {
@@ -2434,6 +2435,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
+    assert.isNonZeroETHAddressHex('Treasury wallet', data.treasuryWallet);
   };
 
   private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
@@ -2499,6 +2501,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
           [(params.data as CappedSTOData).fundRaiseType], // the module's configure function expects an array
           (params.data as CappedSTOData).fundsReceiver,
+          (params.data as CappedSTOData).treasuryWallet,
         ]);
         break;
       case ModuleName.UsdTieredSTO:

@@ -203,27 +203,6 @@ describe('VestingEscrowWalletWrapper', () => {
     });
   });
 
-  describe('TreasuryWallet', () => {
-    test('should get address from treasuryWallet', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.treasuryWallet).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.treasuryWallet();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.treasuryWallet).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
   describe('unassignedTokens', () => {
     test('should call to unassignedTokens', async () => {
       // Address expected

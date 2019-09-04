@@ -4142,6 +4142,7 @@ describe('SecurityTokenWrapper', () => {
         rate: new BigNumber(1),
         fundRaiseType: CappedSTOFundRaiseType.ETH,
         fundsReceiver: '0x2222222222222222222222222222222222222222',
+        treasuryWallet: '0x1234522222222222222222222222222222222222',
       };
       const mockedCappedParams = {
         moduleName: ModuleName.CappedSTO,
@@ -4162,6 +4163,7 @@ describe('SecurityTokenWrapper', () => {
         valueToWei(mockedCappedParams.data.rate, FULL_DECIMALS).toString(),
         [mockedCappedParams.data.fundRaiseType],
         mockedCappedParams.data.fundsReceiver,
+        mockedCappedParams.data.treasuryWallet,
       ]);
 
       when(
@@ -4189,6 +4191,7 @@ describe('SecurityTokenWrapper', () => {
           rate: cappedParams.rate,
           fundRaiseType: cappedParams.fundRaiseType,
           fundsReceiver: cappedParams.fundsReceiver,
+          treasuryWallet: cappedParams.treasuryWallet
         },
         txData: mockedCappedParams.txData,
         safetyFactor: mockedCappedParams.safetyFactor,

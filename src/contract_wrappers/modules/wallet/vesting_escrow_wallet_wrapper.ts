@@ -488,14 +488,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Address of the Treasury wallet. All of the unassigned token will transfer to that address.
-   * @return address
-   */
-  public treasuryWallet = async (): Promise<string> => {
-    return (await this.contract).treasuryWallet.callAsync();
-  };
-
-  /**
    * Number of tokens that are hold by the `this` contract but are unassigned to any schedule
    * @return unassigned token value
    */
