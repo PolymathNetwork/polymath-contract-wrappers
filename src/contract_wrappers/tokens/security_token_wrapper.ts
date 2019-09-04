@@ -47,6 +47,7 @@ import {
   EtherDividendCheckpointContract,
   CountTransferManagerContract,
   PercentageTransferManagerContract,
+  RestrictedPartialSaleTMContract,
   CappedSTOContract,
   USDTieredSTOContract,
   ERC20DividendCheckpointContract,
@@ -73,7 +74,7 @@ import {
   TxParams,
   CappedSTOFundRaiseType,
   TransferStatusCode,
-  ErrorCode
+  ErrorCode,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -945,6 +946,7 @@ interface AddModuleParams extends TxParams {
   data?:
     | CountTransferManagerData
     | PercentageTransferManagerData
+    | RestrictedPartialSaleTransferManagerData
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData
@@ -982,6 +984,11 @@ interface AddPercentageTransferManagerParams extends AddModuleParams {
   data: PercentageTransferManagerData;
 }
 
+interface AddRestrictedPartialSaleTransferManagerParams extends AddModuleParams {
+  moduleName: ModuleName.RestrictedPartialSaleTM;
+  data: RestrictedPartialSaleTransferManagerData;
+}
+
 interface AddDividendCheckpointParams extends AddModuleParams {
   moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
   data: DividendCheckpointData;
@@ -1008,6 +1015,10 @@ interface VestingEscrowWalletData {
 interface PercentageTransferManagerData {
   maxHolderPercentage: BigNumber;
   allowPrimaryIssuance: boolean;
+}
+
+interface RestrictedPartialSaleTransferManagerData {
+  treasuryWallet: string;
 }
 
 interface DividendCheckpointData {
@@ -1046,6 +1057,7 @@ interface USDTieredSTOData {
 interface AddModuleInterface {
   (params: AddCountTransferManagerParams): Promise<PolyResponse>;
   (params: AddPercentageTransferManagerParams): Promise<PolyResponse>;
+  (params: AddRestrictedPartialSaleTransferManagerParams): Promise<PolyResponse>;
   (params: AddDividendCheckpointParams): Promise<PolyResponse>;
   (params: AddCappedSTOParams): Promise<PolyResponse>;
   (params: AddUSDTieredSTOParams): Promise<PolyResponse>;
@@ -2312,11 +2324,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   private checkIsArchived = async (moduleAddress: string) => {
-    assert.assert((await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is not yet archived');
+    assert.assert(
+      (await this.getModule({ moduleAddress })).archived,
+      ErrorCode.PreconditionRequired,
+      'Module is not yet archived',
+    );
   };
 
   private checkIsNotArchived = async (moduleAddress: string) => {
-    assert.assert(!(await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is archived');
+    assert.assert(
+      !(await this.getModule({ moduleAddress })).archived,
+      ErrorCode.PreconditionRequired,
+      'Module is archived',
+    );
   };
 
   private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
@@ -2386,9 +2406,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         'ModuleFactory must be verified or SecurityToken owner must be ModuleFactory owner',
       );
     } else {
-      assert.assert(await this.checkForRegisteredModule(address), ErrorCode.Unauthorized, 'ModuleFactory must be verified');
+      assert.assert(
+        await this.checkForRegisteredModule(address),
+        ErrorCode.Unauthorized,
+        'ModuleFactory must be verified',
+      );
     }
-    assert.assert(await this.isCompatibleModule(address), ErrorCode.InvalidVersion, 'Version should within the compatible range of ST');
+    assert.assert(
+      await this.isCompatibleModule(address),
+      ErrorCode.InvalidVersion,
+      'Version should within the compatible range of ST',
+    );
   };
 
   private checkForRegisteredModule = async (moduleAddress: string) => {
@@ -2454,9 +2482,17 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ErrorCode.InvalidData,
         'Too many discounted tokens',
       );
-      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), ErrorCode.InvalidData, 'Invalid discount');
+      assert.assert(
+        data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]),
+        ErrorCode.InvalidData,
+        'Invalid discount',
+      );
     }
-    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, ErrorCode.InvalidData, 'Raise type is not specified');
+    assert.assert(
+      data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3,
+      ErrorCode.InvalidData,
+      'Raise type is not specified',
+    );
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };
@@ -2489,6 +2525,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
             PERCENTAGE_DECIMALS,
           ).toString(),
           (params.data as PercentageTransferManagerData).allowPrimaryIssuance,
+        ]);
+        break;
+      case ModuleName.RestrictedPartialSaleTM:
+        iface = new ethers.utils.Interface(RestrictedPartialSaleTMContract.ABI());
+        data = iface.functions.configure.encode([
+          (params.data as RestrictedPartialSaleTransferManagerData).treasuryWallet,
         ]);
         break;
       case ModuleName.CappedSTO:

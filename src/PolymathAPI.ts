@@ -26,7 +26,8 @@ import {
   PolyTokenFaucetContract,
   USDTieredSTOContract,
   VolumeRestrictionTMContract,
-  VestingEscrowWalletContract,
+  RestrictedPartialSaleTMContract,
+  VestingEscrowWalletContract
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -163,6 +164,7 @@ export class PolymathAPI {
       LockUpTransferManagerContract.ABI(),
       BlacklistTransferManagerContract.ABI(),
       VolumeRestrictionTMContract.ABI(),
+      RestrictedPartialSaleTMContract.ABI(),
       // Tokens
       ERC20DetailedContract.ABI(),
       PolyTokenContract.ABI(),

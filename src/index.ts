@@ -17,6 +17,7 @@ import { LockUpTransferManagerTransactionParams } from './contract_wrappers/modu
 import { ManualApprovalTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import { PercentageTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import { VolumeRestrictionTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+import { RestrictedPartialSaleTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 import { VestingEscrowWalletTransactionParams } from './contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import { ERC20TransactionParams } from './contract_wrappers/tokens/erc20_wrapper';
 import { PolyTokenFaucetTransactionParams } from './contract_wrappers/tokens/poly_token_faucet_wrapper';
@@ -41,6 +42,7 @@ export namespace TransactionParams {
   export import ManualApprovalTransferManager = ManualApprovalTransferManagerTransactionParams;
   export import PercentageTransferManager = PercentageTransferManagerTransactionParams;
   export import VolumeRestrictionTransferManager = VolumeRestrictionTransferManagerTransactionParams;
+  export import RestrictedPartialSaleTransferManager = RestrictedPartialSaleTransferManagerTransactionParams;
   export import VestingEscrowWallet = VestingEscrowWalletTransactionParams;
   export import ERC20 = ERC20TransactionParams;
   export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
@@ -90,6 +92,9 @@ export {
 export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+export {
+  default as RestrictedPartialSaleTransferManager,
+} from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export {
@@ -110,7 +115,7 @@ export {
   PolymathRegistryChangeAddressEventArgs,
   PolymathRegistryOwnershipTransferredEventArgs,
   SecurityTokenRegistryContract,
-  SecurityTokenRegistryEventArgs,  
+  SecurityTokenRegistryEventArgs,
   SecurityTokenRegistryEvents,
   SecurityTokenRegistryPauseEventArgs,
   SecurityTokenRegistryUnpauseEventArgs,
@@ -308,6 +313,12 @@ export {
   VolumeRestrictionTMModifyIndividualRestrictionEventArgs,
   VolumeRestrictionTMPauseEventArgs,
   VolumeRestrictionTMUnpauseEventArgs,
+  RestrictedPartialSaleTMPauseEventArgs,
+  RestrictedPartialSaleTMUnpauseEventArgs,
+  RestrictedPartialSaleTMContract,
+  RestrictedPartialSaleTMEventArgs,
+  RestrictedPartialSaleTMEvents,
+  RestrictedPartialSaleTMChangedExemptWalletListEventArgs,
   BlockParamLiteral,
   TransactionReceiptWithDecodedLogs,
   LogEntry,

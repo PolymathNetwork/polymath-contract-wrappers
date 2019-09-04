@@ -59,6 +59,9 @@ import {
   VolumeRestrictionTMContract,
   VolumeRestrictionTMEvents,
   VolumeRestrictionTMEventArgs,
+  RestrictedPartialSaleTMEventArgs,
+  RestrictedPartialSaleTMContract,
+  RestrictedPartialSaleTMEvents,
   VestingEscrowWalletEventArgs,
   VestingEscrowWalletContract,
   VestingEscrowWalletEvents,
@@ -170,6 +173,7 @@ export enum ModuleName {
   LockUpTransferManager = 'LockUpTransferManager',
   BlacklistTransferManager = 'BlacklistTransferManager',
   VolumeRestrictionTM = 'VolumeRestrictionTM',
+  RestrictedPartialSaleTM = 'RestrictedPartialSaleTM',
   CappedSTO = 'CappedSTO',
   UsdTieredSTO = 'USDTieredSTO',
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
@@ -242,6 +246,7 @@ export type ContractEventArgs =
   | PercentageTransferManagerEventArgs
   | LockUpTransferManagerEventArgs
   | VolumeRestrictionTMEventArgs
+  | RestrictedPartialSaleTMEventArgs
   | BlacklistTransferManagerEventArgs
   | VestingEscrowWalletEventArgs;
 
@@ -271,7 +276,8 @@ export type ContractEvents =
   | VestingEscrowWalletEvents
   | LockUpTransferManagerEvents
   | BlacklistTransferManagerEvents
-  | VolumeRestrictionTMEvents;
+  | VolumeRestrictionTMEvents
+  | RestrictedPartialSaleTMEvents;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -327,7 +333,8 @@ export type GenericModuleContract =
   | VestingEscrowWalletContract
   | LockUpTransferManagerContract
   | BlacklistTransferManagerContract
-  | VolumeRestrictionTMContract;
+  | VolumeRestrictionTMContract
+  | RestrictedPartialSaleTMContract;
 
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
 

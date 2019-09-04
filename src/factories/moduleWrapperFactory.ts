@@ -17,6 +17,7 @@ import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode } from '../types';
 import { PolymathError } from '../PolymathError';
+import RestrictedPartialSaleTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 
 interface GetModuleParams {
   address: string;
@@ -169,6 +170,13 @@ export default class ModuleWrapperFactory {
         moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
+          this.contractFactory,
+        );
+        break;
+      case ModuleName.RestrictedPartialSaleTM:
+        moduleWrapper = new RestrictedPartialSaleTransferManagerWrapper(
+          this.web3Wrapper,
+          this.contractFactory.getRestrictedPartialSaleTMContract(params.address),
           this.contractFactory,
         );
         break;

@@ -19,6 +19,7 @@ import {
   LockUpTransferManagerContract,
   BlacklistTransferManagerContract,
   VolumeRestrictionTMContract,
+  RestrictedPartialSaleTMContract,
   FeatureRegistryContract,
   ModuleRegistryContract,
   ISecurityTokenRegistryContract,
@@ -267,6 +268,15 @@ export default class ContractFactory {
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract> {
     assert.isETHAddressHex('address', address);
     const contract = new VolumeRestrictionTMContract(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
+  public async getRestrictedPartialSaleTMContract(address: string): Promise<RestrictedPartialSaleTMContract> {
+    assert.isETHAddressHex('address', address);
+    const contract = new RestrictedPartialSaleTMContract(address, this.provider, this.contractDefaults);
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
