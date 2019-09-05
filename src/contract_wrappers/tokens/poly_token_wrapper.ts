@@ -7,6 +7,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
@@ -75,7 +76,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   /**
    * Use to increase approval
    */
-  public increaseApproval = async (params: ChangeApprovalParams) => {
+  public increaseApproval = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
@@ -88,7 +89,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   /**
    * Use to decrease approval
    */
-  public decreaseApproval = async (params: ChangeApprovalParams) => {
+  public decreaseApproval = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,
