@@ -13,10 +13,7 @@ import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import {
-  parseTransferResult,
-  valueToWei,
-} from '../../../utils/convert';
+import { parsePermBytes32Value, parseTransferResult, valueToWei } from '../../../utils/convert';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -27,6 +24,7 @@ import {
   RestrictionType,
   PERCENTAGE_DECIMALS,
   ErrorCode,
+  Perm,
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -176,6 +174,14 @@ export default class RestrictedPartialSaleTransferManagerWrapper extends ModuleW
    */
   public getExemptAddresses = async (): Promise<string[]> => {
     return (await this.contract).getExemptAddresses.callAsync();
+  };
+
+  /**
+   * Return the permissions flags that are associated with restricted partial sale transfer manager
+   */
+  public getPermissions = async (): Promise<Perm[]> => {
+    const permissions = await (await this.contract).getPermissions.callAsync();
+    return permissions.map(parsePermBytes32Value);
   };
 
   /**

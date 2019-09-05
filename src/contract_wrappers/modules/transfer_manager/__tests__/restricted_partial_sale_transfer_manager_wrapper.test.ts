@@ -11,7 +11,8 @@ import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../..
 import ModuleWrapper from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import RestrictedPartialSaleTransferManagerWrapper from '../restricted_partial_sale_transfer_manager_wrapper';
-import { valueToWei } from '../../../../utils/convert';
+import { parsePermBytes32Value, stringArrayToBytes32Array, valueToWei } from '../../../../utils/convert';
+import { Perm } from '../../../../types';
 
 describe('RestrictedPartialSaleTransferManagerWrapper', () => {
   let target: RestrictedPartialSaleTransferManagerWrapper;
@@ -325,6 +326,27 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
       expect(result).toBe(expectedResult);
       // Verifications
       verify(mockedContract.getInitFunction).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('getPermissions', () => {
+    test('should call to getPermissions', async () => {
+      const expectedResult = stringArrayToBytes32Array([Perm.Admin]);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getPermissions).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getPermissions();
+      // Result expectation
+      expect(result).toEqual(expectedResult.map(parsePermBytes32Value));
+      // Verifications
+      verify(mockedContract.getPermissions).once();
       verify(mockedMethod.callAsync()).once();
     });
   });
