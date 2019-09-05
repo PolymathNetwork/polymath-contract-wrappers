@@ -261,7 +261,7 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
     test('should changeExemptWalletList', async () => {
       const mockedParams = {
         wallet: '0x7777777777777777777777777777777777777777',
-        change: true,
+        exempted: true,
         txData: {},
         safetyFactor: 10,
       };
@@ -283,7 +283,7 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.change,
+          mockedParams.exempted,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -301,7 +301,60 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
-          mockedParams.change,
+          mockedParams.exempted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('changeExemptWalletListMulti', () => {
+    test('should changeExemptWalletListMulti', async () => {
+      const mockedParams = {
+        wallets: ['0x7777777777777777777777777777777777777777', '0x2222222222222222222222222222222222222222'],
+        exempted: [true, false],
+        txData: {},
+        safetyFactor: 10,
+      };
+
+      const expectedExemptResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      const mockedExemptMethod = mock(MockedCallMethod);
+
+      when(mockedContract.getExemptAddresses).thenReturn(instance(mockedExemptMethod));
+      when(mockedExemptMethod.callAsync()).thenResolve(expectedExemptResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeExemptWalletListMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.wallets,
+          mockedParams.exempted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeExemptWalletListMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.getExemptAddresses).once();
+      verify(mockedExemptMethod.callAsync()).once();
+      verify(mockedContract.changeExemptWalletListMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.wallets,
+          mockedParams.exempted,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),

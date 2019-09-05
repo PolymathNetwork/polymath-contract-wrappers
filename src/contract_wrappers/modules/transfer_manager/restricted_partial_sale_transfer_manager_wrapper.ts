@@ -91,7 +91,16 @@ interface VerifyTransferParams {
  */
 interface ChangeExemptWalletListParams extends TxParams {
   wallet: string;
-  change: boolean;
+  exempted: boolean;
+}
+
+/**
+ * @param wallets Ethereum wallet/contract addresses that need to be exempted
+ * @param exempted Boolean values used to add (i.e true) or remove (i.e false) from the list
+ */
+interface ChangeExemptWalletListMultiParams extends TxParams {
+  wallets: string[];
+  exempted: boolean[];
 }
 
 /**
@@ -190,13 +199,38 @@ export default class RestrictedPartialSaleTransferManagerWrapper extends ModuleW
   public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
     assert.assert(
-      !(await this.getExemptAddresses()).includes(params.wallet) === params.change,
+      !(await this.getExemptAddresses()).includes(params.wallet) === params.exempted,
       ErrorCode.PreconditionRequired,
       'There will be no change to exempt list',
     );
     return (await this.contract).changeExemptWalletList.sendTransactionAsync(
       params.wallet,
-      params.change,
+      params.exempted,
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Add/Remove multiple wallet address from the exempt list
+   */
+  public changeExemptWalletListMulti = async (params: ChangeExemptWalletListMultiParams) => {
+    assert.areValidArrayLengths(
+      [params.wallets, params.exempted],
+      'Change exempt wallet argument arrays length mismatch',
+    );
+    const exemptedAddresses = await this.getExemptAddresses();
+    for (let i = 0; i < params.wallets.length; i += 1) {
+      assert.isNonZeroETHAddressHex('Wallet', params.wallets[i]);
+      assert.assert(
+        !exemptedAddresses.includes(params.wallets[i]) === params.exempted[i],
+        ErrorCode.PreconditionRequired,
+        'There will be no change to exempt list',
+      );
+    }
+    return (await this.contract).changeExemptWalletListMulti.sendTransactionAsync(
+      params.wallets,
+      params.exempted,
       params.txData,
       params.safetyFactor,
     );
