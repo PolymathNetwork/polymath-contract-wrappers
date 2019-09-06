@@ -1,22 +1,22 @@
 import {
-  VolumeRestrictionTMContract,
-  VolumeRestrictionTMEventArgs,
-  VolumeRestrictionTMEvents,
-  VolumeRestrictionTMChangedExemptWalletListEventArgs,
-  VolumeRestrictionTMAddIndividualRestrictionEventArgs,
-  VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs,
-  VolumeRestrictionTMModifyIndividualRestrictionEventArgs,
-  VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs,
-  VolumeRestrictionTMAddDefaultRestrictionEventArgs,
-  VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs,
-  VolumeRestrictionTMModifyDefaultRestrictionEventArgs,
-  VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs,
-  VolumeRestrictionTMIndividualRestrictionRemovedEventArgs,
-  VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs,
-  VolumeRestrictionTMDefaultRestrictionRemovedEventArgs,
-  VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs,
-  VolumeRestrictionTMPauseEventArgs,
-  VolumeRestrictionTMUnpauseEventArgs,
+  VolumeRestrictionTMContract_3_0_0,
+  VolumeRestrictionTMEventArgs_3_0_0,
+  VolumeRestrictionTMEvents_3_0_0,
+  VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0,
+  VolumeRestrictionTMAddIndividualRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMModifyIndividualRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMAddDefaultRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMModifyDefaultRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs_3_0_0,
+  VolumeRestrictionTMIndividualRestrictionRemovedEventArgs_3_0_0,
+  VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs_3_0_0,
+  VolumeRestrictionTMDefaultRestrictionRemovedEventArgs_3_0_0,
+  VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs_3_0_0,
+  VolumeRestrictionTMPauseEventArgs_3_0_0,
+  VolumeRestrictionTMUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
@@ -49,138 +49,138 @@ import {
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList;
-  callback: EventCallback<VolumeRestrictionTMChangedExemptWalletListEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ChangedExemptWalletList;
+  callback: EventCallback<VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0>;
 }
 
 interface GetChangedExemptWalletListLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ChangedExemptWalletList;
 }
 
 interface AddIndividualRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddIndividualRestriction;
-  callback: EventCallback<VolumeRestrictionTMAddIndividualRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddIndividualRestriction;
+  callback: EventCallback<VolumeRestrictionTMAddIndividualRestrictionEventArgs_3_0_0>;
 }
 
 interface GetAddIndividualRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddIndividualRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddIndividualRestriction;
 }
 
 interface AddIndividualDailyRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddIndividualDailyRestriction;
-  callback: EventCallback<VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddIndividualDailyRestriction;
+  callback: EventCallback<VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs_3_0_0>;
 }
 
 interface GetAddIndividualDailyRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddIndividualDailyRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddIndividualDailyRestriction;
 }
 
 interface ModifyIndividualRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyIndividualRestriction;
-  callback: EventCallback<VolumeRestrictionTMModifyIndividualRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyIndividualRestriction;
+  callback: EventCallback<VolumeRestrictionTMModifyIndividualRestrictionEventArgs_3_0_0>;
 }
 
 interface GetModifyIndividualRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyIndividualRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyIndividualRestriction;
 }
 
 interface ModifyIndividualDailyRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyIndividualDailyRestriction;
-  callback: EventCallback<VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyIndividualDailyRestriction;
+  callback: EventCallback<VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs_3_0_0>;
 }
 
 interface GetModifyIndividualDailyRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyIndividualDailyRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyIndividualDailyRestriction;
 }
 
 interface AddDefaultRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddDefaultRestriction;
-  callback: EventCallback<VolumeRestrictionTMAddDefaultRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddDefaultRestriction;
+  callback: EventCallback<VolumeRestrictionTMAddDefaultRestrictionEventArgs_3_0_0>;
 }
 
 interface GetAddDefaultRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddDefaultRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddDefaultRestriction;
 }
 
 interface AddDefaultDailyRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddDefaultDailyRestriction;
-  callback: EventCallback<VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddDefaultDailyRestriction;
+  callback: EventCallback<VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs_3_0_0>;
 }
 
 interface GetAddDefaultDailyRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.AddDefaultDailyRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.AddDefaultDailyRestriction;
 }
 
 interface ModifyDefaultRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyDefaultRestriction;
-  callback: EventCallback<VolumeRestrictionTMModifyDefaultRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyDefaultRestriction;
+  callback: EventCallback<VolumeRestrictionTMModifyDefaultRestrictionEventArgs_3_0_0>;
 }
 
 interface GetModifyDefaultRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyDefaultRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyDefaultRestriction;
 }
 
 interface ModifyDefaultDailyRestrictionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyDefaultDailyRestriction;
-  callback: EventCallback<VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyDefaultDailyRestriction;
+  callback: EventCallback<VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs_3_0_0>;
 }
 
 interface GetModifyDefaultDailyRestrictionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.ModifyDefaultDailyRestriction;
+  eventName: VolumeRestrictionTMEvents_3_0_0.ModifyDefaultDailyRestriction;
 }
 
 interface IndividualRestrictionRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.IndividualRestrictionRemoved;
-  callback: EventCallback<VolumeRestrictionTMIndividualRestrictionRemovedEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.IndividualRestrictionRemoved;
+  callback: EventCallback<VolumeRestrictionTMIndividualRestrictionRemovedEventArgs_3_0_0>;
 }
 
 interface GetIndividualRestrictionRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.IndividualRestrictionRemoved;
+  eventName: VolumeRestrictionTMEvents_3_0_0.IndividualRestrictionRemoved;
 }
 
 interface IndividualDailyRestrictionRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.IndividualDailyRestrictionRemoved;
-  callback: EventCallback<VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.IndividualDailyRestrictionRemoved;
+  callback: EventCallback<VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs_3_0_0>;
 }
 
 interface GetIndividualDailyRestrictionRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.IndividualDailyRestrictionRemoved;
+  eventName: VolumeRestrictionTMEvents_3_0_0.IndividualDailyRestrictionRemoved;
 }
 
 interface DefaultRestrictionRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.DefaultRestrictionRemoved;
-  callback: EventCallback<VolumeRestrictionTMDefaultRestrictionRemovedEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.DefaultRestrictionRemoved;
+  callback: EventCallback<VolumeRestrictionTMDefaultRestrictionRemovedEventArgs_3_0_0>;
 }
 
 interface GetDefaultRestrictionRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.DefaultRestrictionRemoved;
+  eventName: VolumeRestrictionTMEvents_3_0_0.DefaultRestrictionRemoved;
 }
 
 interface DefaultDailyRestrictionRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.DefaultDailyRestrictionRemoved;
-  callback: EventCallback<VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.DefaultDailyRestrictionRemoved;
+  callback: EventCallback<VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs_3_0_0>;
 }
 
 interface GetDefaultDailyRestrictionRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.DefaultDailyRestrictionRemoved;
+  eventName: VolumeRestrictionTMEvents_3_0_0.DefaultDailyRestrictionRemoved;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.Pause;
-  callback: EventCallback<VolumeRestrictionTMPauseEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.Pause;
+  callback: EventCallback<VolumeRestrictionTMPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.Pause;
+  eventName: VolumeRestrictionTMEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VolumeRestrictionTMEvents.Unpause;
-  callback: EventCallback<VolumeRestrictionTMUnpauseEventArgs>;
+  eventName: VolumeRestrictionTMEvents_3_0_0.Unpause;
+  callback: EventCallback<VolumeRestrictionTMUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VolumeRestrictionTMEvents.Unpause;
+  eventName: VolumeRestrictionTMEvents_3_0_0.Unpause;
 }
 
 interface VolumeRestrictionTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -203,46 +203,46 @@ interface VolumeRestrictionTransferManagerSubscribeAsyncParams extends Subscribe
 
 interface GetVolumeRestrictionTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetChangedExemptWalletListLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMChangedExemptWalletListEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0>[]
   >;
   (params: GetAddIndividualRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMAddIndividualRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMAddIndividualRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetAddIndividualDailyRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetModifyIndividualRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMModifyIndividualRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMModifyIndividualRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetModifyIndividualDailyRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetAddDefaultRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMAddDefaultRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMAddDefaultRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetAddDefaultDailyRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetModifyDefaultRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMModifyDefaultRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMModifyDefaultRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetModifyDefaultDailyRestrictionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs_3_0_0>[]
   >;
   (params: GetIndividualRestrictionRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMIndividualRestrictionRemovedEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMIndividualRestrictionRemovedEventArgs_3_0_0>[]
   >;
   (params: GetIndividualDailyRestrictionRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs_3_0_0>[]
   >;
   (params: GetDefaultRestrictionRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMDefaultRestrictionRemovedEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMDefaultRestrictionRemovedEventArgs_3_0_0>[]
   >;
   (params: GetDefaultDailyRestrictionRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs>[]
+    LogWithDecodedArgs<VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VolumeRestrictionTMUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace VolumeRestrictionTransferManagerTransactionParams {
@@ -414,7 +414,7 @@ interface IndividualRestriction {
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.
  */
 export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<VolumeRestrictionTMContract>;
+  protected contract: Promise<VolumeRestrictionTMContract_3_0_0>;
 
   /**
    * Instantiate VolumeRestrictionManagerWrapper
@@ -423,7 +423,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<VolumeRestrictionTMContract>,
+    contract: Promise<VolumeRestrictionTMContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -1206,11 +1206,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: VolumeRestrictionTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends VolumeRestrictionTMEventArgs
+    ArgsType extends VolumeRestrictionTMEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -1229,11 +1229,11 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetVolumeRestrictionTransferManagerLogsAsyncParams = async <
-    ArgsType extends VolumeRestrictionTMEventArgs
+    ArgsType extends VolumeRestrictionTMEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

@@ -1,10 +1,10 @@
 import {
-  CountTransferManagerContract,
-  CountTransferManagerEventArgs,
-  CountTransferManagerEvents,
-  CountTransferManagerModifyHolderCountEventArgs,
-  CountTransferManagerPauseEventArgs,
-  CountTransferManagerUnpauseEventArgs,
+  CountTransferManagerContract_3_0_0,
+  CountTransferManagerEventArgs_3_0_0,
+  CountTransferManagerEvents_3_0_0,
+  CountTransferManagerModifyHolderCountEventArgs_3_0_0,
+  CountTransferManagerPauseEventArgs_3_0_0,
+  CountTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
@@ -26,30 +26,30 @@ import {
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.ModifyHolderCount;
-  callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
+  callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs_3_0_0>;
 }
 
 interface GetModifyHolderCountLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.ModifyHolderCount;
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.Pause;
-  callback: EventCallback<CountTransferManagerPauseEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<CountTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.Pause;
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.Unpause;
-  callback: EventCallback<CountTransferManagerUnpauseEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<CountTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.Unpause;
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface CountTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -60,10 +60,10 @@ interface CountTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetModifyHolderCountLogsAsyncParams): Promise<
-    LogWithDecodedArgs<CountTransferManagerModifyHolderCountEventArgs>[]
+    LogWithDecodedArgs<CountTransferManagerModifyHolderCountEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace CountTransferManagerTransactionParams {
@@ -94,7 +94,7 @@ interface ChangeHolderCountParams extends TxParams {
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<CountTransferManagerContract>;
+  protected contract: Promise<CountTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate CountTransferManagerWrapper
@@ -104,7 +104,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<CountTransferManagerContract>,
+    contract: Promise<CountTransferManagerContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -193,11 +193,11 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: CountTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends CountTransferManagerEventArgs
+    ArgsType extends CountTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -215,10 +215,10 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <ArgsType extends CountTransferManagerEventArgs>(
+  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <ArgsType extends CountTransferManagerEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

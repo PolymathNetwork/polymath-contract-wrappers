@@ -1,9 +1,9 @@
 // VestingEscrowWallet test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  VestingEscrowWalletContract,
-  ISecurityTokenContract,
-  PolyTokenEvents,
+  VestingEscrowWalletContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -25,15 +25,15 @@ import { TransferStatusCode } from '../../../../types';
 describe('VestingEscrowWalletWrapper', () => {
   let target: VestingEscrowWalletWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: VestingEscrowWalletContract;
+  let mockedContract: VestingEscrowWalletContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(VestingEscrowWalletContract);
+    mockedContract = mock(VestingEscrowWalletContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new VestingEscrowWalletWrapper(
@@ -1908,7 +1908,7 @@ describe('VestingEscrowWalletWrapper', () => {
     test('should throw as eventName does not belong to VestingEscrowWallet', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

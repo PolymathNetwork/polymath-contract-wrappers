@@ -1,5 +1,5 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
+import { TxParams, STOBaseContract_3_0_0, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
 import { bigNumberToDate, weiToValue } from '../../../utils/convert';
@@ -15,7 +15,7 @@ interface FundRaiseTypesParams {
  * This class includes the functionality related to interacting with the all STOs contracts.
  */
 export default abstract class STOWrapper extends ModuleWrapper {
-  protected abstract contract: Promise<STOBaseContract>;
+  protected abstract contract: Promise<STOBaseContract_3_0_0>;
 
   /**
    *  check if the module is paused

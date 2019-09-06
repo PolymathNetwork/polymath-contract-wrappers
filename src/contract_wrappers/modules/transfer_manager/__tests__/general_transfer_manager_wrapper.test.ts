@@ -1,9 +1,9 @@
 // GeneralTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  GeneralTransferManagerContract,
-  ISecurityTokenContract,
-  PolyTokenEvents,
+  GeneralTransferManagerContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -23,15 +23,15 @@ import { FlagsType, TransferType, Perm, Partition } from '../../../../types';
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: GeneralTransferManagerContract;
+  let mockedContract: GeneralTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(GeneralTransferManagerContract);
+    mockedContract = mock(GeneralTransferManagerContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new GeneralTransferManagerWrapper(
@@ -1384,7 +1384,7 @@ describe('GeneralTransferManagerWrapper', () => {
     test('should throw as eventName does not belong to GeneralTransferManager', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

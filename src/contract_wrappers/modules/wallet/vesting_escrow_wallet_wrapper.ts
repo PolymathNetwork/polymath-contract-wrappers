@@ -1,19 +1,19 @@
 import {
-  VestingEscrowWalletContract,
-  VestingEscrowWalletEventArgs,
-  VestingEscrowWalletEvents,
-  VestingEscrowWalletAddScheduleEventArgs,
-  VestingEscrowWalletModifyScheduleEventArgs,
-  VestingEscrowWalletRevokeAllSchedulesEventArgs,
-  VestingEscrowWalletRevokeScheduleEventArgs,
-  VestingEscrowWalletDepositTokensEventArgs,
-  VestingEscrowWalletSendToTreasuryEventArgs,
-  VestingEscrowWalletSendTokensEventArgs,
-  VestingEscrowWalletAddTemplateEventArgs,
-  VestingEscrowWalletRemoveTemplateEventArgs,
-  VestingEscrowWalletTreasuryWalletChangedEventArgs,
-  VestingEscrowWalletPauseEventArgs,
-  VestingEscrowWalletUnpauseEventArgs,
+  VestingEscrowWalletContract_3_0_0,
+  VestingEscrowWalletEventArgs_3_0_0,
+  VestingEscrowWalletEvents_3_0_0,
+  VestingEscrowWalletAddScheduleEventArgs_3_0_0,
+  VestingEscrowWalletModifyScheduleEventArgs_3_0_0,
+  VestingEscrowWalletRevokeAllSchedulesEventArgs_3_0_0,
+  VestingEscrowWalletRevokeScheduleEventArgs_3_0_0,
+  VestingEscrowWalletDepositTokensEventArgs_3_0_0,
+  VestingEscrowWalletSendToTreasuryEventArgs_3_0_0,
+  VestingEscrowWalletSendTokensEventArgs_3_0_0,
+  VestingEscrowWalletAddTemplateEventArgs_3_0_0,
+  VestingEscrowWalletRemoveTemplateEventArgs_3_0_0,
+  VestingEscrowWalletTreasuryWalletChangedEventArgs_3_0_0,
+  VestingEscrowWalletPauseEventArgs_3_0_0,
+  VestingEscrowWalletUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
@@ -45,111 +45,111 @@ import {
 } from '../../../utils/convert';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.AddSchedule;
-  callback: EventCallback<VestingEscrowWalletAddScheduleEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.AddSchedule;
+  callback: EventCallback<VestingEscrowWalletAddScheduleEventArgs_3_0_0>;
 }
 
 interface GetAddScheduleLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.AddSchedule;
+  eventName: VestingEscrowWalletEvents_3_0_0.AddSchedule;
 }
 
 interface ModifyScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.ModifySchedule;
-  callback: EventCallback<VestingEscrowWalletModifyScheduleEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.ModifySchedule;
+  callback: EventCallback<VestingEscrowWalletModifyScheduleEventArgs_3_0_0>;
 }
 
 interface GetModifyScheduleLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.ModifySchedule;
+  eventName: VestingEscrowWalletEvents_3_0_0.ModifySchedule;
 }
 
 interface RevokeAllSchedulesSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.RevokeAllSchedules;
-  callback: EventCallback<VestingEscrowWalletRevokeAllSchedulesEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.RevokeAllSchedules;
+  callback: EventCallback<VestingEscrowWalletRevokeAllSchedulesEventArgs_3_0_0>;
 }
 
 interface GetRevokeAllSchedulesLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.RevokeAllSchedules;
+  eventName: VestingEscrowWalletEvents_3_0_0.RevokeAllSchedules;
 }
 
 interface RevokeScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.RevokeSchedule;
-  callback: EventCallback<VestingEscrowWalletRevokeScheduleEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.RevokeSchedule;
+  callback: EventCallback<VestingEscrowWalletRevokeScheduleEventArgs_3_0_0>;
 }
 
 interface GetRevokeScheduleLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.RevokeSchedule;
+  eventName: VestingEscrowWalletEvents_3_0_0.RevokeSchedule;
 }
 
 interface DepositTokensSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.DepositTokens;
-  callback: EventCallback<VestingEscrowWalletDepositTokensEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.DepositTokens;
+  callback: EventCallback<VestingEscrowWalletDepositTokensEventArgs_3_0_0>;
 }
 
 interface GetDepositTokensLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.DepositTokens;
+  eventName: VestingEscrowWalletEvents_3_0_0.DepositTokens;
 }
 
 interface SendToTreasurySubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.SendToTreasury;
-  callback: EventCallback<VestingEscrowWalletSendToTreasuryEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.SendToTreasury;
+  callback: EventCallback<VestingEscrowWalletSendToTreasuryEventArgs_3_0_0>;
 }
 
 interface GetSendToTreasuryLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.SendToTreasury;
+  eventName: VestingEscrowWalletEvents_3_0_0.SendToTreasury;
 }
 
 interface SendTokensSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.SendTokens;
-  callback: EventCallback<VestingEscrowWalletSendTokensEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.SendTokens;
+  callback: EventCallback<VestingEscrowWalletSendTokensEventArgs_3_0_0>;
 }
 
 interface GetSendTokensLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.SendTokens;
+  eventName: VestingEscrowWalletEvents_3_0_0.SendTokens;
 }
 
 interface AddTemplateSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.AddTemplate;
-  callback: EventCallback<VestingEscrowWalletAddTemplateEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.AddTemplate;
+  callback: EventCallback<VestingEscrowWalletAddTemplateEventArgs_3_0_0>;
 }
 
 interface GetAddTemplateLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.AddTemplate;
+  eventName: VestingEscrowWalletEvents_3_0_0.AddTemplate;
 }
 
 interface RemoveTemplateSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.RemoveTemplate;
-  callback: EventCallback<VestingEscrowWalletRemoveTemplateEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.RemoveTemplate;
+  callback: EventCallback<VestingEscrowWalletRemoveTemplateEventArgs_3_0_0>;
 }
 
 interface GetRemoveTemplateLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.RemoveTemplate;
+  eventName: VestingEscrowWalletEvents_3_0_0.RemoveTemplate;
 }
 
 interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.TreasuryWalletChanged;
-  callback: EventCallback<VestingEscrowWalletTreasuryWalletChangedEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.TreasuryWalletChanged;
+  callback: EventCallback<VestingEscrowWalletTreasuryWalletChangedEventArgs_3_0_0>;
 }
 
 interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.TreasuryWalletChanged;
+  eventName: VestingEscrowWalletEvents_3_0_0.TreasuryWalletChanged;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.Pause;
-  callback: EventCallback<VestingEscrowWalletPauseEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.Pause;
+  callback: EventCallback<VestingEscrowWalletPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.Pause;
+  eventName: VestingEscrowWalletEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: VestingEscrowWalletEvents.Unpause;
-  callback: EventCallback<VestingEscrowWalletUnpauseEventArgs>;
+  eventName: VestingEscrowWalletEvents_3_0_0.Unpause;
+  callback: EventCallback<VestingEscrowWalletUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: VestingEscrowWalletEvents.Unpause;
+  eventName: VestingEscrowWalletEvents_3_0_0.Unpause;
 }
 
 interface VestingEscrowWalletSubscribeAsyncParams extends Subscribe {
@@ -168,22 +168,22 @@ interface VestingEscrowWalletSubscribeAsyncParams extends Subscribe {
 }
 
 interface GetVestingEscrowWalletLogsAsyncParams extends GetLogs {
-  (params: GetAddScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddScheduleEventArgs>[]>;
-  (params: GetModifyScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletModifyScheduleEventArgs>[]>;
+  (params: GetAddScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddScheduleEventArgs_3_0_0>[]>;
+  (params: GetModifyScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletModifyScheduleEventArgs_3_0_0>[]>;
   (params: GetRevokeAllSchedulesLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VestingEscrowWalletRevokeAllSchedulesEventArgs>[]
+    LogWithDecodedArgs<VestingEscrowWalletRevokeAllSchedulesEventArgs_3_0_0>[]
   >;
-  (params: GetRevokeScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRevokeScheduleEventArgs>[]>;
-  (params: GetDepositTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletDepositTokensEventArgs>[]>;
-  (params: GetSendToTreasuryLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendToTreasuryEventArgs>[]>;
-  (params: GetSendTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendTokensEventArgs>[]>;
-  (params: GetAddTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddTemplateEventArgs>[]>;
-  (params: GetRemoveTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRemoveTemplateEventArgs>[]>;
+  (params: GetRevokeScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRevokeScheduleEventArgs_3_0_0>[]>;
+  (params: GetDepositTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletDepositTokensEventArgs_3_0_0>[]>;
+  (params: GetSendToTreasuryLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendToTreasuryEventArgs_3_0_0>[]>;
+  (params: GetSendTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendTokensEventArgs_3_0_0>[]>;
+  (params: GetAddTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddTemplateEventArgs_3_0_0>[]>;
+  (params: GetRemoveTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRemoveTemplateEventArgs_3_0_0>[]>;
   (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<VestingEscrowWalletTreasuryWalletChangedEventArgs>[]
+    LogWithDecodedArgs<VestingEscrowWalletTreasuryWalletChangedEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace VestingEscrowWalletTransactionParams {
@@ -436,7 +436,7 @@ interface BeneficiarySchedule {
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
 export default class VestingEscrowWalletWrapper extends ModuleWrapper {
-  protected contract: Promise<VestingEscrowWalletContract>;
+  protected contract: Promise<VestingEscrowWalletContract_3_0_0>;
 
   /**
    * Instantiate VestingEscrowWalletWrapper
@@ -446,7 +446,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<VestingEscrowWalletContract>,
+    contract: Promise<VestingEscrowWalletContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -1082,11 +1082,11 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: VestingEscrowWalletSubscribeAsyncParams = async <
-    ArgsType extends VestingEscrowWalletEventArgs
+    ArgsType extends VestingEscrowWalletEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, VestingEscrowWalletEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, VestingEscrowWalletEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -1104,10 +1104,10 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetVestingEscrowWalletLogsAsyncParams = async <ArgsType extends VestingEscrowWalletEventArgs>(
+  public getLogsAsync: GetVestingEscrowWalletLogsAsyncParams = async <ArgsType extends VestingEscrowWalletEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, VestingEscrowWalletEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, VestingEscrowWalletEvents_3_0_0);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();

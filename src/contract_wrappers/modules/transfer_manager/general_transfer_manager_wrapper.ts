@@ -1,14 +1,14 @@
 import {
-  GeneralTransferManagerContract,
-  GeneralTransferManagerEventArgs,
-  GeneralTransferManagerEvents,
-  GeneralTransferManagerChangeIssuanceAddressEventArgs,
-  GeneralTransferManagerModifyKYCDataEventArgs,
-  GeneralTransferManagerModifyInvestorFlagEventArgs,
-  GeneralTransferManagerModifyTransferRequirementsEventArgs,
-  GeneralTransferManagerChangeDefaultsEventArgs,
-  GeneralTransferManagerPauseEventArgs,
-  GeneralTransferManagerUnpauseEventArgs,
+  GeneralTransferManagerContract_3_0_0,
+  GeneralTransferManagerEventArgs_3_0_0,
+  GeneralTransferManagerEvents_3_0_0,
+  GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0,
+  GeneralTransferManagerModifyKYCDataEventArgs_3_0_0,
+  GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0,
+  GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0,
+  GeneralTransferManagerChangeDefaultsEventArgs_3_0_0,
+  GeneralTransferManagerPauseEventArgs_3_0_0,
+  GeneralTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
@@ -43,66 +43,66 @@ import {
 const ONE_HUNDRED = new BigNumber(100);
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
-  callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeIssuanceAddress;
+  callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0>;
 }
 
 interface GetChangeIssuanceAddressLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeIssuanceAddress;
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeIssuanceAddress;
 }
 
 interface ChangeDefaultsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeDefaults;
-  callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeDefaults;
+  callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs_3_0_0>;
 }
 
 interface GetChangeDefaultsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ChangeDefaults;
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeDefaults;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.Pause;
-  callback: EventCallback<GeneralTransferManagerPauseEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<GeneralTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.Pause;
+  eventName: GeneralTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.Unpause;
-  callback: EventCallback<GeneralTransferManagerUnpauseEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<GeneralTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.Unpause;
+  eventName: GeneralTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface ModifyKYCDataSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyKYCData;
-  callback: EventCallback<GeneralTransferManagerModifyKYCDataEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyKYCData;
+  callback: EventCallback<GeneralTransferManagerModifyKYCDataEventArgs_3_0_0>;
 }
 
 interface GetModifyKYCDataLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyKYCData;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyKYCData;
 }
 
 interface ModifyInvestorFlagSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyInvestorFlag;
-  callback: EventCallback<GeneralTransferManagerModifyInvestorFlagEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyInvestorFlag;
+  callback: EventCallback<GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0>;
 }
 
 interface GetModifyInvestorFlagLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyInvestorFlag;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyInvestorFlag;
 }
 
 interface ModifyTransferRequirementsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyTransferRequirements;
-  callback: EventCallback<GeneralTransferManagerModifyTransferRequirementsEventArgs>;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements;
+  callback: EventCallback<GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0>;
 }
 
 interface GetModifyTransferRequirementsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralTransferManagerEvents.ModifyTransferRequirements;
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements;
 }
 
 interface GeneralTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -117,21 +117,21 @@ interface GeneralTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetChangeIssuanceAddressLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs>[]
+    LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0>[]
   >;
   (params: GetChangeDefaultsLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs>[]
+    LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs_3_0_0>[]>;
   (params: GetModifyKYCDataLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerModifyKYCDataEventArgs>[]
+    LogWithDecodedArgs<GeneralTransferManagerModifyKYCDataEventArgs_3_0_0>[]
   >;
   (params: GetModifyInvestorFlagLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerModifyInvestorFlagEventArgs>[]
+    LogWithDecodedArgs<GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0>[]
   >;
   (params: GetModifyTransferRequirementsLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralTransferManagerModifyTransferRequirementsEventArgs>[]
+    LogWithDecodedArgs<GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0>[]
   >;
 }
 
@@ -369,7 +369,7 @@ interface KYCDataWithInvestor extends KYCData {
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
 export default class GeneralTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<GeneralTransferManagerContract>;
+  protected contract: Promise<GeneralTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate GeneralTransferManagerWrapper
@@ -379,7 +379,7 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<GeneralTransferManagerContract>,
+    contract: Promise<GeneralTransferManagerContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -897,11 +897,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: GeneralTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends GeneralTransferManagerEventArgs
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -920,11 +920,11 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetGeneralTransferManagerLogsAsyncParams = async <
-    ArgsType extends GeneralTransferManagerEventArgs
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

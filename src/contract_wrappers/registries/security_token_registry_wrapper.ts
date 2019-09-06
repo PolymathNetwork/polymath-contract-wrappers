@@ -1,24 +1,24 @@
 import {
-  ISecurityTokenRegistryContract,
-  ISecurityTokenRegistryEvents,
-  ISecurityTokenRegistryEventArgs,
-  ISecurityTokenRegistryChangeExpiryLimitEventArgs,
-  ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs,
-  ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs,
-  ISecurityTokenRegistryNewSecurityTokenEventArgs,
-  ISecurityTokenRegistryOwnershipTransferredEventArgs,
-  ISecurityTokenRegistryPauseEventArgs,
-  ISecurityTokenRegistryUnpauseEventArgs,
-  ISecurityTokenRegistryRegisterTickerEventArgs,
-  ISecurityTokenRegistryTickerRemovedEventArgs,
-  ISecurityTokenRegistryChangeTickerOwnershipEventArgs,
-  ISecurityTokenRegistryChangeFeeCurrencyEventArgs,
-  ISecurityTokenRegistrySecurityTokenRefreshedEventArgs,
-  ISecurityTokenRegistryProtocolFactorySetEventArgs,
-  ISecurityTokenRegistryLatestVersionSetEventArgs,
-  ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
-  ISecurityTokenContract,
-  PolyTokenContract,
+  ISecurityTokenRegistryContract_3_0_0,
+  ISecurityTokenRegistryEvents_3_0_0,
+  ISecurityTokenRegistryEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0,
+  ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0,
+  ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0,
+  ISecurityTokenRegistryPauseEventArgs_3_0_0,
+  ISecurityTokenRegistryUnpauseEventArgs_3_0_0,
+  ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0,
+  ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0,
+  ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0,
+  ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0,
+  ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0,
+  ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenContract_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
@@ -52,138 +52,138 @@ import functionsUtils from '../../utils/functions_utils';
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ChangeFeeCurrencySubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
-  callback: EventCallback<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeFeeCurrency;
+  callback: EventCallback<ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0>;
 }
 
 interface GetChangeFeeCurrencyLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeFeeCurrency;
 }
 
 interface SecurityTokenRefreshedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.SecurityTokenRefreshed;
-  callback: EventCallback<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.SecurityTokenRefreshed;
+  callback: EventCallback<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0>;
 }
 
 interface GetSecurityTokenRefreshedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.SecurityTokenRefreshed;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.SecurityTokenRefreshed;
 }
 
 interface ProtocolFactorySetSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactorySet;
-  callback: EventCallback<ISecurityTokenRegistryProtocolFactorySetEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactorySet;
+  callback: EventCallback<ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0>;
 }
 
 interface GetProtocolFactorySetLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactorySet;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactorySet;
 }
 
 interface LatestVersionSetSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.LatestVersionSet;
-  callback: EventCallback<ISecurityTokenRegistryLatestVersionSetEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.LatestVersionSet;
+  callback: EventCallback<ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0>;
 }
 
 interface GetLatestVersionSetLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.LatestVersionSet;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.LatestVersionSet;
 }
 
 interface ProtocolFactoryRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactoryRemoved;
-  callback: EventCallback<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactoryRemoved;
+  callback: EventCallback<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0>;
 }
 
 interface GetProtocolFactoryRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactoryRemoved;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactoryRemoved;
 }
 
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeExpiryLimit;
-  callback: EventCallback<ISecurityTokenRegistryChangeExpiryLimitEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit;
+  callback: EventCallback<ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0>;
 }
 
 interface GetChangeExpiryLimitLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeExpiryLimit;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit;
 }
 
 interface ChangeSecurityLaunchFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeSecurityLaunchFee;
-  callback: EventCallback<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeSecurityLaunchFee;
+  callback: EventCallback<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0>;
 }
 
 interface GetChangeSecurityLaunchFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeSecurityLaunchFee;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeSecurityLaunchFee;
 }
 
 interface ChangeTickerOwnershipSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerOwnership;
-  callback: EventCallback<ISecurityTokenRegistryChangeTickerOwnershipEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerOwnership;
+  callback: EventCallback<ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0>;
 }
 
 interface GetChangeTickerOwnershipLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerOwnership;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerOwnership;
 }
 
 interface ChangeTickerRegistrationFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerRegistrationFee;
-  callback: EventCallback<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerRegistrationFee;
+  callback: EventCallback<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0>;
 }
 
 interface GetChangeTickerRegistrationFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerRegistrationFee;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerRegistrationFee;
 }
 
 interface NewSecurityTokenSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityToken;
-  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken;
+  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0>;
 }
 
 interface GetNewSecurityTokenLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityToken;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.OwnershipTransferred;
-  callback: EventCallback<ISecurityTokenRegistryOwnershipTransferredEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.OwnershipTransferred;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.OwnershipTransferred;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Pause;
-  callback: EventCallback<ISecurityTokenRegistryPauseEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Pause;
+  callback: EventCallback<ISecurityTokenRegistryPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Pause;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Pause;
 }
 
 interface RegisterTickerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.RegisterTicker;
-  callback: EventCallback<ISecurityTokenRegistryRegisterTickerEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker;
+  callback: EventCallback<ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0>;
 }
 
 interface GetRegisterTickerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.RegisterTicker;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker;
 }
 
 interface TickerRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.TickerRemoved;
-  callback: EventCallback<ISecurityTokenRegistryTickerRemovedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.TickerRemoved;
+  callback: EventCallback<ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0>;
 }
 
 interface GetTickerRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.TickerRemoved;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.TickerRemoved;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Unpause;
-  callback: EventCallback<ISecurityTokenRegistryUnpauseEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Unpause;
+  callback: EventCallback<ISecurityTokenRegistryUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Unpause;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Unpause;
 }
 
 interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
@@ -206,46 +206,46 @@ interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
 
 interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeeCurrencyLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0>[]
   >;
   (params: GetSecurityTokenRefreshedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0>[]
   >;
   (params: GetProtocolFactorySetLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactorySetEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0>[]
   >;
   (params: GetLatestVersionSetLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryLatestVersionSetEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0>[]
   >;
   (params: GetProtocolFactoryRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0>[]
   >;
   (params: GetChangeExpiryLimitLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeExpiryLimitEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0>[]
   >;
   (params: GetChangeSecurityLaunchFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0>[]
   >;
   (params: GetChangeTickerOwnershipLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerOwnershipEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0>[]
   >;
   (params: GetChangeTickerRegistrationFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0>[]
   >;
   (params: GetNewSecurityTokenLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0>[]
   >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryPauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryPauseEventArgs_3_0_0>[]>;
   (params: GetRegisterTickerLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryRegisterTickerEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0>[]
   >;
   (params: GetTickerRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryTickerRemovedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0>[]
   >;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace SecurityTokenRegistryTransactionParams {
@@ -514,15 +514,15 @@ interface TickerDetails {
  * This class includes the functionality related to interacting with the ISecurityTokenRegistry contract.
  */
 export default class SecurityTokenRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ISecurityTokenRegistryContract>;
+  protected contract: Promise<ISecurityTokenRegistryContract_3_0_0>;
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (address: string): Promise<ISecurityTokenContract> => {
+  protected securityTokenContract = async (address: string): Promise<ISecurityTokenContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
@@ -534,7 +534,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<ISecurityTokenRegistryContract>,
+    contract: Promise<ISecurityTokenRegistryContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -1238,11 +1238,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: SecurityTokenRegistrySubscribeAsyncParams = async <
-    ArgsType extends ISecurityTokenRegistryEventArgs
+    ArgsType extends ISecurityTokenRegistryEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -1261,11 +1261,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetISecurityTokenRegistryLogsAsyncParams = async <
-    ArgsType extends ISecurityTokenRegistryEventArgs
+    ArgsType extends ISecurityTokenRegistryEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

@@ -701,10 +701,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@polymathnetwork/abi-wrappers@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-3.0.0.tgz#eaf9daff64e650299fa87ae4269220ec945d0dba"
-  integrity sha512-CnV55bTz/Z89eb6cjgjkho9Z7KY0v34T8Ldw39YIci/XtIOVUBmtXBoV++cuYqYAtjte2P6EixLq0t4mp/uXbQ==
+"@polymathnetwork/abi-wrappers@4.0.0-beta.1":
+  version "4.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-4.0.0-beta.1.tgz#a5d231b8e6bf5b00861f040f7350226aecc6e4a4"
+  integrity sha512-H9AIe35i4gw8YyK+MAr2Ubc9M7pY3THeOFT2anobW8Nwi6XF0qjBfSt+Api/uwdb9KRzCPZWC57/8fZWUoHtUg==
   dependencies:
     "@0x/base-contract" "^5.1.1"
     "@0x/utils" "^4.4.0"

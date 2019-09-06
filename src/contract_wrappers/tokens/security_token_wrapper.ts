@@ -1,56 +1,56 @@
 import {
-  FeatureRegistryContract,
-  ISecurityTokenContract,
-  ModuleFactoryContract,
-  ModuleRegistryContract,
   PolyResponse,
-  PolyTokenContract,
-  SecurityTokenApprovalEventArgs,
-  SecurityTokenAuthorizedOperatorByPartitionEventArgs,
-  SecurityTokenAuthorizedOperatorEventArgs,
-  SecurityTokenCheckpointCreatedEventArgs,
-  SecurityTokenControllerRedemptionEventArgs,
-  SecurityTokenControllerTransferEventArgs,
-  SecurityTokenDisableControllerEventArgs,
-  SecurityTokenDocumentRemovedEventArgs,
-  SecurityTokenDocumentUpdatedEventArgs,
-  SecurityTokenEventArgs,
-  SecurityTokenEvents,
-  SecurityTokenFreezeIssuanceEventArgs,
-  SecurityTokenFreezeTransfersEventArgs,
-  SecurityTokenGranularityChangedEventArgs,
-  SecurityTokenIssuedByPartitionEventArgs,
-  SecurityTokenIssuedEventArgs,
-  SecurityTokenModuleAddedEventArgs,
-  SecurityTokenModuleArchivedEventArgs,
-  SecurityTokenModuleBudgetChangedEventArgs,
-  SecurityTokenModuleRemovedEventArgs,
-  SecurityTokenModuleUnarchivedEventArgs,
-  SecurityTokenModuleUpgradedEventArgs,
-  SecurityTokenOwnershipTransferredEventArgs,
-  SecurityTokenRedeemedByPartitionEventArgs,
-  SecurityTokenRedeemedEventArgs,
-  SecurityTokenRevokedOperatorByPartitionEventArgs,
-  SecurityTokenRevokedOperatorEventArgs,
-  SecurityTokenSetControllerEventArgs,
-  SecurityTokenTokenUpgradedEventArgs,
-  SecurityTokenTransferByPartitionEventArgs,
-  SecurityTokenTransferEventArgs,
-  SecurityTokenTreasuryWalletChangedEventArgs,
-  SecurityTokenUpdateTokenDetailsEventArgs,
-  SecurityTokenUpdateTokenNameEventArgs,
+  FeatureRegistryContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  ModuleFactoryContract_3_0_0,
+  ModuleRegistryContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  ISecurityTokenApprovalEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorEventArgs_3_0_0,
+  ISecurityTokenCheckpointCreatedEventArgs_3_0_0,
+  ISecurityTokenControllerRedemptionEventArgs_3_0_0,
+  ISecurityTokenControllerTransferEventArgs_3_0_0,
+  ISecurityTokenDisableControllerEventArgs_3_0_0,
+  ISecurityTokenDocumentRemovedEventArgs_3_0_0,
+  ISecurityTokenDocumentUpdatedEventArgs_3_0_0,
+  ISecurityTokenEventArgs_3_0_0,
+  ISecurityTokenEvents_3_0_0,
+  ISecurityTokenFreezeIssuanceEventArgs_3_0_0,
+  ISecurityTokenFreezeTransfersEventArgs_3_0_0,
+  ISecurityTokenGranularityChangedEventArgs_3_0_0,
+  ISecurityTokenIssuedByPartitionEventArgs_3_0_0,
+  ISecurityTokenIssuedEventArgs_3_0_0,
+  ISecurityTokenModuleAddedEventArgs_3_0_0,
+  ISecurityTokenModuleArchivedEventArgs_3_0_0,
+  ISecurityTokenModuleBudgetChangedEventArgs_3_0_0,
+  ISecurityTokenModuleRemovedEventArgs_3_0_0,
+  ISecurityTokenModuleUnarchivedEventArgs_3_0_0,
+  // ISecurityTokenModuleUpgradedEventArgs_3_0_0,
+  ISecurityTokenOwnershipTransferredEventArgs_3_0_0,
+  ISecurityTokenRedeemedByPartitionEventArgs_3_0_0,
+  ISecurityTokenRedeemedEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorEventArgs_3_0_0,
+  ISecurityTokenSetControllerEventArgs_3_0_0,
+  ISecurityTokenTokenUpgradedEventArgs_3_0_0,
+  ISecurityTokenTransferByPartitionEventArgs_3_0_0,
+  ISecurityTokenTransferEventArgs_3_0_0,
+  ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0,
+  ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0,
+  ISecurityTokenUpdateTokenNameEventArgs_3_0_0,
+  EtherDividendCheckpointContract_3_0_0,
+  CountTransferManagerContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,
+  CappedSTOContract_3_0_0,
+  USDTieredSTOContract_3_0_0,
+  ERC20DividendCheckpointContract_3_0_0,
+  VestingEscrowWalletContract_3_0_0,
   TxData,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
   ethers,
-  EtherDividendCheckpointContract,
-  CountTransferManagerContract,
-  PercentageTransferManagerContract,
-  CappedSTOContract,
-  USDTieredSTOContract,
-  ERC20DividendCheckpointContract,
-  VestingEscrowWalletContract,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -94,298 +94,298 @@ const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Approval;
-  callback: EventCallback<SecurityTokenApprovalEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.Approval;
+  callback: EventCallback<ISecurityTokenApprovalEventArgs_3_0_0>;
 }
 
 interface GetApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Approval;
+  eventName: ISecurityTokenEvents_3_0_0.Approval;
 }
 
 interface TransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Transfer;
-  callback: EventCallback<SecurityTokenTransferEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.Transfer;
+  callback: EventCallback<ISecurityTokenTransferEventArgs_3_0_0>;
 }
 
 interface GetTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Transfer;
+  eventName: ISecurityTokenEvents_3_0_0.Transfer;
 }
 
 interface ModuleAddedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleAdded;
-  callback: EventCallback<SecurityTokenModuleAddedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
+  callback: EventCallback<ISecurityTokenModuleAddedEventArgs_3_0_0>;
 }
 
 interface GetModuleAddedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleAdded;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
 }
 
-interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleUpgraded;
-  callback: EventCallback<SecurityTokenModuleUpgradedEventArgs>;
-}
+// interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
+//   callback: EventCallback<ISecurityTokenModuleUpgradedEventArgs_3_0_0>;
+// }
 
-interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleUpgraded;
-}
+// interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
+// }
 
 interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.UpdateTokenDetails;
-  callback: EventCallback<SecurityTokenUpdateTokenDetailsEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  callback: EventCallback<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenDetailsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.UpdateTokenDetails;
+  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
 }
 
 interface UpdateTokenNameSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.UpdateTokenName;
-  callback: EventCallback<SecurityTokenUpdateTokenNameEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
+  callback: EventCallback<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenNameLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.UpdateTokenName;
+  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
 }
 
 interface GranularityChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.GranularityChanged;
-  callback: EventCallback<SecurityTokenGranularityChangedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
+  callback: EventCallback<ISecurityTokenGranularityChangedEventArgs_3_0_0>;
 }
 
 interface GetGranularityChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.GranularityChanged;
+  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
 }
 
 interface ModuleArchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleArchived;
-  callback: EventCallback<SecurityTokenModuleArchivedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
+  callback: EventCallback<ISecurityTokenModuleArchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleArchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleArchived;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
 }
 
 interface ModuleUnarchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleUnarchived;
-  callback: EventCallback<SecurityTokenModuleUnarchivedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
+  callback: EventCallback<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleUnarchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleUnarchived;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
 }
 
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleRemoved;
-  callback: EventCallback<SecurityTokenModuleRemovedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
+  callback: EventCallback<ISecurityTokenModuleRemovedEventArgs_3_0_0>;
 }
 
 interface GetModuleRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleRemoved;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
 }
 
 interface ModuleBudgetChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ModuleBudgetChanged;
-  callback: EventCallback<SecurityTokenModuleBudgetChangedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  callback: EventCallback<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>;
 }
 
 interface GetModuleBudgetChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ModuleBudgetChanged;
+  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
 }
 
 interface TransferByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.TransferByPartition;
-  callback: EventCallback<SecurityTokenTransferByPartitionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
+  callback: EventCallback<ISecurityTokenTransferByPartitionEventArgs_3_0_0>;
 }
 
 interface GetTransferByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.TransferByPartition;
+  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
 }
 
 interface AuthorizedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.AuthorizedOperator;
-  callback: EventCallback<SecurityTokenAuthorizedOperatorEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
+  callback: EventCallback<ISecurityTokenAuthorizedOperatorEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.AuthorizedOperator;
+  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
 }
 
 interface RevokedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.RevokedOperator;
-  callback: EventCallback<SecurityTokenRevokedOperatorEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
+  callback: EventCallback<ISecurityTokenRevokedOperatorEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.RevokedOperator;
+  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
 }
 
 interface AuthorizedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.AuthorizedOperatorByPartition;
-  callback: EventCallback<SecurityTokenAuthorizedOperatorByPartitionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  callback: EventCallback<ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.AuthorizedOperatorByPartition;
+  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
 }
 
 interface RevokedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.RevokedOperatorByPartition;
-  callback: EventCallback<SecurityTokenRevokedOperatorByPartitionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  callback: EventCallback<ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.RevokedOperatorByPartition;
+  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
 }
 
 interface IssuedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.IssuedByPartition;
-  callback: EventCallback<SecurityTokenIssuedByPartitionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
+  callback: EventCallback<ISecurityTokenIssuedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetIssuedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.IssuedByPartition;
+  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
 }
 
 interface RedeemedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.RedeemedByPartition;
-  callback: EventCallback<SecurityTokenRedeemedByPartitionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
+  callback: EventCallback<ISecurityTokenRedeemedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRedeemedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.RedeemedByPartition;
+  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
 }
 
 interface ControllerTransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ControllerTransfer;
-  callback: EventCallback<SecurityTokenControllerTransferEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
+  callback: EventCallback<ISecurityTokenControllerTransferEventArgs_3_0_0>;
 }
 
 interface GetControllerTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ControllerTransfer;
+  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
 }
 
 interface ControllerRedemptionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.ControllerRedemption;
-  callback: EventCallback<SecurityTokenControllerRedemptionEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
+  callback: EventCallback<ISecurityTokenControllerRedemptionEventArgs_3_0_0>;
 }
 
 interface GetControllerRedemptionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.ControllerRedemption;
+  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
 }
 
 interface DocumentRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.DocumentRemoved;
-  callback: EventCallback<SecurityTokenDocumentRemovedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
+  callback: EventCallback<ISecurityTokenDocumentRemovedEventArgs_3_0_0>;
 }
 
 interface GetDocumentRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.DocumentRemoved;
+  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
 }
 
 interface DocumentUpdatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.DocumentUpdated;
-  callback: EventCallback<SecurityTokenDocumentUpdatedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
+  callback: EventCallback<ISecurityTokenDocumentUpdatedEventArgs_3_0_0>;
 }
 
 interface GetDocumentUpdatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.DocumentUpdated;
+  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
 }
 
 interface FreezeTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.FreezeTransfers;
-  callback: EventCallback<SecurityTokenFreezeTransfersEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
+  callback: EventCallback<ISecurityTokenFreezeTransfersEventArgs_3_0_0>;
 }
 
 interface GetFreezeTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.FreezeTransfers;
+  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
 }
 
 interface CheckpointCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.CheckpointCreated;
-  callback: EventCallback<SecurityTokenCheckpointCreatedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
+  callback: EventCallback<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>;
 }
 
 interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.CheckpointCreated;
+  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
 }
 
 interface FreezeIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.FreezeIssuance;
-  callback: EventCallback<SecurityTokenFreezeIssuanceEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
+  callback: EventCallback<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>;
 }
 
 interface GetFreezeIssuanceLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.FreezeIssuance;
+  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
 }
 
 interface IssuedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Issued;
-  callback: EventCallback<SecurityTokenIssuedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.Issued;
+  callback: EventCallback<ISecurityTokenIssuedEventArgs_3_0_0>;
 }
 
 interface GetIssuedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Issued;
+  eventName: ISecurityTokenEvents_3_0_0.Issued;
 }
 
 interface RedeemedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.Redeemed;
-  callback: EventCallback<SecurityTokenRedeemedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
+  callback: EventCallback<ISecurityTokenRedeemedEventArgs_3_0_0>;
 }
 
 interface GetRedeemedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.Redeemed;
+  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
 }
 
 interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.SetController;
-  callback: EventCallback<SecurityTokenSetControllerEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.SetController;
+  callback: EventCallback<ISecurityTokenSetControllerEventArgs_3_0_0>;
 }
 
 interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.SetController;
+  eventName: ISecurityTokenEvents_3_0_0.SetController;
 }
 
 interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.TreasuryWalletChanged;
-  callback: EventCallback<SecurityTokenTreasuryWalletChangedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  callback: EventCallback<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>;
 }
 
 interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.TreasuryWalletChanged;
+  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
 }
 
 interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.DisableController;
-  callback: EventCallback<SecurityTokenDisableControllerEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.DisableController;
+  callback: EventCallback<ISecurityTokenDisableControllerEventArgs_3_0_0>;
 }
 
 interface GetDisableControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.DisableController;
+  eventName: ISecurityTokenEvents_3_0_0.DisableController;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.OwnershipTransferred;
-  callback: EventCallback<SecurityTokenOwnershipTransferredEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.OwnershipTransferred;
+  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
 }
 
 interface TokenUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: SecurityTokenEvents.TokenUpgraded;
-  callback: EventCallback<SecurityTokenTokenUpgradedEventArgs>;
+  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
+  callback: EventCallback<ISecurityTokenTokenUpgradedEventArgs_3_0_0>;
 }
 
 interface GetTokenUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: SecurityTokenEvents.TokenUpgraded;
+  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
 }
 
 interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: ApprovalSubscribeAsyncParams): Promise<string>;
   (params: TransferSubscribeAsyncParams): Promise<string>;
   (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
-  (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
+  // (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenNameSubscribeAsyncParams): Promise<string>;
   (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
@@ -417,56 +417,56 @@ interface SecurityTokenSubscribeAsyncParams extends Subscribe {
 }
 
 interface GetSecurityTokenLogsAsyncParams extends GetLogs {
-  (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenApprovalEventArgs>[]>;
-  (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTransferEventArgs>[]>;
-  (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleAddedEventArgs>[]>;
-  (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs>[]>;
+  (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenApprovalEventArgs_3_0_0>[]>;
+  (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTransferEventArgs_3_0_0>[]>;
+  (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleAddedEventArgs_3_0_0>[]>;
+  // (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenUpdateTokenDetailsEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>[]
   >;
-  (params: GetUpdateTokenNameLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenUpdateTokenNameEventArgs>[]>;
+  (params: GetUpdateTokenNameLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>[]>;
   (params: GetGranularityChangedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenGranularityChangedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenGranularityChangedEventArgs_3_0_0>[]
   >;
-  (params: GetModuleArchivedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleArchivedEventArgs>[]>;
-  (params: GetModuleUnarchivedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUnarchivedEventArgs>[]>;
-  (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleRemovedEventArgs>[]>;
+  (params: GetModuleArchivedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleArchivedEventArgs_3_0_0>[]>;
+  (params: GetModuleUnarchivedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>[]>;
+  (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleRemovedEventArgs_3_0_0>[]>;
   (params: GetModuleBudgetChangedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenModuleBudgetChangedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
   >;
   (params: GetTransferByPartitionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenModuleBudgetChangedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
   >;
-  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetRevokedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetRevokedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
   (params: GetAuthorizedOperatorByPartitionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
   (params: GetRevokedOperatorByPartitionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
-  (params: GetIssuedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetControllerTransferLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
+  (params: GetIssuedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetControllerTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
   (params: GetControllerRedemptionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
-  (params: GetDocumentRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetDocumentUpdatedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetFreezeTransfersLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeTransfersEventArgs>[]>;
-  (params: GetCheckpointCreatedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenCheckpointCreatedEventArgs>[]>;
-  (params: GetFreezeIssuanceLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenFreezeIssuanceEventArgs>[]>;
-  (params: GetIssuedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenIssuedEventArgs>[]>;
-  (params: GetRedeemedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenRedeemedEventArgs>[]>;
-  (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenSetControllerEventArgs>[]>;
+  (params: GetDocumentRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetDocumentUpdatedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetFreezeTransfersLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetCheckpointCreatedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>[]>;
+  (params: GetFreezeIssuanceLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>[]>;
+  (params: GetIssuedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenIssuedEventArgs_3_0_0>[]>;
+  (params: GetRedeemedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRedeemedEventArgs_3_0_0>[]>;
+  (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenSetControllerEventArgs_3_0_0>[]>;
   (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenTreasuryWalletChangedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>[]
   >;
-  (params: GetDisableControllerLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenDisableControllerEventArgs>[]>;
+  (params: GetDisableControllerLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenDisableControllerEventArgs_3_0_0>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<SecurityTokenOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>[]
   >;
-  (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenTokenUpgradedEventArgs>[]>;
+  (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTokenUpgradedEventArgs_3_0_0>[]>;
 }
 
 export namespace SecurityTokenTransactionParams {
@@ -1098,23 +1098,23 @@ interface ProduceAddModuleInformation {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  protected contract: Promise<ISecurityTokenContract>;
+  protected contract: Promise<ISecurityTokenContract_3_0_0>;
 
   protected contractFactory: ContractFactory;
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract> => {
+  protected featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract> => {
+  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract> => {
+  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
     return this.contractFactory.getModuleRegistryContract();
   };
 
@@ -1125,7 +1125,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<ISecurityTokenContract>,
+    contract: Promise<ISecurityTokenContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -2271,10 +2271,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: SecurityTokenSubscribeAsyncParams = async <ArgsType extends SecurityTokenEventArgs>(
+  public subscribeAsync: SecurityTokenSubscribeAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -2292,10 +2292,10 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetSecurityTokenLogsAsyncParams = async <ArgsType extends SecurityTokenEventArgs>(
+  public getLogsAsync: GetSecurityTokenLogsAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -2472,15 +2472,15 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     let data: string;
     switch (params.moduleName) {
       case ModuleName.VestingEscrowWallet:
-        iface = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+        iface = new ethers.utils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet]);
         break;
       case ModuleName.CountTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManagerContract.ABI());
+        iface = new ethers.utils.Interface(CountTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
       case ModuleName.PercentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManagerContract.ABI());
+        iface = new ethers.utils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           valueToWei(
             (params.data as PercentageTransferManagerData).maxHolderPercentage,
@@ -2491,7 +2491,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTOContract.ABI());
+        iface = new ethers.utils.Interface(CappedSTOContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -2503,7 +2503,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTOContract.ABI());
+        iface = new ethers.utils.Interface(USDTieredSTOContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
@@ -2529,12 +2529,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract.ABI());
+        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpointContract.ABI());
+        iface = new ethers.utils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       default:

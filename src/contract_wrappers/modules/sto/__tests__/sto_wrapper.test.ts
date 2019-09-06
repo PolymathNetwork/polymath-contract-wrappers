@@ -1,6 +1,6 @@
 // STOWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { CappedSTOContract, ISecurityTokenContract, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { CappedSTOContract_3_0_0, ISecurityTokenContract_3_0_0, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../capped_sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -12,15 +12,15 @@ describe('STOWrapper', () => {
   // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
   let target: CappedSTOWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: CappedSTOContract;
+  let mockedContract: CappedSTOContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(CappedSTOContract);
+    mockedContract = mock(CappedSTOContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));

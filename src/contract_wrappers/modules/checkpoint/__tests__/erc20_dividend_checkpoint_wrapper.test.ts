@@ -1,10 +1,10 @@
 // ERC20DividendCheckpointWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  ERC20DividendCheckpointContract,
-  ISecurityTokenContract,
-  PolyTokenEvents,
-  ERC20DetailedContract,
+  ERC20DividendCheckpointContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenEvents_3_0_0,
+  ERC20DetailedContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -18,17 +18,17 @@ describe('ERC20DividendCheckpointWrapper', () => {
   // ERC20 Dividend Wrapper is used as contract target here as DividendCheckpoint is abstract
   let target: ERC20DividendCheckpointWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ERC20DividendCheckpointContract;
+  let mockedContract: ERC20DividendCheckpointContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
-  let mockedERC20DetailedContract: ERC20DetailedContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
+  let mockedERC20DetailedContract: ERC20DetailedContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ERC20DividendCheckpointContract);
+    mockedContract = mock(ERC20DividendCheckpointContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
-    mockedERC20DetailedContract = mock(ERC20DetailedContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
+    mockedERC20DetailedContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new ERC20DividendCheckpointWrapper(
@@ -607,7 +607,7 @@ describe('ERC20DividendCheckpointWrapper', () => {
     test('should throw as eventName does not belong to Checkpoint Events', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

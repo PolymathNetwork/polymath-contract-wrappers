@@ -1,21 +1,21 @@
 import {
-  GeneralTransferManagerContract,
-  USDTieredSTOContract,
-  USDTieredSTOEventArgs,
-  USDTieredSTOEvents,
-  USDTieredSTOFundsReceivedEventArgs,
-  USDTieredSTOPauseEventArgs,
-  USDTieredSTOReserveTokenMintEventArgs,
-  USDTieredSTOSetAddressesEventArgs,
-  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs,
-  USDTieredSTOSetFundRaiseTypesEventArgs,
-  USDTieredSTOSetLimitsEventArgs,
-  USDTieredSTOSetNonAccreditedLimitEventArgs,
-  USDTieredSTOSetTiersEventArgs,
-  USDTieredSTOSetTimesEventArgs,
-  USDTieredSTOSetTreasuryWalletEventArgs,
-  USDTieredSTOTokenPurchaseEventArgs,
-  USDTieredSTOUnpauseEventArgs,
+  GeneralTransferManagerContract_3_0_0,
+  USDTieredSTOContract_3_0_0,
+  USDTieredSTOEventArgs_3_0_0,
+  USDTieredSTOEvents_3_0_0,
+  USDTieredSTOFundsReceivedEventArgs_3_0_0,
+  USDTieredSTOPauseEventArgs_3_0_0,
+  USDTieredSTOReserveTokenMintEventArgs_3_0_0,
+  USDTieredSTOSetAddressesEventArgs_3_0_0,
+  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0,
+  USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0,
+  USDTieredSTOSetLimitsEventArgs_3_0_0,
+  USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0,
+  USDTieredSTOSetTiersEventArgs_3_0_0,
+  USDTieredSTOSetTimesEventArgs_3_0_0,
+  USDTieredSTOSetTreasuryWalletEventArgs_3_0_0,
+  USDTieredSTOTokenPurchaseEventArgs_3_0_0,
+  USDTieredSTOUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   BigNumber,
   LogWithDecodedArgs,
@@ -52,120 +52,120 @@ import GeneralTransferManagerWrapper from '../transfer_manager/general_transfer_
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
-  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments;
+  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0>;
 }
 
 interface GetSetAllowBeneficialInvestmentsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAllowBeneficialInvestments;
+  eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments;
 }
 
 interface SetNonAccreditedLimitSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetNonAccreditedLimit;
-  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetNonAccreditedLimit;
+  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0>;
 }
 
 interface GetSetNonAccreditedLimitLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetNonAccreditedLimit;
+  eventName: USDTieredSTOEvents_3_0_0.SetNonAccreditedLimit;
 }
 
 interface SetTreasuryWalletSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetTreasuryWallet;
-  callback: EventCallback<USDTieredSTOSetTreasuryWalletEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetTreasuryWallet;
+  callback: EventCallback<USDTieredSTOSetTreasuryWalletEventArgs_3_0_0>;
 }
 
 interface GetSetTreasuryWalletLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetTreasuryWallet;
+  eventName: USDTieredSTOEvents_3_0_0.SetTreasuryWallet;
 }
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.TokenPurchase;
-  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.TokenPurchase;
+  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs_3_0_0>;
 }
 
 interface GetTokenPurchaseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.TokenPurchase;
+  eventName: USDTieredSTOEvents_3_0_0.TokenPurchase;
 }
 
 interface FundsReceivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.FundsReceived;
-  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.FundsReceived;
+  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs_3_0_0>;
 }
 
 interface GetFundsReceivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.FundsReceived;
+  eventName: USDTieredSTOEvents_3_0_0.FundsReceived;
 }
 
 interface ReserveTokenMintSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.ReserveTokenMint;
-  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.ReserveTokenMint;
+  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs_3_0_0>;
 }
 
 interface GetReserveTokenMintLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.ReserveTokenMint;
+  eventName: USDTieredSTOEvents_3_0_0.ReserveTokenMint;
 }
 
 interface SetAddressesSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetAddresses;
-  callback: EventCallback<USDTieredSTOSetAddressesEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetAddresses;
+  callback: EventCallback<USDTieredSTOSetAddressesEventArgs_3_0_0>;
 }
 
 interface GetSetAddressesLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetAddresses;
+  eventName: USDTieredSTOEvents_3_0_0.SetAddresses;
 }
 
 interface SetLimitsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetLimits;
-  callback: EventCallback<USDTieredSTOSetLimitsEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetLimits;
+  callback: EventCallback<USDTieredSTOSetLimitsEventArgs_3_0_0>;
 }
 
 interface GetSetLimitsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetLimits;
+  eventName: USDTieredSTOEvents_3_0_0.SetLimits;
 }
 
 interface SetTimesSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetTimes;
-  callback: EventCallback<USDTieredSTOSetTimesEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetTimes;
+  callback: EventCallback<USDTieredSTOSetTimesEventArgs_3_0_0>;
 }
 
 interface GetSetTimesLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetTimes;
+  eventName: USDTieredSTOEvents_3_0_0.SetTimes;
 }
 
 interface SetTiersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetTiers;
-  callback: EventCallback<USDTieredSTOSetTiersEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetTiers;
+  callback: EventCallback<USDTieredSTOSetTiersEventArgs_3_0_0>;
 }
 
 interface GetSetTiersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetTiers;
+  eventName: USDTieredSTOEvents_3_0_0.SetTiers;
 }
 
 interface SetFundRaiseTypesSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.SetFundRaiseTypes;
-  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.SetFundRaiseTypes;
+  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0>;
 }
 
 interface GetSetFundRaiseTypesLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.SetFundRaiseTypes;
+  eventName: USDTieredSTOEvents_3_0_0.SetFundRaiseTypes;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.Pause;
-  callback: EventCallback<USDTieredSTOPauseEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.Pause;
+  callback: EventCallback<USDTieredSTOPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.Pause;
+  eventName: USDTieredSTOEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: USDTieredSTOEvents.Unpause;
-  callback: EventCallback<USDTieredSTOUnpauseEventArgs>;
+  eventName: USDTieredSTOEvents_3_0_0.Unpause;
+  callback: EventCallback<USDTieredSTOUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: USDTieredSTOEvents.Unpause;
+  eventName: USDTieredSTOEvents_3_0_0.Unpause;
 }
 
 interface USDTieredSTOSubscribeAsyncParams extends Subscribe {
@@ -186,22 +186,22 @@ interface USDTieredSTOSubscribeAsyncParams extends Subscribe {
 
 interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
   (params: GetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<
-    LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs>[]
+    LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0>[]
   >;
   (params: GetSetNonAccreditedLimitLogsAsyncParams): Promise<
-    LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs>[]
+    LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0>[]
   >;
-  (params: GetSetTreasuryWalletLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTreasuryWalletEventArgs>[]>;
-  (params: GetTokenPurchaseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs>[]>;
-  (params: GetFundsReceivedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs>[]>;
-  (params: GetReserveTokenMintLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs>[]>;
-  (params: GetSetAddressesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs>[]>;
-  (params: GetSetLimitsLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs>[]>;
-  (params: GetSetTimesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs>[]>;
-  (params: GetSetTiersLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs>[]>;
-  (params: GetSetFundRaiseTypesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs>[]>;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs>[]>;
+  (params: GetSetTreasuryWalletLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTreasuryWalletEventArgs_3_0_0>[]>;
+  (params: GetTokenPurchaseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs_3_0_0>[]>;
+  (params: GetFundsReceivedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs_3_0_0>[]>;
+  (params: GetReserveTokenMintLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs_3_0_0>[]>;
+  (params: GetSetAddressesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs_3_0_0>[]>;
+  (params: GetSetLimitsLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs_3_0_0>[]>;
+  (params: GetSetTimesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs_3_0_0>[]>;
+  (params: GetSetTiersLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs_3_0_0>[]>;
+  (params: GetSetFundRaiseTypesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace USDTieredSTOTransactionParams {
@@ -456,9 +456,9 @@ interface MintedByTier {
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
 export default class USDTieredSTOWrapper extends STOWrapper {
-  protected contract: Promise<USDTieredSTOContract>;
+  protected contract: Promise<USDTieredSTOContract_3_0_0>;
 
-  protected generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract> => {
+  protected generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract_3_0_0> => {
     return this.contractFactory.getGeneralTransferManagerContract(address);
   };
 
@@ -469,7 +469,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<USDTieredSTOContract>,
+    contract: Promise<USDTieredSTOContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -1110,10 +1110,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: USDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+  public subscribeAsync: USDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -1131,10 +1131,10 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs>(
+  public getLogsAsync: GetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

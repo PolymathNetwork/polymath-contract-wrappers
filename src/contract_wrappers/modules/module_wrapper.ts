@@ -1,8 +1,8 @@
 import {
-  ISecurityTokenContract,
-  ModuleFactoryContract,
-  PolyTokenContract,
-  ERC20DetailedContract,
+  ISecurityTokenContract_3_0_0,
+  ModuleFactoryContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  ERC20DetailedContract_3_0_0,
   Web3Wrapper,
   TxData,
   BigNumber,
@@ -10,7 +10,7 @@ import {
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { PolymathError } from '../../PolymathError';
-import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode } from '../../types';
+import { TxParams, GenericModuleContract_3_0_0, GetLogs, Subscribe, ErrorCode } from '../../types';
 import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
@@ -26,24 +26,24 @@ interface ReclaimERC20Params extends TxParams {
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class ModuleWrapper extends ContractWrapper {
-  protected contract: Promise<GenericModuleContract>;
+  protected contract: Promise<GenericModuleContract_3_0_0>;
 
   protected contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (): Promise<ISecurityTokenContract> => {
+  protected securityTokenContract = async (): Promise<ISecurityTokenContract_3_0_0> => {
     const address = await (await this.contract).securityToken.callAsync();
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract> => {
+  protected detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
     return this.contractFactory.getERC20DetailedContract(address);
   };
 
-  protected moduleFactoryContract = async (): Promise<ModuleFactoryContract> => {
+  protected moduleFactoryContract = async (): Promise<ModuleFactoryContract_3_0_0> => {
     const address = await (await this.contract).factory.callAsync();
     return this.contractFactory.getModuleFactoryContract(address);
   };
@@ -59,7 +59,7 @@ export default class ModuleWrapper extends ContractWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<GenericModuleContract>,
+    contract: Promise<GenericModuleContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);

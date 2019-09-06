@@ -1,9 +1,9 @@
 // CountTransferManager test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  CountTransferManagerContract,
-  ISecurityTokenContract,
-  PolyTokenEvents,
+  CountTransferManagerContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -16,15 +16,15 @@ import { numberToBigNumber } from '../../../../utils/convert';
 describe('CountTransferManagerWrapper', () => {
   let target: CountTransferManagerWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: CountTransferManagerContract;
+  let mockedContract: CountTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(CountTransferManagerContract);
+    mockedContract = mock(CountTransferManagerContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new CountTransferManagerWrapper(
@@ -282,7 +282,7 @@ describe('CountTransferManagerWrapper', () => {
     test('should throw as eventName does not belong to CountTransferManager', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

@@ -1,9 +1,9 @@
 import {
-  FeatureRegistryContract,
-  FeatureRegistryEventArgs,
-  FeatureRegistryEvents,
-  FeatureRegistryChangeFeatureStatusEventArgs,
-  FeatureRegistryOwnershipTransferredEventArgs,
+  FeatureRegistryContract_3_0_0,
+  FeatureRegistryEventArgs_3_0_0,
+  FeatureRegistryEvents_3_0_0,
+  FeatureRegistryChangeFeatureStatusEventArgs_3_0_0,
+  FeatureRegistryOwnershipTransferredEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
@@ -23,21 +23,21 @@ import {
 import functionsUtils from '../../utils/functions_utils';
 
 interface ChangeFeatureStatusSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.ChangeFeatureStatus;
-  callback: EventCallback<FeatureRegistryChangeFeatureStatusEventArgs>;
+  eventName: FeatureRegistryEvents_3_0_0.ChangeFeatureStatus;
+  callback: EventCallback<FeatureRegistryChangeFeatureStatusEventArgs_3_0_0>;
 }
 
 interface GetChangeFeatureStatusLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.ChangeFeatureStatus;
+  eventName: FeatureRegistryEvents_3_0_0.ChangeFeatureStatus;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipTransferred;
-  callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs>;
+  eventName: FeatureRegistryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<FeatureRegistryOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: FeatureRegistryEvents.OwnershipTransferred;
+  eventName: FeatureRegistryEvents_3_0_0.OwnershipTransferred;
 }
 
 interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
@@ -47,10 +47,10 @@ interface FeatureRegistrySubscribeAsyncParams extends Subscribe {
 
 interface GetFeatureRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeatureStatusLogsAsyncParams): Promise<
-    LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs>[]
+    LogWithDecodedArgs<FeatureRegistryChangeFeatureStatusEventArgs_3_0_0>[]
   >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<FeatureRegistryOwnershipTransferredEventArgs_3_0_0>[]
   >;
 }
 
@@ -78,14 +78,14 @@ interface SetFeatureStatusParams extends TxParams {
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
 export default class FeatureRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<FeatureRegistryContract>;
+  protected contract: Promise<FeatureRegistryContract_3_0_0>;
 
   /**
    * Instantiate FeatureRegistryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<FeatureRegistryContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<FeatureRegistryContract_3_0_0>) {
     super(web3Wrapper, contract);
     this.contract = contract;
   }
@@ -145,10 +145,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: FeatureRegistrySubscribeAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+  public subscribeAsync: FeatureRegistrySubscribeAsyncParams = async <ArgsType extends FeatureRegistryEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -166,10 +166,10 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetFeatureRegistryLogsAsyncParams = async <ArgsType extends FeatureRegistryEventArgs>(
+  public getLogsAsync: GetFeatureRegistryLogsAsyncParams = async <ArgsType extends FeatureRegistryEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, FeatureRegistryEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

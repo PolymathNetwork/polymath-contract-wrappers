@@ -1,8 +1,8 @@
 // DividendCheckpointWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  EtherDividendCheckpointContract,
-  ISecurityTokenContract,
+  EtherDividendCheckpointContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -25,15 +25,15 @@ describe('DividendCheckpointWrapper', () => {
   // ERC20 Dividend Wrapper is used as contract target here as DividendCheckpoint is abstract
   let target: EtherDividendCheckpointWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: EtherDividendCheckpointContract;
+  let mockedContract: EtherDividendCheckpointContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(EtherDividendCheckpointContract);
+    mockedContract = mock(EtherDividendCheckpointContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new EtherDividendCheckpointWrapper(

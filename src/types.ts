@@ -1,80 +1,79 @@
 import {
-  PolyTokenEventArgs,
-  PolyTokenEvents,
-  CappedSTOFactoryEventArgs,
-  CappedSTOEventArgs,
-  ERC20DetailedEventArgs,
-  ERC20DetailedEvents,
-  ERC20DividendCheckpointEventArgs,
-  EtherDividendCheckpointEventArgs,
-  FeatureRegistryEventArgs,
-  GeneralTransferManagerEventArgs,
-  ManualApprovalTransferManagerEventArgs,
-  ModuleFactoryEventArgs,
-  ModuleRegistryEventArgs,
-  PolyTokenFaucetEventArgs,
-  PolymathRegistryEventArgs,
-  SecurityTokenRegistryEventArgs,
-  SecurityTokenEventArgs,
-  USDTieredSTOFactoryEventArgs,
-  USDTieredSTOEventArgs,
-  CappedSTOFactoryEvents,
-  CappedSTOEvents,
-  ERC20DividendCheckpointEvents,
-  EtherDividendCheckpointEvents,
-  FeatureRegistryEvents,
-  GeneralTransferManagerEvents,
-  ManualApprovalTransferManagerEvents,
-  ModuleFactoryEvents,
-  ModuleRegistryEvents,
-  PolyTokenFaucetEvents,
-  PolymathRegistryEvents,
-  SecurityTokenRegistryEvents,
-  ISecurityTokenRegistryEvents,
-  SecurityTokenEvents,
-  USDTieredSTOFactoryEvents,
-  USDTieredSTOEvents,
-  GeneralPermissionManagerEventArgs,
-  GeneralPermissionManagerEvents,
-  ModuleContract,
-  GeneralPermissionManagerContract,
-  GeneralTransferManagerContract,
-  CappedSTOContract,
-  USDTieredSTOContract,
-  ERC20DividendCheckpointContract,
-  STOContract,
-  STOEvents,
-  STOEventArgs,
-  ERC20DetailedContract,
-  PolyTokenContract,
-  ISecurityTokenContract,
-  EtherDividendCheckpointContract,
-  ManualApprovalTransferManagerContract,
-  CountTransferManagerContract,
-  CountTransferManagerEventArgs,
-  CountTransferManagerEvents,
-  PercentageTransferManagerContract,
-  PercentageTransferManagerEventArgs,
-  PercentageTransferManagerEvents,
-  VolumeRestrictionTMContract,
-  VolumeRestrictionTMEvents,
-  VolumeRestrictionTMEventArgs,
-  VestingEscrowWalletEventArgs,
-  VestingEscrowWalletContract,
-  VestingEscrowWalletEvents,
-  LockUpTransferManagerEventArgs,
-  LockUpTransferManagerContract,
-  LockUpTransferManagerEvents,
-  BlacklistTransferManagerEventArgs,
-  BlacklistTransferManagerContract,
-  BlacklistTransferManagerEvents,
-  PolyTokenFaucetContract,
+  PolyTokenEventArgs_3_0_0,
+  PolyTokenEvents_3_0_0,
+  CappedSTOFactoryEventArgs_3_0_0,
+  CappedSTOEventArgs_3_0_0,
+  ERC20DetailedEventArgs_3_0_0,
+  ERC20DetailedEvents_3_0_0,
+  ERC20DividendCheckpointEventArgs_3_0_0,
+  EtherDividendCheckpointEventArgs_3_0_0,
+  FeatureRegistryEventArgs_3_0_0,
+  GeneralTransferManagerEventArgs_3_0_0,
+  ManualApprovalTransferManagerEventArgs_3_0_0,
+  ModuleFactoryEventArgs_3_0_0,
+  ModuleRegistryEventArgs_3_0_0,
+  PolyTokenFaucetEventArgs_3_0_0,
+  PolymathRegistryEventArgs_3_0_0,  
+  USDTieredSTOFactoryEventArgs_3_0_0,
+  USDTieredSTOEventArgs_3_0_0,
+  CappedSTOFactoryEvents_3_0_0,
+  CappedSTOEvents_3_0_0,
+  ERC20DividendCheckpointEvents_3_0_0,
+  EtherDividendCheckpointEvents_3_0_0,
+  FeatureRegistryEvents_3_0_0,
+  GeneralTransferManagerEvents_3_0_0,
+  ManualApprovalTransferManagerEvents_3_0_0,
+  ModuleFactoryEvents_3_0_0,
+  ModuleRegistryEvents_3_0_0,
+  PolyTokenFaucetEvents_3_0_0,
+  PolymathRegistryEvents_3_0_0,
+  ISecurityTokenRegistryEvents_3_0_0,
+  USDTieredSTOFactoryEvents_3_0_0,
+  USDTieredSTOEvents_3_0_0,
+  GeneralPermissionManagerEventArgs_3_0_0,
+  GeneralPermissionManagerEvents_3_0_0,
+  ModuleContract_3_0_0,
+  GeneralPermissionManagerContract_3_0_0,
+  GeneralTransferManagerContract_3_0_0,
+  CappedSTOContract_3_0_0,
+  USDTieredSTOContract_3_0_0,
+  ERC20DividendCheckpointContract_3_0_0,
+  STOContract_3_0_0,
+  STOEvents_3_0_0,
+  STOEventArgs_3_0_0,
+  ERC20DetailedContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  EtherDividendCheckpointContract_3_0_0,
+  ManualApprovalTransferManagerContract_3_0_0,
+  CountTransferManagerContract_3_0_0,
+  CountTransferManagerEventArgs_3_0_0,
+  CountTransferManagerEvents_3_0_0,
+  PercentageTransferManagerContract_3_0_0,
+  PercentageTransferManagerEventArgs_3_0_0,
+  PercentageTransferManagerEvents_3_0_0,
+  VolumeRestrictionTMContract_3_0_0,
+  VolumeRestrictionTMEvents_3_0_0,
+  VolumeRestrictionTMEventArgs_3_0_0,
+  VestingEscrowWalletEventArgs_3_0_0,
+  VestingEscrowWalletContract_3_0_0,
+  VestingEscrowWalletEvents_3_0_0,
+  LockUpTransferManagerEventArgs_3_0_0,
+  LockUpTransferManagerContract_3_0_0,
+  LockUpTransferManagerEvents_3_0_0,
+  BlacklistTransferManagerEventArgs_3_0_0,
+  BlacklistTransferManagerContract_3_0_0,
+  BlacklistTransferManagerEvents_3_0_0,
+  PolyTokenFaucetContract_3_0_0,
   TxData,
   BigNumber,
   ContractEventArg,
   DecodedLogArgs,
   LogWithDecodedArgs,
   BlockParam,
+  ISecurityTokenEvents_3_0_0,
+  ISecurityTokenEventArgs_3_0_0,
+  ISecurityTokenRegistryEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 
 /**
@@ -218,60 +217,63 @@ export interface BlockRange {
   toBlock: BlockParam;
 }
 
-export type ContractEventArgs =
-  | PolyTokenEventArgs
-  | CappedSTOFactoryEventArgs
-  | CappedSTOEventArgs
-  | ERC20DetailedEventArgs
-  | ERC20DividendCheckpointEventArgs
-  | EtherDividendCheckpointEventArgs
-  | FeatureRegistryEventArgs
-  | GeneralPermissionManagerEventArgs
-  | GeneralTransferManagerEventArgs
-  | ManualApprovalTransferManagerEventArgs
-  | ModuleFactoryEventArgs
-  | ModuleRegistryEventArgs
-  | PolyTokenFaucetEventArgs
-  | PolymathRegistryEventArgs
-  | SecurityTokenRegistryEventArgs
-  | SecurityTokenEventArgs
-  | USDTieredSTOFactoryEventArgs
-  | USDTieredSTOEventArgs
-  | STOEventArgs
-  | CountTransferManagerEventArgs
-  | PercentageTransferManagerEventArgs
-  | LockUpTransferManagerEventArgs
-  | VolumeRestrictionTMEventArgs
-  | BlacklistTransferManagerEventArgs
-  | VestingEscrowWalletEventArgs;
+export type ContractEventArgs_3_0_0 =
+  | PolyTokenEventArgs_3_0_0
+  | CappedSTOFactoryEventArgs_3_0_0
+  | CappedSTOEventArgs_3_0_0
+  | ERC20DetailedEventArgs_3_0_0
+  | ERC20DividendCheckpointEventArgs_3_0_0
+  | EtherDividendCheckpointEventArgs_3_0_0
+  | FeatureRegistryEventArgs_3_0_0
+  | GeneralPermissionManagerEventArgs_3_0_0
+  | GeneralTransferManagerEventArgs_3_0_0
+  | ManualApprovalTransferManagerEventArgs_3_0_0
+  | ModuleFactoryEventArgs_3_0_0
+  | ModuleRegistryEventArgs_3_0_0
+  | PolyTokenFaucetEventArgs_3_0_0
+  | PolymathRegistryEventArgs_3_0_0
+  | USDTieredSTOFactoryEventArgs_3_0_0
+  | USDTieredSTOEventArgs_3_0_0
+  | ISecurityTokenEventArgs_3_0_0
+  | ISecurityTokenRegistryEventArgs_3_0_0
+  | STOEventArgs_3_0_0
+  | CountTransferManagerEventArgs_3_0_0
+  | PercentageTransferManagerEventArgs_3_0_0
+  | LockUpTransferManagerEventArgs_3_0_0
+  | VolumeRestrictionTMEventArgs_3_0_0
+  | BlacklistTransferManagerEventArgs_3_0_0
+  | VestingEscrowWalletEventArgs_3_0_0;
 
-export type ContractEvents =
-  | PolyTokenEvents
-  | CappedSTOFactoryEvents
-  | CappedSTOEvents
-  | ERC20DetailedEvents
-  | ERC20DividendCheckpointEvents
-  | EtherDividendCheckpointEvents
-  | FeatureRegistryEvents
-  | GeneralPermissionManagerEvents
-  | GeneralTransferManagerEvents
-  | ManualApprovalTransferManagerEvents
-  | ModuleFactoryEvents
-  | ModuleRegistryEvents
-  | PolyTokenFaucetEvents
-  | PolymathRegistryEvents
-  | SecurityTokenRegistryEvents
-  | ISecurityTokenRegistryEvents
-  | SecurityTokenEvents
-  | USDTieredSTOFactoryEvents
-  | USDTieredSTOEvents
-  | STOEvents
-  | CountTransferManagerEvents
-  | PercentageTransferManagerEvents
-  | VestingEscrowWalletEvents
-  | LockUpTransferManagerEvents
-  | BlacklistTransferManagerEvents
-  | VolumeRestrictionTMEvents;
+export type ContractEventArgs = ContractEventArgs_3_0_0;
+
+export type ContractEvents_3_0_0 =
+  | PolyTokenEvents_3_0_0
+  | CappedSTOFactoryEvents_3_0_0
+  | CappedSTOEvents_3_0_0
+  | ERC20DetailedEvents_3_0_0
+  | ERC20DividendCheckpointEvents_3_0_0
+  | EtherDividendCheckpointEvents_3_0_0
+  | FeatureRegistryEvents_3_0_0
+  | GeneralPermissionManagerEvents_3_0_0
+  | GeneralTransferManagerEvents_3_0_0
+  | ManualApprovalTransferManagerEvents_3_0_0
+  | ModuleFactoryEvents_3_0_0
+  | ModuleRegistryEvents_3_0_0
+  | PolyTokenFaucetEvents_3_0_0
+  | PolymathRegistryEvents_3_0_0
+  | ISecurityTokenRegistryEvents_3_0_0
+  | ISecurityTokenEvents_3_0_0
+  | USDTieredSTOFactoryEvents_3_0_0
+  | USDTieredSTOEvents_3_0_0
+  | STOEvents_3_0_0
+  | CountTransferManagerEvents_3_0_0
+  | PercentageTransferManagerEvents_3_0_0
+  | VestingEscrowWalletEvents_3_0_0
+  | LockUpTransferManagerEvents_3_0_0
+  | BlacklistTransferManagerEvents_3_0_0
+  | VolumeRestrictionTMEvents_3_0_0;
+
+export type ContractEvents = ContractEvents_3_0_0;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -308,30 +310,38 @@ export interface Subscribe {
   (params: SubscribeAsyncParams): Promise<string>;
 }
 
-export type ERC20Contract =
-  | ERC20DetailedContract
-  | ISecurityTokenContract
-  | PolyTokenContract
-  | PolyTokenFaucetContract;
+export type ERC20Contract_3_0_0 =
+  | ERC20DetailedContract_3_0_0
+  | ISecurityTokenContract_3_0_0
+  | PolyTokenContract_3_0_0
+  | PolyTokenFaucetContract_3_0_0;
 
-export type GenericModuleContract =
-  | ModuleContract
-  | GeneralPermissionManagerContract
-  | GeneralTransferManagerContract
-  | STOBaseContract
-  | DividendCheckpointBaseContract
-  | ManualApprovalTransferManagerContract
-  | CountTransferManagerContract
-  | PercentageTransferManagerContract
-  | VolumeRestrictionTMContract
-  | VestingEscrowWalletContract
-  | LockUpTransferManagerContract
-  | BlacklistTransferManagerContract
-  | VolumeRestrictionTMContract;
+export type ERC20Contract = ERC20Contract_3_0_0;
 
-export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
+export type GenericModuleContract_3_0_0 =
+  | ModuleContract_3_0_0
+  | GeneralPermissionManagerContract_3_0_0
+  | GeneralTransferManagerContract_3_0_0
+  | STOBaseContract_3_0_0
+  | DividendCheckpointBaseContract_3_0_0
+  | ManualApprovalTransferManagerContract_3_0_0
+  | CountTransferManagerContract_3_0_0
+  | PercentageTransferManagerContract_3_0_0
+  | VolumeRestrictionTMContract_3_0_0
+  | VestingEscrowWalletContract_3_0_0
+  | LockUpTransferManagerContract_3_0_0
+  | BlacklistTransferManagerContract_3_0_0
+  | VolumeRestrictionTMContract_3_0_0;
 
-export type DividendCheckpointBaseContract = ERC20DividendCheckpointContract | EtherDividendCheckpointContract;
+export type GenericModuleContract = GenericModuleContract_3_0_0;
+
+export type STOBaseContract_3_0_0 = STOContract_3_0_0 | CappedSTOContract_3_0_0 | USDTieredSTOContract_3_0_0;
+
+export type STOBaseContract = STOBaseContract_3_0_0;
+
+export type DividendCheckpointBaseContract_3_0_0 = ERC20DividendCheckpointContract_3_0_0 | EtherDividendCheckpointContract_3_0_0;
+
+export type DividendCheckpointBaseContract = DividendCheckpointBaseContract_3_0_0;
 
 export const PERCENTAGE_DECIMALS = new BigNumber(16);
 export const FULL_DECIMALS = new BigNumber(18);
