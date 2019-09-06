@@ -60,6 +60,10 @@ interface GetVolumeRestrictionTransferManager extends GetModuleParams {
   name: ModuleName.VolumeRestrictionTM;
 }
 
+interface GetRestrictedPartialSaleTransferManager extends GetModuleParams {
+  name: ModuleName.RestrictedPartialSaleTM;
+}
+
 interface GetCappedSTO extends GetModuleParams {
   name: ModuleName.CappedSTO;
 }
@@ -85,6 +89,7 @@ interface GetModuleInstance {
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
+  (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTOWrapper>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTOWrapper>;
   (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpointWrapper>;
