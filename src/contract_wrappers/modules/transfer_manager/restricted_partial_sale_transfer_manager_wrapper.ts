@@ -104,7 +104,7 @@ interface ChangeExemptWalletListMultiParams extends TxParams {
 }
 
 /**
- * This class includes the functionality related to interacting with the Volume Restricted Partial Sale Transfer Manager contract.
+ * This class includes the functionality related to interacting with the Restricted Partial Sale Transfer Manager contract.
  */
 export default class RestrictedPartialSaleTransferManagerWrapper extends ModuleWrapper {
   protected contract: Promise<RestrictedPartialSaleTMContract>;
