@@ -101,4 +101,39 @@ window.addEventListener('load', async () => {
       treasuryWallet: '0x2320351c4670a19C3DD05789d2648DD129A14669',
     },
   });
+
+  const restrictedPartialSaleAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.RestrictedPartialSaleTM,
+  }))[0];
+
+  const restrictedPartialSale = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.RestrictedPartialSaleTM,
+    address: restrictedPartialSaleAddress,
+  });
+
+  // Get General TM Address and allow all transfers so we can test unlocked account transfers
+  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+    moduleName: ModuleName.GeneralTransferManager,
+  }))[0];
+  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
+    name: ModuleName.GeneralTransferManager,
+    address: generalTMAddress,
+  });
+
+  const randomBeneficiaries = [
+    '0x3444444444444444444444444444444444444444',
+    '0x5544444444444444444444444444444444444444',
+    '0x6644444444444444444444444444444444444444',
+  ];
+  // Add all address in the whitelist
+  await generalTM.modifyKYCDataMulti({
+    investors: randomBeneficiaries.concat(myAddress),
+    canSendAfter: [new Date(), new Date(), new Date(), new Date()],
+    canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
+    txData: {
+      from: await polymathAPI.getAccount(),
+    },
+  });
+  console.log('Kyc data modified');
 });
