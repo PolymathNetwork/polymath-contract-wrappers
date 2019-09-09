@@ -1,6 +1,7 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { PolyTokenEvents, SecurityTokenRegistryEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { registerTicker } from './example_components/registerTickerComponent';
 
 // This file acts as a valid sandbox.ts file in root directory for register a new Ticker on an unlocked node (like ganache)
 
@@ -32,7 +33,7 @@ window.addEventListener('load', async () => {
       if (error) {
         console.log(error);
       } else {
-        await registerTicker();
+        console.log('Tokens approved');
       }
     },
   });
@@ -44,43 +45,14 @@ window.addEventListener('load', async () => {
       if (error) {
         console.log(error);
       } else {
-        console.log('Ticker registered!', log);
+        console.log('Ticker Registered!', log);
       }
     },
   });
 
-  const registerTicker = async () => {
-    await polymathAPI.securityTokenRegistry.registerTicker({
-      ticker: ticker!,
-      tokenName: tokenName!,
-    });
-  };
+  // Register ticker
+  await registerTicker(polymathAPI, ticker ? ticker : '', myAddress);
+  console.log('Ticker was registered successfully!');
 
-  const tickerAvailable = await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
-  });
-
-  if (tickerAvailable) {
-    const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-    const polyBalance = await polymathAPI.polyToken.balanceOf();
-    if (polyBalance.isGreaterThanOrEqualTo(tickerFee)) {
-      const owner = await polymathAPI.getAccount();
-      const spender = await polymathAPI.securityTokenRegistry.address();
-      const allowance = await polymathAPI.polyToken.allowance({
-        owner,
-        spender,
-      });
-      if (allowance.isLessThan(tickerFee)) {
-        await polymathAPI.polyToken.approve({
-          spender,
-          value: tickerFee,
-        });
-      }
-
-      await registerTicker();
-    }
-  }
-
-  await polymathAPI.polyToken.unsubscribeAll();
-  await polymathAPI.securityTokenRegistry.unsubscribeAll();
+  polymathAPI.securityTokenRegistry.unsubscribeAll();
 });
