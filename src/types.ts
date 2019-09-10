@@ -333,7 +333,6 @@ export type GenericModuleContract =
   | VestingEscrowWalletContract
   | LockUpTransferManagerContract
   | BlacklistTransferManagerContract
-  | VolumeRestrictionTMContract
   | RestrictedPartialSaleTMContract;
 
 export type STOBaseContract = STOContract | CappedSTOContract | USDTieredSTOContract;
