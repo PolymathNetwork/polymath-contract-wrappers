@@ -95,6 +95,7 @@ export {
 export {
   default as RestrictedPartialSaleTransferManager,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+export { default as VestingEscrowWallet } from './contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export {
@@ -319,6 +320,20 @@ export {
   RestrictedPartialSaleTMEventArgs,
   RestrictedPartialSaleTMEvents,
   RestrictedPartialSaleTMChangedExemptWalletListEventArgs,
+  VestingEscrowWalletContract,
+  VestingEscrowWalletEventArgs,
+  VestingEscrowWalletEvents,
+  VestingEscrowWalletAddScheduleEventArgs,
+  VestingEscrowWalletModifyScheduleEventArgs,
+  VestingEscrowWalletRevokeAllSchedulesEventArgs,
+  VestingEscrowWalletRevokeScheduleEventArgs,
+  VestingEscrowWalletDepositTokensEventArgs,
+  VestingEscrowWalletSendToTreasuryEventArgs,
+  VestingEscrowWalletSendTokensEventArgs,
+  VestingEscrowWalletAddTemplateEventArgs,
+  VestingEscrowWalletRemoveTemplateEventArgs,
+  VestingEscrowWalletTreasuryWalletChangedEventArgs,
+  VestingEscrowWalletPauseEventArgs,
   BlockParamLiteral,
   TransactionReceiptWithDecodedLogs,
   LogEntry,
