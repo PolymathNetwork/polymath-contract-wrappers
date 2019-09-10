@@ -41,9 +41,7 @@ import {
   ISecurityTokenUpdateTokenNameEventArgs_3_0_0,
   EtherDividendCheckpointContract_3_0_0,
   CountTransferManagerContract_3_0_0,
-  PercentageTransferManagerContract_3_0_0,
-  CappedSTOContract_3_0_0,
-  USDTieredSTOContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,  
   ERC20DividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
   TxData,
@@ -51,6 +49,8 @@ import {
   LogWithDecodedArgs,
   BigNumber,
   ethersUtils,
+  CappedSTOContract_3_1_0,
+  USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -2435,6 +2435,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public cappedSTOAssertions = async (data: CappedSTOData) => {
     assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
+    assert.isNonZeroETHAddressHex('Treasury Wallet', data.treasuryWallet);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
@@ -2495,7 +2496,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethersUtils.Interface(CappedSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(CappedSTOContract_3_1_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -2503,11 +2504,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
           [(params.data as CappedSTOData).fundRaiseType], // the module's configure function expects an array
           (params.data as CappedSTOData).fundsReceiver,
+          (params.data as CappedSTOData).treasuryWallet,
         ]);
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethersUtils.Interface(USDTieredSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(USDTieredSTOContract_3_1_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
