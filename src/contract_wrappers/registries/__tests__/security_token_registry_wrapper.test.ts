@@ -18,7 +18,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToBytes32,
+  stringToKeccak256,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { FULL_DECIMALS, FeeType } from '../../../types';
@@ -881,13 +881,13 @@ describe('SecurityTokenRegistryWrapper', () => {
       const mockedParams = {
         feeType: FeeType.TickerRegFee,
       };
-      const bytes32 = stringToBytes32('tickerRegFee');
+      const keccak256 = stringToKeccak256('tickerRegFee');
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getFees).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(objectContaining(bytes32))).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(objectContaining(keccak256))).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getFees(mockedParams);
@@ -895,7 +895,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       expect(result).toEqual(expectedResult);
       // Verifications
       verify(mockedContract.getFees).once();
-      verify(mockedMethod.callAsync(objectContaining(bytes32))).once();
+      verify(mockedMethod.callAsync(objectContaining(keccak256))).once();
     });
   });
 

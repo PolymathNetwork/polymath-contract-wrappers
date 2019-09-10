@@ -9,7 +9,11 @@ export function bytes32ToString(value: string): string {
 }
 
 export function stringToBytes32(value: string): string {
-  return ethers.utils.formatBytes32String(value);
+  return ethers.utils.formatBytes32String(value);  
+}
+
+export function stringToKeccak256(value: string): string {
+  return ethers.utils.id(value);
 }
 
 export function checksumAddress(value: string): string {
