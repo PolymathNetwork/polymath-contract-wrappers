@@ -169,16 +169,26 @@ interface VestingEscrowWalletSubscribeAsyncParams extends Subscribe {
 
 interface GetVestingEscrowWalletLogsAsyncParams extends GetLogs {
   (params: GetAddScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddScheduleEventArgs_3_0_0>[]>;
-  (params: GetModifyScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletModifyScheduleEventArgs_3_0_0>[]>;
+  (params: GetModifyScheduleLogsAsyncParams): Promise<
+    LogWithDecodedArgs<VestingEscrowWalletModifyScheduleEventArgs_3_0_0>[]
+  >;
   (params: GetRevokeAllSchedulesLogsAsyncParams): Promise<
     LogWithDecodedArgs<VestingEscrowWalletRevokeAllSchedulesEventArgs_3_0_0>[]
   >;
-  (params: GetRevokeScheduleLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRevokeScheduleEventArgs_3_0_0>[]>;
-  (params: GetDepositTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletDepositTokensEventArgs_3_0_0>[]>;
-  (params: GetSendToTreasuryLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendToTreasuryEventArgs_3_0_0>[]>;
+  (params: GetRevokeScheduleLogsAsyncParams): Promise<
+    LogWithDecodedArgs<VestingEscrowWalletRevokeScheduleEventArgs_3_0_0>[]
+  >;
+  (params: GetDepositTokensLogsAsyncParams): Promise<
+    LogWithDecodedArgs<VestingEscrowWalletDepositTokensEventArgs_3_0_0>[]
+  >;
+  (params: GetSendToTreasuryLogsAsyncParams): Promise<
+    LogWithDecodedArgs<VestingEscrowWalletSendToTreasuryEventArgs_3_0_0>[]
+  >;
   (params: GetSendTokensLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletSendTokensEventArgs_3_0_0>[]>;
   (params: GetAddTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletAddTemplateEventArgs_3_0_0>[]>;
-  (params: GetRemoveTemplateLogsAsyncParams): Promise<LogWithDecodedArgs<VestingEscrowWalletRemoveTemplateEventArgs_3_0_0>[]>;
+  (params: GetRemoveTemplateLogsAsyncParams): Promise<
+    LogWithDecodedArgs<VestingEscrowWalletRemoveTemplateEventArgs_3_0_0>[]
+  >;
   (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<VestingEscrowWalletTreasuryWalletChangedEventArgs_3_0_0>[]
   >;
@@ -1049,6 +1059,53 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
+  /**
+   * Returns a list of templates for a given template name
+   * @param templateName Name of the template
+   * @return List of templates
+   * 3.1.0
+   */
+  public templates = async (templateName: string) => {
+    const templates = await (await this.contract).templates.callAsync(stringToBytes32(templateName));
+    return templates;
+  };
+
+  /**
+   * Returns the schedule count per template
+   * @param templateName Name of the template
+   * @return count of schedules
+   * 3.1.0
+   */
+  public getSchedulesCountByTemplate = async (templateName: string) => {
+    assert.assert(templateName !== '', ErrorCode.InvalidData, 'Invalid name');
+    const schedulesCount = await (await this.contract).getSchedulesCountByTemplate.callAsync(
+      stringToBytes32(templateName),
+    );
+    return schedulesCount;
+  };
+
+  /**
+   * Returns the list of all beneficiary
+   * @return List of addresses
+   * 3.1.0
+   */
+  public getAllBeneficiaries = async () => {
+    const result = await (await this.contract).getAllBeneficiaries.callAsync();
+    return result;
+  };
+
+  /**
+   * Returns the tokens quantity that can be withdrawn from the contract at a moment
+   * @param beneficiary Address of the beneficiary
+   * @return availableTokens Tokens amount that are available to withdraw
+   * 3.1.0
+   */
+  public getAvailableTokens = async (beneficiary: string) => {
+    assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
+    const result = await (await this.contract).getAvailableTokens.callAsync(beneficiary);
+    return result;
+  };
+
   public validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
     assert.assert(numberOfTokens.toNumber() > 0, ErrorCode.InvalidData, 'Zero amount');
     assert.assert(duration % frequency === 0, ErrorCode.InvalidData, 'Invalid frequency');
@@ -1104,7 +1161,9 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetVestingEscrowWalletLogsAsyncParams = async <ArgsType extends VestingEscrowWalletEventArgs_3_0_0>(
+  public getLogsAsync: GetVestingEscrowWalletLogsAsyncParams = async <
+    ArgsType extends VestingEscrowWalletEventArgs_3_0_0
+  >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, VestingEscrowWalletEvents_3_0_0);
