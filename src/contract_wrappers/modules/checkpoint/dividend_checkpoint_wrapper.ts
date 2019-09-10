@@ -219,13 +219,13 @@ interface CheckpointData {
  * This class includes the functionality related to interacting with the DividendCheckpoint contract.
  */
 export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
-  protected abstract contract: Promise<DividendCheckpointBaseContract_3_0_0>;
+  public abstract contract: Promise<DividendCheckpointBaseContract_3_0_0>;
 
-  protected erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
+  public erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
     return this.contractFactory.getERC20DetailedContract(address);
   };
 
-  protected abstract getDecimals(dividendIndex: number): Promise<BigNumber>;
+  public abstract getDecimals(dividendIndex: number): Promise<BigNumber>;
 
   /**
    *  wallet
@@ -597,7 +597,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return Promise.all(typedResult);
   };
 
-  private pushDividendsData = async (
+  public pushDividendsData = async (
     result: [BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], string[]],
     i: number,
   ): Promise<DividendData> => {
@@ -650,7 +650,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return Promise.all(typedResult);
   };
 
-  private pushDividendProgress = async (
+  public pushDividendProgress = async (
     result: [string[], boolean[], boolean[], BigNumber[], BigNumber[], BigNumber[]],
     i: number,
     dividendIndex: number,
@@ -685,7 +685,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return Promise.all(typedResult);
   };
 
-  private pushCheckpointData = async (
+  public pushCheckpointData = async (
     result: [string[], BigNumber[], BigNumber[]],
     i: number,
   ): Promise<CheckpointData> => {
@@ -725,12 +725,12 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     return (await this.contract).isExcluded.callAsync(params.investor, numberToBigNumber(params.dividendIndex));
   };
 
-  private isValidDividendIndex = async (dividendIndex: number): Promise<boolean> => {
+  public isValidDividendIndex = async (dividendIndex: number): Promise<boolean> => {
     const dividendsData = await (await this.contract).getDividendsData.callAsync();
     return dividendIndex < dividendsData[0].length;
   };
 
-  private checkValidDividend = async (dividendIndex: number) => {
+  public checkValidDividend = async (dividendIndex: number) => {
     assert.assert(await this.isValidDividendIndex(dividendIndex), ErrorCode.InvalidDividend, 'Invalid dividend index');
     const dividend = await this.getDividendData({ dividendIndex });
     assert.assert(
@@ -742,7 +742,7 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
     assert.isFutureDate(dividend.expiry, 'Dividend expiry in past');
   };
 
-  protected checkIfDividendCreationIsValid = async (
+  public checkIfDividendCreationIsValid = async (
     expiry: Date,
     maturity: Date,
     amount: BigNumber,

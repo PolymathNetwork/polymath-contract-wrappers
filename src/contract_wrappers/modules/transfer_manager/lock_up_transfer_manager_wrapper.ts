@@ -348,7 +348,7 @@ interface VerifyTransfer {
  * This class includes the functionality related to interacting with the LockUp Transfer Manager contract.
  */
 export default class LockUpTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<LockUpTransferManagerContract_3_0_0>;
+  public contract: Promise<LockUpTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate LockUpTransferManagerWrapper
@@ -918,19 +918,19 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return logs;
   };
 
-  private checkAddNewLockUpType = async (params: LockUpTypeParams) => {
+  public checkAddNewLockUpType = async (params: LockUpTypeParams) => {
     await this.checkLockUpTypeInformation(params);
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isBigNumberZero(lockup.lockupAmount, 'LockUp already exists');
   };
 
-  private checkModifyLockUpType = async (params: LockUpTypeParams) => {
+  public checkModifyLockUpType = async (params: LockUpTypeParams) => {
     await this.checkLockUpTypeInformation(params);
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isNotDateZero(lockup.startTime, 'LockUp already exists');
   };
 
-  private checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
+  public checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.assert(
@@ -946,7 +946,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };
 
-  private checkAddLockUpByName = async (params: LockUpByNameParams) => {
+  public checkAddLockUpByName = async (params: LockUpByNameParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isNonZeroETHAddressHex('User Address', params.userAddress);
     const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
@@ -959,7 +959,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(lockup.startTime, 'Start time must be in the future');
   };
 
-  private checkRemoveLockUpFromUser = async (params: LockUpByNameParams) => {
+  public checkRemoveLockUpFromUser = async (params: LockUpByNameParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isNonZeroETHAddressHex('User Address', params.userAddress);
     const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
@@ -970,7 +970,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkRemoveLockUpType = async (lockupName: string) => {
+  public checkRemoveLockUpType = async (lockupName: string) => {
     assert.assert(lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     const lockup = await this.getLockUp({ lockupName });
     assert.isNotDateZero(lockup.startTime, 'Lockup does not exist');

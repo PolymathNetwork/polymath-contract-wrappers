@@ -436,7 +436,7 @@ interface BeneficiarySchedule {
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
 export default class VestingEscrowWalletWrapper extends ModuleWrapper {
-  protected contract: Promise<VestingEscrowWalletContract_3_0_0>;
+  public contract: Promise<VestingEscrowWalletContract_3_0_0>;
 
   /**
    * Instantiate VestingEscrowWalletWrapper
@@ -1049,7 +1049,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     );
   };
 
-  private validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
+  public validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
     assert.assert(numberOfTokens.toNumber() > 0, ErrorCode.InvalidData, 'Zero amount');
     assert.assert(duration % frequency === 0, ErrorCode.InvalidData, 'Invalid frequency');
     const periodCount = duration / frequency;
@@ -1059,20 +1059,20 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
     assert.assert(amountPerPeriod % granularity.toNumber() === 0, ErrorCode.InvalidData, 'Invalid granularity');
   };
 
-  private validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {
+  public validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
     assert.assert((await this.getScheduleCount({ beneficiary })) === 0, ErrorCode.AlreadyExists, 'Already added');
     assert.assert(startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
   };
 
-  private validateAddScheduleFromTemplate = async (beneficiary: string, templateName: string, startTime: Date) => {
+  public validateAddScheduleFromTemplate = async (beneficiary: string, templateName: string, startTime: Date) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
     assert.assert((await this.getAllTemplateNames()).includes(templateName), ErrorCode.NotFound, 'Template not found');
     assert.assert((await this.getScheduleCount({ beneficiary })) === 0, ErrorCode.AlreadyExists, 'Already added');
     assert.assert(startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
   };
 
-  private checkSchedule = (beneficiary: string) => {
+  public checkSchedule = (beneficiary: string) => {
     assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
     // TODO: userToTemplateIndex[_beneficiary][_templateName]
   };

@@ -369,7 +369,7 @@ interface KYCDataWithInvestor extends KYCData {
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
 export default class GeneralTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<GeneralTransferManagerContract_3_0_0>;
+  public contract: Promise<GeneralTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate GeneralTransferManagerWrapper
@@ -513,13 +513,13 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
     return result;
   };
 
-  private isFlagTrue = (flagPosition: FlagsType, packedFlags: number) => {
+  public isFlagTrue = (flagPosition: FlagsType, packedFlags: number) => {
     // eslint-disable-next-line no-bitwise
     const bitInFlagPosition = (packedFlags >> flagPosition) & 1;
     return !!bitInFlagPosition;
   };
 
-  private unpackFlags = (investor: string, flags: BigNumber) => {
+  public unpackFlags = (investor: string, flags: BigNumber) => {
     let isAccredited = false;
     let canNotBuyFromSTO = false;
     let isVolRestricted = false;

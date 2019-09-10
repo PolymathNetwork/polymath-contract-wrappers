@@ -12,19 +12,19 @@ import { PolymathError } from '../PolymathError';
  * The SecurityTokenFactory class is a factory to generate new SecurityTokenWrappers.
  */
 export default class TokenWrapperFactory {
-  private readonly web3Wrapper: Web3Wrapper;
+  public readonly web3Wrapper: Web3Wrapper;
 
   /**
    * An instance of the ContractFactory class containing methods
    * to create instances for each contract.
    */
-  private contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
   /**
    * An instance of the SecurityTokenRegistryWrapper class containing methods
    * for interacting with SecurityTokenRegistry smart contract.
    */
-  private securityTokenRegistry: SecurityTokenRegistryWrapper;
+  public securityTokenRegistry: SecurityTokenRegistryWrapper;
 
   public constructor(
     web3Wrapper: Web3Wrapper,

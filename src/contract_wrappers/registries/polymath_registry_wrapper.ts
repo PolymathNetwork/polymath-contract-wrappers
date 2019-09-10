@@ -19,6 +19,7 @@ import {
   GetLogs,
   Subscribe,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -76,7 +77,9 @@ interface ChangeAddressParams extends TxParams {
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
  */
 export default class PolymathRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<PolymathRegistryContract_3_0_0>;
+  public contract: Promise<PolymathRegistryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate PolymathRegistryWrapper
@@ -209,7 +212,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private async getAddressInternal(contractName: string) {
+  public async getAddressInternal(contractName: string) {
     return (await this.contract).getAddress.callAsync(contractName);
   }
 }

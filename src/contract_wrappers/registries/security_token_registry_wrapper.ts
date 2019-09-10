@@ -37,6 +37,7 @@ import {
   FULL_DECIMALS,
   FeeType,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -514,15 +515,17 @@ interface TickerDetails {
  * This class includes the functionality related to interacting with the ISecurityTokenRegistry contract.
  */
 export default class SecurityTokenRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ISecurityTokenRegistryContract_3_0_0>;
+  public contract: Promise<ISecurityTokenRegistryContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (address: string): Promise<ISecurityTokenContract_3_0_0> => {
+  public contractVersion = ContractVersion.V3_0_0;
+
+  public securityTokenContract = async (address: string): Promise<ISecurityTokenContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
+  public polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
@@ -1276,7 +1279,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private getTickerDetailsInternal = async (ticker: string) => {
+  public getTickerDetailsInternal = async (ticker: string) => {
     const result = await (await this.contract).getTickerDetails.callAsync(ticker);
     const typedResult: TickerDetails = {
       owner: result[0],
@@ -1288,7 +1291,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return typedResult;
   };
 
-  private checkWhenNotPausedOrOwner = async () => {
+  public checkWhenNotPausedOrOwner = async () => {
     if (
       !functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -1303,7 +1306,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     }
   };
 
-  private checkOnlyOwner = async () => {
+  public checkOnlyOwner = async () => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -1314,7 +1317,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkRegisterTickerRequirements = async (ticker: string, owner: string) => {
+  public checkRegisterTickerRequirements = async (ticker: string, owner: string) => {
     assert.isETHAddressHex('owner', owner);
     assert.assert(
       ticker.length > 0 && ticker.length <= 10,
@@ -1341,7 +1344,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     }
   };
 
-  private checkModifyST = async (ticker: string, deployedAt: Date, owner: string, securityToken: string) => {
+  public checkModifyST = async (ticker: string, deployedAt: Date, owner: string, securityToken: string) => {
     await this.checkOnlyOwner();
     assert.assert(ticker.length > 0 && ticker.length <= 10, ErrorCode.InvalidData, 'Bad ticker');
     assert.assert(deployedAt.getTime() > new Date(0).getTime(), ErrorCode.TooEarly, 'Bad deployed date');

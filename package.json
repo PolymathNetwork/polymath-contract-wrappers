@@ -84,7 +84,7 @@
     "@0x/subproviders": "^4.1.1",
     "@0x/types": "^2.4.0",
     "@0x/typescript-typings": "^4.2.3",
-    "@polymathnetwork/abi-wrappers": "4.0.0-beta.1",
+    "@polymathnetwork/abi-wrappers": "4.0.0-beta.3",
     "@types/semver": "^6.0.1",
     "ethereumjs-blockstream": "6.0.0",
     "ethereumjs-util": "^6.1.0",

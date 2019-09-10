@@ -15,7 +15,7 @@ import {
   ISecurityTokenDocumentRemovedEventArgs_3_0_0,
   ISecurityTokenDocumentUpdatedEventArgs_3_0_0,
   ISecurityTokenEventArgs_3_0_0,
-  ISecurityTokenEvents_3_0_0,
+  SecurityTokenEvents_3_0_0,
   ISecurityTokenFreezeIssuanceEventArgs_3_0_0,
   ISecurityTokenFreezeTransfersEventArgs_3_0_0,
   ISecurityTokenGranularityChangedEventArgs_3_0_0,
@@ -26,7 +26,7 @@ import {
   ISecurityTokenModuleBudgetChangedEventArgs_3_0_0,
   ISecurityTokenModuleRemovedEventArgs_3_0_0,
   ISecurityTokenModuleUnarchivedEventArgs_3_0_0,
-  // ISecurityTokenModuleUpgradedEventArgs_3_0_0,
+  SecurityTokenModuleUpgradedEventArgs_3_0_0, // this event isn't being exported from the interface contracts, so we need to use the non-interface version
   ISecurityTokenOwnershipTransferredEventArgs_3_0_0,
   ISecurityTokenRedeemedByPartitionEventArgs_3_0_0,
   ISecurityTokenRedeemedEventArgs_3_0_0,
@@ -50,7 +50,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
-  ethers,
+  ethersUtils,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -73,7 +73,8 @@ import {
   TxParams,
   CappedSTOFundRaiseType,
   TransferStatusCode,
-  ErrorCode
+  ErrorCode,
+  ContractVersion
 } from '../../types';
 import {
   bigNumberToDate,
@@ -94,298 +95,298 @@ const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Approval;
+  eventName: SecurityTokenEvents_3_0_0.Approval;
   callback: EventCallback<ISecurityTokenApprovalEventArgs_3_0_0>;
 }
 
 interface GetApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Approval;
+  eventName: SecurityTokenEvents_3_0_0.Approval;
 }
 
 interface TransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Transfer;
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
   callback: EventCallback<ISecurityTokenTransferEventArgs_3_0_0>;
 }
 
 interface GetTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Transfer;
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
 }
 
 interface ModuleAddedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
   callback: EventCallback<ISecurityTokenModuleAddedEventArgs_3_0_0>;
 }
 
 interface GetModuleAddedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
 }
 
-// interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
-//   callback: EventCallback<ISecurityTokenModuleUpgradedEventArgs_3_0_0>;
-// }
+interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+  callback: EventCallback<SecurityTokenModuleUpgradedEventArgs_3_0_0>;
+}
 
-// interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
-// }
+interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+}
 
 interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
   callback: EventCallback<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenDetailsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
 }
 
 interface UpdateTokenNameSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
   callback: EventCallback<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenNameLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
 }
 
 interface GranularityChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
   callback: EventCallback<ISecurityTokenGranularityChangedEventArgs_3_0_0>;
 }
 
 interface GetGranularityChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
 }
 
 interface ModuleArchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
   callback: EventCallback<ISecurityTokenModuleArchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleArchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
 }
 
 interface ModuleUnarchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
   callback: EventCallback<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleUnarchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
 }
 
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
   callback: EventCallback<ISecurityTokenModuleRemovedEventArgs_3_0_0>;
 }
 
 interface GetModuleRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
 }
 
 interface ModuleBudgetChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
   callback: EventCallback<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>;
 }
 
 interface GetModuleBudgetChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
 }
 
 interface TransferByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
   callback: EventCallback<ISecurityTokenTransferByPartitionEventArgs_3_0_0>;
 }
 
 interface GetTransferByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
 }
 
 interface AuthorizedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
   callback: EventCallback<ISecurityTokenAuthorizedOperatorEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
 }
 
 interface RevokedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
   callback: EventCallback<ISecurityTokenRevokedOperatorEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
 }
 
 interface AuthorizedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
   callback: EventCallback<ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
 }
 
 interface RevokedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
   callback: EventCallback<ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
 }
 
 interface IssuedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
   callback: EventCallback<ISecurityTokenIssuedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetIssuedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
 }
 
 interface RedeemedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
   callback: EventCallback<ISecurityTokenRedeemedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRedeemedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
 }
 
 interface ControllerTransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
   callback: EventCallback<ISecurityTokenControllerTransferEventArgs_3_0_0>;
 }
 
 interface GetControllerTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
 }
 
 interface ControllerRedemptionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
   callback: EventCallback<ISecurityTokenControllerRedemptionEventArgs_3_0_0>;
 }
 
 interface GetControllerRedemptionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
 }
 
 interface DocumentRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
   callback: EventCallback<ISecurityTokenDocumentRemovedEventArgs_3_0_0>;
 }
 
 interface GetDocumentRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
 }
 
 interface DocumentUpdatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
   callback: EventCallback<ISecurityTokenDocumentUpdatedEventArgs_3_0_0>;
 }
 
 interface GetDocumentUpdatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
 }
 
 interface FreezeTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
   callback: EventCallback<ISecurityTokenFreezeTransfersEventArgs_3_0_0>;
 }
 
 interface GetFreezeTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
 }
 
 interface CheckpointCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
   callback: EventCallback<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>;
 }
 
 interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
 }
 
 interface FreezeIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
   callback: EventCallback<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>;
 }
 
 interface GetFreezeIssuanceLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
 }
 
 interface IssuedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Issued;
+  eventName: SecurityTokenEvents_3_0_0.Issued;
   callback: EventCallback<ISecurityTokenIssuedEventArgs_3_0_0>;
 }
 
 interface GetIssuedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Issued;
+  eventName: SecurityTokenEvents_3_0_0.Issued;
 }
 
 interface RedeemedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
   callback: EventCallback<ISecurityTokenRedeemedEventArgs_3_0_0>;
 }
 
 interface GetRedeemedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
 }
 
 interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.SetController;
+  eventName: SecurityTokenEvents_3_0_0.SetController;
   callback: EventCallback<ISecurityTokenSetControllerEventArgs_3_0_0>;
 }
 
 interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.SetController;
+  eventName: SecurityTokenEvents_3_0_0.SetController;
 }
 
 interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
   callback: EventCallback<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>;
 }
 
 interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
 }
 
 interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DisableController;
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
   callback: EventCallback<ISecurityTokenDisableControllerEventArgs_3_0_0>;
 }
 
 interface GetDisableControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DisableController;
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
   callback: EventCallback<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
 }
 
 interface TokenUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
   callback: EventCallback<ISecurityTokenTokenUpgradedEventArgs_3_0_0>;
 }
 
 interface GetTokenUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
 }
 
 interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: ApprovalSubscribeAsyncParams): Promise<string>;
   (params: TransferSubscribeAsyncParams): Promise<string>;
   (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
-  // (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenNameSubscribeAsyncParams): Promise<string>;
   (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
@@ -420,7 +421,7 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenApprovalEventArgs_3_0_0>[]>;
   (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTransferEventArgs_3_0_0>[]>;
   (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleAddedEventArgs_3_0_0>[]>;
-  // (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
+  (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>[]
   >;
@@ -1025,6 +1026,7 @@ interface CappedSTOData {
    */
   fundRaiseType: CappedSTOFundRaiseType;
   fundsReceiver: string;
+  treasuryWallet: string;
 }
 
 interface USDTieredSTOData {
@@ -1098,23 +1100,25 @@ interface ProduceAddModuleInformation {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  protected contract: Promise<ISecurityTokenContract_3_0_0>;
+  public contract: Promise<ISecurityTokenContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
+  public contractFactory: ContractFactory;
+
+  public featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
+  public moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
+  public polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
+  public moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
     return this.contractFactory.getModuleRegistryContract();
   };
 
@@ -2104,7 +2108,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return typedResult;
   };
 
-  private getTransferStatusCode = (result: string) => {
+  public getTransferStatusCode = (result: string) => {
     let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
     switch (result) {
       case TransferStatusCode.TransferFailure: {
@@ -2274,7 +2278,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public subscribeAsync: SecurityTokenSubscribeAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -2295,7 +2299,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public getLogsAsync: GetSecurityTokenLogsAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -2306,23 +2310,23 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return logs;
   };
 
-  private checkModuleExists = async (moduleAddress: string) => {
+  public checkModuleExists = async (moduleAddress: string) => {
     assert.assert((await this.getModule({ moduleAddress })).name !== '', ErrorCode.NotFound, 'Module does not exist');
   };
 
-  private checkIsArchived = async (moduleAddress: string) => {
+  public checkIsArchived = async (moduleAddress: string) => {
     assert.assert((await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is not yet archived');
   };
 
-  private checkIsNotArchived = async (moduleAddress: string) => {
+  public checkIsNotArchived = async (moduleAddress: string) => {
     assert.assert(!(await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is archived');
   };
 
-  private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
+  public checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
     assert.isNonZeroETHAddressHex('address', (await this.getModule({ moduleAddress })).address);
   };
 
-  private checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
+  public checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         (await this.getModule({ moduleAddress })).address,
@@ -2333,11 +2337,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkIsControllable = async () => {
+  public checkIsControllable = async () => {
     assert.assert(await this.isControllable(), ErrorCode.PreconditionRequired, 'Controller currently disabled');
   };
 
-  private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
+  public checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
     assert.assert(
       (await this.balanceOf({ owner: from })).isGreaterThanOrEqualTo(value),
       ErrorCode.InsufficientBalance,
@@ -2345,7 +2349,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
+  public checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).setupCostInPoly.callAsync();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
@@ -2360,7 +2364,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+  public checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,
@@ -2368,7 +2372,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
+  public checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       (await this.isControllable()) && (await this.controller()) === (await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,
@@ -2376,7 +2380,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkUseModuleVerified = async (address: string) => {
+  public checkUseModuleVerified = async (address: string) => {
     if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.CustomModulesAllowed)) {
       const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
       assert.assert(
@@ -2390,7 +2394,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(await this.isCompatibleModule(address), ErrorCode.InvalidVersion, 'Version should within the compatible range of ST');
   };
 
-  private checkForRegisteredModule = async (moduleAddress: string) => {
+  public checkForRegisteredModule = async (moduleAddress: string) => {
     const moduleRegistry = await this.moduleRegistryContract();
     const allModulesTypes = [
       await moduleRegistry.getModulesByType.callAsync(ModuleType.PermissionManager),
@@ -2408,7 +2412,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return allModules.includes(true);
   };
 
-  private isCompatibleModule = async (address: string) => {
+  public isCompatibleModule = async (address: string) => {
     const versions = await this.getVersion();
     const upperSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
@@ -2428,7 +2432,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return isCompatible;
   };
 
-  private cappedSTOAssertions = async (data: CappedSTOData) => {
+  public cappedSTOAssertions = async (data: CappedSTOData) => {
     assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
@@ -2436,7 +2440,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
   };
 
-  private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
+  public usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.assert(data.tokensPerTierTotal.length > 0, ErrorCode.InvalidData, 'No tiers provided');
@@ -2459,7 +2463,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };
 
-  private async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
+  public async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
     const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
     const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
@@ -2468,19 +2472,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
     const decimals = await this.decimals();
-    let iface: ethers.utils.Interface;
+    let iface: ethersUtils.Interface;
     let data: string;
     switch (params.moduleName) {
       case ModuleName.VestingEscrowWallet:
-        iface = new ethers.utils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet]);
         break;
       case ModuleName.CountTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManagerContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
       case ModuleName.PercentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           valueToWei(
             (params.data as PercentageTransferManagerData).maxHolderPercentage,
@@ -2491,7 +2495,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(CappedSTOContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -2503,7 +2507,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(USDTieredSTOContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
@@ -2529,12 +2533,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       default:

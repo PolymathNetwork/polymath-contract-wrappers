@@ -31,6 +31,7 @@ import {
   GetLogs,
   Perm,
   ErrorCode,
+  ContractVersion,
 } from '../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../utils/convert';
 
@@ -235,9 +236,11 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
  * This class includes the functionality related to interacting with the EtherDividendCheckpoint contract.
  */
 export default class EtherDividendCheckpointWrapper extends DividendCheckpointWrapper {
-  protected contract: Promise<EtherDividendCheckpointContract_3_0_0>;
+  public contract: Promise<EtherDividendCheckpointContract_3_0_0>;
+  
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected getDecimals = async (): Promise<BigNumber> => {
+  public getDecimals = async (): Promise<BigNumber> => {
     return new BigNumber(18);
   };
 

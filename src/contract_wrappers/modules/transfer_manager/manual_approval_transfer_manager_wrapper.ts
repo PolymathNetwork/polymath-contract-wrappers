@@ -255,7 +255,7 @@ interface Approval {
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
 export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<ManualApprovalTransferManagerContract_3_0_0>;
+  public contract: Promise<ManualApprovalTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate ManualApprovalTransferManagerWrapper
@@ -643,13 +643,13 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return logs;
   };
 
-  private checkApprovalDoesNotExist = async (from: string, to: string) => {
+  public checkApprovalDoesNotExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
     assert.isBigNumberZero(approval.allowance, 'Approval already exists with allowance');
     assert.isPastDate(approval.expiryTime, 'Approval already exists with valid future expiry date');
   };
 
-  private checkApprovalDoesExist = async (from: string, to: string) => {
+  public checkApprovalDoesExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
     assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
     assert.isFutureDate(approval.expiryTime, 'Approval does not exist');

@@ -10,7 +10,7 @@ import {
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { PolymathError } from '../../PolymathError';
-import { TxParams, GenericModuleContract_3_0_0, GetLogs, Subscribe, ErrorCode } from '../../types';
+import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode, ContractVersion } from '../../types';
 import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
@@ -18,32 +18,34 @@ import assert from '../../utils/assert';
 /**
  * @param tokenContract ERC20 Token Contract Address
  */
-interface ReclaimERC20Params extends TxParams {
+export interface ReclaimERC20Params extends TxParams {
   tokenContract: string;
 }
 
 /**
- * This class includes the functionality related to interacting with the General Permission Manager contract.
+ * This class includes the functionality related to interacting with the Module contract.
  */
 export default class ModuleWrapper extends ContractWrapper {
-  protected contract: Promise<GenericModuleContract_3_0_0>;
+  public contract: Promise<GenericModuleContract>;
 
-  protected contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (): Promise<ISecurityTokenContract_3_0_0> => {
+  public contractVersion = ContractVersion.V3_0_0;
+
+  public securityTokenContract = async (): Promise<ISecurityTokenContract_3_0_0> => {
     const address = await (await this.contract).securityToken.callAsync();
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
+  public polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
+  public detailedERC20TokenContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
     return this.contractFactory.getERC20DetailedContract(address);
   };
 
-  protected moduleFactoryContract = async (): Promise<ModuleFactoryContract_3_0_0> => {
+  public moduleFactoryContract = async (): Promise<ModuleFactoryContract_3_0_0> => {
     const address = await (await this.contract).factory.callAsync();
     return this.contractFactory.getModuleFactoryContract(address);
   };
@@ -59,7 +61,7 @@ export default class ModuleWrapper extends ContractWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<GenericModuleContract_3_0_0>,
+    contract: Promise<GenericModuleContract>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -157,7 +159,7 @@ export default class ModuleWrapper extends ContractWrapper {
     return result;
   };
 
-  protected isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
+  public isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
     const from = await this.getCallerAddress(txData);
     return functionsUtils.checksumAddressComparision(
       from,
@@ -165,7 +167,7 @@ export default class ModuleWrapper extends ContractWrapper {
     );
   };
 
-  protected isCallerAllowed = async (txData: Partial<TxData> | undefined, perm: string): Promise<boolean> => {
+  public isCallerAllowed = async (txData: Partial<TxData> | undefined, perm: string): Promise<boolean> => {
     if (await this.isCallerTheSecurityTokenOwner(txData)) {
       return true;
     }

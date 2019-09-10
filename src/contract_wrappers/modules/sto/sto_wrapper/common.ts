@@ -1,13 +1,13 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { TxParams, STOBaseContract_3_0_0, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
-import ModuleWrapper from '../module_wrapper';
-import assert from '../../../utils/assert';
-import { bigNumberToDate, weiToValue } from '../../../utils/convert';
+import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../../types';
+import ModuleWrapper from '../../module_wrapper';
+import assert from '../../../../utils/assert';
+import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 /**
  * @param type The FundRaiseType
  */
-interface FundRaiseTypesParams {
+export interface FundRaiseTypesParams {
   type: FundRaiseType;
 }
 
@@ -15,10 +15,10 @@ interface FundRaiseTypesParams {
  * This class includes the functionality related to interacting with the all STOs contracts.
  */
 export default abstract class STOWrapper extends ModuleWrapper {
-  protected abstract contract: Promise<STOBaseContract_3_0_0>;
+  public abstract contract: Promise<STOBaseContract>;
 
   /**
-   *  check if the module is paused
+   *  Check if the module is paused
    *  @return boolean status of paused
    */
   public paused = async (): Promise<boolean> => {
@@ -26,7 +26,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   /**
-   *  security token address
+   *  Security token address
    *  @return address
    */
   public securityToken = async (): Promise<string> => {
@@ -107,20 +107,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   };
 
   /**
-   *  pause the module
-   */
-  public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Contract already paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  unpause the module
+   *  Unpause the module
    */
   public unpause = async (params: TxParams) => {
     assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Contract is not paused');

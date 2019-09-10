@@ -414,7 +414,7 @@ interface IndividualRestriction {
  * This class includes the functionality related to interacting with the Volume Restriction Transfer Manager contract.
  */
 export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<VolumeRestrictionTMContract_3_0_0>;
+  public contract: Promise<VolumeRestrictionTMContract_3_0_0>;
 
   /**
    * Instantiate VolumeRestrictionManagerWrapper
@@ -1244,7 +1244,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     return logs;
   };
 
-  private checkRestrictionInputParams = (
+  public checkRestrictionInputParams = (
     startTime: Date,
     endTime: Date,
     allowedTokens: BigNumber,
@@ -1269,7 +1269,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
     );
   };
 
-  private decimalsByRestrictionType = async (restrictionType: RestrictionType): Promise<BigNumber> => {
+  public decimalsByRestrictionType = async (restrictionType: RestrictionType): Promise<BigNumber> => {
     let decimals = PERCENTAGE_DECIMALS;
     if (restrictionType === RestrictionType.Fixed) {
       decimals = await (await this.securityTokenContract()).decimals.callAsync();

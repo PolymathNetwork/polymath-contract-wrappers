@@ -27,6 +27,12 @@ import {
   USDTieredSTOContract_3_0_0,
   VolumeRestrictionTMContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
+  USDTieredSTOContract_3_1_0,
+  CappedSTOContract_3_1_0,
+  GeneralPermissionManagerContract_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
+  RestrictedPartialSaleTMContract_3_1_0,
+  VestingEscrowWalletContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -118,11 +124,11 @@ export class PolymathAPI {
    * An instance of the PolyTokenFaucetWrapper class containing methods
    * for interacting with PolyTokenFaucet smart contract.
    */
-  private polyTokenFaucet: PolyTokenFaucetWrapper;
+  public polyTokenFaucet: PolyTokenFaucetWrapper;
 
-  private readonly web3Wrapper: Web3Wrapper;
+  public readonly web3Wrapper: Web3Wrapper;
 
-  private contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
   /**
    * Instantiates a new PolymathAPI instance.
@@ -139,6 +145,7 @@ export class PolymathAPI {
     });
 
     const abiArray = [
+      /* 3.0.0 */
       // Registries
       FeatureRegistryContract_3_0_0.ABI(),
       ModuleRegistryContract_3_0_0.ABI(),
@@ -170,11 +177,19 @@ export class PolymathAPI {
       ISecurityTokenContract_3_0_0.ABI(),
       // Wallet
       VestingEscrowWalletContract_3_0_0.ABI(),
-    ];
 
-    abiArray.forEach((abi): void => {
-      this.web3Wrapper.abiDecoder.addABI(abi);
-    });
+      /* 3.1.0 */
+      // Permission
+      GeneralPermissionManagerContract_3_1_0.ABI(),
+      // STO
+      CappedSTOContract_3_1_0.ABI(),
+      USDTieredSTOContract_3_1_0.ABI(),
+      // Transfer
+      GeneralTransferManagerContract_3_1_0.ABI(),
+      RestrictedPartialSaleTMContract_3_1_0.ABI(),
+      // Wallet
+      VestingEscrowWalletContract_3_1_0.ABI(),
+    ];
 
     this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 

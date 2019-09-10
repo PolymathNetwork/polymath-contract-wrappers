@@ -25,6 +25,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import {
   bytes32ArrayToStringArray,
@@ -133,7 +134,9 @@ interface ChangeSTVersionBoundsParams extends TxParams {
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
 export default class ModuleFactoryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleFactoryContract_3_0_0>;
+  public contract: Promise<ModuleFactoryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate ModuleFactoryWrapper
@@ -400,7 +403,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+  public checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,

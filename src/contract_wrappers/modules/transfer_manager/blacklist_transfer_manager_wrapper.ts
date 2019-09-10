@@ -307,7 +307,7 @@ interface BlacklistsDetails {
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
  */
 export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<BlacklistTransferManagerContract_3_0_0>;
+  public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate BlacklistTransferManagerWrapper
@@ -830,7 +830,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     return logs;
   };
 
-  private checkAddBlacklistType = async (params: BlacklistTypeParams) => {
+  public checkAddBlacklistType = async (params: BlacklistTypeParams) => {
     const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
     assert.assert(
       dateToBigNumber(blacklistInfo.endTime).isZero(),
@@ -840,13 +840,13 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     await this.checkBlacklistTypeDetails(params);
   };
 
-  private checkModifyBlacklistType = async (params: BlacklistTypeParams) => {
+  public checkModifyBlacklistType = async (params: BlacklistTypeParams) => {
     const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
     assert.isNotDateZero(blacklistInfo.endTime, 'Blacklist you are trying to modify does not exist');
     await this.checkBlacklistTypeDetails(params);
   };
 
-  private checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
+  public checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
     assert.assert(params.blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.assert(params.startTime < params.endTime, ErrorCode.TooLate, 'Start time must be before the end time');
@@ -860,7 +860,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     }
   };
 
-  private checkDeleteBlacklistType = async (blacklistName: string) => {
+  public checkDeleteBlacklistType = async (blacklistName: string) => {
     assert.assert(blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist Name cannot be empty string');
     const blacklistsDetails = await this.blacklists({ blacklistName });
     assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
@@ -872,13 +872,13 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkBlacklistToModifyInvestors = async (params: InvestorAndBlacklistParams) => {
+  public checkBlacklistToModifyInvestors = async (params: InvestorAndBlacklistParams) => {
     assert.assert(params.blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist name cannot be empty string');
     const blacklistsDetails = await this.blacklists({ blacklistName: params.blacklistName });
     assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
   };
 
-  private checkAddInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public checkAddInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
     await this.checkBlacklistToModifyInvestors(params);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
@@ -888,7 +888,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkDeleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public checkDeleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
     await this.checkBlacklistToModifyInvestors(params);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
@@ -898,7 +898,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkDeleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
+  public checkDeleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
     assert.isNonZeroETHAddressHex('Investor Address', params.investor);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.investor });
     assert.assert(

@@ -94,7 +94,7 @@ interface ChangeHolderCountParams extends TxParams {
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<CountTransferManagerContract_3_0_0>;
+  public contract: Promise<CountTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate CountTransferManagerWrapper

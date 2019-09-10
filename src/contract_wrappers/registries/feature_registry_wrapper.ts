@@ -19,6 +19,7 @@ import {
   Subscribe,
   GetLogs,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -78,7 +79,9 @@ interface SetFeatureStatusParams extends TxParams {
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
 export default class FeatureRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<FeatureRegistryContract_3_0_0>;
+  public contract: Promise<FeatureRegistryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate FeatureRegistryWrapper

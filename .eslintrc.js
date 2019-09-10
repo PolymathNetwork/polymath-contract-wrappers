@@ -24,6 +24,7 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/class-name-casing': 'off',
     "import/prefer-default-export": 'off',
     'jest/expect-expect': 'error',
     'jest/no-empty-title': 'warn',

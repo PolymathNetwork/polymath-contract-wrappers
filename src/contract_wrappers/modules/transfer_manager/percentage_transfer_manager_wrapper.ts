@@ -158,7 +158,7 @@ interface SetAllowPrimaryIssuanceParams extends TxParams {
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
 export default class PercentageTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<PercentageTransferManagerContract_3_0_0>;
+  public contract: Promise<PercentageTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate PercentageTransferManagerWrapper

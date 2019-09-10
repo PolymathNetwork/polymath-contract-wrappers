@@ -8,13 +8,15 @@ import {
 import { schemas } from '@0x/json-schemas';
 import { bytes32ToString } from '../../utils/convert';
 import ERC20TokenWrapper from './erc20_wrapper';
-import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams } from '../../types';
+import { GetLogs, GetLogsAsyncParams, Subscribe, SubscribeAsyncParams, ContractVersion } from '../../types';
 import assert from '../../utils/assert';
 /**
  * This class includes the functionality related to interacting with the AlternativeERC20 contract.
  */
 export default class AlternativeERC20Wrapper extends ERC20TokenWrapper {
-  protected contract: Promise<ERC20DetailedContract_3_0_0>;
+  public contract: Promise<ERC20DetailedContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate AlternativeERC20Wrapper

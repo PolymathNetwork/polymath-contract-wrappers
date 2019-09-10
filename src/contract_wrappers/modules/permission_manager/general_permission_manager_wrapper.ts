@@ -164,7 +164,7 @@ interface PermissionsPerModule {
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<GeneralPermissionManagerContract_3_0_0>;
+  public contract: Promise<GeneralPermissionManagerContract_3_0_0>;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper

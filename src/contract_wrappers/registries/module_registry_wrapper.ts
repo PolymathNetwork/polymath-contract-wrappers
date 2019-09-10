@@ -31,6 +31,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import { bytes32ArrayToStringArray } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
@@ -210,19 +211,21 @@ interface FactoryDetails {
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
  */
 export default class ModuleRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleRegistryContract_3_0_0>;
+  public contract: Promise<ModuleRegistryContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract_3_0_0> => {
+  public contractFactory: ContractFactory;
+
+  public securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenRegistryContract();
   };
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
+  public featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
+  public moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
@@ -533,7 +536,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkForRegisteredModule = async (moduleAddress: string) => {
+  public checkForRegisteredModule = async (moduleAddress: string) => {
     const allModulesTypes = [
       await this.getModulesByType({ moduleType: ModuleType.PermissionManager }),
       await this.getModulesByType({ moduleType: ModuleType.STO }),
@@ -549,11 +552,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return allModules.includes(true);
   };
 
-  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+  public callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
     return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
   };
 
-  private checkMsgSenderIsOwner = async () => {
+  public checkMsgSenderIsOwner = async () => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -564,7 +567,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleRegistered = async (moduleFactory: string) => {
+  public checkModuleRegistered = async (moduleFactory: string) => {
     assert.assert(
       await this.checkForRegisteredModule(moduleFactory),
       ErrorCode.PreconditionRequired,
@@ -572,7 +575,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotRegistered = async (moduleFactory: string) => {
+  public checkModuleNotRegistered = async (moduleFactory: string) => {
     assert.assert(
       !(await this.checkForRegisteredModule(moduleFactory)),
       ErrorCode.AlreadyExists,
@@ -580,7 +583,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPausedOrOwner = async () => {
+  public checkModuleNotPausedOrOwner = async () => {
     assert.assert(
       !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
@@ -589,11 +592,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPaused = async () => {
+  public checkModuleNotPaused = async () => {
     assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is currently paused');
   };
 
-  private checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
+  public checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
     const callerAddress = await this.getCallerAddress(undefined);
     const owner = await this.owner();
     const factoryOwner = await (await this.moduleFactoryContract(moduleFactoryAddress)).owner.callAsync();
