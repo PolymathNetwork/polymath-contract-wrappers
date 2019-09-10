@@ -1,61 +1,49 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
+import { PolymathAPI } from '../src';
 import { PolyTokenEvents, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { launchToken } from './example_components/launchTokenComponent';
-import BigNumber from 'bignumber.js';
-import { registerTicker } from './example_components/registerTickerComponent';
 
-// This file acts as a valid sandbox.ts file in root directory for launch a new Token on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
-  const myAddress = await polymathAPI.getAccount();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('Ticker', '');
-  const tokenName = prompt('Token Name', '');
-
-  await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Tokens approved');
-      }
-    },
+/**
+ * Generates a new security token. Requires that a ticker has been registered previously.
+ * @param polymathAPI Instance of the polymathAPI.
+ * @param name The name of the token.
+ * @param ticker The ticker symbol of the security token.
+ * @param tokenDetails The off-chain details of the token.
+ * @param divisible Whether or not the token is divisible.
+ * @param treasuryWallet Ethereum address which will holds the STs.
+ * @param protocolVersion Version of securityToken contract.
+ */
+export const launchToken = async (
+  polymathAPI: PolymathAPI,
+  name: string,
+  ticker: string,
+  tokenDetails: string,
+  treasuryWallet: string,
+  divisible: boolean,
+  protocolVersion?: string,
+) => {
+  // Get the st launch fee and approve the security token registry to spend
+  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
+  // Get the st registry address
+  const spender = await polymathAPI.securityTokenRegistry.address();
+  // Finding the polytoken allowance for current user
+  const allowance = await polymathAPI.polyToken.allowance({
+    owner: await polymathAPI.getAccount(),
+    spender,
   });
-
-  await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('New security token!', log);
-      }
-    },
+  if (allowance.isLessThan(securityTokenLaunchFee)) {
+    // Approve poly token expenditure
+    await polymathAPI.polyToken.approve({
+      spender,
+      value: securityTokenLaunchFee,
+    });
+  }
+  protocolVersion = protocolVersion ? protocolVersion : '0';
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
+    name,
+    ticker,
+    tokenDetails,
+    treasuryWallet,
+    protocolVersion,
+    divisible,
   });
-
-  // Register ticker and launch token
-  await registerTicker(polymathAPI, ticker ? ticker : '', myAddress);
-  await launchToken(polymathAPI, tokenName ? tokenName : '', ticker ? ticker : '', 'http://', myAddress, false);
-  console.log('Ticker was registered and token was launched successfully!');
-
-  polymathAPI.securityTokenRegistry.unsubscribeAll();
-});
+  console.log('Token launched successfully!');
+};

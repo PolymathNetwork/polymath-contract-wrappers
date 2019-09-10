@@ -1,8 +1,12 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { RestrictedPartialSaleTMEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { RestrictedPartialSaleTMEvents, SecurityTokenRegistryEvents, PolyTokenEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
+import {registerTicker} from './registerTicker';
+import {launchToken} from './launchToken';
+import {moduleInstanceLookup} from './moduleInstanceLookup';
+import {addInvestorsToWhitelist} from './addInvestorsToWhitelist';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
 
@@ -27,44 +31,51 @@ window.addEventListener('load', async () => {
   const ticker = prompt('Ticker', '');
   const tokenName = prompt('Token Name', '');
 
-  // Double check available
-  await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
+  // Subscribe to approval and register ticker events
+  await polymathAPI.polyToken.subscribeAsync({
+    eventName: PolyTokenEvents.Approval,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Tokens approved');
+      }
+    },
+  });
+  await polymathAPI.securityTokenRegistry.subscribeAsync({
+    eventName: SecurityTokenRegistryEvents.RegisterTicker,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Ticker registered!', log);
+      }
+    },
   });
 
-  // Get the ticker fee and approve the security token registry to spend
-  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: tickerFee,
-  });
+  // Register the ticker
+  await registerTicker(polymathAPI, ticker ? ticker : '', myAddress);
 
-  // Register a ticker
-  await polymathAPI.securityTokenRegistry.registerTicker({
-    ticker: ticker!,
-    tokenName: tokenName!,
+  await polymathAPI.securityTokenRegistry.subscribeAsync({
+    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('New security token!', log);
+      }
+    },
   });
-
-  // Get the st launch fee and approve the security token registry to spend
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: securityTokenLaunchFee,
-  });
-
-  // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
-    name: tokenName!,
-    ticker: ticker!,
-    tokenDetails: 'http://',
-    divisible: false,
-    treasuryWallet: myAddress,
-    protocolVersion: '0',
-  });
+  // Generate a new Security Token
+  await launchToken(polymathAPI, tokenName ? tokenName : '', ticker ? ticker : '', 'http://', myAddress, false);
 
   // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
+  // ** Start of add module
   // Get sto factory address
   const moduleStringName = 'RestrictedPartialSaleTM';
   const moduleName = ModuleName.RestrictedPartialSaleTM;
@@ -101,24 +112,14 @@ window.addEventListener('load', async () => {
       treasuryWallet: myAddress,
     },
   });
+  // Module added
 
-  const restrictedPartialSaleAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.RestrictedPartialSaleTM,
-  }))[0];
-
-  const restrictedPartialSale = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.RestrictedPartialSaleTM,
-    address: restrictedPartialSaleAddress,
-  });
-
-  // Get General TM Address and allow all transfers so we can test unlocked account transfers
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.GeneralTransferManager,
-  }))[0];
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralTransferManager,
-    address: generalTMAddress,
-  });
+  const restrictedPartialSale = await moduleInstanceLookup(
+      polymathAPI,
+      ModuleName.RestrictedPartialSaleTM,
+      ticker ? ticker : '',
+  );
+  const generalTM = await moduleInstanceLookup(polymathAPI, ModuleName.GeneralTransferManager, ticker ? ticker : '');
 
   const randomBeneficiaries = [
     '0x3444444444444444444444444444444444444444',
@@ -126,7 +127,7 @@ window.addEventListener('load', async () => {
     '0x6644444444444444444444444444444444444444',
   ];
   // Add all address in the whitelist
-  await generalTM.modifyKYCDataMulti({
+  const kycInvestorMultiData = {
     investors: randomBeneficiaries.concat(myAddress),
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
@@ -134,7 +135,10 @@ window.addEventListener('load', async () => {
     txData: {
       from: await polymathAPI.getAccount(),
     },
-  });
+  };
+
+  await addInvestorsToWhitelist(polymathAPI, ticker ? ticker : '', kycInvestorMultiData);
+
   console.log('Kyc data modified');
 
   // Mint yourself some tokens and make some transfers
@@ -145,7 +149,7 @@ window.addEventListener('load', async () => {
   await restrictedPartialSale.subscribeAsync({
     eventName: RestrictedPartialSaleTMEvents.ChangedExemptWalletList,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
