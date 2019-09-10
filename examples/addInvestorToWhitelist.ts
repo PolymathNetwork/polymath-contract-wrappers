@@ -4,6 +4,7 @@ import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
 import {registerTicker} from './example_components/registerTickerComponent';
 import {launchToken} from './example_components/launchTokenComponent';
+import {moduleInstance} from './example_components/moduleInstanceComponent';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a new address to the whitelist on an unlocked node (like ganache)
 
@@ -33,25 +34,14 @@ window.addEventListener('load', async () => {
   await launchToken(polymathAPI, tokenName ? tokenName : '', ticker ? ticker : '', 'http://', myAddress, false);
   console.log('Ticker was registered and token was launched successfully!');
 
-  // Create a Security Token Instance
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-
-  // Get General TM Address
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.GeneralTransferManager,
-  }))[0];
-
   // Get general TM module instance
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralTransferManager,
-    address: generalTMAddress,
-  });
+  const generalTM = await moduleInstance(polymathAPI, ModuleName.GeneralTransferManager, ticker ? ticker : '');
 
   // Subscribe to event of modify KYC data
   await generalTM.subscribeAsync({
     eventName: GeneralTransferManagerEvents.ModifyKYCData,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
