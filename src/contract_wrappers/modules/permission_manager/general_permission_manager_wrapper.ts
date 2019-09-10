@@ -56,7 +56,9 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
   (params: GetChangePermissionLogsAsyncParams): Promise<
     LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>[]
   >;
-  (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>[]>;
+  (params: GetAddDelegateLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>[]
+  >;
 }
 
 export namespace GeneralPermissionManagerTransactionParams {
@@ -149,6 +151,22 @@ interface ChangePermissionMultiParams extends TxParams {
   modules: string[];
   perms: Perm[];
   valids: boolean[];
+}
+
+/**
+ * @param delegates An array of Ethereum addresses of the delegates
+ * @param details An array of details about the delegates i.e `Belongs to financial firm`
+ */
+interface AddDelegateMultiParams extends TxParams {
+  delegates: string[];
+  details: string[];
+}
+
+/**
+ * @param delegates An array of Ethereum address of delegates
+ */
+interface DeleteDelegateMultiParams extends TxParams {
+  delegates: string[];
 }
 
 // // Return types ////
@@ -366,6 +384,77 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    */
   public getAllDelegates = async () => {
     return (await this.contract).getAllDelegates.callAsync();
+  };
+
+  /**
+   * Used to add multiple delegates in a batch
+   * 3.1.0
+   */
+  public addDelegateMulti = async (params: AddDelegateMultiParams) => {
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+    assert.assert(
+      params.delegates.length === params.details.length,
+      ErrorCode.MismatchedArrayLength,
+      'Array length mismatch',
+    );
+
+    const resultCheckDelegate = [];
+    for (let i = 0; i < params.delegates.length; i += 1) {
+      assert.isNonZeroETHAddressHex('delegate', params.delegates[i]);
+      assert.assert(params.details[i].length > 0, ErrorCode.InvalidData, '0 value not allowed');
+      resultCheckDelegate.push(this.delegateIsNotPresent(params.delegates[i]));
+    }
+    await Promise.all(resultCheckDelegate);
+    await (await this.contract).addDelegateMulti.sendTransactionAsync(
+      params.delegates,
+      stringArrayToBytes32Array(params.details),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Used to delete a list of delegates
+   * 3.1.0
+   */
+  public deleteDelegateMulti = async (params: DeleteDelegateMultiParams) => {
+    assert.assert(
+      await this.isCallerAllowed(params.txData, Perm.Admin),
+      ErrorCode.Unauthorized,
+      'Caller is not allowed',
+    );
+
+    const resultCheckDelegate = [];
+    for (let i = 0; i < params.delegates.length; i += 1) {
+      assert.isNonZeroETHAddressHex('delegate', params.delegates[i]);
+      resultCheckDelegate.push(this.delegateDoesNotExist(params.delegates[i]));
+    }
+    await Promise.all(resultCheckDelegate);
+    return (await this.contract).deleteDelegateMulti.sendTransactionAsync(
+      stringArrayToBytes32Array(params.delegates),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  private delegateIsNotPresent = async (delegate: string) => {
+    assert.assert(
+      !(await (await this.contract).checkDelegate.callAsync(delegate)),
+      ErrorCode.AlreadyExists,
+      `Delegate already present`,
+    );
+  };
+
+  private delegateDoesNotExist = async (delegate: string) => {
+    assert.assert(
+      await (await this.contract).checkDelegate.callAsync(delegate),
+      ErrorCode.NotFound,
+      'Delegate does not exist',
+    );
   };
 
   /**
