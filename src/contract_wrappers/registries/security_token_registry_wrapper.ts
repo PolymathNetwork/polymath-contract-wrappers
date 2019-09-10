@@ -45,7 +45,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToBytes32,
+  stringToKeccak256,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -1213,8 +1213,8 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
       assert.assert(false, ErrorCode.InvalidData, 'Incorrect fee type');
     }
-    const feeTypeBytes32 = stringToBytes32(params.feeType);
-    return (await this.contract).getFees.callAsync(feeTypeBytes32);
+    const feeTypeKeccak256 = stringToKeccak256(params.feeType);
+    return (await this.contract).getFees.callAsync(feeTypeKeccak256);
   };
 
   /**
