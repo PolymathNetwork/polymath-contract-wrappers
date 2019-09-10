@@ -892,7 +892,7 @@ describe('SecurityTokenRegistryWrapper', () => {
       // Real call
       const result = await target.getFees(mockedParams);
       // Result expectation
-      expect(result).toEqual(expectedResult);
+      expect(result).toEqual(expectedResult.map(fee => weiToValue(fee, FULL_DECIMALS)));
       // Verifications
       verify(mockedContract.getFees).once();
       verify(mockedMethod.callAsync(objectContaining(keccak256))).once();

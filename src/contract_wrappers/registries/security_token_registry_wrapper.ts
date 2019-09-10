@@ -1207,14 +1207,15 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Get the fees
    * @return the [usd & poly] fee for a particular feetype
    */
-
   public getFees = async (params: GetFeesParams) => {
     const { feeType } = params;
     if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
       assert.assert(false, ErrorCode.InvalidData, 'Incorrect fee type');
     }
     const feeTypeKeccak256 = stringToKeccak256(params.feeType);
-    return (await this.contract).getFees.callAsync(feeTypeKeccak256);
+    const fees = await (await this.contract).getFees.callAsync(feeTypeKeccak256);
+
+    return fees.map(fee => weiToValue(fee, FULL_DECIMALS));
   };
 
   /**
