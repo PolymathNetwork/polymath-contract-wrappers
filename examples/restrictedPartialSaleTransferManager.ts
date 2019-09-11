@@ -5,7 +5,7 @@ import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
 import {registerTicker} from './registerTicker';
 import {launchToken} from './launchToken';
-import {moduleInstanceLookup} from './moduleInstanceLookup';
+import {moduleInstancesLookup} from './moduleInstancesLookup';
 import {addInvestorsToWhitelist} from './addInvestorsToWhitelist';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
@@ -113,13 +113,11 @@ window.addEventListener('load', async () => {
     },
   });
   // Module added
-
-  const restrictedPartialSale = await moduleInstanceLookup(
-      polymathAPI,
-      ModuleName.RestrictedPartialSaleTM,
-      ticker ? ticker : '',
-  );
-  const generalTM = await moduleInstanceLookup(polymathAPI, ModuleName.GeneralTransferManager, ticker ? ticker : '');
+  const myTicker = ticker ? ticker : '';
+  const restrictedPartialSale = (await moduleInstancesLookup(polymathAPI, {
+    ticker: myTicker,
+    moduleName: ModuleName.RestrictedPartialSaleTM,
+  }))[0];
 
   const randomBeneficiaries = [
     '0x3444444444444444444444444444444444444444',
@@ -137,7 +135,7 @@ window.addEventListener('load', async () => {
     },
   };
 
-  await addInvestorsToWhitelist(polymathAPI, ticker ? ticker : '', kycInvestorMultiData);
+  await addInvestorsToWhitelist(polymathAPI, myTicker, kycInvestorMultiData);
 
   console.log('Kyc data modified');
 

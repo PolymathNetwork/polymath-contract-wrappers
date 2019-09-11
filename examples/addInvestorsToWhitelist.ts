@@ -1,5 +1,5 @@
 import { PolymathAPI, TransactionParams, ModuleName } from '../src';
-import { moduleInstanceLookup } from './moduleInstanceLookup';
+import { moduleInstancesLookup } from './moduleInstancesLookup';
 
 /**
  * Adds investors to a security token's whitelist. Requires that a valid security token has been generated previously.
@@ -13,8 +13,10 @@ export const addInvestorsToWhitelist = async (
   modifyKYCDataMultiParams: TransactionParams.GeneralTransferManager.ModifyKYCDataMulti,
 ) => {
   // Get general TM module instance
-  const generalTM = await moduleInstanceLookup(polymathAPI, ModuleName.GeneralTransferManager, ticker ? ticker : '');
-
+    const generalTM = (await moduleInstancesLookup(polymathAPI, {
+        ticker,
+        moduleName: ModuleName.GeneralTransferManager,
+    }))[0];
   // Publish kyc data to whitelist in general transfer manager
   await generalTM.modifyKYCDataMulti(modifyKYCDataMultiParams);
 
