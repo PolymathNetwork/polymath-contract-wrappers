@@ -1004,28 +1004,28 @@ interface AddUSDTieredSTOParams extends AddModuleParams {
   data: USDTieredSTOData;
 }
 
-interface CountTransferManagerData {
+export interface CountTransferManagerData {
   maxHolderCount: number;
 }
 
-interface VestingEscrowWalletData {
+export interface VestingEscrowWalletData {
   treasuryWallet: string;
 }
 
-interface PercentageTransferManagerData {
+export interface PercentageTransferManagerData {
   maxHolderPercentage: BigNumber;
   allowPrimaryIssuance: boolean;
 }
 
-interface RestrictedPartialSaleTransferManagerData {
+export interface RestrictedPartialSaleTransferManagerData {
   treasuryWallet: string;
 }
 
-interface DividendCheckpointData {
+export interface DividendCheckpointData {
   wallet: string;
 }
 
-interface CappedSTOData {
+export interface CappedSTOData {
   startTime: Date;
   endTime: Date;
   cap: BigNumber;
@@ -1039,7 +1039,7 @@ interface CappedSTOData {
   treasuryWallet: string;
 }
 
-interface USDTieredSTOData {
+export interface USDTieredSTOData {
   startTime: Date;
   endTime: Date;
   ratePerTier: BigNumber[];

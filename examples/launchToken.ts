@@ -20,6 +20,30 @@ export const launchToken = async (
   divisible: boolean,
   protocolVersion?: string,
 ) => {
+  // Subscribe to events
+  await polymathAPI.polyToken.subscribeAsync({
+    eventName: PolyTokenEvents.Approval,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Tokens approved');
+      }
+    },
+  });
+  await polymathAPI.securityTokenRegistry.subscribeAsync({
+    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+    indexFilterValues: {},
+    callback: async (error, log) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('New security token!', log);
+      }
+    },
+  });
+
   // Get the st launch fee and approve the security token registry to spend
   const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
   // Get the st registry address
