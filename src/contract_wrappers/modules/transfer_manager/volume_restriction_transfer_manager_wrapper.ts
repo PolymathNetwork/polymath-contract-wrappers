@@ -1162,13 +1162,6 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   };
 
   /**
-   * This function returns the signature of configure function
-   */
-  public getInitFunction = async (): Promise<string> => {
-    return (await this.contract).getInitFunction.callAsync();
-  };
-
-  /**
    * Provide the restriction details of all the restricted addresses
    * @return List of the restricted addresses,
    * List of the tokens allowed to the restricted addresses corresponds to restricted address,

@@ -1,7 +1,6 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../../types';
+import { STOBaseContract, FundRaiseType, FULL_DECIMALS } from '../../../../types';
 import ModuleWrapper from '../../module_wrapper';
-import assert from '../../../../utils/assert';
 import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 /**
@@ -12,26 +11,10 @@ export interface FundRaiseTypesParams {
 }
 
 /**
- * This class includes the functionality related to interacting with the all STOs contracts.
+ * This class includes the functionality related to interacting with all STO contracts
  */
 export default abstract class STOWrapper extends ModuleWrapper {
   public abstract contract: Promise<STOBaseContract>;
-
-  /**
-   *  Check if the module is paused
-   *  @return boolean status of paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
-   *  Security token address
-   *  @return address
-   */
-  public securityToken = async (): Promise<string> => {
-    return (await this.contract).securityToken.callAsync();
-  };
 
   /**
    * Type of currency used to collect the funds
@@ -104,18 +87,5 @@ export default abstract class STOWrapper extends ModuleWrapper {
    */
   public getRaised = async (params: FundRaiseTypesParams): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).getRaised.callAsync(params.type), FULL_DECIMALS);
-  };
-
-  /**
-   *  Unpause the module
-   */
-  public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Contract is not paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 }

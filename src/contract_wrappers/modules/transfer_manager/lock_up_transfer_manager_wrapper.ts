@@ -37,7 +37,6 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
-  parsePermBytes32Value,
   parseTransferResult,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -500,14 +499,6 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
       ),
       decimals,
     );
-  };
-
-  /**
-   * Returns the permissions flags that are associated with Percentage transfer Manager
-   */
-  public getPermissions = async (): Promise<Perm[]> => {
-    const permissions = await (await this.contract).getPermissions.callAsync();
-    return permissions.map(parsePermBytes32Value);
   };
 
   /**

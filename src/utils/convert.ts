@@ -103,7 +103,7 @@ export function parsePermBytes32Value(value: string): Perm {
     case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
+      throw new PolymathError({ message: 'Permission not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parseModuleTypeValue(value: BigNumber): ModuleType {

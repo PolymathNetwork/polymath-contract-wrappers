@@ -859,31 +859,6 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Return the permissions flags that are associated with general transfer manager
-   * @return array of Perm type
-   */
-  public getPermissions = async (): Promise<Perm[]> => {
-    const call = await (await this.contract).getPermissions.callAsync();
-    const result: Perm[] = [];
-    for (let i = 0; i < call.length; i += 1) {
-      switch (bytes32ToString(call[i])) {
-        case Perm.Admin: {
-          result.push(Perm.Admin);
-          break;
-        }
-        case Perm.Operator: {
-          result.push(Perm.Operator);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    }
-    return result;
-  };
-
-  /**
    * Get Address bytes32 string value
    * @return bytes32 to string representation
    */

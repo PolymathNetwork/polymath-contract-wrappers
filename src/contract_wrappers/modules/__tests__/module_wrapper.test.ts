@@ -1,29 +1,32 @@
-// STOWrapper test
+// ModuleFactoryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { CappedSTOContract_3_0_0, ISecurityTokenContract_3_0_0, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import CappedSTOWrapper from '../capped_sto_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
-import ModuleWrapper from '../../module_wrapper';
-import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
+import {
+  Web3Wrapper,
+  ModuleContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+} from '@polymathnetwork/abi-wrappers';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../test_utils/mocked_methods';
+import ContractFactory from '../../../factories/contractFactory';
+import ContractWrapper from '../../contract_wrapper';
+import ModuleWrapper from '../module_wrapper';
+import { stringToBytes32 } from '../../../utils/convert';
+import { Perm } from '../../../types';
 
-describe('STOWrapper', () => {
-  // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
-  let target: CappedSTOWrapper;
+describe('ModuleFactoryWrapper', () => {
+  let target: ModuleWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: CappedSTOContract_3_0_0;
+  let mockedContract: ModuleContract_3_0_0;
   let mockedContractFactory: ContractFactory;
   let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(CappedSTOContract_3_0_0);
+    mockedContract = mock(ModuleContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new ModuleWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -34,50 +37,89 @@ describe('STOWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend ContractWrapper', async () => {
+      expect(target instanceof ContractWrapper).toBe(true);
     });
   });
 
-  describe('FundRaiseTypes', () => {
-    test('should get the boolean for fundRaiseTypes', async () => {
+  describe('GetInitFunction', () => {
+    test('should get init function', async () => {
       // Address expected
-      const expectedResult = true;
+      const expectedResult = 'ZERO';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.fundRaiseTypes).thenReturn(instance(mockedMethod));
+      when(mockedContract.getInitFunction).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.fundRaiseTypes({ type: FundRaiseType.StableCoin });
+      const result = await target.getInitFunction();
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.fundRaiseTypes).once();
-      verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();
+      verify(mockedContract.getInitFunction).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
-  describe('FundsRaised', () => {
-    test('should get the Big Number for funds raised', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
+  describe('polyToken', () => {
+    test('should call to polyToken', async () => {
+      const expectedResult = '0x0123456789012345678901234567890123456789';
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.fundsRaised).thenReturn(instance(mockedMethod));
+      when(mockedContract.polyToken).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.fundsRaised({ type: FundRaiseType.StableCoin });
+      const result = await target.polyToken();
       // Result expectation
-      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
+      expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.fundsRaised).once();
-      verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();
+      verify(mockedContract.polyToken).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('securityToken', () => {
+    test('should call to securityToken', async () => {
+      const expectedResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.securityToken).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.securityToken();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.securityToken).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('factory', () => {
+    test('should call to factory', async () => {
+      const expectedResult = '0x0123456789012345678901234567890123456789';
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.factory).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.factory();
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.factory).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 
@@ -99,172 +141,6 @@ describe('STOWrapper', () => {
       // Verifications
       verify(mockedContract.paused).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('StartTime', () => {
-    test('should get the start time', async () => {
-      // Value expected
-      const expectedResult = new BigNumber(1);
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.startTime).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.startTime();
-      // Result expectation
-      expect(result).toEqual(bigNumberToDate(expectedResult));
-      // Verifications
-      verify(mockedContract.startTime).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('EndTime', () => {
-    test('should get the end time', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.endTime).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.endTime();
-      // Result expectation
-      expect(result).toEqual(bigNumberToDate(expectedResult));
-      // Verifications
-      verify(mockedContract.endTime).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('PausedTime', () => {
-    test('should get the paused time', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.pausedTime).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.pausedTime();
-      // Result expectation
-      expect(result).toEqual(bigNumberToDate(expectedResult));
-      // Verifications
-      verify(mockedContract.pausedTime).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('InvestorCount', () => {
-    test('should get the investor count', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.investorCount).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.investorCount();
-      // Result expectation
-      expect(result).toEqual(expectedResult.toNumber());
-      // Verifications
-      verify(mockedContract.investorCount).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('Wallet', () => {
-    test('should get the wallet address', async () => {
-      // Address expected
-      const expectedResult = '0x1234567890123456789012345678901234567890';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.wallet).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.wallet();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.wallet).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('TotalTokensSold', () => {
-    test('should get the total of tokens sold', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
-
-      // Security Token, its address, and decimals mocked
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
-      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.totalTokensSold).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.totalTokensSold();
-      // Result expectation
-      expect(result).toEqual(weiToValue(expectedResult, expectedDecimalsResult));
-      // Verifications
-      verify(mockedContract.totalTokensSold).once();
-      verify(mockedMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-    });
-  });
-
-  describe('GetRaised', () => {
-    test('should getRaised', async () => {
-      // Address expected
-      const expectedResult = new BigNumber(1);
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getRaised).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync(FundRaiseType.StableCoin)).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getRaised({ type: FundRaiseType.StableCoin });
-      // Result expectation
-      expect(result).toEqual(weiToValue(expectedResult, FULL_DECIMALS));
-      // Verifications
-      verify(mockedContract.getRaised).once();
-      verify(mockedMethod.callAsync(FundRaiseType.StableCoin)).once();
     });
   });
 
@@ -394,6 +270,59 @@ describe('STOWrapper', () => {
     });
   });
 
+  describe('ReclaimETH', () => {
+    test('should call to Reclaim ETH', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.reclaimETH).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
+        expectedResult,
+      );
+
+      // Real call
+      const result = await target.reclaimETH(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.reclaimETH).once();
+      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+    });
+  });
+
   describe('ReclaimERC20', () => {
     test('should call to Reclaim ERC20', async () => {
       // Owner Address expected
@@ -446,61 +375,31 @@ describe('STOWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
-  describe('ReclaimETH', () => {
-    test('should call to Reclaim ETH', async () => {
-      // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
+  describe('GetPermissions', () => {
+    test('should getPermissions', async () => {
+      // Address expected
+      const expectedResult = [stringToBytes32(Perm.Admin)];
       // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
+      const mockedMethod = mock(MockedCallMethod);
       // Stub the method
-      when(mockedContract.reclaimETH).thenReturn(instance(mockedMethod));
+      when(mockedContract.getPermissions).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.reclaimETH(mockedParams);
+      const result = await target.getPermissions();
 
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(stringToBytes32(result[0])).toBe(expectedResult[0]);
+
       // Verifications
-      verify(mockedContract.reclaimETH).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.getPermissions).once();
+      verify(mockedMethod.callAsync()).once();
     });
   });
 });

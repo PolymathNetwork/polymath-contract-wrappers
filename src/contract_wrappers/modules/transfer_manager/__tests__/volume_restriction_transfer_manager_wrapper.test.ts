@@ -2165,27 +2165,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     });
   });
 
-  describe('Get Init Function', () => {
-    test('Should getInitFunction', async () => {
-      // Address expected
-      const expectedResult = 'Function';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getInitFunction).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getInitFunction();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.getInitFunction).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
   describe('Get Exempt Address', () => {
     test('should getExemptAddress', async () => {
       // Address expected

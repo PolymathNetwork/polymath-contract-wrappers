@@ -290,14 +290,6 @@ export default class USDTieredSTOWrapper extends STO {
   };
 
   /**
-   *  Check if the module is paused
-   *  @return boolean if paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
    * Final amount of tokens returned to the issuer
    * @return amount of tokens
    */
@@ -590,7 +582,6 @@ export default class USDTieredSTOWrapper extends STO {
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
-
 
   /**
    * Return the total no. of tiers
@@ -909,6 +900,7 @@ export default class USDTieredSTOWrapper extends STO {
     const generalTMAddress = await (await this.securityTokenContract()).getModulesByName.callAsync(
       stringToBytes32(ModuleName.GeneralTransferManager),
     );
+
     const generalTM = new GeneralTransferManagerWrapper(
       this.web3Wrapper,
       this.generalTransferManagerContract(generalTMAddress[0]),

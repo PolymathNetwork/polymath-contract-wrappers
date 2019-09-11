@@ -323,13 +323,6 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   /**
-   * This function returns the signature of configure function
-   */
-  public getInitFunction = async (): Promise<string> => {
-    return (await this.contract).getInitFunction.callAsync();
-  };
-
-  /**
    * Used to verify the transfer transaction (View)
    *  @return boolean transfer result, address
    */
