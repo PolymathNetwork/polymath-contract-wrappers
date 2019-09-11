@@ -18,7 +18,7 @@ import {
   stringToBytes32,
   valueToWei,
 } from '../../../../utils/convert';
-import { FlagsType, TransferType, Perm, Partition } from '../../../../types';
+import { FlagsType, TransferType, Partition } from '../../../../types';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManagerWrapper;
@@ -1286,29 +1286,6 @@ describe('GeneralTransferManagerWrapper', () => {
           objectContaining(new BigNumber(mockedParams.toIndex)),
         ),
       ).once();
-    });
-  });
-
-  describe('GetPermissions', () => {
-    test('should getPermissions', async () => {
-      // Address expected
-      const expectedResult = [stringToBytes32(Perm.Admin)];
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getPermissions).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getPermissions();
-
-      // Result expectation
-      expect(stringToBytes32(result[0])).toBe(expectedResult[0]);
-
-      // Verifications
-      verify(mockedContract.getPermissions).once();
-      verify(mockedMethod.callAsync()).once();
     });
   });
 

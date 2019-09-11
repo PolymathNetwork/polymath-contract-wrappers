@@ -10,8 +10,8 @@ import {
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
 import { PolymathError } from '../../PolymathError';
-import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode, ContractVersion } from '../../types';
-import { stringToBytes32, parseModuleTypeValue } from '../../utils/convert';
+import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode, ContractVersion, Perm } from '../../types';
+import { stringToBytes32, parseModuleTypeValue, parsePermBytes32Value } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 import assert from '../../utils/assert';
 
@@ -70,6 +70,14 @@ export default class ModuleWrapper extends ContractWrapper {
   }
 
   /**
+   *  Check if the module is paused
+   *  @return boolean status of paused
+   */
+  public paused = async (): Promise<boolean> => {
+    return (await this.contract).paused.callAsync();
+  };
+
+  /**
    * Return init function result
    * @return init function string
    */
@@ -97,15 +105,16 @@ export default class ModuleWrapper extends ContractWrapper {
    * Return permissions
    * @return list of permissions
    */
-  public getPermissions = async (): Promise<string[]> => {
-    return (await this.contract).getPermissions.callAsync();
+  public getPermissions = async (): Promise<Perm[]> => {
+    const permissions = await (await this.contract).getPermissions.callAsync();
+    return permissions.map(parsePermBytes32Value);
   };
 
   /**
    * Return factory address
    * @return address
    */
-  public factory = async (): Promise<string> => {
+  public factory = async (): Promise<string> => {    
     return (await this.contract).factory.callAsync();
   };
 
@@ -138,6 +147,32 @@ export default class ModuleWrapper extends ContractWrapper {
     );
   };
 
+  /**
+   *  Pause the module
+   */
+  public pause = async (params: TxParams) => {
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   *  Unpause the module
+   */
+  public unpause = async (params: TxParams) => {
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Contract currently not paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
+    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
   public isValidModule = async () => {
     const moduleFactoryContract = await this.moduleFactoryContract();
     const getTypes = await moduleFactoryContract.getTypes.callAsync();
@@ -161,9 +196,10 @@ export default class ModuleWrapper extends ContractWrapper {
 
   public isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
     const from = await this.getCallerAddress(txData);
+    const stContract = await this.securityTokenContract();
     return functionsUtils.checksumAddressComparision(
       from,
-      await (await this.securityTokenContract()).owner.callAsync(),
+      await (stContract).owner.callAsync(),
     );
   };
 

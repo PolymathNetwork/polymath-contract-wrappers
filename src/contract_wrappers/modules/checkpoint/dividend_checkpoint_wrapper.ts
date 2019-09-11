@@ -291,32 +291,6 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   /**
-   *  pause the module
-   */
-  public pause = async (params: TxParams) => {
-    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  unpause the module
-   */
-  public unpause = async (params: TxParams) => {
-    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Contract currently not paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
    * Function used to change wallet address
    */
   public changeWallet = async (params: ChangeWalletParams) => {

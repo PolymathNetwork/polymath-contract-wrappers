@@ -6,7 +6,7 @@ import {
   USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
-import { STO } from '../sto_wrapper';
+import { STOCommon } from '../sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
   FULL_DECIMALS,
@@ -260,7 +260,7 @@ export interface USDTieredSTOData {
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
-export default class USDTieredSTOWrapper extends STO {
+export default class USDTieredSTOWrapper extends STOCommon {
   public contract: Promise<USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0>;
 
   public generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract_3_0_0> => {
@@ -287,14 +287,6 @@ export default class USDTieredSTOWrapper extends STO {
    */
   public allowBeneficialInvestments = async (): Promise<boolean> => {
     return (await this.contract).allowBeneficialInvestments.callAsync();
-  };
-
-  /**
-   *  Check if the module is paused
-   *  @return boolean if paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
   };
 
   /**
@@ -590,7 +582,6 @@ export default class USDTieredSTOWrapper extends STO {
       await (await this.securityTokenContract()).decimals.callAsync(),
     );
   };
-
 
   /**
    * Return the total no. of tiers
@@ -909,6 +900,7 @@ export default class USDTieredSTOWrapper extends STO {
     const generalTMAddress = await (await this.securityTokenContract()).getModulesByName.callAsync(
       stringToBytes32(ModuleName.GeneralTransferManager),
     );
+
     const generalTM = new GeneralTransferManagerWrapper(
       this.web3Wrapper,
       this.generalTransferManagerContract(generalTMAddress[0]),

@@ -25,7 +25,7 @@ export interface MixinSTO_3_1_0 {
 
   allowPreMinting: (params: TxParams) => Promise<PolyResponse>;
 
-  revokePreMinting: (params: TxParams) => Promise<PolyResponse>;
+  revokePreMintFlag: (params: TxParams) => Promise<PolyResponse>;
 }
 
 export const WithSTO_3_1_0 = <T extends Constructor<STOWrapper>>(Base: T): Constructor<MixinSTO_3_1_0> & T => {
@@ -99,7 +99,7 @@ export const WithSTO_3_1_0 = <T extends Constructor<STOWrapper>>(Base: T): Const
       const stAddress = await contract.securityToken.callAsync();
 
       if (stAddress === params.tokenContract) {
-        assert.assert((await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO should be finalized to');
+        assert.assert((await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO should be finalized to be able to reclaim minted tokens');
       }
       assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
       return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -120,7 +120,7 @@ export const WithSTO_3_1_0 = <T extends Constructor<STOWrapper>>(Base: T): Const
     /**
      * Disable pre minting
      */
-    public revokePreMinting = async (params: TxParams) => {
+    public revokePreMintFlag = async (params: TxParams) => {
       assert.isFutureDate(await this.startTime(), 'STO already started');
       return (await this.contract).revokePreMintFlag.sendTransactionAsync(params.txData, params.safetyFactor);
     };

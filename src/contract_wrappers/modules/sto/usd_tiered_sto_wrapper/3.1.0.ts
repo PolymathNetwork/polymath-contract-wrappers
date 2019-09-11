@@ -3,7 +3,7 @@ import { schemas } from '@0x/json-schemas';
 import USDTieredSTOWrapper, { TierIndexParams } from './common';
 import assert from '../../../../utils/assert';
 import {
-  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, Mixin, FULL_DECIMALS,
+  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
 } from '../../../../types';
 import {
   numberToBigNumber,  

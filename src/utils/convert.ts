@@ -9,7 +9,11 @@ export function bytes32ToString(value: string): string {
 }
 
 export function stringToBytes32(value: string): string {
-  return ethersUtils.formatBytes32String(value);
+  return ethersUtils.formatBytes32String(value);  
+}
+
+export function stringToKeccak256(value: string): string {
+  return ethersUtils.id(value);
 }
 
 export function checksumAddress(value: string): string {
@@ -99,7 +103,7 @@ export function parsePermBytes32Value(value: string): Perm {
     case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
+      throw new PolymathError({ message: 'Permission not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parseModuleTypeValue(value: BigNumber): ModuleType {

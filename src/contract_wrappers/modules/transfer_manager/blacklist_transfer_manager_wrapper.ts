@@ -36,7 +36,6 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
-  parsePermBytes32Value,
   parseTransferResult,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -751,14 +750,6 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
       ),
       decimals,
     );
-  };
-
-  /**
-   * Return the permissions flags that are associated with blacklist transfer manager
-   */
-  public getPermissions = async (): Promise<Perm[]> => {
-    const permissions = await (await this.contract).getPermissions.callAsync();
-    return permissions.map(parsePermBytes32Value);
   };
 
   /**

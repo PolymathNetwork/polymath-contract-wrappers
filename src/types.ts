@@ -86,9 +86,6 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 
 export type Constructor<T = {}> = new(...args: any[]) => T;
-export type AnyFunction<A = any> = (...input: any[]) => A
-
-export type Mixin<T extends AnyFunction> = InstanceType<ReturnType<T>>
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'

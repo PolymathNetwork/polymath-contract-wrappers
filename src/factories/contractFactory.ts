@@ -31,7 +31,7 @@ import {
   USDTieredSTOContract_3_1_0,
   CappedSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
-import { PolymathError } from 'PolymathError';
+import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
 import getDefaultContractAddresses from '../utils/addresses';
 import { PolymathContract, NetworkId, ContractVersion, ErrorCode } from '../types';

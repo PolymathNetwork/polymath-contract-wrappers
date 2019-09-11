@@ -1,12 +1,13 @@
-import { CappedSTOContract_3_0_0, Web3Wrapper, CappedSTOEventArgs_3_0_0, CappedSTOEvents_3_0_0, LogWithDecodedArgs, EventCallback, CappedSTOTokenPurchaseEventArgs_3_0_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0, CappedSTOSetFundRaiseTypesEventArgs_3_0_0, CappedSTOPauseEventArgs_3_0_0, CappedSTOUnpauseEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import { CappedSTOContract_3_0_0, Web3Wrapper, CappedSTOEventArgs_3_0_0, CappedSTOEvents_3_0_0, LogWithDecodedArgs, EventCallback, CappedSTOTokenPurchaseEventArgs_3_0_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0, CappedSTOSetFundRaiseTypesEventArgs_3_0_0, CappedSTOPauseEventArgs_3_0_0, CappedSTOUnpauseEventArgs_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import CappedSTOWrapper from './common';
 import assert from '../../../../utils/assert';
 import {
-  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs,
+  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
 } from '../../../../types';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
+import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents_3_0_0.TokenPurchase;
@@ -71,6 +72,27 @@ interface GetCappedSTOLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CappedSTOUnpauseEventArgs_3_0_0>[]>;
 }
 
+// // Return types ////
+export interface CappedSTODetails {
+  /** Timestamp at which offering gets start. */
+  startTime: Date;
+  /** Timestamp at which offering ends. */
+  endTime: Date;
+  /** Number of token base units this STO will be allowed to sell to investors. */
+  cap: BigNumber;
+  /** Token units a buyer gets(multiplied by 10^18) per wei / base unit of POLY */
+  rate: BigNumber;
+  /** Amount of funds raised */
+  fundsRaised: BigNumber;
+  /** Number of individual investors this STO have. */
+  investorCount: number;
+  /** Amount of tokens get sold. */
+  totalTokensSold: BigNumber;
+  /** Boolean value to justify whether the fund raise type is POLY or not, i.e true for POLY. */
+  isRaisedInPoly: boolean;
+}
+// // End of return types ////
+
 const CappedSTOWrapperBase_3_0_0 = WithSTO_3_0_0(CappedSTOWrapper);
 
 export class CappedSTO_3_0_0 extends CappedSTOWrapperBase_3_0_0 {
@@ -86,7 +108,30 @@ export class CappedSTO_3_0_0 extends CappedSTOWrapperBase_3_0_0 {
   public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_0_0>, contractFactory: ContractFactory) {
     super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
-  }  
+  }
+
+  /**
+   * Return the STO details
+   * @return Date at which offering gets start, Date at which offering ends, Number of token base units this STO will
+   * be allowed to sell to investors, Token units a buyer gets as the rate, Amount of funds raised, Number of
+   * individual investors this STO have, Amount of tokens get sold, Boolean value to justify whether the fund raise
+   * type is POLY or not, ie true for POLY
+   */
+  public getSTODetails = async (): Promise<CappedSTODetails> => {
+    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
+    const result = await (await this.contract).getSTODetails.callAsync();
+    const typedResult: CappedSTODetails = {
+      startTime: bigNumberToDate(result[0]),
+      endTime: bigNumberToDate(result[1]),
+      cap: weiToValue(result[2], decimals),
+      rate: weiToValue(result[3], FULL_DECIMALS),
+      fundsRaised: weiToValue(result[4], FULL_DECIMALS),
+      investorCount: new BigNumber(result[5]).toNumber(),
+      totalTokensSold: weiToValue(result[6], decimals),
+      isRaisedInPoly: result[7],
+    };
+    return typedResult;
+  };
 
   /**
    * Subscribe to an event type emitted by the contract.

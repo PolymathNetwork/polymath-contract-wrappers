@@ -3,20 +3,18 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   CappedSTOContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
+  PolyTokenContract_3_0_0,  
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import CappedSTOWrapper from '../capped_sto_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import STOWrapper from '../sto_wrapper';
-import { dateToBigNumber, valueToWei, weiToValue } from '../../../../utils/convert';
-import { FULL_DECIMALS, FundRaiseType } from '../../../../types';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import CappedSTOWrapper from '../common';
+import ContractFactory from '../../../../../factories/contractFactory';
+import { STOCommon } from '../../sto_wrapper';
+import { valueToWei, weiToValue } from '../../../../../utils/convert';
+import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('CappedSTOWrapper', () => {
-  // Capped STO Wrapper is used as contract target here as STOWrapper is abstract
+describe('CappedSTOWrapper', () => {  
   let target: CappedSTOWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_0_0;
@@ -45,7 +43,7 @@ describe('CappedSTOWrapper', () => {
 
   describe('Types', () => {
     test('should extend STOWrapper', async () => {
-      expect(target instanceof STOWrapper).toBe(true);
+      expect(target instanceof STOCommon).toBe(true);
     });
   });
 
@@ -292,68 +290,6 @@ describe('CappedSTOWrapper', () => {
     });
   });
 
-  describe('GetSTODetails', () => {
-    test('should call getSTODetails', async () => {
-      const expectedStartTime = new Date(2025, 1);
-      const expectedEndTime = new Date(2026, 1);
-      const cap = new BigNumber(1);
-      const rate = new BigNumber(1);
-      const fundsRaised = new BigNumber(1);
-      const totalTokensSold = new BigNumber(1);
-      const expectedResult = [
-        dateToBigNumber(expectedStartTime),
-        dateToBigNumber(expectedEndTime),
-        cap,
-        rate,
-        fundsRaised,
-        new BigNumber(1),
-        totalTokensSold,
-        true,
-      ];
-
-      // Security Token, its address, and decimals mocked
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const expectedDecimalsResult = new BigNumber(18);
-      const mockedDecimalsMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
-      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
-
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getSTODetails).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getSTODetails();
-      // Result expectation
-      expect(result.startTime).toEqual(expectedStartTime);
-      expect(result.endTime).toEqual(expectedEndTime);
-      expect(result.cap).toEqual(weiToValue(cap, expectedDecimalsResult));
-      expect(result.rate).toEqual(weiToValue(rate, FULL_DECIMALS));
-      expect(result.fundsRaised).toEqual(weiToValue(fundsRaised, FULL_DECIMALS));
-      expect(result.investorCount).toEqual(1);
-      expect(result.totalTokensSold).toEqual(weiToValue(totalTokensSold, expectedDecimalsResult));
-      expect(result.isRaisedInPoly).toBe(expectedResult[7]);
-
-      // Verifications
-      verify(mockedContract.getSTODetails).once();
-      verify(mockedMethod.callAsync()).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenContract.decimals).once();
-      verify(mockedDecimalsMethod.callAsync()).once();
-    });
-  });
-
   describe('BuyTokens', () => {
     test('should buy tokens', async () => {
       // Address expected
@@ -555,24 +491,5 @@ describe('CappedSTOWrapper', () => {
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
     });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'TokenPurchase', 'SetAllowBeneficialInvestments', 'Pause', 'Unpause', 'SetFundRaiseTypes', encountered: Transfer`,
-        ),
-      );
-    });
-  });
+  });  
 });
