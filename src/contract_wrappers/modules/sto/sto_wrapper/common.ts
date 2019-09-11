@@ -13,7 +13,7 @@ export interface FundRaiseTypesParams {
 /**
  * This class includes the functionality related to interacting with all STO contracts
  */
-export default abstract class STOWrapper extends ModuleWrapper {
+export default abstract class STOCommon extends ModuleWrapper {
   public abstract contract: Promise<STOBaseContract>;
 
   /**

@@ -12,7 +12,7 @@ import {
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import USDTieredSTOWrapper from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
-import { STO } from '../../sto_wrapper';
+import { STOCommon } from '../../sto_wrapper';
 import {
   dateToBigNumber,
   stringToBytes32,
@@ -58,7 +58,7 @@ describe('USDTieredSTOWrapper', () => {
 
   describe('Types', () => {
     test('should extend STOWrapper', async () => {
-      expect(target instanceof STO).toBe(true);
+      expect(target instanceof STOCommon).toBe(true);
     });
   });
 

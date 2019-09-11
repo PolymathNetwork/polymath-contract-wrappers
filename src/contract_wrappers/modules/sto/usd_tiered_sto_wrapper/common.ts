@@ -6,7 +6,7 @@ import {
   USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
-import { STO } from '../sto_wrapper';
+import { STOCommon } from '../sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
   FULL_DECIMALS,
@@ -260,7 +260,7 @@ export interface USDTieredSTOData {
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
-export default class USDTieredSTOWrapper extends STO {
+export default class USDTieredSTOWrapper extends STOCommon {
   public contract: Promise<USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0>;
 
   public generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract_3_0_0> => {

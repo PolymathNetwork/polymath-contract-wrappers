@@ -5,7 +5,7 @@ import {
   CappedSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
-import { STO } from '../sto_wrapper';
+import { STOCommon } from '../sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
   TxParams,
@@ -55,11 +55,11 @@ export interface BuyTokensWithPolyParams extends TxParams {
 /**
  * This class includes the functionality related to interacting with the CappedSTO contract.
  */
-export default class CappedSTOWrapper extends STO {
+export default class CappedSTOCommon extends STOCommon {
   public contract: Promise<CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0>;
 
   /**
-   * Instantiate CappedSTOWrapper
+   * Instantiate CappedSTOCommon
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */

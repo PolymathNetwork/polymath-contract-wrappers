@@ -10,3 +10,4 @@ export {
   USDTieredSTO_3_1_0,
   isUSDTieredSTO_3_1_0
 };
+export { default as USDTieredSTOCommon } from './common';

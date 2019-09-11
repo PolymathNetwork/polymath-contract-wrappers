@@ -10,7 +10,7 @@ import {
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import CappedSTOWrapper from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
-import { STO } from '../../sto_wrapper';
+import { STOCommon } from '../../sto_wrapper';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
@@ -43,7 +43,7 @@ describe('CappedSTOWrapper', () => {
 
   describe('Types', () => {
     test('should extend STOWrapper', async () => {
-      expect(target instanceof STO).toBe(true);
+      expect(target instanceof STOCommon).toBe(true);
     });
   });
 

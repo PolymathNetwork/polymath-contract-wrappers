@@ -10,3 +10,4 @@ export {
   CappedSTO_3_1_0,
   isCappedSTO_3_1_0
 };
+export { default as CappedSTOCommon } from './common';
