@@ -22,7 +22,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
-  PolyResponse
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -1209,7 +1209,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return the [usd & poly] fee for a particular feetype
    */
 
-  public getFees = async (params: GetFeesParams): Promise<[BigNumber, BigNumber]> => {
+  public getFees = async (params: GetFeesParams): Promise<BigNumber[]> => {
     const { feeType } = params;
     if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
       assert.assert(false, ErrorCode.InvalidData, 'Incorrect fee type');
