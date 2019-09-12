@@ -379,6 +379,6 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
   };
 }
 
-export function isUSDTieredSTO_3_1_0(wrapper: any): wrapper is USDTieredSTO_3_1_0 {
+export function isUSDTieredSTO_3_1_0(wrapper: USDTieredSTOCommon): wrapper is USDTieredSTO_3_1_0 {
   return wrapper.contractVersion === ContractVersion.V3_1_0;
 };
