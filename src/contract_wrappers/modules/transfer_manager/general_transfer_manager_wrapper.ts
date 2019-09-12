@@ -25,6 +25,7 @@ import {
   weiToValue,
   bytes32ToString,
   stringToBytes32,
+  parseTransferResult,
 } from '../../../utils/convert';
 import ContractFactory from '../../../factories/contractFactory';
 import {
@@ -39,6 +40,7 @@ import {
   TransferType,
   Partition,
   ErrorCode,
+  TransferResult
 } from '../../../types';
 
 const ONE_HUNDRED = new BigNumber(100);
@@ -370,6 +372,15 @@ interface InvestorFlag {
   isAccredited: boolean;
   canNotBuyFromSTO: boolean;
   isVolRestricted: boolean;
+}
+
+/**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
 }
 
 // // End of return types ////
@@ -739,14 +750,18 @@ export default class GeneralTransferManagerWrapper extends ModuleWrapper {
   /**
    * Default implementation of verifyTransfer used by SecurityToken
    */
-  public verifyTransfer = async (params: ExecuteTransferParams): Promise<[BigNumber, string]> => {
+  public verifyTransfer = async (params: ExecuteTransferParams): Promise<VerifyTransfer> => {
     const result = await (await this.contract).verifyTransfer.callAsync(
       params.from,
       params.to,
       ONE_HUNDRED, // this value isn't used by the contracts, so we send an arbitrary value
       params.data,
     );
-    return result;
+    const transferResult = parseTransferResult(result[0]);
+    return {
+      transferResult,
+      address: result[1],
+    };
   };
 
   /**
