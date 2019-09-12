@@ -1,4 +1,4 @@
-import { BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, Web3Wrapper, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ERC20Contract } from '../../types';
@@ -83,7 +83,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Approves the passed address to spend the specified amount of tokens
    */
-  public approve = async (params: ApproveParams) => {
+  public approve = async (params: ApproveParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('spender', params.spender);
     return (await this.contract).approve.sendTransactionAsync(
       params.spender,
@@ -104,7 +104,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Send tokens amount of tokens from address from to address to
    */
-  public transferFrom = async (params: TransferFromParams) => {
+  public transferFrom = async (params: TransferFromParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transferFrom.sendTransactionAsync(
@@ -146,7 +146,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
   /**
    * Transfer the balance from token owner's account to 'to' account
    */
-  public transfer = async (params: TransferParams) => {
+  public transfer = async (params: TransferParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transfer.sendTransactionAsync(
       params.to,
@@ -160,7 +160,7 @@ export default abstract class ERC20TokenWrapper extends ContractWrapper {
    * Function to check the amount of tokens a spender is allowed to spend
    * @return A BigNumber specifying the amount of tokens left available for the spender
    */
-  public allowance = async (params: AllowanceParams) => {
+  public allowance = async (params: AllowanceParams): Promise<BigNumber> => {
     assert.isETHAddressHex('owner', params.owner);
     assert.isETHAddressHex('spender', params.spender);
     return weiToValue(
