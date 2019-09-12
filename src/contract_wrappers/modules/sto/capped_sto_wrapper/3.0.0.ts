@@ -8,6 +8,7 @@ import {
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
+import { CappedSTO_3_1_0 } from '.';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents_3_0_0.TokenPurchase;
@@ -173,6 +174,6 @@ export class CappedSTO_3_0_0 extends CappedSTOBase_3_0_0 {
   };
 }
 
-export function isCappedSTO_3_0_0(wrapper: any): wrapper is CappedSTO_3_0_0 {
+export function isCappedSTO_3_0_0(wrapper: CappedSTOCommon): wrapper is CappedSTO_3_0_0 {
   return wrapper.contractVersion === ContractVersion.V3_0_0;
 };

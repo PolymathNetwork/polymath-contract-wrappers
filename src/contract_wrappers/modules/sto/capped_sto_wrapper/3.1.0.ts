@@ -291,6 +291,6 @@ export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
   };
 }
 
-export function isCappedSTO_3_1_0(wrapper: any): wrapper is CappedSTO_3_1_0 {
+export function isCappedSTO_3_1_0(wrapper: CappedSTOCommon): wrapper is CappedSTO_3_1_0 {
   return wrapper.contractVersion === ContractVersion.V3_1_0;
 };
