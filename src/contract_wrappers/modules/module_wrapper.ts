@@ -6,6 +6,7 @@ import {
   Web3Wrapper,
   TxData,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import ContractFactory from '../../factories/contractFactory';
@@ -110,7 +111,7 @@ export default class ModuleWrapper extends ContractWrapper {
   /**
    * Reclaim ETH from contract
    */
-  public reclaimETH = async (params: TxParams) => {
+  public reclaimETH = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -122,7 +123,7 @@ export default class ModuleWrapper extends ContractWrapper {
   /**
    * Reclaim ERC20 tokens from contract
    */
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -136,7 +137,7 @@ export default class ModuleWrapper extends ContractWrapper {
     );
   };
 
-  public isValidModule = async () => {
+  public isValidModule = async (): Promise<boolean> => {
     const moduleFactoryContract = await this.moduleFactoryContract();
     const getTypes = await moduleFactoryContract.getTypes.callAsync();
     const types = getTypes.filter(type => {

@@ -20,6 +20,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -46,6 +47,7 @@ import {
   RestrictionType,
   PERCENTAGE_DECIMALS,
   ErrorCode,
+  TransferResult
 } from '../../../types';
 
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
@@ -408,6 +410,15 @@ interface IndividualRestriction {
   restrictionType: RestrictionType;
 }
 
+/**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
+}
+
 // // End of return types ////
 
 /**
@@ -433,7 +444,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -454,7 +465,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -468,7 +479,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
    * Used to verify the transfer transaction (View)
    * @return boolean transfer result, address
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -575,7 +586,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Add/Remove wallet address from the exempt list
    */
-  public changeExemptWalletList = async (params: ChangeExemptWalletListParams) => {
+  public changeExemptWalletList = async (params: ChangeExemptWalletListParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
     assert.assert(
       !(await this.getExemptAddress()).includes(params.wallet) === params.change,
@@ -593,7 +604,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new individual restriction for multiple token holders
    */
-  public addIndividualRestriction = async (params: IndividualRestrictionParams) => {
+  public addIndividualRestriction = async (params: IndividualRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -628,7 +639,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new individual daily restriction for all token holder
    */
-  public addIndividualDailyRestriction = async (params: IndividualRestrictionParams) => {
+  public addIndividualDailyRestriction = async (params: IndividualRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -651,7 +662,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new individual daily restriction for multiple token holders
    */
-  public addIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams) => {
+  public addIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -696,7 +707,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new individual restriction for multiple token holders
    */
-  public addIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+  public addIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -749,7 +760,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new default restriction for all token holder
    */
-  public addDefaultRestriction = async (params: RestrictionParams) => {
+  public addDefaultRestriction = async (params: RestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -777,7 +788,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to add the new default daily restriction for all token holder
    */
-  public addDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
+  public addDefaultDailyRestriction = async (params: DailyRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -798,7 +809,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the individual restriction for a given address
    */
-  public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams) => {
+  public removeIndividualRestriction = async (params: HolderIndividualRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -819,7 +830,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the individual restriction for a given address
    */
-  public removeIndividualRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
+  public removeIndividualRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -844,7 +855,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the individual daily restriction for a given address
    */
-  public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams) => {
+  public removeIndividualDailyRestriction = async (params: HolderIndividualRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -865,7 +876,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the individual daily restriction for a given address
    */
-  public removeIndividualDailyRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams) => {
+  public removeIndividualDailyRestrictionMulti = async (params: RemoveIndividualRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -890,7 +901,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the default restriction
    */
-  public removeDefaultRestriction = async (params: TxParams) => {
+  public removeDefaultRestriction = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -903,7 +914,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to remove the daily default restriction
    */
-  public removeDefaultDailyRestriction = async (params: TxParams) => {
+  public removeDefaultDailyRestriction = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -919,7 +930,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the existing individual restriction for a given token holder
    */
-  public modifyIndividualRestriction = async (params: IndividualRestrictionParams) => {
+  public modifyIndividualRestriction = async (params: IndividualRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -949,7 +960,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the existing individual daily restriction for a given token holder
    */
-  public modifyIndividualDailyRestriction = async (params: IndividualDailyRestrictionParams) => {
+  public modifyIndividualDailyRestriction = async (params: IndividualDailyRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -972,7 +983,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the existing individual daily restriction for multiple token holders
    */
-  public modifyIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams) => {
+  public modifyIndividualDailyRestrictionMulti = async (params: IndividualDailyRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -1017,7 +1028,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the existing individual restriction for multiple token holders
    */
-  public modifyIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams) => {
+  public modifyIndividualRestrictionMulti = async (params: IndividualRestrictionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -1064,7 +1075,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the global restriction for all token holders
    */
-  public modifyDefaultRestriction = async (params: RestrictionParams) => {
+  public modifyDefaultRestriction = async (params: RestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -1092,7 +1103,7 @@ export default class VolumeRestrictionTransferManagerWrapper extends ModuleWrapp
   /**
    * Use to modify the daily default restriction for all token holders
    */
-  public modifyDefaultDailyRestriction = async (params: DailyRestrictionParams) => {
+  public modifyDefaultDailyRestriction = async (params: DailyRestrictionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

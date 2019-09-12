@@ -12,6 +12,7 @@ import {
   LockUpTransferManagerUnpauseEventArgs,
   LogWithDecodedArgs,
   Web3Wrapper,
+  PolyResponse
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -368,7 +369,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -381,14 +382,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Check if the module is paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -534,7 +535,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to add the new lockup type
    */
-  public addNewLockUpType = async (params: LockUpTypeParams) => {
+  public addNewLockUpType = async (params: LockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -556,7 +557,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to add multiple new lockup types
    */
-  public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
+  public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupAmounts.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths(
       [
@@ -601,7 +602,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add a lockup to a specific user
    */
-  public addLockUpByName = async (params: LockUpByNameParams) => {
+  public addLockUpByName = async (params: LockUpByNameParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -619,7 +620,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add multiple lockups to multiple users
    */
-  public addLockUpByNameMulti = async (params: LockUpByNameMultiParams) => {
+  public addLockUpByNameMulti = async (params: LockUpByNameMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
     assert.assert(
@@ -648,7 +649,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin create a volume restriction lockup for a given address.
    */
-  public addNewLockUpToUser = async (params: AddNewLockUpToUserParams) => {
+  public addNewLockUpToUser = async (params: AddNewLockUpToUserParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -673,7 +674,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin create multiple volume restriction lockups for multiple given addresses.
    */
-  public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams) => {
+  public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -723,7 +724,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin remove a user from a lock up
    */
-  public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams) => {
+  public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -741,7 +742,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to remove the lockup for multiple users
    */
-  public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams) => {
+  public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
     assert.assert(
@@ -770,7 +771,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to remove the lockup type
    */
-  public removeLockupType = async (params: RemoveLockUpTypeParams) => {
+  public removeLockupType = async (params: RemoveLockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -787,7 +788,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to remove the multiple lockup type
    */
-  public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams) => {
+  public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -809,7 +810,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin modify a lockup.
    */
-  public modifyLockUpType = async (params: LockUpTypeParams) => {
+  public modifyLockUpType = async (params: LockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -831,7 +832,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin modify a volume restriction lockup for multiple addresses.
    */
-  public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
+  public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupAmounts.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths(
       [

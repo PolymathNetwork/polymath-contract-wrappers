@@ -6,6 +6,7 @@ import {
   FeatureRegistryOwnershipTransferredEventArgs,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
@@ -109,7 +110,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Change a feature status
    */
-  public setFeatureStatus = async (params: SetFeatureStatusParams) => {
+  public setFeatureStatus = async (params: SetFeatureStatusParams): Promise<PolyResponse> => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
       ErrorCode.Unauthorized,
