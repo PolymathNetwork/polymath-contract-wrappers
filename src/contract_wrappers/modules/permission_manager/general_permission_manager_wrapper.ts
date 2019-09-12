@@ -6,6 +6,7 @@ import {
   GeneralPermissionManagerAddDelegateEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
@@ -183,7 +184,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Mapping used to hold the permissions on the modules provided to delegate
    */
-  public perms = async (params: PermParams) => {
+  public perms = async (params: PermParams): Promise<boolean> => {
     assert.isETHAddressHex('module', params.module);
     assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).perms.callAsync(params.module, params.delegate, stringToBytes32(params.permission));
@@ -221,7 +222,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to add a delegate
    */
-  public addDelegate = async (params: AddDelegateParams) => {
+  public addDelegate = async (params: AddDelegateParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -245,7 +246,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete a delegate
    */
-  public deleteDelegate = async (params: DelegateTxParams) => {
+  public deleteDelegate = async (params: DelegateTxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -276,7 +277,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to provide/change the permission to the delegate corresponds to the module contract
    */
-  public changePermission = async (params: ChangePermissionParams) => {
+  public changePermission = async (params: ChangePermissionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -297,7 +298,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to change one or more permissions for a single delegate at once
    */
-  public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
+  public changePermissionMulti = async (params: ChangePermissionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -364,7 +365,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * Used to get all delegates
    * @return delegate addresses array
    */
-  public getAllDelegates = async () => {
+  public getAllDelegates = async (): Promise<string[]> => {
     return (await this.contract).getAllDelegates.callAsync();
   };
 

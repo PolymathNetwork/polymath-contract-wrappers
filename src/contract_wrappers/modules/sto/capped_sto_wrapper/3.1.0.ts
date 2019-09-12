@@ -1,4 +1,4 @@
-import { Web3Wrapper, EventCallback, CappedSTOEvents_3_1_0, CappedSTOTokenPurchaseEventArgs_3_1_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, CappedSTOSetFundRaiseTypesEventArgs_3_1_0, CappedSTOPauseEventArgs_3_1_0, CappedSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, CappedSTOContract_3_1_0, CappedSTOEventArgs_3_1_0, CappedSTOReserveTokenMintEventArgs_3_1_0, CappedSTOReserveTokenTransferEventArgs_3_1_0, CappedSTOAllowPreMintFlagEventArgs_3_1_0, CappedSTORevokePreMintFlagEventArgs_3_1_0, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper, EventCallback, CappedSTOEvents_3_1_0, CappedSTOTokenPurchaseEventArgs_3_1_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, CappedSTOSetFundRaiseTypesEventArgs_3_1_0, CappedSTOPauseEventArgs_3_1_0, CappedSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, CappedSTOContract_3_1_0, CappedSTOEventArgs_3_1_0, CappedSTOReserveTokenMintEventArgs_3_1_0, CappedSTOReserveTokenTransferEventArgs_3_1_0, CappedSTOAllowPreMintFlagEventArgs_3_1_0, CappedSTORevokePreMintFlagEventArgs_3_1_0, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import functionsUtils from '../../../../utils/functions_utils';
 import CappedSTOCommon, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
@@ -185,8 +185,8 @@ export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
 
   /**
    * Low level token purchase
-   */
-  public buyTokens = async (params: BuyTokensParams) => {
+   */  
+  public buyTokens = async (params: BuyTokensParams): Promise<PolyResponse> => {
     assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
     assert.isNonZeroETHAddressHex('beneficiary', params.beneficiary);
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');
@@ -223,7 +223,7 @@ export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
   /**
    * Low level token purchase for poly
    */
-  public buyTokensWithPoly = async (params: BuyTokensWithPolyParams) => {
+  public buyTokensWithPoly = async (params: BuyTokensWithPolyParams): Promise<PolyResponse> => {
     assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
     assert.isBigNumberGreaterThanZero(params.investedPOLY, 'Amount invested should not be equal to 0');
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Should not be paused');

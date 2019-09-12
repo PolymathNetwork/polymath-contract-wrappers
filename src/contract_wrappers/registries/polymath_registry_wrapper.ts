@@ -6,6 +6,7 @@ import {
   PolymathRegistryOwnershipTransferredEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -158,7 +159,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
   /**
    * Changes the contract address
    */
-  public changeAddress = async (params: ChangeAddressParams) => {
+  public changeAddress = async (params: ChangeAddressParams): Promise<PolyResponse> => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
       ErrorCode.Unauthorized,
