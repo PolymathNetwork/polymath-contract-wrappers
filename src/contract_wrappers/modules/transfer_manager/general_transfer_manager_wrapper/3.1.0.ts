@@ -192,6 +192,6 @@ export class GeneralTransferManager_3_1_0 extends GeneralTransferManagerCommon {
   };
 }
 
-export function isGeneralTransferManager_3_1_0(wrapper: any): wrapper is GeneralTransferManager_3_1_0 {
+export function isGeneralTransferManager_3_1_0(wrapper: GeneralTransferManagerCommon): wrapper is GeneralTransferManager_3_1_0 {
   return wrapper.contractVersion === ContractVersion.V3_1_0;
 }
