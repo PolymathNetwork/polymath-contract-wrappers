@@ -1,7 +1,7 @@
 import { Web3Wrapper, EventCallback, CappedSTOEvents_3_1_0, CappedSTOTokenPurchaseEventArgs_3_1_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, CappedSTOSetFundRaiseTypesEventArgs_3_1_0, CappedSTOPauseEventArgs_3_1_0, CappedSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, CappedSTOContract_3_1_0, CappedSTOEventArgs_3_1_0, CappedSTOReserveTokenMintEventArgs_3_1_0, CappedSTOReserveTokenTransferEventArgs_3_1_0, CappedSTOAllowPreMintFlagEventArgs_3_1_0, CappedSTORevokePreMintFlagEventArgs_3_1_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import functionsUtils from '../../../../utils/functions_utils';
-import CappedSTOWrapper, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
+import CappedSTOCommon, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
 import assert from '../../../../utils/assert';
 import {
   ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType,
@@ -141,15 +141,15 @@ export interface CappedSTODetails {
   preMintingAllowed: boolean;
 }
 
-const CappedSTOWrapperBase_3_1_0 = WithSTO_3_1_0(CappedSTOWrapper);
+const CappedSTOBase_3_1_0 = WithSTO_3_1_0(CappedSTOCommon);
 
-export class CappedSTO_3_1_0 extends CappedSTOWrapperBase_3_1_0 {
+export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
   public contract: Promise<CappedSTOContract_3_1_0>;
 
   public contractVersion = ContractVersion.V3_1_0;
 
   /**
-   * Instantiate CappedSTOWrapper
+   * Instantiate CappedSTO_3_1_0
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */

@@ -1,6 +1,6 @@
 import { USDTieredSTOContract_3_1_0, BigNumber, Web3Wrapper, USDTieredSTOEvents_3_1_0, EventCallback, USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, USDTieredSTOSetNonAccreditedLimitEventArgs_3_1_0, USDTieredSTOSetTreasuryWalletEventArgs_3_1_0, USDTieredSTOTokenPurchaseEventArgs_3_1_0, USDTieredSTOFundsReceivedEventArgs_3_1_0, USDTieredSTOReserveTokenMintEventArgs_3_1_0, USDTieredSTOSetAddressesEventArgs_3_1_0, USDTieredSTOSetLimitsEventArgs_3_1_0, USDTieredSTOSetTimesEventArgs_3_1_0, USDTieredSTOSetTiersEventArgs_3_1_0, USDTieredSTOSetFundRaiseTypesEventArgs_3_1_0, USDTieredSTOPauseEventArgs_3_1_0, USDTieredSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, USDTieredSTOEventArgs_3_1_0, USDTieredSTOReserveTokenTransferEventArgs_3_1_0, USDTieredSTOAllowPreMintFlagEventArgs_3_1_0, USDTieredSTORevokePreMintFlagEventArgs_3_1_0 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import USDTieredSTOWrapper, { TierIndexParams } from './common';
+import USDTieredSTOCommon, { TierIndexParams } from './common';
 import assert from '../../../../utils/assert';
 import {
   ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
@@ -248,15 +248,15 @@ interface Tier {
   soldDiscountPoly: BigNumber;
 }
 
-const USDTieredSTOWrapperBase_3_1_0 = WithSTO_3_1_0(USDTieredSTOWrapper);
+const USDTieredSTOBase_3_1_0 = WithSTO_3_1_0(USDTieredSTOCommon);
 
-export class USDTieredSTO_3_1_0 extends USDTieredSTOWrapperBase_3_1_0 {
+export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
   public contract: Promise<USDTieredSTOContract_3_1_0>;
 
   public contractVersion = ContractVersion.V3_1_0;
 
   /**
-   * Instantiate USDTieredSTOWrapper
+   * Instantiate USDTieredSTO_3_1_0
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */

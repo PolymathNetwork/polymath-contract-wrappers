@@ -1,6 +1,6 @@
 import { CappedSTOContract_3_0_0, Web3Wrapper, CappedSTOEventArgs_3_0_0, CappedSTOEvents_3_0_0, LogWithDecodedArgs, EventCallback, CappedSTOTokenPurchaseEventArgs_3_0_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0, CappedSTOSetFundRaiseTypesEventArgs_3_0_0, CappedSTOPauseEventArgs_3_0_0, CappedSTOUnpauseEventArgs_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import CappedSTOWrapper from './common';
+import CappedSTOCommon from './common';
 import assert from '../../../../utils/assert';
 import {
   ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
@@ -93,15 +93,15 @@ export interface CappedSTODetails {
 }
 // // End of return types ////
 
-const CappedSTOWrapperBase_3_0_0 = WithSTO_3_0_0(CappedSTOWrapper);
+const CappedSTOBase_3_0_0 = WithSTO_3_0_0(CappedSTOCommon);
 
-export class CappedSTO_3_0_0 extends CappedSTOWrapperBase_3_0_0 {
+export class CappedSTO_3_0_0 extends CappedSTOBase_3_0_0 {
   public contract: Promise<CappedSTOContract_3_0_0>;
 
   public contractVersion = ContractVersion.V3_0_0;
 
   /**
-   * Instantiate CappedSTOWrapper
+   * Instantiate CappedSTO_3_0_0
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
