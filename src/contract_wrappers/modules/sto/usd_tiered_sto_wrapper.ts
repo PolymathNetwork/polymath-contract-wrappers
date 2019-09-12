@@ -19,6 +19,7 @@ import {
   Web3Wrapper,
   BigNumber,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -507,7 +508,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Amount in fund raise type invested by each investor
    * @return amount invested
    */
-  public investorInvested = async (params: InvestorInvestedParams) => {
+  public investorInvested = async (params: InvestorInvestedParams): Promise<BigNumber> => {
     assert.isETHAddressHex('investorAddress', params.investorAddress);
     return weiToValue(
       await (await this.contract).investorInvested.callAsync(params.investorAddress, params.fundRaiseType),
@@ -527,7 +528,9 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Function to set allowBeneficialInvestments (allow beneficiary to be different to funder)
    */
-  public changeAllowBeneficialInvestments = async (params: ChangeAllowBeneficialInvestmentsParams) => {
+  public changeAllowBeneficialInvestments = async (
+    params: ChangeAllowBeneficialInvestmentsParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -548,7 +551,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy with eth without rate restriction
    */
-  public buyWithETH = async (params: BuyWithETHParams) => {
+  public buyWithETH = async (params: BuyWithETHParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     const investmentValue = valueToWei(params.value, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
@@ -571,7 +574,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy with poly without rate restriction
    */
-  public buyWithPOLY = async (params: BuyWithPOLYParams) => {
+  public buyWithPOLY = async (params: BuyWithPOLYParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     const investmentValue = valueToWei(params.investedPOLY, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
@@ -591,7 +594,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy with USD stable coin without rate restriction
    */
-  public buyWithUSD = async (params: BuyWithUSDParams) => {
+  public buyWithUSD = async (params: BuyWithUSDParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
     const investmentValue = valueToWei(params.investedSC, FULL_DECIMALS);
@@ -614,7 +617,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy tokens with eth and with rate restriction
    */
-  public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams) => {
+  public buyWithETHRateLimited = async (params: BuyWithETHRateLimitedParams): Promise<PolyResponse> => {
     const investmentValue = valueToWei(params.value, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
       params.beneficiary,
@@ -637,7 +640,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy tokens with poly and with rate restriction
    */
-  public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams) => {
+  public buyWithPOLYRateLimited = async (params: BuyWithPOLYRateLimitedParams): Promise<PolyResponse> => {
     const investmentValue = valueToWei(params.investedPOLY, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
       params.beneficiary,
@@ -657,7 +660,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Buy tokens with usd stable coin and with rate restriction
    */
-  public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams) => {
+  public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams): Promise<PolyResponse> => {
     const investmentValue = valueToWei(params.investedSC, FULL_DECIMALS);
     await this.checkIfBuyIsValid(
       params.beneficiary,
@@ -704,7 +707,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * This function converts from USD to ETH or POLY
    * @return Value in ETH or POLY
    */
-  public convertFromUSD = async (params: ConvertToOrFromUSDParams) => {
+  public convertFromUSD = async (params: ConvertToOrFromUSDParams): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).convertFromUSD.callAsync(
         params.fundRaiseType,
@@ -729,7 +732,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return the total number of tokens sold in a given tier
    * @return Total amount of tokens sold in the tier
    */
-  public getTokensSoldByTier = async (params: TierIndexParams) => {
+  public getTokensSoldByTier = async (params: TierIndexParams): Promise<BigNumber> => {
     const tiers = await this.getNumberOfTiers();
     assert.assert(params.tier < new BigNumber(tiers).toNumber(), ErrorCode.InvalidData, 'Invalid tier');
     return weiToValue(
@@ -792,7 +795,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Ethereum account address to receive unsold tokens
    * @return wallet address
    */
-  public treasuryWallet = async () => {
+  public treasuryWallet = async (): Promise<string> => {
     return (await this.contract).treasuryWallet.callAsync();
   };
 
@@ -861,7 +864,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return array of minted tokens in each fund raise type for given tier
    * @return tokens amount by tier
    */
-  public getTokensMintedByTier = async (params: TierIndexParams) => {
+  public getTokensMintedByTier = async (params: TierIndexParams): Promise<MintedByTier> => {
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     assert.assert(params.tier < (await this.getNumberOfTiers()), ErrorCode.InvalidData, 'Invalid tier');
     const result = await (await this.contract).getTokensMintedByTier.callAsync(numberToBigNumber(params.tier));
@@ -877,7 +880,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * This function converts from ETH or POLY to USD
    * @return Value in USD
    */
-  public convertToUSD = async (params: ConvertToOrFromUSDParams) => {
+  public convertToUSD = async (params: ConvertToOrFromUSDParams): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).convertToUSD.callAsync(
         params.fundRaiseType,
@@ -891,7 +894,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Return the total no. of tokens sold for the given fund raise type
    * @return Total number of tokens sold for ETH
    */
-  public getTokensSoldFor = async (params: FundRaiseTypeParams) => {
+  public getTokensSoldFor = async (params: FundRaiseTypeParams): Promise<BigNumber> => {
     return weiToValue(
       await (await this.contract).getTokensSoldFor.callAsync(params.fundRaiseType),
       await (await this.securityTokenContract()).decimals.callAsync(),
@@ -911,7 +914,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
    * Finalizes the STO and mint remaining tokens to reserve address
    * Reserve address must be whitelisted to successfully finalize
    */
-  public finalize = async (params: TxParams) => {
+  public finalize = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -925,7 +928,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies the list of overrides for non-accredited limits in USD
    */
-  public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams) => {
+  public changeNonAccreditedLimit = async (params: ChangeNonAccreditedLimitParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -948,7 +951,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies STO start and end times
    */
-  public modifyTimes = async (params: ModifyTimesParams) => {
+  public modifyTimes = async (params: ModifyTimesParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -968,7 +971,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies oracle
    */
-  public modifyOracle = async (params: ModifyOracleParams) => {
+  public modifyOracle = async (params: ModifyOracleParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -990,7 +993,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies max non accredited investment limit and overall minimum investment limit
    */
-  public modifyLimits = async (params: ModifyLimitsParams) => {
+  public modifyLimits = async (params: ModifyLimitsParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -1008,7 +1011,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies fund raise types
    */
-  public modifyFunding = async (params: ModifyFundingParams) => {
+  public modifyFunding = async (params: ModifyFundingParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -1025,7 +1028,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifies addresses used as wallet, reserve wallet and usd token
    */
-  public modifyAddresses = async (params: ModifyAddressesParams) => {
+  public modifyAddresses = async (params: ModifyAddressesParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -1046,7 +1049,7 @@ export default class USDTieredSTOWrapper extends STOWrapper {
   /**
    * Modifiers STO tiers. All tiers must be passed, can not edit specific tiers.
    */
-  public modifyTiers = async (params: ModifyTiersParams) => {
+  public modifyTiers = async (params: ModifyTiersParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,

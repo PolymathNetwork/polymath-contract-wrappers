@@ -1,4 +1,4 @@
-import { BigNumber } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import { TxParams, STOBaseContract, FundRaiseType, FULL_DECIMALS, ErrorCode } from '../../../types';
 import ModuleWrapper from '../module_wrapper';
 import assert from '../../../utils/assert';
@@ -109,7 +109,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   /**
    *  pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Contract already paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -122,7 +122,7 @@ export default abstract class STOWrapper extends ModuleWrapper {
   /**
    *  unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Contract is not paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),

@@ -17,6 +17,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -258,7 +259,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   /**
    * Creates a dividend and checkpoint for the dividend
    */
-  public createDividend = async (params: CreateDividendParams) => {
+  public createDividend = async (params: CreateDividendParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -288,7 +289,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   /**
    * Creates a dividend with a provided checkpoint
    */
-  public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams) => {
+  public createDividendWithCheckpoint = async (params: CreateDividendWithCheckpointParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -320,7 +321,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
   /**
    * Creates a dividend and checkpoint for the dividend with excluded addresses
    */
-  public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams) => {
+  public createDividendWithExclusions = async (params: CreateDividendWithExclusionsParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -355,7 +356,7 @@ export default class EtherDividendCheckpointWrapper extends DividendCheckpointWr
    */
   public createDividendWithCheckpointAndExclusions = async (
     params: CreateDividendWithCheckpointAndExclusionsParams,
-  ) => {
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
