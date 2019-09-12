@@ -1,6 +1,6 @@
 {
   "name": "@polymathnetwork/contract-wrappers",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.41",
   "description": "Smart TS wrappers for Polymath smart contracts",
   "keywords": [
     "polymath",
