@@ -1,21 +1,15 @@
 import {
-  GeneralTransferManagerContract_3_0_0,
-  USDTieredSTOContract_3_0_0,  
-  Web3Wrapper,
   BigNumber,
-  USDTieredSTOContract_3_1_0,
+  GeneralTransferManagerContract_3_0_0,
   PolyResponse,
+  USDTieredSTOContract_3_0_0,
+  USDTieredSTOContract_3_1_0,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import { STOCommon } from '../sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import {
-  FULL_DECIMALS,
-  FundRaiseType,
-  ModuleName,
-  TxParams,
-  ErrorCode,
-} from '../../../../types';
+import { ContractVersion, ErrorCode, FULL_DECIMALS, FundRaiseType, ModuleName, TxParams } from '../../../../types';
 import {
   bigNumberToDate,
   dateToBigNumber,
@@ -26,7 +20,7 @@ import {
   weiToValue,
 } from '../../../../utils/convert';
 import functionsUtils from '../../../../utils/functions_utils';
-import GeneralTransferManagerWrapper from '../../transfer_manager/general_transfer_manager_wrapper';
+import { GeneralTransferManager_3_0_0 } from '../../transfer_manager/general_transfer_manager_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -265,7 +259,7 @@ export default class USDTieredSTOWrapper extends STOCommon {
   public contract: Promise<USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0>;
 
   public generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract_3_0_0> => {
-    return this.contractFactory.getGeneralTransferManagerContract(address);
+    return this.contractFactory.getGeneralTransferManagerContract(address, ContractVersion.V3_0_0);
   };
 
   /**
@@ -904,7 +898,7 @@ export default class USDTieredSTOWrapper extends STOCommon {
       stringToBytes32(ModuleName.GeneralTransferManager),
     );
 
-    const generalTM = new GeneralTransferManagerWrapper(
+    const generalTM = new GeneralTransferManager_3_0_0(
       this.web3Wrapper,
       this.generalTransferManagerContract(generalTMAddress[0]),
       this.contractFactory,

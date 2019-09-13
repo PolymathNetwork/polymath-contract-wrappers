@@ -1,12 +1,12 @@
 // USDTieredSTOWrapper test
 import { instance, mock, objectContaining, reset, verify, when } from 'ts-mockito';
 import {
-  ISecurityTokenContract_3_0_0,
-  ERC20DetailedContract_3_0_0,
-  USDTieredSTOContract_3_0_0,
-  GeneralTransferManagerContract_3_0_0,
-  PolyTokenContract_3_0_0,
   BigNumber,
+  ERC20DetailedContract_3_0_0,
+  GeneralTransferManagerContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  USDTieredSTOContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
@@ -21,9 +21,9 @@ import {
   weiArrayToValueArray,
   weiToValue,
 } from '../../../../../utils/convert';
-import { FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../../types';
+import { ContractVersion, FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../../types';
 
-describe('USDTieredSTOWrapper', () => {  
+describe('USDTieredSTOWrapper', () => {
   let target: USDTieredSTOWrapper;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_0_0;
@@ -357,9 +357,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -452,7 +452,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
@@ -522,9 +524,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -674,7 +676,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
@@ -744,9 +748,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -901,7 +905,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
@@ -973,9 +979,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -1117,7 +1123,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
@@ -1187,9 +1195,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -1337,7 +1345,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
@@ -1407,9 +1417,9 @@ describe('USDTieredSTOWrapper', () => {
       when(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).thenResolve(
         expectedGetModulesByNameAddress,
       );
-      when(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).thenResolve(
-        instance(mockedGeneralTransferManagerContract),
-      );
+      when(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).thenResolve(instance(mockedGeneralTransferManagerContract));
 
       const expectedInvestorFlagResult = true;
       const mockedInvestorFlagMethod = mock(MockedCallMethod);
@@ -1561,7 +1571,9 @@ describe('USDTieredSTOWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-      verify(mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress)).once();
+      verify(
+        mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
+      ).once();
       verify(mockedSecurityTokenContract.getModulesByName).once();
       verify(mockedGetModulesByNameMethod.callAsync(stringToBytes32(ModuleName.GeneralTransferManager))).once();
       verify(mockedGeneralTransferManagerContract.getInvestorFlag).once();
