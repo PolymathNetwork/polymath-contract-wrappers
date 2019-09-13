@@ -67,14 +67,30 @@ export {
 export {
   default as GeneralPermissionManager,
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
-export { CappedSTO, CappedSTO_3_0_0, isCappedSTO_3_0_0, CappedSTO_3_1_0, isCappedSTO_3_1_0 } from './contract_wrappers/modules/sto/capped_sto_wrapper';
-export { USDTieredSTO, USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0, USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
+export {
+  CappedSTO,
+  CappedSTO_3_0_0,
+  isCappedSTO_3_0_0,
+  CappedSTO_3_1_0,
+  isCappedSTO_3_1_0,
+} from './contract_wrappers/modules/sto/capped_sto_wrapper';
+export {
+  USDTieredSTO,
+  USDTieredSTO_3_0_0,
+  isUSDTieredSTO_3_0_0,
+  USDTieredSTO_3_1_0,
+  isUSDTieredSTO_3_1_0,
+} from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
+export {
+  GeneralTransferManager,
+  GeneralTransferManager_3_0_0,
+  isGeneralTransferManager_3_0_0,
+  GeneralTransferManager_3_1_0,
+  isGeneralTransferManager_3_1_0,
+} from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
   default as CountTransferManager,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
-export {
-  default as GeneralTransferManager,
-} from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
   default as ManualApprovalTransferManager,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';

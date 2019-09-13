@@ -30,6 +30,7 @@ import {
   ContractAbi,
   USDTieredSTOContract_3_1_0,
   CappedSTOContract_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { ERC20DividendCheckpoint_3_0_0 } from 'contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { PolymathError } from '../PolymathError';
@@ -45,6 +46,10 @@ async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: s
   );
 }
 
+export interface GetGeneralTransferManagerContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<GeneralTransferManagerContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<GeneralTransferManagerContract_3_1_0>;
+}
 export interface GetCappedSTOContract {
   (address: string, version: ContractVersion.V3_0_0): Promise<CappedSTOContract_3_0_0>;
   (address: string, version: ContractVersion.V3_1_0): Promise<CappedSTOContract_3_1_0>;
@@ -195,16 +200,19 @@ export default class ContractFactory {
     return contract;
   }
 
-  public getCappedSTOContract: GetCappedSTOContract = async (address: string, version: ContractVersion): Promise<any> => {
+  public getCappedSTOContract: GetCappedSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;    
+    let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;
 
     if (version === ContractVersion.V3_0_0) {
       contract = new CappedSTOContract_3_0_0(address, this.provider, this.contractDefaults);
     } else {
       contract = new CappedSTOContract_3_1_0(address, this.provider, this.contractDefaults);
     }
-    
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
@@ -220,13 +228,16 @@ export default class ContractFactory {
     return contract;
   }
 
-  public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (address: string, version: ContractVersion): Promise<any> => {
+  public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0;
 
     if (version === ContractVersion.V3_0_0) {
       contract = new USDTieredSTOContract_3_0_0(address, this.provider, this.contractDefaults);
-    } else {    
+    } else {
       contract = new USDTieredSTOContract_3_1_0(address, this.provider, this.contractDefaults);
     }
 
@@ -245,14 +256,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getGeneralTransferManagerContract(address: string): Promise<GeneralTransferManagerContract_3_0_0> {
+  public getGeneralTransferManagerContract: GetGeneralTransferManagerContract = async (
+      address: string,
+      version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new GeneralTransferManagerContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: GeneralTransferManagerContract_3_0_0 | GeneralTransferManagerContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new GeneralTransferManagerContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new GeneralTransferManagerContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getManualApprovalTransferManagerContract(
     address: string,
@@ -357,7 +378,7 @@ export default class ContractFactory {
         return ContractVersion.V3_1_0;
       }
       default: {
-        throw new PolymathError({ code: ErrorCode.UnsupportedVersion, message: `Version ${version} not supported`});
+        throw new PolymathError({ code: ErrorCode.UnsupportedVersion, message: `Version ${version} not supported` });
       }
     }
   }

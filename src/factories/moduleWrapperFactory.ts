@@ -1,4 +1,8 @@
 import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import {
+  GeneralTransferManager_3_0_0,
+  GeneralTransferManager_3_1_0,
+} from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
@@ -9,7 +13,6 @@ import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/chec
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
 import { USDTieredSTO_3_0_0, USDTieredSTO_3_1_0 } from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
 import VestingEscrowWalletWrapper from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
@@ -78,7 +81,7 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManagerWrapper>;
   (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
-  (params: GetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
+  (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
@@ -133,11 +136,19 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.GeneralTransferManager:
-        moduleWrapper = new GeneralTransferManagerWrapper(
-          this.web3Wrapper,
-          this.contractFactory.getGeneralTransferManagerContract(params.address),
-          this.contractFactory,
-        );
+        if (version === ContractVersion.V3_0_0) {
+          moduleWrapper = new GeneralTransferManager_3_0_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralTransferManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        } else {
+          moduleWrapper = new GeneralTransferManager_3_1_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralTransferManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        }
         break;
       case ModuleName.ManualApprovalTransferManager:
         moduleWrapper = new ManualApprovalTransferManagerWrapper(
