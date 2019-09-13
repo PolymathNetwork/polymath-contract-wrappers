@@ -3,7 +3,6 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   VestingEscrowWalletContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -1817,22 +1816,4 @@ describe('VestingEscrowWalletWrapper', () => {
     });
   });
 
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to VestingEscrowWallet', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'AddSchedule', 'ModifySchedule', 'RevokeAllSchedules', 'RevokeSchedule', 'DepositTokens', 'SendToTreasury', 'SendTokens', 'AddTemplate', 'RemoveTemplate', 'TreasuryWalletChanged', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
-    });
-  });
 });

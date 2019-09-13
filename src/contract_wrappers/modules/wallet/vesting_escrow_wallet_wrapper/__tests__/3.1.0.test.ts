@@ -5,6 +5,7 @@ import {
   ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
+  PolyTokenEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import { VestingEscrowWallet_3_1_0 } from '../3.1.0';
@@ -223,6 +224,25 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to VestingEscrowWallet', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(
+          `Expected eventName to be one of: 'AddSchedule', 'ModifySchedule', 'RevokeAllSchedules', 'RevokeSchedule', 'DepositTokens', 'SendToTreasury', 'SendTokens', 'AddTemplate', 'RemoveTemplate', 'TreasuryWalletChanged', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
+      );
     });
   });
 });
