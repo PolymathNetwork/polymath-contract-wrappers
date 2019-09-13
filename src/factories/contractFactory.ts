@@ -30,6 +30,7 @@ import {
   ContractAbi,
   USDTieredSTOContract_3_1_0,
   CappedSTOContract_3_1_0,
+  VestingEscrowWalletContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
@@ -52,6 +53,11 @@ export interface GetCappedSTOContract {
 export interface GetUSDTieredSTOContract {
   (address: string, version: ContractVersion.V3_0_0): Promise<USDTieredSTOContract_3_0_0>;
   (address: string, version: ContractVersion.V3_1_0): Promise<USDTieredSTOContract_3_1_0>;
+}
+
+export interface GetVestingEscrowWalletContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<VestingEscrowWalletContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<VestingEscrowWalletContract_3_1_0>;
 }
 
 export default class ContractFactory {
@@ -117,14 +123,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getVestingEscrowWalletContract(address: string): Promise<VestingEscrowWalletContract_3_0_0> {
+  public getVestingEscrowWalletContract: GetVestingEscrowWalletContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new VestingEscrowWalletContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new VestingEscrowWalletContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new VestingEscrowWalletContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getERC20DetailedContract(address: string): Promise<ERC20DetailedContract_3_0_0> {
     assert.isETHAddressHex('address', address);
@@ -194,16 +210,19 @@ export default class ContractFactory {
     return contract;
   }
 
-  public getCappedSTOContract: GetCappedSTOContract = async (address: string, version: ContractVersion): Promise<any> => {
+  public getCappedSTOContract: GetCappedSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;    
+    let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;
 
     if (version === ContractVersion.V3_0_0) {
       contract = new CappedSTOContract_3_0_0(address, this.provider, this.contractDefaults);
     } else {
       contract = new CappedSTOContract_3_1_0(address, this.provider, this.contractDefaults);
     }
-    
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
@@ -219,13 +238,16 @@ export default class ContractFactory {
     return contract;
   }
 
-  public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (address: string, version: ContractVersion): Promise<any> => {
+  public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0;
 
     if (version === ContractVersion.V3_0_0) {
       contract = new USDTieredSTOContract_3_0_0(address, this.provider, this.contractDefaults);
-    } else {    
+    } else {
       contract = new USDTieredSTOContract_3_1_0(address, this.provider, this.contractDefaults);
     }
 
@@ -356,7 +378,7 @@ export default class ContractFactory {
         return ContractVersion.V3_1_0;
       }
       default: {
-        throw new PolymathError({ code: ErrorCode.UnsupportedVersion, message: `Version ${version} not supported`});
+        throw new PolymathError({ code: ErrorCode.UnsupportedVersion, message: `Version ${version} not supported` });
       }
     }
   }

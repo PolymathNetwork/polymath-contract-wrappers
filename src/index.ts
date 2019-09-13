@@ -67,8 +67,20 @@ export {
 export {
   default as GeneralPermissionManager,
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
-export { CappedSTO, CappedSTO_3_0_0, isCappedSTO_3_0_0, CappedSTO_3_1_0, isCappedSTO_3_1_0 } from './contract_wrappers/modules/sto/capped_sto_wrapper';
-export { USDTieredSTO, USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0, USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
+export {
+  CappedSTO,
+  CappedSTO_3_0_0,
+  isCappedSTO_3_0_0,
+  CappedSTO_3_1_0,
+  isCappedSTO_3_1_0,
+} from './contract_wrappers/modules/sto/capped_sto_wrapper';
+export {
+  USDTieredSTO,
+  USDTieredSTO_3_0_0,
+  isUSDTieredSTO_3_0_0,
+  USDTieredSTO_3_1_0,
+  isUSDTieredSTO_3_1_0,
+} from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export {
   default as CountTransferManager,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
@@ -90,6 +102,13 @@ export {
 export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+export {
+  VestingEscrowWallet,
+  VestingEscrowWallet_3_0_0,
+  isVestingEscrowWallet_3_0_0,
+  VestingEscrowWallet_3_1_0,
+  isVestingEscrowWallet_3_1_0,
+} from './contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export {

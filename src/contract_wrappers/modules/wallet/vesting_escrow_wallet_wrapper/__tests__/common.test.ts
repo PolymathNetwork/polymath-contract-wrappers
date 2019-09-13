@@ -7,10 +7,10 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import VestingEscrowWalletWrapper from '../vesting_escrow_wallet_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import VestingEscrowWalletWrapper from '../common';
+import ContractFactory from '../../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
 import {
   numberToBigNumber,
   stringToBytes32,
@@ -19,8 +19,8 @@ import {
   dateToBigNumber,
   valueToWei,
   weiToValue,
-} from '../../../../utils/convert';
-import { TransferStatusCode } from '../../../../types';
+} from '../../../../../utils/convert';
+import { TransferStatusCode } from '../../../../../types';
 
 describe('VestingEscrowWalletWrapper', () => {
   let target: VestingEscrowWalletWrapper;
@@ -200,27 +200,6 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
-  describe('TreasuryWallet', () => {
-    test('should get address from treasuryWallet', async () => {
-      // Address expected
-      const expectedResult = '0x1111111111111111111111111111111111111111';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.treasuryWallet).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.treasuryWallet();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.treasuryWallet).once();
-      verify(mockedMethod.callAsync()).once();
     });
   });
 
@@ -1261,72 +1240,6 @@ describe('VestingEscrowWalletWrapper', () => {
       // getAllTemplateNames
       verify(mockedContract.getAllTemplateNames).once();
       verify(mockedPausedMethod.callAsync()).once();
-      // isCallerAllowed
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
-  describe('modifySchedule', () => {
-    test('should modifySchedule', async () => {
-      const mockedParams = {
-        beneficiary: '0x5555555555555555555555555555555555555555',
-        templateName: 'template',
-        startTime: new Date(2020, 10),
-        txData: {},
-        safetyFactor: 10,
-      };
-
-      // isCallerAllowed
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.modifySchedule).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.beneficiary,
-          stringToBytes32(mockedParams.templateName),
-          objectContaining(dateToBigNumber(mockedParams.startTime)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.modifySchedule(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.modifySchedule).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.beneficiary,
-          stringToBytes32(mockedParams.templateName),
-          objectContaining(dateToBigNumber(mockedParams.startTime)),
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
       // isCallerAllowed
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();

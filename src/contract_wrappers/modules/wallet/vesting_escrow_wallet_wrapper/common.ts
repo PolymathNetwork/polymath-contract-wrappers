@@ -17,11 +17,12 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  VestingEscrowWalletContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import assert from '../../../../utils/assert';
+import ModuleWrapper from '../../module_wrapper';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -32,7 +33,7 @@ import {
   Perm,
   TransferStatusCode,
   ErrorCode,
-} from '../../../types';
+} from '../../../../types';
 import {
   numberToBigNumber,
   valueToWei,
@@ -42,7 +43,7 @@ import {
   bytes32ArrayToStringArray,
   bigNumberToDate,
   stringToBytes32,
-} from '../../../utils/convert';
+} from '../../../../utils/convert';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents_3_0_0.AddSchedule;
@@ -205,7 +206,6 @@ export namespace VestingEscrowWalletTransactionParams {
   export interface RemoveTemplate extends RemoveTemplateParams {}
   export interface AddSchedule extends AddScheduleParams {}
   export interface AddScheduleFromTemplate extends AddScheduleFromTemplateParams {}
-  export interface ModifySchedule extends ModifyScheduleParams {}
   export interface RevokeSchedule extends RevokeScheduleParams {}
   export interface RevokeAllSchedules extends RevokeAllSchedulesParams {}
   export interface PushAvailableTokensMulti extends PushAvailableTokensMultiParams {}
@@ -309,17 +309,6 @@ interface AddScheduleParams extends TxParams {
  * @param startTime Start time of the created vesting schedule
  */
 interface AddScheduleFromTemplateParams extends TxParams {
-  beneficiary: string;
-  templateName: string;
-  startTime: Date;
-}
-
-/**
- * @param beneficiary Address of the beneficiary for whom it is modified
- * @param templateName Name of the template was used for schedule creation
- * @param startTime Start time of the created vesting schedule
- */
-interface ModifyScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
   startTime: Date;
@@ -445,8 +434,8 @@ interface BeneficiarySchedule {
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
-export default class VestingEscrowWalletWrapper extends ModuleWrapper {
-  public contract: Promise<VestingEscrowWalletContract_3_0_0>;
+export default class VestingEscrowWalletCommon extends ModuleWrapper {
+  public contract: Promise<VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0>;
 
   /**
    * Instantiate VestingEscrowWalletWrapper
@@ -456,7 +445,7 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<VestingEscrowWalletContract_3_0_0>,
+    contract: Promise<VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -495,14 +484,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       'Sender is not owner',
     );
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   * Address of the Treasury wallet. All of the unassigned token will transfer to that address.
-   * @return address
-   */
-  public treasuryWallet = async (): Promise<string> => {
-    return (await this.contract).treasuryWallet.callAsync();
   };
 
   /**
@@ -778,27 +759,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
   };
 
   /**
-   * Modifies a vesting schedule for a beneficiary address
-   */
-  public modifySchedule = async (params: ModifyScheduleParams) => {
-    assert.assert(
-      await this.isCallerAllowed(params.txData, Perm.Admin),
-      ErrorCode.Unauthorized,
-      'Caller is not allowed',
-    );
-    this.checkSchedule(params.beneficiary);
-    assert.assert(params.startTime.getTime() > Date.now(), ErrorCode.TooEarly, 'Date in the past');
-    // TODO: require(now < schedule.startTime, "Schedule started");
-    return (await this.contract).modifySchedule.sendTransactionAsync(
-      params.beneficiary,
-      stringToBytes32(params.templateName),
-      dateToBigNumber(params.startTime),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  /**
    * Revokes a vesting schedule with a given template name for a given beneficiary
    */
   public revokeSchedule = async (params: RevokeScheduleParams) => {
@@ -1057,53 +1017,6 @@ export default class VestingEscrowWalletWrapper extends ModuleWrapper {
       params.txData,
       params.safetyFactor,
     );
-  };
-
-  /**
-   * Returns a list of templates for a given template name
-   * @param templateName Name of the template
-   * @return List of templates
-   * 3.1.0
-   */
-  public templates = async (templateName: string) => {
-    const templates = await (await this.contract).templates.callAsync(stringToBytes32(templateName));
-    return templates;
-  };
-
-  /**
-   * Returns the schedule count per template
-   * @param templateName Name of the template
-   * @return count of schedules
-   * 3.1.0
-   */
-  public getSchedulesCountByTemplate = async (templateName: string) => {
-    assert.assert(templateName !== '', ErrorCode.InvalidData, 'Invalid name');
-    const schedulesCount = await (await this.contract).getSchedulesCountByTemplate.callAsync(
-      stringToBytes32(templateName),
-    );
-    return schedulesCount;
-  };
-
-  /**
-   * Returns the list of all beneficiary
-   * @return List of addresses
-   * 3.1.0
-   */
-  public getAllBeneficiaries = async () => {
-    const result = await (await this.contract).getAllBeneficiaries.callAsync();
-    return result;
-  };
-
-  /**
-   * Returns the tokens quantity that can be withdrawn from the contract at a moment
-   * @param beneficiary Address of the beneficiary
-   * @return availableTokens Tokens amount that are available to withdraw
-   * 3.1.0
-   */
-  public getAvailableTokens = async (beneficiary: string) => {
-    assert.isNonZeroETHAddressHex('beneficiary', beneficiary);
-    const result = await (await this.contract).getAvailableTokens.callAsync(beneficiary);
-    return result;
   };
 
   public validateTemplate = async (numberOfTokens: BigNumber, duration: number, frequency: number) => {
