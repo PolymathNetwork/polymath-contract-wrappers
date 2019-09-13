@@ -1,5 +1,5 @@
 import { PolyResponse } from '@polymathnetwork/abi-wrappers';
-import STOWrapper from './common';
+import STOCommon from './common';
 import { TxParams, STOBaseContract_3_1_0, ErrorCode, Constructor } from '../../../../types';
 import assert from '../../../../utils/assert';
 
@@ -28,7 +28,7 @@ export interface MixinSTO_3_1_0 {
   revokePreMintFlag: (params: TxParams) => Promise<PolyResponse>;
 }
 
-export const WithSTO_3_1_0 = <T extends Constructor<STOWrapper>>(Base: T): Constructor<MixinSTO_3_1_0> & T => {
+export const WithSTO_3_1_0 = <T extends Constructor<STOCommon>>(Base: T): Constructor<MixinSTO_3_1_0> & T => {
   class Extended extends Base {
     public contract!: Promise<STOBaseContract_3_1_0>;
 

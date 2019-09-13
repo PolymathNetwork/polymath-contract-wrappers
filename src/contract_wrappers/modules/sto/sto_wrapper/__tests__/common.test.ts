@@ -6,11 +6,11 @@ import ContractFactory from '../../../../../factories/contractFactory';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 import ModuleWrapper from '../../../module_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../../utils/convert';
-import STO from '../common';
+import STOCommon from '../common';
 
-describe('STOWrapper', () => {
+describe('STO Common', () => {
   // we extend the class to be able to instance it, using the 3.0.0 CappedSTO contract since it has all common functionality
-  class FakeSTO extends STO {
+  class FakeSTO extends STOCommon {
     public contract: Promise<CappedSTOContract_3_0_0>;
 
     public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_0_0>, contractFactory: ContractFactory) {

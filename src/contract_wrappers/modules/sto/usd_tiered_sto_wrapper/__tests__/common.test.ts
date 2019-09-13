@@ -10,7 +10,7 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
-import USDTieredSTOWrapper from '../common';
+import USDTieredSTOCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { STOCommon } from '../../sto_wrapper';
 import {
@@ -23,8 +23,8 @@ import {
 } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../../types';
 
-describe('USDTieredSTOWrapper', () => {  
-  let target: USDTieredSTOWrapper;
+describe('USD Tiered STO Common', () => {  
+  let target: USDTieredSTOCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -43,7 +43,7 @@ describe('USDTieredSTOWrapper', () => {
     mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new USDTieredSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new USDTieredSTOCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -57,7 +57,7 @@ describe('USDTieredSTOWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend STOWrapper', async () => {
+    test('should extend STOCommon', async () => {
       expect(target instanceof STOCommon).toBe(true);
     });
   });
