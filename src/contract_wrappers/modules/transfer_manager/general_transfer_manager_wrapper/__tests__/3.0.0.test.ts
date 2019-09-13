@@ -4,7 +4,6 @@ import {
   GeneralTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
   PolyTokenEvents_3_0_0,
-  BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';

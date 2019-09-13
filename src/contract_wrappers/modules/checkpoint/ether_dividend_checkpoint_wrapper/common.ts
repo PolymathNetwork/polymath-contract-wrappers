@@ -4,7 +4,6 @@ import {
   BigNumber,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
-import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { DividendCheckpointCommon } from "../dividend_checkpoint_wrapper";
 import ContractFactory from '../../../../factories/contractFactory';

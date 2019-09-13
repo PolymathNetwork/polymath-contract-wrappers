@@ -32,7 +32,6 @@ import {
   CappedSTOContract_3_1_0,
   GeneralTransferManagerContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
-import { ERC20DividendCheckpoint_3_0_0 } from 'contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
 import getDefaultContractAddresses from '../utils/addresses';

@@ -1,5 +1,5 @@
 // GeneralTransferManager test
-import { mock, instance, reset, when, objectContaining, verify } from 'ts-mockito';
+import { mock, instance, reset, when, verify } from 'ts-mockito';
 import {
   GeneralTransferManagerContract_3_1_0,
   ISecurityTokenContract_3_0_0,
