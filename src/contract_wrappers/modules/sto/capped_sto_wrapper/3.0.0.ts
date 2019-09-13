@@ -8,7 +8,6 @@ import {
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
-import { CappedSTO_3_1_0 } from '.';
 
 interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CappedSTOEvents_3_0_0.TokenPurchase;

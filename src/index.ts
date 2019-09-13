@@ -59,10 +59,14 @@ export { default as SecurityTokenRegistry } from './contract_wrappers/registries
 export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
 export { default as ERC20 } from './contract_wrappers/tokens/erc20_detailed_wrapper';
 export {
-  default as ERC20DividendCheckpoint,
+  ERC20DividendCheckpoint,
+  ERC20DividendCheckpoint_3_0_0,
+  isERC20DividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export {
-  default as EtherDividendCheckpoint,
+  EtherDividendCheckpoint,
+  EtherDividendCheckpoint_3_0_0,
+  isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
   default as GeneralPermissionManager,
@@ -82,11 +86,15 @@ export {
   isUSDTieredSTO_3_1_0,
 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export {
+  GeneralTransferManager,
+  GeneralTransferManager_3_0_0,
+  isGeneralTransferManager_3_0_0,
+  GeneralTransferManager_3_1_0,
+  isGeneralTransferManager_3_1_0,
+} from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
+export {
   default as CountTransferManager,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
-export {
-  default as GeneralTransferManager,
-} from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
   default as ManualApprovalTransferManager,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
@@ -275,6 +283,54 @@ export {
   VolumeRestrictionTMModifyIndividualRestrictionEventArgs_3_0_0,
   VolumeRestrictionTMPauseEventArgs_3_0_0,
   VolumeRestrictionTMUnpauseEventArgs_3_0_0,
+  CappedSTOContract_3_1_0,
+  CappedSTOEventArgs_3_1_0,
+  CappedSTOEvents_3_1_0,
+  CappedSTOPauseEventArgs_3_1_0,
+  CappedSTOUnpauseEventArgs_3_1_0,
+  CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0,
+  CappedSTOTokenPurchaseEventArgs_3_1_0,
+  CappedSTOSetFundRaiseTypesEventArgs_3_1_0,
+  CappedSTOAllowPreMintFlagEventArgs_3_1_0,
+  CappedSTOReserveTokenMintEventArgs_3_1_0,
+  CappedSTORevokePreMintFlagEventArgs_3_1_0,
+  CappedSTOReserveTokenTransferEventArgs_3_1_0,
+  USDTieredSTOContract_3_1_0,
+  USDTieredSTOEventArgs_3_1_0,
+  USDTieredSTOEvents_3_1_0,
+  USDTieredSTOFundsReceivedEventArgs_3_1_0,
+  USDTieredSTOPauseEventArgs_3_1_0,
+  USDTieredSTOReserveTokenMintEventArgs_3_1_0,
+  USDTieredSTOSetAddressesEventArgs_3_1_0,
+  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0,
+  USDTieredSTOSetFundRaiseTypesEventArgs_3_1_0,
+  USDTieredSTOSetLimitsEventArgs_3_1_0,
+  USDTieredSTOSetNonAccreditedLimitEventArgs_3_1_0,
+  USDTieredSTOSetTiersEventArgs_3_1_0,
+  USDTieredSTOSetTimesEventArgs_3_1_0,
+  USDTieredSTOSetTreasuryWalletEventArgs_3_1_0,
+  USDTieredSTOTokenPurchaseEventArgs_3_1_0,
+  USDTieredSTOUnpauseEventArgs_3_1_0,
+  USDTieredSTOAllowPreMintFlagEventArgs_3_1_0,
+  USDTieredSTORevokePreMintFlagEventArgs_3_1_0,
+  USDTieredSTOReserveTokenTransferEventArgs_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
+  GeneralTransferManagerEventArgs_3_1_0,
+  GeneralTransferManagerEvents_3_1_0,
+  GeneralTransferManagerChangeIssuanceAddressEventArgs_3_1_0,
+  GeneralTransferManagerChangeDefaultsEventArgs_3_1_0,
+  GeneralTransferManagerPauseEventArgs_3_1_0,
+  GeneralTransferManagerUnpauseEventArgs_3_1_0,
+  GeneralTransferManagerModifyKYCDataEventArgs_3_1_0,
+  GeneralTransferManagerModifyInvestorFlagEventArgs_3_1_0,
+  GeneralTransferManagerModifyTransferRequirementsEventArgs_3_1_0,
+  GeneralPermissionManagerContract_3_1_0,
+  GeneralPermissionManagerEventArgs_3_1_0,
+  GeneralPermissionManagerEvents_3_1_0,
+  GeneralPermissionManagerChangePermissionEventArgs_3_1_0,
+  GeneralPermissionManagerAddDelegateEventArgs_3_1_0,
+  GeneralPermissionManagerPauseEventArgs_3_1_0,
+  GeneralPermissionManagerUnpauseEventArgs_3_1_0,
   BlockParamLiteral,
   TransactionReceiptWithDecodedLogs,
   LogEntry,

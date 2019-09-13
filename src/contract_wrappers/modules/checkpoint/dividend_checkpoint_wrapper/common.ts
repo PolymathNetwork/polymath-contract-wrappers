@@ -1,7 +1,7 @@
 import { BigNumber, TxData, ERC20DetailedContract_3_0_0, PolyResponse } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../module_wrapper';
-import assert from '../../../utils/assert';
-import { TxParams, DividendCheckpointBaseContract_3_0_0, Perm, PERCENTAGE_DECIMALS, ErrorCode } from '../../../types';
+import ModuleWrapper from '../../module_wrapper';
+import assert from '../../../../utils/assert';
+import { TxParams, Perm, PERCENTAGE_DECIMALS, ErrorCode, DividendCheckpointBaseContract } from '../../../../types';
 import {
   numberToBigNumber,
   dateToBigNumber,
@@ -10,7 +10,7 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
-} from '../../../utils/convert';
+} from '../../../../utils/convert';
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
@@ -216,10 +216,10 @@ interface CheckpointData {
 // // End of return types ////
 
 /**
- * This class includes the functionality related to interacting with the DividendCheckpoint contract.
+ * This class includes the functionality related to interacting with all DividendCheckpoint contracts.
  */
-export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
-  public abstract contract: Promise<DividendCheckpointBaseContract_3_0_0>;
+export default abstract class DividendCheckpointCommon extends ModuleWrapper {
+  public abstract contract: Promise<DividendCheckpointBaseContract>;
 
   public erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
     return this.contractFactory.getERC20DetailedContract(address);
@@ -291,35 +291,6 @@ export default abstract class DividendCheckpointWrapper extends ModuleWrapper {
   };
 
   /**
-<<<<<<< HEAD
-=======
-   *  pause the module
-   */
-  public pause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  unpause the module
-   */
-  public unpause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Contract currently not paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
->>>>>>> d71a293aef2041a7c8e5de4e672ed29a3986906e
    * Function used to change wallet address
    */
   public changeWallet = async (params: ChangeWalletParams): Promise<PolyResponse> => {

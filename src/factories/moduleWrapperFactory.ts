@@ -1,15 +1,18 @@
 import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import {
+  GeneralTransferManager_3_0_0,
+  GeneralTransferManager_3_1_0,
+} from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
-import ERC20DividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
-import EtherDividendCheckpointWrapper from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
+import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
+import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
 import { USDTieredSTO_3_0_0, USDTieredSTO_3_1_0 } from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-import GeneralTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
 import {
@@ -81,7 +84,7 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManagerWrapper>;
   (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
-  (params: GetGeneralTransferManager): Promise<GeneralTransferManagerWrapper>;
+  (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
@@ -89,9 +92,9 @@ interface GetModuleInstance {
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
-  (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpointWrapper>;
-  (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpointWrapper>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
+  (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpoint_3_0_0>;
+  (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpoint_3_0_0>;
 }
 
 /**
@@ -136,11 +139,19 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.GeneralTransferManager:
-        moduleWrapper = new GeneralTransferManagerWrapper(
-          this.web3Wrapper,
-          this.contractFactory.getGeneralTransferManagerContract(params.address),
-          this.contractFactory,
-        );
+        if (version === ContractVersion.V3_0_0) {
+          moduleWrapper = new GeneralTransferManager_3_0_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralTransferManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        } else {
+          moduleWrapper = new GeneralTransferManager_3_1_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralTransferManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        }
         break;
       case ModuleName.ManualApprovalTransferManager:
         moduleWrapper = new ManualApprovalTransferManagerWrapper(
@@ -212,14 +223,14 @@ export default class ModuleWrapperFactory {
       }
       // Checkpoint
       case ModuleName.ERC20DividendCheckpoint:
-        moduleWrapper = new ERC20DividendCheckpointWrapper(
+        moduleWrapper = new ERC20DividendCheckpoint_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getERC20DividendCheckpointContract(params.address),
           this.contractFactory,
         );
         break;
       case ModuleName.EtherDividendCheckpoint:
-        moduleWrapper = new EtherDividendCheckpointWrapper(
+        moduleWrapper = new EtherDividendCheckpoint_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
           this.contractFactory,

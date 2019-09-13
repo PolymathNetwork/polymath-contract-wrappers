@@ -2,14 +2,14 @@
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { CappedSTOContract_3_1_0, ISecurityTokenContract_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';
-import STO from '../common';
+import STOCommon from '../common';
 import { WithSTO_3_1_0 } from '../3.1.0';
 import { MockedCallMethod, getMockedPolyResponse, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import { dateToBigNumber } from '../../../../../utils/convert';
 
-describe('STOWrapper 3.1.0', () => {
+describe('STO 3.1.0', () => {
   // we extend the class to be able to instance it, using the 3.1.0 CappedSTO contract since it has all common functionality
-  class FakeSTO extends STO {
+  class FakeSTO extends STOCommon {
     public contract: Promise<CappedSTOContract_3_1_0>;
 
     public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_1_0>, contractFactory: ContractFactory) {
@@ -46,7 +46,7 @@ describe('STOWrapper 3.1.0', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof STO).toBe(true);
+      expect(target instanceof STOCommon).toBe(true);
     });
   });
 

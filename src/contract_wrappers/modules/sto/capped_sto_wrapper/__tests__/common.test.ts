@@ -1,4 +1,4 @@
-// CappedSTOWrapper test
+// CappedSTOCommon test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
   CappedSTOContract_3_0_0,
@@ -8,14 +8,14 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
-import CappedSTOWrapper from '../common';
+import CappedSTOCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { STOCommon } from '../../sto_wrapper';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('CappedSTOWrapper', () => {  
-  let target: CappedSTOWrapper;
+describe('Capped STO Common', () => {  
+  let target: CappedSTOCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -30,7 +30,7 @@ describe('CappedSTOWrapper', () => {
     mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new CappedSTOWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new CappedSTOCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -42,7 +42,7 @@ describe('CappedSTOWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend STOWrapper', async () => {
+    test('should extend STOCommon', async () => {
       expect(target instanceof STOCommon).toBe(true);
     });
   });

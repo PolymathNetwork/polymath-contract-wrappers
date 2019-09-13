@@ -8,13 +8,13 @@ import {
   PolyTokenEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
-import USDTieredSTOWrapper from '../common';
+import USDTieredSTOCommon from '../common';
 import { USDTieredSTO_3_0_0 } from '../3.0.0';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { weiToValue } from '../../../../../utils/convert';
 import { FULL_DECIMALS } from '../../../../../types';
 
-describe('USDTieredSTOWrapper', () => {  
+describe('USD Tiered STO 3.0.0', () => {  
   let target: USDTieredSTO_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_0_0;
@@ -40,7 +40,7 @@ describe('USDTieredSTOWrapper', () => {
 
   describe('Types', () => {
     test('should extend USDTieredSTOWrapper', async () => {
-      expect(target instanceof USDTieredSTOWrapper).toBe(true);
+      expect(target instanceof USDTieredSTOCommon).toBe(true);
     });
   });
 

@@ -7,21 +7,21 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import GeneralTransferManagerWrapper from '../general_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
 import {
   bigNumberToDate,
   dateToBigNumber,
   numberToBigNumber,
   stringToBytes32,
   valueToWei,
-} from '../../../../utils/convert';
-import { FlagsType, TransferType, Partition } from '../../../../types';
+} from '../../../../../utils/convert';
+import { FlagsType, TransferType, Partition } from '../../../../../types';
+import GeneralTransferManagerCommon from '../common';
 
 describe('GeneralTransferManagerWrapper', () => {
-  let target: GeneralTransferManagerWrapper;
+  let target: GeneralTransferManagerCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -34,7 +34,7 @@ describe('GeneralTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new GeneralTransferManagerWrapper(
+    target = new GeneralTransferManagerCommon(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -570,7 +570,10 @@ describe('GeneralTransferManagerWrapper', () => {
   describe('GetAllInvestorFlags', () => {
     test('should getAllInvestorFlags', async () => {
       // Address expected
-      const expectedResult = [['0x3333333333333333333333333333333333333333', '0x4444444444444444444444444444444444444444'], [new BigNumber(2), new BigNumber(2)]];
+      const expectedResult = [
+        ['0x3333333333333333333333333333333333333333', '0x4444444444444444444444444444444444444444'],
+        [new BigNumber(2), new BigNumber(2)],
+      ];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1330,8 +1333,8 @@ describe('GeneralTransferManagerWrapper', () => {
 
       const mockedParams = {
         partition: Partition.Unlocked,
-        tokenHolder: "0x2222222222222222222222222222222222222222",
-        additionalBalance: new BigNumber(100)
+        tokenHolder: '0x2222222222222222222222222222222222222222',
+        additionalBalance: new BigNumber(100),
       };
       // Address expected
       const expectedResult = new BigNumber(200);
@@ -1340,7 +1343,13 @@ describe('GeneralTransferManagerWrapper', () => {
       // Stub the method
       when(mockedContract.getTokensByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).thenResolve(expectedResult);
+      when(
+        mockedMethod.callAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getTokensByPartition(mockedParams);
@@ -1350,31 +1359,18 @@ describe('GeneralTransferManagerWrapper', () => {
 
       // Verifications
       verify(mockedContract.getTokensByPartition).once();
-      verify(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).once();
+      verify(
+        mockedMethod.callAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to GeneralTransferManager', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'ChangeDefaults', 'ModifyKYCData', 'ModifyInvestorFlag', 'ModifyTransferRequirements', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });

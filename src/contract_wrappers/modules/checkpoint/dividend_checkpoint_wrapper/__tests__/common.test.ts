@@ -6,9 +6,8 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import EtherDividendCheckpointWrapper from '../ether_dividend_checkpoint_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   bytes32ToString,
   dateToBigNumber,
@@ -18,12 +17,26 @@ import {
   valueToWei,
   numberArrayToBigNumberArray,
   numberToBigNumber,
-} from '../../../../utils/convert';
-import ModuleWrapper from '../../module_wrapper';
+} from '../../../../../utils/convert';
+import ModuleWrapper from '../../../module_wrapper';
+import DividendCheckpointCommon from '../common';
 
 describe('DividendCheckpointWrapper', () => {
-  // ERC20 Dividend Wrapper is used as contract target here as DividendCheckpoint is abstract
-  let target: EtherDividendCheckpointWrapper;
+  // we extend the class to be able to instance it, using the 3.0.0 DividendCheckpoint contract since it has all common functionality
+  class FakeDividendCheckpoint extends DividendCheckpointCommon {
+    public contract: Promise<EtherDividendCheckpointContract_3_0_0>;
+
+    public getDecimals = async (): Promise<BigNumber> => {
+      return new BigNumber(18);
+    };
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<EtherDividendCheckpointContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeDividendCheckpoint;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: EtherDividendCheckpointContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -36,7 +49,7 @@ describe('DividendCheckpointWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new EtherDividendCheckpointWrapper(
+    target = new FakeDividendCheckpoint(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

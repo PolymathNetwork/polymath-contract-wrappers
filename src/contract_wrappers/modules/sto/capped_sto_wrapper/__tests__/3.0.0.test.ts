@@ -9,13 +9,13 @@ import {
   PolyTokenEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
-import CappedSTOWrapper from '../common';
+import CappedSTOCommon from '../common';
 import { CappedSTO_3_0_0 } from '../3.0.0';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { valueToWei, weiToValue, dateToBigNumber } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('CappedSTOWrapper', () => {  
+describe('Capped STO 3.0.0', () => {  
   let target: CappedSTO_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_0_0;
@@ -44,7 +44,7 @@ describe('CappedSTOWrapper', () => {
 
   describe('Types', () => {
     test('should extend CappedSTOWrapper', async () => {
-      expect(target instanceof CappedSTOWrapper).toBe(true);
+      expect(target instanceof CappedSTOCommon).toBe(true);
     });
   });
 
