@@ -1,4 +1,4 @@
-import { PolyTokenFaucetContract_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenFaucetContract_3_0_0, Web3Wrapper, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../contract_wrapper';
 import { TxParams, ErrorCode, ContractVersion } from '../../types';
 import assert from '../../utils/assert';
@@ -40,7 +40,7 @@ export default class PolyTokenFaucetWrapper extends ContractWrapper {
   /**
    * Used to get tokens from faucet
    */
-  public getTokens = async (params: GetTokensParams) => {
+  public getTokens = async (params: GetTokensParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('recipient', params.recipient);
     assert.assert(
       params.amount.isLessThanOrEqualTo(MAX_TOKEN_AMOUNT),

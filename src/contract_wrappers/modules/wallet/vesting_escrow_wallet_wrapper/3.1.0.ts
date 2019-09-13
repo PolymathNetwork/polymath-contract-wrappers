@@ -1,4 +1,4 @@
-import { VestingEscrowWalletContract_3_1_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { VestingEscrowWalletContract_3_1_0, Web3Wrapper, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { ErrorCode, ContractVersion, TxParams, Perm } from '../../../../types';
@@ -51,7 +51,7 @@ export class VestingEscrowWallet_3_1_0 extends VestingEscrowWalletCommon {
   /**
    * Modifies a vesting schedule for a beneficiary address
    */
-  public modifySchedule = async (params: ModifyScheduleParams) => {
+  public modifySchedule = async (params: ModifyScheduleParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

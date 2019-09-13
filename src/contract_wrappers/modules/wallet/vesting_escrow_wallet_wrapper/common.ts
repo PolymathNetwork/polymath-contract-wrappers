@@ -18,6 +18,7 @@ import {
   LogWithDecodedArgs,
   BigNumber,
   VestingEscrowWalletContract_3_1_0,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
@@ -455,7 +456,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -476,7 +477,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -531,7 +532,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to change the treasury wallet address
    */
-  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
+  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
       ErrorCode.Unauthorized,
@@ -547,7 +548,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to deposit tokens from treasury wallet to the vesting escrow wallet
    */
-  public depositTokens = async (params: DepositTokensParams) => {
+  public depositTokens = async (params: DepositTokensParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -578,7 +579,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Sends unassigned tokens to the treasury wallet
    */
-  public sendToTreasury = async (params: SendToTreasuryParams) => {
+  public sendToTreasury = async (params: SendToTreasuryParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
       ErrorCode.Unauthorized,
@@ -623,7 +624,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Pushes available tokens to the beneficiary's address
    */
-  public pushAvailableTokens = async (params: PushAvailableTokensParams) => {
+  public pushAvailableTokens = async (params: PushAvailableTokensParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
       ErrorCode.Unauthorized,
@@ -640,7 +641,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to withdraw available tokens by beneficiary
    */
-  public pullAvailableTokens = async (params: TxParams) => {
+  public pullAvailableTokens = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Contract currently paused');
     return (await this.contract).pullAvailableTokens.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -648,7 +649,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Adds template that can be used for creating schedule
    */
-  public addTemplate = async (params: AddTemplateParams) => {
+  public addTemplate = async (params: AddTemplateParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -675,7 +676,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Removes template with a given name
    */
-  public removeTemplate = async (params: RemoveTemplateParams) => {
+  public removeTemplate = async (params: RemoveTemplateParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -712,7 +713,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Adds a vesting schedule for the beneficiary address
    */
-  public addSchedule = async (params: AddScheduleParams) => {
+  public addSchedule = async (params: AddScheduleParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -742,7 +743,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Adds a vesting schedule for the beneficiary address from a template
    */
-  public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams) => {
+  public addScheduleFromTemplate = async (params: AddScheduleFromTemplateParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -761,7 +762,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Revokes a vesting schedule with a given template name for a given beneficiary
    */
-  public revokeSchedule = async (params: RevokeScheduleParams) => {
+  public revokeSchedule = async (params: RevokeScheduleParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -780,7 +781,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Revokes all vesting schedules for a given beneficiary address
    */
-  public revokeAllSchedules = async (params: RevokeAllSchedulesParams) => {
+  public revokeAllSchedules = async (params: RevokeAllSchedulesParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -857,7 +858,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to bulk add vesting schedules for each of the beneficiaries
    */
-  public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams) => {
+  public pushAvailableTokensMulti = async (params: PushAvailableTokensMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Operator),
       ErrorCode.Unauthorized,
@@ -875,7 +876,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to bulk add vesting schedules for each of beneficiary
    */
-  public addScheduleMulti = async (params: AddScheduleMultiParams) => {
+  public addScheduleMulti = async (params: AddScheduleMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -940,7 +941,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to bulk add vesting schedules from templates for each of the beneficiary addresses
    */
-  public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams) => {
+  public addScheduleFromTemplateMulti = async (params: AddScheduleFromTemplateMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -969,7 +970,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to bulk revoke vesting schedules for each of the beneficiaries
    */
-  public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams) => {
+  public revokeSchedulesMulti = async (params: RevokeSchedulesMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -988,7 +989,7 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   /**
    * Used to bulk modify vesting schedules for each of the beneficiaries
    */
-  public modifyScheduleMulti = async (params: ModifyScheduleMultiParams) => {
+  public modifyScheduleMulti = async (params: ModifyScheduleMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

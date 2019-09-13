@@ -921,7 +921,8 @@ describe('GeneralTransferManagerWrapper', () => {
       };
 
       // Address expected
-      const expectedResult = [new BigNumber(2), '0x4444444444444444444444444444444444444444'];
+      const statusCode = new BigNumber(2);
+      const expectedResult = [statusCode, '0x4444444444444444444444444444444444444444'];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -935,7 +936,8 @@ describe('GeneralTransferManagerWrapper', () => {
       const result = await target.verifyTransfer(mockedParams);
 
       // Result expectation
-      expect(result).toEqual(expectedResult);
+      expect(result.transferResult).toBe(statusCode.toNumber());
+      expect(result.address).toBe(expectedResult[1]);
 
       // Verifications
       verify(mockedContract.verifyTransfer).once();
