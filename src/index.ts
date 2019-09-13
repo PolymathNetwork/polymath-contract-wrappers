@@ -59,10 +59,14 @@ export { default as SecurityTokenRegistry } from './contract_wrappers/registries
 export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
 export { default as ERC20 } from './contract_wrappers/tokens/erc20_detailed_wrapper';
 export {
-  ERC20DividendCheckpoint, ERC20DividendCheckpoint_3_0_0, isERC20DividendCheckpoint_3_0_0,
+  ERC20DividendCheckpoint,
+  ERC20DividendCheckpoint_3_0_0,
+  isERC20DividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export {
-  EtherDividendCheckpoint, EtherDividendCheckpoint_3_0_0, isEtherDividendCheckpoint_3_0_0,
+  EtherDividendCheckpoint,
+  EtherDividendCheckpoint_3_0_0,
+  isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
   default as GeneralPermissionManager,
@@ -106,6 +110,13 @@ export {
 export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+export {
+  VestingEscrowWallet,
+  VestingEscrowWallet_3_0_0,
+  isVestingEscrowWallet_3_0_0,
+  VestingEscrowWallet_3_1_0,
+  isVestingEscrowWallet_3_1_0,
+} from './contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export {
@@ -328,4 +339,34 @@ export {
   Provider,
   Web3Wrapper,
   BigNumber,
+  VestingEscrowWalletContract_3_0_0,
+  VestingEscrowWalletEventArgs_3_0_0,
+  VestingEscrowWalletEvents_3_0_0,
+  VestingEscrowWalletPauseEventArgs_3_0_0,
+  VestingEscrowWalletUnpauseEventArgs_3_0_0,
+  VestingEscrowWalletAddScheduleEventArgs_3_0_0,
+  VestingEscrowWalletModifyScheduleEventArgs_3_0_0,
+  VestingEscrowWalletRevokeAllSchedulesEventArgs_3_0_0,
+  VestingEscrowWalletRevokeScheduleEventArgs_3_0_0,
+  VestingEscrowWalletDepositTokensEventArgs_3_0_0,
+  VestingEscrowWalletSendToTreasuryEventArgs_3_0_0,
+  VestingEscrowWalletSendTokensEventArgs_3_0_0,
+  VestingEscrowWalletAddTemplateEventArgs_3_0_0,
+  VestingEscrowWalletRemoveTemplateEventArgs_3_0_0,
+  VestingEscrowWalletTreasuryWalletChangedEventArgs_3_0_0,
+  VestingEscrowWalletContract_3_1_0,
+  VestingEscrowWalletEventArgs_3_1_0,
+  VestingEscrowWalletEvents_3_1_0,
+  VestingEscrowWalletPauseEventArgs_3_1_0,
+  VestingEscrowWalletUnpauseEventArgs_3_1_0,
+  VestingEscrowWalletAddScheduleEventArgs_3_1_0,
+  VestingEscrowWalletModifyScheduleEventArgs_3_1_0,
+  VestingEscrowWalletRevokeAllSchedulesEventArgs_3_1_0,
+  VestingEscrowWalletRevokeScheduleEventArgs_3_1_0,
+  VestingEscrowWalletDepositTokensEventArgs_3_1_0,
+  VestingEscrowWalletSendToTreasuryEventArgs_3_1_0,
+  VestingEscrowWalletSendTokensEventArgs_3_1_0,
+  VestingEscrowWalletAddTemplateEventArgs_3_1_0,
+  VestingEscrowWalletRemoveTemplateEventArgs_3_1_0,
+  VestingEscrowWalletTreasuryWalletChangedEventArgs_3_1_0,
 } from '@polymathnetwork/abi-wrappers';

@@ -15,7 +15,10 @@ import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/s
 import { USDTieredSTO_3_0_0, USDTieredSTO_3_1_0 } from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
-import VestingEscrowWalletWrapper from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
+import {
+  VestingEscrowWallet_3_0_0,
+  VestingEscrowWallet_3_1_0,
+} from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode, ContractVersion } from '../types';
@@ -89,9 +92,9 @@ interface GetModuleInstance {
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
+  (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
   (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpoint_3_0_0>;
   (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpoint_3_0_0>;
-  (params: GetVestingEscrowWallet): Promise<VestingEscrowWalletWrapper>;
 }
 
 /**
@@ -215,7 +218,7 @@ export default class ModuleWrapperFactory {
             this.contractFactory.getUSDTieredSTOContract(params.address, version),
             this.contractFactory,
           );
-        }        
+        }
         break;
       }
       // Checkpoint
@@ -235,11 +238,19 @@ export default class ModuleWrapperFactory {
         break;
       // Wallet
       case ModuleName.VestingEscrowWallet:
-        moduleWrapper = new VestingEscrowWalletWrapper(
-          this.web3Wrapper,
-          this.contractFactory.getVestingEscrowWalletContract(params.address),
-          this.contractFactory,
-        );
+        if (version === ContractVersion.V3_0_0) {
+          moduleWrapper = new VestingEscrowWallet_3_0_0(
+            this.web3Wrapper,
+            this.contractFactory.getVestingEscrowWalletContract(params.address, version),
+            this.contractFactory,
+          );
+        } else {
+          moduleWrapper = new VestingEscrowWallet_3_1_0(
+            this.web3Wrapper,
+            this.contractFactory.getVestingEscrowWalletContract(params.address, version),
+            this.contractFactory,
+          );
+        }
         break;
       // Burn
       default:
