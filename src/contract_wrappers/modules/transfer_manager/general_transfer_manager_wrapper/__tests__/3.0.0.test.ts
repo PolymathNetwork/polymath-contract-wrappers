@@ -8,7 +8,7 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';
-import {GeneralTransferManager_3_0_0} from '../3.0.0';
+import { GeneralTransferManager_3_0_0 } from '../3.0.0';
 
 describe('GeneralTransferManagerWrapper', () => {
   let target: GeneralTransferManager_3_0_0;
@@ -25,9 +25,9 @@ describe('GeneralTransferManagerWrapper', () => {
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new GeneralTransferManager_3_0_0(
-        instance(mockedWrapper),
-        myContractPromise,
-        instance(mockedContractFactory),
+      instance(mockedWrapper),
+      myContractPromise,
+      instance(mockedContractFactory),
     );
   });
 
@@ -50,9 +50,9 @@ describe('GeneralTransferManagerWrapper', () => {
 
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-          new Error(
-              `Expected eventName to be one of: 'ChangeIssuanceAddress', 'ChangeDefaults', 'ModifyKYCData', 'ModifyInvestorFlag', 'ModifyTransferRequirements', 'Pause', 'Unpause', encountered: Transfer`,
-          ),
+        new Error(
+          `Expected eventName to be one of: 'ChangeIssuanceAddress', 'ChangeDefaults', 'ModifyKYCData', 'ModifyInvestorFlag', 'ModifyTransferRequirements', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
       );
     });
   });

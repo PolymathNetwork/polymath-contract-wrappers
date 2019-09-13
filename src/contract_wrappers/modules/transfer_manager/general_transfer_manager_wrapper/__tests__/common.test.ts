@@ -35,9 +35,9 @@ describe('GeneralTransferManagerWrapper', () => {
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new GeneralTransferManagerCommon(
-        instance(mockedWrapper),
-        myContractPromise,
-        instance(mockedContractFactory),
+      instance(mockedWrapper),
+      myContractPromise,
+      instance(mockedContractFactory),
     );
   });
 
@@ -97,7 +97,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -117,7 +117,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.pause).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -159,7 +159,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
 
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -179,7 +179,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.unpause).thenReturn(instance(mockedMethod));
       // Stub the request
       when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
+        expectedResult,
       );
 
       // Real call
@@ -215,7 +215,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.nonceMap).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce))),
+        mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce))),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -226,7 +226,7 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.nonceMap).once();
       verify(
-          mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce))),
+        mockedMethod.callAsync(mockedParams.address, objectContaining(numberToBigNumber(mockedParams.nonce))),
       ).once();
     });
   });
@@ -286,7 +286,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -308,12 +308,12 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.changeDefaults).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
-              objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
+          objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -324,12 +324,12 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.changeDefaults).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
-              objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.defaultFromTime)),
+          objectContaining(dateToBigNumber(mockedParams.defaultToTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -352,7 +352,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -373,7 +373,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.changeIssuanceAddress).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(mockedParams.issuanceAddress, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.issuanceAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -384,7 +384,7 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.changeIssuanceAddress).once();
       verify(
-          mockedMethod.sendTransactionAsync(mockedParams.issuanceAddress, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(mockedParams.issuanceAddress, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -407,7 +407,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -431,14 +431,14 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyKYCData).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
-              objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
-              objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -449,14 +449,14 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyKYCData).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
-              objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
-              objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -570,7 +570,10 @@ describe('GeneralTransferManagerWrapper', () => {
   describe('GetAllInvestorFlags', () => {
     test('should getAllInvestorFlags', async () => {
       // Address expected
-      const expectedResult = [['0x3333333333333333333333333333333333333333', '0x4444444444444444444444444444444444444444'], [new BigNumber(2), new BigNumber(2)]];
+      const expectedResult = [
+        ['0x3333333333333333333333333333333333333333', '0x4444444444444444444444444444444444444444'],
+        [new BigNumber(2), new BigNumber(2)],
+      ];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -653,7 +656,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -667,7 +670,7 @@ describe('GeneralTransferManagerWrapper', () => {
       const mockedNonceMethod = mock(MockedCallMethod);
       when(mockedContract.nonceMap).thenReturn(instance(mockedNonceMethod));
       when(
-          mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
+        mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
       ).thenResolve(expectedNonceResult);
 
       const expectedResult = getMockedPolyResponse();
@@ -677,18 +680,18 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyKYCDataSigned).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
-              objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
-              objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-              objectContaining(dateToBigNumber(mockedParams.validFrom)),
-              objectContaining(dateToBigNumber(mockedParams.validTo)),
-              objectContaining(numberToBigNumber(mockedParams.nonce)),
-              mockedParams.signature,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -699,22 +702,22 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.nonceMap).once();
       verify(
-          mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
+        mockedNonceMethod.callAsync(mockedParams.investor, objectContaining(numberToBigNumber(mockedParams.nonce))),
       ).once();
       verify(mockedContract.modifyKYCDataSigned).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
-              objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
-              objectContaining(dateToBigNumber(mockedParams.expiryTime)),
-              objectContaining(dateToBigNumber(mockedParams.validFrom)),
-              objectContaining(dateToBigNumber(mockedParams.validTo)),
-              objectContaining(numberToBigNumber(mockedParams.nonce)),
-              mockedParams.signature,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          objectContaining(dateToBigNumber(mockedParams.canSendAfter)),
+          objectContaining(dateToBigNumber(mockedParams.canReceiveAfter)),
+          objectContaining(dateToBigNumber(mockedParams.expiryTime)),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(numberToBigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
@@ -737,7 +740,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -760,13 +763,13 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyInvestorFlag).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              mockedParams.flag,
-              mockedParams.value,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -777,13 +780,13 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyInvestorFlag).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              mockedParams.flag,
-              mockedParams.value,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investor,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -806,7 +809,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -829,13 +832,13 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyInvestorFlagMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              mockedParams.flag,
-              mockedParams.value,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -846,13 +849,13 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyInvestorFlagMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              mockedParams.flag,
-              mockedParams.value,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          mockedParams.flag,
+          mockedParams.value,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -881,14 +884,14 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.executeTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.from,
-              mockedParams.to,
-              objectContaining(value),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(value),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -899,14 +902,14 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.executeTransfer).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.from,
-              mockedParams.to,
-              objectContaining(value),
-              mockedParams.data,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.from,
+          mockedParams.to,
+          objectContaining(value),
+          mockedParams.data,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
     });
   });
@@ -929,7 +932,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.verifyTransfer).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.callAsync(mockedParams.from, mockedParams.to, objectContaining(value), mockedParams.data),
+        mockedMethod.callAsync(mockedParams.from, mockedParams.to, objectContaining(value), mockedParams.data),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -942,11 +945,10 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.verifyTransfer).once();
       verify(
-          mockedMethod.callAsync(mockedParams.from, mockedParams.to, objectContaining(value), mockedParams.data),
+        mockedMethod.callAsync(mockedParams.from, mockedParams.to, objectContaining(value), mockedParams.data),
       ).once();
     });
   });
-
 
   describe('ModifyTransferRequirements', () => {
     test('should modifyTransferRequirements', async () => {
@@ -968,15 +970,15 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyTransferRequirements).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.transferType,
-              mockedParams.fromValidKYC,
-              mockedParams.toValidKYC,
-              mockedParams.fromRestricted,
-              mockedParams.toRestricted,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.transferType,
+          mockedParams.fromValidKYC,
+          mockedParams.toValidKYC,
+          mockedParams.fromRestricted,
+          mockedParams.toRestricted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -988,15 +990,15 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyTransferRequirements).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.transferType,
-              mockedParams.fromValidKYC,
-              mockedParams.toValidKYC,
-              mockedParams.fromRestricted,
-              mockedParams.toRestricted,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.transferType,
+          mockedParams.fromValidKYC,
+          mockedParams.toValidKYC,
+          mockedParams.fromRestricted,
+          mockedParams.toRestricted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
     });
   });
@@ -1023,7 +1025,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -1040,15 +1042,15 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.modifyTransferRequirementsMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.transferTypes,
-              mockedParams.fromValidKYC,
-              mockedParams.toValidKYC,
-              mockedParams.fromRestricted,
-              mockedParams.toRestricted,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.transferTypes,
+          mockedParams.fromValidKYC,
+          mockedParams.toValidKYC,
+          mockedParams.fromRestricted,
+          mockedParams.toRestricted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1060,15 +1062,15 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyTransferRequirementsMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.transferTypes,
-              mockedParams.fromValidKYC,
-              mockedParams.toValidKYC,
-              mockedParams.fromRestricted,
-              mockedParams.toRestricted,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.transferTypes,
+          mockedParams.fromValidKYC,
+          mockedParams.toValidKYC,
+          mockedParams.fromRestricted,
+          mockedParams.toRestricted,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
@@ -1100,7 +1102,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
@@ -1122,14 +1124,14 @@ describe('GeneralTransferManagerWrapper', () => {
       const expiryTime = mockedParams.expiryTime.map(dateToBigNumber);
 
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              objectContaining(canSendAfter),
-              objectContaining(canReceiveAfter),
-              objectContaining(expiryTime),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(canSendAfter),
+          objectContaining(canReceiveAfter),
+          objectContaining(expiryTime),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1141,14 +1143,14 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyKYCDataMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              objectContaining(canSendAfter),
-              objectContaining(canReceiveAfter),
-              objectContaining(expiryTime),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(canSendAfter),
+          objectContaining(canReceiveAfter),
+          objectContaining(expiryTime),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
@@ -1187,18 +1189,18 @@ describe('GeneralTransferManagerWrapper', () => {
       const expiryTime = mockedParams.expiryTime.map(dateToBigNumber);
 
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              objectContaining(canSendAfter),
-              objectContaining(canReceiveAfter),
-              objectContaining(expiryTime),
-              objectContaining(dateToBigNumber(mockedParams.validFrom)),
-              objectContaining(dateToBigNumber(mockedParams.validTo)),
-              objectContaining(new BigNumber(mockedParams.nonce)),
-              mockedParams.signature,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(canSendAfter),
+          objectContaining(canReceiveAfter),
+          objectContaining(expiryTime),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(new BigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1210,18 +1212,18 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.modifyKYCDataSignedMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              objectContaining(canSendAfter),
-              objectContaining(canReceiveAfter),
-              objectContaining(expiryTime),
-              objectContaining(dateToBigNumber(mockedParams.validFrom)),
-              objectContaining(dateToBigNumber(mockedParams.validTo)),
-              objectContaining(new BigNumber(mockedParams.nonce)),
-              mockedParams.signature,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.investors,
+          objectContaining(canSendAfter),
+          objectContaining(canReceiveAfter),
+          objectContaining(expiryTime),
+          objectContaining(dateToBigNumber(mockedParams.validFrom)),
+          objectContaining(dateToBigNumber(mockedParams.validTo)),
+          objectContaining(new BigNumber(mockedParams.nonce)),
+          mockedParams.signature,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
     });
   });
@@ -1269,10 +1271,10 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.getInvestors).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.callAsync(
-              objectContaining(new BigNumber(mockedParams.fromIndex)),
-              objectContaining(new BigNumber(mockedParams.toIndex)),
-          ),
+        mockedMethod.callAsync(
+          objectContaining(new BigNumber(mockedParams.fromIndex)),
+          objectContaining(new BigNumber(mockedParams.toIndex)),
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1284,10 +1286,10 @@ describe('GeneralTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getInvestors).once();
       verify(
-          mockedMethod.callAsync(
-              objectContaining(new BigNumber(mockedParams.fromIndex)),
-              objectContaining(new BigNumber(mockedParams.toIndex)),
-          ),
+        mockedMethod.callAsync(
+          objectContaining(new BigNumber(mockedParams.fromIndex)),
+          objectContaining(new BigNumber(mockedParams.toIndex)),
+        ),
       ).once();
     });
   });
@@ -1322,7 +1324,7 @@ describe('GeneralTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const expectedDecimalsResult = new BigNumber(18);
       const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
@@ -1331,8 +1333,8 @@ describe('GeneralTransferManagerWrapper', () => {
 
       const mockedParams = {
         partition: Partition.Unlocked,
-        tokenHolder: "0x2222222222222222222222222222222222222222",
-        additionalBalance: new BigNumber(100)
+        tokenHolder: '0x2222222222222222222222222222222222222222',
+        additionalBalance: new BigNumber(100),
       };
       // Address expected
       const expectedResult = new BigNumber(200);
@@ -1341,7 +1343,13 @@ describe('GeneralTransferManagerWrapper', () => {
       // Stub the method
       when(mockedContract.getTokensByPartition).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).thenResolve(expectedResult);
+      when(
+        mockedMethod.callAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getTokensByPartition(mockedParams);
@@ -1351,7 +1359,13 @@ describe('GeneralTransferManagerWrapper', () => {
 
       // Verifications
       verify(mockedContract.getTokensByPartition).once();
-      verify(mockedMethod.callAsync(stringToBytes32(mockedParams.partition), mockedParams.tokenHolder, objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)))).once();
+      verify(
+        mockedMethod.callAsync(
+          stringToBytes32(mockedParams.partition),
+          mockedParams.tokenHolder,
+          objectContaining(valueToWei(mockedParams.additionalBalance, expectedDecimalsResult)),
+        ),
+      ).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();

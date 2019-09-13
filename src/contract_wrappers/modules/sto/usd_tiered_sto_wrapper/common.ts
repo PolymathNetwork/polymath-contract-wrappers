@@ -20,7 +20,7 @@ import {
   weiToValue,
 } from '../../../../utils/convert';
 import functionsUtils from '../../../../utils/functions_utils';
-import { GeneralTransferManager_3_0_0 } from '../../transfer_manager/general_transfer_manager_wrapper';
+import { GeneralTransferManagerCommon } from '../../transfer_manager/general_transfer_manager_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -898,7 +898,7 @@ export default class USDTieredSTOWrapper extends STOCommon {
       stringToBytes32(ModuleName.GeneralTransferManager),
     );
 
-    const generalTM = new GeneralTransferManager_3_0_0(
+    const generalTM = new GeneralTransferManagerCommon(
       this.web3Wrapper,
       this.generalTransferManagerContract(generalTMAddress[0]),
       this.contractFactory,
