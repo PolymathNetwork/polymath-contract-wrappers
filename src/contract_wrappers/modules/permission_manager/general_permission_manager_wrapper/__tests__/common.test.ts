@@ -2,21 +2,20 @@
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import {
   GeneralPermissionManagerContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../module_wrapper';
-import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
+import GeneralPermissionManagerWrapper from '../common';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   stringToBytes32,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
   numberToBigNumber,
-} from '../../../../utils/convert';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { Perm } from '../../../../types';
+} from '../../../../../utils/convert';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
+import { Perm } from '../../../../../types';
 
 describe('GeneralPermissionManagerWrapper', () => {
   // Declare GeneralPermissionManagerWrapper object
@@ -573,25 +572,6 @@ describe('GeneralPermissionManagerWrapper', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to GeneralPermissionManagerEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ChangePermission', 'AddDelegate', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });

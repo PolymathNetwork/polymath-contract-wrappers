@@ -10,9 +10,8 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import assert from '../../../../utils/assert';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -22,13 +21,15 @@ import {
   Subscribe,
   Perm,
   ErrorCode,
-} from '../../../types';
+  ContractVersion,
+} from '../../../../types';
 import {
   numberToBigNumber,
   stringToBytes32,
   stringArrayToBytes32Array,
   parsePermBytes32Value,
-} from '../../../utils/convert';
+} from '../../../../utils/convert';
+import GeneralPermissionManagerCommon from './common';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
@@ -182,8 +183,10 @@ interface PermissionsPerModule {
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
-export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
+export class GeneralPermissionManager_3_0_0 extends GeneralPermissionManagerCommon {
   public contract: Promise<GeneralPermissionManagerContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper
@@ -388,77 +391,6 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Used to add multiple delegates in a batch
-   * 3.1.0
-   */
-  public addDelegateMulti = async (params: AddDelegateMultiParams) => {
-    assert.assert(
-      await this.isCallerAllowed(params.txData, Perm.Admin),
-      ErrorCode.Unauthorized,
-      'Caller is not allowed',
-    );
-    assert.assert(
-      params.delegates.length === params.details.length,
-      ErrorCode.MismatchedArrayLength,
-      'Array length mismatch',
-    );
-
-    const resultCheckDelegate = [];
-    for (let i = 0; i < params.delegates.length; i += 1) {
-      assert.isNonZeroETHAddressHex('delegate', params.delegates[i]);
-      assert.assert(params.details[i].length > 0, ErrorCode.InvalidData, '0 value not allowed');
-      resultCheckDelegate.push(this.delegateIsNotPresent(params.delegates[i]));
-    }
-    await Promise.all(resultCheckDelegate);
-    await (await this.contract).addDelegateMulti.sendTransactionAsync(
-      params.delegates,
-      stringArrayToBytes32Array(params.details),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  /**
-   * Used to delete a list of delegates
-   * 3.1.0
-   */
-  public deleteDelegateMulti = async (params: DeleteDelegateMultiParams) => {
-    assert.assert(
-      await this.isCallerAllowed(params.txData, Perm.Admin),
-      ErrorCode.Unauthorized,
-      'Caller is not allowed',
-    );
-
-    const resultCheckDelegate = [];
-    for (let i = 0; i < params.delegates.length; i += 1) {
-      assert.isNonZeroETHAddressHex('delegate', params.delegates[i]);
-      resultCheckDelegate.push(this.delegateDoesNotExist(params.delegates[i]));
-    }
-    await Promise.all(resultCheckDelegate);
-    return (await this.contract).deleteDelegateMulti.sendTransactionAsync(
-      stringArrayToBytes32Array(params.delegates),
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  private delegateIsNotPresent = async (delegate: string) => {
-    assert.assert(
-      !(await (await this.contract).checkDelegate.callAsync(delegate)),
-      ErrorCode.AlreadyExists,
-      `Delegate already present`,
-    );
-  };
-
-  private delegateDoesNotExist = async (delegate: string) => {
-    assert.assert(
-      await (await this.contract).checkDelegate.callAsync(delegate),
-      ErrorCode.NotFound,
-      'Delegate does not exist',
-    );
-  };
-
-  /**
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
@@ -500,4 +432,10 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
     );
     return logs;
   };
+}
+
+export function isGeneralPermissionManager_3_0_0(
+  wrapper: GeneralPermissionManagerCommon,
+): wrapper is GeneralPermissionManager_3_0_0 {
+  return wrapper.contractVersion === ContractVersion.V3_0_0;
 }
