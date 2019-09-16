@@ -9,6 +9,7 @@ import {
   ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
   TxData,
   Web3Wrapper,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import semver from 'semver';
 import { schemas } from '@0x/json-schemas';
@@ -25,6 +26,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import {
   bytes32ArrayToStringArray,
@@ -133,7 +135,9 @@ interface ChangeSTVersionBoundsParams extends TxParams {
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
 export default class ModuleFactoryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleFactoryContract_3_0_0>;
+  public contract: Promise<ModuleFactoryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate ModuleFactoryWrapper
@@ -215,7 +219,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the setupCost
    */
-  public changeSetupCost = async (params: ChangeSetupCostParams) => {
+  public changeSetupCost = async (params: ChangeSetupCostParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeSetupCost.sendTransactionAsync(
       params.setupCost,
@@ -227,7 +231,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the cost and type
    */
-  public changeCostAndType = async (params: ChangeCostAndTypeParams) => {
+  public changeCostAndType = async (params: ChangeCostAndTypeParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeCostAndType.sendTransactionAsync(
       params.setupCost,
@@ -240,7 +244,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the title
    */
-  public changeTitle = async (params: ChangeTitleParams) => {
+  public changeTitle = async (params: ChangeTitleParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.title.length > 0, ErrorCode.InvalidData, 'Invalid title');
     return (await this.contract).changeTitle.sendTransactionAsync(params.title, params.txData, params.safetyFactor);
@@ -249,7 +253,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the description
    */
-  public changeDescription = async (params: ChangeDescriptionParams) => {
+  public changeDescription = async (params: ChangeDescriptionParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.description.length > 0, ErrorCode.InvalidData, 'Invalid description');
     return (await this.contract).changeDescription.sendTransactionAsync(
@@ -262,7 +266,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the name
    */
-  public changeName = async (params: ChangeNameParams) => {
+  public changeName = async (params: ChangeNameParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Invalid name');
     return (await this.contract).changeName.sendTransactionAsync(
@@ -275,7 +279,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the tags
    */
-  public changeTags = async (params: ChangeTagsParams) => {
+  public changeTags = async (params: ChangeTagsParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.tags.length > 0, ErrorCode.InvalidData, 'Invalid, must provide one or more tags');
     return (await this.contract).changeTags.sendTransactionAsync(
@@ -288,7 +292,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the ST VersionBounds
    */
-  public changeSTVersionBounds = async (params: ChangeSTVersionBoundsParams) => {
+  public changeSTVersionBounds = async (params: ChangeSTVersionBoundsParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(
       params.boundType === BoundType.LowerBound || params.boundType === BoundType.UpperBound,
@@ -400,7 +404,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+  public checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,

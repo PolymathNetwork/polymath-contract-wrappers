@@ -7,16 +7,16 @@ import {
   ModuleFactoryContract_3_0_0,
   PolyTokenContract_3_0_0,
   ModuleRegistryContract_3_0_0,
-  ethers,
+  ethersUtils,
   BigNumber,
   Web3Wrapper,
   CountTransferManagerContract_3_0_0,
-  ERC20DividendCheckpointContract_3_0_0,
-  CappedSTOContract_3_0_0,
-  USDTieredSTOContract_3_0_0,
+  ERC20DividendCheckpointContract_3_0_0,  
   PercentageTransferManagerContract_3_0_0,
   EtherDividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
+  CappedSTOContract_3_1_0,
+  USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import {
@@ -3571,7 +3571,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract_3_0_0.ABI());
+      const iCtmFace = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3766,7 +3766,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract_3_0_0.ABI());
+      const iCtmFace = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3956,7 +3956,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iPtmFace = new ethers.utils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
+      const iPtmFace = new ethersUtils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
       const ptmData = iPtmFace.functions.configure.encode([
         valueToWei(mockedPtmParams.data.maxHolderPercentage, PERCENTAGE_DECIMALS).toString(),
         mockedPtmParams.data.allowPrimaryIssuance,
@@ -4142,6 +4142,7 @@ describe('SecurityTokenWrapper', () => {
         rate: new BigNumber(1),
         fundRaiseType: CappedSTOFundRaiseType.ETH,
         fundsReceiver: '0x2222222222222222222222222222222222222222',
+        treasuryWallet: '0x3333333333333333333333333333333333333333',
       };
       const mockedCappedParams = {
         moduleName: ModuleName.CappedSTO,
@@ -4154,7 +4155,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCappedFace = new ethers.utils.Interface(CappedSTOContract_3_0_0.ABI());
+      const iCappedFace = new ethersUtils.Interface(CappedSTOContract_3_1_0.ABI());
       const cappedData = iCappedFace.functions.configure.encode([
         dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
@@ -4162,6 +4163,7 @@ describe('SecurityTokenWrapper', () => {
         valueToWei(mockedCappedParams.data.rate, FULL_DECIMALS).toString(),
         [mockedCappedParams.data.fundRaiseType],
         mockedCappedParams.data.fundsReceiver,
+        mockedCappedParams.data.treasuryWallet,
       ]);
 
       when(
@@ -4189,6 +4191,7 @@ describe('SecurityTokenWrapper', () => {
           rate: cappedParams.rate,
           fundRaiseType: cappedParams.fundRaiseType,
           fundsReceiver: cappedParams.fundsReceiver,
+          treasuryWallet: cappedParams.treasuryWallet
         },
         txData: mockedCappedParams.txData,
         safetyFactor: mockedCappedParams.safetyFactor,
@@ -4366,7 +4369,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iUsdTieredStoFace = new ethers.utils.Interface(USDTieredSTOContract_3_0_0.ABI());
+      const iUsdTieredStoFace = new ethersUtils.Interface(USDTieredSTOContract_3_1_0.ABI());
       const usdTieredStoData = iUsdTieredStoFace.functions.configure.encode([
         dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
         dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
@@ -4587,7 +4590,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iErc20DividendFace = new ethers.utils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
+      const iErc20DividendFace = new ethersUtils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
       const erc20DividendData = iErc20DividendFace.functions.configure.encode([mockedErc20DividendParams.data.wallet]);
 
       when(
@@ -4776,7 +4779,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iEtherDividendFace = new ethers.utils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
+      const iEtherDividendFace = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
       const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
 
       when(
@@ -4965,7 +4968,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iEtherDividendFace = new ethers.utils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
+      const iEtherDividendFace = new ethersUtils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
       const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
 
       when(

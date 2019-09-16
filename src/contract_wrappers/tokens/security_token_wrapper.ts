@@ -15,7 +15,7 @@ import {
   ISecurityTokenDocumentRemovedEventArgs_3_0_0,
   ISecurityTokenDocumentUpdatedEventArgs_3_0_0,
   ISecurityTokenEventArgs_3_0_0,
-  ISecurityTokenEvents_3_0_0,
+  SecurityTokenEvents_3_0_0,
   ISecurityTokenFreezeIssuanceEventArgs_3_0_0,
   ISecurityTokenFreezeTransfersEventArgs_3_0_0,
   ISecurityTokenGranularityChangedEventArgs_3_0_0,
@@ -26,7 +26,7 @@ import {
   ISecurityTokenModuleBudgetChangedEventArgs_3_0_0,
   ISecurityTokenModuleRemovedEventArgs_3_0_0,
   ISecurityTokenModuleUnarchivedEventArgs_3_0_0,
-  // ISecurityTokenModuleUpgradedEventArgs_3_0_0,
+  SecurityTokenModuleUpgradedEventArgs_3_0_0, // this event isn't being exported from the interface contracts, so we need to use the non-interface version
   ISecurityTokenOwnershipTransferredEventArgs_3_0_0,
   ISecurityTokenRedeemedByPartitionEventArgs_3_0_0,
   ISecurityTokenRedeemedEventArgs_3_0_0,
@@ -41,16 +41,16 @@ import {
   ISecurityTokenUpdateTokenNameEventArgs_3_0_0,
   EtherDividendCheckpointContract_3_0_0,
   CountTransferManagerContract_3_0_0,
-  PercentageTransferManagerContract_3_0_0,
-  CappedSTOContract_3_0_0,
-  USDTieredSTOContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,  
   ERC20DividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
   TxData,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
-  ethers,
+  ethersUtils,
+  CappedSTOContract_3_1_0,
+  USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -73,7 +73,8 @@ import {
   TxParams,
   CappedSTOFundRaiseType,
   TransferStatusCode,
-  ErrorCode
+  ErrorCode,
+  ContractVersion
 } from '../../types';
 import {
   bigNumberToDate,
@@ -94,298 +95,298 @@ const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Approval;
+  eventName: SecurityTokenEvents_3_0_0.Approval;
   callback: EventCallback<ISecurityTokenApprovalEventArgs_3_0_0>;
 }
 
 interface GetApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Approval;
+  eventName: SecurityTokenEvents_3_0_0.Approval;
 }
 
 interface TransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Transfer;
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
   callback: EventCallback<ISecurityTokenTransferEventArgs_3_0_0>;
 }
 
 interface GetTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Transfer;
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
 }
 
 interface ModuleAddedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
   callback: EventCallback<ISecurityTokenModuleAddedEventArgs_3_0_0>;
 }
 
 interface GetModuleAddedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleAdded;
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
 }
 
-// interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
-//   callback: EventCallback<ISecurityTokenModuleUpgradedEventArgs_3_0_0>;
-// }
+interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+  callback: EventCallback<SecurityTokenModuleUpgradedEventArgs_3_0_0>;
+}
 
-// interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-//   eventName: ISecurityTokenEvents_3_0_0.ModuleUpgraded;
-// }
+interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+}
 
 interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
   callback: EventCallback<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenDetailsLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
 }
 
 interface UpdateTokenNameSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
   callback: EventCallback<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>;
 }
 
 interface GetUpdateTokenNameLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.UpdateTokenName;
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
 }
 
 interface GranularityChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
   callback: EventCallback<ISecurityTokenGranularityChangedEventArgs_3_0_0>;
 }
 
 interface GetGranularityChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.GranularityChanged;
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
 }
 
 interface ModuleArchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
   callback: EventCallback<ISecurityTokenModuleArchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleArchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleArchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
 }
 
 interface ModuleUnarchivedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
   callback: EventCallback<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>;
 }
 
 interface GetModuleUnarchivedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleUnarchived;
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
 }
 
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
   callback: EventCallback<ISecurityTokenModuleRemovedEventArgs_3_0_0>;
 }
 
 interface GetModuleRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleRemoved;
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
 }
 
 interface ModuleBudgetChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
   callback: EventCallback<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>;
 }
 
 interface GetModuleBudgetChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
 }
 
 interface TransferByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
   callback: EventCallback<ISecurityTokenTransferByPartitionEventArgs_3_0_0>;
 }
 
 interface GetTransferByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TransferByPartition;
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
 }
 
 interface AuthorizedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
   callback: EventCallback<ISecurityTokenAuthorizedOperatorEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperator;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
 }
 
 interface RevokedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
   callback: EventCallback<ISecurityTokenRevokedOperatorEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperator;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
 }
 
 interface AuthorizedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
   callback: EventCallback<ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetAuthorizedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
 }
 
 interface RevokedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
   callback: EventCallback<ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRevokedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
 }
 
 interface IssuedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
   callback: EventCallback<ISecurityTokenIssuedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetIssuedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.IssuedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
 }
 
 interface RedeemedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
   callback: EventCallback<ISecurityTokenRedeemedByPartitionEventArgs_3_0_0>;
 }
 
 interface GetRedeemedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.RedeemedByPartition;
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
 }
 
 interface ControllerTransferSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
   callback: EventCallback<ISecurityTokenControllerTransferEventArgs_3_0_0>;
 }
 
 interface GetControllerTransferLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerTransfer;
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
 }
 
 interface ControllerRedemptionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
   callback: EventCallback<ISecurityTokenControllerRedemptionEventArgs_3_0_0>;
 }
 
 interface GetControllerRedemptionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.ControllerRedemption;
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
 }
 
 interface DocumentRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
   callback: EventCallback<ISecurityTokenDocumentRemovedEventArgs_3_0_0>;
 }
 
 interface GetDocumentRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentRemoved;
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
 }
 
 interface DocumentUpdatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
   callback: EventCallback<ISecurityTokenDocumentUpdatedEventArgs_3_0_0>;
 }
 
 interface GetDocumentUpdatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DocumentUpdated;
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
 }
 
 interface FreezeTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
   callback: EventCallback<ISecurityTokenFreezeTransfersEventArgs_3_0_0>;
 }
 
 interface GetFreezeTransfersLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeTransfers;
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
 }
 
 interface CheckpointCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
   callback: EventCallback<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>;
 }
 
 interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.CheckpointCreated;
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
 }
 
 interface FreezeIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
   callback: EventCallback<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>;
 }
 
 interface GetFreezeIssuanceLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.FreezeIssuance;
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
 }
 
 interface IssuedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Issued;
+  eventName: SecurityTokenEvents_3_0_0.Issued;
   callback: EventCallback<ISecurityTokenIssuedEventArgs_3_0_0>;
 }
 
 interface GetIssuedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Issued;
+  eventName: SecurityTokenEvents_3_0_0.Issued;
 }
 
 interface RedeemedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
   callback: EventCallback<ISecurityTokenRedeemedEventArgs_3_0_0>;
 }
 
 interface GetRedeemedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.Redeemed;
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
 }
 
 interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.SetController;
+  eventName: SecurityTokenEvents_3_0_0.SetController;
   callback: EventCallback<ISecurityTokenSetControllerEventArgs_3_0_0>;
 }
 
 interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.SetController;
+  eventName: SecurityTokenEvents_3_0_0.SetController;
 }
 
 interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
   callback: EventCallback<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>;
 }
 
 interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
 }
 
 interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DisableController;
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
   callback: EventCallback<ISecurityTokenDisableControllerEventArgs_3_0_0>;
 }
 
 interface GetDisableControllerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.DisableController;
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
   callback: EventCallback<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.OwnershipTransferred;
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
 }
 
 interface TokenUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
   callback: EventCallback<ISecurityTokenTokenUpgradedEventArgs_3_0_0>;
 }
 
 interface GetTokenUpgradedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenEvents_3_0_0.TokenUpgraded;
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
 }
 
 interface SecurityTokenSubscribeAsyncParams extends Subscribe {
   (params: ApprovalSubscribeAsyncParams): Promise<string>;
   (params: TransferSubscribeAsyncParams): Promise<string>;
   (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
-  // (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
   (params: UpdateTokenNameSubscribeAsyncParams): Promise<string>;
   (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
@@ -420,7 +421,7 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenApprovalEventArgs_3_0_0>[]>;
   (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTransferEventArgs_3_0_0>[]>;
   (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleAddedEventArgs_3_0_0>[]>;
-  // (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
+  (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>[]
   >;
@@ -1025,6 +1026,7 @@ interface CappedSTOData {
    */
   fundRaiseType: CappedSTOFundRaiseType;
   fundsReceiver: string;
+  treasuryWallet: string;
 }
 
 interface USDTieredSTOData {
@@ -1098,23 +1100,25 @@ interface ProduceAddModuleInformation {
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
 export default class SecurityTokenWrapper extends ERC20TokenWrapper {
-  protected contract: Promise<ISecurityTokenContract_3_0_0>;
+  public contract: Promise<ISecurityTokenContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
+  public contractFactory: ContractFactory;
+
+  public featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
+  public moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
+  public polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
-  protected moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
+  public moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
     return this.contractFactory.getModuleRegistryContract();
   };
 
@@ -1197,7 +1201,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Decrease Allowance
    */
-  public decreaseAllowance = async (params: ChangeApprovalParams) => {
+  public decreaseAllowance = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseAllowance.sendTransactionAsync(
       params.spender,
@@ -1265,7 +1269,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * `controllerTransfer` / `controllerRedeem` will always revert.
    * @return bool `true` when controller address is non-zero otherwise return `false`.
    */
-  public isControllable = async () => {
+  public isControllable = async (): Promise<boolean> => {
     return (await this.contract).isControllable.callAsync();
   };
 
@@ -1273,7 +1277,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Get moduleRegistry
    * @return address of moduleRegistry
    */
-  public moduleRegistry = async () => {
+  public moduleRegistry = async (): Promise<string> => {
     return (await this.contract).moduleRegistry.callAsync();
   };
 
@@ -1281,7 +1285,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Get securityTokenRegistry
    * @return address of securityTokenRegistry
    */
-  public securityTokenRegistry = async () => {
+  public securityTokenRegistry = async (): Promise<string> => {
     return (await this.contract).securityTokenRegistry.callAsync();
   };
 
@@ -1289,14 +1293,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Get tokenDetails
    * @return off chain data details of token
    */
-  public tokenDetails = async () => {
+  public tokenDetails = async (): Promise<string> => {
     return (await this.contract).tokenDetails.callAsync();
   };
 
   /**
    * Increase Allowance
    */
-  public increaseAllowance = async (params: ChangeApprovalParams) => {
+  public increaseAllowance = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseAllowance.sendTransactionAsync(
       params.spender,
@@ -1317,7 +1321,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
-  public transferOwnership = async (params: TransferOwnershipParams) => {
+  public transferOwnership = async (params: TransferOwnershipParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
       params.newOwner,
@@ -1329,14 +1333,14 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Update ST from registry
    */
-  public updateFromRegistry = async (params: TxParams) => {
+  public updateFromRegistry = async (params: TxParams): Promise<PolyResponse> => {
     return (await this.contract).updateFromRegistry.sendTransactionAsync(params.txData, params.safetyFactor);
   };
 
   /**
    * Archives a module attached to the SecurityToken
    */
-  public archiveModule = async (params: ModuleAddressTxParams) => {
+  public archiveModule = async (params: ModuleAddressTxParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleExists(params.moduleAddress);
@@ -1351,7 +1355,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Unarchives a module attached to the SecurityToken
    */
-  public unarchiveModule = async (params: ModuleAddressTxParams) => {
+  public unarchiveModule = async (params: ModuleAddressTxParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleExists(params.moduleAddress);
@@ -1366,7 +1370,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Removes a module attached to the SecurityToken
    */
-  public removeModule = async (params: ModuleAddressTxParams) => {
+  public removeModule = async (params: ModuleAddressTxParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleStructAddressIsNotZero(params.moduleAddress);
@@ -1382,7 +1386,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Returns module list for a module name
    * @return address List of modules with this name
    */
-  public getModulesByName = async (params: ModuleNameParams) => {
+  public getModulesByName = async (params: ModuleNameParams): Promise<string[]> => {
     const moduleNameHex = stringToBytes32(params.moduleName);
     return (await this.contract).getModulesByName.callAsync(moduleNameHex);
   };
@@ -1391,7 +1395,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Allows the owner to withdraw unspent POLY stored by them on the ST or any ERC20 token.
    * Owner can transfer POLY to the ST which will be used to pay for modules that require a POLY fee.
    */
-  public withdrawERC20 = async (params: WithdrawERC20Params) => {
+  public withdrawERC20 = async (params: WithdrawERC20Params): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).withdrawERC20.sendTransactionAsync(
@@ -1405,7 +1409,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows owner to increase/decrease POLY approval of one of the modules
    */
-  public changeModuleBudget = async (params: ChangeModuleBudgetParams) => {
+  public changeModuleBudget = async (params: ChangeModuleBudgetParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('module', params.module);
     await this.checkModuleStructAddressIsNotZero(params.module);
     await this.checkOnlyOwner(params.txData);
@@ -1421,7 +1425,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Changes the tokenDetails
    */
-  public updateTokenDetails = async (params: UpdateTokenDetailsParams) => {
+  public updateTokenDetails = async (params: UpdateTokenDetailsParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).updateTokenDetails.sendTransactionAsync(
       params.newTokenDetails,
@@ -1433,7 +1437,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows the owner to change token granularity
    */
-  public changeGranularity = async (params: ChangeGranularityParams) => {
+  public changeGranularity = async (params: ChangeGranularityParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.isBigNumberGreaterThanZero(params.granularity, 'Granularity must not be 0');
     return (await this.contract).changeGranularity.sendTransactionAsync(
@@ -1446,7 +1450,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows owner to change token name
    */
-  public changeName = async (params: ChangeNameParams) => {
+  public changeName = async (params: ChangeNameParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name required');
     return (await this.contract).changeName.sendTransactionAsync(params.name, params.txData, params.safetyFactor);
@@ -1455,7 +1459,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows to change the treasury wallet address
    */
-  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams) => {
+  public changeTreasuryWallet = async (params: ChangeTreasuryWalletParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('treasuryWallet', params.treasuryWallet);
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeTreasuryWallet.sendTransactionAsync(
@@ -1468,7 +1472,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Allows owner to change data store
    */
-  public changeDataStore = async (params: DataStoreAddressParams) => {
+  public changeDataStore = async (params: DataStoreAddressParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('dataStore', params.dataStore);
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeDataStore.sendTransactionAsync(
@@ -1535,7 +1539,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Freezes all the transfers
    */
-  public freezeTransfers = async (params: TxParams) => {
+  public freezeTransfers = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(!(await this.transfersFrozen()), ErrorCode.PreconditionRequired, 'Transfers already frozen');
     return (await this.contract).freezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1544,7 +1548,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Un-Freezes all the transfers
    */
-  public unfreezeTransfers = async (params: TxParams) => {
+  public unfreezeTransfers = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.transfersFrozen(), ErrorCode.PreconditionRequired, 'Transfers are not frozen');
     return (await this.contract).unfreezeTransfers.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1554,7 +1558,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Overloaded version of the transfer function
    * @return bool success
    */
-  public transferWithData = async (params: TransferWithDataParams) => {
+  public transferWithData = async (params: TransferWithDataParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
@@ -1569,7 +1573,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Overloaded version of the transferFrom function
    * @return bool success
    */
-  public transferFromWithData = async (params: TransferFromWithDataParams) => {
+  public transferFromWithData = async (params: TransferFromWithDataParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     return (await this.contract).transferFromWithData.sendTransactionAsync(
@@ -1586,7 +1590,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Permanently freeze issuance of this security token.
    * It MUST NOT be possible to increase `totalSupply` after this function is called.
    */
-  public freezeIssuance = async (params: FreezeIssuanceParams) => {
+  public freezeIssuance = async (params: FreezeIssuanceParams): Promise<PolyResponse> => {
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     assert.assert(
       functionsUtils.checksumAddressComparision(
@@ -1609,7 +1613,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * have the any logic related to operator but its superset ERC1400 have the operator logic and this function
    * is allowed to call by the operator.
    */
-  public issue = async (params: IssueParams) => {
+  public issue = async (params: IssueParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
@@ -1635,7 +1639,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Increases totalSupply and the corresponding amount of the specified owners partition
    */
-  public issueByPartition = async (params: IssueByPartitionParams) => {
+  public issueByPartition = async (params: IssueByPartitionParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
@@ -1654,7 +1658,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * issue new tokens and assigns them to the target _tokenHolder.
    * @return success
    */
-  public issueMulti = async (params: IssueMultiParams) => {
+  public issueMulti = async (params: IssueMultiParams): Promise<PolyResponse> => {
     params.investors.forEach(address => assert.isNonZeroETHAddressHex('investors', address));
     assert.assert(
       params.investors.length === params.values.length,
@@ -1692,7 +1696,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * using different ways that could be implemented with in the `redeem` function definition. But those implementations
    * are out of the scope of the ERC1594.
    */
-  public redeem = async (params: RedeemParams) => {
+  public redeem = async (params: RedeemParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     return (await this.contract).redeem.sendTransactionAsync(
       valueToWei(params.value, await this.decimals()),
@@ -1705,7 +1709,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Decreases totalSupply and the corresponding amount of the specified partition of msg.sender
    */
-  public redeemByPartition = async (params: RedeemByPartitionParams) => {
+  public redeemByPartition = async (params: RedeemByPartitionParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isValidPartition(params.partition);
     return (await this.contract).redeemByPartition.sendTransactionAsync(
@@ -1726,7 +1730,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * @param data Additional data attached to the burning of tokens
    * @param operatorData Additional data attached to the transfer of tokens by the operator
    */
-  public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams) => {
+  public operatorRedeemByPartition = async (params: OperatorRedeemByPartitionParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
     assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
@@ -1748,7 +1752,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * are out of the scope of the ERC1594.
    * It is analogy to `transferFrom`
    */
-  public redeemFrom = async (params: RedeemFromParams) => {
+  public redeemFrom = async (params: RedeemFromParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     assert.assert(
       (await this.allowance({
@@ -1771,7 +1775,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Creates a checkpoint that can be used to query historical balances / totalSupply
    */
-  public createCheckpoint = async (params: TxParams) => {
+  public createCheckpoint = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(
       (await this.currentCheckpointId()).isLessThan(MAX_CHECKPOINT_NUMBER),
@@ -1794,7 +1798,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Queries totalSupply at a specified checkpoint
    */
-  public totalSupplyAt = async (params: CheckpointIdParams) => {
+  public totalSupplyAt = async (params: CheckpointIdParams): Promise<BigNumber> => {
     assert.assert(
       (await this.currentCheckpointId()).isGreaterThanOrEqualTo(params.checkpointId),
       ErrorCode.InvalidData,
@@ -1827,7 +1831,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Get the balance according to the provided partitions
    * @return balance amount
    */
-  public balanceOfByPartition = async (params: BalanceOfByPartitionParams) => {
+  public balanceOfByPartition = async (params: BalanceOfByPartitionParams): Promise<BigNumber> => {
     assert.isETHAddressHex('investor', params.tokenHolder);
     return weiToValue(
       await (await this.contract).balanceOfByPartition.callAsync(stringToBytes32(params.partition), params.tokenHolder),
@@ -1839,7 +1843,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Transfers the ownership of tokens from a specified partition from one address to another address
    * @return The partition to which the transferred tokens were allocated for the to address
    */
-  public transferByPartition = async (params: TransferByPartitionParams) => {
+  public transferByPartition = async (params: TransferByPartitionParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('To', params.to);
     assert.isValidPartition(params.partition);
     return (await this.contract).transferByPartition.sendTransactionAsync(
@@ -1858,7 +1862,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * but it doesn't mean we operator is allowed to transfer the LOCKED partition values.
    * Logic for this restriction is written in `operatorTransferByPartition()` function.
    */
-  public authorizeOperator = async (params: AuthorizeOperatorParams) => {
+  public authorizeOperator = async (params: AuthorizeOperatorParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('Operator', params.operator);
     return (await this.contract).authorizeOperator.sendTransactionAsync(
       params.operator,
@@ -1873,7 +1877,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * but it doesn't mean we operator is allowed to transfer the LOCKED partition values.
    * Logic for this restriction is written in `operatorTransferByPartition()` function.
    */
-  public revokeOperator = async (params: AuthorizeOperatorParams) => {
+  public revokeOperator = async (params: AuthorizeOperatorParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('Operator', params.operator);
     return (await this.contract).revokeOperator.sendTransactionAsync(
       params.operator,
@@ -1885,7 +1889,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Authorises an operator for a given partition of `msg.sender`
    */
-  public authorizeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams) => {
+  public authorizeOperatorByPartition = async (params: AuthorizeOperatorByPartitionParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('Operator', params.operator);
     assert.isValidPartition(params.partition);
     return (await this.contract).authorizeOperatorByPartition.sendTransactionAsync(
@@ -1899,7 +1903,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Revokes authorisation of an operator previously given for a specified partition of `msg.sender`
    */
-  public revokeOperatorByPartition = async (params: RevokeOperatorByPartitionParams) => {
+  public revokeOperatorByPartition = async (params: RevokeOperatorByPartitionParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('Operator', params.operator);
     assert.isValidPartition(params.partition);
     return (await this.contract).revokeOperatorByPartition.sendTransactionAsync(
@@ -1914,7 +1918,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Transfers the ownership of tokens from a specified partition from one address to another address
    * @return The partition to which the transferred tokens were allocated for the to address
    */
-  public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams) => {
+  public operatorTransferByPartition = async (params: OperatorTransferByPartitionParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('To', params.to);
     assert.isETHAddressHex('From', params.from);
     assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
@@ -1934,7 +1938,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Used by the issuer to set the controller addresses
    */
-  public setController = async (params: SetControllerParams) => {
+  public setController = async (params: SetControllerParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     await this.checkIsControllable();
     assert.isETHAddressHex('controller', params.controller);
@@ -1949,7 +1953,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Used by the issuer to permanently disable controller functionality
    * enabled via feature switch "disableControllerAllowed"
    */
-  public disableController = async (params: DisableControllerParams) => {
+  public disableController = async (params: DisableControllerParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     await this.checkIsControllable();
     return (await this.contract).disableController.sendTransactionAsync(
@@ -1965,7 +1969,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * `balanceOf(_from)` tokens) and potentially also need to respect other transfer restrictions.
    * This function can only be executed by the `controller` address.
    */
-  public controllerTransfer = async (params: ControllerTransferParams) => {
+  public controllerTransfer = async (params: ControllerTransferParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
     await this.checkMsgSenderIsController(params.txData);
@@ -1988,7 +1992,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * `balanceOf(tokenHolder)` tokens) and potentially also need to respect other transfer restrictions.
    * This function can only be executed by the `controller` address.
    */
-  public controllerRedeem = async (params: ControllerRedeemParams) => {
+  public controllerRedeem = async (params: ControllerRedeemParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('from', params.from);
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     await this.checkMsgSenderIsController(params.txData);
@@ -2013,7 +2017,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Returns a list of modules that match the provided module type
    * @return address[] list of modules with this type
    */
-  public getModulesByType = async (params: ModuleTypeParams) => {
+  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return (await this.contract).getModulesByType.callAsync(params.type);
   };
 
@@ -2032,7 +2036,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * - there is no existing module of that type yet added
    * - the last member of the module list is replacable
    */
-  public addModule: AddModuleInterface = async (params: AddModuleParams) => {
+  public addModule: AddModuleInterface = async (params: AddModuleParams): Promise<PolyResponse> => {
     const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
     return (await this.contract).addModule.sendTransactionAsync(
       params.address,
@@ -2050,7 +2054,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * E.G.: On deployment (through the STR) ST gets a TransferManager module attached to it
    * to control restrictions on transfers.
    */
-  public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams) => {
+  public addModuleWithLabel: AddModuleInterface = async (params: AddModuleParams): Promise<PolyResponse> => {
     const producedAddModuleInfo = await this.addModuleRequirementsAndGetData(params);
     return (await this.contract).addModuleWithLabel.sendTransactionAsync(
       params.address,
@@ -2067,7 +2071,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Upgrades a module attached to the SecurityToken
    */
-  public upgradeModule = async (params: ModuleAddressTxParams) => {
+  public upgradeModule = async (params: ModuleAddressTxParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleAddress', params.moduleAddress);
     await this.checkOnlyOwner(params.txData);
     await this.checkModuleExists(params.moduleAddress);
@@ -2081,7 +2085,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   /**
    * Upgrades security token
    */
-  public upgradeToken = async (params: TxParams) => {
+  public upgradeToken = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).upgradeToken.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -2104,7 +2108,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return typedResult;
   };
 
-  private getTransferStatusCode = (result: string) => {
+  public getTransferStatusCode = (result: string) => {
     let status: TransferStatusCode = TransferStatusCode.TransferSuccess;
     switch (result) {
       case TransferStatusCode.TransferFailure: {
@@ -2154,7 +2158,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Validates if can transfer
    * @return statusCode, reasonCode
    */
-  public canTransfer = async (params: CanTransferParams) => {
+  public canTransfer = async (params: CanTransferParams): Promise<CanTransferFromData> => {
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransfer.callAsync(
       params.to,
@@ -2173,7 +2177,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Validates if can transfer from
    * @return statusCode, reasonCode
    */
-  public canTransferFrom = async (params: CanTransferFromParams) => {
+  public canTransferFrom = async (params: CanTransferFromParams): Promise<CanTransferFromData> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransferFrom.callAsync(
@@ -2194,7 +2198,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Validates if can transfer with partition
    * @return statusCode, reasonCode, partition
    */
-  public canTransferByPartition = async (params: CanTransferByPartitionParams) => {
+  public canTransferByPartition = async (params: CanTransferByPartitionParams): Promise<CanTransferByPartitionData> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const result = await (await this.contract).canTransferByPartition.callAsync(
@@ -2217,7 +2221,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Used to attach a new document to the contract, or update the URI or hash of an existing attached document
    * Can only be executed by the owner of the contract.
    */
-  public setDocument = async (params: SetDocumentParams) => {
+  public setDocument = async (params: SetDocumentParams): Promise<PolyResponse> => {
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Bad name, cannot be empty');
     assert.assert(params.uri.length > 0, ErrorCode.InvalidData, 'Bad uri, cannot be empty');
     await this.checkOnlyOwner(params.txData);
@@ -2234,7 +2238,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Used to remove an existing document from the contract by giving the name of the document.
    * Can only be executed by the owner of the contract.
    */
-  public removeDocument = async (params: DocumentParams) => {
+  public removeDocument = async (params: DocumentParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     const document = await this.getDocument({ name: params.name });
     assert.assert(document.documentUri.length !== 0, ErrorCode.NotFound, 'Document does not exist');
@@ -2249,7 +2253,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
    * Get the document
    * @return Returns the data associated to a module
    */
-  public getDocument = async (params: DocumentParams) => {
+  public getDocument = async (params: DocumentParams): Promise<DocumentData> => {
     const result = await (await this.contract).getDocument.callAsync(stringToBytes32(params.name));
     const typedResult: DocumentData = {
       documentUri: result[0],
@@ -2274,7 +2278,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public subscribeAsync: SecurityTokenSubscribeAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -2295,7 +2299,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   public getLogsAsync: GetSecurityTokenLogsAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenEvents_3_0_0);
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -2306,23 +2310,23 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return logs;
   };
 
-  private checkModuleExists = async (moduleAddress: string) => {
+  public checkModuleExists = async (moduleAddress: string) => {
     assert.assert((await this.getModule({ moduleAddress })).name !== '', ErrorCode.NotFound, 'Module does not exist');
   };
 
-  private checkIsArchived = async (moduleAddress: string) => {
+  public checkIsArchived = async (moduleAddress: string) => {
     assert.assert((await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is not yet archived');
   };
 
-  private checkIsNotArchived = async (moduleAddress: string) => {
+  public checkIsNotArchived = async (moduleAddress: string) => {
     assert.assert(!(await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is archived');
   };
 
-  private checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
+  public checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
     assert.isNonZeroETHAddressHex('address', (await this.getModule({ moduleAddress })).address);
   };
 
-  private checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
+  public checkModuleStructAddressIsEmpty = async (moduleAddress: string) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         (await this.getModule({ moduleAddress })).address,
@@ -2333,11 +2337,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkIsControllable = async () => {
+  public checkIsControllable = async () => {
     assert.assert(await this.isControllable(), ErrorCode.PreconditionRequired, 'Controller currently disabled');
   };
 
-  private checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
+  public checkBalanceFromGreaterThanValue = async (from: string, value: BigNumber) => {
     assert.assert(
       (await this.balanceOf({ owner: from })).isGreaterThanOrEqualTo(value),
       ErrorCode.InsufficientBalance,
@@ -2345,7 +2349,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
+  public checkModuleCostBelowMaxCost = async (moduleFactory: string, maxCost: BigNumber) => {
     const moduleCost = await (await this.moduleFactoryContract(moduleFactory)).setupCostInPoly.callAsync();
     assert.assert(
       maxCost.isGreaterThanOrEqualTo(moduleCost),
@@ -2360,7 +2364,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+  public checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,
@@ -2368,7 +2372,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
+  public checkMsgSenderIsController = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       (await this.isControllable()) && (await this.controller()) === (await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,
@@ -2376,7 +2380,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     );
   };
 
-  private checkUseModuleVerified = async (address: string) => {
+  public checkUseModuleVerified = async (address: string) => {
     if (await (await this.featureRegistryContract()).getFeatureStatus.callAsync(Feature.CustomModulesAllowed)) {
       const isOwner = (await (await this.moduleFactoryContract(address)).owner.callAsync()) === (await this.owner());
       assert.assert(
@@ -2390,7 +2394,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.assert(await this.isCompatibleModule(address), ErrorCode.InvalidVersion, 'Version should within the compatible range of ST');
   };
 
-  private checkForRegisteredModule = async (moduleAddress: string) => {
+  public checkForRegisteredModule = async (moduleAddress: string) => {
     const moduleRegistry = await this.moduleRegistryContract();
     const allModulesTypes = [
       await moduleRegistry.getModulesByType.callAsync(ModuleType.PermissionManager),
@@ -2408,7 +2412,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return allModules.includes(true);
   };
 
-  private isCompatibleModule = async (address: string) => {
+  public isCompatibleModule = async (address: string) => {
     const versions = await this.getVersion();
     const upperSTVersionBounds = (await (await this.moduleFactoryContract(
       address,
@@ -2428,15 +2432,16 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     return isCompatible;
   };
 
-  private cappedSTOAssertions = async (data: CappedSTOData) => {
+  public cappedSTOAssertions = async (data: CappedSTOData) => {
     assert.isBigNumberGreaterThanZero(data.rate, 'Rate of token should be greater than 0');
     assert.isNonZeroETHAddressHex('Funds Receiver', data.fundsReceiver);
+    assert.isNonZeroETHAddressHex('Treasury Wallet', data.treasuryWallet);
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.isBigNumberGreaterThanZero(data.cap, 'Cap should be greater than 0');
   };
 
-  private usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
+  public usdTieredSTOAssertions = async (data: USDTieredSTOData) => {
     assert.isFutureDate(data.startTime, 'Start time date not valid');
     assert.assert(data.endTime > data.startTime, ErrorCode.TooEarly, 'End time not valid');
     assert.assert(data.tokensPerTierTotal.length > 0, ErrorCode.InvalidData, 'No tiers provided');
@@ -2459,7 +2464,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };
 
-  private async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
+  public async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
     const maxCost = params.maxCost === undefined ? BIG_NUMBER_ZERO : valueToWei(params.maxCost, FULL_DECIMALS);
     const budget = params.budget === undefined ? BIG_NUMBER_ZERO : valueToWei(params.budget, FULL_DECIMALS);
     assert.isETHAddressHex('address', params.address);
@@ -2468,19 +2473,19 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
     await this.checkModuleStructAddressIsEmpty(params.address);
     await this.checkUseModuleVerified(params.address);
     const decimals = await this.decimals();
-    let iface: ethers.utils.Interface;
+    let iface: ethersUtils.Interface;
     let data: string;
     switch (params.moduleName) {
       case ModuleName.VestingEscrowWallet:
-        iface = new ethers.utils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as VestingEscrowWalletData).treasuryWallet]);
         break;
       case ModuleName.CountTransferManager:
-        iface = new ethers.utils.Interface(CountTransferManagerContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as CountTransferManagerData).maxHolderCount]);
         break;
       case ModuleName.PercentageTransferManager:
-        iface = new ethers.utils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
         data = iface.functions.configure.encode([
           valueToWei(
             (params.data as PercentageTransferManagerData).maxHolderPercentage,
@@ -2491,7 +2496,7 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.CappedSTO:
         await this.cappedSTOAssertions(params.data as CappedSTOData);
-        iface = new ethers.utils.Interface(CappedSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(CappedSTOContract_3_1_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as CappedSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as CappedSTOData).endTime).toNumber(),
@@ -2499,11 +2504,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
           valueToWei((params.data as CappedSTOData).rate, FULL_DECIMALS).toString(),
           [(params.data as CappedSTOData).fundRaiseType], // the module's configure function expects an array
           (params.data as CappedSTOData).fundsReceiver,
+          (params.data as CappedSTOData).treasuryWallet,
         ]);
         break;
       case ModuleName.UsdTieredSTO:
         await this.usdTieredSTOAssertions(params.data as USDTieredSTOData);
-        iface = new ethers.utils.Interface(USDTieredSTOContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(USDTieredSTOContract_3_1_0.ABI());
         data = iface.functions.configure.encode([
           dateToBigNumber((params.data as USDTieredSTOData).startTime).toNumber(),
           dateToBigNumber((params.data as USDTieredSTOData).endTime).toNumber(),
@@ -2529,12 +2535,12 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         break;
       case ModuleName.ERC20DividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       case ModuleName.EtherDividendCheckpoint:
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
-        iface = new ethers.utils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
+        iface = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
       default:

@@ -28,10 +28,15 @@ import {
   CallData,
   Provider,
   ContractAbi,
+  USDTieredSTOContract_3_1_0,
+  CappedSTOContract_3_1_0,
+  VestingEscrowWalletContract_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
+import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
 import getDefaultContractAddresses from '../utils/addresses';
-import { PolymathContract, NetworkId } from '../types';
+import { PolymathContract, NetworkId, ContractVersion, ErrorCode } from '../types';
 
 async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: string) {
   return new PolymathRegistryContract_3_0_0(
@@ -41,16 +46,35 @@ async function getPolymathRegistryContract(web3Wrapper: Web3Wrapper, address?: s
   );
 }
 
+export interface GetGeneralTransferManagerContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<GeneralTransferManagerContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<GeneralTransferManagerContract_3_1_0>;
+}
+export interface GetCappedSTOContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<CappedSTOContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<CappedSTOContract_3_1_0>;
+}
+
+export interface GetUSDTieredSTOContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<USDTieredSTOContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<USDTieredSTOContract_3_1_0>;
+}
+
+export interface GetVestingEscrowWalletContract {
+  (address: string, version: ContractVersion.V3_0_0): Promise<VestingEscrowWalletContract_3_0_0>;
+  (address: string, version: ContractVersion.V3_1_0): Promise<VestingEscrowWalletContract_3_1_0>;
+}
+
 export default class ContractFactory {
-  private web3Wrapper: Web3Wrapper;
+  public web3Wrapper: Web3Wrapper;
 
-  private abiArray: ContractAbi[];
+  public abiArray: ContractAbi[];
 
-  private provider: Provider;
+  public provider: Provider;
 
-  private polymathRegistry: Promise<PolymathRegistryContract_3_0_0>;
+  public polymathRegistry: Promise<PolymathRegistryContract_3_0_0>;
 
-  private contractDefaults: Partial<CallData> | undefined;
+  public contractDefaults: Partial<CallData> | undefined;
 
   public constructor(web3Wrapper: Web3Wrapper, abiArray: ContractAbi[], polymathRegistryAddress?: string) {
     this.web3Wrapper = web3Wrapper;
@@ -104,14 +128,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getVestingEscrowWalletContract(address: string): Promise<VestingEscrowWalletContract_3_0_0> {
+  public getVestingEscrowWalletContract: GetVestingEscrowWalletContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new VestingEscrowWalletContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new VestingEscrowWalletContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new VestingEscrowWalletContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getERC20DetailedContract(address: string): Promise<ERC20DetailedContract_3_0_0> {
     assert.isETHAddressHex('address', address);
@@ -181,14 +215,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getCappedSTOContract(address: string): Promise<CappedSTOContract_3_0_0> {
+  public getCappedSTOContract: GetCappedSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new CappedSTOContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new CappedSTOContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new CappedSTOContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getUSDTieredSTOFactoryContract(address: string): Promise<USDTieredSTOFactoryContract_3_0_0> {
     assert.isETHAddressHex('address', address);
@@ -199,14 +243,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getUSDTieredSTOContract(address: string): Promise<USDTieredSTOContract_3_0_0> {
+  public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new USDTieredSTOContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new USDTieredSTOContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new USDTieredSTOContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getCountTransferManagerContract(address: string): Promise<CountTransferManagerContract_3_0_0> {
     assert.isETHAddressHex('address', address);
@@ -217,14 +271,24 @@ export default class ContractFactory {
     return contract;
   }
 
-  public async getGeneralTransferManagerContract(address: string): Promise<GeneralTransferManagerContract_3_0_0> {
+  public getGeneralTransferManagerContract: GetGeneralTransferManagerContract = async (
+    address: string,
+    version: ContractVersion,
+  ): Promise<any> => {
     assert.isETHAddressHex('address', address);
-    const contract = new GeneralTransferManagerContract_3_0_0(address, this.provider, this.contractDefaults);
+    let contract: GeneralTransferManagerContract_3_0_0 | GeneralTransferManagerContract_3_1_0;
+
+    if (version === ContractVersion.V3_0_0) {
+      contract = new GeneralTransferManagerContract_3_0_0(address, this.provider, this.contractDefaults);
+    } else {
+      contract = new GeneralTransferManagerContract_3_1_0(address, this.provider, this.contractDefaults);
+    }
+
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });
     return contract;
-  }
+  };
 
   public async getManualApprovalTransferManagerContract(
     address: string,
@@ -307,5 +371,30 @@ export default class ContractFactory {
       contract.addABItoDecoder(abi);
     });
     return contract;
+  }
+
+  public async getModuleVersion(address: string): Promise<ContractVersion> {
+    const contract = new ModuleContract_3_0_0(address, this.provider, this.contractDefaults);
+    const factoryAddress = await contract.factory.callAsync();
+
+    return this.getModuleFactoryVersion(factoryAddress);
+  }
+
+  public async getModuleFactoryVersion(address: string): Promise<ContractVersion> {
+    const contract = new ModuleFactoryContract_3_0_0(address, this.provider, this.contractDefaults);
+
+    const version = await contract.version.callAsync();
+
+    switch (version) {
+      case ContractVersion.V3_0_0: {
+        return ContractVersion.V3_0_0;
+      }
+      case ContractVersion.V3_1_0: {
+        return ContractVersion.V3_1_0;
+      }
+      default: {
+        throw new PolymathError({ code: ErrorCode.UnsupportedVersion, message: `Version ${version} not supported` });
+      }
+    }
   }
 }

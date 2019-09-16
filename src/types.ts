@@ -38,9 +38,6 @@ import {
   CappedSTOContract_3_0_0,
   USDTieredSTOContract_3_0_0,
   ERC20DividendCheckpointContract_3_0_0,
-  STOContract_3_0_0,
-  STOEvents_3_0_0,
-  STOEventArgs_3_0_0,
   ERC20DetailedContract_3_0_0,
   PolyTokenContract_3_0_0,
   ISecurityTokenContract_3_0_0,
@@ -74,7 +71,21 @@ import {
   ISecurityTokenEvents_3_0_0,
   ISecurityTokenEventArgs_3_0_0,
   ISecurityTokenRegistryEventArgs_3_0_0,
+  SecurityTokenEvents_3_0_0,
+  CappedSTOContract_3_1_0,
+  USDTieredSTOContract_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
+  GeneralPermissionManagerContract_3_1_0,
+  VestingEscrowWalletContract_3_1_0,
+  RestrictedPartialSaleTMContract_3_1_0,
+  GeneralTransferManagerEvents_3_1_0,
+  GeneralPermissionManagerEvents_3_1_0,
+  VestingEscrowWalletEvents_3_1_0,
+  CappedSTOEvents_3_1_0,
+  USDTieredSTOEvents_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
+
+export type Constructor<T = {}> = new(...args: any[]) => T;
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
@@ -236,7 +247,6 @@ export type ContractEventArgs_3_0_0 =
   | USDTieredSTOEventArgs_3_0_0
   | ISecurityTokenEventArgs_3_0_0
   | ISecurityTokenRegistryEventArgs_3_0_0
-  | STOEventArgs_3_0_0
   | CountTransferManagerEventArgs_3_0_0
   | PercentageTransferManagerEventArgs_3_0_0
   | LockUpTransferManagerEventArgs_3_0_0
@@ -263,9 +273,9 @@ export type ContractEvents_3_0_0 =
   | PolymathRegistryEvents_3_0_0
   | ISecurityTokenRegistryEvents_3_0_0
   | ISecurityTokenEvents_3_0_0
+  | SecurityTokenEvents_3_0_0 // necessary duplication because of incomplete events
   | USDTieredSTOFactoryEvents_3_0_0
   | USDTieredSTOEvents_3_0_0
-  | STOEvents_3_0_0
   | CountTransferManagerEvents_3_0_0
   | PercentageTransferManagerEvents_3_0_0
   | VestingEscrowWalletEvents_3_0_0
@@ -273,7 +283,14 @@ export type ContractEvents_3_0_0 =
   | BlacklistTransferManagerEvents_3_0_0
   | VolumeRestrictionTMEvents_3_0_0;
 
-export type ContractEvents = ContractEvents_3_0_0;
+export type ContractEvents_3_1_0 =
+  | GeneralTransferManagerEvents_3_1_0
+  | GeneralPermissionManagerEvents_3_1_0
+  | VestingEscrowWalletEvents_3_1_0
+  | CappedSTOEvents_3_1_0
+  | USDTieredSTOEvents_3_1_0;
+
+export type ContractEvents = ContractEvents_3_0_0 | ContractEvents_3_1_0;
 
 /**
  * @param eventName           The contract event you would like to subscribe to.
@@ -333,11 +350,20 @@ export type GenericModuleContract_3_0_0 =
   | BlacklistTransferManagerContract_3_0_0
   | VolumeRestrictionTMContract_3_0_0;
 
-export type GenericModuleContract = GenericModuleContract_3_0_0;
+  export type GenericModuleContract_3_1_0 =
+  | STOBaseContract_3_1_0
+  | GeneralTransferManagerContract_3_1_0
+  | GeneralPermissionManagerContract_3_1_0
+  | VestingEscrowWalletContract_3_1_0
+  | RestrictedPartialSaleTMContract_3_1_0;
 
-export type STOBaseContract_3_0_0 = STOContract_3_0_0 | CappedSTOContract_3_0_0 | USDTieredSTOContract_3_0_0;
+export type GenericModuleContract = GenericModuleContract_3_0_0 | GenericModuleContract_3_1_0;
 
-export type STOBaseContract = STOBaseContract_3_0_0;
+export type STOBaseContract_3_0_0 = CappedSTOContract_3_0_0 | USDTieredSTOContract_3_0_0;
+
+export type STOBaseContract_3_1_0 = CappedSTOContract_3_1_0 | USDTieredSTOContract_3_1_0;
+
+export type STOBaseContract = STOBaseContract_3_0_0 | STOBaseContract_3_1_0;
 
 export type DividendCheckpointBaseContract_3_0_0 = ERC20DividendCheckpointContract_3_0_0 | EtherDividendCheckpointContract_3_0_0;
 
@@ -376,4 +402,10 @@ export enum ErrorCode {
   NotFound = 'NotFound',
   TickerExpired = 'TickerExpired',
   UnknownNetwork = 'UnknownNetwork',
+  UnsupportedVersion = 'UnsupportedVersion',
+}
+
+export enum ContractVersion {
+  V3_0_0 = '3.0.0',
+  V3_1_0 = '3.1.0',
 }

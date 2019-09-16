@@ -10,6 +10,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -25,6 +26,7 @@ import {
   Perm,
   PERCENTAGE_DECIMALS,
   ErrorCode,
+  TransferResult,
 } from '../../../types';
 import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
 
@@ -155,10 +157,19 @@ interface SetAllowPrimaryIssuanceParams extends TxParams {
 }
 
 /**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
+}
+
+/**
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
 export default class PercentageTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<PercentageTransferManagerContract_3_0_0>;
+  public contract: Promise<PercentageTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate PercentageTransferManagerWrapper
@@ -194,7 +205,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -214,7 +225,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -237,7 +248,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
    * Used to verify the transfer transaction (View)
    * @return boolean transfer result, address
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -257,7 +268,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    * Sets the maximum percentage that an individual token holder can hold
    */
-  public changeHolderPercentage = async (params: ChangeHolderPercentageParams) => {
+  public changeHolderPercentage = async (params: ChangeHolderPercentageParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -274,7 +285,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    * Adds or removes single addresses from the whitelist.
    */
-  public modifyWhitelist = async (params: ModifyWhitelistParams) => {
+  public modifyWhitelist = async (params: ModifyWhitelistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -292,7 +303,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    * Adds or removes addresses from the whitelist.
    */
-  public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams) => {
+  public modifyWhitelistMulti = async (params: ModifyWhitelistMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -315,7 +326,7 @@ export default class PercentageTransferManagerWrapper extends ModuleWrapper {
   /**
    * Sets whether or not to consider primary issuance transfers
    */
-  public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams) => {
+  public setAllowPrimaryIssuance = async (params: SetAllowPrimaryIssuanceParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

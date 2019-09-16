@@ -261,27 +261,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
     });
   });
 
-  describe('GetInitFunction', () => {
-    test('should get init function', async () => {
-      // Address expected
-      const expectedResult = 'ZERO';
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.getInitFunction).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.getInitFunction();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.getInitFunction).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
   describe('Add Manual Approval', () => {
     test('should addManualApproval', async () => {
       // Owner Address expected

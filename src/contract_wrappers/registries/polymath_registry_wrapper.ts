@@ -6,6 +6,7 @@ import {
   PolymathRegistryOwnershipTransferredEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -19,6 +20,7 @@ import {
   GetLogs,
   Subscribe,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -76,7 +78,9 @@ interface ChangeAddressParams extends TxParams {
  * This class includes the functionality related to interacting with the PolymathRegistry contract.
  */
 export default class PolymathRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<PolymathRegistryContract_3_0_0>;
+  public contract: Promise<PolymathRegistryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate PolymathRegistryWrapper
@@ -155,7 +159,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
   /**
    * Changes the contract address
    */
-  public changeAddress = async (params: ChangeAddressParams) => {
+  public changeAddress = async (params: ChangeAddressParams): Promise<PolyResponse> => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
       ErrorCode.Unauthorized,
@@ -209,7 +213,7 @@ export default class PolymathRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private async getAddressInternal(contractName: string) {
+  public async getAddressInternal(contractName: string) {
     return (await this.contract).getAddress.callAsync(contractName);
   }
 }

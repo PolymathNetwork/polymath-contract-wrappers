@@ -8,6 +8,7 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -22,6 +23,7 @@ import {
   GetLogs,
   Perm,
   ErrorCode,
+  TransferResult,
 } from '../../../types';
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
@@ -91,10 +93,19 @@ interface ChangeHolderCountParams extends TxParams {
 }
 
 /**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
+}
+
+/**
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<CountTransferManagerContract_3_0_0>;
+  public contract: Promise<CountTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate CountTransferManagerWrapper
@@ -114,7 +125,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -127,14 +138,14 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Check if module paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -155,7 +166,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
    * @return boolean transfer result, address
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -175,7 +186,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    * Sets the cap for the amount of token holders there can be
    */
-  public changeHolderCount = async (params: ChangeHolderCountParams) => {
+  public changeHolderCount = async (params: ChangeHolderCountParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

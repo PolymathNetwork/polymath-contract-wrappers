@@ -6,6 +6,7 @@ import {
   FeatureRegistryOwnershipTransferredEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import ContractWrapper from '../contract_wrapper';
@@ -19,6 +20,7 @@ import {
   Subscribe,
   GetLogs,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import functionsUtils from '../../utils/functions_utils';
 
@@ -78,7 +80,9 @@ interface SetFeatureStatusParams extends TxParams {
  * This class includes the functionality related to interacting with the FeatureRegistry contract.
  */
 export default class FeatureRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<FeatureRegistryContract_3_0_0>;
+  public contract: Promise<FeatureRegistryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate FeatureRegistryWrapper
@@ -109,7 +113,7 @@ export default class FeatureRegistryWrapper extends ContractWrapper {
   /**
    * Change a feature status
    */
-  public setFeatureStatus = async (params: SetFeatureStatusParams) => {
+  public setFeatureStatus = async (params: SetFeatureStatusParams): Promise<PolyResponse> => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(params.txData)),
       ErrorCode.Unauthorized,

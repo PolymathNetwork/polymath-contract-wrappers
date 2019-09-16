@@ -15,6 +15,7 @@ import {
   ModuleFactoryContract_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
@@ -31,6 +32,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import { bytes32ArrayToStringArray } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
@@ -210,19 +212,21 @@ interface FactoryDetails {
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
  */
 export default class ModuleRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleRegistryContract_3_0_0>;
+  public contract: Promise<ModuleRegistryContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract_3_0_0> => {
+  public contractFactory: ContractFactory;
+
+  public securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenRegistryContract();
   };
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
+  public featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
+  public moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
@@ -253,7 +257,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    *  Called by the ModuleFactory owner to register new modules for SecurityTokens to use
    */
-  public registerModule = async (params: ModuleFactoryParams) => {
+  public registerModule = async (params: ModuleFactoryParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkModuleNotPausedOrOwner();
     await this.checkModuleNotRegistered(params.moduleFactory);
@@ -294,7 +298,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Called by the ModuleFactory owner or registry curator to delete a ModuleFactory from the registry
    */
-  public removeModule = async (params: ModuleFactoryParams) => {
+  public removeModule = async (params: ModuleFactoryParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkModuleNotPaused();
     await this.checkModuleRegistered(params.moduleFactory);
@@ -312,7 +316,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * (The only exception to this is that the author of the module is the owner of the ST)
    * -> Only if Polymath enabled the feature.
    */
-  public verifyModule = async (params: ModuleFactoryParams) => {
+  public verifyModule = async (params: ModuleFactoryParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkMsgSenderIsOwner();
     await this.checkModuleRegistered(params.moduleFactory);
@@ -329,7 +333,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * (The only exception to this is that the author of the module is the owner of the ST)
    * -> Only if Polymath enabled the feature.
    */
-  public unverifyModule = async (params: ModuleFactoryParams) => {
+  public unverifyModule = async (params: ModuleFactoryParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('moduleFactory', params.moduleFactory);
     await this.checkIsOwnerOrModuleFactoryOwner(params.moduleFactory);
     await this.checkModuleRegistered(params.moduleFactory);
@@ -344,7 +348,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Returns all the tags related to the a module type which are valid for the given token
    * @return list of tags, corresponding list of module factories
    */
-  public getTagsByTypeAndToken = async (params: TypeAndTokenParams) => {
+  public getTagsByTypeAndToken = async (params: TypeAndTokenParams): Promise<TagsByModule[]> => {
     assert.isETHAddressHex('securityToken', params.securityToken);
     const result = await (await this.contract).getTagsByTypeAndToken.callAsync(params.moduleType, params.securityToken);
     // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
@@ -368,7 +372,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Returns all the tags related to the a module type which are valid for the given token
    * @return list of tags, corresponding list of module factories
    */
-  public getTagsByType = async (params: ModuleTypeParams) => {
+  public getTagsByType = async (params: ModuleTypeParams): Promise<TagsByModule[]> => {
     const result = await (await this.contract).getTagsByType.callAsync(params.moduleType);
     // [tag1, tag2, tag3, tag2, tag3], [module1, module1, module1, module2, module2]
     const zippedResult = _.zip(result[0], result[1]); // [[tag1, module1], [tag2, module1], [tag3, module1] ...]
@@ -391,7 +395,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Gets the factory details
    * @return factoryIsVerified, factoryOwnerAddress, listSecurityTokens
    */
-  public getFactoryDetails = async (params: GetFactoryDetailsParams) => {
+  public getFactoryDetails = async (params: GetFactoryDetailsParams): Promise<FactoryDetails> => {
     const result = await (await this.contract).getFactoryDetails.callAsync(params.factoryAddress);
     const typedResult: FactoryDetails = {
       isVerified: result[0],
@@ -405,7 +409,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of addresses of verified Module Factory of a particular type
    * @return address array that contains the list of addresses of module factory contracts.
    */
-  public getModulesByType = async (params: ModuleTypeParams) => {
+  public getModulesByType = async (params: ModuleTypeParams): Promise<string[]> => {
     return (await this.contract).getModulesByType.callAsync(params.moduleType);
   };
 
@@ -421,7 +425,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Returns the list of available Module factory addresses of a particular type for a given token.
    * @return address array that contains the list of available addresses of module factory contracts.
    */
-  public getModulesByTypeAndToken = async (params: TypeAndTokenParams) => {
+  public getModulesByTypeAndToken = async (params: TypeAndTokenParams): Promise<string[]> => {
     assert.isETHAddressHex('securityToken', params.securityToken);
     return (await this.contract).getModulesByTypeAndToken.callAsync(params.moduleType, params.securityToken);
   };
@@ -429,7 +433,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Reclaim ERC20 tokens from contract
    */
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -442,7 +446,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkMsgSenderIsOwner();
     assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is paused');
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -451,7 +455,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkMsgSenderIsOwner();
     assert.assert(await this.isPaused(), ErrorCode.PreconditionRequired, 'Contract is already not paused');
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -460,7 +464,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Stores the contract addresses of other key contracts from the PolymathRegistry
    */
-  public updateFromRegistry = async (params: TxParams) => {
+  public updateFromRegistry = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkMsgSenderIsOwner();
     return (await this.contract).updateFromRegistry.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -468,7 +472,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
   /**
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
-  public transferOwnership = async (params: TransferOwnershipParams) => {
+  public transferOwnership = async (params: TransferOwnershipParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     await this.checkMsgSenderIsOwner();
     return (await this.contract).transferOwnership.sendTransactionAsync(
@@ -533,7 +537,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkForRegisteredModule = async (moduleAddress: string) => {
+  public checkForRegisteredModule = async (moduleAddress: string) => {
     const allModulesTypes = [
       await this.getModulesByType({ moduleType: ModuleType.PermissionManager }),
       await this.getModulesByType({ moduleType: ModuleType.STO }),
@@ -549,11 +553,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return allModules.includes(true);
   };
 
-  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+  public callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
     return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
   };
 
-  private checkMsgSenderIsOwner = async () => {
+  public checkMsgSenderIsOwner = async () => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -564,7 +568,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleRegistered = async (moduleFactory: string) => {
+  public checkModuleRegistered = async (moduleFactory: string) => {
     assert.assert(
       await this.checkForRegisteredModule(moduleFactory),
       ErrorCode.PreconditionRequired,
@@ -572,7 +576,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotRegistered = async (moduleFactory: string) => {
+  public checkModuleNotRegistered = async (moduleFactory: string) => {
     assert.assert(
       !(await this.checkForRegisteredModule(moduleFactory)),
       ErrorCode.AlreadyExists,
@@ -580,7 +584,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPausedOrOwner = async () => {
+  public checkModuleNotPausedOrOwner = async () => {
     assert.assert(
       !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
@@ -589,11 +593,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPaused = async () => {
+  public checkModuleNotPaused = async () => {
     assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is currently paused');
   };
 
-  private checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
+  public checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
     const callerAddress = await this.getCallerAddress(undefined);
     const owner = await this.owner();
     const factoryOwner = await (await this.moduleFactoryContract(moduleFactoryAddress)).owner.callAsync();

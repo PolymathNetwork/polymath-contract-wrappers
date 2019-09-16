@@ -7,9 +7,10 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs } from '../../types';
+import { TxParams, GetLogsAsyncParams, SubscribeAsyncParams, EventCallback, Subscribe, GetLogs, ContractVersion } from '../../types';
 import assert from '../../utils/assert';
 import ERC20TokenWrapper from './erc20_wrapper';
 import { valueToWei } from '../../utils/convert';
@@ -59,7 +60,9 @@ interface ChangeApprovalParams extends TxParams {
  * This class includes the functionality related to interacting with the PolyToken contract.
  */
 export default class PolyTokenWrapper extends ERC20TokenWrapper {
-  protected contract: Promise<PolyTokenContract_3_0_0>;
+  public contract: Promise<PolyTokenContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate PolyTokenWrapper
@@ -75,7 +78,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   /**
    * Use to increase approval
    */
-  public increaseApproval = async (params: ChangeApprovalParams) => {
+  public increaseApproval = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).increaseApproval.sendTransactionAsync(
       params.spender,
@@ -88,7 +91,7 @@ export default class PolyTokenWrapper extends ERC20TokenWrapper {
   /**
    * Use to decrease approval
    */
-  public decreaseApproval = async (params: ChangeApprovalParams) => {
+  public decreaseApproval = async (params: ChangeApprovalParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('spender', params.spender);
     return (await this.contract).decreaseApproval.sendTransactionAsync(
       params.spender,

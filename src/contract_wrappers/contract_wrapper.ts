@@ -27,18 +27,21 @@ import {
   GetLogs,
   Subscribe,
   ErrorCode,
+  ContractVersion,
 } from '../types';
 import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
 
 export default abstract class ContractWrapper {
-  protected contract: Promise<BaseContract>;
+  public contract: Promise<BaseContract>;
 
-  protected web3Wrapper: Web3Wrapper;
+  public web3Wrapper: Web3Wrapper;
 
   public abstract getLogsAsync: GetLogs | undefined;
 
   public abstract subscribeAsync: Subscribe | undefined;
+
+  public abstract contractVersion: ContractVersion;
 
   /**
    * Returns the contract ABI
@@ -73,23 +76,23 @@ export default abstract class ContractWrapper {
     });
   };
 
-  private _blockAndLogStreamerIfExists: BlockAndLogStreamer<Block, Log> | undefined;
+  public _blockAndLogStreamerIfExists: BlockAndLogStreamer<Block, Log> | undefined;
 
-  private _blockAndLogStreamIntervalIfExists?: NodeJS.Timer;
+  public _blockAndLogStreamIntervalIfExists?: NodeJS.Timer;
 
-  private _onLogAddedSubscriptionToken: string | undefined;
+  public _onLogAddedSubscriptionToken: string | undefined;
 
-  private _onLogRemovedSubscriptionToken: string | undefined;
+  public _onLogRemovedSubscriptionToken: string | undefined;
 
-  private readonly _blockPollingIntervalMs: number;
+  public readonly _blockPollingIntervalMs: number;
 
-  private readonly _filters: { [filterToken: string]: FilterObject };
+  public readonly _filters: { [filterToken: string]: FilterObject };
 
-  private readonly _filterCallbacks: {
+  public readonly _filterCallbacks: {
     [filterToken: string]: EventCallback<ContractEventArgs>;
   };
 
-  private static _onBlockAndLogStreamerError(isVerbose: boolean, err: Error): void {
+  public static _onBlockAndLogStreamerError(isVerbose: boolean, err: Error): void {
     if (isVerbose) {
       logUtils.warn(err);
     }
@@ -103,7 +106,7 @@ export default abstract class ContractWrapper {
     this._filterCallbacks = {};
   }
 
-  protected unsubscribeInternal(filterToken: string, err?: Error): void {
+  public unsubscribeInternal(filterToken: string, err?: Error): void {
     if (_.isUndefined(this._filters[filterToken])) {
       throw new PolymathError({ code: ErrorCode.NotFound });
     }
@@ -118,7 +121,7 @@ export default abstract class ContractWrapper {
     }
   }
 
-  protected async subscribeInternal<ArgsType extends ContractEventArgs>(
+  public async subscribeInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
     indexFilterValues: IndexedFilterValues,
@@ -136,7 +139,7 @@ export default abstract class ContractWrapper {
     return filterToken;
   }
 
-  protected async getLogsAsyncInternal<ArgsType extends ContractEventArgs>(
+  public async getLogsAsyncInternal<ArgsType extends ContractEventArgs>(
     address: string,
     eventName: ContractEvents,
     blockRange?: BlockRange,
@@ -156,7 +159,7 @@ export default abstract class ContractWrapper {
     return logsWithDecodedArguments as LogWithDecodedArgs<ArgsType>[];
   }
 
-  protected tryToDecodeLogOrNoopInternal<ArgsType extends ContractEventArgs>(
+  public tryToDecodeLogOrNoopInternal<ArgsType extends ContractEventArgs>(
     log: LogEntry,
   ): LogWithDecodedArgs<ArgsType> | RawLog {
     const { abiDecoder } = this.web3Wrapper;
@@ -164,7 +167,7 @@ export default abstract class ContractWrapper {
     return logWithDecodedArgs;
   }
 
-  private _onLogStateChanged<ArgsType extends ContractEventArgs>(isRemoved: boolean, rawLog: Log): void {
+  public _onLogStateChanged<ArgsType extends ContractEventArgs>(isRemoved: boolean, rawLog: Log): void {
     const log: LogEntry = marshaller.unmarshalLog(rawLog as RawLogEntry);
     _.forEach(this._filters, (filter: FilterObject, filterToken: string): void => {
       if (filterUtils.matchesFilter(log, filter)) {
@@ -178,7 +181,7 @@ export default abstract class ContractWrapper {
     });
   }
 
-  private _startBlockAndLogStream(isVerbose: boolean): void {
+  public _startBlockAndLogStream(isVerbose: boolean): void {
     if (!_.isUndefined(this._blockAndLogStreamerIfExists)) {
       throw new PolymathError({ code: ErrorCode.AlreadyExists });
     }
@@ -205,7 +208,7 @@ export default abstract class ContractWrapper {
   }
 
   // This method only exists in order to comply with the expected interface of Blockstream's constructor
-  private async _blockstreamGetBlockOrNullAsync(hash: string): Promise<Block | null> {
+  public async _blockstreamGetBlockOrNullAsync(hash: string): Promise<Block | null> {
     const shouldIncludeTransactionData = false;
     const blockOrNull = await this.web3Wrapper.sendRawPayloadAsync<Block | null>({
       method: 'eth_getBlockByHash',
@@ -215,7 +218,7 @@ export default abstract class ContractWrapper {
   }
 
   // This method only exists in order to comply with the expected interface of Blockstream's constructor
-  private async _blockstreamGetLatestBlockOrNullAsync(): Promise<Block | null> {
+  public async _blockstreamGetLatestBlockOrNullAsync(): Promise<Block | null> {
     const shouldIncludeTransactionData = false;
     const blockOrNull = await this.web3Wrapper.sendRawPayloadAsync<Block | null>({
       method: 'eth_getBlockByNumber',
@@ -224,7 +227,7 @@ export default abstract class ContractWrapper {
     return blockOrNull;
   }
 
-  private _stopBlockAndLogStream(): void {
+  public _stopBlockAndLogStream(): void {
     if (_.isUndefined(this._blockAndLogStreamerIfExists)) {
       throw new PolymathError({ code: ErrorCode.NotFound });
     }
@@ -234,7 +237,7 @@ export default abstract class ContractWrapper {
     delete this._blockAndLogStreamerIfExists;
   }
 
-  private async _blockstreamGetLogsAsync(filterOptions: FilterObject): Promise<Log[]> {
+  public async _blockstreamGetLogsAsync(filterOptions: FilterObject): Promise<Log[]> {
     const logs = await this.web3Wrapper.sendRawPayloadAsync<RawLogEntry[]>({
       method: 'eth_getLogs',
       params: [filterOptions],
@@ -242,7 +245,7 @@ export default abstract class ContractWrapper {
     return logs as Log[];
   }
 
-  private async _reconcileBlockAsync(): Promise<void> {
+  public async _reconcileBlockAsync(): Promise<void> {
     const latestBlockOrNull = await this._blockstreamGetLatestBlockOrNullAsync();
     if (_.isNull(latestBlockOrNull)) {
       return;
@@ -252,12 +255,12 @@ export default abstract class ContractWrapper {
     }
   }
 
-  protected getDefaultFromAddress = async (): Promise<string> => {
+  public getDefaultFromAddress = async (): Promise<string> => {
     const addresses = await this.web3Wrapper.getAvailableAddressesAsync();
     return addresses[0];
   };
 
-  protected getCallerAddress = async (txData: Partial<TxData> | undefined): Promise<string> => {
+  public getCallerAddress = async (txData: Partial<TxData> | undefined): Promise<string> => {
     return txData === undefined || txData.from === undefined ? this.getDefaultFromAddress() : txData.from;
   };
 }
