@@ -3,19 +3,18 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   RestrictedPartialSaleTMContract_3_1_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import ModuleWrapper from '../../module_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import RestrictedPartialSaleTransferManagerWrapper from '../restricted_partial_sale_transfer_manager_wrapper';
-import { parsePermBytes32Value, stringArrayToBytes32Array, valueToWei } from '../../../../utils/convert';
-import { Perm } from '../../../../types';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
+import ModuleWrapper from '../../../module_wrapper';
+import ContractFactory from '../../../../../factories/contractFactory';
+import { parsePermBytes32Value, stringArrayToBytes32Array, valueToWei } from '../../../../../utils/convert';
+import { Perm } from '../../../../../types';
+import { RestrictedPartialSaleTransferManager_3_1_0 } from '../3.1.0';
 
 describe('RestrictedPartialSaleTransferManagerWrapper', () => {
-  let target: RestrictedPartialSaleTransferManagerWrapper;
+  let target: RestrictedPartialSaleTransferManager_3_1_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: RestrictedPartialSaleTMContract_3_1_0;
   let mockedContractFactory: ContractFactory;
@@ -28,7 +27,7 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new RestrictedPartialSaleTransferManagerWrapper(
+    target = new RestrictedPartialSaleTransferManager_3_1_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -425,25 +424,6 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.getExemptAddresses).once();
       verify(mockedMethod.callAsync()).once();
-    });
-
-    describe('SubscribeAsync', () => {
-      test('should throw as eventName does not belong to RestrictedPartialSaleTransferManager', async () => {
-        // Mocked parameters
-        const mockedParams = {
-          eventName: PolyTokenEvents_3_0_0.Transfer,
-          indexFilterValues: {},
-          callback: () => {},
-          isVerbose: false,
-        };
-
-        // Real call
-        await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-          new Error(
-            `Expected eventName to be one of: 'ChangedExemptWalletList', 'Pause', 'Unpause', encountered: Transfer`,
-          ),
-        );
-      });
     });
   });
 });

@@ -23,7 +23,7 @@ import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode, ContractVersion } from '../types';
 import { PolymathError } from '../PolymathError';
-import RestrictedPartialSaleTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+import {RestrictedPartialSaleTransferManager_3_1_0} from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 
 interface GetModuleParams {
   address: string;
@@ -95,7 +95,7 @@ interface GetModuleInstance {
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
-  (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManagerWrapper>;
+  (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManager_3_1_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
@@ -195,7 +195,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.RestrictedPartialSaleTM:
-        moduleWrapper = new RestrictedPartialSaleTransferManagerWrapper(
+        moduleWrapper = new RestrictedPartialSaleTransferManager_3_1_0(
           this.web3Wrapper,
           this.contractFactory.getRestrictedPartialSaleTMContract(params.address),
           this.contractFactory,

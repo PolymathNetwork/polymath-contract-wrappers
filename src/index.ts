@@ -114,8 +114,11 @@ export {
   default as VolumeRestrictionTransferManager,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export {
-  default as RestrictedPartialSaleTransferManager,
+  RestrictedPartialSaleTransferManager,
+  RestrictedPartialSaleTransferManager_3_1_0,
+  isRestrictedPartialSaleTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+
 export {
   VestingEscrowWallet,
   VestingEscrowWallet_3_0_0,
