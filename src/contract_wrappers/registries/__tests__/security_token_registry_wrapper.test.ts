@@ -1,10 +1,10 @@
 // SecurityTokenRegistryWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import {
-  ISecurityTokenRegistryContract,
-  PolyTokenEvents,
-  ISecurityTokenContract,
-  PolyTokenContract,
+  ISecurityTokenRegistryContract_3_0_0,
+  PolyTokenEvents_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -18,7 +18,7 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToBytes32,
+  stringToKeccak256,
 } from '../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { FULL_DECIMALS, FeeType } from '../../../types';
@@ -26,17 +26,17 @@ import { FULL_DECIMALS, FeeType } from '../../../types';
 describe('SecurityTokenRegistryWrapper', () => {
   let target: SecurityTokenRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ISecurityTokenRegistryContract;
+  let mockedContract: ISecurityTokenRegistryContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedSecurityTokenContract: ISecurityTokenContract;
-  let mockedPolyTokenContract: PolyTokenContract;
+  let mockedSecurityTokenContract: ISecurityTokenContract_3_0_0;
+  let mockedPolyTokenContract: PolyTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ISecurityTokenRegistryContract);
+    mockedContract = mock(ISecurityTokenRegistryContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedSecurityTokenContract = mock(ISecurityTokenContract);
-    mockedPolyTokenContract = mock(PolyTokenContract);
+    mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
+    mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenRegistryWrapper(
@@ -881,21 +881,21 @@ describe('SecurityTokenRegistryWrapper', () => {
       const mockedParams = {
         feeType: FeeType.TickerRegFee,
       };
-      const bytes32 = stringToBytes32('tickerRegFee');
+      const keccak256 = stringToKeccak256('tickerRegFee');
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
       when(mockedContract.getFees).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(objectContaining(bytes32))).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(objectContaining(keccak256))).thenResolve(expectedResult);
 
       // Real call
       const result = await target.getFees(mockedParams);
       // Result expectation
-      expect(result).toEqual(expectedResult);
+      expect(result).toEqual(expectedResult.map(fee => weiToValue(fee, FULL_DECIMALS)));
       // Verifications
       verify(mockedContract.getFees).once();
-      verify(mockedMethod.callAsync(objectContaining(bytes32))).once();
+      verify(mockedMethod.callAsync(objectContaining(keccak256))).once();
     });
   });
 
@@ -2241,7 +2241,7 @@ describe('SecurityTokenRegistryWrapper', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

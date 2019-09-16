@@ -701,10 +701,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@polymathnetwork/abi-wrappers@3.1.0-beta.1":
-  version "3.1.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-3.1.0-beta.1.tgz#b8d92c011c311abf0d63dda92f58d40896f40501"
-  integrity sha512-BLM7CroEZ2GvpQNyPcmPYZnkpl1u+J4akJJ3w4ZOahMLSK3OWmtsBzmGYQVt1MovnO2DI5dmvqnM1MlvjJf6rw==
+"@polymathnetwork/abi-wrappers@4.0.0-beta.3":
+  version "4.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@polymathnetwork/abi-wrappers/-/abi-wrappers-4.0.0-beta.3.tgz#91eeba5fa7bd04e1e9077d34920fd4eee8ac3bd3"
+  integrity sha512-rMAFp/oH8UshLug7i0Jwt5Wjilp1XtCFgvzEPxDSnMXBN3vD2RQKbNBCqSw3E73416+PHiM+2VcKrjYhlEE05g==
   dependencies:
     "@0x/base-contract" "^5.1.1"
     "@0x/utils" "^4.4.0"
@@ -720,6 +720,16 @@
   integrity sha512-MI4Xx6LHs4Webyvi6EbspgyAb4D2Q2VtnCQ1blOJcoLS6mVa8lNN2rkIy1CVxfTUpoyIbCTkXES1rLXztFD1lg==
   dependencies:
     any-observable "^0.3.0"
+
+"@semantic-release/changelog@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@semantic-release/changelog/-/changelog-3.0.4.tgz#8fc578b76bca5b23c3000694277c38e0fa835edd"
+  integrity sha512-UqEPahcZSW0IKtzOglyjeEZCN99ku6Wb/yH/iOKEBJ7Vkw0/+Fc3VRiGoXTkMfHSFUJk+4UkoQKTlYuwf61C2w==
+  dependencies:
+    "@semantic-release/error" "^2.1.0"
+    aggregate-error "^3.0.0"
+    fs-extra "^8.0.0"
+    lodash "^4.17.4"
 
 "@semantic-release/commit-analyzer@^7.0.0-beta.1":
   version "7.0.0-beta-.2"

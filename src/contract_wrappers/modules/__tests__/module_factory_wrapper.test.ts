@@ -1,10 +1,10 @@
 // ModuleFactoryWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
 import {
-  ModuleFactoryContract,
+  ModuleFactoryContract_3_0_0,
   BigNumber,
   Web3Wrapper,
-  EtherDividendCheckpointEvents,
+  EtherDividendCheckpointEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../test_utils/mocked_methods';
 import ContractFactory from '../../../factories/contractFactory';
@@ -22,12 +22,12 @@ import {BoundType, FULL_DECIMALS, ModuleType} from '../../../types';
 describe('ModuleFactoryWrapper', () => {
   let target: ModuleFactoryWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ModuleFactoryContract;
+  let mockedContract: ModuleFactoryContract_3_0_0;
   let mockedContractFactory: ContractFactory;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ModuleFactoryContract);
+    mockedContract = mock(ModuleFactoryContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
@@ -681,7 +681,7 @@ describe('ModuleFactoryWrapper', () => {
     test('should throw as eventName does not belong to ModuleFactoryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: EtherDividendCheckpointEvents.EtherDividendDeposited,
+        eventName: EtherDividendCheckpointEvents_3_0_0.EtherDividendDeposited,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

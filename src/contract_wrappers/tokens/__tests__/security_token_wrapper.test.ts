@@ -1,22 +1,22 @@
 // SecurityTokenWrapper test
 import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockito';
 import {
-  ISecurityTokenContract,
-  FeatureRegistryContract,
-  FeatureRegistryEvents,
-  ModuleFactoryContract,
-  PolyTokenContract,
-  ModuleRegistryContract,
-  ethers,
+  ISecurityTokenContract_3_0_0,
+  FeatureRegistryContract_3_0_0,
+  FeatureRegistryEvents_3_0_0,
+  ModuleFactoryContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  ModuleRegistryContract_3_0_0,
+  ethersUtils,
   BigNumber,
   Web3Wrapper,
-  CountTransferManagerContract,
-  ERC20DividendCheckpointContract,
-  CappedSTOContract,
-  USDTieredSTOContract,
-  PercentageTransferManagerContract,
-  EtherDividendCheckpointContract,
-  VestingEscrowWalletContract,
+  CountTransferManagerContract_3_0_0,
+  ERC20DividendCheckpointContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,
+  EtherDividendCheckpointContract_3_0_0,
+  VestingEscrowWalletContract_3_0_0,
+  CappedSTOContract_3_1_0,
+  USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import {
@@ -52,21 +52,21 @@ describe('SecurityTokenWrapper', () => {
   // Declare SecurityTokenWrapper object
   let target: SecurityTokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ISecurityTokenContract;
+  let mockedContract: ISecurityTokenContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedFeatureRegistryContract: FeatureRegistryContract;
-  let mockedModuleFactoryContract: ModuleFactoryContract;
-  let mockedPolyTokenContract: PolyTokenContract;
-  let mockedModuleRegistryContract: ModuleRegistryContract;
+  let mockedFeatureRegistryContract: FeatureRegistryContract_3_0_0;
+  let mockedModuleFactoryContract: ModuleFactoryContract_3_0_0;
+  let mockedPolyTokenContract: PolyTokenContract_3_0_0;
+  let mockedModuleRegistryContract: ModuleRegistryContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ISecurityTokenContract);
+    mockedContract = mock(ISecurityTokenContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedFeatureRegistryContract = mock(FeatureRegistryContract);
-    mockedModuleFactoryContract = mock(ModuleFactoryContract);
-    mockedPolyTokenContract = mock(PolyTokenContract);
-    mockedModuleRegistryContract = mock(ModuleRegistryContract);
+    mockedFeatureRegistryContract = mock(FeatureRegistryContract_3_0_0);
+    mockedModuleFactoryContract = mock(ModuleFactoryContract_3_0_0);
+    mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
+    mockedModuleRegistryContract = mock(ModuleRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -3571,7 +3571,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract.ABI());
+      const iCtmFace = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3766,7 +3766,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCtmFace = new ethers.utils.Interface(CountTransferManagerContract.ABI());
+      const iCtmFace = new ethersUtils.Interface(CountTransferManagerContract_3_0_0.ABI());
       const ctmData = iCtmFace.functions.configure.encode([mockedCtmParams.data.maxHolderCount]);
 
       when(
@@ -3956,7 +3956,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iPtmFace = new ethers.utils.Interface(PercentageTransferManagerContract.ABI());
+      const iPtmFace = new ethersUtils.Interface(PercentageTransferManagerContract_3_0_0.ABI());
       const ptmData = iPtmFace.functions.configure.encode([
         valueToWei(mockedPtmParams.data.maxHolderPercentage, PERCENTAGE_DECIMALS).toString(),
         mockedPtmParams.data.allowPrimaryIssuance,
@@ -4155,7 +4155,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iCappedFace = new ethers.utils.Interface(CappedSTOContract.ABI());
+      const iCappedFace = new ethersUtils.Interface(CappedSTOContract_3_1_0.ABI());
       const cappedData = iCappedFace.functions.configure.encode([
         dateToBigNumber(mockedCappedParams.data.startTime).toNumber(),
         dateToBigNumber(mockedCappedParams.data.endTime).toNumber(),
@@ -4369,7 +4369,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iUsdTieredStoFace = new ethers.utils.Interface(USDTieredSTOContract.ABI());
+      const iUsdTieredStoFace = new ethersUtils.Interface(USDTieredSTOContract_3_1_0.ABI());
       const usdTieredStoData = iUsdTieredStoFace.functions.configure.encode([
         dateToBigNumber(mockedUsdTieredStoParams.data.startTime).toNumber(),
         dateToBigNumber(mockedUsdTieredStoParams.data.endTime).toNumber(),
@@ -4590,7 +4590,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iErc20DividendFace = new ethers.utils.Interface(ERC20DividendCheckpointContract.ABI());
+      const iErc20DividendFace = new ethersUtils.Interface(ERC20DividendCheckpointContract_3_0_0.ABI());
       const erc20DividendData = iErc20DividendFace.functions.configure.encode([mockedErc20DividendParams.data.wallet]);
 
       when(
@@ -4779,7 +4779,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iEtherDividendFace = new ethers.utils.Interface(EtherDividendCheckpointContract.ABI());
+      const iEtherDividendFace = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
       const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
 
       when(
@@ -4968,7 +4968,7 @@ describe('SecurityTokenWrapper', () => {
         safetyFactor: 10,
       };
 
-      const iEtherDividendFace = new ethers.utils.Interface(VestingEscrowWalletContract.ABI());
+      const iEtherDividendFace = new ethersUtils.Interface(VestingEscrowWalletContract_3_0_0.ABI());
       const etherDividendData = iEtherDividendFace.functions.configure.encode([mockedEtherDividendParams.data.wallet]);
 
       when(
@@ -5233,7 +5233,7 @@ describe('SecurityTokenWrapper', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: FeatureRegistryEvents.ChangeFeatureStatus,
+        eventName: FeatureRegistryEvents_3_0_0.ChangeFeatureStatus,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

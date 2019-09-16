@@ -1,22 +1,23 @@
 import {
   BigNumber,
-  LockUpTransferManagerAddLockUpToUserEventArgs,
-  LockUpTransferManagerAddNewLockUpTypeEventArgs,
-  LockUpTransferManagerContract,
-  LockUpTransferManagerEventArgs,
-  LockUpTransferManagerEvents,
-  LockUpTransferManagerModifyLockUpTypeEventArgs,
-  LockUpTransferManagerPauseEventArgs,
-  LockUpTransferManagerRemoveLockUpFromUserEventArgs,
-  LockUpTransferManagerRemoveLockUpTypeEventArgs,
-  LockUpTransferManagerUnpauseEventArgs,
+  LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0,
+  LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerContract_3_0_0,
+  LockUpTransferManagerEventArgs_3_0_0,
+  LockUpTransferManagerEvents_3_0_0,
+  LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerPauseEventArgs_3_0_0,
+  LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0,
+  LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerUnpauseEventArgs_3_0_0,
   LogWithDecodedArgs,
   Web3Wrapper,
+  PolyResponse
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import Contract_3_0_0Factory from '../../../factories/contractFactory';
 import {
   EventCallback,
   GetLogs,
@@ -37,7 +38,6 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
-  parsePermBytes32Value,
   parseTransferResult,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -47,66 +47,66 @@ import {
 } from '../../../utils/convert';
 
 interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.AddLockUpToUser;
-  callback: EventCallback<LockUpTransferManagerAddLockUpToUserEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser;
+  callback: EventCallback<LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0>;
 }
 
 interface GetAddLockUpToUserLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.AddLockUpToUser;
+  eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser;
 }
 
 interface RemoveLockUpFromUserSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
-  callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpFromUser;
+  callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0>;
 }
 
 interface GetRemoveLockUpFromUserLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser;
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpFromUser;
 }
 
 interface ModifyLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.ModifyLockUpType;
-  callback: EventCallback<LockUpTransferManagerModifyLockUpTypeEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.ModifyLockUpType;
+  callback: EventCallback<LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0>;
 }
 
 interface GetModifyLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.ModifyLockUpType;
+  eventName: LockUpTransferManagerEvents_3_0_0.ModifyLockUpType;
 }
 
 interface AddNewLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.AddNewLockUpType;
-  callback: EventCallback<LockUpTransferManagerAddNewLockUpTypeEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.AddNewLockUpType;
+  callback: EventCallback<LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0>;
 }
 
 interface GetAddNewLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.AddNewLockUpType;
+  eventName: LockUpTransferManagerEvents_3_0_0.AddNewLockUpType;
 }
 
 interface RemoveLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.RemoveLockUpType;
-  callback: EventCallback<LockUpTransferManagerRemoveLockUpTypeEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpType;
+  callback: EventCallback<LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0>;
 }
 
 interface GetRemoveLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.RemoveLockUpType;
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpType;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.Pause;
-  callback: EventCallback<LockUpTransferManagerPauseEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<LockUpTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.Pause;
+  eventName: LockUpTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: LockUpTransferManagerEvents.Unpause;
-  callback: EventCallback<LockUpTransferManagerUnpauseEventArgs>;
+  eventName: LockUpTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<LockUpTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: LockUpTransferManagerEvents.Unpause;
+  eventName: LockUpTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface LockUpTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -121,22 +121,22 @@ interface LockUpTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetAddLockUpToUserLogsAsyncParams): Promise<
-    LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs>[]
+    LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0>[]
   >;
   (params: GetRemoveLockUpFromUserLogsAsyncParams): Promise<
-    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs>[]
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0>[]
   >;
   (params: GetModifyLockUpTypeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs>[]
+    LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0>[]
   >;
   (params: GetAddNewLockUpTypeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs>[]
+    LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0>[]
   >;
   (params: GetRemoveLockUpTypeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs>[]
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace LockUpTransferManagerTransactionParams {
@@ -348,7 +348,7 @@ interface VerifyTransfer {
  * This class includes the functionality related to interacting with the LockUp Transfer Manager contract.
  */
 export default class LockUpTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<LockUpTransferManagerContract>;
+  public contract: Promise<LockUpTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate LockUpTransferManagerWrapper
@@ -358,8 +358,8 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<LockUpTransferManagerContract>,
-    contractFactory: ContractFactory,
+    contract: Promise<LockUpTransferManagerContract_3_0_0>,
+    contractFactory: Contract_3_0_0Factory,
   ) {
     super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
@@ -368,7 +368,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.ContractPaused, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -381,14 +381,14 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Check if the module is paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.PreconditionRequired, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -503,14 +503,6 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Returns the permissions flags that are associated with Percentage transfer Manager
-   */
-  public getPermissions = async (): Promise<Perm[]> => {
-    const permissions = await (await this.contract).getPermissions.callAsync();
-    return permissions.map(parsePermBytes32Value);
-  };
-
-  /**
    *  Used to verify the transfer transaction and prevent locked up tokens from being transferred
    *  @return boolean transfer result, address
    */
@@ -534,7 +526,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to add the new lockup type
    */
-  public addNewLockUpType = async (params: LockUpTypeParams) => {
+  public addNewLockUpType = async (params: LockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -556,7 +548,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to add multiple new lockup types
    */
-  public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
+  public addNewLockUpTypeMulti = async (params: LockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupAmounts.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths(
       [
@@ -601,7 +593,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add a lockup to a specific user
    */
-  public addLockUpByName = async (params: LockUpByNameParams) => {
+  public addLockUpByName = async (params: LockUpByNameParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -619,7 +611,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Add multiple lockups to multiple users
    */
-  public addLockUpByNameMulti = async (params: LockUpByNameMultiParams) => {
+  public addLockUpByNameMulti = async (params: LockUpByNameMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
     assert.assert(
@@ -648,7 +640,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin create a volume restriction lockup for a given address.
    */
-  public addNewLockUpToUser = async (params: AddNewLockUpToUserParams) => {
+  public addNewLockUpToUser = async (params: AddNewLockUpToUserParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -673,7 +665,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin create multiple volume restriction lockups for multiple given addresses.
    */
-  public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams) => {
+  public addNewLockUpToUserMulti = async (params: AddNewLockUpToUserMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -723,7 +715,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin remove a user from a lock up
    */
-  public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams) => {
+  public removeLockUpFromUser = async (params: RemoveLockUpFromUserParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -741,7 +733,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Use to remove the lockup for multiple users
    */
-  public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams) => {
+  public removeLockUpFromUserMulti = async (params: RemoveLockUpFromUserMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths([params.userAddresses, params.lockupNames], 'Argument arrays length mismatch');
     assert.assert(
@@ -770,7 +762,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to remove the lockup type
    */
-  public removeLockupType = async (params: RemoveLockUpTypeParams) => {
+  public removeLockupType = async (params: RemoveLockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -787,7 +779,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to remove the multiple lockup type
    */
-  public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams) => {
+  public removeLockupTypeMulti = async (params: RemoveLockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupNames.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -809,7 +801,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin modify a lockup.
    */
-  public modifyLockUpType = async (params: LockUpTypeParams) => {
+  public modifyLockUpType = async (params: LockUpTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -831,7 +823,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
   /**
    * Lets the admin modify a volume restriction lockup for multiple addresses.
    */
-  public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams) => {
+  public modifyLockUpTypeMulti = async (params: LockUpTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.lockupAmounts.length > 0, ErrorCode.InvalidData, 'Empty lockup information');
     assert.areValidArrayLengths(
       [
@@ -878,16 +870,16 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: LockUpTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends LockUpTransferManagerEventArgs
+    ArgsType extends LockUpTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
     const subscriptionToken = await this.subscribeInternal<ArgsType>(
-      normalizedContractAddress,
+      normalizedContract_3_0_0Address,
       params.eventName,
       params.indexFilterValues,
       params.callback,
@@ -901,16 +893,16 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetLockUpTransferManagerLogsAsyncParams = async <
-    ArgsType extends LockUpTransferManagerEventArgs
+    ArgsType extends LockUpTransferManagerEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
+      normalizedContract_3_0_0Address,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
@@ -918,19 +910,19 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     return logs;
   };
 
-  private checkAddNewLockUpType = async (params: LockUpTypeParams) => {
+  public checkAddNewLockUpType = async (params: LockUpTypeParams) => {
     await this.checkLockUpTypeInformation(params);
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isBigNumberZero(lockup.lockupAmount, 'LockUp already exists');
   };
 
-  private checkModifyLockUpType = async (params: LockUpTypeParams) => {
+  public checkModifyLockUpType = async (params: LockUpTypeParams) => {
     await this.checkLockUpTypeInformation(params);
     const lockup = await this.getLockUp({ lockupName: params.lockupName });
     assert.isNotDateZero(lockup.startTime, 'LockUp already exists');
   };
 
-  private checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
+  public checkLockUpTypeInformation = async (params: LockUpTypeParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.assert(
@@ -946,7 +938,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isBigNumberGreaterThanZero(params.lockupAmount, 'Lockup amount should be greater than 0');
   };
 
-  private checkAddLockUpByName = async (params: LockUpByNameParams) => {
+  public checkAddLockUpByName = async (params: LockUpByNameParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isNonZeroETHAddressHex('User Address', params.userAddress);
     const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
@@ -959,7 +951,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     assert.isFutureDate(lockup.startTime, 'Start time must be in the future');
   };
 
-  private checkRemoveLockUpFromUser = async (params: LockUpByNameParams) => {
+  public checkRemoveLockUpFromUser = async (params: LockUpByNameParams) => {
     assert.assert(params.lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     assert.isNonZeroETHAddressHex('User Address', params.userAddress);
     const lockupNames = await this.getLockupsNamesToUser({ user: params.userAddress });
@@ -970,7 +962,7 @@ export default class LockUpTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkRemoveLockUpType = async (lockupName: string) => {
+  public checkRemoveLockUpType = async (lockupName: string) => {
     assert.assert(lockupName.length > 0, ErrorCode.InvalidData, 'Lockup Name cannot be empty string');
     const lockup = await this.getLockUp({ lockupName });
     assert.isNotDateZero(lockup.startTime, 'Lockup does not exist');

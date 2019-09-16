@@ -1,17 +1,18 @@
 import {
   BigNumber,
-  BlacklistTransferManagerContract,
-  BlacklistTransferManagerEventArgs,
-  BlacklistTransferManagerEvents,
-  BlacklistTransferManagerPauseEventArgs,
-  BlacklistTransferManagerUnpauseEventArgs,
-  BlacklistTransferManagerAddBlacklistTypeEventArgs,
-  BlacklistTransferManagerModifyBlacklistTypeEventArgs,
-  BlacklistTransferManagerDeleteBlacklistTypeEventArgs,
-  BlacklistTransferManagerAddInvestorToBlacklistEventArgs,
-  BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs,
+  BlacklistTransferManagerContract_3_0_0,
+  BlacklistTransferManagerEventArgs_3_0_0,
+  BlacklistTransferManagerEvents_3_0_0,
+  BlacklistTransferManagerPauseEventArgs_3_0_0,
+  BlacklistTransferManagerUnpauseEventArgs_3_0_0,
+  BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0,
   LogWithDecodedArgs,
   Web3Wrapper,
+  PolyResponse
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -36,7 +37,6 @@ import {
   dateToBigNumber,
   numberArrayToBigNumberArray,
   numberToBigNumber,
-  parsePermBytes32Value,
   parseTransferResult,
   stringArrayToBytes32Array,
   stringToBytes32,
@@ -45,66 +45,66 @@ import {
 } from '../../../utils/convert';
 
 interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.DeleteInvestorFromBlacklist;
-  callback: EventCallback<BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
+  callback: EventCallback<BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0>;
 }
 
 interface GetDeleteInvestorFromBlacklistLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.DeleteInvestorFromBlacklist;
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
 }
 
 interface AddInvestorToBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.AddInvestorToBlacklist;
-  callback: EventCallback<BlacklistTransferManagerAddInvestorToBlacklistEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
+  callback: EventCallback<BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0>;
 }
 
 interface GetAddInvestorToBlacklistLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.AddInvestorToBlacklist;
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
 }
 
 interface DeleteBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.DeleteBlacklistType;
-  callback: EventCallback<BlacklistTransferManagerDeleteBlacklistTypeEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0>;
 }
 
 interface GetDeleteBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.DeleteBlacklistType;
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
 }
 
 interface ModifyBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.ModifyBlacklistType;
-  callback: EventCallback<BlacklistTransferManagerModifyBlacklistTypeEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0>;
 }
 
 interface GetModifyBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.ModifyBlacklistType;
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
 }
 
 interface AddBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.AddBlacklistType;
-  callback: EventCallback<BlacklistTransferManagerAddBlacklistTypeEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0>;
 }
 
 interface GetAddBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.AddBlacklistType;
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.Pause;
-  callback: EventCallback<BlacklistTransferManagerPauseEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<BlacklistTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.Pause;
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: BlacklistTransferManagerEvents.Unpause;
-  callback: EventCallback<BlacklistTransferManagerUnpauseEventArgs>;
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<BlacklistTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: BlacklistTransferManagerEvents.Unpause;
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -118,21 +118,21 @@ interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
 }
 
 interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
-  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
+  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]>;
   (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
   >;
   (params: GetDeleteBlacklistTypeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
   >;
   (params: GetAddInvestorToBlacklistLogsAsyncParams): Promise<
-    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
   >;
   (params: GetDeleteInvestorFromBlacklistLogsAsyncParams): Promise<
-    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace BlacklistTransferManagerTransactionParams {
@@ -307,7 +307,7 @@ interface BlacklistsDetails {
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
  */
 export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<BlacklistTransferManagerContract>;
+  public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate BlacklistTransferManagerWrapper
@@ -317,7 +317,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<BlacklistTransferManagerContract>,
+    contract: Promise<BlacklistTransferManagerContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -327,7 +327,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -340,14 +340,14 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Check if the module is paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -373,7 +373,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to add the blacklist type
    */
-  public addBlacklistType = async (params: BlacklistTypeParams) => {
+  public addBlacklistType = async (params: BlacklistTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -393,7 +393,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to add multiple blacklist types
    */
-  public addNewBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
+  public addNewBlacklistTypeMulti = async (params: BlacklistTypeMultiParams): Promise<PolyResponse> => {
     assert.areValidArrayLengths(
       [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
       'Argument arrays length mismatch',
@@ -429,7 +429,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify the details of a given blacklist type
    */
-  public modifyBlacklistType = async (params: BlacklistTypeParams) => {
+  public modifyBlacklistType = async (params: BlacklistTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -449,7 +449,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to modify the details of given multiple blacklist types
    */
-  public modifyBlacklistTypeMulti = async (params: BlacklistTypeMultiParams) => {
+  public modifyBlacklistTypeMulti = async (params: BlacklistTypeMultiParams): Promise<PolyResponse> => {
     assert.areValidArrayLengths(
       [params.startTimes, params.endTimes, params.blacklistNames, params.repeatPeriodTimes],
       'Argument arrays length mismatch',
@@ -485,7 +485,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the blacklist type
    */
-  public deleteBlacklistType = async (params: DeleteBlacklistTypeParams) => {
+  public deleteBlacklistType = async (params: DeleteBlacklistTypeParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -502,7 +502,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the multiple blacklist types
    */
-  public deleteBlacklistTypeMulti = async (params: DeleteBlacklistTypeMultiParams) => {
+  public deleteBlacklistTypeMulti = async (params: DeleteBlacklistTypeMultiParams): Promise<PolyResponse> => {
     assert.assert(params.blacklistNames.length > 0, ErrorCode.InvalidData, 'Empty blacklist information');
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -524,7 +524,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to assign the blacklist type to the investor
    */
-  public addInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public addInvestorToBlacklist = async (params: InvestorAndBlacklistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -542,7 +542,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to assign a single blacklist type to multiple investors
    */
-  public addInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistParams) => {
+  public addInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -570,7 +570,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to assign multiple specific blacklist types to multiple investors
    */
-  public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
+  public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -599,7 +599,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to create a new blacklist type and add it to the investor
    */
-  public addInvestorToNewBlacklist = async (params: AddNewInvestorToNewBlacklistParams) => {
+  public addInvestorToNewBlacklist = async (params: AddNewInvestorToNewBlacklistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -620,7 +620,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the investor from the blacklist
    */
-  public deleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public deleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -638,7 +638,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the multiple investors from multiple specific blacklists
    */
-  public deleteMultiInvestorsFromBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams) => {
+  public deleteMultiInvestorsFromBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -667,7 +667,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the investor from all the associated blacklist types
    */
-  public deleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
+  public deleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -684,7 +684,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete multiple investors from multiple associated blacklist types
    */
-  public deleteInvestorFromAllBlacklistMulti = async (params: DeleteInvestorFromAllBlacklistMultiParams) => {
+  public deleteInvestorFromAllBlacklistMulti = async (params: DeleteInvestorFromAllBlacklistMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -754,14 +754,6 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   };
 
   /**
-   * Return the permissions flags that are associated with blacklist transfer manager
-   */
-  public getPermissions = async (): Promise<Perm[]> => {
-    const permissions = await (await this.contract).getPermissions.callAsync();
-    return permissions.map(parsePermBytes32Value);
-  };
-
-  /**
    * Used to verify the transfer transaction (View)
    * Restrict the blacklist address to transfer tokens
    * if the current time is between the timeframe define for the
@@ -790,11 +782,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: BlacklistTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends BlacklistTransferManagerEventArgs
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -813,11 +805,11 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetBlacklistTransferManagerLogsAsyncParams = async <
-    ArgsType extends BlacklistTransferManagerEventArgs
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -830,7 +822,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     return logs;
   };
 
-  private checkAddBlacklistType = async (params: BlacklistTypeParams) => {
+  public checkAddBlacklistType = async (params: BlacklistTypeParams) => {
     const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
     assert.assert(
       dateToBigNumber(blacklistInfo.endTime).isZero(),
@@ -840,13 +832,13 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     await this.checkBlacklistTypeDetails(params);
   };
 
-  private checkModifyBlacklistType = async (params: BlacklistTypeParams) => {
+  public checkModifyBlacklistType = async (params: BlacklistTypeParams) => {
     const blacklistInfo = await this.blacklists({ blacklistName: params.blacklistName });
     assert.isNotDateZero(blacklistInfo.endTime, 'Blacklist you are trying to modify does not exist');
     await this.checkBlacklistTypeDetails(params);
   };
 
-  private checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
+  public checkBlacklistTypeDetails = async (params: BlacklistTypeParams) => {
     assert.assert(params.blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist Name cannot be empty string');
     assert.isFutureDate(params.startTime, 'Start time must be in the future');
     assert.assert(params.startTime < params.endTime, ErrorCode.TooLate, 'Start time must be before the end time');
@@ -860,7 +852,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     }
   };
 
-  private checkDeleteBlacklistType = async (blacklistName: string) => {
+  public checkDeleteBlacklistType = async (blacklistName: string) => {
     assert.assert(blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist Name cannot be empty string');
     const blacklistsDetails = await this.blacklists({ blacklistName });
     assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
@@ -872,13 +864,13 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkBlacklistToModifyInvestors = async (params: InvestorAndBlacklistParams) => {
+  public checkBlacklistToModifyInvestors = async (params: InvestorAndBlacklistParams) => {
     assert.assert(params.blacklistName.length > 0, ErrorCode.InvalidData, 'Blacklist name cannot be empty string');
     const blacklistsDetails = await this.blacklists({ blacklistName: params.blacklistName });
     assert.isNotDateZero(blacklistsDetails.endTime, 'Blacklist does not exist');
   };
 
-  private checkAddInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public checkAddInvestorToBlacklist = async (params: InvestorAndBlacklistParams) => {
     await this.checkBlacklistToModifyInvestors(params);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
@@ -888,7 +880,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkDeleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
+  public checkDeleteInvestorFromBlacklist = async (params: InvestorAndBlacklistParams) => {
     await this.checkBlacklistToModifyInvestors(params);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.userAddress });
     assert.assert(
@@ -898,7 +890,7 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
     );
   };
 
-  private checkDeleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
+  public checkDeleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams) => {
     assert.isNonZeroETHAddressHex('Investor Address', params.investor);
     const currentBlacklistNames = await this.getBlacklistNamesToUser({ user: params.investor });
     assert.assert(

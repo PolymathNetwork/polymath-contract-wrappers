@@ -1,27 +1,28 @@
 import {
-  ISecurityTokenRegistryContract,
-  ISecurityTokenRegistryEvents,
-  ISecurityTokenRegistryEventArgs,
-  ISecurityTokenRegistryChangeExpiryLimitEventArgs,
-  ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs,
-  ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs,
-  ISecurityTokenRegistryNewSecurityTokenEventArgs,
-  ISecurityTokenRegistryOwnershipTransferredEventArgs,
-  ISecurityTokenRegistryPauseEventArgs,
-  ISecurityTokenRegistryUnpauseEventArgs,
-  ISecurityTokenRegistryRegisterTickerEventArgs,
-  ISecurityTokenRegistryTickerRemovedEventArgs,
-  ISecurityTokenRegistryChangeTickerOwnershipEventArgs,
-  ISecurityTokenRegistryChangeFeeCurrencyEventArgs,
-  ISecurityTokenRegistrySecurityTokenRefreshedEventArgs,
-  ISecurityTokenRegistryProtocolFactorySetEventArgs,
-  ISecurityTokenRegistryLatestVersionSetEventArgs,
-  ISecurityTokenRegistryProtocolFactoryRemovedEventArgs,
-  ISecurityTokenContract,
-  PolyTokenContract,
+  ISecurityTokenRegistryContract_3_0_0,
+  ISecurityTokenRegistryEvents_3_0_0,
+  ISecurityTokenRegistryEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0,
+  ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0,
+  ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0,
+  ISecurityTokenRegistryPauseEventArgs_3_0_0,
+  ISecurityTokenRegistryUnpauseEventArgs_3_0_0,
+  ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0,
+  ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0,
+  ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0,
+  ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0,
+  ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0,
+  ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0,
+  ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  PolyTokenContract_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../utils/assert';
@@ -37,6 +38,7 @@ import {
   FULL_DECIMALS,
   FeeType,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import {
   bigNumberToDate,
@@ -45,145 +47,145 @@ import {
   weiToValue,
   valueToWei,
   packVersion,
-  stringToBytes32,
+  stringToKeccak256,
 } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
 interface ChangeFeeCurrencySubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
-  callback: EventCallback<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeFeeCurrency;
+  callback: EventCallback<ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0>;
 }
 
 interface GetChangeFeeCurrencyLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeFeeCurrency;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeFeeCurrency;
 }
 
 interface SecurityTokenRefreshedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.SecurityTokenRefreshed;
-  callback: EventCallback<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.SecurityTokenRefreshed;
+  callback: EventCallback<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0>;
 }
 
 interface GetSecurityTokenRefreshedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.SecurityTokenRefreshed;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.SecurityTokenRefreshed;
 }
 
 interface ProtocolFactorySetSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactorySet;
-  callback: EventCallback<ISecurityTokenRegistryProtocolFactorySetEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactorySet;
+  callback: EventCallback<ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0>;
 }
 
 interface GetProtocolFactorySetLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactorySet;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactorySet;
 }
 
 interface LatestVersionSetSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.LatestVersionSet;
-  callback: EventCallback<ISecurityTokenRegistryLatestVersionSetEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.LatestVersionSet;
+  callback: EventCallback<ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0>;
 }
 
 interface GetLatestVersionSetLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.LatestVersionSet;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.LatestVersionSet;
 }
 
 interface ProtocolFactoryRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactoryRemoved;
-  callback: EventCallback<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactoryRemoved;
+  callback: EventCallback<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0>;
 }
 
 interface GetProtocolFactoryRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ProtocolFactoryRemoved;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ProtocolFactoryRemoved;
 }
 
 interface ChangeExpiryLimitSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeExpiryLimit;
-  callback: EventCallback<ISecurityTokenRegistryChangeExpiryLimitEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit;
+  callback: EventCallback<ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0>;
 }
 
 interface GetChangeExpiryLimitLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeExpiryLimit;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit;
 }
 
 interface ChangeSecurityLaunchFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeSecurityLaunchFee;
-  callback: EventCallback<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeSecurityLaunchFee;
+  callback: EventCallback<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0>;
 }
 
 interface GetChangeSecurityLaunchFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeSecurityLaunchFee;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeSecurityLaunchFee;
 }
 
 interface ChangeTickerOwnershipSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerOwnership;
-  callback: EventCallback<ISecurityTokenRegistryChangeTickerOwnershipEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerOwnership;
+  callback: EventCallback<ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0>;
 }
 
 interface GetChangeTickerOwnershipLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerOwnership;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerOwnership;
 }
 
 interface ChangeTickerRegistrationFeeSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerRegistrationFee;
-  callback: EventCallback<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerRegistrationFee;
+  callback: EventCallback<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0>;
 }
 
 interface GetChangeTickerRegistrationFeeLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.ChangeTickerRegistrationFee;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeTickerRegistrationFee;
 }
 
 interface NewSecurityTokenSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityToken;
-  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken;
+  callback: EventCallback<ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0>;
 }
 
 interface GetNewSecurityTokenLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.NewSecurityToken;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.OwnershipTransferred;
-  callback: EventCallback<ISecurityTokenRegistryOwnershipTransferredEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.OwnershipTransferred;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.OwnershipTransferred;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Pause;
-  callback: EventCallback<ISecurityTokenRegistryPauseEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Pause;
+  callback: EventCallback<ISecurityTokenRegistryPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Pause;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Pause;
 }
 
 interface RegisterTickerSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.RegisterTicker;
-  callback: EventCallback<ISecurityTokenRegistryRegisterTickerEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker;
+  callback: EventCallback<ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0>;
 }
 
 interface GetRegisterTickerLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.RegisterTicker;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker;
 }
 
 interface TickerRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.TickerRemoved;
-  callback: EventCallback<ISecurityTokenRegistryTickerRemovedEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.TickerRemoved;
+  callback: EventCallback<ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0>;
 }
 
 interface GetTickerRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.TickerRemoved;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.TickerRemoved;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Unpause;
-  callback: EventCallback<ISecurityTokenRegistryUnpauseEventArgs>;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Unpause;
+  callback: EventCallback<ISecurityTokenRegistryUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ISecurityTokenRegistryEvents.Unpause;
+  eventName: ISecurityTokenRegistryEvents_3_0_0.Unpause;
 }
 
 interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
@@ -206,46 +208,46 @@ interface SecurityTokenRegistrySubscribeAsyncParams extends Subscribe {
 
 interface GetISecurityTokenRegistryLogsAsyncParams extends GetLogs {
   (params: GetChangeFeeCurrencyLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeFeeCurrencyEventArgs_3_0_0>[]
   >;
   (params: GetSecurityTokenRefreshedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistrySecurityTokenRefreshedEventArgs_3_0_0>[]
   >;
   (params: GetProtocolFactorySetLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactorySetEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0>[]
   >;
   (params: GetLatestVersionSetLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryLatestVersionSetEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0>[]
   >;
   (params: GetProtocolFactoryRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0>[]
   >;
   (params: GetChangeExpiryLimitLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeExpiryLimitEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeExpiryLimitEventArgs_3_0_0>[]
   >;
   (params: GetChangeSecurityLaunchFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeSecurityLaunchFeeEventArgs_3_0_0>[]
   >;
   (params: GetChangeTickerOwnershipLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerOwnershipEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerOwnershipEventArgs_3_0_0>[]
   >;
   (params: GetChangeTickerRegistrationFeeLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryChangeTickerRegistrationFeeEventArgs_3_0_0>[]
   >;
   (params: GetNewSecurityTokenLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryNewSecurityTokenEventArgs_3_0_0>[]
   >;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryOwnershipTransferredEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryPauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryPauseEventArgs_3_0_0>[]>;
   (params: GetRegisterTickerLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryRegisterTickerEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryRegisterTickerEventArgs_3_0_0>[]
   >;
   (params: GetTickerRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenRegistryTickerRemovedEventArgs>[]
+    LogWithDecodedArgs<ISecurityTokenRegistryTickerRemovedEventArgs_3_0_0>[]
   >;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRegistryUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace SecurityTokenRegistryTransactionParams {
@@ -514,15 +516,17 @@ interface TickerDetails {
  * This class includes the functionality related to interacting with the ISecurityTokenRegistry contract.
  */
 export default class SecurityTokenRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ISecurityTokenRegistryContract>;
+  public contract: Promise<ISecurityTokenRegistryContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
-  protected securityTokenContract = async (address: string): Promise<ISecurityTokenContract> => {
+  public contractVersion = ContractVersion.V3_0_0;
+
+  public securityTokenContract = async (address: string): Promise<ISecurityTokenContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenContract(address);
   };
 
-  protected polyTokenContract = async (): Promise<PolyTokenContract> => {
+  public polyTokenContract = async (): Promise<PolyTokenContract_3_0_0> => {
     return this.contractFactory.getPolyTokenContract();
   };
 
@@ -534,7 +538,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<ISecurityTokenRegistryContract>,
+    contract: Promise<ISecurityTokenRegistryContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -582,7 +586,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration and ST launch fee amount and currency
    */
-  public changeFeesAmountAndCurrency = async (params: ChangeFeesAmountAndCurrencyParams) => {
+  public changeFeesAmountAndCurrency = async (params: ChangeFeesAmountAndCurrencyParams): Promise<PolyResponse> => {
     const isOldFeesInPoly = await this.getIsFeeInPoly();
     assert.assert(isOldFeesInPoly !== params.isFeeInPoly, ErrorCode.PreconditionRequired, 'Currency unchanged');
     return (await this.contract).changeFeesAmountAndCurrency.sendTransactionAsync(
@@ -598,7 +602,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Deploys an instance of a new Security Token and replaces the old one in the registry
    * This can be used to upgrade from version 2.0 of ST to 3.0 or in case something goes wrong with earlier ST
    */
-  public refreshSecurityToken = async (params: RefreshSecurityTokenParams) => {
+  public refreshSecurityToken = async (params: RefreshSecurityTokenParams): Promise<PolyResponse> => {
     await this.checkWhenNotPausedOrOwner();
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name cannot be an empty string');
     assert.assert(params.ticker.length > 0, ErrorCode.InvalidData, 'Ticker cannot be an empty string');
@@ -625,7 +629,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Removes a STFactory
    */
-  public removeProtocolFactory = async (params: PackageVersionParams) => {
+  public removeProtocolFactory = async (params: PackageVersionParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     const LATEST_VERSION = await this.getLatestProtocolVersion();
     assert.isValidVersion(params.version);
@@ -682,7 +686,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
-  public generateNewSecurityToken = async (params: NewSecurityTokenParams) => {
+  public generateNewSecurityToken = async (params: NewSecurityTokenParams): Promise<PolyResponse> => {
     assert.assert(params.ticker.length > 0, ErrorCode.InvalidData, 'Ticker cannot be an empty string');
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name cannot be an empty string');
     assert.isNonZeroETHAddressHex('treasuryWallet', params.treasuryWallet);
@@ -741,7 +745,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Once the token ticker is registered to its owner then no other issuer can claim
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
-  public registerNewTicker = async (params: RegisterNewTickerParams) => {
+  public registerNewTicker = async (params: RegisterNewTickerParams): Promise<PolyResponse> => {
     await this.checkWhenNotPausedOrOwner();
     const owner = params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     await this.checkRegisterTickerRequirements(params.ticker, owner);
@@ -757,7 +761,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Modifies the ticker details. Only Polymath has the ability to do so.
    * Only allowed to modify the tickers which are not yet deployed.
    */
-  public modifyExistingTicker = async (params: ModifyExistingTickerParams) => {
+  public modifyExistingTicker = async (params: ModifyExistingTickerParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.assert(params.ticker.length > 0 && params.ticker.length <= 10, ErrorCode.InvalidData, 'Bad ticker');
     assert.assert(params.expiryDate.getTime() > new Date(0).getTime(), ErrorCode.TooEarly, 'Bad expiry date');
@@ -785,7 +789,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
-  public modifyExistingSecurityToken = async (params: ModifyExistingSecurityTokenParams) => {
+  public modifyExistingSecurityToken = async (params: ModifyExistingSecurityTokenParams): Promise<PolyResponse> => {
     await this.checkModifyST(params.ticker, params.deployedAt, params.owner, params.securityToken);
     return (await this.contract).modifyExistingSecurityToken.sendTransactionAsync(
       params.ticker,
@@ -819,7 +823,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Once the token ticker is registered to its owner then no other issuer can claim
    * its ownership. If the ticker expires and its issuer hasn't used it, then someone else can take it.
    */
-  public registerTicker = async (params: RegisterTickerParams) => {
+  public registerTicker = async (params: RegisterTickerParams): Promise<PolyResponse> => {
     await this.checkWhenNotPausedOrOwner();
     const owner = params.owner !== undefined ? params.owner : await this.getDefaultFromAddress();
     await this.checkRegisterTickerRequirements(params.ticker, owner);
@@ -835,7 +839,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Transfers the ownership of the ticker
    */
-  public transferTickerOwnership = async (params: TransferTickerOwnershipParams) => {
+  public transferTickerOwnership = async (params: TransferTickerOwnershipParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     await this.checkWhenNotPausedOrOwner();
     const tickerDetails = await this.getTickerDetails({
@@ -868,7 +872,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Deploys an instance of a new Security Token and records it to the registry
    */
-  public generateSecurityToken = async (params: GenerateSecurityTokenParams) => {
+  public generateSecurityToken = async (params: GenerateSecurityTokenParams): Promise<PolyResponse> => {
     assert.assert(params.ticker.length > 0, ErrorCode.InvalidData, 'Ticker cannot be an empty string');
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Name cannot be an empty string');
     await this.checkWhenNotPausedOrOwner();
@@ -956,7 +960,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Modifies the ticker details. Only Polymath has the ability to do so.
    */
-  public modifyTicker = async (params: ModifyTickerParams) => {
+  public modifyTicker = async (params: ModifyTickerParams): Promise<PolyResponse> => {
     assert.assert(params.ticker.length > 0, ErrorCode.InvalidData, 'Ticker cannot be an empty string');
     assert.assert(params.ticker.length <= 10, ErrorCode.InvalidData, 'Ticker length can not be greater than 10');
     await this.checkOnlyOwner();
@@ -985,7 +989,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Removes the ticker details, associated ownership & security token mapping
    */
-  public removeTicker = async (params: RemoveTickerParams) => {
+  public removeTicker = async (params: RemoveTickerParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     const ticker = await this.getTickerDetails({
       ticker: params.ticker,
@@ -997,7 +1001,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the expiry time for the token ticker. Only available to Polymath.
    */
-  public changeExpiryLimit = async (params: ChangeExpiryLimitParams) => {
+  public changeExpiryLimit = async (params: ChangeExpiryLimitParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.assert(params.newExpiry.toNumber() >= 86400, ErrorCode.TooEarly, 'Expiry should >= 1 day');
     return (await this.contract).changeExpiryLimit.sendTransactionAsync(
@@ -1010,7 +1014,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Adds a new custom Security Token and saves it to the registry. (Token should follow the ISecurityToken interface)
    */
-  public modifySecurityToken = async (params: ModifySecurityTokenParams) => {
+  public modifySecurityToken = async (params: ModifySecurityTokenParams): Promise<PolyResponse> => {
     await this.checkModifyST(params.ticker, params.deployedAt, params.owner, params.securityToken);
     return (await this.contract).modifySecurityToken.sendTransactionAsync(
       params.name,
@@ -1036,7 +1040,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Allows the current owner to transfer control of the contract to a newOwner.
    */
-  public transferOwnership = async (params: TransferOwnershipParams) => {
+  public transferOwnership = async (params: TransferOwnershipParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.isNonZeroETHAddressHex('newOwner', params.newOwner);
     return (await this.contract).transferOwnership.sendTransactionAsync(
@@ -1049,7 +1053,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to pause, triggers stopped state
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is paused');
     await this.checkOnlyOwner();
     return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1058,7 +1062,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Called by the owner to unpause, returns to normal state
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.isPaused(), ErrorCode.PreconditionRequired, 'Contract is already not paused');
     await this.checkOnlyOwner();
     return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
@@ -1067,7 +1071,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
-  public changeTickerRegistrationFee = async (params: ChangeFeeParams) => {
+  public changeTickerRegistrationFee = async (params: ChangeFeeParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     const actualFee = await this.getTickerRegistrationFee();
     assert.assert(!actualFee.eq(params.newFee), ErrorCode.PreconditionRequired, 'Fee not changed');
@@ -1081,7 +1085,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Sets the ticker registration fee in POLY tokens. Only Polymath.
    */
-  public changeSecurityLaunchFee = async (params: ChangeFeeParams) => {
+  public changeSecurityLaunchFee = async (params: ChangeFeeParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     const actualFee = await this.getSecurityTokenLaunchFee();
     assert.assert(!actualFee.eq(params.newFee), ErrorCode.PreconditionRequired, 'Fee not changed');
@@ -1095,7 +1099,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Reclaims all ERC20Basic compatible tokens
    */
-  public reclaimERC20 = async (params: ReclaimERC20Params) => {
+  public reclaimERC20 = async (params: ReclaimERC20Params): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.isNonZeroETHAddressHex('tokenContract', params.tokenContract);
     return (await this.contract).reclaimERC20.sendTransactionAsync(
@@ -1108,7 +1112,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the protocol version and the SecurityToken contract
    */
-  public setProtocolFactory = async (params: SetProtocolFactoryParams) => {
+  public setProtocolFactory = async (params: SetProtocolFactoryParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.isValidVersion(params.version);
     assert.isNonZeroETHAddressHex('STFactoryAddress', params.STFactoryAddress);
@@ -1145,7 +1149,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
   /**
    * Changes the PolyToken address. Only Polymath.
    */
-  public updateFromRegistry = async (params: TxParams) => {
+  public updateFromRegistry = async (params: TxParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     return (await this.contract).updateFromRegistry.sendTransactionAsync(params.txData, params.safetyFactor);
   };
@@ -1187,7 +1191,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * Used only by Polymath to upgrade the SecurityToken contract and add more functionalities to future versions
    * Changing versions does not affect existing tokens.
    */
-  public setLatestVersion = async (params: PackageVersionParams) => {
+  public setLatestVersion = async (params: PackageVersionParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner();
     assert.isValidVersion(params.version);
     const splitVersion = params.version.split('.');
@@ -1208,13 +1212,15 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return the [usd & poly] fee for a particular feetype
    */
 
-  public getFees = async (params: GetFeesParams) => {
+  public getFees = async (params: GetFeesParams): Promise<BigNumber[]> => {
     const { feeType } = params;
     if (![FeeType.StLaunchFee, FeeType.TickerRegFee].includes(feeType)) {
       assert.assert(false, ErrorCode.InvalidData, 'Incorrect fee type');
     }
-    const feeTypeBytes32 = stringToBytes32(params.feeType);
-    return (await this.contract).getFees.callAsync(feeTypeBytes32);
+    const feeTypeKeccak256 = stringToKeccak256(params.feeType);
+    const fees = await (await this.contract).getFees.callAsync(feeTypeKeccak256);
+
+    return fees.map(fee => weiToValue(fee, FULL_DECIMALS));
   };
 
   /**
@@ -1238,11 +1244,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: SecurityTokenRegistrySubscribeAsyncParams = async <
-    ArgsType extends ISecurityTokenRegistryEventArgs
+    ArgsType extends ISecurityTokenRegistryEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -1261,11 +1267,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetISecurityTokenRegistryLogsAsyncParams = async <
-    ArgsType extends ISecurityTokenRegistryEventArgs
+    ArgsType extends ISecurityTokenRegistryEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ISecurityTokenRegistryEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -1276,7 +1282,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private getTickerDetailsInternal = async (ticker: string) => {
+  public getTickerDetailsInternal = async (ticker: string) => {
     const result = await (await this.contract).getTickerDetails.callAsync(ticker);
     const typedResult: TickerDetails = {
       owner: result[0],
@@ -1288,7 +1294,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     return typedResult;
   };
 
-  private checkWhenNotPausedOrOwner = async () => {
+  public checkWhenNotPausedOrOwner = async () => {
     if (
       !functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -1303,7 +1309,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     }
   };
 
-  private checkOnlyOwner = async () => {
+  public checkOnlyOwner = async () => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -1314,7 +1320,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkRegisterTickerRequirements = async (ticker: string, owner: string) => {
+  public checkRegisterTickerRequirements = async (ticker: string, owner: string) => {
     assert.isETHAddressHex('owner', owner);
     assert.assert(
       ticker.length > 0 && ticker.length <= 10,
@@ -1341,7 +1347,7 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
     }
   };
 
-  private checkModifyST = async (ticker: string, deployedAt: Date, owner: string, securityToken: string) => {
+  public checkModifyST = async (ticker: string, deployedAt: Date, owner: string, securityToken: string) => {
     await this.checkOnlyOwner();
     assert.assert(ticker.length > 0 && ticker.length <= 10, ErrorCode.InvalidData, 'Bad ticker');
     assert.assert(deployedAt.getTime() > new Date(0).getTime(), ErrorCode.TooEarly, 'Bad deployed date');

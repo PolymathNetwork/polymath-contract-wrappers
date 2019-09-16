@@ -1,14 +1,15 @@
 import {
   BigNumber,
   LogWithDecodedArgs,
-  ModuleFactoryChangeSTVersionBoundEventArgs,
-  ModuleFactoryContract,
-  ModuleFactoryEventArgs,
-  ModuleFactoryEvents,
-  ModuleFactoryGenerateModuleFromFactoryEventArgs,
-  ModuleFactoryOwnershipTransferredEventArgs,
+  ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0,
+  ModuleFactoryContract_3_0_0,
+  ModuleFactoryEventArgs_3_0_0,
+  ModuleFactoryEvents_3_0_0,
+  ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0,
+  ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
   TxData,
   Web3Wrapper,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import semver from 'semver';
 import { schemas } from '@0x/json-schemas';
@@ -25,6 +26,7 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import {
   bytes32ArrayToStringArray,
@@ -37,30 +39,30 @@ import {
 import functionsUtils from '../../utils/functions_utils';
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipTransferred;
-  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs>;
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.OwnershipTransferred;
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
 }
 
 interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.GenerateModuleFromFactory;
-  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs>;
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
+  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>;
 }
 
 interface GetGenerateModuleFromFactoryLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.GenerateModuleFromFactory;
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
 }
 
 interface ChangeSTVersionBoundSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeSTVersionBound;
-  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs>;
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
+  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>;
 }
 
 interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents.ChangeSTVersionBound;
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
 }
 
 interface ModuleFactorySubscribeAsyncParams extends Subscribe {
@@ -68,13 +70,13 @@ interface ModuleFactorySubscribeAsyncParams extends Subscribe {
   (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
   (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>[]
   >;
   (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs>[]
+    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>[]
   >;
   (params: GetChangeSTVersionBoundLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs>[]
+    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>[]
   >;
 }
 
@@ -133,14 +135,16 @@ interface ChangeSTVersionBoundsParams extends TxParams {
  * This class includes the functionality related to interacting with the ModuleFactory contract.
  */
 export default class ModuleFactoryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleFactoryContract>;
+  public contract: Promise<ModuleFactoryContract_3_0_0>;
+
+  public contractVersion = ContractVersion.V3_0_0;
 
   /**
    * Instantiate ModuleFactoryWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
-  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleFactoryContract>) {
+  public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleFactoryContract_3_0_0>) {
     super(web3Wrapper, contract);
     this.contract = contract;
   }
@@ -215,7 +219,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the setupCost
    */
-  public changeSetupCost = async (params: ChangeSetupCostParams) => {
+  public changeSetupCost = async (params: ChangeSetupCostParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeSetupCost.sendTransactionAsync(
       params.setupCost,
@@ -227,7 +231,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the cost and type
    */
-  public changeCostAndType = async (params: ChangeCostAndTypeParams) => {
+  public changeCostAndType = async (params: ChangeCostAndTypeParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     return (await this.contract).changeCostAndType.sendTransactionAsync(
       params.setupCost,
@@ -240,7 +244,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the title
    */
-  public changeTitle = async (params: ChangeTitleParams) => {
+  public changeTitle = async (params: ChangeTitleParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.title.length > 0, ErrorCode.InvalidData, 'Invalid title');
     return (await this.contract).changeTitle.sendTransactionAsync(params.title, params.txData, params.safetyFactor);
@@ -249,7 +253,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the description
    */
-  public changeDescription = async (params: ChangeDescriptionParams) => {
+  public changeDescription = async (params: ChangeDescriptionParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.description.length > 0, ErrorCode.InvalidData, 'Invalid description');
     return (await this.contract).changeDescription.sendTransactionAsync(
@@ -262,7 +266,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the name
    */
-  public changeName = async (params: ChangeNameParams) => {
+  public changeName = async (params: ChangeNameParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.name.length > 0, ErrorCode.InvalidData, 'Invalid name');
     return (await this.contract).changeName.sendTransactionAsync(
@@ -275,7 +279,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the tags
    */
-  public changeTags = async (params: ChangeTagsParams) => {
+  public changeTags = async (params: ChangeTagsParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(params.tags.length > 0, ErrorCode.InvalidData, 'Invalid, must provide one or more tags');
     return (await this.contract).changeTags.sendTransactionAsync(
@@ -288,7 +292,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
   /**
    * Change the ST VersionBounds
    */
-  public changeSTVersionBounds = async (params: ChangeSTVersionBoundsParams) => {
+  public changeSTVersionBounds = async (params: ChangeSTVersionBoundsParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     assert.assert(
       params.boundType === BoundType.LowerBound || params.boundType === BoundType.UpperBound,
@@ -365,10 +369,10 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: Subscribe = async <ArgsType extends ModuleFactoryEventArgs>(
+  public subscribeAsync: Subscribe = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -386,10 +390,10 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetLogs = async <ArgsType extends ModuleFactoryEventArgs>(
+  public getLogsAsync: GetLogs = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -400,7 +404,7 @@ export default class ModuleFactoryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
+  public checkOnlyOwner = async (txData: Partial<TxData> | undefined) => {
     assert.assert(
       functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(txData)),
       ErrorCode.Unauthorized,

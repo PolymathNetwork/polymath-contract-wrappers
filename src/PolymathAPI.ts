@@ -4,30 +4,35 @@ import {
   BigNumber,
   providerUtils,
   Provider,
-  BlacklistTransferManagerContract,
-  CappedSTOContract,
-  CountTransferManagerContract,
-  ERC20DetailedContract,
-  ERC20DividendCheckpointContract,
-  EtherDividendCheckpointContract,
-  FeatureRegistryContract,
-  GeneralPermissionManagerContract,
-  GeneralTransferManagerContract,
-  ISecurityTokenContract,
-  ISecurityTokenRegistryContract,
-  LockUpTransferManagerContract,
-  ManualApprovalTransferManagerContract,
-  ModuleContract,
-  ModuleFactoryContract,
-  ModuleRegistryContract,
-  PercentageTransferManagerContract,
-  PolymathRegistryContract,
-  PolyTokenContract,
-  PolyTokenFaucetContract,
-  USDTieredSTOContract,
-  VolumeRestrictionTMContract,
-  RestrictedPartialSaleTMContract,
-  VestingEscrowWalletContract
+  BlacklistTransferManagerContract_3_0_0,
+  CappedSTOContract_3_0_0,
+  CountTransferManagerContract_3_0_0,
+  ERC20DetailedContract_3_0_0,
+  ERC20DividendCheckpointContract_3_0_0,
+  EtherDividendCheckpointContract_3_0_0,
+  FeatureRegistryContract_3_0_0,
+  GeneralPermissionManagerContract_3_0_0,
+  GeneralTransferManagerContract_3_0_0,
+  ISecurityTokenContract_3_0_0,
+  ISecurityTokenRegistryContract_3_0_0,
+  LockUpTransferManagerContract_3_0_0,
+  ManualApprovalTransferManagerContract_3_0_0,
+  ModuleContract_3_0_0,
+  ModuleFactoryContract_3_0_0,
+  ModuleRegistryContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,
+  PolymathRegistryContract_3_0_0,
+  PolyTokenContract_3_0_0,
+  PolyTokenFaucetContract_3_0_0,
+  USDTieredSTOContract_3_0_0,
+  VolumeRestrictionTMContract_3_0_0,
+  VestingEscrowWalletContract_3_0_0,
+  USDTieredSTOContract_3_1_0,
+  CappedSTOContract_3_1_0,
+  GeneralPermissionManagerContract_3_1_0,
+  GeneralTransferManagerContract_3_1_0,
+  RestrictedPartialSaleTMContract_3_1_0,
+  VestingEscrowWalletContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -119,11 +124,11 @@ export class PolymathAPI {
    * An instance of the PolyTokenFaucetWrapper class containing methods
    * for interacting with PolyTokenFaucet smart contract.
    */
-  private polyTokenFaucet: PolyTokenFaucetWrapper;
+  public polyTokenFaucet: PolyTokenFaucetWrapper;
 
-  private readonly web3Wrapper: Web3Wrapper;
+  public readonly web3Wrapper: Web3Wrapper;
 
-  private contractFactory: ContractFactory;
+  public contractFactory: ContractFactory;
 
   /**
    * Instantiates a new PolymathAPI instance.
@@ -140,43 +145,51 @@ export class PolymathAPI {
     });
 
     const abiArray = [
+      /* 3.0.0 */
       // Registries
-      FeatureRegistryContract.ABI(),
-      ModuleRegistryContract.ABI(),
-      PolymathRegistryContract.ABI(),
-      ISecurityTokenRegistryContract.ABI(),
+      FeatureRegistryContract_3_0_0.ABI(),
+      ModuleRegistryContract_3_0_0.ABI(),
+      PolymathRegistryContract_3_0_0.ABI(),
+      ISecurityTokenRegistryContract_3_0_0.ABI(),
       // Modules
-      ModuleFactoryContract.ABI(),
-      ModuleContract.ABI(),
+      ModuleFactoryContract_3_0_0.ABI(),
+      ModuleContract_3_0_0.ABI(),
       // Checkpoint
-      ERC20DividendCheckpointContract.ABI(),
-      EtherDividendCheckpointContract.ABI(),
+      ERC20DividendCheckpointContract_3_0_0.ABI(),
+      EtherDividendCheckpointContract_3_0_0.ABI(),
       // Permission
-      GeneralPermissionManagerContract.ABI(),
+      GeneralPermissionManagerContract_3_0_0.ABI(),
       // STO
-      CappedSTOContract.ABI(),
-      USDTieredSTOContract.ABI(),
+      CappedSTOContract_3_0_0.ABI(),
+      USDTieredSTOContract_3_0_0.ABI(),
       // Transfer
-      CountTransferManagerContract.ABI(),
-      GeneralTransferManagerContract.ABI(),
-      ManualApprovalTransferManagerContract.ABI(),
-      PercentageTransferManagerContract.ABI(),
-      LockUpTransferManagerContract.ABI(),
-      BlacklistTransferManagerContract.ABI(),
-      VolumeRestrictionTMContract.ABI(),
-      RestrictedPartialSaleTMContract.ABI(),
+      CountTransferManagerContract_3_0_0.ABI(),
+      GeneralTransferManagerContract_3_0_0.ABI(),
+      ManualApprovalTransferManagerContract_3_0_0.ABI(),
+      PercentageTransferManagerContract_3_0_0.ABI(),
+      LockUpTransferManagerContract_3_0_0.ABI(),
+      BlacklistTransferManagerContract_3_0_0.ABI(),
+      VolumeRestrictionTMContract_3_0_0.ABI(),
       // Tokens
-      ERC20DetailedContract.ABI(),
-      PolyTokenContract.ABI(),
-      PolyTokenFaucetContract.ABI(),
-      ISecurityTokenContract.ABI(),
+      ERC20DetailedContract_3_0_0.ABI(),
+      PolyTokenContract_3_0_0.ABI(),
+      PolyTokenFaucetContract_3_0_0.ABI(),
+      ISecurityTokenContract_3_0_0.ABI(),
       // Wallet
-      VestingEscrowWalletContract.ABI(),
-    ];
+      VestingEscrowWalletContract_3_0_0.ABI(),
 
-    abiArray.forEach((abi): void => {
-      this.web3Wrapper.abiDecoder.addABI(abi);
-    });
+      /* 3.1.0 */
+      // Permission
+      GeneralPermissionManagerContract_3_1_0.ABI(),
+      // STO
+      CappedSTOContract_3_1_0.ABI(),
+      USDTieredSTOContract_3_1_0.ABI(),
+      // Transfer
+      GeneralTransferManagerContract_3_1_0.ABI(),
+      RestrictedPartialSaleTMContract_3_1_0.ABI(),
+      // Wallet
+      VestingEscrowWalletContract_3_1_0.ABI(),
+    ];
 
     this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 

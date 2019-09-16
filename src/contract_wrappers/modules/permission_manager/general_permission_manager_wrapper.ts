@@ -1,11 +1,12 @@
 import {
-  GeneralPermissionManagerContract,
-  GeneralPermissionManagerEventArgs,
-  GeneralPermissionManagerEvents,
-  GeneralPermissionManagerChangePermissionEventArgs,
-  GeneralPermissionManagerAddDelegateEventArgs,
+  GeneralPermissionManagerContract_3_0_0,
+  GeneralPermissionManagerEventArgs_3_0_0,
+  GeneralPermissionManagerEvents_3_0_0,
+  GeneralPermissionManagerChangePermissionEventArgs_3_0_0,
+  GeneralPermissionManagerAddDelegateEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import { schemas } from '@0x/json-schemas';
@@ -30,21 +31,21 @@ import {
 } from '../../../utils/convert';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents.ChangePermission;
-  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs>;
+  eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
+  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>;
 }
 
 interface GetChangePermissionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents.ChangePermission;
+  eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
 }
 
 interface AddDelegateSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents.AddDelegate;
-  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs>;
+  eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate;
+  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>;
 }
 
 interface GetAddDelegateLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents.AddDelegate;
+  eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate;
 }
 
 interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
@@ -54,9 +55,9 @@ interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
   (params: GetChangePermissionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs>[]
+    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>[]
   >;
-  (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs>[]>;
+  (params: GetAddDelegateLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>[]>;
 }
 
 export namespace GeneralPermissionManagerTransactionParams {
@@ -164,7 +165,7 @@ interface PermissionsPerModule {
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
 export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<GeneralPermissionManagerContract>;
+  public contract: Promise<GeneralPermissionManagerContract_3_0_0>;
 
   /**
    * Instantiate GeneralPermissionManagerWrapper
@@ -173,7 +174,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<GeneralPermissionManagerContract>,
+    contract: Promise<GeneralPermissionManagerContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -183,7 +184,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Mapping used to hold the permissions on the modules provided to delegate
    */
-  public perms = async (params: PermParams) => {
+  public perms = async (params: PermParams): Promise<boolean> => {
     assert.isETHAddressHex('module', params.module);
     assert.isETHAddressHex('delegate', params.delegate);
     return (await this.contract).perms.callAsync(params.module, params.delegate, stringToBytes32(params.permission));
@@ -221,7 +222,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to add a delegate
    */
-  public addDelegate = async (params: AddDelegateParams) => {
+  public addDelegate = async (params: AddDelegateParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -245,7 +246,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete a delegate
    */
-  public deleteDelegate = async (params: DelegateTxParams) => {
+  public deleteDelegate = async (params: DelegateTxParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -276,7 +277,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to provide/change the permission to the delegate corresponds to the module contract
    */
-  public changePermission = async (params: ChangePermissionParams) => {
+  public changePermission = async (params: ChangePermissionParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -297,7 +298,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
   /**
    * Used to change one or more permissions for a single delegate at once
    */
-  public changePermissionMulti = async (params: ChangePermissionMultiParams) => {
+  public changePermissionMulti = async (params: ChangePermissionMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -364,7 +365,7 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * Used to get all delegates
    * @return delegate addresses array
    */
-  public getAllDelegates = async () => {
+  public getAllDelegates = async (): Promise<string[]> => {
     return (await this.contract).getAllDelegates.callAsync();
   };
 
@@ -373,11 +374,11 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: GeneralPermissionManagerSubscribeAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs
+    ArgsType extends GeneralPermissionManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -396,11 +397,11 @@ export default class GeneralPermissionManagerWrapper extends ModuleWrapper {
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetGeneralPermissionManagerLogsAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs
+    ArgsType extends GeneralPermissionManagerEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,

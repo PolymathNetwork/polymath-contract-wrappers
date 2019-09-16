@@ -1,13 +1,13 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import {
-  RestrictedPartialSaleTMEvents,
-  SecurityTokenRegistryEvents,
-  PolyTokenEvents,
+  RestrictedPartialSaleTMEvents_3_1_0,
+  ISecurityTokenRegistryEvents_3_0_0,
+  PolyTokenEvents_3_0_0,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName, ModuleType, TransactionParams } from '../src';
+import { ModuleName, ModuleType } from '../src';
 import { registerTicker } from './registerTicker';
 import { launchToken } from './launchToken';
 import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';
@@ -73,7 +73,7 @@ window.addEventListener('load', async () => {
   ];
 
   // Add all address in the whitelist including myAddress
-  const kycInvestorMultiData: TransactionParams.GeneralTransferManager.ModifyKYCDataMulti = {
+  const kycInvestorMultiData = {
     investors: randomBeneficiaries.concat(myAddress),
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
@@ -85,7 +85,7 @@ window.addEventListener('load', async () => {
   await addInvestorsToWhitelist(polymathAPI, myTicker, kycInvestorMultiData);
 
   // Issue tokens to the investors
-  const issueMultiParams: TransactionParams.SecurityToken.IssueMulti = {
+  const issueMultiParams = {
     investors: [myAddress],
     values: [new BigNumber(1000)],
   };

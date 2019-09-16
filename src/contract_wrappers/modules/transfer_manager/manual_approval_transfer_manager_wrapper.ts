@@ -1,20 +1,21 @@
 import {
-  ManualApprovalTransferManagerContract,
-  ManualApprovalTransferManagerEventArgs,
-  ManualApprovalTransferManagerEvents,
-  ManualApprovalTransferManagerAddManualApprovalEventArgs,
-  ManualApprovalTransferManagerModifyManualApprovalEventArgs,
-  ManualApprovalTransferManagerRevokeManualApprovalEventArgs,
-  ManualApprovalTransferManagerPauseEventArgs,
-  ManualApprovalTransferManagerUnpauseEventArgs,
+  ManualApprovalTransferManagerContract_3_0_0,
+  ManualApprovalTransferManagerEventArgs_3_0_0,
+  ManualApprovalTransferManagerEvents_3_0_0,
+  ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerPauseEventArgs_3_0_0,
+  ManualApprovalTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import Contract_3_0_0Factory from '../../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -24,6 +25,7 @@ import {
   GetLogs,
   Perm,
   ErrorCode,
+  TransferResult
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -40,48 +42,48 @@ import {
 } from '../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.AddManualApproval;
-  callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs>;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>;
 }
 
 interface GetAddManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.AddManualApproval;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
 }
 
 interface ModifyManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.ModifyManualApproval;
-  callback: EventCallback<ManualApprovalTransferManagerModifyManualApprovalEventArgs>;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>;
 }
 
 interface GetModifyManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.ModifyManualApproval;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
 }
 
 interface RevokeManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.RevokeManualApproval;
-  callback: EventCallback<ManualApprovalTransferManagerRevokeManualApprovalEventArgs>;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>;
 }
 
 interface GetRevokeManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.RevokeManualApproval;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.Pause;
-  callback: EventCallback<ManualApprovalTransferManagerPauseEventArgs>;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<ManualApprovalTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.Pause;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.Unpause;
-  callback: EventCallback<ManualApprovalTransferManagerUnpauseEventArgs>;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ManualApprovalTransferManagerEvents.Unpause;
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface ManualApprovalTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -94,16 +96,16 @@ interface ManualApprovalTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetAddManualApprovalLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ManualApprovalTransferManagerAddManualApprovalEventArgs>[]
+    LogWithDecodedArgs<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>[]
   >;
   (params: GetModifyManualApprovalLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ManualApprovalTransferManagerModifyManualApprovalEventArgs>[]
+    LogWithDecodedArgs<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>[]
   >;
   (params: GetRevokeManualApprovalLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs>[]
+    LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace ManualApprovalTransferManagerTransactionParams {
@@ -249,13 +251,22 @@ interface Approval {
   /**  */
   description: string;
 }
+
+/**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
+}
 // // End of return types ////
 
 /**
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
 export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<ManualApprovalTransferManagerContract>;
+  public contract: Promise<ManualApprovalTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate ManualApprovalTransferManagerWrapper
@@ -264,8 +275,8 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<ManualApprovalTransferManagerContract>,
-    contractFactory: ContractFactory,
+    contract: Promise<ManualApprovalTransferManagerContract_3_0_0>,
+    contractFactory: Contract_3_0_0Factory,
   ) {
     super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
@@ -274,7 +285,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -287,14 +298,14 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    *  Check if the module is paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -309,7 +320,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
    * it is never looped through in an on chain call. It is defined as an Array instead of mapping
    * just to make it easier for users to fetch list of all approvals through constant functions.
    */
-  public approvals = async (params: ApprovalsParams) => {
+  public approvals = async (params: ApprovalsParams): Promise<Approval> => {
     const result = await (await this.contract).approvals.callAsync(numberToBigNumber(params.index));
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
     const typedResult: Approval = {
@@ -323,17 +334,10 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   };
 
   /**
-   * This function returns the signature of configure function
-   */
-  public getInitFunction = async (): Promise<string> => {
-    return (await this.contract).getInitFunction.callAsync();
-  };
-
-  /**
    * Used to verify the transfer transaction (View)
    *  @return boolean transfer result, address
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -353,7 +357,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Adds a pair of addresses to manual approvals
    */
-  public addManualApproval = async (params: AddManualApprovalParams) => {
+  public addManualApproval = async (params: AddManualApprovalParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -379,7 +383,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Adds multiple manual approvals in batch
    */
-  public addManualApprovalMulti = async (params: AddManualApprovalMultiParams) => {
+  public addManualApprovalMulti = async (params: AddManualApprovalMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -419,7 +423,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Modify the existing manual approvals
    */
-  public modifyManualApproval = async (params: ModifyManualApprovalParams) => {
+  public modifyManualApproval = async (params: ModifyManualApprovalParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -445,7 +449,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Adds multiple manual approvals in batch
    */
-  public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams) => {
+  public modifyManualApprovalMulti = async (params: ModifyManualApprovalMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -483,7 +487,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Removes pairs of addresses from manual approvals
    */
-  public revokeManualApproval = async (params: RevokeManualApprovalParams) => {
+  public revokeManualApproval = async (params: RevokeManualApprovalParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -503,7 +507,7 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
   /**
    * Removes multiple pairs of addresses from manual approvals
    */
-  public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams) => {
+  public revokeManualApprovalMulti = async (params: RevokeManualApprovalMultiParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -605,16 +609,16 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: ManualApprovalTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends ManualApprovalTransferManagerEventArgs
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
     const subscriptionToken = await this.subscribeInternal<ArgsType>(
-      normalizedContractAddress,
+      normalizedContract_3_0_0Address,
       params.eventName,
       params.indexFilterValues,
       params.callback,
@@ -628,14 +632,14 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
    * @return Array of logs that match the parameters
    */
   public getLogsAsync: GetManualApprovalTransferManagerLogsAsyncParams = async <
-    ArgsType extends ManualApprovalTransferManagerEventArgs
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
   >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
+      normalizedContract_3_0_0Address,
       params.eventName,
       params.blockRange,
       params.indexFilterValues,
@@ -643,13 +647,13 @@ export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper 
     return logs;
   };
 
-  private checkApprovalDoesNotExist = async (from: string, to: string) => {
+  public checkApprovalDoesNotExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
     assert.isBigNumberZero(approval.allowance, 'Approval already exists with allowance');
     assert.isPastDate(approval.expiryTime, 'Approval already exists with valid future expiry date');
   };
 
-  private checkApprovalDoesExist = async (from: string, to: string) => {
+  public checkApprovalDoesExist = async (from: string, to: string) => {
     const approval = await this.getApprovalDetails({ from, to });
     assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
     assert.isFutureDate(approval.expiryTime, 'Approval does not exist');

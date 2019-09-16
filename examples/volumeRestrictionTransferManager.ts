@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { VolumeRestrictionTMEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { VolumeRestrictionTMEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
@@ -142,7 +142,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of add individual daily restriction
   await vrtm.subscribeAsync({
-    eventName: VolumeRestrictionTMEvents.AddIndividualRestriction,
+    eventName: VolumeRestrictionTMEvents_3_0_0.AddIndividualRestriction,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -294,7 +294,7 @@ window.addEventListener('load', async () => {
   // Add some exemptions
   // Subscribe to event change exempt wallet list
   await vrtm.subscribeAsync({
-    eventName: VolumeRestrictionTMEvents.ChangedExemptWalletList,
+    eventName: VolumeRestrictionTMEvents_3_0_0.ChangedExemptWalletList,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

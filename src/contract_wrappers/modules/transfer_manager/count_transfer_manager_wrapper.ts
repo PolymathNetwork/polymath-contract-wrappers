@@ -1,13 +1,14 @@
 import {
-  CountTransferManagerContract,
-  CountTransferManagerEventArgs,
-  CountTransferManagerEvents,
-  CountTransferManagerModifyHolderCountEventArgs,
-  CountTransferManagerPauseEventArgs,
-  CountTransferManagerUnpauseEventArgs,
+  CountTransferManagerContract_3_0_0,
+  CountTransferManagerEventArgs_3_0_0,
+  CountTransferManagerEvents_3_0_0,
+  CountTransferManagerModifyHolderCountEventArgs_3_0_0,
+  CountTransferManagerPauseEventArgs_3_0_0,
+  CountTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
@@ -22,34 +23,35 @@ import {
   GetLogs,
   Perm,
   ErrorCode,
+  TransferResult,
 } from '../../../types';
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.ModifyHolderCount;
-  callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
+  callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs_3_0_0>;
 }
 
 interface GetModifyHolderCountLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.ModifyHolderCount;
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
 }
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.Pause;
-  callback: EventCallback<CountTransferManagerPauseEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<CountTransferManagerPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.Pause;
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: CountTransferManagerEvents.Unpause;
-  callback: EventCallback<CountTransferManagerUnpauseEventArgs>;
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<CountTransferManagerUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: CountTransferManagerEvents.Unpause;
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
 }
 
 interface CountTransferManagerSubscribeAsyncParams extends Subscribe {
@@ -60,10 +62,10 @@ interface CountTransferManagerSubscribeAsyncParams extends Subscribe {
 
 interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
   (params: GetModifyHolderCountLogsAsyncParams): Promise<
-    LogWithDecodedArgs<CountTransferManagerModifyHolderCountEventArgs>[]
+    LogWithDecodedArgs<CountTransferManagerModifyHolderCountEventArgs_3_0_0>[]
   >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 export namespace CountTransferManagerTransactionParams {
@@ -91,10 +93,19 @@ interface ChangeHolderCountParams extends TxParams {
 }
 
 /**
+ * @param transferResult
+ * @param address
+ */
+interface VerifyTransfer {
+  transferResult: TransferResult;
+  address: string;
+}
+
+/**
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
 export default class CountTransferManagerWrapper extends ModuleWrapper {
-  protected contract: Promise<CountTransferManagerContract>;
+  public contract: Promise<CountTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate CountTransferManagerWrapper
@@ -104,7 +115,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<CountTransferManagerContract>,
+    contract: Promise<CountTransferManagerContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract, contractFactory);
@@ -114,7 +125,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Unpause the module
    */
-  public unpause = async (params: TxParams) => {
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -127,14 +138,14 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    *  Check if module paused
    */
-  public paused = async () => {
+  public paused = async (): Promise<boolean> => {
     return (await this.contract).paused.callAsync();
   };
 
   /**
    *  Pause the module
    */
-  public pause = async (params: TxParams) => {
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
     assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
     assert.assert(
       await this.isCallerTheSecurityTokenOwner(params.txData),
@@ -155,7 +166,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Used to verify the transfer transaction and prevent a transfer if it passes the allowed amount of token holders
    * @return boolean transfer result, address
    */
-  public verifyTransfer = async (params: VerifyTransferParams) => {
+  public verifyTransfer = async (params: VerifyTransferParams): Promise<VerifyTransfer> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
     const decimals = await (await this.securityTokenContract()).decimals.callAsync();
@@ -175,7 +186,7 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
   /**
    * Sets the cap for the amount of token holders there can be
    */
-  public changeHolderCount = async (params: ChangeHolderCountParams) => {
+  public changeHolderCount = async (params: ChangeHolderCountParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -193,11 +204,11 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * @return Subscription token used later to unsubscribe
    */
   public subscribeAsync: CountTransferManagerSubscribeAsyncParams = async <
-    ArgsType extends CountTransferManagerEventArgs
+    ArgsType extends CountTransferManagerEventArgs_3_0_0
   >(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -215,10 +226,10 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <ArgsType extends CountTransferManagerEventArgs>(
+  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <ArgsType extends CountTransferManagerEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
