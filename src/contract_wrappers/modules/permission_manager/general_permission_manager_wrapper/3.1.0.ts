@@ -191,7 +191,7 @@ export class GeneralPermissionManager_3_1_0 extends GeneralPermissionManagerComm
     }
     await Promise.all(resultCheckDelegate);
     return (await this.contract).deleteDelegateMulti.sendTransactionAsync(
-      stringArrayToBytes32Array(params.delegates),
+      params.delegates,
       params.txData,
       params.safetyFactor,
     );

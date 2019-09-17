@@ -47,6 +47,151 @@ describe('GeneralPermissionManagerWrapper', () => {
     reset(mockedContractFactory);
   });
 
+  describe('addDelegateMulti', () => {
+    test('should send the transaction to addDelegateMulti', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked parameters
+      const mockedParams = {
+        delegates: ['0x1111111111111111111111111111111111111111'],
+        details: ['details'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.addDelegateMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.delegates,
+          objectContaining(stringArrayToBytes32Array(mockedParams.details)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // checkDelegate
+      const expectedDelegateResult = false;
+      // Mocked method
+      const mockedDelegateMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.checkDelegate).thenReturn(instance(mockedDelegateMethod));
+      // Stub the request
+      when(mockedDelegateMethod.callAsync(mockedParams.delegates[0])).thenResolve(expectedDelegateResult);
+
+      // Real call
+      const result = await target.addDelegateMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.addDelegateMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.delegates,
+          objectContaining(stringArrayToBytes32Array(mockedParams.details)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.checkDelegate).once();
+      verify(mockedDelegateMethod.callAsync(mockedParams.delegates[0])).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
+  describe('deleteDelegateMulti', () => {
+    test('should send the transaction to deleteDelegateMulti', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Mocked parameters
+      const mockedParams = {
+        delegates: ['0x1111111111111111111111111111111111111111'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.deleteDelegateMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(mockedParams.delegates, mockedParams.txData, mockedParams.safetyFactor),
+      ).thenResolve(expectedResult);
+
+      // checkDelegate
+      const expectedDelegateResult = true;
+      // Mocked method
+      const mockedDelegateMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.checkDelegate).thenReturn(instance(mockedDelegateMethod));
+      // Stub the request
+      when(mockedDelegateMethod.callAsync(mockedParams.delegates[0])).thenResolve(expectedDelegateResult);
+
+      // Real call
+      const result = await target.deleteDelegateMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.deleteDelegateMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(mockedParams.delegates, mockedParams.txData, mockedParams.safetyFactor),
+      ).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedContract.checkDelegate).once();
+      verify(mockedDelegateMethod.callAsync(mockedParams.delegates[0])).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+    });
+  });
+
   describe('SubscribeAsync', () => {
     test('should throw as eventName does not belong to GeneralPermissionManagerEvents', async () => {
       // Mocked parameters
