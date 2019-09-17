@@ -1,14 +1,14 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { ERC20DetailedContract_3_0_0, ISecurityTokenRegistryEvents_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
-import ERC20TokenWrapper from '../erc20_wrapper';
-import AlternativeERC20TokenWrapper from '../alternative_erc20_wrapper';
-import { MockedCallMethod } from '../../../test_utils/mocked_methods';
-import { bytes32ToString, stringToBytes32 } from '../../../utils/convert';
+import { ERC20DetailedContract_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import ERC20TokenWrapper from '../../erc20_wrapper';
+import { AlternativeERC20_3_0_0 } from '../3.0.0';
+import { MockedCallMethod } from '../../../../test_utils/mocked_methods';
+import { bytes32ToString, stringToBytes32 } from '../../../../utils/convert';
 
 describe('AlternativeERC20TokenWrapper', () => {
   // Declare ERC20DetailedTokenWrapper object
-  let target: AlternativeERC20TokenWrapper;
+  let target: AlternativeERC20_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ERC20DetailedContract_3_0_0;
 
@@ -17,7 +17,7 @@ describe('AlternativeERC20TokenWrapper', () => {
     mockedContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new AlternativeERC20TokenWrapper(instance(mockedWrapper), myContractPromise);
+    target = new AlternativeERC20_3_0_0(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
@@ -95,23 +95,6 @@ describe('AlternativeERC20TokenWrapper', () => {
       verify(mockedContract.totalSupply).once();
       verify(mockedContract.symbol).once();
       verify(mockedContract.name).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'Transfer', 'Approval', encountered: ChangeExpiryLimit`),
-      );
     });
   });
 });
