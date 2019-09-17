@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { BigNumber, ModuleRegistryEvents, PercentageTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, ModuleRegistryEvents_3_0_0, PercentageTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
@@ -83,7 +83,7 @@ window.addEventListener('load', async () => {
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   await polymathAPI.moduleRegistry.subscribeAsync({
-    eventName: ModuleRegistryEvents.ModuleRegistered,
+    eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -134,7 +134,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of setAllowPrimaryIssuance
   await percentageTM.subscribeAsync({
-    eventName: PercentageTransferManagerEvents.SetAllowPrimaryIssuance,
+    eventName: PercentageTransferManagerEvents_3_0_0.SetAllowPrimaryIssuance,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

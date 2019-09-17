@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { GeneralPermissionManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { GeneralPermissionManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType, Perm, TransferType } from '../src';
@@ -109,7 +109,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of add delegate
   await generalPM.subscribeAsync({
-    eventName: GeneralPermissionManagerEvents.AddDelegate,
+    eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

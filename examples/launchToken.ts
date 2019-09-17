@@ -1,5 +1,5 @@
 import { PolymathAPI } from '../src';
-import { PolyTokenEvents, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenEvents_3_0_0, ISecurityTokenRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
 /**
  * Generates a new security token. Requires that a ticker has been registered previously.
@@ -22,7 +22,7 @@ export const launchToken = async (
 ) => {
   // Subscribe to events
   await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
+    eventName: PolyTokenEvents_3_0_0.Approval,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -33,7 +33,7 @@ export const launchToken = async (
     },
   });
   await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+    eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

@@ -5,9 +5,8 @@ import {
   PolyTokenEvents_3_0_0,
   BigNumber,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName, ModuleType } from '../src';
+import { ModuleName } from '../src';
 import { registerTicker } from './registerTicker';
 import { launchToken } from './launchToken';
 import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';

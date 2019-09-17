@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { CountTransferManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { CountTransferManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { bytes32ToString } from '../src/utils/convert';
@@ -156,7 +156,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of modify holder count
   await countTM.subscribeAsync({
-    eventName: CountTransferManagerEvents.ModifyHolderCount,
+    eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

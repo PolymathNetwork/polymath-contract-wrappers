@@ -2,7 +2,6 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { VolumeRestrictionTMEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { bytes32ToString } from '../src/utils/convert';
 import { ModuleName, ModuleType, RestrictionType } from '../src';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)

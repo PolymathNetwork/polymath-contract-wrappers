@@ -1,6 +1,6 @@
-import { PolymathAPI, TransactionParams, ModuleName } from '../src';
+import {PolymathAPI, ModuleName, TransactionParams} from '../src';
 import { moduleInstancesLookup } from './modules';
-import { GeneralTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { GeneralTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
 /**
  * Adds investors to a security token's whitelist. Requires that a valid security token has been generated previously.
@@ -21,7 +21,7 @@ export const addInvestorsToWhitelist = async (
 
   // Subscribe to event
   await generalTM.subscribeAsync({
-    eventName: GeneralTransferManagerEvents.ModifyKYCData,
+    eventName: GeneralTransferManagerEvents_3_0_0.ModifyKYCData,
     indexFilterValues: {},
     callback: async (error: any, log: any) => {
       if (error) {
