@@ -6,21 +6,16 @@ import {
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../../module_wrapper';
 import { GeneralPermissionManager_3_1_0 } from '../3.1.0';
 import ContractFactory from '../../../../../factories/contractFactory';
-import {
-  stringToBytes32,
-  stringArrayToBytes32Array,
-  bytes32ArrayToStringArray,
-  numberToBigNumber,
-} from '../../../../../utils/convert';
+import { stringArrayToBytes32Array } from '../../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
-import { Perm } from '../../../../../types';
 
 describe('GeneralPermissionManagerWrapper', () => {
+  class FakeGeneralPermissionManager_3_1_0 extends GeneralPermissionManager_3_1_0 {}
+
   // Declare GeneralPermissionManagerWrapper object
-  let target: GeneralPermissionManager_3_1_0;
+  let target: FakeGeneralPermissionManager_3_1_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract_3_1_0;
   let mockedContractFactory: ContractFactory;
@@ -33,7 +28,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new GeneralPermissionManager_3_1_0(
+    target = new FakeGeneralPermissionManager_3_1_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
