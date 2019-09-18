@@ -5,7 +5,7 @@ import {
 } from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
-import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import { PercentageTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
@@ -86,7 +86,7 @@ interface GetModuleInstance {
   (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
-  (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
+  (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
@@ -161,7 +161,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.PercentageTransferManager:
-        moduleWrapper = new PercentageTransferManagerWrapper(
+        moduleWrapper = new PercentageTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
