@@ -7,15 +7,14 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { GeneralPermissionManager_3_1_0 } from '../3.1.0';
+import GeneralPermissionManagerCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { stringArrayToBytes32Array } from '../../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
 
 describe('GeneralPermissionManagerWrapper', () => {
-  class FakeGeneralPermissionManager_3_1_0 extends GeneralPermissionManager_3_1_0 {}
-
   // Declare GeneralPermissionManagerWrapper object
-  let target: FakeGeneralPermissionManager_3_1_0;
+  let target: GeneralPermissionManager_3_1_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract_3_1_0;
   let mockedContractFactory: ContractFactory;
@@ -28,7 +27,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new FakeGeneralPermissionManager_3_1_0(
+    target = new GeneralPermissionManager_3_1_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -40,6 +39,12 @@ describe('GeneralPermissionManagerWrapper', () => {
     reset(mockedContract);
     reset(mockedSecurityTokenContract);
     reset(mockedContractFactory);
+  });
+
+  describe('Types', () => {
+    test('should extend GeneralPermissionManagerCommon', async () => {
+      expect(target instanceof GeneralPermissionManagerCommon).toBe(true);
+    });
   });
 
   describe('addDelegateMulti', () => {
