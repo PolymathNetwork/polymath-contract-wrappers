@@ -1,15 +1,12 @@
-// PolymathRegistryWrapper test
 import { mock, instance, reset } from 'ts-mockito';
-import {
-  ERC20DetailedContract_3_0_0,
-  ISecurityTokenRegistryEvents_3_0_0,
-  Web3Wrapper,
-} from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper, ERC20DetailedContract_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import AlternativeERC20Common from '../common';
 import { AlternativeERC20_3_0_0 } from '../3.0.0';
 
-describe('AlternativeERC20TokenWrapper', () => {
-  // Declare ERC20DetailedTokenWrapper object
-  let target: AlternativeERC20_3_0_0;
+describe('BlacklistTransferManager 3.0.0', () => {
+  class FakeAlternativeERC20_3_0_0 extends AlternativeERC20_3_0_0 {}
+
+  let target: FakeAlternativeERC20_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ERC20DetailedContract_3_0_0;
 
@@ -18,7 +15,7 @@ describe('AlternativeERC20TokenWrapper', () => {
     mockedContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new AlternativeERC20_3_0_0(instance(mockedWrapper), myContractPromise);
+    target = new FakeAlternativeERC20_3_0_0(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
@@ -26,20 +23,9 @@ describe('AlternativeERC20TokenWrapper', () => {
     reset(mockedContract);
   });
 
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(`Expected eventName to be one of: 'Transfer', 'Approval', encountered: ChangeExpiryLimit`),
-      );
+  describe('Types', () => {
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof AlternativeERC20Common).toBe(true);
     });
   });
 });
