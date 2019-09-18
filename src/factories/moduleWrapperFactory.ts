@@ -7,7 +7,7 @@ import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_m
 import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
-import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
+import { BlacklistTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
@@ -88,7 +88,7 @@ interface GetModuleInstance {
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
-  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
+  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
@@ -175,7 +175,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.BlacklistTransferManager:
-        moduleWrapper = new BlacklistTransferManagerWrapper(
+        moduleWrapper = new BlacklistTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getBlacklistTransferManagerContract(params.address),
           this.contractFactory,
