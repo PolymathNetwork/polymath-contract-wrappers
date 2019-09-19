@@ -6,7 +6,7 @@ import {
 import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import { ManualApprovalTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
-import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+import { LockUpTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import { BlacklistTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
@@ -90,7 +90,7 @@ interface GetModuleInstance {
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
-  (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
+  (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
@@ -179,7 +179,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.LockUpTransferManager:
-        moduleWrapper = new LockUpTransferManagerWrapper(
+        moduleWrapper = new LockUpTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getLockUpTransferManagerContract(params.address),
           this.contractFactory,
