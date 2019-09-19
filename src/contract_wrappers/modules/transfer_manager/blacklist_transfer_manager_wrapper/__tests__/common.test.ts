@@ -7,10 +7,9 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import BlacklistTransferManagerWrapper from '../blacklist_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
 import {
   bytes32ArrayToStringArray,
   dateArrayToBigNumberArray,
@@ -20,11 +19,22 @@ import {
   stringToBytes32,
   valueToWei,
   weiToValue,
-} from '../../../../utils/convert';
-import { Partition } from '../../../../types';
+} from '../../../../../utils/convert';
+import { Partition } from '../../../../../types';
+import BlacklistTransferManagerCommon from '../common';
 
 describe('BlacklistTransferManagerWrapper', () => {
-  let target: BlacklistTransferManagerWrapper;
+
+  class FakeBlacklistTransferManager extends BlacklistTransferManagerCommon {
+    public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<BlacklistTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeBlacklistTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: BlacklistTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -37,7 +47,7 @@ describe('BlacklistTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new BlacklistTransferManagerWrapper(
+    target = new FakeBlacklistTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
