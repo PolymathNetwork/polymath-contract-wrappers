@@ -96,7 +96,8 @@ export {
   default as CountTransferManager,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
-  default as ManualApprovalTransferManager,
+  ManualApprovalTransferManager,
+  ManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
   default as PercentageTransferManager,
