@@ -17,6 +17,7 @@ import {
 } from '../../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
 import { Perm } from '../../../../../types';
+import GeneralPermissionManagerCommon from '../common';
 
 describe('GeneralPermissionManagerWrapper', () => {
   // Declare GeneralPermissionManagerWrapper object
@@ -48,8 +49,8 @@ describe('GeneralPermissionManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend GeneralPermissionManagerCommon', async () => {
+      expect(target instanceof GeneralPermissionManagerCommon).toBe(true);
     });
   });
 

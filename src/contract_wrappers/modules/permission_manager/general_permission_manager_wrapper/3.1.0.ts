@@ -57,55 +57,6 @@ interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
   >;
 }
 
-export namespace GeneralPermissionManagerTransactionParams {
-  export interface DeleteDelegate extends DelegateTxParams {}
-  export interface AddDelegate extends AddDelegateParams {}
-  export interface ChangePermission extends ChangePermissionParams {}
-  export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
-}
-
-/**
- * @param delegate Ethereum address of the delegate
- */
-interface DelegateTxParams extends TxParams {
-  delegate: string;
-}
-
-/**
- * @param delegate Ethereum address of the delegate
- * @param details Details about the delegate i.e `Belongs to financial firm`
- */
-interface AddDelegateParams extends TxParams {
-  delegate: string;
-  details: string;
-}
-
-/**
- * @param delegate Ethereum address of the delegate
- * @param module Ethereum contract address of the module
- * @param perm Permission flag
- * @param valid Bool flag use to switch on/off the permission
- */
-interface ChangePermissionParams extends TxParams {
-  delegate: string;
-  module: string;
-  perm: Perm;
-  valid: boolean;
-}
-
-/**
- * @param delegate Ethereum address of the delegate
- * @param modules Multiple module matching the multiple perms, needs to be same length
- * @param perms Multiple permission flag needs to be changed
- * @param valids Bool array consist the flag to switch on/off the permission
- */
-interface ChangePermissionMultiParams extends TxParams {
-  delegate: string;
-  modules: string[];
-  perms: Perm[];
-  valids: boolean[];
-}
-
 /**
  * @param delegates An array of Ethereum addresses of the delegates
  * @param details An array of details about the delegates i.e `Belongs to financial firm`

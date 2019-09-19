@@ -41,7 +41,7 @@ import {
   ISecurityTokenUpdateTokenNameEventArgs_3_0_0,
   EtherDividendCheckpointContract_3_0_0,
   CountTransferManagerContract_3_0_0,
-  PercentageTransferManagerContract_3_0_0,
+  PercentageTransferManagerContract_3_0_0,  
   ERC20DividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
   TxData,
@@ -74,7 +74,7 @@ import {
   CappedSTOFundRaiseType,
   TransferStatusCode,
   ErrorCode,
-  ContractVersion,
+  ContractVersion
 } from '../../types';
 import {
   bigNumberToDate,
@@ -425,18 +425,12 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>[]
   >;
-  (params: GetUpdateTokenNameLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>[]
-  >;
+  (params: GetUpdateTokenNameLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>[]>;
   (params: GetGranularityChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenGranularityChangedEventArgs_3_0_0>[]
   >;
-  (params: GetModuleArchivedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenModuleArchivedEventArgs_3_0_0>[]
-  >;
-  (params: GetModuleUnarchivedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>[]
-  >;
+  (params: GetModuleArchivedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleArchivedEventArgs_3_0_0>[]>;
+  (params: GetModuleUnarchivedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>[]>;
   (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleRemovedEventArgs_3_0_0>[]>;
   (params: GetModuleBudgetChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
@@ -444,54 +438,32 @@ interface GetSecurityTokenLogsAsyncParams extends GetLogs {
   (params: GetTransferByPartitionLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
   >;
-  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetRevokedOperatorLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
+  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetRevokedOperatorLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
   (params: GetAuthorizedOperatorByPartitionLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
   (params: GetRevokedOperatorByPartitionLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
-  (params: GetIssuedByPartitionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetControllerTransferLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
+  (params: GetIssuedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetControllerTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
   (params: GetControllerRedemptionLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
   >;
-  (params: GetDocumentRemovedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetDocumentUpdatedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetFreezeTransfersLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
-  >;
-  (params: GetCheckpointCreatedLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>[]
-  >;
-  (params: GetFreezeIssuanceLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>[]
-  >;
+  (params: GetDocumentRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetDocumentUpdatedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetFreezeTransfersLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]>;
+  (params: GetCheckpointCreatedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>[]>;
+  (params: GetFreezeIssuanceLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>[]>;
   (params: GetIssuedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenIssuedEventArgs_3_0_0>[]>;
   (params: GetRedeemedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRedeemedEventArgs_3_0_0>[]>;
   (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenSetControllerEventArgs_3_0_0>[]>;
   (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>[]
   >;
-  (params: GetDisableControllerLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ISecurityTokenDisableControllerEventArgs_3_0_0>[]
-  >;
+  (params: GetDisableControllerLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenDisableControllerEventArgs_3_0_0>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
     LogWithDecodedArgs<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>[]
   >;
@@ -2343,19 +2315,11 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
   };
 
   public checkIsArchived = async (moduleAddress: string) => {
-    assert.assert(
-      (await this.getModule({ moduleAddress })).archived,
-      ErrorCode.PreconditionRequired,
-      'Module is not yet archived',
-    );
+    assert.assert((await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is not yet archived');
   };
 
   public checkIsNotArchived = async (moduleAddress: string) => {
-    assert.assert(
-      !(await this.getModule({ moduleAddress })).archived,
-      ErrorCode.PreconditionRequired,
-      'Module is archived',
-    );
+    assert.assert(!(await this.getModule({ moduleAddress })).archived, ErrorCode.PreconditionRequired, 'Module is archived');
   };
 
   public checkModuleStructAddressIsNotZero = async (moduleAddress: string) => {
@@ -2425,17 +2389,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         'ModuleFactory must be verified or SecurityToken owner must be ModuleFactory owner',
       );
     } else {
-      assert.assert(
-        await this.checkForRegisteredModule(address),
-        ErrorCode.Unauthorized,
-        'ModuleFactory must be verified',
-      );
+      assert.assert(await this.checkForRegisteredModule(address), ErrorCode.Unauthorized, 'ModuleFactory must be verified');
     }
-    assert.assert(
-      await this.isCompatibleModule(address),
-      ErrorCode.InvalidVersion,
-      'Version should within the compatible range of ST',
-    );
+    assert.assert(await this.isCompatibleModule(address), ErrorCode.InvalidVersion, 'Version should within the compatible range of ST');
   };
 
   public checkForRegisteredModule = async (moduleAddress: string) => {
@@ -2501,17 +2457,9 @@ export default class SecurityTokenWrapper extends ERC20TokenWrapper {
         ErrorCode.InvalidData,
         'Too many discounted tokens',
       );
-      assert.assert(
-        data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]),
-        ErrorCode.InvalidData,
-        'Invalid discount',
-      );
+      assert.assert(data.ratePerTierDiscountPoly[i].isLessThanOrEqualTo(data.ratePerTier[i]), ErrorCode.InvalidData, 'Invalid discount');
     }
-    assert.assert(
-      data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3,
-      ErrorCode.InvalidData,
-      'Raise type is not specified',
-    );
+    assert.assert(data.fundRaiseTypes.length > 0 && data.fundRaiseTypes.length <= 3, ErrorCode.InvalidData, 'Raise type is not specified');
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
   };

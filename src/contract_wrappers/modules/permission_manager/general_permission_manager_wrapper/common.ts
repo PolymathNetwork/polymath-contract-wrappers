@@ -108,22 +108,6 @@ interface ChangePermissionMultiParams extends TxParams {
   valids: boolean[];
 }
 
-/**
- * @param delegates An array of Ethereum addresses of the delegates
- * @param details An array of details about the delegates i.e `Belongs to financial firm`
- */
-interface AddDelegateMultiParams extends TxParams {
-  delegates: string[];
-  details: string[];
-}
-
-/**
- * @param delegates An array of Ethereum address of delegates
- */
-interface DeleteDelegateMultiParams extends TxParams {
-  delegates: string[];
-}
-
 // // Return types ////
 interface PermissionsPerModule {
   /** Module address */
