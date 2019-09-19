@@ -69,7 +69,11 @@ export {
   isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
-  default as GeneralPermissionManager,
+  GeneralPermissionManager,
+  GeneralPermissionManager_3_0_0,
+  isGeneralPermissionManager_3_0_0,
+  GeneralPermissionManager_3_1_0,
+  isGeneralPermissionManager_3_1_0,
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 export {
   CappedSTO,
