@@ -102,7 +102,8 @@ export {
   default as PercentageTransferManager,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
-  default as LockUpTransferManager,
+  LockUpTransferManager,
+  LockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
   default as BlacklistTransferManager,
