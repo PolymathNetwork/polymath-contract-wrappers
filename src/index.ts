@@ -104,6 +104,7 @@ export {
 export {
   LockUpTransferManager,
   LockUpTransferManager_3_0_0,
+  isLockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
   default as BlacklistTransferManager,
