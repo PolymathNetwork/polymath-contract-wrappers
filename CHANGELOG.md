@@ -1,3 +1,10 @@
+# [3.0.0-beta.42](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.41@beta...v3.0.0-beta.42@beta) (2019-09-19)
+
+
+### Bug Fixes
+
+* 🐛 add bundle-analyzer to visualize size of project ([4b6e660](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/4b6e660))
+
 # [3.0.0-beta.41](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.40@beta...v3.0.0-beta.41@beta) (2019-09-12)
 
 
