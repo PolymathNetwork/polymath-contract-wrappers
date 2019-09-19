@@ -16,6 +16,7 @@
     "start": "webpack-dev-server --config=webpack.config.dev.js",
     "build": "webpack",
     "build:ci": "yarn build",
+    "build:analyze": "webpack --config=webpack.config.analyze.js",
     "commit": "npx git-cz",
     "semantic-release": "semantic-release",
     "lint": "./node_modules/.bin/eslint ./src --ext .js,.ts",

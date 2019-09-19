@@ -1,8 +1,6 @@
 /* Base configuration shared accross webpack bundles */
-const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
   devtool: 'cheap-module-source-map',
@@ -26,7 +24,6 @@ module.exports = {
   },
   plugins: [
     // Ensures import paths match case of actual files in disk
-    new CaseSensitivePathsPlugin(),
-    new BundleAnalyzerPlugin(),
+    new CaseSensitivePathsPlugin()
   ],
 };
