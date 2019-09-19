@@ -13,7 +13,10 @@ import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/chec
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
 import { USDTieredSTO_3_0_0, USDTieredSTO_3_1_0 } from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
+import {
+  GeneralPermissionManager_3_0_0,
+  GeneralPermissionManager_3_1_0,
+} from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
 import {
   VestingEscrowWallet_3_0_0,
@@ -82,7 +85,7 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 }
 
 interface GetModuleInstance {
-  (params: GetGeneralPermissionManager): Promise<GeneralPermissionManagerWrapper>;
+  (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
@@ -124,11 +127,19 @@ export default class ModuleWrapperFactory {
     switch (params.name) {
       // Permission
       case ModuleName.GeneralPermissionManager:
-        moduleWrapper = new GeneralPermissionManagerWrapper(
-          this.web3Wrapper,
-          this.contractFactory.getGeneralPermissionManagerContract(params.address),
-          this.contractFactory,
-        );
+        if (version === ContractVersion.V3_0_0) {
+          moduleWrapper = new GeneralPermissionManager_3_0_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralPermissionManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        } else {
+          moduleWrapper = new GeneralPermissionManager_3_1_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralPermissionManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        }
         break;
       // TMs
       case ModuleName.CountTransferManager:
