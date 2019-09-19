@@ -102,6 +102,7 @@ export {
 export {
   ManualApprovalTransferManager,
   ManualApprovalTransferManager_3_0_0,
+  isManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
   default as PercentageTransferManager,
