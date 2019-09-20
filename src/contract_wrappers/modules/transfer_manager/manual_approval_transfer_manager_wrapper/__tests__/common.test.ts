@@ -9,7 +9,6 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
-import ModuleWrapper from '../../../module_wrapper';
 import {
   bigNumberToDate,
   bytes32ToString,
