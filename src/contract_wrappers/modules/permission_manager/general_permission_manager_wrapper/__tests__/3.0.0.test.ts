@@ -6,7 +6,6 @@ import {
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../../module_wrapper';
 import { GeneralPermissionManager_3_0_0 } from '../3.0.0';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
