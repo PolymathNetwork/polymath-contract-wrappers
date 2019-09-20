@@ -7,11 +7,10 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { RestrictionType } from '../../../../types';
-import ModuleWrapper from '../../module_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import VolumeRestrictionTransferManagerWrapper from '../volume_restriction_transfer_manager_wrapper';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
+import { RestrictionType } from '../../../../../types';
+import ModuleWrapper from '../../../module_wrapper';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   bigNumberToDate,
   numberToBigNumber,
@@ -21,10 +20,11 @@ import {
   valueArrayToWeiArray,
   weiToValue,
   valueToWei,
-} from '../../../../utils/convert';
+} from '../../../../../utils/convert';
+import VolumeRestrictionTransferManagerCommon from '../common';
 
 describe('VolumeRestrictionTransferManagerWrapper', () => {
-  let target: VolumeRestrictionTransferManagerWrapper;
+  let target: VolumeRestrictionTransferManagerCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: VolumeRestrictionTMContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -37,7 +37,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new VolumeRestrictionTransferManagerWrapper(
+    target = new VolumeRestrictionTransferManagerCommon(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

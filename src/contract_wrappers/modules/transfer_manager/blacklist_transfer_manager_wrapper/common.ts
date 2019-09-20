@@ -12,12 +12,12 @@ import {
   BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0,
   LogWithDecodedArgs,
   Web3Wrapper,
-  PolyResponse
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import assert from '../../../../utils/assert';
+import ModuleWrapper from '../../module_wrapper';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   EventCallback,
   GetLogs,
@@ -29,7 +29,7 @@ import {
   TransferResult,
   TxParams,
   ErrorCode,
-} from '../../../types';
+} from '../../../../types';
 import {
   bigNumberToDate,
   bytes32ArrayToStringArray,
@@ -42,7 +42,7 @@ import {
   stringToBytes32,
   valueToWei,
   weiToValue,
-} from '../../../utils/convert';
+} from '../../../../utils/convert';
 
 interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
@@ -118,7 +118,9 @@ interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
 }
 
 interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
-  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
   (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<
     LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
   >;
@@ -306,7 +308,7 @@ interface BlacklistsDetails {
 /**
  * This class includes the functionality related to interacting with the Blacklist Transfer Manager contract.
  */
-export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
+export default class BlacklistTransferManagerCommon extends ModuleWrapper {
   public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
 
   /**
@@ -570,7 +572,9 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to assign multiple specific blacklist types to multiple investors
    */
-  public addMultiInvestorToBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams): Promise<PolyResponse> => {
+  public addMultiInvestorToBlacklistMulti = async (
+    params: InvestorMultiAndBlacklistMultiParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -638,7 +642,9 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the multiple investors from multiple specific blacklists
    */
-  public deleteMultiInvestorsFromBlacklistMulti = async (params: InvestorMultiAndBlacklistMultiParams): Promise<PolyResponse> => {
+  public deleteMultiInvestorsFromBlacklistMulti = async (
+    params: InvestorMultiAndBlacklistMultiParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -667,7 +673,9 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete the investor from all the associated blacklist types
    */
-  public deleteInvestorFromAllBlacklist = async (params: DeleteInvestorFromAllBlacklistParams): Promise<PolyResponse> => {
+  public deleteInvestorFromAllBlacklist = async (
+    params: DeleteInvestorFromAllBlacklistParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
@@ -684,7 +692,9 @@ export default class BlacklistTransferManagerWrapper extends ModuleWrapper {
   /**
    * Used to delete multiple investors from multiple associated blacklist types
    */
-  public deleteInvestorFromAllBlacklistMulti = async (params: DeleteInvestorFromAllBlacklistMultiParams): Promise<PolyResponse> => {
+  public deleteInvestorFromAllBlacklistMulti = async (
+    params: DeleteInvestorFromAllBlacklistMultiParams,
+  ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,

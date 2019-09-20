@@ -7,10 +7,8 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import ManualApprovalTransferManagerWrapper from '../manual_approval_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -22,10 +20,12 @@ import {
   valueToWei,
   valueArrayToWeiArray,
   weiToValue,
-} from '../../../../utils/convert';
+} from '../../../../../utils/convert';
+import ManualApprovarTransferManagerCommon from '../common';
+import ModuleWrapper from '../../../module_wrapper';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
-  let target: ManualApprovalTransferManagerWrapper;
+  let target: ManualApprovarTransferManagerCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ManualApprovalTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -38,7 +38,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ManualApprovalTransferManagerWrapper(
+    target = new ManualApprovarTransferManagerCommon(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

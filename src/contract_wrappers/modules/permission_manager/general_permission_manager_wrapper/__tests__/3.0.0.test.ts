@@ -6,21 +6,21 @@ import {
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../module_wrapper';
-import GeneralPermissionManagerWrapper from '../general_permission_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
+import { GeneralPermissionManager_3_0_0 } from '../3.0.0';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   stringToBytes32,
   stringArrayToBytes32Array,
   bytes32ArrayToStringArray,
   numberToBigNumber,
-} from '../../../../utils/convert';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
-import { Perm } from '../../../../types';
+} from '../../../../../utils/convert';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
+import { Perm } from '../../../../../types';
+import GeneralPermissionManagerCommon from '../common';
 
 describe('GeneralPermissionManagerWrapper', () => {
   // Declare GeneralPermissionManagerWrapper object
-  let target: GeneralPermissionManagerWrapper;
+  let target: GeneralPermissionManager_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -33,7 +33,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new GeneralPermissionManagerWrapper(
+    target = new GeneralPermissionManager_3_0_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -48,8 +48,8 @@ describe('GeneralPermissionManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend GeneralPermissionManagerCommon', async () => {
+      expect(target instanceof GeneralPermissionManagerCommon).toBe(true);
     });
   });
 
