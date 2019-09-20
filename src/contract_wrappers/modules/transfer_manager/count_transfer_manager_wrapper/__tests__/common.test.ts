@@ -7,14 +7,14 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import CountTransferManagerWrapper from '../count_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
-import { numberToBigNumber } from '../../../../utils/convert';
+import { CountTransferManager_3_0_0 } from '../3.0.0';
+import ContractFactory from '../../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import { numberToBigNumber } from '../../../../../utils/convert';
 
 describe('CountTransferManagerWrapper', () => {
-  let target: CountTransferManagerWrapper;
+  let target: CountTransferManager_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CountTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -27,7 +27,7 @@ describe('CountTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new CountTransferManagerWrapper(
+    target = new CountTransferManager_3_0_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
