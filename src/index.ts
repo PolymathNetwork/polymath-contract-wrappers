@@ -117,7 +117,9 @@ export {
   isLockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
-  default as BlacklistTransferManager,
+  BlacklistTransferManager,
+  BlacklistTransferManager_3_0_0,
+  isBlacklistTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 export {
   VolumeRestrictionTransferManager,
@@ -135,6 +137,14 @@ export * from './types';
 export { PolymathAPI } from './PolymathAPI';
 export {
   PolyResponse,
+  BlockParamLiteral,
+  TransactionReceiptWithDecodedLogs,
+  LogEntry,
+  LogWithDecodedArgs,
+  DecodedLogArgs,
+  Provider,
+  Web3Wrapper,
+  BigNumber,
   PolyTokenContract_3_0_0 as PolyTokenContract,
   PolyTokenEventArgs_3_0_0 as PolyTokenEventArgs,
   PolyTokenFaucetEventArgs_3_0_0 as PolyTokenFaucetEventArgs,
@@ -185,7 +195,6 @@ export {
   ISecurityTokenRegistryProtocolFactorySetEventArgs_3_0_0 as SecurityTokenRegistryProtocolFactorySetEventArgs,
   ISecurityTokenRegistryLatestVersionSetEventArgs_3_0_0 as SecurityTokenRegistryLatestVersionSetEventArgs,
   ISecurityTokenRegistryProtocolFactoryRemovedEventArgs_3_0_0 as SecurityTokenRegistryProtocolFactoryRemovedEventArgs,
-  ISecurityTokenContract_3_0_0,
   GeneralTransferManagerContract_3_0_0,
   GeneralTransferManagerEventArgs_3_0_0,
   GeneralTransferManagerEvents_3_0_0,
@@ -364,14 +373,6 @@ export {
   GeneralPermissionManagerAddDelegateEventArgs_3_1_0,
   GeneralPermissionManagerPauseEventArgs_3_1_0,
   GeneralPermissionManagerUnpauseEventArgs_3_1_0,
-  BlockParamLiteral,
-  TransactionReceiptWithDecodedLogs,
-  LogEntry,
-  LogWithDecodedArgs,
-  DecodedLogArgs,
-  Provider,
-  Web3Wrapper,
-  BigNumber,
   VestingEscrowWalletContract_3_0_0,
   VestingEscrowWalletEventArgs_3_0_0,
   VestingEscrowWalletEvents_3_0_0,
