@@ -8,7 +8,7 @@ import { ManualApprovalTransferManager_3_0_0 } from '../contract_wrappers/module
 import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import { LockUpTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import { BlacklistTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
-import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+import { VolumeRestrictionTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
@@ -92,7 +92,7 @@ interface GetModuleInstance {
   (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
-  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
+  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManager_3_0_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
@@ -193,7 +193,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.VolumeRestrictionTM:
-        moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
+        moduleWrapper = new VolumeRestrictionTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,
