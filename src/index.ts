@@ -69,7 +69,11 @@ export {
   isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
-  default as GeneralPermissionManager,
+  GeneralPermissionManager,
+  GeneralPermissionManager_3_0_0,
+  isGeneralPermissionManager_3_0_0,
+  GeneralPermissionManager_3_1_0,
+  isGeneralPermissionManager_3_1_0,
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 export {
   CappedSTO,
@@ -99,19 +103,25 @@ export {
   isCountTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
-  default as ManualApprovalTransferManager,
+  ManualApprovalTransferManager,
+  ManualApprovalTransferManager_3_0_0,
+  isManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
   default as PercentageTransferManager,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
-  default as LockUpTransferManager,
+  LockUpTransferManager,
+  LockUpTransferManager_3_0_0,
+  isLockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
   default as BlacklistTransferManager,
 } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 export {
-  default as VolumeRestrictionTransferManager,
+  VolumeRestrictionTransferManager,
+  VolumeRestrictionTransferManager_3_0_0,
+  isVolumeRestrictionTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export {
   VestingEscrowWallet,
