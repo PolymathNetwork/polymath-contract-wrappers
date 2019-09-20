@@ -7,15 +7,15 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import PercentageTransferManagerWrapper from '../percentage_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
-import { valueToWei, weiToValue } from '../../../../utils/convert';
-import { PERCENTAGE_DECIMALS } from '../../../../types';
+import { PercentageTransferManager_3_0_0 } from '../3.0.0';
+import ContractFactory from '../../../../../factories/contractFactory';
+import ModuleWrapper from '../../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import { valueToWei, weiToValue } from '../../../../../utils/convert';
+import { PERCENTAGE_DECIMALS } from '../../../../../types';
 
 describe('PercentageTransferManagerWrapper', () => {
-  let target: PercentageTransferManagerWrapper;
+  let target: PercentageTransferManager_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: PercentageTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -28,7 +28,7 @@ describe('PercentageTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new PercentageTransferManagerWrapper(
+    target = new PercentageTransferManager_3_0_0(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

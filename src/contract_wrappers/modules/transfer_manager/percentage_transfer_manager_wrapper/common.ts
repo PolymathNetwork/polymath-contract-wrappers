@@ -2,33 +2,34 @@ import {
   PercentageTransferManagerContract_3_0_0,
   PercentageTransferManagerEventArgs_3_0_0,
   PercentageTransferManagerEvents_3_0_0,
+  LogWithDecodedArgs,
   PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0,
   PercentageTransferManagerModifyWhitelistEventArgs_3_0_0,
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs_3_0_0,
   PercentageTransferManagerPauseEventArgs_3_0_0,
   PercentageTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
-  LogWithDecodedArgs,
   BigNumber,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import { parseTransferResult, valueToWei, weiToValue } from '../../../../utils/convert';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
+  ErrorCode,
+  PERCENTAGE_DECIMALS,
+  Perm,
+  TransferResult,
   TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
-  EventCallback,
   Subscribe,
   GetLogs,
-  Perm,
-  PERCENTAGE_DECIMALS,
-  ErrorCode,
-  TransferResult,
-} from '../../../types';
-import { parseTransferResult, valueToWei, weiToValue } from '../../../utils/convert';
+  EventCallback,
+  SubscribeAsyncParams,
+  GetLogsAsyncParams,
+} from '../../../../types';
+import assert from '../../../../utils/assert';
+import ModuleWrapper from '../../module_wrapper';
+
 
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents_3_0_0.ModifyHolderPercentage;
@@ -168,13 +169,14 @@ interface VerifyTransfer {
 /**
  * This class includes the functionality related to interacting with the Percentage Transfer Manager contract.
  */
-export default class PercentageTransferManagerWrapper extends ModuleWrapper {
+export default class PercentageTransferManagerCommon extends ModuleWrapper {
   public contract: Promise<PercentageTransferManagerContract_3_0_0>;
 
   /**
    * Instantiate PercentageTransferManagerWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
+   * @param contractFactory
    */
   public constructor(
     web3Wrapper: Web3Wrapper,

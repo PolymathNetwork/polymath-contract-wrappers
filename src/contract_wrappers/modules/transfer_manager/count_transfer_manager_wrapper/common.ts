@@ -6,26 +6,26 @@ import {
   CountTransferManagerPauseEventArgs_3_0_0,
   CountTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
-  LogWithDecodedArgs,
   BigNumber,
   PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+import assert from '../../../../utils/assert';
+import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../../utils/convert';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
+  ErrorCode,
+  Perm,
+  TransferResult,
   TxParams,
-  GetLogsAsyncParams,
   SubscribeAsyncParams,
-  EventCallback,
+  GetLogsAsyncParams,
   Subscribe,
   GetLogs,
-  Perm,
-  ErrorCode,
-  TransferResult,
-} from '../../../types';
-import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../utils/convert';
+  EventCallback,
+} from '../../../../types';
+import ModuleWrapper from '../../module_wrapper';
 
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
@@ -104,7 +104,7 @@ interface VerifyTransfer {
 /**
  * This class includes the functionality related to interacting with the Count Transfer Manager contract.
  */
-export default class CountTransferManagerWrapper extends ModuleWrapper {
+export default class CountTransferManagerCommon extends ModuleWrapper {
   public contract: Promise<CountTransferManagerContract_3_0_0>;
 
   /**
@@ -226,7 +226,9 @@ export default class CountTransferManagerWrapper extends ModuleWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <ArgsType extends CountTransferManagerEventArgs_3_0_0>(
+  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <
+    ArgsType extends CountTransferManagerEventArgs_3_0_0
+  >(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
     assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);

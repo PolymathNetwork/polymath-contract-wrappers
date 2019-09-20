@@ -97,7 +97,9 @@ export {
   isGeneralTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
-  default as CountTransferManager,
+  CountTransferManager,
+  CountTransferManager_3_0_0,
+  isCountTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
   ManualApprovalTransferManager,
@@ -105,7 +107,9 @@ export {
   isManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
-  default as PercentageTransferManager,
+  PercentageTransferManager,
+  PercentageTransferManager_3_0_0,
+  isPercentageTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
   LockUpTransferManager,
@@ -116,7 +120,9 @@ export {
   default as BlacklistTransferManager,
 } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 export {
-  default as VolumeRestrictionTransferManager,
+  VolumeRestrictionTransferManager,
+  VolumeRestrictionTransferManager_3_0_0,
+  isVolumeRestrictionTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export {
   VestingEscrowWallet,

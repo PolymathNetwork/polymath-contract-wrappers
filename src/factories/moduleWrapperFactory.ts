@@ -3,12 +3,12 @@ import {
   GeneralTransferManager_3_0_0,
   GeneralTransferManager_3_1_0,
 } from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
-import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
+import { CountTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 import { ManualApprovalTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
-import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import { PercentageTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 import { LockUpTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 import { BlacklistTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
-import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+import { VolumeRestrictionTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
@@ -86,13 +86,12 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
-  (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
-  (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
+  (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
-  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
+  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManager_3_0_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
@@ -143,7 +142,7 @@ export default class ModuleWrapperFactory {
         break;
       // TMs
       case ModuleName.CountTransferManager:
-        moduleWrapper = new CountTransferManagerWrapper(
+        moduleWrapper = new CountTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getCountTransferManagerContract(params.address),
           this.contractFactory,
@@ -172,7 +171,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.PercentageTransferManager:
-        moduleWrapper = new PercentageTransferManagerWrapper(
+        moduleWrapper = new PercentageTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
@@ -193,7 +192,7 @@ export default class ModuleWrapperFactory {
         );
         break;
       case ModuleName.VolumeRestrictionTM:
-        moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
+        moduleWrapper = new VolumeRestrictionTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,

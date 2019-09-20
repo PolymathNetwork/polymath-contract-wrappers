@@ -7,6 +7,7 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
+import ModuleWrapper from '../../../module_wrapper';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
@@ -54,8 +55,8 @@ describe('LockUpTransferManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend LockUpTransferManagerCommon', async () => {
-      expect(target instanceof LockUpTransferManagerCommon).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 

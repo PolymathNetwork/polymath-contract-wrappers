@@ -22,6 +22,7 @@ import {
   weiToValue,
 } from '../../../../../utils/convert';
 import ManualApprovarTransferManagerCommon from '../common';
+import ModuleWrapper from '../../../module_wrapper';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
   let target: ManualApprovarTransferManagerCommon;
@@ -52,8 +53,8 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ManualApprovarTransferManagerCommon', async () => {
-      expect(target instanceof ManualApprovarTransferManagerCommon).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 
