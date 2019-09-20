@@ -53,8 +53,8 @@ describe('ManualApprovalTransferManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ManualApprovarTransferManagerCommon', async () => {
-      expect(target instanceof ManualApprovarTransferManagerCommon).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 

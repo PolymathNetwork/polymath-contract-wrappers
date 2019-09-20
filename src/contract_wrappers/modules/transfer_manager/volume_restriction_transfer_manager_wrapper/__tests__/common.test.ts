@@ -52,8 +52,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend VolumeRestrictionTransferManagerCommon', async () => {
-      expect(target instanceof VolumeRestrictionTransferManagerCommon).toBe(true);
+    test('should extend ModuleWrapper', async () => {
+      expect(target instanceof ModuleWrapper).toBe(true);
     });
   });
 
