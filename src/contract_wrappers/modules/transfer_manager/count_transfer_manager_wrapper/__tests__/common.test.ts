@@ -277,4 +277,21 @@ describe('CountTransferManagerWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to CountTransferManager', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(`Expected eventName to be one of: 'ModifyHolderCount', 'Pause', 'Unpause', encountered: Transfer`),
+      );
+    });
+  });
 });

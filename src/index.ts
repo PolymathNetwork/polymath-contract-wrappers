@@ -100,7 +100,6 @@ export {
   CountTransferManager,
   CountTransferManager_3_0_0,
   isCountTransferManager_3_0_0,
-  isCountTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
   ManualApprovalTransferManager,
