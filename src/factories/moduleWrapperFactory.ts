@@ -3,17 +3,20 @@ import {
   GeneralTransferManager_3_0_0,
   GeneralTransferManager_3_1_0,
 } from '../contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
-import CountTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
-import ManualApprovalTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
-import PercentageTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
-import LockUpTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
-import BlacklistTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
-import VolumeRestrictionTransferManagerWrapper from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
+import { CountTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
+import { ManualApprovalTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
+import { PercentageTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
+import { LockUpTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
+import { BlacklistTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
+import { VolumeRestrictionTransferManager_3_0_0 } from '../contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 import { ERC20DividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 import { EtherDividendCheckpoint_3_0_0 } from '../contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 import { CappedSTO_3_0_0, CappedSTO_3_1_0 } from '../contract_wrappers/modules/sto/capped_sto_wrapper';
 import { USDTieredSTO_3_0_0, USDTieredSTO_3_1_0 } from '../contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
-import GeneralPermissionManagerWrapper from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
+import {
+  GeneralPermissionManager_3_0_0,
+  GeneralPermissionManager_3_1_0,
+} from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
 import {
   VestingEscrowWallet_3_0_0,
@@ -87,14 +90,13 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 }
 
 interface GetModuleInstance {
-  (params: GetGeneralPermissionManager): Promise<GeneralPermissionManagerWrapper>;
-  (params: GetCountTransferManager): Promise<CountTransferManagerWrapper>;
+  (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
-  (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManagerWrapper>;
-  (params: GetPercentageTransferManager): Promise<PercentageTransferManagerWrapper>;
-  (params: GetLockUpTransferManager): Promise<LockUpTransferManagerWrapper>;
-  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManagerWrapper>;
-  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManagerWrapper>;
+  (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
+  (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
+  (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
+  (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
+  (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManager_3_0_0>;
   (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManager_3_1_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
@@ -130,15 +132,23 @@ export default class ModuleWrapperFactory {
     switch (params.name) {
       // Permission
       case ModuleName.GeneralPermissionManager:
-        moduleWrapper = new GeneralPermissionManagerWrapper(
-          this.web3Wrapper,
-          this.contractFactory.getGeneralPermissionManagerContract(params.address),
-          this.contractFactory,
-        );
+        if (version === ContractVersion.V3_0_0) {
+          moduleWrapper = new GeneralPermissionManager_3_0_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralPermissionManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        } else {
+          moduleWrapper = new GeneralPermissionManager_3_1_0(
+            this.web3Wrapper,
+            this.contractFactory.getGeneralPermissionManagerContract(params.address, version),
+            this.contractFactory,
+          );
+        }
         break;
       // TMs
       case ModuleName.CountTransferManager:
-        moduleWrapper = new CountTransferManagerWrapper(
+        moduleWrapper = new CountTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getCountTransferManagerContract(params.address),
           this.contractFactory,
@@ -160,35 +170,35 @@ export default class ModuleWrapperFactory {
         }
         break;
       case ModuleName.ManualApprovalTransferManager:
-        moduleWrapper = new ManualApprovalTransferManagerWrapper(
+        moduleWrapper = new ManualApprovalTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getManualApprovalTransferManagerContract(params.address),
           this.contractFactory,
         );
         break;
       case ModuleName.PercentageTransferManager:
-        moduleWrapper = new PercentageTransferManagerWrapper(
+        moduleWrapper = new PercentageTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getPercentageTransferManagerContract(params.address),
           this.contractFactory,
         );
         break;
       case ModuleName.LockUpTransferManager:
-        moduleWrapper = new LockUpTransferManagerWrapper(
+        moduleWrapper = new LockUpTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getLockUpTransferManagerContract(params.address),
           this.contractFactory,
         );
         break;
       case ModuleName.BlacklistTransferManager:
-        moduleWrapper = new BlacklistTransferManagerWrapper(
+        moduleWrapper = new BlacklistTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getBlacklistTransferManagerContract(params.address),
           this.contractFactory,
         );
         break;
       case ModuleName.VolumeRestrictionTM:
-        moduleWrapper = new VolumeRestrictionTransferManagerWrapper(
+        moduleWrapper = new VolumeRestrictionTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
           this.contractFactory,

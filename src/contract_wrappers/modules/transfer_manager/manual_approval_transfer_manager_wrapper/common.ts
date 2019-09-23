@@ -10,12 +10,12 @@ import {
   Web3Wrapper,
   LogWithDecodedArgs,
   BigNumber,
-  PolyResponse
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import assert from '../../../utils/assert';
-import ModuleWrapper from '../module_wrapper';
-import Contract_3_0_0Factory from '../../../factories/contractFactory';
+import assert from '../../../../utils/assert';
+import ModuleWrapper from '../../module_wrapper';
+import Contract_3_0_0Factory from '../../../../factories/contractFactory';
 import {
   TxParams,
   GetLogsAsyncParams,
@@ -25,8 +25,8 @@ import {
   GetLogs,
   Perm,
   ErrorCode,
-  TransferResult
-} from '../../../types';
+  TransferResult,
+} from '../../../../types';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -39,7 +39,7 @@ import {
   valueArrayToWeiArray,
   weiToValue,
   parseTransferResult,
-} from '../../../utils/convert';
+} from '../../../../utils/convert';
 
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
@@ -105,7 +105,9 @@ interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
     LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>[]
   >;
   (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerPauseEventArgs_3_0_0>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>[]
+  >;
 }
 
 export namespace ManualApprovalTransferManagerTransactionParams {
@@ -265,7 +267,7 @@ interface VerifyTransfer {
 /**
  * This class includes the functionality related to interacting with the ManualApproval Transfer Manager contract.
  */
-export default class ManualApprovalTransferManagerWrapper extends ModuleWrapper {
+export default class ManualApprovalTransferManagerCommon extends ModuleWrapper {
   public contract: Promise<ManualApprovalTransferManagerContract_3_0_0>;
 
   /**

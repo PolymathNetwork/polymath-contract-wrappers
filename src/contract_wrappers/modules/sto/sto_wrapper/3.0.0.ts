@@ -1,4 +1,4 @@
-import { STOBaseContract_3_0_0, Constructor } from 'types';
+import { STOBaseContract_3_0_0, Constructor } from '../../../../types';
 import STOCommon from './common';
 
 export interface MixinSTO_3_0_0 {}

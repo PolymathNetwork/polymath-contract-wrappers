@@ -57,11 +57,11 @@ const assert = {
   isBigNumberGreaterThanZero(value: BigNumber, message: string): void {
     this.assert(value >= BIG_NUMBER_ZERO, ErrorCode.InvalidData, message);
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   areValidArrayLengths(value: any[][], message: string) {
-    // eslint-disable-line
     this.assert(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       value.every((x: any[]) => {
-        // eslint-disable-line
         return x.length === value[0].length;
       }),
       ErrorCode.MismatchedArrayLength,

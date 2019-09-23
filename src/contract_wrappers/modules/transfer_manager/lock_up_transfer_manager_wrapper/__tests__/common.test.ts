@@ -7,10 +7,9 @@ import {
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
-import LockUpTransferManagerWrapper from '../lock_up_transfer_manager_wrapper';
-import ContractFactory from '../../../../factories/contractFactory';
-import ModuleWrapper from '../../module_wrapper';
+import ModuleWrapper from '../../../module_wrapper';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../../factories/contractFactory';
 import {
   bytes32ArrayToStringArray,
   bytes32ToString,
@@ -23,11 +22,12 @@ import {
   valueArrayToWeiArray,
   valueToWei,
   weiToValue,
-} from '../../../../utils/convert';
-import { Partition } from '../../../../types';
+} from '../../../../../utils/convert';
+import { Partition } from '../../../../../types';
+import LockUpTransferManagerCommon from '../common';
 
 describe('LockUpTransferManagerWrapper', () => {
-  let target: LockUpTransferManagerWrapper;
+  let target: LockUpTransferManagerCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: LockUpTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -40,7 +40,7 @@ describe('LockUpTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new LockUpTransferManagerWrapper(
+    target = new LockUpTransferManagerCommon(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

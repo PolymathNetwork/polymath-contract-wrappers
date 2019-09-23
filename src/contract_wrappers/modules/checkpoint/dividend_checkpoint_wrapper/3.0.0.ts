@@ -1,4 +1,4 @@
-import { DividendCheckpointBaseContract_3_0_0, Constructor } from 'types';
+import { DividendCheckpointBaseContract_3_0_0, Constructor } from '../../../../types';
 import DividendCheckpointCommon from './common';
 
 export interface MixinDividendCheckpoint_3_0_0 {}
