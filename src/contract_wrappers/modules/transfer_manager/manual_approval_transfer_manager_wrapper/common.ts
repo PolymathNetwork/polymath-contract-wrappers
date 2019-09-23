@@ -285,6 +285,39 @@ export default class ManualApprovalTransferManagerCommon extends ModuleWrapper {
   }
 
   /**
+   *  Unpause the module
+   */
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
+    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   *  Check if the module is paused
+   */
+  public paused = async (): Promise<boolean> => {
+    return (await this.contract).paused.callAsync();
+  };
+
+  /**
+   *  Pause the module
+   */
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
    *  An array to track all approvals. It is an unbounded array but it's not a problem as
    * it is never looped through in an on chain call. It is defined as an Array instead of mapping
    * just to make it easier for users to fetch list of all approvals through constant functions.

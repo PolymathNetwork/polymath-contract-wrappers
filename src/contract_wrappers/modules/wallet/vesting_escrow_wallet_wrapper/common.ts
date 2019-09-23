@@ -276,6 +276,40 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
   }
 
   /**
+   *  Unpause the module
+   */
+  public unpause = async (params: TxParams): Promise<PolyResponse> => {
+    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
+    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   *  Check if module paused
+   *  @return boolean is paused
+   */
+  public paused = async (): Promise<boolean> => {
+    return (await this.contract).paused.callAsync();
+  };
+
+  /**
+   *  Pause the module
+   */
+  public pause = async (params: TxParams): Promise<PolyResponse> => {
+    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'Sender is not owner',
+    );
+    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
    * Number of tokens that are hold by the `this` contract but are unassigned to any schedule
    * @return unassigned token value
    */
