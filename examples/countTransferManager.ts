@@ -158,7 +158,7 @@ window.addEventListener('load', async () => {
   await countTM.subscribeAsync({
     eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
