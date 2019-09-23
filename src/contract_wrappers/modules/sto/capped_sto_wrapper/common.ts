@@ -96,14 +96,6 @@ export default class CappedSTOCommon extends STOCommon {
   };
 
   /**
-   *  check if the module is paused
-   *  @return boolean if paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
    * Access mapping of Capped STO investors
    * @return amount of investor investment
    */
