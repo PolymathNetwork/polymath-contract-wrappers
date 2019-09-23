@@ -18,7 +18,7 @@ import {
   CappedSTOContract_3_1_0,
   USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
-import ERC20TokenWrapper from '../erc20_wrapper';
+import ERC20TokenWrapper from '../../erc20_wrapper';
 import {
   ModuleType,
   ModuleName,
@@ -30,9 +30,9 @@ import {
   Perm,
   CappedSTOFundRaiseType,
   TransferStatusCode
-} from '../../../types';
-import SecurityTokenWrapper from '../security_token_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+} from '../../../../types';
+import SecurityTokenCommon from '../common';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   stringToBytes32,
   bytes32ToString,
@@ -45,12 +45,12 @@ import {
   bytes32ArrayToStringArray,
   bigNumberToDate,
   parsePartitionBytes32Value,
-} from '../../../utils/convert';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
+} from '../../../../utils/convert';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 
-describe('SecurityTokenWrapper', () => {
-  // Declare SecurityTokenWrapper object
-  let target: SecurityTokenWrapper;
+describe('SecurityTokenCommon', () => {
+  // Declare SecurityTokenCommon object
+  let target: SecurityTokenCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ISecurityTokenContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -69,7 +69,7 @@ describe('SecurityTokenWrapper', () => {
     mockedModuleRegistryContract = mock(ModuleRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new SecurityTokenCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {

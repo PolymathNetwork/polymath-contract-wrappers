@@ -56,7 +56,11 @@ export { default as ModuleRegistry } from './contract_wrappers/registries/module
 export { default as PolyToken } from './contract_wrappers/tokens/poly_token_wrapper';
 export { default as PolymathRegistry } from './contract_wrappers/registries/polymath_registry_wrapper';
 export { default as SecurityTokenRegistry } from './contract_wrappers/registries/security_token_registry_wrapper';
-export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
+export {
+  SecurityToken,
+  SecurityToken_3_0_0,
+  isSecurityToken_3_0_0,
+} from './contract_wrappers/tokens/security_token_wrapper';
 export { default as ERC20 } from './contract_wrappers/tokens/erc20_detailed_wrapper';
 export {
   ERC20DividendCheckpoint,
