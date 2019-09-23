@@ -205,39 +205,6 @@ export default class PercentageTransferManagerCommon extends ModuleWrapper {
   };
 
   /**
-   *  Unpause the module
-   */
-  public unpause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  Check if module is paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
-   *  Pause the module
-   */
-  public pause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
    * Addresses on this list are always able to send / receive tokens
    * @return boolean on whitelist
    */

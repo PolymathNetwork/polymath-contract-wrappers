@@ -242,13 +242,6 @@ export default abstract class DividendCheckpointCommon extends ModuleWrapper {
   };
 
   /**
-   *  check if the module is paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
    *  check dividend information at a specific dividend index
    *  @return checkpointId, created, maturity, expiry, token amount,
    *  claimedAmount, totalSupply, reclaimed tokens, total withheld,
