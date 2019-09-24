@@ -23,7 +23,7 @@ import {
 } from '../../../../../utils/convert';
 import { ContractVersion, FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../../types';
 
-describe('USD Tiered STO Common', () => {  
+describe('USD Tiered STO Common', () => {
   let target: USDTieredSTOCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_0_0;

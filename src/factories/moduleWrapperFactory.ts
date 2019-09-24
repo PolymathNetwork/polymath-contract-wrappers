@@ -26,6 +26,7 @@ import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode, ContractVersion } from '../types';
 import { PolymathError } from '../PolymathError';
+import {RestrictedPartialSaleTransferManager_3_1_0} from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 
 interface GetModuleParams {
   address: string;
@@ -68,6 +69,10 @@ interface GetVolumeRestrictionTransferManager extends GetModuleParams {
   name: ModuleName.VolumeRestrictionTM;
 }
 
+interface GetRestrictedPartialSaleTransferManager extends GetModuleParams {
+  name: ModuleName.RestrictedPartialSaleTM;
+}
+
 interface GetCappedSTO extends GetModuleParams {
   name: ModuleName.CappedSTO;
 }
@@ -88,10 +93,12 @@ interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
+  (params: GetCountTransferManager): Promise<CountTransferManager_3_0_0>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManager_3_0_0>;
+  (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManager_3_1_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
@@ -195,6 +202,13 @@ export default class ModuleWrapperFactory {
         moduleWrapper = new VolumeRestrictionTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
+          this.contractFactory,
+        );
+        break;
+      case ModuleName.RestrictedPartialSaleTM:
+        moduleWrapper = new RestrictedPartialSaleTransferManager_3_1_0(
+          this.web3Wrapper,
+          this.contractFactory.getRestrictedPartialSaleTMContract(params.address),
           this.contractFactory,
         );
         break;

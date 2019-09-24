@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { BigNumber, LockUpTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, LockUpTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
@@ -126,7 +126,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of addLockUpToUser
   await lockUpTM.subscribeAsync({
-    eventName: LockUpTransferManagerEvents.AddLockUpToUser,
+    eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -156,7 +156,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of modify lock up type
   await lockUpTM.subscribeAsync({
-    eventName: LockUpTransferManagerEvents.ModifyLockUpType,
+    eventName: LockUpTransferManagerEvents_3_0_0.ModifyLockUpType,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -179,7 +179,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of remove lockup from user
   await lockUpTM.subscribeAsync({
-    eventName: LockUpTransferManagerEvents.RemoveLockUpFromUser,
+    eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpFromUser,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

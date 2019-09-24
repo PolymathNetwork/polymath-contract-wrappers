@@ -602,7 +602,7 @@ export default class USDTieredSTOWrapper extends STOCommon {
    */
   public fundsRaisedUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).fundsRaisedUSD.callAsync(), FULL_DECIMALS);
-  }; 
+  };
 
   /**
    * This function converts from ETH or POLY to USD

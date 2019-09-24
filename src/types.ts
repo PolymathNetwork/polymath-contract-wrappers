@@ -13,7 +13,7 @@ import {
   ModuleFactoryEventArgs_3_0_0,
   ModuleRegistryEventArgs_3_0_0,
   PolyTokenFaucetEventArgs_3_0_0,
-  PolymathRegistryEventArgs_3_0_0,  
+  PolymathRegistryEventArgs_3_0_0,
   USDTieredSTOFactoryEventArgs_3_0_0,
   USDTieredSTOEventArgs_3_0_0,
   CappedSTOFactoryEvents_3_0_0,
@@ -78,15 +78,22 @@ import {
   GeneralPermissionManagerContract_3_1_0,
   VestingEscrowWalletContract_3_1_0,
   RestrictedPartialSaleTMContract_3_1_0,
+  RestrictedPartialSaleTMEvents_3_1_0,
+  RestrictedPartialSaleTMEventArgs_3_1_0,
+  GeneralTransferManagerEventArgs_3_1_0,
+  CappedSTOEventArgs_3_1_0,
+  USDTieredSTOEventArgs_3_1_0,
+  GeneralPermissionManagerEventArgs_3_1_0,
   GeneralTransferManagerEvents_3_1_0,
   GeneralPermissionManagerEvents_3_1_0,
   VestingEscrowWalletEvents_3_1_0,
+  VestingEscrowWalletEventArgs_3_1_0,
   CappedSTOEvents_3_1_0,
   USDTieredSTOEvents_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Constructor<T = {}> = new(...args: any[]) => T;
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
 /**
  * @param txData Data to override default values on tx, i.e. 'from', 'gasPrice'
@@ -181,6 +188,7 @@ export enum ModuleName {
   LockUpTransferManager = 'LockUpTransferManager',
   BlacklistTransferManager = 'BlacklistTransferManager',
   VolumeRestrictionTM = 'VolumeRestrictionTM',
+  RestrictedPartialSaleTM = 'RestrictedPartialSaleTM',
   CappedSTO = 'CappedSTO',
   UsdTieredSTO = 'USDTieredSTO',
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
@@ -255,7 +263,15 @@ export type ContractEventArgs_3_0_0 =
   | BlacklistTransferManagerEventArgs_3_0_0
   | VestingEscrowWalletEventArgs_3_0_0;
 
-export type ContractEventArgs = ContractEventArgs_3_0_0;
+export type ContractEventArgs_3_1_0 =
+  | GeneralTransferManagerEventArgs_3_1_0
+  | RestrictedPartialSaleTMEventArgs_3_1_0
+  | CappedSTOEventArgs_3_1_0
+  | USDTieredSTOEventArgs_3_1_0
+  | GeneralPermissionManagerEventArgs_3_1_0
+  | VestingEscrowWalletEventArgs_3_1_0;
+
+export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 
 export type ContractEvents_3_0_0 =
   | PolyTokenEvents_3_0_0
@@ -286,6 +302,7 @@ export type ContractEvents_3_0_0 =
 
 export type ContractEvents_3_1_0 =
   | GeneralTransferManagerEvents_3_1_0
+  | RestrictedPartialSaleTMEvents_3_1_0
   | GeneralPermissionManagerEvents_3_1_0
   | VestingEscrowWalletEvents_3_1_0
   | CappedSTOEvents_3_1_0
@@ -351,7 +368,7 @@ export type GenericModuleContract_3_0_0 =
   | BlacklistTransferManagerContract_3_0_0
   | VolumeRestrictionTMContract_3_0_0;
 
-  export type GenericModuleContract_3_1_0 =
+export type GenericModuleContract_3_1_0 =
   | STOBaseContract_3_1_0
   | GeneralTransferManagerContract_3_1_0
   | GeneralPermissionManagerContract_3_1_0
@@ -366,7 +383,9 @@ export type STOBaseContract_3_1_0 = CappedSTOContract_3_1_0 | USDTieredSTOContra
 
 export type STOBaseContract = STOBaseContract_3_0_0 | STOBaseContract_3_1_0;
 
-export type DividendCheckpointBaseContract_3_0_0 = ERC20DividendCheckpointContract_3_0_0 | EtherDividendCheckpointContract_3_0_0;
+export type DividendCheckpointBaseContract_3_0_0 =
+  | ERC20DividendCheckpointContract_3_0_0
+  | EtherDividendCheckpointContract_3_0_0;
 
 export type DividendCheckpointBaseContract = DividendCheckpointBaseContract_3_0_0;
 

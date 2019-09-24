@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { ERC20DividendCheckpointEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { ERC20DividendCheckpointEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
@@ -186,7 +186,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of update dividend dates
   await erc20DividendCheckpoint.subscribeAsync({
-    eventName: ERC20DividendCheckpointEvents.UpdateDividendDates,
+    eventName: ERC20DividendCheckpointEvents_3_0_0.UpdateDividendDates,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

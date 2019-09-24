@@ -31,6 +31,7 @@ import {
   USDTieredSTOContract_3_1_0,
   CappedSTOContract_3_1_0,
   VestingEscrowWalletContract_3_1_0,
+  RestrictedPartialSaleTMContract_3_1_0,
   GeneralTransferManagerContract_3_1_0,
   GeneralPermissionManagerContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
@@ -353,6 +354,15 @@ export default class ContractFactory {
   public async getVolumeRestrictionTMContract(address: string): Promise<VolumeRestrictionTMContract_3_0_0> {
     assert.isETHAddressHex('address', address);
     const contract = new VolumeRestrictionTMContract_3_0_0(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
+  public async getRestrictedPartialSaleTMContract(address: string): Promise<RestrictedPartialSaleTMContract_3_1_0> {
+    assert.isETHAddressHex('address', address);
+    const contract = new RestrictedPartialSaleTMContract_3_1_0(address, this.provider, this.contractDefaults);
     this.abiArray.forEach((abi): void => {
       contract.addABItoDecoder(abi);
     });

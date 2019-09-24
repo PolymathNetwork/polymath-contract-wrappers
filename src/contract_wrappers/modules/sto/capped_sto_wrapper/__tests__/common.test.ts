@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   CappedSTOContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenContract_3_0_0,  
+  PolyTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -14,7 +14,7 @@ import { STOCommon } from '../../sto_wrapper';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('Capped STO Common', () => {  
+describe('Capped STO Common', () => {
   let target: CappedSTOCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_0_0;
@@ -491,5 +491,5 @@ describe('Capped STO Common', () => {
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
     });
-  });  
+  });
 });
