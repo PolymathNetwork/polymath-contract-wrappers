@@ -80,9 +80,13 @@ import {
   RestrictedPartialSaleTMContract_3_1_0,
   RestrictedPartialSaleTMEvents_3_1_0,
   RestrictedPartialSaleTMEventArgs_3_1_0,
+  GeneralTransferManagerEventArgs_3_1_0,
+  CappedSTOEventArgs_3_1_0,
+  GeneralPermissionManagerEventArgs_3_1_0,
   GeneralTransferManagerEvents_3_1_0,
   GeneralPermissionManagerEvents_3_1_0,
   VestingEscrowWalletEvents_3_1_0,
+  VestingEscrowWalletEventArgs_3_1_0,
   CappedSTOEvents_3_1_0,
   USDTieredSTOEvents_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
@@ -258,7 +262,13 @@ export type ContractEventArgs_3_0_0 =
   | BlacklistTransferManagerEventArgs_3_0_0
   | VestingEscrowWalletEventArgs_3_0_0;
 
-export type ContractEventArgs_3_1_0 = RestrictedPartialSaleTMEventArgs_3_1_0;
+export type ContractEventArgs_3_1_0 =
+    | GeneralTransferManagerEventArgs_3_1_0
+    | RestrictedPartialSaleTMEventArgs_3_1_0
+    | CappedSTOEventArgs_3_1_0
+    | GeneralPermissionManagerEventArgs_3_1_0
+    | VestingEscrowWalletEventArgs_3_1_0;
+
 export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 
 export type ContractEvents_3_0_0 =
