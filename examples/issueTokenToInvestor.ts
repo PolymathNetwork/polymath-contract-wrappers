@@ -1,6 +1,6 @@
-import {PolymathAPI, ModuleName, TransactionParams} from '../src';
+import { PolymathAPI, ModuleName, TransactionParams } from '../src';
 import { moduleInstancesLookup } from './modules';
-import {SecurityTokenEvents_3_0_0} from '@polymathnetwork/abi-wrappers/lib/src';
+import { SecurityTokenEvents_3_0_0 } from '@polymathnetwork/abi-wrappers/lib/src';
 
 /**
  * Mints the token to a specific investor. Requires a valid security token and no transfer restrictions impeding the issuance.

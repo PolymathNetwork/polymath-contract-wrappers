@@ -141,8 +141,9 @@ interface GetAttachedModules {
     EtherDividendCheckpoint[]
   >;
 }
+
 /**
- * Looks up the instance of a module based on its moduleName. Requires security token to already be generated.
+ * Adds a module to the security token instance for a specific moduleName. Requires security token to already be generated.
  * @param polymathAPI Instance of the polymathAPI.
  * @param moduleName The enum ModuleName identifier
  * @param ticker The ticker symbol of the security token.

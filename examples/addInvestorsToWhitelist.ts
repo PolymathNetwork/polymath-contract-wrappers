@@ -1,4 +1,4 @@
-import {PolymathAPI, ModuleName, TransactionParams} from '../src';
+import { PolymathAPI, ModuleName, TransactionParams } from '../src';
 import { moduleInstancesLookup } from './modules';
 import { GeneralTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 

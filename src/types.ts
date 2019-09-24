@@ -259,7 +259,6 @@ export type ContractEventArgs_3_0_0 =
   | VestingEscrowWalletEventArgs_3_0_0;
 
 export type ContractEventArgs_3_1_0 = RestrictedPartialSaleTMEventArgs_3_1_0;
-
 export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 
 export type ContractEvents_3_0_0 =

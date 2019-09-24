@@ -1,4 +1,6 @@
 /* istanbul ignore file */
+import * as conversionUtils from './utils/convert';
+
 import { FeatureRegistryTransactionParams } from './contract_wrappers/registries/feature_registry_wrapper';
 import { GeneralTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper/common';
 import {SecurityTokenTransactionParams} from './contract_wrappers/tokens/security_token_wrapper';
@@ -49,6 +51,8 @@ export namespace TransactionParams {
   //   export import PolyToken = PolyTokenTransactionParams;
      export import SecurityToken = SecurityTokenTransactionParams;
 }
+
+export { conversionUtils };
 
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';

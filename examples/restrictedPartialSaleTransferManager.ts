@@ -9,10 +9,10 @@ import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
 import { registerTicker } from './registerTicker';
 import { launchToken } from './launchToken';
-import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
-import {RestrictedPartialSaleTransferManagerData} from '../src/contract_wrappers/tokens/security_token_wrapper';
+import { RestrictedPartialSaleTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper';
 
 // This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
 
@@ -56,12 +56,12 @@ window.addEventListener('load', async () => {
     label: 'TM Label',
   };
   await addModule(
-      polymathAPI,
-      {
-        ticker: myTicker,
-        moduleName: ModuleName.RestrictedPartialSaleTM,
-      },
-      options,
+    polymathAPI,
+    {
+      ticker: myTicker,
+      moduleName: ModuleName.RestrictedPartialSaleTM,
+    },
+    options,
   );
 
   // Declare some random beneficiaries to work with later on

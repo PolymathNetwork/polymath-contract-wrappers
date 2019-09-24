@@ -1,5 +1,5 @@
 import { PolymathAPI } from '../src';
-import {PolyTokenEvents_3_0_0, ISecurityTokenRegistryEvents_3_0_0} from '@polymathnetwork/abi-wrappers';
+import { PolyTokenEvents_3_0_0, ISecurityTokenRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
 /**
  * Registers a ticker for a future token. Requires no previous setup.
