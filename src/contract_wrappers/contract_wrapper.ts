@@ -37,9 +37,9 @@ export default abstract class ContractWrapper {
 
   public web3Wrapper: Web3Wrapper;
 
-  public abstract getLogsAsync: GetLogs | undefined;
+  public abstract getLogsAsync: GetLogs;
 
-  public abstract subscribeAsync: Subscribe | undefined;
+  public abstract subscribeAsync: Subscribe;
 
   public abstract contractVersion: ContractVersion;
 

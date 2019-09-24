@@ -8,7 +8,7 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import {
   bigNumberToDate,
   dateToBigNumber,
@@ -16,11 +16,27 @@ import {
   stringToBytes32,
   valueToWei,
 } from '../../../../../utils/convert';
-import { FlagsType, TransferType, Partition } from '../../../../../types';
+import { FlagsType, TransferType, Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 import GeneralTransferManagerCommon from '../common';
 
-describe('GeneralTransferManagerWrapper', () => {
-  let target: GeneralTransferManagerCommon;
+describe('General Transfer Manager Common', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 GeneralTransferManager contract since it has all common functionality
+  class FakeGeneralTransferManager extends GeneralTransferManagerCommon {
+    public contract: Promise<GeneralTransferManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeGeneralTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -33,7 +49,7 @@ describe('GeneralTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new GeneralTransferManagerCommon(
+    target = new FakeGeneralTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -48,8 +64,8 @@ describe('GeneralTransferManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend Module', async () => {
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 

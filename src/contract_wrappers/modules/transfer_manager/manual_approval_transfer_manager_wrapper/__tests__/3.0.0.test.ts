@@ -1,5 +1,5 @@
 import { mock, instance, reset } from 'ts-mockito';
-import { Web3Wrapper, ManualApprovalTransferManagerContract_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper, ManualApprovalTransferManagerContract_3_0_0, PolyTokenEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';
 import ManualApprovalTransferManagerCommon from '../common';
 import { ManualApprovalTransferManager_3_0_0 } from '../3.0.0';
@@ -35,6 +35,25 @@ describe('ManualApprovalTransferManager 3.0.0', () => {
   describe('Types', () => {
     test('should extend ManualApprovalTransferManagerCommon', async () => {
       expect(target instanceof ManualApprovalTransferManagerCommon).toBe(true);
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to ManualApprovalTransferManager', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(
+          `Expected eventName to be one of: 'AddManualApproval', 'ModifyManualApproval', 'RevokeManualApproval', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
+      );
     });
   });
 });

@@ -6,7 +6,7 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import assert from '../../../../utils/assert';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { TxParams, Perm, ErrorCode } from '../../../../types';
 import {
@@ -120,7 +120,7 @@ interface PermissionsPerModule {
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
-export default class GeneralPermissionManagerCommon extends ModuleWrapper {
+export default abstract class GeneralPermissionManagerCommon extends ModuleCommon {
   public contract: Promise<GeneralPermissionManagerContract_3_0_0 | GeneralPermissionManagerContract_3_1_0>;
 
   /**

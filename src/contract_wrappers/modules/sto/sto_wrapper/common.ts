@@ -1,6 +1,6 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import { STOBaseContract, FundRaiseType, FULL_DECIMALS } from '../../../../types';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 /**
@@ -13,7 +13,7 @@ export interface FundRaiseTypesParams {
 /**
  * This class includes the functionality related to interacting with all STO contracts
  */
-export default abstract class STOCommon extends ModuleWrapper {
+export default abstract class STOCommon extends ModuleCommon {
   public abstract contract: Promise<STOBaseContract>;
 
   /**

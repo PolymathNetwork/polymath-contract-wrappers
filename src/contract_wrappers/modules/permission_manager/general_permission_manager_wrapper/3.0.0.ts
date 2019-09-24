@@ -22,6 +22,7 @@ import {
   Perm,
   ErrorCode,
   ContractVersion,
+  Constructor,
 } from '../../../../types';
 import {
   numberToBigNumber,
@@ -30,6 +31,7 @@ import {
   parsePermBytes32Value,
 } from '../../../../utils/convert';
 import GeneralPermissionManagerCommon from './common';
+import { WithModule_3_0_0 } from '../../module_wrapper';
 
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
@@ -164,10 +166,12 @@ interface PermissionsPerModule {
 }
 // // End of return types ////
 
+const GeneralPermissionManagerBase_3_0_0 = WithModule_3_0_0(GeneralPermissionManagerCommon as unknown as Constructor<GeneralPermissionManagerCommon>);
+
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
  */
-export class GeneralPermissionManager_3_0_0 extends GeneralPermissionManagerCommon {
+export class GeneralPermissionManager_3_0_0 extends GeneralPermissionManagerBase_3_0_0 {
   public contract: Promise<GeneralPermissionManagerContract_3_0_0>;
 
   public contractVersion = ContractVersion.V3_0_0;

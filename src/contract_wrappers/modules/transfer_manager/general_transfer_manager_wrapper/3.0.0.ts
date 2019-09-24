@@ -21,10 +21,12 @@ import {
   Subscribe,
   GetLogs,
   EventCallback,
+  Constructor,
 } from '../../../../types';
 import ContractFactory from '../../../../factories/contractFactory';
 
 import GeneralTransferManagerCommon from './common';
+import { WithModule_3_0_0 } from '../../module_wrapper';
 
 interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralTransferManagerEvents_3_0_0.ChangeIssuanceAddress;
@@ -119,7 +121,9 @@ interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
   >;
 }
 
-export class GeneralTransferManager_3_0_0 extends GeneralTransferManagerCommon {
+const GeneralTransferManagerBase_3_0_0 = WithModule_3_0_0(GeneralTransferManagerCommon as unknown as Constructor<GeneralTransferManagerCommon>);
+
+export class GeneralTransferManager_3_0_0 extends GeneralTransferManagerBase_3_0_0 {
   public contract: Promise<GeneralTransferManagerContract_3_0_0>;
 
   public contractVersion = ContractVersion.V3_0_0;

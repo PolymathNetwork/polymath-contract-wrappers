@@ -6,7 +6,7 @@ import {
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { TxParams, Perm, TransferStatusCode, ErrorCode } from '../../../../types';
 import {
@@ -257,7 +257,7 @@ interface BeneficiarySchedule {
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
-export default class VestingEscrowWalletCommon extends ModuleWrapper {
+export default abstract class VestingEscrowWalletCommon extends ModuleCommon {
   public contract: Promise<VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0>;
 
   /**

@@ -7,9 +7,9 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
-import VestingEscrowWalletWrapper from '../common';
+import VestingEscrowWalletCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import {
   numberToBigNumber,
   stringToBytes32,
@@ -19,10 +19,26 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { TransferStatusCode } from '../../../../../types';
+import { TransferStatusCode, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('VestingEscrowWalletWrapper', () => {
-  let target: VestingEscrowWalletWrapper;
+  // we extend the class to be able to instance it, using the 3.0.0 VestingEscrowWallet contract since it has all common functionality
+  class FakeVestingEscrowWallet extends VestingEscrowWalletCommon {
+    public contract: Promise<VestingEscrowWalletContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<VestingEscrowWalletContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeVestingEscrowWallet;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: VestingEscrowWalletContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -35,7 +51,7 @@ describe('VestingEscrowWalletWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new VestingEscrowWalletWrapper(
+    target = new FakeVestingEscrowWallet(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -51,7 +67,7 @@ describe('VestingEscrowWalletWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 

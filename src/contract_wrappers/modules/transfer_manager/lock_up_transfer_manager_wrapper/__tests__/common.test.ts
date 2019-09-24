@@ -3,11 +3,10 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   LockUpTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
@@ -23,10 +22,26 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { Partition } from '../../../../../types';
+import { Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 import LockUpTransferManagerCommon from '../common';
 
 describe('LockUpTransferManagerWrapper', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 LockUpTransferManager contract since it has all common functionality
+  class FakeLockUpTransferManager extends LockUpTransferManagerCommon {
+    public contract: Promise<LockUpTransferManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<LockUpTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
   let target: LockUpTransferManagerCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: LockUpTransferManagerContract_3_0_0;
@@ -40,7 +55,7 @@ describe('LockUpTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new LockUpTransferManagerCommon(
+    target = new FakeLockUpTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -56,7 +71,7 @@ describe('LockUpTransferManagerWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 
@@ -1797,25 +1812,6 @@ describe('LockUpTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to LockUpTransferManager', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'AddLockUpToUser', 'RemoveLockUpFromUser', 'ModifyLockUpType', 'AddNewLockUpType', 'RemoveLockUpType', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });

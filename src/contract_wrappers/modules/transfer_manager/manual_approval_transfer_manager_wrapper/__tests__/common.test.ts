@@ -3,7 +3,6 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   ManualApprovalTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -21,11 +20,28 @@ import {
   valueArrayToWeiArray,
   weiToValue,
 } from '../../../../../utils/convert';
-import ManualApprovarTransferManagerCommon from '../common';
-import ModuleWrapper from '../../../module_wrapper';
+import ManualApprovalTransferManagerCommon from '../common';
+import { ModuleCommon } from '../../../module_wrapper';
+import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
-  let target: ManualApprovarTransferManagerCommon;
+  // we extend the class to be able to instance it, using the 3.0.0 ManualApprovalTransferManager contract since it has all common functionality
+  class FakeManualApprovalTransferManager extends ManualApprovalTransferManagerCommon {
+    public contract: Promise<ManualApprovalTransferManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ManualApprovalTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeManualApprovalTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ManualApprovalTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -38,7 +54,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ManualApprovarTransferManagerCommon(
+    target = new FakeManualApprovalTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -54,7 +70,7 @@ describe('ManualApprovalTransferManagerWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 
@@ -842,25 +858,6 @@ describe('ManualApprovalTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to ManualApprovalTransferManager', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'AddManualApproval', 'ModifyManualApproval', 'RevokeManualApproval', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });

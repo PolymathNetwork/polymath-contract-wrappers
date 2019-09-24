@@ -21,10 +21,26 @@ import {
   weiArrayToValueArray,
   weiToValue,
 } from '../../../../../utils/convert';
-import { ContractVersion, FULL_DECIMALS, FundRaiseType, ModuleName } from '../../../../../types';
+import { ContractVersion, FULL_DECIMALS, FundRaiseType, ModuleName, Subscribe, GetLogs } from '../../../../../types';
 
-describe('USD Tiered STO Common', () => {  
-  let target: USDTieredSTOCommon;
+describe('USD Tiered STO Common', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 STO contract since it has all common functionality
+  class FakeUSDTieredSTO extends USDTieredSTOCommon {
+    public contract: Promise<USDTieredSTOContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<USDTieredSTOContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeUSDTieredSTO;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -43,7 +59,7 @@ describe('USD Tiered STO Common', () => {
     mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new USDTieredSTOCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new FakeUSDTieredSTO(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {

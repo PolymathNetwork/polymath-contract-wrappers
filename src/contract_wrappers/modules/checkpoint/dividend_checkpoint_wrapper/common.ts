@@ -1,5 +1,5 @@
 import { BigNumber, TxData, ERC20DetailedContract_3_0_0, PolyResponse } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 import { TxParams, Perm, PERCENTAGE_DECIMALS, ErrorCode, DividendCheckpointBaseContract } from '../../../../types';
 import {
@@ -218,7 +218,7 @@ interface CheckpointData {
 /**
  * This class includes the functionality related to interacting with all DividendCheckpoint contracts.
  */
-export default abstract class DividendCheckpointCommon extends ModuleWrapper {
+export default abstract class DividendCheckpointCommon extends ModuleCommon {
   public abstract contract: Promise<DividendCheckpointBaseContract>;
 
   public erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {

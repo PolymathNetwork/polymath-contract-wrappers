@@ -4,7 +4,7 @@ import functionsUtils from '../../../../utils/functions_utils';
 import CappedSTOCommon, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
 import assert from '../../../../utils/assert';
 import {
-  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType,
+  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType, Constructor,
 } from '../../../../types';
 import {
   valueToWei, bigNumberToDate, weiToValue,
@@ -141,7 +141,7 @@ export interface CappedSTODetails {
   preMintingAllowed: boolean;
 }
 
-const CappedSTOBase_3_1_0 = WithSTO_3_1_0(CappedSTOCommon);
+const CappedSTOBase_3_1_0 = WithSTO_3_1_0(CappedSTOCommon as unknown as Constructor<CappedSTOCommon>);
 
 export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
   public contract: Promise<CappedSTOContract_3_1_0>;

@@ -55,7 +55,7 @@ export interface BuyTokensWithPolyParams extends TxParams {
 /**
  * This class includes the functionality related to interacting with the CappedSTO contract.
  */
-export default class CappedSTOCommon extends STOCommon {
+export default abstract class CappedSTOCommon extends STOCommon {
   public contract: Promise<CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0>;
 
   /**

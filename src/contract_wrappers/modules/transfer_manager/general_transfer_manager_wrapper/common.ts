@@ -17,7 +17,7 @@ import {
 } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { ErrorCode, FlagsType, Partition, Perm, TransferResult, TransferType, TxParams } from '../../../../types';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 
 const ONE_HUNDRED = new BigNumber(100);
@@ -267,7 +267,7 @@ interface VerifyTransfer {
 /**
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
-export default class GeneralTransferManagerCommon extends ModuleWrapper {
+export default abstract class GeneralTransferManagerCommon extends ModuleCommon {
   public contract: Promise<GeneralTransferManagerContract_3_0_0 | GeneralTransferManagerContract_3_1_0>;
 
   /**

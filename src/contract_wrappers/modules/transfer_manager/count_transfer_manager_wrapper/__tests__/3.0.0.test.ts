@@ -4,6 +4,7 @@ import {
   CountTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
+  PolyTokenEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { CountTransferManager_3_0_0 } from '../3.0.0';
@@ -40,6 +41,23 @@ describe('CountTransferManagerWrapper', () => {
   describe('Types', () => {
     test('should extend CountTransferManagerCommon', async () => {
       expect(target instanceof CountTransferManagerCommon).toBe(true);
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to CountTransferManager', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(`Expected eventName to be one of: 'ModifyHolderCount', 'Pause', 'Unpause', encountered: Transfer`),
+      );
     });
   });
 });

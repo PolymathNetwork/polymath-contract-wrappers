@@ -18,13 +18,20 @@ import {
   numberArrayToBigNumberArray,
   numberToBigNumber,
 } from '../../../../../utils/convert';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import DividendCheckpointCommon from '../common';
+import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('DividendCheckpointWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 DividendCheckpoint contract since it has all common functionality
   class FakeDividendCheckpoint extends DividendCheckpointCommon {
     public contract: Promise<EtherDividendCheckpointContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
 
     public getDecimals = async (): Promise<BigNumber> => {
       return new BigNumber(18);
@@ -64,8 +71,8 @@ describe('DividendCheckpointWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend Module', async () => {
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 

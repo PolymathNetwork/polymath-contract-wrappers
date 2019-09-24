@@ -3,13 +3,12 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   VolumeRestrictionTMContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
-import { RestrictionType } from '../../../../../types';
-import ModuleWrapper from '../../../module_wrapper';
+import { RestrictionType, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { ModuleCommon } from '../../../module_wrapper';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
   bigNumberToDate,
@@ -24,7 +23,23 @@ import {
 import VolumeRestrictionTransferManagerCommon from '../common';
 
 describe('VolumeRestrictionTransferManagerWrapper', () => {
-  let target: VolumeRestrictionTransferManagerCommon;
+  // we extend the class to be able to instance it, using the 3.0.0 VolumeRestrictionTransferManager contract since it has all common functionality
+  class FakeVolumeRestrictionTransferManager extends VolumeRestrictionTransferManagerCommon {
+    public contract: Promise<VolumeRestrictionTMContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<VolumeRestrictionTMContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeVolumeRestrictionTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: VolumeRestrictionTMContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -37,7 +52,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new VolumeRestrictionTransferManagerCommon(
+    target = new FakeVolumeRestrictionTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -53,7 +68,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 
@@ -2098,25 +2113,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
         verify(mockedSecurityTokenContract.decimals).twice();
       });
-    });
-
-    describe('SubscribeAsync', () => {
-      test('should throw as eventName does not belong to VolumeRestrictionTransferManager', async () => {
-        // Mocked parameters
-        const mockedParams = {
-          eventName: PolyTokenEvents_3_0_0.Transfer,
-          indexFilterValues: {},
-          callback: () => {},
-          isVerbose: false,
-        };
-
-        // Real call
-        await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-          new Error(
-            `Expected eventName to be one of: 'ChangedExemptWalletList', 'AddIndividualRestriction', 'AddIndividualDailyRestriction', 'ModifyIndividualRestriction', 'ModifyIndividualDailyRestriction', 'AddDefaultRestriction', 'AddDefaultDailyRestriction', 'ModifyDefaultRestriction', 'ModifyDefaultDailyRestriction', 'IndividualRestrictionRemoved', 'IndividualDailyRestrictionRemoved', 'DefaultRestrictionRemoved', 'DefaultDailyRestrictionRemoved', 'Pause', 'Unpause', encountered: Transfer`,
-          ),
-        );
-      });
-    });
+    });    
   });
 });

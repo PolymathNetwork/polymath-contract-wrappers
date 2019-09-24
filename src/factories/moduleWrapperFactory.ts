@@ -17,7 +17,7 @@ import {
   GeneralPermissionManager_3_0_0,
   GeneralPermissionManager_3_1_0,
 } from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
-import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory_3_0_0 } from '../contract_wrappers/modules/module_factory_wrapper';
 import {
   VestingEscrowWallet_3_0_0,
   VestingEscrowWallet_3_1_0,
@@ -87,6 +87,7 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
+  (params: GetCountTransferManager): Promise<CountTransferManager_3_0_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
@@ -112,9 +113,9 @@ export default class ModuleWrapperFactory {
     this.contractFactory = contractFactory;
   }
 
-  public getModuleFactory = async (address: string): Promise<ModuleFactoryWrapper> => {
+  public getModuleFactory = async (address: string): Promise<ModuleFactory_3_0_0> => {
     const factory = this.contractFactory.getModuleFactoryContract(address);
-    return new ModuleFactoryWrapper(this.web3Wrapper, factory);
+    return new ModuleFactory_3_0_0(this.web3Wrapper, factory);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -5,15 +5,31 @@ import {
   ModuleContract_3_0_0,
   ISecurityTokenContract_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../test_utils/mocked_methods';
-import ContractFactory from '../../../factories/contractFactory';
-import ContractWrapper from '../../contract_wrapper';
-import ModuleWrapper from '../module_wrapper';
-import { stringToBytes32 } from '../../../utils/convert';
-import { Perm } from '../../../types';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../factories/contractFactory';
+import ContractWrapper from '../../../contract_wrapper';
+import ModuleCommon from '../common';
+import { stringToBytes32 } from '../../../../utils/convert';
+import { Perm, ContractVersion, Subscribe, GetLogs } from '../../../../types';
 
-describe('ModuleFactoryWrapper', () => {
-  let target: ModuleWrapper;
+describe('Module Common', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 CappedSTO contract since it has all common functionality
+  class FakeModule extends ModuleCommon {
+    public contract: Promise<ModuleContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ModuleContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeModule;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -26,7 +42,7 @@ describe('ModuleFactoryWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ModuleWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new FakeModule(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {

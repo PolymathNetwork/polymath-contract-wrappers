@@ -23,6 +23,7 @@ import {
   Subscribe,
   GetLogs,
   ContractVersion,
+  Constructor,
 } from '../../../../types';
 import ERC20DividendCheckpointCommon from './common';
 
@@ -123,7 +124,7 @@ interface GetERC20DividendCheckpointLogsAsyncParams extends GetLogs {
   >;
 }
 
-const ERC20DividendCheckpointBase_3_0_0 = WithDividendCheckpoint_3_0_0(ERC20DividendCheckpointCommon);
+const ERC20DividendCheckpointBase_3_0_0 = WithDividendCheckpoint_3_0_0(ERC20DividendCheckpointCommon as unknown as Constructor<ERC20DividendCheckpointCommon>);
 
 export class ERC20DividendCheckpoint_3_0_0 extends ERC20DividendCheckpointBase_3_0_0 {
   public contract: Promise<ERC20DividendCheckpointContract_3_0_0>;

@@ -3,8 +3,8 @@ import { mock, instance, reset, when, verify } from 'ts-mockito';
 import { CappedSTOContract_3_0_0, ISecurityTokenContract_3_0_0, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
-import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
-import ModuleWrapper from '../../../module_wrapper';
+import { FULL_DECIMALS, FundRaiseType, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { ModuleCommon } from '../../../module_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../../utils/convert';
 import STOCommon from '../common';
 
@@ -12,6 +12,12 @@ describe('STO Common', () => {
   // we extend the class to be able to instance it, using the 3.0.0 CappedSTO contract since it has all common functionality
   class FakeSTO extends STOCommon {
     public contract: Promise<CappedSTOContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
 
     public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_0_0>, contractFactory: ContractFactory) {
       super(web3Wrapper, contract, contractFactory);
@@ -43,8 +49,8 @@ describe('STO Common', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend Module', async () => {
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 

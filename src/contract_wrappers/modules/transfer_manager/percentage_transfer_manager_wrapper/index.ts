@@ -1,7 +1,18 @@
 /* istanbul ignore file */
 import { PercentageTransferManager_3_0_0, isPercentageTransferManager_3_0_0 } from './3.0.0';
 
+import Common from './common';
+import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+
 export type PercentageTransferManager = PercentageTransferManager_3_0_0;
 
 export { PercentageTransferManager_3_0_0, isPercentageTransferManager_3_0_0 };
-export { default as PercentageTransferManagerCommon } from './common';
+
+// for internal use
+export class PercentageTransferManagerCommon extends Common {
+  public contractVersion!: ContractVersion;
+
+  public subscribeAsync!: Subscribe;
+
+  public getLogsAsync!: GetLogs;
+}

@@ -1,5 +1,5 @@
 import { mock, instance, reset } from 'ts-mockito';
-import { Web3Wrapper, LockUpTransferManagerContract_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper, LockUpTransferManagerContract_3_0_0, PolyTokenEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../../factories/contractFactory';
 import LockUpTransferManagerCommon from '../common';
 import { LockUpTransferManager_3_0_0 } from '../3.0.0';
@@ -35,6 +35,25 @@ describe('LockUpTransferManager 3.0.0', () => {
   describe('Types', () => {
     test('should extend LockUpTransferManagerCommon', async () => {
       expect(target instanceof LockUpTransferManagerCommon).toBe(true);
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to LockUpTransferManager', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(
+          `Expected eventName to be one of: 'AddLockUpToUser', 'RemoveLockUpFromUser', 'ModifyLockUpType', 'AddNewLockUpType', 'RemoveLockUpType', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
+      );
     });
   });
 });

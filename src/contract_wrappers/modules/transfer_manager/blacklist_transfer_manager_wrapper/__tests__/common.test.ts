@@ -3,13 +3,12 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   BlacklistTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import ContractFactory from '../../../../../factories/contractFactory';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import {
   bytes32ArrayToStringArray,
   dateArrayToBigNumberArray,
@@ -20,13 +19,19 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { Partition } from '../../../../../types';
+import { Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 import BlacklistTransferManagerCommon from '../common';
 
 describe('BlacklistTransferManagerWrapper', () => {
 
   class FakeBlacklistTransferManager extends BlacklistTransferManagerCommon {
     public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
 
     public constructor(web3Wrapper: Web3Wrapper, contract: Promise<BlacklistTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
       super(web3Wrapper, contract, contractFactory);
@@ -63,7 +68,7 @@ describe('BlacklistTransferManagerWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 
@@ -1645,25 +1650,6 @@ describe('BlacklistTransferManagerWrapper', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.decimals).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to BlacklistTransferManager', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'AddBlacklistType', 'ModifyBlacklistType', 'DeleteBlacklistType', 'AddInvestorToBlacklist', 'DeleteInvestorFromBlacklist', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });
