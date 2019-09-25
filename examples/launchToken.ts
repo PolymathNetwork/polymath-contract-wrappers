@@ -1,48 +1,39 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { PolyTokenEvents, SecurityTokenRegistryEvents } from '@polymathnetwork/abi-wrappers';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { PolymathAPI } from '../src';
+import { PolyTokenEvents_3_0_0, ISecurityTokenRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
-// This file acts as a valid sandbox.ts file in root directory for launch a new Token on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  const ticker = 'TEST';
-  const tokenName = 'TEST TOKEN';
-
-  const launchToken = async () => {
-    await polymathAPI.securityTokenRegistry.generateSecurityToken({
-      name: tokenName,
-      ticker,
-      details: 'http://www.polymath.network',
-      divisible: true,
-    });
-  };
-
+/**
+ * Generates a new security token. Requires that a ticker has been registered previously.
+ * @param polymathAPI Instance of the polymathAPI.
+ * @param name The name of the token.
+ * @param ticker The ticker symbol of the security token.
+ * @param tokenDetails The off-chain details of the token.
+ * @param divisible Whether or not the token is divisible.
+ * @param treasuryWallet Ethereum address which will holds the STs.
+ * @param protocolVersion Version of securityToken contract.
+ */
+export const launchToken = async (
+  polymathAPI: PolymathAPI,
+  name: string,
+  ticker: string,
+  tokenDetails: string,
+  treasuryWallet: string,
+  divisible: boolean,
+  protocolVersion?: string,
+) => {
+  // Subscribe to events
   await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
+    eventName: PolyTokenEvents_3_0_0.Approval,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
         console.log(error);
       } else {
-        await launchToken();
+        console.log('Tokens approved');
       }
     },
   });
-
   await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.NewSecurityToken,
+    eventName: ISecurityTokenRegistryEvents_3_0_0.NewSecurityToken,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -53,24 +44,30 @@ window.addEventListener('load', async () => {
     },
   });
 
+  // Get the st launch fee and approve the security token registry to spend
   const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  const polyBalance = await polymathAPI.polyToken.balanceOf();
-  if (polyBalance.isGreaterThanOrEqualTo(polyBalance)) {
-    const owner = await polymathAPI.getAccount();
-    const spender = await polymathAPI.securityTokenRegistry.address();
-    const allowance = await polymathAPI.polyToken.allowance({
-      owner,
+  // Get the st registry address
+  const spender = await polymathAPI.securityTokenRegistry.address();
+  // Finding the polytoken allowance for current user
+  const allowance = await polymathAPI.polyToken.allowance({
+    owner: await polymathAPI.getAccount(),
+    spender,
+  });
+  if (allowance.isLessThan(securityTokenLaunchFee)) {
+    // Approve poly token expenditure
+    await polymathAPI.polyToken.approve({
       spender,
+      value: securityTokenLaunchFee,
     });
-    if (allowance.isLessThan(securityTokenLaunchFee)) {
-      await polymathAPI.polyToken.approve({
-        spender,
-        value: securityTokenLaunchFee,
-      });
-    } else {
-      await launchToken();
-    }
   }
-
-  polymathAPI.securityTokenRegistry.unsubscribeAll();
-});
+  protocolVersion = protocolVersion ? protocolVersion : '0';
+  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
+    name,
+    ticker,
+    tokenDetails,
+    treasuryWallet,
+    protocolVersion,
+    divisible,
+  });
+  console.log('Token launched successfully!');
+};

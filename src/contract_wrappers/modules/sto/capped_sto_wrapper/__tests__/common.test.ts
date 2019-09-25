@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   CappedSTOContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenContract_3_0_0,  
+  PolyTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -507,5 +507,5 @@ describe('Capped STO Common', () => {
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
     });
-  });  
+  });
 });
