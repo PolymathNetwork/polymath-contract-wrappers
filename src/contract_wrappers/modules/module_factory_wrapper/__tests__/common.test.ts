@@ -4,23 +4,23 @@ import {
   ModuleFactoryContract_3_0_0,
   BigNumber,
   Web3Wrapper,
-  EtherDividendCheckpointEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
-import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../test_utils/mocked_methods';
-import ContractFactory from '../../../factories/contractFactory';
+import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../test_utils/mocked_methods';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   bytes32ToString,
   parseModuleTypeValue,
   stringArrayToBytes32Array,
   stringToBytes32,
   weiToValue,
-} from '../../../utils/convert';
-import ModuleFactoryWrapper from '../module_factory_wrapper';
-import ContractWrapper from '../../contract_wrapper';
-import {BoundType, FULL_DECIMALS, ModuleType} from '../../../types';
+} from '../../../../utils/convert';
+import ModuleFactoryCommon from '../common';
+import { ModuleFactory_3_0_0 } from '../3.0.0';
+import ContractWrapper from '../../../contract_wrapper';
+import { BoundType, FULL_DECIMALS, ModuleType } from '../../../../types';
 
 describe('ModuleFactoryWrapper', () => {
-  let target: ModuleFactoryWrapper;
+  let target: ModuleFactoryCommon;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ModuleFactoryContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -31,7 +31,8 @@ describe('ModuleFactoryWrapper', () => {
     mockedContractFactory = mock(ContractFactory);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ModuleFactoryWrapper(instance(mockedWrapper), myContractPromise);
+    // we use the 3.0 class since the common one is abstract
+    target = new ModuleFactory_3_0_0(instance(mockedWrapper), myContractPromise);
   });
 
   afterEach(() => {
@@ -674,25 +675,6 @@ describe('ModuleFactoryWrapper', () => {
       // Verifications
       verify(mockedContract.setupCostInPoly).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to ModuleFactoryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: EtherDividendCheckpointEvents_3_0_0.EtherDividendDeposited,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'OwnershipTransferred', 'ChangeSetupCost', 'ChangeCostType', 'GenerateModuleFromFactory', 'ChangeSTVersionBound', encountered: EtherDividendDeposited`,
-        ),
-      );
     });
   });
 });

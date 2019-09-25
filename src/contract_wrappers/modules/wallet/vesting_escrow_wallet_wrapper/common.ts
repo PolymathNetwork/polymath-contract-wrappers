@@ -6,7 +6,7 @@ import {
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import { TxParams, Perm, TransferStatusCode, ErrorCode } from '../../../../types';
 import {
@@ -257,7 +257,7 @@ interface BeneficiarySchedule {
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
-export default class VestingEscrowWalletCommon extends ModuleWrapper {
+export default abstract class VestingEscrowWalletCommon extends ModuleCommon {
   public contract: Promise<VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0>;
 
   /**
@@ -274,40 +274,6 @@ export default class VestingEscrowWalletCommon extends ModuleWrapper {
     super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
-
-  /**
-   *  Unpause the module
-   */
-  public unpause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  Check if module paused
-   *  @return boolean is paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
-   *  Pause the module
-   */
-  public pause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
 
   /**
    * Number of tokens that are hold by the `this` contract but are unassigned to any schedule

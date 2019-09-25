@@ -30,10 +30,12 @@ import {
   EventCallback,
   Subscribe,
   GetLogs,
+  Constructor,
 } from '../../../../types';
 import { stringToBytes32, dateToBigNumber } from '../../../../utils/convert';
 import VestingEscrowWalletCommon from './common';
 import assert from '../../../../utils/assert';
+import { WithModule_3_0_0 } from '../../module_wrapper';
 
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents_3_0_0.AddSchedule;
@@ -202,10 +204,12 @@ export namespace VestingEscrowWalletTransactionParams {
   export interface ModifySchedule extends ModifyScheduleParams {}
 }
 
+const VestingEscrowWalletBase_3_0_0 = WithModule_3_0_0(VestingEscrowWalletCommon as unknown as Constructor<VestingEscrowWalletCommon>);
+
 /**
  * This class includes the functionality related to interacting with the Vesting Escrow Wallet contract.
  */
-export class VestingEscrowWallet_3_0_0 extends VestingEscrowWalletCommon {
+export class VestingEscrowWallet_3_0_0 extends VestingEscrowWalletBase_3_0_0 {
   public contract: Promise<VestingEscrowWalletContract_3_0_0>;
 
   public contractVersion = ContractVersion.V3_0_0;

@@ -28,6 +28,7 @@ import {
   Subscribe,
   GetLogs,
   ContractVersion,
+  Constructor,
 } from '../../../../types';
 import EtherDividendCheckpointCommon from './common';
 
@@ -187,7 +188,7 @@ interface GetEtherDividendCheckpointLogsAsyncParams extends GetLogs {
   (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<EtherDividendCheckpointUnpauseEventArgs_3_0_0>[]>;
 }
 
-const EtherDividendCheckpointBase_3_0_0 = WithDividendCheckpoint_3_0_0(EtherDividendCheckpointCommon);
+const EtherDividendCheckpointBase_3_0_0 = WithDividendCheckpoint_3_0_0(EtherDividendCheckpointCommon as unknown as Constructor<EtherDividendCheckpointCommon>);
 
 export class EtherDividendCheckpoint_3_0_0 extends EtherDividendCheckpointBase_3_0_0 {
   public contract: Promise<EtherDividendCheckpointContract_3_0_0>;

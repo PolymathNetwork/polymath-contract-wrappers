@@ -3,7 +3,7 @@ import { schemas } from '@0x/json-schemas';
 import USDTieredSTOCommon, { TierIndexParams } from './common';
 import assert from '../../../../utils/assert';
 import {
-  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
+  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, Constructor,
 } from '../../../../types';
 import {
   numberToBigNumber,  
@@ -248,7 +248,7 @@ interface Tier {
   soldDiscountPoly: BigNumber;
 }
 
-const USDTieredSTOBase_3_1_0 = WithSTO_3_1_0(USDTieredSTOCommon);
+const USDTieredSTOBase_3_1_0 = WithSTO_3_1_0(USDTieredSTOCommon as unknown as Constructor<USDTieredSTOCommon>);
 
 export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
   public contract: Promise<USDTieredSTOContract_3_1_0>;

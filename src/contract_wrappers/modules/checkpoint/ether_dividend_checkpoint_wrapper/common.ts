@@ -59,7 +59,7 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
 /**
  * This class includes the functionality related to interacting with the EtherDividendCheckpoint contract.
  */
-export default class EtherDividendCheckpointWrapper extends DividendCheckpointCommon {
+export default abstract class EtherDividendCheckpointCommon extends DividendCheckpointCommon {
   public contract: Promise<EtherDividendCheckpointContract_3_0_0>;
   
   public contractVersion = ContractVersion.V3_0_0;

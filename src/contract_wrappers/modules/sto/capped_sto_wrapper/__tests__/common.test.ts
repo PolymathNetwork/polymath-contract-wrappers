@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   CappedSTOContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenContract_3_0_0,  
+  PolyTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -12,10 +12,26 @@ import CappedSTOCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { STOCommon } from '../../sto_wrapper';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
-import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
+import { FULL_DECIMALS, FundRaiseType, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
-describe('Capped STO Common', () => {  
-  let target: CappedSTOCommon;
+describe('Capped STO Common', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 STO contract since it has all common functionality
+  class FakeCappedSTO extends CappedSTOCommon {
+    public contract: Promise<CappedSTOContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeCappedSTO;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -30,7 +46,7 @@ describe('Capped STO Common', () => {
     mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new CappedSTOCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new FakeCappedSTO(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -491,5 +507,5 @@ describe('Capped STO Common', () => {
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
     });
-  });  
+  });
 });

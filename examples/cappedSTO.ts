@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { ModuleRegistryEvents, BigNumber, CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
+import { ModuleRegistryEvents_3_0_0, BigNumber, CappedSTOEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { CappedSTOFundRaiseType, ModuleName, ModuleType } from '../src';
@@ -92,7 +92,7 @@ window.addEventListener('load', async () => {
   });
 
   await polymathAPI.moduleRegistry.subscribeAsync({
-    eventName: ModuleRegistryEvents.ModuleRegistered,
+    eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -136,6 +136,7 @@ window.addEventListener('load', async () => {
       rate: new BigNumber(10),
       fundRaiseType: CappedSTOFundRaiseType.ETH,
       fundsReceiver: await polymathAPI.getAccount(),
+      treasuryWallet: myAddress
     },
   });
 
@@ -156,7 +157,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of token purchase
   await cappedSTO.subscribeAsync({
-    eventName: CappedSTOEvents.TokenPurchase,
+    eventName: CappedSTOEvents_3_0_0.TokenPurchase,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

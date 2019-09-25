@@ -6,11 +6,18 @@ import STOCommon from '../common';
 import { WithSTO_3_1_0 } from '../3.1.0';
 import { MockedCallMethod, getMockedPolyResponse, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import { dateToBigNumber } from '../../../../../utils/convert';
+import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('STO 3.1.0', () => {
   // we extend the class to be able to instance it, using the 3.1.0 CappedSTO contract since it has all common functionality
   class FakeSTO extends STOCommon {
     public contract: Promise<CappedSTOContract_3_1_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
 
     public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_1_0>, contractFactory: ContractFactory) {
       super(web3Wrapper, contract, contractFactory);

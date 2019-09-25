@@ -3,7 +3,7 @@ import { schemas } from '@0x/json-schemas';
 import CappedSTOCommon from './common';
 import assert from '../../../../utils/assert';
 import {
-  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS,
+  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, Constructor,
 } from '../../../../types';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
@@ -93,7 +93,7 @@ export interface CappedSTODetails {
 }
 // // End of return types ////
 
-const CappedSTOBase_3_0_0 = WithSTO_3_0_0(CappedSTOCommon);
+const CappedSTOBase_3_0_0 = WithSTO_3_0_0(CappedSTOCommon as unknown as Constructor<CappedSTOCommon>);
 
 export class CappedSTO_3_0_0 extends CappedSTOBase_3_0_0 {
   public contract: Promise<CappedSTOContract_3_0_0>;

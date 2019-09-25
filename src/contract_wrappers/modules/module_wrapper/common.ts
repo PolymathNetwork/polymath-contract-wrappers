@@ -8,13 +8,13 @@ import {
   BigNumber,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
-import ContractWrapper from '../contract_wrapper';
-import ContractFactory from '../../factories/contractFactory';
-import { PolymathError } from '../../PolymathError';
-import { TxParams, GenericModuleContract, GetLogs, Subscribe, ErrorCode, ContractVersion, Perm } from '../../types';
-import { stringToBytes32, parseModuleTypeValue, parsePermBytes32Value } from '../../utils/convert';
-import functionsUtils from '../../utils/functions_utils';
-import assert from '../../utils/assert';
+import ContractWrapper from '../../contract_wrapper';
+import ContractFactory from '../../../factories/contractFactory';
+import { PolymathError } from '../../../PolymathError';
+import { TxParams, GenericModuleContract, ErrorCode, Perm } from '../../../types';
+import { stringToBytes32, parseModuleTypeValue, parsePermBytes32Value } from '../../../utils/convert';
+import functionsUtils from '../../../utils/functions_utils';
+import assert from '../../../utils/assert';
 
 /**
  * @param tokenContract ERC20 Token Contract Address
@@ -26,12 +26,10 @@ export interface ReclaimERC20Params extends TxParams {
 /**
  * This class includes the functionality related to interacting with the Module contract.
  */
-export default class ModuleWrapper extends ContractWrapper {
-  public contract: Promise<GenericModuleContract>;
+export default abstract class ModuleCommon extends ContractWrapper {
+  public abstract contract: Promise<GenericModuleContract>;
 
   public contractFactory: ContractFactory;
-
-  public contractVersion = ContractVersion.V3_0_0;
 
   public securityTokenContract = async (): Promise<ISecurityTokenContract_3_0_0> => {
     const address = await (await this.contract).securityToken.callAsync();
@@ -51,12 +49,8 @@ export default class ModuleWrapper extends ContractWrapper {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
-  public getLogsAsync: GetLogs | undefined;
-
-  public subscribeAsync: Subscribe | undefined;
-
   /**
-   * Instantiate GeneralPermissionManagerWrapper
+   * Instantiate ModuleWrapper
    * @param web3Wrapper Web3Wrapper instance to use
    * @param contract
    */
@@ -65,8 +59,7 @@ export default class ModuleWrapper extends ContractWrapper {
     contract: Promise<GenericModuleContract>,
     contractFactory: ContractFactory,
   ) {
-    super(web3Wrapper, contract);
-    this.contract = contract;
+    super(web3Wrapper, contract);    
     this.contractFactory = contractFactory;
   }
 

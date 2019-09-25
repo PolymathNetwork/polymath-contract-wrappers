@@ -255,7 +255,7 @@ export interface USDTieredSTOData {
 /**
  * This class includes the functionality related to interacting with the USDTieredSTO contract.
  */
-export default class USDTieredSTOWrapper extends STOCommon {
+export default abstract class USDTieredSTOCommon extends STOCommon {
   public contract: Promise<USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0>;
 
   public generalTransferManagerContract = async (address: string): Promise<GeneralTransferManagerContract_3_0_0> => {
@@ -602,7 +602,7 @@ export default class USDTieredSTOWrapper extends STOCommon {
    */
   public fundsRaisedUSD = async (): Promise<BigNumber> => {
     return weiToValue(await (await this.contract).fundsRaisedUSD.callAsync(), FULL_DECIMALS);
-  }; 
+  };
 
   /**
    * This function converts from ETH or POLY to USD

@@ -12,7 +12,6 @@ import {
   TxParams,
   Perm,
   ErrorCode,
-  ContractVersion,
 } from '../../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../../utils/convert';
 
@@ -71,10 +70,8 @@ interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividend
 /**
  * This class includes the functionality related to interacting with the ERC20DividendCheckpoint contract.
  */
-export default class ERC20DividendCheckpointCommon extends DividendCheckpointCommon {
+export default abstract class ERC20DividendCheckpointCommon extends DividendCheckpointCommon {
   public contract: Promise<ERC20DividendCheckpointContract_3_0_0>;
-
-  public contractVersion = ContractVersion.V3_0_0;
 
   public erc20DetailedContract = async (address: string): Promise<ERC20DetailedContract_3_0_0> => {
     return this.contractFactory.getERC20DetailedContract(address);

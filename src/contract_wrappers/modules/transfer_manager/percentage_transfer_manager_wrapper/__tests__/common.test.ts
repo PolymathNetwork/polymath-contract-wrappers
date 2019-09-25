@@ -3,19 +3,34 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   PercentageTransferManagerContract_3_0_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenEvents_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import { PercentageTransferManager_3_0_0 } from '../3.0.0';
 import ContractFactory from '../../../../../factories/contractFactory';
-import ModuleWrapper from '../../../module_wrapper';
+import { ModuleCommon } from '../../../module_wrapper';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
-import { PERCENTAGE_DECIMALS } from '../../../../../types';
+import { PERCENTAGE_DECIMALS, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import PercentageTransferManagerCommon from '../common';
 
 describe('PercentageTransferManagerWrapper', () => {
-  let target: PercentageTransferManager_3_0_0;
+  // we extend the class to be able to instance it, using the 3.0.0 PercentageTransferManager contract since it has all common functionality
+  class FakePercentageTransferManager extends PercentageTransferManagerCommon {
+    public contract: Promise<PercentageTransferManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<PercentageTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakePercentageTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: PercentageTransferManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -28,7 +43,7 @@ describe('PercentageTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new PercentageTransferManager_3_0_0(
+    target = new FakePercentageTransferManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -44,7 +59,7 @@ describe('PercentageTransferManagerWrapper', () => {
 
   describe('Types', () => {
     test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 
@@ -87,153 +102,6 @@ describe('PercentageTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.maxHolderPercentage).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('paused', () => {
-    test('should get Paused', async () => {
-      // Address expected
-      const expectedResult = true;
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.paused).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.paused();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.paused).once();
-      verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('pause/unpause', () => {
-    test('should call to pause', async () => {
-      // Pause Result expected
-      const expectedPauseResult = false;
-      // Mocked method
-      const mockedPauseMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.paused).thenReturn(instance(mockedPauseMethod));
-      // Stub the request
-      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
-
-      // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.pause).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.pause(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.pause).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-      verify(mockedContract.paused).once();
-      verify(mockedPauseMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-    });
-
-    test('should call to unpause', async () => {
-      // Pause Result expected
-      const expectedPauseResult = true;
-      // Mocked method
-      const mockedPauseMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.paused).thenReturn(instance(mockedPauseMethod));
-      // Stub the request
-      when(mockedPauseMethod.callAsync()).thenResolve(expectedPauseResult);
-
-      // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.unpause).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
-
-      // Real call
-      const result = await target.unpause(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.unpause).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-      verify(mockedContract.paused).once();
-      verify(mockedPauseMethod.callAsync()).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 
@@ -585,25 +453,6 @@ describe('PercentageTransferManagerWrapper', () => {
       verify(mockedIssuanceMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to PercentageTransferManager', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: PolyTokenEvents_3_0_0.Transfer,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ModifyHolderPercentage', 'ModifyWhitelist', 'SetAllowPrimaryIssuance', 'Pause', 'Unpause', encountered: Transfer`,
-        ),
-      );
     });
   });
 });

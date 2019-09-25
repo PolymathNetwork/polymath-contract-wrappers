@@ -11,7 +11,7 @@ import {
   BigNumber,
   Web3Wrapper,
   CountTransferManagerContract_3_0_0,
-  ERC20DividendCheckpointContract_3_0_0,  
+  ERC20DividendCheckpointContract_3_0_0,
   PercentageTransferManagerContract_3_0_0,
   EtherDividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
@@ -4142,7 +4142,7 @@ describe('SecurityTokenCommon', () => {
         rate: new BigNumber(1),
         fundRaiseType: CappedSTOFundRaiseType.ETH,
         fundsReceiver: '0x2222222222222222222222222222222222222222',
-        treasuryWallet: '0x3333333333333333333333333333333333333333',
+        treasuryWallet: '0x1234522222222222222222222222222222222222',
       };
       const mockedCappedParams = {
         moduleName: ModuleName.CappedSTO,

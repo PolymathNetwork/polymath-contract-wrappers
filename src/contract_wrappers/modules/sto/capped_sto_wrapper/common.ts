@@ -55,7 +55,7 @@ export interface BuyTokensWithPolyParams extends TxParams {
 /**
  * This class includes the functionality related to interacting with the CappedSTO contract.
  */
-export default class CappedSTOCommon extends STOCommon {
+export default abstract class CappedSTOCommon extends STOCommon {
   public contract: Promise<CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0>;
 
   /**
@@ -93,14 +93,6 @@ export default class CappedSTOCommon extends STOCommon {
    */
   public allowBeneficialInvestments = async (): Promise<boolean> => {
     return (await this.contract).allowBeneficialInvestments.callAsync();
-  };
-
-  /**
-   *  check if the module is paused
-   *  @return boolean if paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
   };
 
   /**

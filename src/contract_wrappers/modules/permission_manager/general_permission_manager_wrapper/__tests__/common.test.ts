@@ -5,8 +5,8 @@ import {
   ISecurityTokenContract_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
-import ModuleWrapper from '../../../module_wrapper';
-import GeneralPermissionManagerWrapper from '../common';
+import { ModuleCommon } from '../../../module_wrapper';
+import GeneralPermissionManagerCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
   stringToBytes32,
@@ -15,11 +15,26 @@ import {
   numberToBigNumber,
 } from '../../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
-import { Perm } from '../../../../../types';
+import { Perm, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('GeneralPermissionManagerWrapper', () => {
-  // Declare GeneralPermissionManagerWrapper object
-  let target: GeneralPermissionManagerWrapper;
+  // we extend the class to be able to instance it, using the 3.0.0 GeneralPermissionManager contract since it has all common functionality
+  class FakeGeneralPermissionManager extends GeneralPermissionManagerCommon {
+    public contract: Promise<GeneralPermissionManagerContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+  
+  let target: FakeGeneralPermissionManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -32,7 +47,7 @@ describe('GeneralPermissionManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new GeneralPermissionManagerWrapper(
+    target = new FakeGeneralPermissionManager(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),
@@ -47,8 +62,8 @@ describe('GeneralPermissionManagerWrapper', () => {
   });
 
   describe('Types', () => {
-    test('should extend ModuleWrapper', async () => {
-      expect(target instanceof ModuleWrapper).toBe(true);
+    test('should extend Module', async () => {
+      expect(target instanceof ModuleCommon).toBe(true);
     });
   });
 

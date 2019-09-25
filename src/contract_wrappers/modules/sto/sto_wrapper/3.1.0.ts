@@ -2,6 +2,7 @@ import { PolyResponse } from '@polymathnetwork/abi-wrappers';
 import STOCommon from './common';
 import { TxParams, STOBaseContract_3_1_0, ErrorCode, Constructor } from '../../../../types';
 import assert from '../../../../utils/assert';
+import { WithModule_3_0_0 } from '../../module_wrapper';
 
 /**
  * @param tokenContract address of the ERC20 token to reclaim
@@ -29,8 +30,8 @@ export interface MixinSTO_3_1_0 {
 }
 
 export const WithSTO_3_1_0 = <T extends Constructor<STOCommon>>(Base: T): Constructor<MixinSTO_3_1_0> & T => {
-  class Extended extends Base {
-    public contract!: Promise<STOBaseContract_3_1_0>;
+  abstract class Extended extends Base {
+    public contract!: Promise<STOBaseContract_3_1_0>;    
 
     /**
      * Check if pre minting is allowed
@@ -126,5 +127,6 @@ export const WithSTO_3_1_0 = <T extends Constructor<STOCommon>>(Base: T): Constr
     };
   }
 
-  return Extended;
+  // even though this is a 3.1.0 contract, it still inherits from the 3.0.0 module contract
+  return WithModule_3_0_0(Extended);
 }

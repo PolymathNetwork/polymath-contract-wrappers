@@ -17,7 +17,7 @@ import {
 } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { ErrorCode, FlagsType, Partition, Perm, TransferResult, TransferType, TxParams } from '../../../../types';
-import ModuleWrapper from '../../module_wrapper';
+import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 
 const ONE_HUNDRED = new BigNumber(100);
@@ -267,7 +267,7 @@ interface VerifyTransfer {
 /**
  * This class includes the functionality related to interacting with the General Transfer Manager contract.
  */
-export default class GeneralTransferManagerCommon extends ModuleWrapper {
+export default abstract class GeneralTransferManagerCommon extends ModuleCommon {
   public contract: Promise<GeneralTransferManagerContract_3_0_0 | GeneralTransferManagerContract_3_1_0>;
 
   /**
@@ -284,39 +284,6 @@ export default class GeneralTransferManagerCommon extends ModuleWrapper {
     super(web3Wrapper, contract, contractFactory);
     this.contract = contract;
   }
-
-  /**
-   *  Unpause the module
-   */
-  public unpause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(await this.paused(), ErrorCode.PreconditionRequired, 'Controller not currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).unpause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   *  Check if the module is paused
-   */
-  public paused = async (): Promise<boolean> => {
-    return (await this.contract).paused.callAsync();
-  };
-
-  /**
-   *  Pause the module
-   */
-  public pause = async (params: TxParams): Promise<PolyResponse> => {
-    assert.assert(!(await this.paused()), ErrorCode.ContractPaused, 'Controller currently paused');
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'Sender is not owner',
-    );
-    return (await this.contract).pause.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
 
   /**
    *  Map of used nonces by customer

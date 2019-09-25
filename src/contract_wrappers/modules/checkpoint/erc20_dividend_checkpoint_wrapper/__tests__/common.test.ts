@@ -12,9 +12,26 @@ import ERC20DividendCheckpointCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { DividendCheckpointCommon } from '../../dividend_checkpoint_wrapper';
 import { dateToBigNumber, stringToBytes32, valueToWei } from '../../../../../utils/convert';
+import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
 
 describe('ERC20 Dividend Checkpoint Common', () => {
-  let target: ERC20DividendCheckpointCommon;
+  // we extend the class to be able to instance it, using the 3.0.0 ERC20DividendCheckpoint contract since it has all common functionality
+  class FakeERC20DividendCheckpoint extends ERC20DividendCheckpointCommon {
+    public contract: Promise<ERC20DividendCheckpointContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DividendCheckpointContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeERC20DividendCheckpoint;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ERC20DividendCheckpointContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -29,7 +46,7 @@ describe('ERC20 Dividend Checkpoint Common', () => {
     mockedERC20DetailedContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new ERC20DividendCheckpointCommon(
+    target = new FakeERC20DividendCheckpoint(
       instance(mockedWrapper),
       myContractPromise,
       instance(mockedContractFactory),

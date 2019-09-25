@@ -1,44 +1,27 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { PolyTokenEvents, SecurityTokenRegistryEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { PolymathAPI } from '../src';
+import { PolyTokenEvents_3_0_0, ISecurityTokenRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
-// This file acts as a valid sandbox.ts file in root directory for register a new Ticker on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
-  const myAddress = await polymathAPI.getAccount();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('Ticker', '');
-  const tokenName = prompt('Token Name', '');
-
+/**
+ * Registers a ticker for a future token. Requires no previous setup.
+ * @param polymathAPI Instance of the polymathAPI.
+ * @param ticker Token symbol you wish to reserve.
+ * @param owner Address of the owner for the registered ticker.
+ */
+export const registerTicker = async (polymathAPI: PolymathAPI, ticker: string, owner: string) => {
+  // Subscribe to events
   await polymathAPI.polyToken.subscribeAsync({
-    eventName: PolyTokenEvents.Approval,
+    eventName: PolyTokenEvents_3_0_0.Approval,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
         console.log(error);
       } else {
-        await registerTicker();
+        console.log('Tokens approved');
       }
     },
   });
-
   await polymathAPI.securityTokenRegistry.subscribeAsync({
-    eventName: SecurityTokenRegistryEvents.RegisterTicker,
+    eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -49,38 +32,25 @@ window.addEventListener('load', async () => {
     },
   });
 
-  const registerTicker = async () => {
-    await polymathAPI.securityTokenRegistry.registerTicker({
-      ticker: ticker!,
-      tokenName: tokenName!,
-    });
-  };
-
-  const tickerAvailable = await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
+  // Get the ticker fee and approve the security token registry to spend
+  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
+  // Get the security token registry address
+  const spender = await polymathAPI.securityTokenRegistry.address();
+  // Get the allowance for the polytoken owner
+  const allowance = await polymathAPI.polyToken.allowance({
+    owner,
+    spender,
   });
-
-  if (tickerAvailable) {
-    const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-    const polyBalance = await polymathAPI.polyToken.balanceOf();
-    if (polyBalance.isGreaterThanOrEqualTo(tickerFee)) {
-      const owner = await polymathAPI.getAccount();
-      const spender = await polymathAPI.securityTokenRegistry.address();
-      const allowance = await polymathAPI.polyToken.allowance({
-        owner,
-        spender,
-      });
-      if (allowance.isLessThan(tickerFee)) {
-        await polymathAPI.polyToken.approve({
-          spender,
-          value: tickerFee,
-        });
-      }
-
-      await registerTicker();
-    }
+  if (allowance.isLessThan(tickerFee)) {
+    // Approve spending of poly tokens
+    await polymathAPI.polyToken.approve({
+      spender,
+      value: tickerFee,
+    });
   }
-
-  await polymathAPI.polyToken.unsubscribeAll();
-  await polymathAPI.securityTokenRegistry.unsubscribeAll();
-});
+  await polymathAPI.securityTokenRegistry.registerNewTicker({
+    owner,
+    ticker,
+  });
+  console.log('Ticker registered successfully!');
+};

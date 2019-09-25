@@ -17,11 +17,12 @@ import {
   GeneralPermissionManager_3_0_0,
   GeneralPermissionManager_3_1_0,
 } from '../contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
-import ModuleFactoryWrapper from '../contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory_3_0_0 } from '../contract_wrappers/modules/module_factory_wrapper';
 import {
   VestingEscrowWallet_3_0_0,
   VestingEscrowWallet_3_1_0,
 } from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
+import { RestrictedPartialSaleTransferManager_3_1_0 } from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode, ContractVersion } from '../types';
@@ -68,6 +69,10 @@ interface GetVolumeRestrictionTransferManager extends GetModuleParams {
   name: ModuleName.VolumeRestrictionTM;
 }
 
+interface GetRestrictedPartialSaleTransferManager extends GetModuleParams {
+  name: ModuleName.RestrictedPartialSaleTM;
+}
+
 interface GetCappedSTO extends GetModuleParams {
   name: ModuleName.CappedSTO;
 }
@@ -87,11 +92,14 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
+  (params: GetCountTransferManager): Promise<CountTransferManager_3_0_0>;
   (params: GetManualApprovalTransferManager): Promise<ManualApprovalTransferManager_3_0_0>;
+  (params: GetCountTransferManager): Promise<CountTransferManager_3_0_0>;
   (params: GetPercentageTransferManager): Promise<PercentageTransferManager_3_0_0>;
   (params: GetLockUpTransferManager): Promise<LockUpTransferManager_3_0_0>;
   (params: GetBlacklistTransferManager): Promise<BlacklistTransferManager_3_0_0>;
   (params: GetVolumeRestrictionTransferManager): Promise<VolumeRestrictionTransferManager_3_0_0>;
+  (params: GetRestrictedPartialSaleTransferManager): Promise<RestrictedPartialSaleTransferManager_3_1_0>;
   (params: GetCappedSTO): Promise<CappedSTO_3_0_0 | CappedSTO_3_1_0>;
   (params: GetUSDTieredSTO): Promise<USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0>;
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
@@ -112,9 +120,9 @@ export default class ModuleWrapperFactory {
     this.contractFactory = contractFactory;
   }
 
-  public getModuleFactory = async (address: string): Promise<ModuleFactoryWrapper> => {
+  public getModuleFactory = async (address: string): Promise<ModuleFactory_3_0_0> => {
     const factory = this.contractFactory.getModuleFactoryContract(address);
-    return new ModuleFactoryWrapper(this.web3Wrapper, factory);
+    return new ModuleFactory_3_0_0(this.web3Wrapper, factory);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,6 +203,13 @@ export default class ModuleWrapperFactory {
         moduleWrapper = new VolumeRestrictionTransferManager_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getVolumeRestrictionTMContract(params.address),
+          this.contractFactory,
+        );
+        break;
+      case ModuleName.RestrictedPartialSaleTM:
+        moduleWrapper = new RestrictedPartialSaleTransferManager_3_1_0(
+          this.web3Wrapper,
+          this.contractFactory.getRestrictedPartialSaleTMContract(params.address),
           this.contractFactory,
         );
         break;
