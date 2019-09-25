@@ -3,7 +3,7 @@ import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockit
 import {
   CappedSTOContract_3_1_0,
   ISecurityTokenContract_3_0_0,
-  PolyTokenContract_3_0_0,
+  PolyTokenContract_3_0_0,  
   BigNumber,
   Web3Wrapper,
   PolyTokenEvents_3_0_0,
@@ -15,7 +15,7 @@ import ContractFactory from '../../../../../factories/contractFactory';
 import { valueToWei, weiToValue, dateToBigNumber } from '../../../../../utils/convert';
 import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('Capped STO 3.1.0', () => {
+describe('Capped STO 3.1.0', () => {  
   let target: CappedSTO_3_1_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: CappedSTOContract_3_1_0;
@@ -334,68 +334,6 @@ describe('Capped STO 3.1.0', () => {
       verify(mockedContract.startTime).once();
       verify(mockedEndTimeMethod.callAsync()).once();
       verify(mockedContract.endTime).once();
-    });
-  });
-
-  describe('Finalize', () => {
-    test('should finalize STO', async () => {
-      // Address expected
-      const expectedIsFinalizedResult = false;
-      // Mocked method
-      const mockedIsFinalizedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.isFinalized).thenReturn(instance(mockedIsFinalizedMethod));
-      // Stub the request
-      when(mockedIsFinalizedMethod.callAsync()).thenResolve(expectedIsFinalizedResult);
-
-      // Mock Only Owner and Security Token
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        txData: {},
-        safetyFactor: 10,
-      };
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.finalize).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-          expectedResult,
-      );
-
-      // Real call
-      const result = await target.finalize(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.finalize).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.isFinalized).once();
-      verify(mockedIsFinalizedMethod.callAsync()).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
 

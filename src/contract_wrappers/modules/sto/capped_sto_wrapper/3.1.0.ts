@@ -4,16 +4,7 @@ import functionsUtils from '../../../../utils/functions_utils';
 import CappedSTOCommon, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
 import assert from '../../../../utils/assert';
 import {
-  ErrorCode,
-  ContractVersion,
-  SubscribeAsyncParams,
-  GetLogsAsyncParams,
-  Subscribe,
-  GetLogs,
-  FULL_DECIMALS,
-  FundRaiseType,
-  Constructor,
-  TxParams,
+  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType, Constructor,
 } from '../../../../types';
 import {
   valueToWei, bigNumberToDate, weiToValue,
@@ -259,22 +250,6 @@ export class CappedSTO_3_1_0 extends CappedSTOBase_3_1_0 {
       params.safetyFactor,
     );
   };
-
-  /**
-   * Finalizes the STO and mint remaining tokens to reserve address
-   * Reserve address must be whitelisted to successfully finalize
-   */
-  public finalize = async (params: TxParams) => {
-    assert.assert(
-        await this.isCallerTheSecurityTokenOwner(params.txData),
-        ErrorCode.Unauthorized,
-        'The caller must be the ST owner',
-    );
-    assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
-    // we can't execute mint to validate the method
-    return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
 
   /**
    * Subscribe to an event type emitted by the contract.
