@@ -423,6 +423,7 @@ export enum ErrorCode {
   TickerExpired = 'TickerExpired',
   UnknownNetwork = 'UnknownNetwork',
   UnsupportedVersion = 'UnsupportedVersion',
+  InvalidLength = 'InvalidLength',
 }
 
 export enum ContractVersion {
