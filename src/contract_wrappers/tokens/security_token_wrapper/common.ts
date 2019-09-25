@@ -34,9 +34,6 @@ import {
   CappedSTOFundRaiseType,
   TransferStatusCode,
   ErrorCode,
-  ContractVersion,
-  Subscribe,
-  GetLogs,
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -696,10 +693,8 @@ interface ProduceAddModuleInformation {
 /**
  * This class includes the functionality related to interacting with the SecurityToken contract.
  */
-export default class SecurityTokenCommon extends ERC20TokenWrapper {
+export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public contract: Promise<ISecurityTokenContract_3_0_0>;
-
-  public contractVersion = ContractVersion.V3_0_0;
 
   public contractFactory: ContractFactory;
 
@@ -718,10 +713,6 @@ export default class SecurityTokenCommon extends ERC20TokenWrapper {
   public moduleRegistryContract = async (): Promise<ModuleRegistryContract_3_0_0> => {
     return this.contractFactory.getModuleRegistryContract();
   };
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 
   /**
    * Instantiate SecurityTokenWrapper

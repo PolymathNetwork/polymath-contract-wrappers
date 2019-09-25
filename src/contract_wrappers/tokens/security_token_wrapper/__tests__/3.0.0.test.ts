@@ -5,10 +5,7 @@ import SecurityTokenCommon from '../common';
 import { SecurityToken_3_0_0 } from '../3.0.0';
 
 describe('SecurityToken 3.0.0', () => {
-  // we empty-extend the mixin to be able to use the class as a type
-  class FakeSecurityToken_3_0_0 extends SecurityToken_3_0_0 {}
-
-  let target: FakeSecurityToken_3_0_0;
+  let target: SecurityToken_3_0_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ISecurityTokenContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -19,7 +16,7 @@ describe('SecurityToken 3.0.0', () => {
     mockedContractFactory = mock(ContractFactory);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new FakeSecurityToken_3_0_0(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new SecurityToken_3_0_0(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
