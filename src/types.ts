@@ -71,7 +71,6 @@ import {
   ISecurityTokenEvents_3_0_0,
   ISecurityTokenEventArgs_3_0_0,
   ISecurityTokenRegistryEventArgs_3_0_0,
-  SecurityTokenEvents_3_0_0,
   CappedSTOContract_3_1_0,
   USDTieredSTOContract_3_1_0,
   GeneralTransferManagerContract_3_1_0,
@@ -290,7 +289,6 @@ export type ContractEvents_3_0_0 =
   | PolymathRegistryEvents_3_0_0
   | ISecurityTokenRegistryEvents_3_0_0
   | ISecurityTokenEvents_3_0_0
-  | SecurityTokenEvents_3_0_0 // necessary duplication because of incomplete events
   | USDTieredSTOFactoryEvents_3_0_0
   | USDTieredSTOEvents_3_0_0
   | CountTransferManagerEvents_3_0_0

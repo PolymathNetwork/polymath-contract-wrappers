@@ -5242,7 +5242,7 @@ describe('SecurityTokenWrapper', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'ModuleAdded', 'ModuleUpgraded', 'UpdateTokenDetails', 'UpdateTokenName', 'GranularityChanged', 'FreezeIssuance', 'FreezeTransfers', 'CheckpointCreated', 'SetController', 'TreasuryWalletChanged', 'DisableController', 'OwnershipTransferred', 'TokenUpgraded', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'TransferByPartition', 'AuthorizedOperator', 'RevokedOperator', 'AuthorizedOperatorByPartition', 'RevokedOperatorByPartition', 'IssuedByPartition', 'RedeemedByPartition', 'ControllerTransfer', 'ControllerRedemption', 'DocumentRemoved', 'DocumentUpdated', 'Issued', 'Redeemed', 'Transfer', 'Approval', encountered: ChangeFeatureStatus`,
+          `Expected eventName to be one of: 'Transfer', 'Approval', 'ModuleAdded', 'UpdateTokenDetails', 'UpdateTokenName', 'GranularityChanged', 'FreezeIssuance', 'FreezeTransfers', 'CheckpointCreated', 'SetController', 'TreasuryWalletChanged', 'DisableController', 'OwnershipTransferred', 'TokenUpgraded', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'TransferByPartition', 'AuthorizedOperator', 'RevokedOperator', 'AuthorizedOperatorByPartition', 'RevokedOperatorByPartition', 'IssuedByPartition', 'RedeemedByPartition', 'DocumentRemoved', 'DocumentUpdated', 'ControllerTransfer', 'ControllerRedemption', 'Issued', 'Redeemed', encountered: ChangeFeatureStatus`,
         ),
       );
     });
