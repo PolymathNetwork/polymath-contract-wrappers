@@ -3,7 +3,6 @@ import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockit
 import {
   ISecurityTokenContract_3_0_0,
   FeatureRegistryContract_3_0_0,
-  FeatureRegistryEvents_3_0_0,
   ModuleFactoryContract_3_0_0,
   PolyTokenContract_3_0_0,
   ModuleRegistryContract_3_0_0,
@@ -5226,25 +5225,6 @@ describe('SecurityTokenCommon', () => {
       // Verifications
       verify(mockedContract.getAllDocuments).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: FeatureRegistryEvents_3_0_0.ChangeFeatureStatus,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ModuleAdded', 'ModuleUpgraded', 'UpdateTokenDetails', 'UpdateTokenName', 'GranularityChanged', 'FreezeIssuance', 'FreezeTransfers', 'CheckpointCreated', 'SetController', 'TreasuryWalletChanged', 'DisableController', 'OwnershipTransferred', 'TokenUpgraded', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'TransferByPartition', 'AuthorizedOperator', 'RevokedOperator', 'AuthorizedOperatorByPartition', 'RevokedOperatorByPartition', 'IssuedByPartition', 'RedeemedByPartition', 'ControllerTransfer', 'ControllerRedemption', 'DocumentRemoved', 'DocumentUpdated', 'Issued', 'Redeemed', 'Transfer', 'Approval', encountered: ChangeFeatureStatus`,
-        ),
-      );
     });
   });
 });

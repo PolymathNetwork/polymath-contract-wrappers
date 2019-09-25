@@ -3,7 +3,7 @@ import * as conversionUtils from './utils/convert';
 
 import { FeatureRegistryTransactionParams } from './contract_wrappers/registries/feature_registry_wrapper';
 import { GeneralTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper/common';
-import {SecurityTokenTransactionParams} from './contract_wrappers/tokens/security_token_wrapper';
+import { SecurityTokenTransactionParams } from './contract_wrappers/tokens/security_token_wrapper/common';
 // import { SecurityTokenRegistryTransactionParams } from './contract_wrappers/registries/security_token_registry_wrapper';
 // import { ModuleRegistryTransactionParams } from './contract_wrappers/registries/module_registry_wrapper';
 // import { PolymathRegistryTransactionParams } from './contract_wrappers/registries/polymath_registry_wrapper';
@@ -49,7 +49,7 @@ export namespace TransactionParams {
   //   export import ERC20 = ERC20TransactionParams;
   //   export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
   //   export import PolyToken = PolyTokenTransactionParams;
-     export import SecurityToken = SecurityTokenTransactionParams;
+  export import SecurityToken = SecurityTokenTransactionParams;
 }
 
 export { conversionUtils };
