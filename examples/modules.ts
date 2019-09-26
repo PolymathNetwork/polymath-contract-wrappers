@@ -1,3 +1,4 @@
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import {
   BlacklistTransferManager,
   CappedSTO,
@@ -177,6 +178,13 @@ export const addModule = async (
     [ModuleName.VestingEscrowWallet]: ModuleType.Wallet,
   };
 
+  async function getRequiredPolyTokenBalanceOnSecurityToken(setupCost: BigNumber) {
+    // Get some poly tokens on the security token instance
+    await polymathAPI.polyToken.transfer({
+      to: await tickerSecurityTokenInstance.address(),
+      value: setupCost,
+    });
+  }
   // This has to be done this way because of typescript limitations
   switch (moduleName) {
     case ModuleName.GeneralPermissionManager: {
@@ -187,6 +195,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.GeneralPermissionManager,
         address,
@@ -205,6 +214,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.CountTransferManager,
         address,
@@ -224,6 +234,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.GeneralTransferManager,
         address,
@@ -242,6 +253,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.ManualApprovalTransferManager,
         address,
@@ -260,6 +272,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.PercentageTransferManager,
         address,
@@ -279,6 +292,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.VolumeRestrictionTM,
         address,
@@ -297,6 +311,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.RestrictedPartialSaleTM,
         address,
@@ -316,6 +331,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.VestingEscrowWallet,
         address,
@@ -335,6 +351,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.BlacklistTransferManager,
         address,
@@ -353,6 +370,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.LockUpTransferManager,
         address,
@@ -367,6 +385,7 @@ export const addModule = async (
       const address = await getFactoryAddress(polymathAPI, moduleTypes[ModuleName.CappedSTO], ModuleName.CappedSTO);
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.CappedSTO,
         address,
@@ -386,6 +405,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.UsdTieredSTO,
         address,
@@ -405,6 +425,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.ERC20DividendCheckpoint,
         address,
@@ -424,6 +445,7 @@ export const addModule = async (
       );
       const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
       const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
       await tickerSecurityTokenInstance.addModule({
         moduleName: ModuleName.EtherDividendCheckpoint,
         address,
