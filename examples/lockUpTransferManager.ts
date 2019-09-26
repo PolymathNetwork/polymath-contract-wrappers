@@ -1,6 +1,6 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { BigNumber, LockUpTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
 
@@ -65,7 +65,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.TransferManager,
   });
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });

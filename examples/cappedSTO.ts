@@ -1,6 +1,6 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { ModuleRegistryEvents_3_0_0, BigNumber, CappedSTOEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { CappedSTOFundRaiseType, ModuleName, ModuleType } from '../src';
 
@@ -66,7 +66,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.STO,
   });
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -136,7 +136,7 @@ window.addEventListener('load', async () => {
       rate: new BigNumber(10),
       fundRaiseType: CappedSTOFundRaiseType.ETH,
       fundsReceiver: await polymathAPI.getAccount(),
-      treasuryWallet: myAddress
+      treasuryWallet: myAddress,
     },
   });
 

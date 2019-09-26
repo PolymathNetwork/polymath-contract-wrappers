@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
 import { BigNumber, BlacklistTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
@@ -65,7 +65,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.TransferManager,
   });
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
@@ -175,11 +175,14 @@ window.addEventListener('load', async () => {
     blacklistNames: testBlacklistNames,
     startTimes: [newStartTime, newStartTime, newStartTime],
     endTimes: [newEndTime, newEndTime, newEndTime],
-    repeatPeriodTimes: [1, 2, 3]
+    repeatPeriodTimes: [1, 2, 3],
   });
   console.log('Many more example blacklists created');
 
-  await blacklistTM.addMultiInvestorToBlacklistMulti({blacklistNames: testBlacklistNames, userAddresses: [myAddress, randomBeneficiary1, randomBeneficiary2]});
+  await blacklistTM.addMultiInvestorToBlacklistMulti({
+    blacklistNames: testBlacklistNames,
+    userAddresses: [myAddress, randomBeneficiary1, randomBeneficiary2],
+  });
   console.log('Multi investors added to multi blacklists');
 
   await sleep(15000);
@@ -191,7 +194,9 @@ window.addEventListener('load', async () => {
     console.log('Transfer of 10 tokens during new blacklist period amount fails as expected');
   }
 
-  await blacklistTM.deleteInvestorFromAllBlacklistMulti({investors: [myAddress, randomBeneficiary1, randomBeneficiary2]});
+  await blacklistTM.deleteInvestorFromAllBlacklistMulti({
+    investors: [myAddress, randomBeneficiary1, randomBeneficiary2],
+  });
   console.log('Multi investors deleted from all blacklists they are part of');
 
   // Transfer out more tokens now that the investor has been removed from the new blacklist

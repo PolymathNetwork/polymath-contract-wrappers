@@ -29,7 +29,7 @@ import {
   USDTieredSTOData,
   VestingEscrowWalletData,
 } from '../src/contract_wrappers/tokens/security_token_wrapper';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 interface GetAttachedModulesParams {
   ticker: string;
@@ -458,7 +458,7 @@ export const getFactoryAddress = async (
   const modules = await polymathAPI.moduleRegistry.getModulesByType({
     moduleType,
   });
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
