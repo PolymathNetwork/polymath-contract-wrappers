@@ -28,7 +28,8 @@ import {
   Partition,
   Perm,
   CappedSTOFundRaiseType,
-  TransferStatusCode
+  TransferStatusCode,
+  ContractVersion, Subscribe, GetLogs
 } from '../../../../types';
 import SecurityTokenCommon from '../common';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -47,9 +48,25 @@ import {
 } from '../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 
+
 describe('SecurityTokenCommon', () => {
-  // Declare SecurityTokenCommon object
-  let target: SecurityTokenCommon;
+  // we extend the class to be able to instance it, using the 3.0.0 SecurityToken contract since it has all common functionality
+  class FakeSecurityToken extends SecurityTokenCommon {
+    public contract: Promise<ISecurityTokenContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ISecurityTokenContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeSecurityToken;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ISecurityTokenContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -68,7 +85,7 @@ describe('SecurityTokenCommon', () => {
     mockedModuleRegistryContract = mock(ModuleRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new SecurityTokenCommon(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new FakeSecurityToken(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
