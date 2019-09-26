@@ -6,7 +6,11 @@ import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
 import { RestrictedPartialSaleTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper';
 
-// This file acts as a valid sandbox for using a volume restriction transfer manager module on an unlocked node (like ganache)
+/**
+ * This method adds a RPSTM module and uses it. Requires that a valid security token has already been generated.
+ * @param polymathAPI The polymathAPI instance.
+ * @param ticker Ticker symbol.
+ */
 export const restrictedPartialSaleTransferManager = async (polymathAPI: PolymathAPI, ticker: string) => {
   const myAddress = await polymathAPI.getAccount();
   // Add the RPSTM module
