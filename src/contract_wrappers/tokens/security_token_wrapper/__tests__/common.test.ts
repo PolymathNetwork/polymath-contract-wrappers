@@ -29,7 +29,9 @@ import {
   Perm,
   CappedSTOFundRaiseType,
   TransferStatusCode,
-  ContractVersion, Subscribe, GetLogs
+  ContractVersion,
+  Subscribe,
+  GetLogs
 } from '../../../../types';
 import SecurityTokenCommon from '../common';
 import ContractFactory from '../../../../factories/contractFactory';
