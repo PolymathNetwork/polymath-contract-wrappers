@@ -90,6 +90,9 @@ import {
   VestingEscrowWalletEventArgs_3_1_0,
   CappedSTOEvents_3_1_0,
   USDTieredSTOEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointContract_3_1_0,
+  AdvancedPLCRVotingCheckpointEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointEventArgs_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -306,7 +309,8 @@ export type ContractEvents_3_1_0 =
   | GeneralPermissionManagerEvents_3_1_0
   | VestingEscrowWalletEvents_3_1_0
   | CappedSTOEvents_3_1_0
-  | USDTieredSTOEvents_3_1_0;
+  | USDTieredSTOEvents_3_1_0
+  | AdvancedPLCRVotingCheckpointEvents_3_1_0;
 
 export type ContractEvents = ContractEvents_3_0_0 | ContractEvents_3_1_0;
 
@@ -373,7 +377,8 @@ export type GenericModuleContract_3_1_0 =
   | GeneralTransferManagerContract_3_1_0
   | GeneralPermissionManagerContract_3_1_0
   | VestingEscrowWalletContract_3_1_0
-  | RestrictedPartialSaleTMContract_3_1_0;
+  | RestrictedPartialSaleTMContract_3_1_0
+  | AdvancedPLCRVotingCheckpointContract_3_1_0;
 
 export type GenericModuleContract = GenericModuleContract_3_0_0 | GenericModuleContract_3_1_0;
 
