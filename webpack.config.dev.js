@@ -61,6 +61,9 @@ const devConfig = merge.smart(baseConfig, {
     filename: "devServer.js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/"
+  },
+  node: {
+    fs: 'empty'
   }
 });
 

@@ -1,9 +1,9 @@
-import { CappedSTOContract_3_0_0, Web3Wrapper, CappedSTOEventArgs_3_0_0, CappedSTOEvents_3_0_0, LogWithDecodedArgs, EventCallback, CappedSTOTokenPurchaseEventArgs_3_0_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0, CappedSTOSetFundRaiseTypesEventArgs_3_0_0, CappedSTOPauseEventArgs_3_0_0, CappedSTOUnpauseEventArgs_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { CappedSTOContract_3_0_0, Web3Wrapper, CappedSTOEventArgs_3_0_0, CappedSTOEvents_3_0_0, LogWithDecodedArgs, CappedSTOTokenPurchaseEventArgs_3_0_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0, CappedSTOSetFundRaiseTypesEventArgs_3_0_0, CappedSTOPauseEventArgs_3_0_0, CappedSTOUnpauseEventArgs_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import CappedSTOCommon from './common';
 import assert from '../../../../utils/assert';
 import {
-  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, Constructor,
+  ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, Constructor, EventCallback
 } from '../../../../types';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';

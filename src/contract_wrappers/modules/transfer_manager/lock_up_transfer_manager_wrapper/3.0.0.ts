@@ -1,7 +1,7 @@
-import { LockUpTransferManagerContract_3_0_0, LockUpTransferManagerEvents_3_0_0, EventCallback, LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0, LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0, LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0, LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0, LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0, LockUpTransferManagerPauseEventArgs_3_0_0, LockUpTransferManagerUnpauseEventArgs_3_0_0, LogWithDecodedArgs, LockUpTransferManagerEventArgs_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { LockUpTransferManagerContract_3_0_0, LockUpTransferManagerEvents_3_0_0, LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0, LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0, LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0, LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0, LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0, LockUpTransferManagerPauseEventArgs_3_0_0, LockUpTransferManagerUnpauseEventArgs_3_0_0, LogWithDecodedArgs, LockUpTransferManagerEventArgs_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import LockUpTransferManagerCommon from './common';
-import { ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, Constructor } from '../../../../types';
+import { ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, Constructor, EventCallback } from '../../../../types';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithModule_3_0_0 } from '../../module_wrapper';
