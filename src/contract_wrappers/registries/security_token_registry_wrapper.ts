@@ -933,6 +933,11 @@ export default class SecurityTokenRegistryWrapper extends ContractWrapper {
    * @return boolean
    */
   public tickerAvailable = async (params: TickerParams): Promise<boolean> => {
+    assert.assert(
+      params.ticker.length > 0 && params.ticker.length <= 10,
+      ErrorCode.InvalidLength,
+      'Ticker must be 1 to 10 characters long',
+    );
     return (await this.contract).tickerAvailable.callAsync(params.ticker.toUpperCase());
   };
 
