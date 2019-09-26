@@ -7,7 +7,6 @@ import {
   PolyTokenFaucetEventArgs_3_0_0,
   LogWithDecodedArgs,
   PolyTokenFaucetApprovalEventArgs_3_0_0,
-  EventCallback,
   PolyTokenFaucetTransferEventArgs_3_0_0
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
@@ -19,7 +18,8 @@ import {
   GetLogsAsyncParams,
   SubscribeAsyncParams,
   GetLogs,
-  Subscribe
+  Subscribe,
+  EventCallback
 } from '../../types';
 import assert from '../../utils/assert';
 import { valueToWei } from '../../utils/convert';
