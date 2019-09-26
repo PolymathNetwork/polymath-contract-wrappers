@@ -15,6 +15,9 @@ const browserConfig = merge.smart(baseConfig, {
     library: '@polymathnetwork/contract-wrappers',
     libraryTarget: 'commonjs2',
     globalObject: 'this',
+  },
+  node: {
+    fs: 'empty'
   }
 })
 
@@ -30,6 +33,9 @@ const nodeConfig = merge.smart(baseConfig, {
     library: '@polymathnetwork/contract-wrappers',
     libraryTarget: 'commonjs2',
     globalObject: 'this',
+  },
+  externals: {
+    fs: true
   }
 });
 
