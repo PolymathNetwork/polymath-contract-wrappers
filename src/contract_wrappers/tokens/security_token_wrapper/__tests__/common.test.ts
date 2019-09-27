@@ -3,7 +3,6 @@ import { instance, mock, reset, verify, when, objectContaining } from 'ts-mockit
 import {
   ISecurityTokenContract_3_0_0,
   FeatureRegistryContract_3_0_0,
-  FeatureRegistryEvents_3_0_0,
   ModuleFactoryContract_3_0_0,
   PolyTokenContract_3_0_0,
   ModuleRegistryContract_3_0_0,
@@ -18,7 +17,7 @@ import {
   CappedSTOContract_3_1_0,
   USDTieredSTOContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
-import ERC20TokenWrapper from '../erc20_wrapper';
+import ERC20TokenWrapper from '../../erc20_wrapper';
 import {
   ModuleType,
   ModuleName,
@@ -29,10 +28,13 @@ import {
   Partition,
   Perm,
   CappedSTOFundRaiseType,
-  TransferStatusCode
-} from '../../../types';
-import SecurityTokenWrapper from '../security_token_wrapper';
-import ContractFactory from '../../../factories/contractFactory';
+  TransferStatusCode,
+  ContractVersion,
+  Subscribe,
+  GetLogs
+} from '../../../../types';
+import SecurityTokenCommon from '../common';
+import ContractFactory from '../../../../factories/contractFactory';
 import {
   stringToBytes32,
   bytes32ToString,
@@ -45,12 +47,28 @@ import {
   bytes32ArrayToStringArray,
   bigNumberToDate,
   parsePartitionBytes32Value,
-} from '../../../utils/convert';
-import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
+} from '../../../../utils/convert';
+import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 
-describe('SecurityTokenWrapper', () => {
-  // Declare SecurityTokenWrapper object
-  let target: SecurityTokenWrapper;
+
+describe('SecurityTokenCommon', () => {
+  // we extend the class to be able to instance it, using the 3.0.0 SecurityToken contract since it has all common functionality
+  class FakeSecurityToken extends SecurityTokenCommon {
+    public contract: Promise<ISecurityTokenContract_3_0_0>;
+
+    public contractVersion!: ContractVersion;
+
+    public subscribeAsync!: Subscribe
+
+    public getLogsAsync!: GetLogs;
+
+    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ISecurityTokenContract_3_0_0>, contractFactory: ContractFactory) {
+      super(web3Wrapper, contract, contractFactory);
+      this.contract = contract;
+    }
+  }
+
+  let target: FakeSecurityToken;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: ISecurityTokenContract_3_0_0;
   let mockedContractFactory: ContractFactory;
@@ -69,7 +87,7 @@ describe('SecurityTokenWrapper', () => {
     mockedModuleRegistryContract = mock(ModuleRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new SecurityTokenWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
+    target = new FakeSecurityToken(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -5226,25 +5244,6 @@ describe('SecurityTokenWrapper', () => {
       // Verifications
       verify(mockedContract.getAllDocuments).once();
       verify(mockedMethod.callAsync()).once();
-    });
-  });
-
-  describe('SubscribeAsync', () => {
-    test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
-      // Mocked parameters
-      const mockedParams = {
-        eventName: FeatureRegistryEvents_3_0_0.ChangeFeatureStatus,
-        indexFilterValues: {},
-        callback: () => {},
-        isVerbose: false,
-      };
-
-      // Real call
-      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
-        new Error(
-          `Expected eventName to be one of: 'ModuleAdded', 'ModuleUpgraded', 'UpdateTokenDetails', 'UpdateTokenName', 'GranularityChanged', 'FreezeIssuance', 'FreezeTransfers', 'CheckpointCreated', 'SetController', 'TreasuryWalletChanged', 'DisableController', 'OwnershipTransferred', 'TokenUpgraded', 'ModuleArchived', 'ModuleUnarchived', 'ModuleRemoved', 'ModuleBudgetChanged', 'TransferByPartition', 'AuthorizedOperator', 'RevokedOperator', 'AuthorizedOperatorByPartition', 'RevokedOperatorByPartition', 'IssuedByPartition', 'RedeemedByPartition', 'ControllerTransfer', 'ControllerRedemption', 'DocumentRemoved', 'DocumentUpdated', 'Issued', 'Redeemed', 'Transfer', 'Approval', encountered: ChangeFeatureStatus`,
-        ),
-      );
     });
   });
 });
