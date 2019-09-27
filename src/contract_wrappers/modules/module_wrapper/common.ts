@@ -1,18 +1,18 @@
 import {
+  BigNumber,
+  ERC20DetailedContract_3_0_0,
   ISecurityTokenContract_3_0_0,
   ModuleFactoryContract_3_0_0,
-  PolyTokenContract_3_0_0,
-  ERC20DetailedContract_3_0_0,
-  Web3Wrapper,
-  TxData,
-  BigNumber,
   PolyResponse,
+  PolyTokenContract_3_0_0,
+  TxData,
+  Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import { PolymathError } from '../../../PolymathError';
-import { TxParams, GenericModuleContract, ErrorCode, Perm } from '../../../types';
-import { stringToBytes32, parseModuleTypeValue, parsePermBytes32Value } from '../../../utils/convert';
+import {PolymathError} from '../../../PolymathError';
+import {ErrorCode, GenericModuleContract, ModuleType, Perm, TxParams} from '../../../types';
+import {parseModuleTypeValue, parsePermBytes32Value, stringToBytes32} from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
 import assert from '../../../utils/assert';
 
@@ -59,7 +59,7 @@ export default abstract class ModuleCommon extends ContractWrapper {
     contract: Promise<GenericModuleContract>,
     contractFactory: ContractFactory,
   ) {
-    super(web3Wrapper, contract);    
+    super(web3Wrapper, contract);
     this.contractFactory = contractFactory;
   }
 
@@ -108,7 +108,7 @@ export default abstract class ModuleCommon extends ContractWrapper {
    * Return factory address
    * @return address
    */
-  public factory = async (): Promise<string> => {    
+  public factory = async (): Promise<string> => {
     return (await this.contract).factory.callAsync();
   };
 
@@ -173,8 +173,10 @@ export default abstract class ModuleCommon extends ContractWrapper {
     const types = getTypes.filter(type => {
       // type '6' and '8' are valid but they are not mapped, so we must filter them
       try {
-        parseModuleTypeValue(new BigNumber(type));
-        return true;
+        const parsedModuleTypeValue = parseModuleTypeValue(new BigNumber(type));
+        // We ignore the burn type in this case, we only need the main type
+        return parsedModuleTypeValue !== ModuleType.Burn;
+
       } catch (e) {
         return false;
       }
@@ -183,6 +185,7 @@ export default abstract class ModuleCommon extends ContractWrapper {
     if (!types.length || types.length > 1) {
       throw new PolymathError({ code: ErrorCode.InvalidData });
     }
+
     const address = await this.address();
     const result = await (await this.securityTokenContract()).isModule.callAsync(address, types[0]);
     return result;
@@ -191,10 +194,7 @@ export default abstract class ModuleCommon extends ContractWrapper {
   public isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
     const from = await this.getCallerAddress(txData);
     const stContract = await this.securityTokenContract();
-    return functionsUtils.checksumAddressComparision(
-      from,
-      await (stContract).owner.callAsync(),
-    );
+    return functionsUtils.checksumAddressComparision(from, await stContract.owner.callAsync());
   };
 
   public isCallerAllowed = async (txData: Partial<TxData> | undefined, perm: string): Promise<boolean> => {
