@@ -61,7 +61,7 @@ export const volumeRestrictionTransferManager = async (polymathAPI: PolymathAPI,
   await issueTokenToInvestors(polymathAPI, ticker, issueMultiParams);
 
   // VRTM
-  const delay = 3000;
+  const delay = 10000;
 
   // Subscribe to event of add individual daily restriction
   await vrtm.subscribeAsync({
