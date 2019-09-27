@@ -4,3 +4,4 @@ node_modules
 sandbox.ts
 .idea
 .vscode
+.DS_Store
