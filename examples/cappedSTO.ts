@@ -1,10 +1,10 @@
 import { ModuleRegistryEvents_3_0_0, BigNumber, CappedSTOEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src/PolymathAPI';
 import {CappedSTOFundRaiseType, ModuleName} from '../src';
-import { CappedSTOData } from '../src/contract_wrappers/tokens/security_token_wrapper';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
+import { CappedSTOData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 
 /**
  * This method adds a CappedSTO module and uses it. Requires that a valid security token has already been generated.

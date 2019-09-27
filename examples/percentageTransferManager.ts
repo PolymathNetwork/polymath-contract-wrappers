@@ -10,7 +10,7 @@ import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
 import {
   PercentageTransferManagerData,
-} from '../src/contract_wrappers/tokens/security_token_wrapper';
+} from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 
 /**
  * This method adds a percentageTransferManager module and uses it. Requires that a valid security token has already been generated.

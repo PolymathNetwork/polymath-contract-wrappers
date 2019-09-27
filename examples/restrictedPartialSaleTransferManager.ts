@@ -4,7 +4,7 @@ import { ModuleName } from '../src';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
-import { RestrictedPartialSaleTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper';
+import { RestrictedPartialSaleTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 
 /**
  * This method adds a RPSTM module and uses it. Requires that a valid security token has already been generated.

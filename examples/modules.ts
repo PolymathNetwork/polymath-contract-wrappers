@@ -29,7 +29,7 @@ import {
   RestrictedPartialSaleTransferManagerData,
   USDTieredSTOData,
   VestingEscrowWalletData,
-} from '../src/contract_wrappers/tokens/security_token_wrapper';
+} from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 interface GetAttachedModulesParams {

@@ -1,6 +1,6 @@
 import { CountTransferManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src/PolymathAPI';
-import { CountTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper';
+import { CountTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { ModuleName } from '../src';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
