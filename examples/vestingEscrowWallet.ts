@@ -139,4 +139,6 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     templateName: TEMPLATE_NAME,
     startTime: new Date(new Date().getTime() + 60000),
   });
+
+  console.log('VEW schedule added correctly from template.')
 };

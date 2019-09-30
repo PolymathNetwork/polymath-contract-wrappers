@@ -264,7 +264,7 @@ interface UpdateTokenDetailsParams extends TxParams {
  * @param granularity Granularity level of the token
  */
 interface ChangeGranularityParams extends TxParams {
-  granularity: BigNumber;
+  granularity: number;
 }
 
 /**
@@ -778,8 +778,8 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    * Granular level of the token
    * @return granularity
    */
-  public granularity = async (): Promise<BigNumber> => {
-    return (await this.contract).granularity.callAsync();
+  public granularity = async (): Promise<number> => {
+    return weiToValue(await (await this.contract).granularity.callAsync(), FULL_DECIMALS).toNumber();
   };
 
   /**
@@ -1031,9 +1031,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public changeGranularity = async (params: ChangeGranularityParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
-    assert.isBigNumberGreaterThanZero(params.granularity, 'Granularity must not be 0');
+    assert.assert(
+      params.granularity > 0 && params.granularity <= 18,
+      ErrorCode.InvalidData,
+      'Granularity must be between 1 and 18 decimal places',
+    );
     return (await this.contract).changeGranularity.sendTransactionAsync(
-      params.granularity,
+      valueToWei(new BigNumber(params.granularity), FULL_DECIMALS),
       params.txData,
       params.safetyFactor,
     );

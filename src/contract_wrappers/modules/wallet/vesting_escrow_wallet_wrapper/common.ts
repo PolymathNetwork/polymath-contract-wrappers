@@ -8,7 +8,7 @@ import {
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import { TxParams, Perm, TransferStatusCode, ErrorCode } from '../../../../types';
+import { TxParams, Perm, TransferStatusCode, ErrorCode, FULL_DECIMALS } from '../../../../types';
 import {
   numberToBigNumber,
   valueToWei,
@@ -814,8 +814,11 @@ export default abstract class VestingEscrowWalletCommon extends ModuleCommon {
     const periodCount = duration / frequency;
     assert.assert(numberOfTokens.toNumber() % periodCount === 0, ErrorCode.InvalidData, 'Invalid period count');
     const amountPerPeriod = numberOfTokens.toNumber() / periodCount;
-    const granularity = await (await this.securityTokenContract()).granularity.callAsync();
-    assert.assert(amountPerPeriod % granularity.toNumber() === 0, ErrorCode.InvalidData, 'Invalid granularity');
+    const granularity = weiToValue(
+      await (await this.securityTokenContract()).granularity.callAsync(),
+      FULL_DECIMALS,
+    ).toNumber();
+    assert.assert(amountPerPeriod % granularity === 0, ErrorCode.InvalidData, 'Invalid granularity');
   };
 
   public validateAddSchedule = async (beneficiary: string, templateName: string, startTime: Date) => {

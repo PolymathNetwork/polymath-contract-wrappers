@@ -19,7 +19,7 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { TransferStatusCode, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { TransferStatusCode, ContractVersion, Subscribe, GetLogs, FULL_DECIMALS } from '../../../../../types';
 
 describe('VestingEscrowWalletWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 VestingEscrowWallet contract since it has all common functionality
@@ -28,11 +28,15 @@ describe('VestingEscrowWalletWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
+    public subscribeAsync!: Subscribe;
 
     public getLogsAsync!: GetLogs;
 
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<VestingEscrowWalletContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<VestingEscrowWalletContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -51,11 +55,7 @@ describe('VestingEscrowWalletWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new FakeVestingEscrowWallet(
-      instance(mockedWrapper),
-      myContractPromise,
-      instance(mockedContractFactory),
-    );
+    target = new FakeVestingEscrowWallet(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {
@@ -791,7 +791,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
       // granularity
-      const expectedGranularityResult = new BigNumber(50);
+      const expectedGranularityResult = valueToWei(new BigNumber(1), FULL_DECIMALS);
       const mockedSecurityTokenGranularityMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenGranularityMethod.callAsync()).thenResolve(expectedGranularityResult);
       when(mockedSecurityTokenContract.granularity).thenReturn(instance(mockedSecurityTokenGranularityMethod));
@@ -937,7 +937,7 @@ describe('VestingEscrowWalletWrapper', () => {
       };
 
       // granularity
-      const expectedGranularityResult = new BigNumber(50);
+      const expectedGranularityResult = valueToWei(new BigNumber(1), FULL_DECIMALS);
       const mockedSecurityTokenGranularityMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenGranularityMethod.callAsync()).thenResolve(expectedGranularityResult);
       when(mockedSecurityTokenContract.granularity).thenReturn(instance(mockedSecurityTokenGranularityMethod));
@@ -1316,7 +1316,7 @@ describe('VestingEscrowWalletWrapper', () => {
       when(mockedAllTemplatesMethod.callAsync()).thenResolve(expectedAllTemplatesResult);
 
       // granularity
-      const expectedGranularityResult = new BigNumber(50);
+      const expectedGranularityResult = valueToWei(new BigNumber(1), FULL_DECIMALS);
       const mockedSecurityTokenGranularityMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenGranularityMethod.callAsync()).thenResolve(expectedGranularityResult);
       when(mockedSecurityTokenContract.granularity).thenReturn(instance(mockedSecurityTokenGranularityMethod));
@@ -1684,5 +1684,4 @@ describe('VestingEscrowWalletWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
   });
-
 });

@@ -31,7 +31,7 @@ import {
   TransferStatusCode,
   ContractVersion,
   Subscribe,
-  GetLogs
+  GetLogs,
 } from '../../../../types';
 import SecurityTokenCommon from '../common';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -50,7 +50,6 @@ import {
 } from '../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../test_utils/mocked_methods';
 
-
 describe('SecurityTokenCommon', () => {
   // we extend the class to be able to instance it, using the 3.0.0 SecurityToken contract since it has all common functionality
   class FakeSecurityToken extends SecurityTokenCommon {
@@ -58,11 +57,15 @@ describe('SecurityTokenCommon', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
+    public subscribeAsync!: Subscribe;
 
     public getLogsAsync!: GetLogs;
 
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ISecurityTokenContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<ISecurityTokenContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -214,7 +217,7 @@ describe('SecurityTokenCommon', () => {
 
   describe('granularity', () => {
     test('should call to granularity', async () => {
-      const expectedResult = new BigNumber(1);
+      const expectedResult = valueToWei(new BigNumber(1), FULL_DECIMALS);
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
       // Stub the method
@@ -225,7 +228,7 @@ describe('SecurityTokenCommon', () => {
       // Real call
       const result = await target.granularity();
       // Result expectation
-      expect(result).toBe(expectedResult);
+      expect(result).toBe(weiToValue(expectedResult, FULL_DECIMALS).toNumber());
       // Verifications
       verify(mockedContract.granularity).once();
       verify(mockedMethod.callAsync()).once();
@@ -1824,7 +1827,7 @@ describe('SecurityTokenCommon', () => {
     test('should send the transaction to changeGranularity', async () => {
       // Mocked parameters
       const mockedParams = {
-        granularity: new BigNumber(1),
+        granularity: 1,
         txData: {},
         safetyFactor: 10,
       };
@@ -1835,7 +1838,11 @@ describe('SecurityTokenCommon', () => {
       when(mockedContract.changeGranularity).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-        mockedMethod.sendTransactionAsync(mockedParams.granularity, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(new BigNumber(mockedParams.granularity), FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Owner Address expected
@@ -1859,7 +1866,11 @@ describe('SecurityTokenCommon', () => {
       verify(mockedOwnerMethod.callAsync()).once();
       verify(mockedContract.changeGranularity).once();
       verify(
-        mockedMethod.sendTransactionAsync(mockedParams.granularity, mockedParams.txData, mockedParams.safetyFactor),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(valueToWei(new BigNumber(mockedParams.granularity), FULL_DECIMALS)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
     });
@@ -2598,11 +2609,13 @@ describe('SecurityTokenCommon', () => {
 
       const mockedCanMethod = mock(MockedCallMethod);
       when(mockedContract.canTransfer).thenReturn(instance(mockedCanMethod));
-      when(mockedCanMethod.callAsync(
-        mockedParams.investor,
-        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-        mockedParams.data
-      )).thenResolve(expectedCanResult);
+      when(
+        mockedCanMethod.callAsync(
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).thenResolve(expectedCanResult);
 
       const expectedIsIssuableResult = true;
       // Mocked method
@@ -2635,11 +2648,13 @@ describe('SecurityTokenCommon', () => {
       verify(mockedContract.decimals).twice();
       verify(mockedDecimalsMethod.callAsync()).twice();
       verify(mockedContract.canTransfer).once();
-      verify(mockedCanMethod.callAsync(
-        mockedParams.investor,
-        objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-        mockedParams.data
-      )).once();
+      verify(
+        mockedCanMethod.callAsync(
+          mockedParams.investor,
+          objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
+          mockedParams.data,
+        ),
+      ).once();
     });
   });
 
@@ -4209,7 +4224,7 @@ describe('SecurityTokenCommon', () => {
           rate: cappedParams.rate,
           fundRaiseType: cappedParams.fundRaiseType,
           fundsReceiver: cappedParams.fundsReceiver,
-          treasuryWallet: cappedParams.treasuryWallet
+          treasuryWallet: cappedParams.treasuryWallet,
         },
         txData: mockedCappedParams.txData,
         safetyFactor: mockedCappedParams.safetyFactor,
