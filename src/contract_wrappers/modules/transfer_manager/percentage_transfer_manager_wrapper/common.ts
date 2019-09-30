@@ -15,6 +15,7 @@ import {
 } from '../../../../types';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace PercentageTransferManagerTransactionParams {
   export interface ChangeHolderPercentage extends ChangeHolderPercentageParams {}
@@ -231,3 +232,7 @@ export default abstract class PercentageTransferManagerCommon extends ModuleComm
     );
   };
 }
+
+export function isPercentageTransferManager(wrapper: ContractWrapper): wrapper is PercentageTransferManagerCommon {
+  return wrapper instanceof PercentageTransferManagerCommon;
+};

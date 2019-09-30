@@ -2,12 +2,13 @@
 import { GeneralTransferManager_3_0_0, isGeneralTransferManager_3_0_0 } from './3.0.0';
 import { GeneralTransferManager_3_1_0, isGeneralTransferManager_3_1_0 } from './3.1.0';
 
-import Common from './common';
+import Common, { isGeneralTransferManager } from './common';
 import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
 
 export type GeneralTransferManager = GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0;
 
 export {
+  isGeneralTransferManager,
   GeneralTransferManager_3_0_0,
   isGeneralTransferManager_3_0_0,
   GeneralTransferManager_3_1_0,

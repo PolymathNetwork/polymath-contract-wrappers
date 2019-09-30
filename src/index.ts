@@ -56,29 +56,38 @@ export { conversionUtils };
 
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';
-export { default as ModuleFactory } from './contract_wrappers/modules/module_factory_wrapper';
 export { default as ModuleRegistry } from './contract_wrappers/registries/module_registry_wrapper';
 export { default as PolyToken } from './contract_wrappers/tokens/poly_token_wrapper';
 export { default as PolymathRegistry } from './contract_wrappers/registries/polymath_registry_wrapper';
 export { default as SecurityTokenRegistry } from './contract_wrappers/registries/security_token_registry_wrapper';
 export {
+  ModuleFactory,
+  isModuleFactory,
+  ModuleFactory_3_0_0,
+  isModuleFactory_3_0_0,
+} from './contract_wrappers/modules/module_factory_wrapper';
+export {
   SecurityToken,
+  isSecurityToken,
   SecurityToken_3_0_0,
   isSecurityToken_3_0_0,
 } from './contract_wrappers/tokens/security_token_wrapper';
 export { default as ERC20 } from './contract_wrappers/tokens/erc20_detailed_wrapper';
 export {
   ERC20DividendCheckpoint,
+  isERC20DividendCheckpoint,
   ERC20DividendCheckpoint_3_0_0,
   isERC20DividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export {
   EtherDividendCheckpoint,
+  isEtherDividendCheckpoint,
   EtherDividendCheckpoint_3_0_0,
   isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
   GeneralPermissionManager,
+  isGeneralPermissionManager,
   GeneralPermissionManager_3_0_0,
   isGeneralPermissionManager_3_0_0,
   GeneralPermissionManager_3_1_0,
@@ -86,13 +95,15 @@ export {
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 export {
   CappedSTO,
+  isCappedSTO,
   CappedSTO_3_0_0,
   isCappedSTO_3_0_0,
   CappedSTO_3_1_0,
   isCappedSTO_3_1_0,
 } from './contract_wrappers/modules/sto/capped_sto_wrapper';
-export {
+export {  
   USDTieredSTO,
+  isUSDTieredSTO,
   USDTieredSTO_3_0_0,
   isUSDTieredSTO_3_0_0,
   USDTieredSTO_3_1_0,
@@ -100,6 +111,7 @@ export {
 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export {
   GeneralTransferManager,
+  isGeneralTransferManager,
   GeneralTransferManager_3_0_0,
   isGeneralTransferManager_3_0_0,
   GeneralTransferManager_3_1_0,
@@ -107,42 +119,49 @@ export {
 } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
   CountTransferManager,
+  isCountTransferManager,
   CountTransferManager_3_0_0,
   isCountTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
   ManualApprovalTransferManager,
+  isManualApprovalTransferManager,
   ManualApprovalTransferManager_3_0_0,
   isManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
   PercentageTransferManager,
+  isPercentageTransferManager,
   PercentageTransferManager_3_0_0,
   isPercentageTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
   LockUpTransferManager,
+  isLockUpTransferManager,
   LockUpTransferManager_3_0_0,
   isLockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
   BlacklistTransferManager,
+  isBlacklistTransferManager,
   BlacklistTransferManager_3_0_0,
   isBlacklistTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 export {
   VolumeRestrictionTransferManager,
+  isVolumeRestrictionTransferManager,
   VolumeRestrictionTransferManager_3_0_0,
   isVolumeRestrictionTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export {
   RestrictedPartialSaleTransferManager,
+  isRestrictedPartialSaleTransferManager,
   RestrictedPartialSaleTransferManager_3_1_0,
   isRestrictedPartialSaleTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
-
 export {
   VestingEscrowWallet,
+  isVestingEscrowWallet,
   VestingEscrowWallet_3_0_0,
   isVestingEscrowWallet_3_0_0,
   VestingEscrowWallet_3_1_0,

@@ -15,6 +15,7 @@ import {
   stringArrayToBytes32Array,
   parsePermBytes32Value,
 } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace GeneralPermissionManagerTransactionParams {
   export interface DeleteDelegate extends DelegateTxParams {}
@@ -325,3 +326,7 @@ export default abstract class GeneralPermissionManagerCommon extends ModuleCommo
     return (await this.contract).getAllDelegates.callAsync();
   };
 }
+
+export function isGeneralPermissionManager(wrapper: ContractWrapper): wrapper is GeneralPermissionManagerCommon {
+  return wrapper instanceof GeneralPermissionManagerCommon;
+};

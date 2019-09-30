@@ -14,6 +14,7 @@ import {
   ErrorCode,
 } from '../../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace ERC20DividendCheckpointTransactionParams {
   export interface CreateDividend extends CreateDividendParams {}
@@ -234,3 +235,7 @@ export default abstract class ERC20DividendCheckpointCommon extends DividendChec
     );
   };
 }
+
+export function isERC20DividendCheckpoint(wrapper: ContractWrapper): wrapper is ERC20DividendCheckpointCommon {
+  return wrapper instanceof ERC20DividendCheckpointCommon;
+};

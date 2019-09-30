@@ -14,6 +14,7 @@ import {
   TxParams,
 } from '../../../../types';
 import { ModuleCommon } from '../../module_wrapper';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace CountTransferManagerTransactionParams {
   export interface ChangeHolderCount extends ChangeHolderCountParams {}
@@ -113,3 +114,7 @@ export default abstract class CountTransferManagerCommon extends ModuleCommon {
     );
   };
 }
+
+export function isCountTransferManager(wrapper: ContractWrapper): wrapper is CountTransferManagerCommon {
+  return wrapper instanceof CountTransferManagerCommon;
+};

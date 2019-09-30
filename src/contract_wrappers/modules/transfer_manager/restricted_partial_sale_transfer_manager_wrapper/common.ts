@@ -16,6 +16,7 @@ import {
 } from '../../../../types';
 import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
+import ContractWrapper from '../../../contract_wrapper';
 
 /**
  * @param wallet Ethereum wallet/contract address that need to be exempted
@@ -165,3 +166,7 @@ export default abstract class RestrictedPartialSaleTransferManagerCommon extends
     return (await this.contract).getInitFunction.callAsync();
   };
 }
+
+export function isRestrictedPartialSaleTransferManager(wrapper: ContractWrapper): wrapper is RestrictedPartialSaleTransferManagerCommon {
+  return wrapper instanceof RestrictedPartialSaleTransferManagerCommon;
+};

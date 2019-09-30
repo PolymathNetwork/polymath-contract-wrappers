@@ -1,12 +1,13 @@
 /* istanbul ignore file */
 import { EtherDividendCheckpoint_3_0_0, isEtherDividendCheckpoint_3_0_0 } from './3.0.0';
 
-import Common from './common';
+import Common, { isEtherDividendCheckpoint } from './common';
 import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
 
 export type EtherDividendCheckpoint = EtherDividendCheckpoint_3_0_0;
 
 export {
+  isEtherDividendCheckpoint,
   EtherDividendCheckpoint_3_0_0,
   isEtherDividendCheckpoint_3_0_0,
 };
