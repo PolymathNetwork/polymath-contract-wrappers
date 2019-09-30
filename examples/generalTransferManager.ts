@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { GeneralTransferManagerEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { GeneralTransferManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, TransferType } from '../src';
 
@@ -78,7 +78,7 @@ window.addEventListener('load', async () => {
   // Modify transfer requirements
   // Subscribe to event of modify transfer requirements
   await generalTM.subscribeAsync({
-    eventName: GeneralTransferManagerEvents.ModifyTransferRequirements,
+    eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

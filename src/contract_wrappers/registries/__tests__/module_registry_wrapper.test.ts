@@ -1,10 +1,10 @@
 // ModuleRegistryWrapper test
 import { instance, mock, reset, verify, when } from 'ts-mockito';
 import {
-  ModuleRegistryContract,
-  PolyTokenEvents,
-  FeatureRegistryContract,
-  ModuleFactoryContract,
+  ModuleRegistryContract_3_0_0,
+  PolyTokenEvents_3_0_0,
+  FeatureRegistryContract_3_0_0,
+  ModuleFactoryContract_3_0_0,
   BigNumber,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
@@ -23,17 +23,17 @@ import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../..
 describe('ModuleRegistryWrapper', () => {
   let target: ModuleRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ModuleRegistryContract;
+  let mockedContract: ModuleRegistryContract_3_0_0;
   let mockedContractFactory: ContractFactory;
-  let mockedModuleFactoryContract: ModuleFactoryContract;
-  let mockedFeatureRegistryContract: FeatureRegistryContract;
+  let mockedModuleFactoryContract: ModuleFactoryContract_3_0_0;
+  let mockedFeatureRegistryContract: FeatureRegistryContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ModuleRegistryContract);
+    mockedContract = mock(ModuleRegistryContract_3_0_0);
     mockedContractFactory = mock(ContractFactory);
-    mockedModuleFactoryContract = mock(ModuleFactoryContract);
-    mockedFeatureRegistryContract = mock(FeatureRegistryContract);
+    mockedModuleFactoryContract = mock(ModuleFactoryContract_3_0_0);
+    mockedFeatureRegistryContract = mock(FeatureRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new ModuleRegistryWrapper(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -1004,7 +1004,7 @@ describe('ModuleRegistryWrapper', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

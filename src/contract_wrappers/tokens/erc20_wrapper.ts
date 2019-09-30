@@ -60,7 +60,7 @@ interface AllowanceParams {
  * This class includes the functionality related to interacting with the ERC20 contract.
  */
 export default abstract class ERC20TokenWrapper extends ContractWrapper {
-  protected contract: Promise<ERC20Contract>;
+  public contract: Promise<ERC20Contract>;
 
   /**
    * Instantiate ERC20Wrapper

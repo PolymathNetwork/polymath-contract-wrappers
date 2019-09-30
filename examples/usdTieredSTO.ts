@@ -1,5 +1,5 @@
 import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { USDTieredSTOEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { USDTieredSTOEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { FundRaiseType, ModuleName, ModuleType } from '../src';
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
@@ -139,7 +139,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event for setTiers
   await usdTiered.subscribeAsync({
-    eventName: USDTieredSTOEvents.SetTiers,
+    eventName: USDTieredSTOEvents_3_0_0.SetTiers,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -166,7 +166,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event for token purchase
   await usdTiered.subscribeAsync({
-    eventName: USDTieredSTOEvents.TokenPurchase,
+    eventName: USDTieredSTOEvents_3_0_0.TokenPurchase,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

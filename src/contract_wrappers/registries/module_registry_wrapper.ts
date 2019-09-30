@@ -1,18 +1,18 @@
 import {
-  ModuleRegistryContract,
-  ModuleRegistryEventArgs,
-  ModuleRegistryEvents,
-  ModuleRegistryModuleRegisteredEventArgs,
-  ModuleRegistryModuleRemovedEventArgs,
-  ModuleRegistryModuleUsedEventArgs,
-  ModuleRegistryModuleVerifiedEventArgs,
-  ModuleRegistryModuleUnverifiedEventArgs,
-  ModuleRegistryOwnershipTransferredEventArgs,
-  ModuleRegistryPauseEventArgs,
-  ModuleRegistryUnpauseEventArgs,
-  ISecurityTokenRegistryContract,
-  FeatureRegistryContract,
-  ModuleFactoryContract,
+  ModuleRegistryContract_3_0_0,
+  ModuleRegistryEventArgs_3_0_0,
+  ModuleRegistryEvents_3_0_0,
+  ModuleRegistryModuleRegisteredEventArgs_3_0_0,
+  ModuleRegistryModuleRemovedEventArgs_3_0_0,
+  ModuleRegistryModuleUsedEventArgs_3_0_0,
+  ModuleRegistryModuleVerifiedEventArgs_3_0_0,
+  ModuleRegistryModuleUnverifiedEventArgs_3_0_0,
+  ModuleRegistryOwnershipTransferredEventArgs_3_0_0,
+  ModuleRegistryPauseEventArgs_3_0_0,
+  ModuleRegistryUnpauseEventArgs_3_0_0,
+  ISecurityTokenRegistryContract_3_0_0,
+  FeatureRegistryContract_3_0_0,
+  ModuleFactoryContract_3_0_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   PolyResponse,
@@ -32,80 +32,81 @@ import {
   SubscribeAsyncParams,
   TxParams,
   ErrorCode,
+  ContractVersion,
 } from '../../types';
 import { bytes32ArrayToStringArray } from '../../utils/convert';
 import functionsUtils from '../../utils/functions_utils';
 
 interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.Pause;
-  callback: EventCallback<ModuleRegistryPauseEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.Pause;
+  callback: EventCallback<ModuleRegistryPauseEventArgs_3_0_0>;
 }
 
 interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.Pause;
+  eventName: ModuleRegistryEvents_3_0_0.Pause;
 }
 
 interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.Unpause;
-  callback: EventCallback<ModuleRegistryUnpauseEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.Unpause;
+  callback: EventCallback<ModuleRegistryUnpauseEventArgs_3_0_0>;
 }
 
 interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.Unpause;
+  eventName: ModuleRegistryEvents_3_0_0.Unpause;
 }
 
 interface ModuleUsedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleUsed;
-  callback: EventCallback<ModuleRegistryModuleUsedEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleUsed;
+  callback: EventCallback<ModuleRegistryModuleUsedEventArgs_3_0_0>;
 }
 
 interface GetModuleUsedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleUsed;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleUsed;
 }
 
 interface ModuleRegisteredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleRegistered;
-  callback: EventCallback<ModuleRegistryModuleRegisteredEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered;
+  callback: EventCallback<ModuleRegistryModuleRegisteredEventArgs_3_0_0>;
 }
 
 interface GetModuleRegisteredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleRegistered;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered;
 }
 
 interface ModuleVerifiedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleVerified;
-  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleVerified;
+  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs_3_0_0>;
 }
 
 interface GetModuleVerifiedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleVerified;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleVerified;
 }
 
 interface ModuleUnverifiedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleUnverified;
-  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleUnverified;
+  callback: EventCallback<ModuleRegistryModuleVerifiedEventArgs_3_0_0>;
 }
 
 interface GetModuleUnverifiedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleUnverified;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleUnverified;
 }
 
 interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleRemoved;
-  callback: EventCallback<ModuleRegistryModuleRemovedEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleRemoved;
+  callback: EventCallback<ModuleRegistryModuleRemovedEventArgs_3_0_0>;
 }
 
 interface GetModuleRemovedLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.ModuleRemoved;
+  eventName: ModuleRegistryEvents_3_0_0.ModuleRemoved;
 }
 
 interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleRegistryEvents.OwnershipTransferred;
-  callback: EventCallback<ModuleRegistryOwnershipTransferredEventArgs>;
+  eventName: ModuleRegistryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ModuleRegistryOwnershipTransferredEventArgs_3_0_0>;
 }
 
 interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleRegistryEvents.OwnershipTransferred;
+  eventName: ModuleRegistryEvents_3_0_0.OwnershipTransferred;
 }
 
 interface ModuleRegistrySubscribeAsyncParams extends Subscribe {
@@ -120,15 +121,15 @@ interface ModuleRegistrySubscribeAsyncParams extends Subscribe {
 }
 
 interface GetModuleRegistryLogsAsyncParams extends GetLogs {
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryPauseEventArgs>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryUnpauseEventArgs>[]>;
-  (params: GetModuleUsedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs>[]>;
-  (params: GetModuleRegisteredLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRegisteredEventArgs>[]>;
-  (params: GetModuleVerifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleVerifiedEventArgs>[]>;
-  (params: GetModuleUnverifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUnverifiedEventArgs>[]>;
-  (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRemovedEventArgs>[]>;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryUnpauseEventArgs_3_0_0>[]>;
+  (params: GetModuleUsedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUsedEventArgs_3_0_0>[]>;
+  (params: GetModuleRegisteredLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRegisteredEventArgs_3_0_0>[]>;
+  (params: GetModuleVerifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleVerifiedEventArgs_3_0_0>[]>;
+  (params: GetModuleUnverifiedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleUnverifiedEventArgs_3_0_0>[]>;
+  (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleRegistryModuleRemovedEventArgs_3_0_0>[]>;
   (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs>[]
+    LogWithDecodedArgs<ModuleRegistryOwnershipTransferredEventArgs_3_0_0>[]
   >;
 }
 
@@ -211,19 +212,21 @@ interface FactoryDetails {
  * This class includes the functionality related to interacting with the ModuleRegistry contract.
  */
 export default class ModuleRegistryWrapper extends ContractWrapper {
-  protected contract: Promise<ModuleRegistryContract>;
+  public contract: Promise<ModuleRegistryContract_3_0_0>;
 
-  protected contractFactory: ContractFactory;
+  public contractVersion = ContractVersion.V3_0_0;
 
-  protected securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract> => {
+  public contractFactory: ContractFactory;
+
+  public securityTokenRegistryContract = async (): Promise<ISecurityTokenRegistryContract_3_0_0> => {
     return this.contractFactory.getSecurityTokenRegistryContract();
   };
 
-  protected featureRegistryContract = async (): Promise<FeatureRegistryContract> => {
+  public featureRegistryContract = async (): Promise<FeatureRegistryContract_3_0_0> => {
     return this.contractFactory.getFeatureRegistryContract();
   };
 
-  protected moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract> => {
+  public moduleFactoryContract = async (address: string): Promise<ModuleFactoryContract_3_0_0> => {
     return this.contractFactory.getModuleFactoryContract(address);
   };
 
@@ -235,7 +238,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    */
   public constructor(
     web3Wrapper: Web3Wrapper,
-    contract: Promise<ModuleRegistryContract>,
+    contract: Promise<ModuleRegistryContract_3_0_0>,
     contractFactory: ContractFactory,
   ) {
     super(web3Wrapper, contract);
@@ -499,10 +502,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Subscribe to an event type emitted by the contract.
    * @return Subscription token used later to unsubscribe
    */
-  public subscribeAsync: ModuleRegistrySubscribeAsyncParams = async <ArgsType extends ModuleRegistryEventArgs>(
+  public subscribeAsync: ModuleRegistrySubscribeAsyncParams = async <ArgsType extends ModuleRegistryEventArgs_3_0_0>(
     params: SubscribeAsyncParams,
   ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents_3_0_0);
     assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
     assert.isFunction('callback', params.callback);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
@@ -520,10 +523,10 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
    * Gets historical logs without creating a subscription
    * @return Array of logs that match the parameters
    */
-  public getLogsAsync: GetModuleRegistryLogsAsyncParams = async <ArgsType extends ModuleRegistryEventArgs>(
+  public getLogsAsync: GetModuleRegistryLogsAsyncParams = async <ArgsType extends ModuleRegistryEventArgs_3_0_0>(
     params: GetLogsAsyncParams,
   ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents);
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleRegistryEvents_3_0_0);
     const normalizedContractAddress = (await this.contract).address.toLowerCase();
     const logs = await this.getLogsAsyncInternal<ArgsType>(
       normalizedContractAddress,
@@ -534,7 +537,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return logs;
   };
 
-  private checkForRegisteredModule = async (moduleAddress: string) => {
+  public checkForRegisteredModule = async (moduleAddress: string) => {
     const allModulesTypes = [
       await this.getModulesByType({ moduleType: ModuleType.PermissionManager }),
       await this.getModulesByType({ moduleType: ModuleType.STO }),
@@ -550,11 +553,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     return allModules.includes(true);
   };
 
-  private callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
+  public callGetModulesByTypeAndReturnIfModuleExists = async (moduleType: ModuleType, moduleAddress: string) => {
     return (await this.getModulesByType({ moduleType })).includes(moduleAddress);
   };
 
-  private checkMsgSenderIsOwner = async () => {
+  public checkMsgSenderIsOwner = async () => {
     assert.assert(
       functionsUtils.checksumAddressComparision(
         await this.owner(),
@@ -565,7 +568,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleRegistered = async (moduleFactory: string) => {
+  public checkModuleRegistered = async (moduleFactory: string) => {
     assert.assert(
       await this.checkForRegisteredModule(moduleFactory),
       ErrorCode.PreconditionRequired,
@@ -573,7 +576,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotRegistered = async (moduleFactory: string) => {
+  public checkModuleNotRegistered = async (moduleFactory: string) => {
     assert.assert(
       !(await this.checkForRegisteredModule(moduleFactory)),
       ErrorCode.AlreadyExists,
@@ -581,7 +584,7 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPausedOrOwner = async () => {
+  public checkModuleNotPausedOrOwner = async () => {
     assert.assert(
       !(await this.isPaused()) ||
         functionsUtils.checksumAddressComparision(await this.owner(), await this.getCallerAddress(undefined)),
@@ -590,11 +593,11 @@ export default class ModuleRegistryWrapper extends ContractWrapper {
     );
   };
 
-  private checkModuleNotPaused = async () => {
+  public checkModuleNotPaused = async () => {
     assert.assert(!(await this.isPaused()), ErrorCode.ContractPaused, 'Contract is currently paused');
   };
 
-  private checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
+  public checkIsOwnerOrModuleFactoryOwner = async (moduleFactoryAddress: string) => {
     const callerAddress = await this.getCallerAddress(undefined);
     const owner = await this.owner();
     const factoryOwner = await (await this.moduleFactoryContract(moduleFactoryAddress)).owner.callAsync();

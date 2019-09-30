@@ -1,23 +1,23 @@
-import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { ethersUtils, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ModuleType, Partition, Perm, TransferResult, ErrorCode } from '../types';
 import { PolymathError } from '../PolymathError';
 
 const BASE = new BigNumber(10);
 
 export function bytes32ToString(value: string): string {
-  return ethers.utils.parseBytes32String(value);
+  return ethersUtils.parseBytes32String(value);
 }
 
 export function stringToBytes32(value: string): string {
-  return ethers.utils.formatBytes32String(value);  
+  return ethersUtils.formatBytes32String(value);  
 }
 
 export function stringToKeccak256(value: string): string {
-  return ethers.utils.id(value);
+  return ethersUtils.id(value);
 }
 
 export function checksumAddress(value: string): string {
-  return ethers.utils.getAddress(value);
+  return ethersUtils.getAddress(value);
 }
 
 export function bigNumberToDate(value: BigNumber) {
@@ -103,7 +103,7 @@ export function parsePermBytes32Value(value: string): Perm {
     case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
+      throw new PolymathError({ message: 'Permission not recognized', code: ErrorCode.NotFound });
   }
 }
 export function parseModuleTypeValue(value: BigNumber): ModuleType {

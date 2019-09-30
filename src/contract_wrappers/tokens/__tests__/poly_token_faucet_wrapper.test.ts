@@ -1,6 +1,6 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { PolyTokenFaucetContract, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenFaucetContract_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import PolyTokenFaucetWrapper from '../poly_token_faucet_wrapper';
 import { MockedSendMethod, getMockedPolyResponse, MockedCallMethod } from '../../../test_utils/mocked_methods';
@@ -10,11 +10,11 @@ describe('PolyTokenFaucetWrapper', () => {
   // Declare PolyTokenFaucetWrapper object
   let target: PolyTokenFaucetWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: PolyTokenFaucetContract;
+  let mockedContract: PolyTokenFaucetContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(PolyTokenFaucetContract);
+    mockedContract = mock(PolyTokenFaucetContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new PolyTokenFaucetWrapper(instance(mockedWrapper), myContractPromise);

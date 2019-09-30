@@ -1,6 +1,6 @@
 // FeatureRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { FeatureRegistryContract, PolyTokenEvents, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { FeatureRegistryContract_3_0_0, PolyTokenEvents_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
 import { Feature } from '../../../types';
 import ContractWrapper from '../../contract_wrapper';
@@ -9,11 +9,11 @@ import FeatureRegistryWrapper from '../feature_registry_wrapper';
 describe('FeatureRegistryWrapper', () => {
   let target: FeatureRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: FeatureRegistryContract;
+  let mockedContract: FeatureRegistryContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(FeatureRegistryContract);
+    mockedContract = mock(FeatureRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new FeatureRegistryWrapper(instance(mockedWrapper), myContractPromise);
@@ -166,7 +166,7 @@ describe('FeatureRegistryWrapper', () => {
     test('should throw as eventName does not belong to FeatureRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

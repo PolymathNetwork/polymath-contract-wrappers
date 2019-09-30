@@ -1,9 +1,9 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
 import {
-  PolymathRegistryContract,
-  PolyTokenEvents,
-  PolymathRegistryEvents,
+  PolymathRegistryContract_3_0_0,
+  PolyTokenEvents_3_0_0,
+  PolymathRegistryEvents_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../test_utils/mocked_methods';
@@ -15,11 +15,11 @@ describe('PolyMathRegistryWrapper', () => {
   // Declare PolyMathRegistryWrapper object
   let target: PolymathRegistryWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: PolymathRegistryContract;
+  let mockedContract: PolymathRegistryContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(PolymathRegistryContract);
+    mockedContract = mock(PolymathRegistryContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new PolymathRegistryWrapper(instance(mockedWrapper), myContractPromise);
@@ -253,7 +253,7 @@ describe('PolyMathRegistryWrapper', () => {
     test('should throw as eventName does not belong to PolymathRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolyTokenEvents.Transfer,
+        eventName: PolyTokenEvents_3_0_0.Transfer,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,
@@ -268,7 +268,7 @@ describe('PolyMathRegistryWrapper', () => {
     test('should throw as indexFilterValues does not conform the schema', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: PolymathRegistryEvents.ChangeAddress,
+        eventName: PolymathRegistryEvents_3_0_0.ChangeAddress,
         indexFilterValues: { 1: 'aValue' },
         callback: () => {},
         isVerbose: false,

@@ -2,7 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
-import { BigNumber, ModuleRegistryEvents, BlacklistTransferManagerEvents } from '@polymathnetwork/abi-wrappers';
+import { BigNumber, BlacklistTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 
 // This file acts as a valid sandbox for using a blacklist restriction transfer manager module on an unlocked node (like ganache)
 window.addEventListener('load', async () => {
@@ -123,7 +123,7 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of addblacklisttype
   await blacklistTM.subscribeAsync({
-    eventName: BlacklistTransferManagerEvents.AddBlacklistType,
+    eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {

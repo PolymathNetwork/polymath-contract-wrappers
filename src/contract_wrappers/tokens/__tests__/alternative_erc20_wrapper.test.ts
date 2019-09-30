@@ -1,6 +1,6 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify } from 'ts-mockito';
-import { ERC20DetailedContract, SecurityTokenRegistryEvents, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { ERC20DetailedContract_3_0_0, ISecurityTokenRegistryEvents_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import AlternativeERC20TokenWrapper from '../alternative_erc20_wrapper';
 import { MockedCallMethod } from '../../../test_utils/mocked_methods';
@@ -10,11 +10,11 @@ describe('AlternativeERC20TokenWrapper', () => {
   // Declare ERC20DetailedTokenWrapper object
   let target: AlternativeERC20TokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: ERC20DetailedContract;
+  let mockedContract: ERC20DetailedContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(ERC20DetailedContract);
+    mockedContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new AlternativeERC20TokenWrapper(instance(mockedWrapper), myContractPromise);
@@ -102,7 +102,7 @@ describe('AlternativeERC20TokenWrapper', () => {
     test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: SecurityTokenRegistryEvents.ChangeExpiryLimit,
+        eventName: ISecurityTokenRegistryEvents_3_0_0.ChangeExpiryLimit,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,
