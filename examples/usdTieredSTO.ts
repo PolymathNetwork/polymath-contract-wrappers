@@ -110,12 +110,6 @@ export const usdTieredSTO = async (polymathAPI: PolymathAPI, ticker: string) => 
     tokensPerTierDiscountPoly: [new BigNumber(4), new BigNumber(4)],
   });
 
-  const sleep = (milliseconds: number) => {
-    console.log('Sleeping until the STO starts');
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  };
-  await sleep(20000);
-
   // Subscribe to event for token purchase
   await usdTiered.subscribeAsync({
     eventName: USDTieredSTOEvents_3_0_0.TokenPurchase,
@@ -129,6 +123,30 @@ export const usdTieredSTO = async (polymathAPI: PolymathAPI, ticker: string) => 
     },
   });
 
+  // Subscribe to event for token purchase
+  await usdTiered.subscribeAsync({
+    eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments,
+    indexFilterValues: {},
+    callback: async (error: any, log: any) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Changed allowBeneficialInvestments!', log);
+      }
+    },
+  });
+
+  const sleep = (milliseconds: number) => {
+    console.log('Sleeping until the STO starts');
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  };
+
+  await sleep(21000);
+
+  // We call changeAllowBeneficialInvestments here both to demo, and due to ganache limitations,
+  // the time based assertions will return the right value.
+  await usdTiered.changeAllowBeneficialInvestments({ allowBeneficialInvestments: true });
+  // Call to buy with ETH
   await usdTiered.buyWithETH({ value: new BigNumber(1), beneficiary: myAddress });
   console.log('BuyWithETH complete');
 

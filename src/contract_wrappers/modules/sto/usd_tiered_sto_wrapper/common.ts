@@ -671,7 +671,7 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
       'The caller must be the ST owner',
     );
     assert.isFutureDate(await this.startTime(), 'STO already started');
-    assert.assert(params.endTime > params.startTime, ErrorCode.TooEarly, 'Start date must be greater than end time');
+    assert.assert(params.endTime > params.startTime, ErrorCode.TooEarly, 'End time must be greater than start time');
     assert.isFutureDate(params.startTime, 'Start date must be in the future');
     return (await this.contract).modifyTimes.sendTransactionAsync(
       dateToBigNumber(params.startTime),
