@@ -1,3 +1,10 @@
+# [3.0.0-beta.44](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.43@beta...v3.0.0-beta.44@beta) (2019-09-30)
+
+
+### Bug Fixes
+
+* 🐛 return correct instance of the ST from factory getters ([92f3a24](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/92f3a24))
+
 # [3.0.0-beta.43](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.42@beta...v3.0.0-beta.43@beta) (2019-09-30)
 
 
