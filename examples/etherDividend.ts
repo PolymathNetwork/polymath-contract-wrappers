@@ -1,9 +1,9 @@
 import { EtherDividendCheckpointEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI, ModuleName } from '../src/';
-import {DividendCheckpointData} from '../src/contract_wrappers/tokens/security_token_wrapper/common';
-import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';
-import {addInvestorsToWhitelist} from './addInvestorsToWhitelist';
-import {issueTokenToInvestors} from './issueTokenToInvestor';
+import { DividendCheckpointData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
 
 /**
  * This method adds a EtherDividendCheckpoint module and uses it. Requires that a valid security token has already been generated.
@@ -31,12 +31,12 @@ export const etherDividendCheckpoint = async (polymathAPI: PolymathAPI, ticker: 
     label: 'TM Label',
   };
   await addModule(
-      polymathAPI,
-      {
-        ticker,
-        moduleName: ModuleName.EtherDividendCheckpoint,
-      },
-      options,
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.EtherDividendCheckpoint,
+    },
+    options,
   );
 
   // Add all address in the whitelist including myAddress
@@ -45,9 +45,6 @@ export const etherDividendCheckpoint = async (polymathAPI: PolymathAPI, ticker: 
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 
