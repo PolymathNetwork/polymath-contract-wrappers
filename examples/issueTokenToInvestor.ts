@@ -13,21 +13,8 @@ export const issueTokenToInvestors = async (
   ticker: string,
   issueMultiParams: TransactionParams.SecurityToken.IssueMulti,
 ) => {
-  const tokenAddress = await polymathAPI.securityTokenRegistry.getSecurityTokenAddress({ ticker: ticker! });
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromAddress(tokenAddress);
-
-  // Subscribe to event
-  await tickerSecurityTokenInstance.subscribeAsync({
-    eventName: SecurityTokenEvents_3_0_0.Issued,
-    indexFilterValues: {},
-    callback: async (error: any, log: any) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Tokens issued successfully', log);
-      }
-    },
-  });
+  // Create a Security Token Instance
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Get general TM module instance
   const generalTM = (await moduleInstancesLookup(polymathAPI, {

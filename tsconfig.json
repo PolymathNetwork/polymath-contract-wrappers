@@ -18,5 +18,5 @@
     "baseUrl": "src",
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "lib", "examples", "sandbox.ts"]
+  "exclude": ["node_modules", "lib", "examples", "sandbox.ts", "sandboxSample.ts"]
 }

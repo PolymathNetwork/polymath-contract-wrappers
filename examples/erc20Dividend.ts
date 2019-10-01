@@ -2,7 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { ERC20DividendCheckpointEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox for adding a erc20Dividend module on an unlocked node (like ganache)
 
@@ -67,7 +67,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.Dividends,
   });
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });

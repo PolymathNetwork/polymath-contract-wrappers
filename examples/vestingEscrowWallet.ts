@@ -2,7 +2,7 @@ import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/su
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName, ModuleType } from '../src';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
 // This file acts as a valid sandbox.ts file in root directory for adding a new Vesting Escrow Wallet module
 
@@ -73,7 +73,7 @@ window.addEventListener('load', async () => {
     moduleType: ModuleType.Wallet,
   });
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
+  const instances: Promise<ModuleFactory>[] = [];
   modules.map(address => {
     instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
   });
