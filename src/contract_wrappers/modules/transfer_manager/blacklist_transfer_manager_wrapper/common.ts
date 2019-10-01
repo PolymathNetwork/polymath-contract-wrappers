@@ -27,6 +27,7 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace BlacklistTransferManagerTransactionParams {
   export interface AddBlacklistType extends BlacklistTypeParams {}
@@ -723,3 +724,7 @@ export default abstract class BlacklistTransferManagerCommon extends ModuleCommo
     );
   };
 }
+
+export function isBlacklistTransferManager(wrapper: ContractWrapper): wrapper is BlacklistTransferManagerCommon {
+  return wrapper instanceof BlacklistTransferManagerCommon;
+};

@@ -15,6 +15,7 @@ import {
 } from '../../../../types';
 import { valueToWei, weiToValue } from '../../../../utils/convert';
 import functionsUtils from '../../../../utils/functions_utils';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace CappedSTOTransactionParams {
   export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
@@ -208,3 +209,7 @@ export default abstract class CappedSTOCommon extends STOCommon {
     );
   };
 }
+
+export function isCappedSTO(wrapper: ContractWrapper): wrapper is CappedSTOCommon {
+  return wrapper instanceof CappedSTOCommon;
+};

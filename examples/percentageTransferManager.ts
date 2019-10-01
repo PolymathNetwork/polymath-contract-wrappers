@@ -8,9 +8,7 @@ import { ModuleName } from '../src';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
-import {
-  PercentageTransferManagerData,
-} from '../src/contract_wrappers/tokens/security_token_wrapper/common';
+import { PercentageTransferManagerData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 
 /**
  * This method adds a percentageTransferManager module and uses it. Requires that a valid security token has already been generated.
@@ -60,9 +58,6 @@ export const percentageTransferManager = async (polymathAPI: PolymathAPI, ticker
     canReceiveAfter: [new Date(), new Date(), new Date()],
     canSendAfter: [new Date(), new Date(), new Date()],
     expiryTime: [new Date(2035, 1), new Date(2035, 1), new Date(2035, 1)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 

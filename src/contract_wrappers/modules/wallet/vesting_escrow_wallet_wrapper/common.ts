@@ -19,6 +19,7 @@ import {
   bigNumberToDate,
   stringToBytes32,
 } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace VestingEscrowWalletTransactionParams {
   export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
@@ -839,3 +840,8 @@ export default abstract class VestingEscrowWalletCommon extends ModuleCommon {
     // TODO: userToTemplateIndex[_beneficiary][_templateName]
   };
 }
+
+export function isVestingEscrowWallet(wrapper: ContractWrapper): wrapper is VestingEscrowWalletCommon {
+  return wrapper instanceof VestingEscrowWalletCommon;
+};
+

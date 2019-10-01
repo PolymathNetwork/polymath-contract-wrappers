@@ -1,12 +1,13 @@
 /* istanbul ignore file */
 import { GeneralPermissionManager_3_0_0, isGeneralPermissionManager_3_0_0 } from './3.0.0';
 import { GeneralPermissionManager_3_1_0, isGeneralPermissionManager_3_1_0 } from './3.1.0';
-import Common from './common';
+import Common, { isGeneralPermissionManager } from './common';
 import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
 
 export type GeneralPermissionManager = GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0;
 
 export {
+  isGeneralPermissionManager,
   GeneralPermissionManager_3_0_0,
   isGeneralPermissionManager_3_0_0,
   GeneralPermissionManager_3_1_0,

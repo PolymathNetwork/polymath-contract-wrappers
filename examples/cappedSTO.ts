@@ -1,6 +1,6 @@
 import { ModuleRegistryEvents_3_0_0, BigNumber, CappedSTOEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src/PolymathAPI';
-import {CappedSTOFundRaiseType, ModuleName} from '../src';
+import { CappedSTOFundRaiseType, ModuleName } from '../src';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
@@ -65,9 +65,6 @@ export const cappedSTO = async (polymathAPI: PolymathAPI, ticker: string) => {
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 

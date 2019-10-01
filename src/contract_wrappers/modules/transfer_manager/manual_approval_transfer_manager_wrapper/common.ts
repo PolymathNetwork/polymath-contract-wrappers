@@ -26,6 +26,7 @@ import {
   weiToValue,
   parseTransferResult,
 } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace ManualApprovalTransferManagerTransactionParams {
   export interface AddManualApproval extends AddManualApprovalParams {}
@@ -502,3 +503,7 @@ export default abstract class ManualApprovalTransferManagerCommon extends Module
     assert.isFutureDate(approval.expiryTime, 'Approval does not exist');
   };
 }
+
+export function isManualApprovalTransferManager(wrapper: ContractWrapper): wrapper is ManualApprovalTransferManagerCommon {
+  return wrapper instanceof ManualApprovalTransferManagerCommon;
+};

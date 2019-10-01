@@ -10,9 +10,9 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import ContractWrapper from '../../contract_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
-import {PolymathError} from '../../../PolymathError';
-import {ErrorCode, GenericModuleContract, ModuleType, Perm, TxParams} from '../../../types';
-import {parseModuleTypeValue, parsePermBytes32Value, stringToBytes32} from '../../../utils/convert';
+import { PolymathError } from '../../../PolymathError';
+import { ErrorCode, GenericModuleContract, ModuleType, Perm, TxParams } from '../../../types';
+import { parseModuleTypeValue, parsePermBytes32Value, stringToBytes32 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
 import assert from '../../../utils/assert';
 
@@ -176,7 +176,6 @@ export default abstract class ModuleCommon extends ContractWrapper {
         const parsedModuleTypeValue = parseModuleTypeValue(new BigNumber(type));
         // We ignore the burn type in this case, we only need the main type
         return parsedModuleTypeValue !== ModuleType.Burn;
-
       } catch (e) {
         return false;
       }

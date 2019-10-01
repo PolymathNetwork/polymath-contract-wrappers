@@ -48,6 +48,7 @@ import {
   weiToValue,
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
+import ContractWrapper from '../../contract_wrapper';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -2138,3 +2139,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     return { maxCost, budget, data };
   }
 }
+
+export function isSecurityToken(wrapper: ContractWrapper): wrapper is SecurityTokenCommon {
+  return wrapper instanceof SecurityTokenCommon;
+};
