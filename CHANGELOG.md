@@ -1,3 +1,10 @@
+# [3.0.0-beta.46](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.45@beta...v3.0.0-beta.46@beta) (2019-10-01)
+
+
+### Bug Fixes
+
+* 🐛 export USDTieredSTO typeguard ([c1f4df9](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c1f4df9))
+
 # [3.0.0-beta.45](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.44@beta...v3.0.0-beta.45@beta) (2019-10-01)
 
 
