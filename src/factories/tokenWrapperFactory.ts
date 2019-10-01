@@ -1,6 +1,6 @@
 import { Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import SecurityTokenRegistryWrapper from '../contract_wrappers/registries/security_token_registry_wrapper';
-import { SecurityTokenCommon } from '../contract_wrappers/tokens/security_token_wrapper';
+import { SecurityToken_3_0_0 } from '../contract_wrappers/tokens/security_token_wrapper';
 import ERC20TokenWrapper from '../contract_wrappers/tokens/erc20_wrapper';
 import ERC20DetailedTokenWrapper from '../contract_wrappers/tokens/erc20_detailed_wrapper';
 import ContractFactory from './contractFactory';
@@ -58,10 +58,10 @@ export default class TokenWrapperFactory {
    *
    * @memberof SecurityTokenWrapperFactory
    */
-  public getSecurityTokenInstanceFromAddress = async (address: string): Promise<SecurityTokenCommon> => {
+  public getSecurityTokenInstanceFromAddress = async (address: string): Promise<SecurityToken_3_0_0> => {
     assert.isETHAddressHex('address', address);
     if (await this.securityTokenRegistry.isSecurityToken({ securityTokenAddress: address })) {
-      return new SecurityTokenCommon(
+      return new SecurityToken_3_0_0(
         this.web3Wrapper,
         this.contractFactory.getSecurityTokenContract(address),
         this.contractFactory,
@@ -75,10 +75,10 @@ export default class TokenWrapperFactory {
    *
    * @memberof SecurityTokenWrapperFactory
    */
-  public getSecurityTokenInstanceFromTicker = async (ticker: string): Promise<SecurityTokenCommon> => {
+  public getSecurityTokenInstanceFromTicker = async (ticker: string): Promise<SecurityToken_3_0_0> => {
     const address = await this.securityTokenRegistry.getSecurityTokenAddress({ ticker });
     assert.isNonZeroETHAddressHex('address', address);
-    return new SecurityTokenCommon(
+    return new SecurityToken_3_0_0(
       this.web3Wrapper,
       this.contractFactory.getSecurityTokenContract(address),
       this.contractFactory,

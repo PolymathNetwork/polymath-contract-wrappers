@@ -316,3 +316,7 @@ export default abstract class ModuleFactoryCommon extends ContractWrapper {
     );
   };
 }
+
+export function isModuleFactory(wrapper: ContractWrapper): wrapper is ModuleFactoryCommon {
+  return wrapper instanceof ModuleFactoryCommon;
+};

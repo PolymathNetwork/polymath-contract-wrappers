@@ -21,6 +21,7 @@ import {
 } from '../../../../utils/convert';
 import functionsUtils from '../../../../utils/functions_utils';
 import { GeneralTransferManagerCommon } from '../../transfer_manager/general_transfer_manager_wrapper';
+import ContractWrapper from '../../../contract_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
@@ -923,3 +924,7 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
     }
   };
 }
+
+export function isUSDTieredSTO(wrapper: ContractWrapper): wrapper is USDTieredSTOCommon {
+  return wrapper instanceof USDTieredSTOCommon;
+};

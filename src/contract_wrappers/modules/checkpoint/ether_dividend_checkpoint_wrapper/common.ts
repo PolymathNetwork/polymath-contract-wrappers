@@ -14,6 +14,7 @@ import {
   ContractVersion,
 } from '../../../../types';
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../../utils/convert';
+import ContractWrapper from '../../../contract_wrapper';
 
 export namespace EtherDividendCheckpointTransactionParams {
   export interface CreateDividend extends CreateDividendParams {}
@@ -213,3 +214,7 @@ export default abstract class EtherDividendCheckpointCommon extends DividendChec
     );
   };
 }
+
+export function isEtherDividendCheckpoint(wrapper: ContractWrapper): wrapper is EtherDividendCheckpointCommon {
+  return wrapper instanceof EtherDividendCheckpointCommon;
+};

@@ -1,3 +1,31 @@
+# [3.0.0-beta.47](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.46@beta...v3.0.0-beta.47@beta) (2019-10-01)
+
+
+### Bug Fixes
+
+* 🐛 export ST events ([bc13aac](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/bc13aac))
+
+# [3.0.0-beta.46](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.45@beta...v3.0.0-beta.46@beta) (2019-10-01)
+
+
+### Bug Fixes
+
+* 🐛 export USDTieredSTO typeguard ([c1f4df9](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c1f4df9))
+
+# [3.0.0-beta.45](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.44@beta...v3.0.0-beta.45@beta) (2019-10-01)
+
+
+### Features
+
+* 🎸 export type guards for common wrappers ([d9f8b18](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/d9f8b18))
+
+# [3.0.0-beta.44](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.43@beta...v3.0.0-beta.44@beta) (2019-09-30)
+
+
+### Bug Fixes
+
+* 🐛 return correct instance of the ST from factory getters ([92f3a24](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/92f3a24))
+
 # [3.0.0-beta.43](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.42@beta...v3.0.0-beta.43@beta) (2019-09-30)
 
 
