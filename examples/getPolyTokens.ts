@@ -2,7 +2,7 @@ import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src';
 
 /**
- * This method adds a CappedSTO module and uses it. Requires that a valid security token has already been generated.
+ * This method will transfer a given amount of poly tokens from the token faucet to the current user's address
  * @param polymathAPI The polymathAPI instance.
  * @param amount Amount of tokens to ask for (Max 1000000)
  */
