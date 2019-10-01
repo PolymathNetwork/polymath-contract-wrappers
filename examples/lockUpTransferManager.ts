@@ -1,9 +1,9 @@
 import { BigNumber, LockUpTransferManagerEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src/PolymathAPI';
 import { ModuleName } from '../src';
-import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';
-import {addInvestorsToWhitelist} from './addInvestorsToWhitelist';
-import {issueTokenToInvestors} from './issueTokenToInvestor';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
 
 /**
  * This method adds a lockUpTransferManager module and uses it. Requires that a valid security token has already been generated.
@@ -19,12 +19,12 @@ export const lockUpTransferManager = async (polymathAPI: PolymathAPI, ticker: st
     label: 'TM Label',
   };
   await addModule(
-      polymathAPI,
-      {
-        ticker,
-        moduleName: ModuleName.LockUpTransferManager,
-      },
-      options,
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.LockUpTransferManager,
+    },
+    options,
   );
 
   // Declare some random beneficiaries to work with later on
@@ -39,9 +39,6 @@ export const lockUpTransferManager = async (polymathAPI: PolymathAPI, ticker: st
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 

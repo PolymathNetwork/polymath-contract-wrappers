@@ -18,12 +18,12 @@ export const volumeRestrictionTransferManager = async (polymathAPI: PolymathAPI,
     label: 'TM Label',
   };
   await addModule(
-      polymathAPI,
-      {
-        ticker,
-        moduleName: ModuleName.VolumeRestrictionTM,
-      },
-      options,
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.VolumeRestrictionTM,
+    },
+    options,
   );
 
   // Create a Security Token Instance
@@ -47,9 +47,6 @@ export const volumeRestrictionTransferManager = async (polymathAPI: PolymathAPI,
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 

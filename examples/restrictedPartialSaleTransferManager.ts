@@ -44,9 +44,6 @@ export const restrictedPartialSaleTransferManager = async (polymathAPI: Polymath
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 
@@ -66,7 +63,7 @@ export const restrictedPartialSaleTransferManager = async (polymathAPI: Polymath
 
   await tickerSecurityTokenInstance.transfer({ to: randomBeneficiaries[2], value: new BigNumber(10) });
   console.log('Transfer worked as this is the treasury wallet address:');
-  await restrictedPartialSale.changeExemptWalletList({ wallet: myAddress, change: false });
+  await restrictedPartialSale.changeExemptWalletList({ wallet: myAddress, exempted: false });
 
   // Transfers
   // Try out transfer 10 during restrictedPartialSale, will fail
