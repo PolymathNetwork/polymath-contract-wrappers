@@ -1,3 +1,10 @@
+# [3.0.0-beta.45](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.44@beta...v3.0.0-beta.45@beta) (2019-10-01)
+
+
+### Features
+
+* 🎸 export type guards for common wrappers ([d9f8b18](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/d9f8b18))
+
 # [3.0.0-beta.44](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.43@beta...v3.0.0-beta.44@beta) (2019-09-30)
 
 
