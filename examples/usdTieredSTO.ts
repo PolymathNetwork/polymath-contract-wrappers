@@ -71,9 +71,6 @@ export const usdTieredSTO = async (polymathAPI: PolymathAPI, ticker: string) => 
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 

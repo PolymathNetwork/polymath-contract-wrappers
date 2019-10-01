@@ -1,11 +1,11 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName} from '../src';
-import {VestingEscrowWalletData} from '../src/contract_wrappers/tokens/security_token_wrapper/common';
-import {AddingModuleOpts, addModule, moduleInstancesLookup} from './modules';
-import {ModuleRegistryEvents_3_0_0} from '@polymathnetwork/abi-wrappers/lib/src';
-import {addInvestorsToWhitelist} from './addInvestorsToWhitelist';
-import {issueTokenToInvestors} from './issueTokenToInvestor';
+import { ModuleName } from '../src';
+import { VestingEscrowWalletData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { ModuleRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers/lib/src';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
 
 /**
  * This method adds a VestingEscrowWallet module and uses it. Requires that a valid security token has already been generated.
@@ -25,12 +25,12 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     label: 'TM Label',
   };
   await addModule(
-      polymathAPI,
-      {
-        ticker,
-        moduleName: ModuleName.VestingEscrowWallet,
-      },
-      options,
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.VestingEscrowWallet,
+    },
+    options,
   );
 
   await polymathAPI.moduleRegistry.subscribeAsync({
@@ -58,9 +58,6 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     canSendAfter: [new Date(), new Date(), new Date(), new Date()],
     canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
     expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 
@@ -98,9 +95,6 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     canSendAfter: new Date(2019, 7),
     canReceiveAfter: new Date(2019, 7),
     expiryTime: new Date(2020, 1),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   });
 
   // Mint yourself some tokens and make some transfers
@@ -115,9 +109,6 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     canSendAfter: new Date(2019, 7),
     canReceiveAfter: new Date(2019, 7),
     expiryTime: new Date(2020, 1),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   });
 
   // Add Template
@@ -140,5 +131,5 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     startTime: new Date(new Date().getTime() + 60000),
   });
 
-  console.log('VEW schedule added correctly from template.')
+  console.log('VEW schedule added correctly from template.');
 };
