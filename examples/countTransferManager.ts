@@ -92,9 +92,6 @@ export const countTransferManager = async (polymathAPI: PolymathAPI, ticker: str
     canSendAfter: [new Date()],
     canReceiveAfter: [new Date()],
     expiryTime: [new Date(2021, 10)],
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorData);
 
