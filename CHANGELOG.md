@@ -1,3 +1,10 @@
+# [3.0.0-beta.47](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.46@beta...v3.0.0-beta.47@beta) (2019-10-01)
+
+
+### Bug Fixes
+
+* 🐛 export ST events ([bc13aac](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/bc13aac))
+
 # [3.0.0-beta.46](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.45@beta...v3.0.0-beta.46@beta) (2019-10-01)
 
 
