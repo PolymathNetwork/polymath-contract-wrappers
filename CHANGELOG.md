@@ -1,3 +1,18 @@
+# [3.0.0-beta.48](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.47@beta...v3.0.0-beta.48@beta) (2019-10-01)
+
+
+### Bug Fixes
+
+* 🐛 checkAndAsk becomes getPolyTokens example for faucet ([da56829](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/da56829))
+* 🐛 examples, remove the txParams and add prettier syntax ([9289129](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/9289129))
+* 🐛 isValidModule fix so that burn types filter works ([ad87574](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/ad87574))
+* 🐛 moduleFactory reference in examples (yarn start working) ([e4fb61e](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/e4fb61e))
+* 🐛 modules need to get poly on their ST balance ([f5895d6](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/f5895d6))
+* 🐛 remove other txParams usage from CTM module ([289db3a](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/289db3a))
+* reference to module data interfaces in examples ([11cbe15](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/11cbe15))
+* vrtm needs longer examples delay ([fbe9225](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/fbe9225))
+* yarn build can now compile without throwing error ([1e02e0e](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/1e02e0e))
+
 # [3.0.0-beta.47](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.46@beta...v3.0.0-beta.47@beta) (2019-10-01)
 
 
