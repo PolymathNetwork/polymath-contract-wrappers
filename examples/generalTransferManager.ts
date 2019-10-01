@@ -1,7 +1,7 @@
 import { GeneralTransferManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
 import { PolymathAPI } from '../src';
 import { ModuleName, TransferType } from '../src';
-import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { moduleInstancesLookup } from './modules';
 
 /**
  * This method adds a GeneralTransferManager module and uses it. Requires that a valid security token has already been generated.
@@ -11,20 +11,8 @@ import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 export const generalTransferManager = async (polymathAPI: PolymathAPI, ticker: string) => {
   const myAddress = await polymathAPI.getAccount();
 
-  // Add the GTM module
-  const options: AddingModuleOpts = {
-    archived: false,
-    label: 'TM Label',
-  };
-  await addModule(
-    polymathAPI,
-    {
-      ticker,
-      moduleName: ModuleName.GeneralTransferManager,
-    },
-    options,
-  );
-
+  // The GTM module should be attached by default to an already existing security token.
+  // We can do a lookup to get the wrapper instance.
   const generalTM = (await moduleInstancesLookup(polymathAPI, {
     ticker,
     moduleName: ModuleName.GeneralTransferManager,
@@ -52,9 +40,6 @@ export const generalTransferManager = async (polymathAPI: PolymathAPI, ticker: s
     canSendAfter: new Date(),
     canReceiveAfter: new Date(),
     expiryTime: new Date(2020, 0),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   });
 
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
