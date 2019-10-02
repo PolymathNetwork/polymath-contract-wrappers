@@ -1,5 +1,6 @@
 import { USDTieredSTOEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { FundRaiseType, ModuleName, PolymathAPI } from '../src';
+import { PolymathAPI } from '../src/PolymathAPI';
+import { ModuleName, FundRaiseType } from '../src/types';
 import { USDTieredSTOData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
