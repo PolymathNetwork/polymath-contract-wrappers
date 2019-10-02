@@ -1,11 +1,9 @@
 import { USDTieredSTOEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { PolymathAPI } from '../src/PolymathAPI';
-import { FundRaiseType, ModuleName } from '../src';
+import { FundRaiseType, ModuleName, PolymathAPI } from '../src';
 import { USDTieredSTOData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
-import { ModuleRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers/lib/src';
 
 /**
  * This method adds a USDTieredSTO module and uses it. Requires that a valid security token has already been generated.
@@ -45,18 +43,6 @@ export const usdTieredSTO = async (polymathAPI: PolymathAPI, ticker: string) => 
     },
     options,
   );
-
-  await polymathAPI.moduleRegistry.subscribeAsync({
-    eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Module added!', log);
-      }
-    },
-  });
 
   // Declare some random beneficiaries to work with later on
   const randomBeneficiaries = [

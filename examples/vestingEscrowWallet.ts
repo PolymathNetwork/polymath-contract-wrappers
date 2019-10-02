@@ -1,9 +1,7 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName } from '../src';
+import { PolymathAPI, ModuleName } from '../src';
 import { VestingEscrowWalletData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
-import { ModuleRegistryEvents_3_0_0 } from '@polymathnetwork/abi-wrappers/lib/src';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
 
@@ -32,18 +30,6 @@ export const vestingEscrowWallet = async (polymathAPI: PolymathAPI, ticker: stri
     },
     options,
   );
-
-  await polymathAPI.moduleRegistry.subscribeAsync({
-    eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered,
-    indexFilterValues: {},
-    callback: async (error, log) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Module added!', log);
-      }
-    },
-  });
 
   // Declare some random beneficiaries to work with later on
   const randomBeneficiaries = [
