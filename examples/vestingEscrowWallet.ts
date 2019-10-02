@@ -1,5 +1,6 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
-import { PolymathAPI, ModuleName } from '../src';
+import { ModuleName } from '../src/types';
+import { PolymathAPI } from '../src/PolymathAPI';
 import { VestingEscrowWalletData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
 import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
