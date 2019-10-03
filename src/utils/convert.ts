@@ -1,5 +1,5 @@
-import { ethersUtils, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ModuleType, Partition, Perm, TransferResult, ErrorCode } from '../types';
+import { BigNumber, ethersUtils } from '@polymathnetwork/abi-wrappers';
+import { ErrorCode, ModuleType, Partition, Perm, TransferResult } from '../types';
 import { PolymathError } from '../PolymathError';
 
 const BASE = new BigNumber(10);
@@ -118,6 +118,8 @@ export function parseModuleTypeValue(value: BigNumber): ModuleType {
       return ModuleType.PermissionManager;
     case ModuleType.Burn:
       return ModuleType.Burn;
+    case ModuleType.Wallet:
+      return ModuleType.Wallet;
     default:
       throw new PolymathError({ message: 'Module Type not recognized', code: ErrorCode.NotFound });
   }
