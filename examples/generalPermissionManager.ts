@@ -1,117 +1,66 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { GeneralPermissionManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName, ModuleType, Perm, TransferType } from '../src';
+import { PolymathAPI } from '../src/PolymathAPI';
+import { ModuleName, Perm, TransferType } from '../src';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
 
-// This file acts as a valid sandbox for adding a permission manager  module on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
+/**
+ * This method adds a GeneralPermissionManager module and uses it. Requires that a valid security token has already been generated.
+ * @param polymathAPI The polymathAPI instance.
+ * @param ticker Ticker symbol.
+ */
+export const generalPermissionManager = async (polymathAPI: PolymathAPI, ticker: string) => {
   const myAddress = await polymathAPI.getAccount();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('Ticker', '');
-  const tokenName = prompt('Token Name', '');
-
-  // Double check available
-  await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
-  });
-
-  // Get the ticker fee and approve the security token registry to spend
-  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: tickerFee,
-  });
-
-  // Register a ticker
-  await polymathAPI.securityTokenRegistry.registerTicker({
-    ticker: ticker!,
-    tokenName: tokenName!,
-  });
-
-  // Get the st launch fee and approve the security token registry to spend
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: securityTokenLaunchFee,
-  });
-
-  // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
-    name: tokenName!,
-    ticker: ticker!,
-    tokenDetails: 'http://',
-    divisible: true,
-    treasuryWallet: myAddress,
-    protocolVersion: '0',
-  });
-
-  // Get permission manager factory address
-  const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.PermissionManager,
-  });
-
-  const moduleStringName = 'GeneralPermissionManager';
-  const moduleName = ModuleName.GeneralPermissionManager;
-
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
-  modules.map(address => {
-    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
-  });
-  const resultInstances = await Promise.all(instances);
-
-  const names: Promise<string>[] = [];
-  resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name());
-  });
-  const resultNames = await Promise.all(names);
-  const index = resultNames.indexOf(moduleStringName);
-
-  // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
-  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.setupCostInPoly();
+  // Declare some random investors to work with later on
+  const randomInvestors = [
+    '0x3444444444444444444444444444444444444444',
+    '0x5544444444444444444444444444444444444444',
+    '0x6644444444444444444444444444444444444444',
+  ];
 
-  // Call to add module
-  await tickerSecurityTokenInstance.addModule({
-    moduleName,
-    address: modules[index],
-    maxCost: setupCost,
-    budget: setupCost,
+  // Add the GeneralPermissionManager module
+  const options: AddingModuleOpts = {
     archived: false,
-  });
+    label: 'TM Label',
+  };
+  await addModule(
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.GeneralPermissionManager,
+    },
+    options,
+  );
 
-  const generalPMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+  // Add all address in the whitelist including myAddress
+  const kycInvestorMultiData = {
+    investors: randomInvestors.concat(myAddress),
+    canSendAfter: [new Date(), new Date(), new Date(), new Date()],
+    canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
+  };
+  await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
+
+  // Issue tokens to the investors
+  const issueMultiParams = {
+    investors: randomInvestors.concat(myAddress),
+    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20), new BigNumber(1000)],
+  };
+  await issueTokenToInvestors(polymathAPI, ticker, issueMultiParams);
+
+  const generalPM = (await moduleInstancesLookup(polymathAPI, {
+    ticker,
     moduleName: ModuleName.GeneralPermissionManager,
   }))[0];
-
-  const generalPM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralPermissionManager,
-    address: generalPMAddress,
-  });
 
   // Subscribe to event of add delegate
   await generalPM.subscribeAsync({
     eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
@@ -182,4 +131,4 @@ window.addEventListener('load', async () => {
   console.log(await generalPM.checkDelegate({ delegate: myAddress }));
 
   generalPM.unsubscribeAll();
-});
+};

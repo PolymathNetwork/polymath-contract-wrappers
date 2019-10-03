@@ -19,6 +19,7 @@ import ContractFactory from '../../../../factories/contractFactory';
 import { ErrorCode, FlagsType, Partition, Perm, TransferResult, TransferType, TxParams } from '../../../../types';
 import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
+import ContractWrapper from '../../../contract_wrapper';
 
 const ONE_HUNDRED = new BigNumber(100);
 
@@ -739,3 +740,7 @@ export default abstract class GeneralTransferManagerCommon extends ModuleCommon 
     return bytes32ToString(result);
   };
 }
+
+export function isGeneralTransferManager(wrapper: ContractWrapper): wrapper is GeneralTransferManagerCommon {
+  return wrapper instanceof GeneralTransferManagerCommon;
+};

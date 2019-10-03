@@ -3,7 +3,7 @@ import * as conversionUtils from './utils/convert';
 
 import { FeatureRegistryTransactionParams } from './contract_wrappers/registries/feature_registry_wrapper';
 import { GeneralTransferManagerTransactionParams } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper/common';
-import {SecurityTokenTransactionParams} from './contract_wrappers/tokens/security_token_wrapper';
+import { SecurityTokenTransactionParams } from './contract_wrappers/tokens/security_token_wrapper/common';
 // import { SecurityTokenRegistryTransactionParams } from './contract_wrappers/registries/security_token_registry_wrapper';
 // import { ModuleRegistryTransactionParams } from './contract_wrappers/registries/module_registry_wrapper';
 // import { PolymathRegistryTransactionParams } from './contract_wrappers/registries/polymath_registry_wrapper';
@@ -49,32 +49,45 @@ export namespace TransactionParams {
   //   export import ERC20 = ERC20TransactionParams;
   //   export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
   //   export import PolyToken = PolyTokenTransactionParams;
-     export import SecurityToken = SecurityTokenTransactionParams;
+  export import SecurityToken = SecurityTokenTransactionParams;
 }
 
 export { conversionUtils };
 
 export { default as ContractWrapper } from './contract_wrappers/contract_wrapper';
 export { default as FeatureRegistry } from './contract_wrappers/registries/feature_registry_wrapper';
-export { default as ModuleFactory } from './contract_wrappers/modules/module_factory_wrapper';
 export { default as ModuleRegistry } from './contract_wrappers/registries/module_registry_wrapper';
 export { default as PolyToken } from './contract_wrappers/tokens/poly_token_wrapper';
 export { default as PolymathRegistry } from './contract_wrappers/registries/polymath_registry_wrapper';
 export { default as SecurityTokenRegistry } from './contract_wrappers/registries/security_token_registry_wrapper';
-export { default as SecurityToken } from './contract_wrappers/tokens/security_token_wrapper';
+export {
+  ModuleFactory,
+  isModuleFactory,
+  ModuleFactory_3_0_0,
+  isModuleFactory_3_0_0,
+} from './contract_wrappers/modules/module_factory_wrapper';
+export {
+  SecurityToken,
+  isSecurityToken,
+  SecurityToken_3_0_0,
+  isSecurityToken_3_0_0,
+} from './contract_wrappers/tokens/security_token_wrapper';
 export { default as ERC20 } from './contract_wrappers/tokens/erc20_detailed_wrapper';
 export {
   ERC20DividendCheckpoint,
+  isERC20DividendCheckpoint,
   ERC20DividendCheckpoint_3_0_0,
   isERC20DividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/erc20_dividend_checkpoint_wrapper';
 export {
   EtherDividendCheckpoint,
+  isEtherDividendCheckpoint,
   EtherDividendCheckpoint_3_0_0,
   isEtherDividendCheckpoint_3_0_0,
 } from './contract_wrappers/modules/checkpoint/ether_dividend_checkpoint_wrapper';
 export {
   GeneralPermissionManager,
+  isGeneralPermissionManager,
   GeneralPermissionManager_3_0_0,
   isGeneralPermissionManager_3_0_0,
   GeneralPermissionManager_3_1_0,
@@ -82,13 +95,15 @@ export {
 } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 export {
   CappedSTO,
+  isCappedSTO,
   CappedSTO_3_0_0,
   isCappedSTO_3_0_0,
   CappedSTO_3_1_0,
   isCappedSTO_3_1_0,
 } from './contract_wrappers/modules/sto/capped_sto_wrapper';
-export {
+export {  
   USDTieredSTO,
+  isUSDTieredSTO,
   USDTieredSTO_3_0_0,
   isUSDTieredSTO_3_0_0,
   USDTieredSTO_3_1_0,
@@ -96,6 +111,7 @@ export {
 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export {
   GeneralTransferManager,
+  isGeneralTransferManager,
   GeneralTransferManager_3_0_0,
   isGeneralTransferManager_3_0_0,
   GeneralTransferManager_3_1_0,
@@ -103,42 +119,49 @@ export {
 } from './contract_wrappers/modules/transfer_manager/general_transfer_manager_wrapper';
 export {
   CountTransferManager,
+  isCountTransferManager,
   CountTransferManager_3_0_0,
   isCountTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/count_transfer_manager_wrapper';
 export {
   ManualApprovalTransferManager,
+  isManualApprovalTransferManager,
   ManualApprovalTransferManager_3_0_0,
   isManualApprovalTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/manual_approval_transfer_manager_wrapper';
 export {
   PercentageTransferManager,
+  isPercentageTransferManager,
   PercentageTransferManager_3_0_0,
   isPercentageTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/percentage_transfer_manager_wrapper';
 export {
   LockUpTransferManager,
+  isLockUpTransferManager,
   LockUpTransferManager_3_0_0,
   isLockUpTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/lock_up_transfer_manager_wrapper';
 export {
   BlacklistTransferManager,
+  isBlacklistTransferManager,
   BlacklistTransferManager_3_0_0,
   isBlacklistTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/blacklist_transfer_manager_wrapper';
 export {
   VolumeRestrictionTransferManager,
+  isVolumeRestrictionTransferManager,
   VolumeRestrictionTransferManager_3_0_0,
   isVolumeRestrictionTransferManager_3_0_0,
 } from './contract_wrappers/modules/transfer_manager/volume_restriction_transfer_manager_wrapper';
 export {
   RestrictedPartialSaleTransferManager,
+  isRestrictedPartialSaleTransferManager,
   RestrictedPartialSaleTransferManager_3_1_0,
   isRestrictedPartialSaleTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
-
 export {
   VestingEscrowWallet,
+  isVestingEscrowWallet,
   VestingEscrowWallet_3_0_0,
   isVestingEscrowWallet_3_0_0,
   VestingEscrowWallet_3_1_0,
@@ -188,6 +211,39 @@ export {
   FeatureRegistryChangeFeatureStatusEventArgs_3_0_0 as FeatureRegistryChangeFeatureStatusEventArgs,
   FeatureRegistryOwnershipTransferredEventArgs_3_0_0 as FeatureRegistryOwnershipTransferredEventArgs,
   ISecurityTokenContract_3_0_0 as SecurityTokenContract_3_0_0,
+  ISecurityTokenEvents_3_0_0 as SecurityTokenEvents_3_0_0,
+  ISecurityTokenEventArgs_3_0_0 as SecurityTokenEventArgs_3_0_0,
+  ISecurityTokenApprovalEventArgs_3_0_0 as SecurityTokenApprovalEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0 as SecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorEventArgs_3_0_0 as SecurityTokenAuthorizedOperatorEventArgs_3_0_0,
+  ISecurityTokenCheckpointCreatedEventArgs_3_0_0 as SecurityTokenCheckpointCreatedEventArgs_3_0_0,
+  ISecurityTokenControllerRedemptionEventArgs_3_0_0 as SecurityTokenControllerRedemptionEventArgs_3_0_0,
+  ISecurityTokenControllerTransferEventArgs_3_0_0 as SecurityTokenControllerTransferEventArgs_3_0_0,
+  ISecurityTokenDisableControllerEventArgs_3_0_0 as SecurityTokenDisableControllerEventArgs_3_0_0,
+  ISecurityTokenDocumentRemovedEventArgs_3_0_0 as SecurityTokenDocumentRemovedEventArgs_3_0_0,
+  ISecurityTokenDocumentUpdatedEventArgs_3_0_0 as SecurityTokenDocumentUpdatedEventArgs_3_0_0,
+  ISecurityTokenFreezeIssuanceEventArgs_3_0_0 as SecurityTokenFreezeIssuanceEventArgs_3_0_0,
+  ISecurityTokenFreezeTransfersEventArgs_3_0_0 as SecurityTokenFreezeTransfersEventArgs_3_0_0,
+  ISecurityTokenGranularityChangedEventArgs_3_0_0 as SecurityTokenGranularityChangedEventArgs_3_0_0,
+  ISecurityTokenIssuedByPartitionEventArgs_3_0_0 as SecurityTokenIssuedByPartitionEventArgs_3_0_0,
+  ISecurityTokenIssuedEventArgs_3_0_0 as SecurityTokenIssuedEventArgs_3_0_0,
+  ISecurityTokenModuleAddedEventArgs_3_0_0 as SecurityTokenModuleAddedEventArgs_3_0_0,
+  ISecurityTokenModuleArchivedEventArgs_3_0_0 as SecurityTokenModuleArchivedEventArgs_3_0_0,
+  ISecurityTokenModuleBudgetChangedEventArgs_3_0_0 as SecurityTokenModuleBudgetChangedEventArgs_3_0_0,
+  ISecurityTokenModuleRemovedEventArgs_3_0_0 as SecurityTokenModuleRemovedEventArgs_3_0_0,
+  ISecurityTokenModuleUnarchivedEventArgs_3_0_0 as SecurityTokenModuleUnarchivedEventArgs_3_0_0,
+  ISecurityTokenOwnershipTransferredEventArgs_3_0_0 as SecurityTokenOwnershipTransferredEventArgs_3_0_0,
+  ISecurityTokenRedeemedByPartitionEventArgs_3_0_0 as SecurityTokenRedeemedByPartitionEventArgs_3_0_0,
+  ISecurityTokenRedeemedEventArgs_3_0_0 as SecurityTokenRedeemedEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0 as SecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorEventArgs_3_0_0 as SecurityTokenRevokedOperatorEventArgs_3_0_0,
+  ISecurityTokenSetControllerEventArgs_3_0_0 as SecurityTokenSetControllerEventArgs_3_0_0,
+  ISecurityTokenTokenUpgradedEventArgs_3_0_0 as SecurityTokenTokenUpgradedEventArgs_3_0_0,
+  ISecurityTokenTransferByPartitionEventArgs_3_0_0 as SecurityTokenTransferByPartitionEventArgs_3_0_0,
+  ISecurityTokenTransferEventArgs_3_0_0 as SecurityTokenTransferEventArgs_3_0_0,
+  ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0 as SecurityTokenTreasuryWalletChangedEventArgs_3_0_0,
+  ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0 as SecurityTokenUpdateTokenDetailsEventArgs_3_0_0,
+  ISecurityTokenUpdateTokenNameEventArgs_3_0_0 as SecurityTokenUpdateTokenNameEventArgs_3_0_0,  
   ISecurityTokenRegistryContract_3_0_0 as SecurityTokenRegistryContract,
   ISecurityTokenRegistryEvents_3_0_0 as SecurityTokenRegistryEvents,
   ISecurityTokenRegistryEventArgs_3_0_0 as SecurityTokenRegistryEventArgs,

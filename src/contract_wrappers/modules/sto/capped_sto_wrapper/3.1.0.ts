@@ -1,10 +1,10 @@
-import { Web3Wrapper, EventCallback, CappedSTOEvents_3_1_0, CappedSTOTokenPurchaseEventArgs_3_1_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, CappedSTOSetFundRaiseTypesEventArgs_3_1_0, CappedSTOPauseEventArgs_3_1_0, CappedSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, CappedSTOContract_3_1_0, CappedSTOEventArgs_3_1_0, CappedSTOReserveTokenMintEventArgs_3_1_0, CappedSTOReserveTokenTransferEventArgs_3_1_0, CappedSTOAllowPreMintFlagEventArgs_3_1_0, CappedSTORevokePreMintFlagEventArgs_3_1_0, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
+import { Web3Wrapper, CappedSTOEvents_3_1_0, CappedSTOTokenPurchaseEventArgs_3_1_0, CappedSTOSetAllowBeneficialInvestmentsEventArgs_3_1_0, CappedSTOSetFundRaiseTypesEventArgs_3_1_0, CappedSTOPauseEventArgs_3_1_0, CappedSTOUnpauseEventArgs_3_1_0, LogWithDecodedArgs, CappedSTOContract_3_1_0, CappedSTOEventArgs_3_1_0, CappedSTOReserveTokenMintEventArgs_3_1_0, CappedSTOReserveTokenTransferEventArgs_3_1_0, CappedSTOAllowPreMintFlagEventArgs_3_1_0, CappedSTORevokePreMintFlagEventArgs_3_1_0, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import functionsUtils from '../../../../utils/functions_utils';
 import CappedSTOCommon, { BuyTokensWithPolyParams, BuyTokensParams } from './common';
 import assert from '../../../../utils/assert';
 import {
-  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType, Constructor,
+  ErrorCode, ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, FULL_DECIMALS, FundRaiseType, Constructor, EventCallback
 } from '../../../../types';
 import {
   valueToWei, bigNumberToDate, weiToValue,

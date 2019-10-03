@@ -1,86 +1,31 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
 import { GeneralTransferManagerEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
+import { PolymathAPI } from '../src';
 import { ModuleName, TransferType } from '../src';
+import { moduleInstancesLookup } from './modules';
 
-// This file acts as a valid sandbox for using a general transfer manager  module on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
+/**
+ * This method adds a GeneralTransferManager module and uses it. Requires that a valid security token has already been generated.
+ * @param polymathAPI The polymathAPI instance.
+ * @param ticker Ticker symbol.
+ */
+export const generalTransferManager = async (polymathAPI: PolymathAPI, ticker: string) => {
   const myAddress = await polymathAPI.getAccount();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
 
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('Ticker', '');
-  const tokenName = prompt('Token Name', '');
-
-  // Double check available
-  await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
-  });
-
-  // Get the ticker fee and approve the security token registry to spend
-  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: tickerFee,
-  });
-
-  // Register a ticker
-  await polymathAPI.securityTokenRegistry.registerTicker({
-    ticker: ticker!,
-    tokenName: tokenName!,
-  });
-
-  // Get the st launch fee and approve the security token registry to spend
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: securityTokenLaunchFee,
-  });
-
-  // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
-    name: tokenName!,
-    ticker: ticker!,
-    tokenDetails: 'http://',
-    divisible: false,
-    treasuryWallet: myAddress,
-    protocolVersion: '0',
-  });
-
-  // Create a Security Token Instance
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-
-  // Get General TM Address
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
+  // The GTM module should be attached by default to an already existing security token.
+  // We can do a lookup to get the wrapper instance.
+  const generalTM = (await moduleInstancesLookup(polymathAPI, {
+    ticker,
     moduleName: ModuleName.GeneralTransferManager,
   }))[0];
 
-  // Get general TM module instance
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralTransferManager,
-    address: generalTMAddress,
-  });
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Modify transfer requirements
   // Subscribe to event of modify transfer requirements
   await generalTM.subscribeAsync({
     eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
@@ -95,9 +40,6 @@ window.addEventListener('load', async () => {
     canSendAfter: new Date(),
     canReceiveAfter: new Date(),
     expiryTime: new Date(2020, 0),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
   });
 
   const randomBeneficiary1 = '0x3444444444444444444444444444444444444444';
@@ -151,4 +93,4 @@ window.addEventListener('load', async () => {
   console.log('Funds transferred');
 
   generalTM.unsubscribeAll();
-});
+};

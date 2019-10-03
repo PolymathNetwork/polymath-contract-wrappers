@@ -1,7 +1,7 @@
-import { ManualApprovalTransferManagerContract_3_0_0, ManualApprovalTransferManagerEvents_3_0_0, EventCallback, ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerPauseEventArgs_3_0_0, ManualApprovalTransferManagerUnpauseEventArgs_3_0_0, LogWithDecodedArgs, ManualApprovalTransferManagerEventArgs_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { ManualApprovalTransferManagerContract_3_0_0, ManualApprovalTransferManagerEvents_3_0_0, ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0, ManualApprovalTransferManagerPauseEventArgs_3_0_0, ManualApprovalTransferManagerUnpauseEventArgs_3_0_0, LogWithDecodedArgs, ManualApprovalTransferManagerEventArgs_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import ManualApprovalTransferManagerCommon from './common';
-import { ContractVersion, Constructor, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion, Constructor, SubscribeAsyncParams, GetLogsAsyncParams, Subscribe, GetLogs, EventCallback } from '../../../../types';
 import { WithModule_3_0_0 } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
