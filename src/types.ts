@@ -152,6 +152,13 @@ export enum TransferResult {
   FORCE_VALID,
 }
 
+export enum BallotStage {
+  Prep = 'PREP',
+  Commit = 'COMMIT',
+  Reveal = 'REVEAL',
+  Resolved = 'RESOLVED',
+}
+
 export enum FeeType {
   TickerRegFee = 'tickerRegFee',
   StLaunchFee = 'stLaunchFee',
