@@ -1,3 +1,16 @@
+# [3.0.0-beta.49](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.48@beta...v3.0.0-beta.49@beta) (2019-10-03)
+
+
+### Bug Fixes
+
+* 🐛 and test modular example for GPM (remove txparams) ([e7e5d10](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/e7e5d10))
+* 🐛 complete txparams removal ([41b8ca1](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/41b8ca1))
+* 🐛 usdTieredSTO modular example now functioning ([5a5aebf](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/5a5aebf))
+* make imports specific to their file names ([fe9e3a3](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/fe9e3a3))
+* remove unnecessary event subscription and reorganize imports ([b4d6388](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/b4d6388))
+* remove unnecessary import for events in example ([f60179b](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/f60179b))
+* vew imports as well ([2f921c8](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/2f921c8))
+
 # [3.0.0-beta.48](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.47@beta...v3.0.0-beta.48@beta) (2019-10-01)
 
 
