@@ -3,15 +3,27 @@ import {
   Web3Wrapper,
   BigNumber,
   PolyResponse,
+  ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0,
+  LogWithDecodedArgs,
+  ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerPauseEventArgs_3_0_0,
+  ManualApprovalTransferManagerUnpauseEventArgs_3_0_0,
+  ManualApprovalTransferManagerEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
-  TxParams,  
+  TxParams,
   Perm,
   ErrorCode,
   TransferResult,
+  Subscribe,
+  GetLogs,
+  GetLogsAsyncParams,
+  EventCallback,
+  SubscribeAsyncParams,
 } from '../../../../types';
 import {
   bigNumberToDate,
@@ -35,6 +47,75 @@ export namespace ManualApprovalTransferManagerTransactionParams {
   export interface ModifyManualApprovalMulti extends ModifyManualApprovalMultiParams {}
   export interface RevokeManualApproval extends RevokeManualApprovalParams {}
   export interface RevokeManualApprovalMulti extends RevokeManualApprovalMultiParams {}
+}
+
+interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetAddManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
+}
+
+interface ModifyManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetModifyManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
+}
+
+interface RevokeManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetRevokeManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<ManualApprovalTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface ManualApprovalTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: ModifyManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: RevokeManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetRevokeManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>[]
+  >;
 }
 
 /**
@@ -504,6 +585,8 @@ export default abstract class ManualApprovalTransferManagerCommon extends Module
   };
 }
 
-export function isManualApprovalTransferManager(wrapper: ContractWrapper): wrapper is ManualApprovalTransferManagerCommon {
+export function isManualApprovalTransferManager(
+  wrapper: ContractWrapper,
+): wrapper is ManualApprovalTransferManagerCommon {
   return wrapper instanceof ManualApprovalTransferManagerCommon;
-};
+}

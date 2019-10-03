@@ -1,8 +1,13 @@
 import {
   CountTransferManagerContract_3_0_0,
+  CountTransferManagerEvents_3_0_0,
+  CountTransferManagerModifyHolderCountEventArgs_3_0_0,
+  CountTransferManagerPauseEventArgs_3_0_0,
+  CountTransferManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   BigNumber,
   PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../../utils/convert';
@@ -12,12 +17,58 @@ import {
   Perm,
   TransferResult,
   TxParams,
+  Subscribe,
+  GetLogs,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
 } from '../../../../types';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractWrapper from '../../../contract_wrapper';
 
 export namespace CountTransferManagerTransactionParams {
   export interface ChangeHolderCount extends ChangeHolderCountParams {}
+}
+
+interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
+  callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs_3_0_0>;
+}
+
+interface GetModifyHolderCountLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<CountTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<CountTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: CountTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface CountTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: ModifyHolderCountSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetCountTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetModifyHolderCountLogsAsyncParams): Promise<
+    LogWithDecodedArgs<CountTransferManagerModifyHolderCountEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<CountTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -117,4 +168,4 @@ export default abstract class CountTransferManagerCommon extends ModuleCommon {
 
 export function isCountTransferManager(wrapper: ContractWrapper): wrapper is CountTransferManagerCommon {
   return wrapper instanceof CountTransferManagerCommon;
-};
+}

@@ -1,15 +1,37 @@
 /* istanbul ignore file */
+import { VolumeRestrictionTMEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { VolumeRestrictionTransferManager_3_0_0, isVolumeRestrictionTransferManager_3_0_0 } from './3.0.0';
 
 import Common, { isVolumeRestrictionTransferManager } from './common';
 import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+
+export type VolumeRestrictionTMEventArgs = VolumeRestrictionTMEventArgs_3_0_0;
+
+export {
+  VolumeRestrictionTMEvents_3_0_0 as VolumeRestrictionTMEvents,
+  VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs_3_0_0 as VolumeRestrictionTMAddDefaultDailyRestrictionEventArgs,
+  VolumeRestrictionTMAddDefaultRestrictionEventArgs_3_0_0 as VolumeRestrictionTMAddDefaultRestrictionEventArgs,
+  VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs_3_0_0 as VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs,
+  VolumeRestrictionTMAddIndividualRestrictionEventArgs_3_0_0 as VolumeRestrictionTMAddIndividualRestrictionEventArgs,
+  VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0 as VolumeRestrictionTMChangedExemptWalletListEventArgs,
+  VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs_3_0_0 as VolumeRestrictionTMDefaultDailyRestrictionRemovedEventArgs,
+  VolumeRestrictionTMDefaultRestrictionRemovedEventArgs_3_0_0 as VolumeRestrictionTMDefaultRestrictionRemovedEventArgs,
+  VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs_3_0_0 as VolumeRestrictionTMIndividualDailyRestrictionRemovedEventArgs,
+  VolumeRestrictionTMIndividualRestrictionRemovedEventArgs_3_0_0 as VolumeRestrictionTMIndividualRestrictionRemovedEventArgs,
+  VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs_3_0_0 as VolumeRestrictionTMModifyDefaultDailyRestrictionEventArgs,
+  VolumeRestrictionTMModifyDefaultRestrictionEventArgs_3_0_0 as VolumeRestrictionTMModifyDefaultRestrictionEventArgs,
+  VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs_3_0_0 as VolumeRestrictionTMModifyIndividualDailyRestrictionEventArgs,
+  VolumeRestrictionTMModifyIndividualRestrictionEventArgs_3_0_0 as VolumeRestrictionTMModifyIndividualRestrictionEventArgs,
+  VolumeRestrictionTMPauseEventArgs_3_0_0 as VolumeRestrictionTMPauseEventArgs,
+  VolumeRestrictionTMUnpauseEventArgs_3_0_0 as VolumeRestrictionTMUnpauseEventArgs,
+} from '@polymathnetwork/abi-wrappers';
 
 export type VolumeRestrictionTransferManager = VolumeRestrictionTransferManager_3_0_0;
 
 export {
   isVolumeRestrictionTransferManager,
   VolumeRestrictionTransferManager_3_0_0,
-  isVolumeRestrictionTransferManager_3_0_0
+  isVolumeRestrictionTransferManager_3_0_0,
 };
 
 // for internal use

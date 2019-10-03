@@ -2,71 +2,24 @@ import {
   RestrictedPartialSaleTMContract_3_1_0,
   RestrictedPartialSaleTMEventArgs_3_1_0,
   RestrictedPartialSaleTMEvents_3_1_0,
-  RestrictedPartialSaleTMChangedExemptWalletListEventArgs_3_1_0,
-  RestrictedPartialSaleTMPauseEventArgs_3_1_0,
-  RestrictedPartialSaleTMUnpauseEventArgs_3_1_0,
   LogWithDecodedArgs,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import {
-  ContractVersion,
-  SubscribeAsyncParams,
-  GetLogsAsyncParams,
-  Subscribe,
-  GetLogs,
-  EventCallback,
-  Constructor,
-} from '../../../../types';
+import { ContractVersion, SubscribeAsyncParams, GetLogsAsyncParams, Constructor } from '../../../../types';
 import ContractFactory from '../../../../factories/contractFactory';
 
-import RestrictedPartialSaleTransferManagerCommon from './common';
+import RestrictedPartialSaleTransferManagerCommon, {
+  RestrictedPartialSaleTransferManagerSubscribeAsyncParams,
+  GetRestrictedPartialSaleTransferManagerLogsAsyncParams,
+} from './common';
 import assert from '../../../../utils/assert';
 import { WithModule_3_0_0 } from '../../module_wrapper';
 
-interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.ChangedExemptWalletList;
-  callback: EventCallback<RestrictedPartialSaleTMChangedExemptWalletListEventArgs_3_1_0>;
-}
-
-interface GetChangedExemptWalletListLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.ChangedExemptWalletList;
-}
-
-interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.Pause;
-  callback: EventCallback<RestrictedPartialSaleTMPauseEventArgs_3_1_0>;
-}
-
-interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.Pause;
-}
-
-interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.Unpause;
-  callback: EventCallback<RestrictedPartialSaleTMUnpauseEventArgs_3_1_0>;
-}
-
-interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: RestrictedPartialSaleTMEvents_3_1_0.Unpause;
-}
-
-interface RestrictedPartialSaleTransferManagerSubscribeAsyncParams extends Subscribe {
-  (params: ChangedExemptWalletListSubscribeAsyncParams): Promise<string>;
-  (params: PauseSubscribeAsyncParams): Promise<string>;
-  (params: UnpauseSubscribeAsyncParams): Promise<string>;
-}
-
-interface GetRestrictedPartialSaleTransferManagerLogsAsyncParams extends GetLogs {
-  (params: GetChangedExemptWalletListLogsAsyncParams): Promise<
-    LogWithDecodedArgs<RestrictedPartialSaleTMChangedExemptWalletListEventArgs_3_1_0>[]
-  >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<RestrictedPartialSaleTMPauseEventArgs_3_1_0>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<RestrictedPartialSaleTMUnpauseEventArgs_3_1_0>[]>;
-}
-
 // uses 3.0.0 Module contract
-const RestrictedPartialSaleTransferManagerBase_3_1_0 = WithModule_3_0_0(RestrictedPartialSaleTransferManagerCommon as unknown as Constructor<RestrictedPartialSaleTransferManagerCommon>);
+const RestrictedPartialSaleTransferManagerBase_3_1_0 = WithModule_3_0_0(
+  (RestrictedPartialSaleTransferManagerCommon as unknown) as Constructor<RestrictedPartialSaleTransferManagerCommon>,
+);
 
 export class RestrictedPartialSaleTransferManager_3_1_0 extends RestrictedPartialSaleTransferManagerBase_3_1_0 {
   public contract: Promise<RestrictedPartialSaleTMContract_3_1_0>;

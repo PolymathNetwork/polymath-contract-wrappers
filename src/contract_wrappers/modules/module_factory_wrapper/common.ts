@@ -1,9 +1,16 @@
 import {
-  BigNumber,
   ModuleFactoryContract_3_0_0,
+  ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0,
+  ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0,
+  ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
+  ModuleFactoryChangeCostTypeEventArgs_3_0_0,
+  ModuleFactoryChangeSetupCostEventArgs_3_0_0,
+  BigNumber,
   TxData,
   Web3Wrapper,
   PolyResponse,
+  ModuleFactoryEvents_3_0_0,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import semver from 'semver';
 import assert from '../../../utils/assert';
@@ -14,6 +21,11 @@ import {
   ModuleType,
   TxParams,
   ErrorCode,
+  Subscribe,
+  GetLogs,
+  EventCallback,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
 } from '../../../types';
 import {
   bytes32ArrayToStringArray,
@@ -24,6 +36,75 @@ import {
   weiToValue,
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
+
+interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>;
+}
+
+interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
+}
+
+interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
+  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>;
+}
+
+interface GetGenerateModuleFromFactoryLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
+}
+
+interface ChangeSTVersionBoundSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
+  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>;
+}
+
+interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
+}
+
+interface ChangeCostTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeCostType;
+  callback: EventCallback<ModuleFactoryChangeCostTypeEventArgs_3_0_0>;
+}
+
+interface GetChangeCostTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeCostType;
+}
+
+interface ChangeSetupCostSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSetupCost;
+  callback: EventCallback<ModuleFactoryChangeSetupCostEventArgs_3_0_0>;
+}
+
+interface GetChangeSetupCostLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSetupCost;
+}
+
+export interface ModuleFactorySubscribeAsyncParams extends Subscribe {
+  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
+  (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
+  (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
+  (params: ChangeCostTypeSubscribeAsyncParams): Promise<string>;
+  (params: ChangeSetupCostSubscribeAsyncParams): Promise<string>;
+}
+
+export interface ModuleFactoryGetLogsAsyncParams extends GetLogs {
+  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>[]
+  >;
+  (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>[]
+  >;
+  (params: GetChangeSTVersionBoundLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>[]
+  >;
+  (params: GetChangeCostTypeLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleFactoryChangeCostTypeEventArgs_3_0_0>[]>;
+  (params: GetChangeSetupCostLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeSetupCostEventArgs_3_0_0>[]
+  >;
+}
 
 /**
  * @param setupCost Cost to setup module
@@ -319,4 +400,4 @@ export default abstract class ModuleFactoryCommon extends ContractWrapper {
 
 export function isModuleFactory(wrapper: ContractWrapper): wrapper is ModuleFactoryCommon {
   return wrapper instanceof ModuleFactoryCommon;
-};
+}

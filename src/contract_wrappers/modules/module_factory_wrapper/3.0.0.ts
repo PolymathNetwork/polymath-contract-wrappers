@@ -1,69 +1,14 @@
 import {
   LogWithDecodedArgs,
-  ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0,
   ModuleFactoryContract_3_0_0,
   ModuleFactoryEventArgs_3_0_0,
   ModuleFactoryEvents_3_0_0,
-  ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0,
-  ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
-import {
-  EventCallback,
-  GetLogs,
-  GetLogsAsyncParams,
-  Subscribe,
-  SubscribeAsyncParams,
-  ContractVersion,
-} from '../../../types';
-import ModuleFactoryCommon from './common';
-
-interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
-  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>;
-}
-
-interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
-}
-
-interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
-  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>;
-}
-
-interface GetGenerateModuleFromFactoryLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
-}
-
-interface ChangeSTVersionBoundSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
-  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>;
-}
-
-interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
-}
-
-interface ModuleFactorySubscribeAsyncParams extends Subscribe {
-  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
-  (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
-  (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
-}
-
-interface ModuleFactoryGetLogsAsyncParams extends GetLogs {
-  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>[]
-  >;
-  (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>[]
-  >;
-  (params: GetChangeSTVersionBoundLogsAsyncParams): Promise<
-    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>[]
-  >;
-}
+import { GetLogsAsyncParams, SubscribeAsyncParams, ContractVersion } from '../../../types';
+import ModuleFactoryCommon, { ModuleFactorySubscribeAsyncParams, ModuleFactoryGetLogsAsyncParams } from './common';
 
 /**
  * This class includes the functionality related to interacting with the ModuleFactory contract.

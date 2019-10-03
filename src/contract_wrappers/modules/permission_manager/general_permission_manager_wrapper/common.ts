@@ -1,14 +1,29 @@
 import {
   GeneralPermissionManagerContract_3_0_0,
+  GeneralPermissionManagerContract_3_1_0,
+  GeneralPermissionManagerEvents_3_0_0,
+  GeneralPermissionManagerAddDelegateEventArgs_3_0_0,
+  GeneralPermissionManagerChangePermissionEventArgs_3_0_0,
+  GeneralPermissionManagerPauseEventArgs_3_0_0,
+  GeneralPermissionManagerUnpauseEventArgs_3_0_0,
   Web3Wrapper,
   PolyResponse,
-  GeneralPermissionManagerContract_3_1_0,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import { TxParams, Perm, ErrorCode } from '../../../../types';
+import {
+  TxParams,
+  Perm,
+  ErrorCode,
+  GetLogs,
+  Subscribe,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+} from '../../../../types';
 import {
   numberToBigNumber,
   stringToBytes32,
@@ -22,6 +37,60 @@ export namespace GeneralPermissionManagerTransactionParams {
   export interface AddDelegate extends AddDelegateParams {}
   export interface ChangePermission extends ChangePermissionParams {}
   export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
+}
+
+interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
+  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>;
+}
+
+interface GetChangePermissionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
+}
+
+interface AddDelegateSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate;
+  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>;
+}
+
+interface GetAddDelegateLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.AddDelegate;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.Pause;
+  callback: EventCallback<GeneralPermissionManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<GeneralPermissionManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralPermissionManagerEvents_3_0_0.Unpause;
+}
+
+export interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
+  (params: ChangePermissionSubscribeAsyncParams): Promise<string>;
+  (params: AddDelegateSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
+  (params: GetChangePermissionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>[]
+  >;
+  (params: GetAddDelegateLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralPermissionManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -329,4 +398,4 @@ export default abstract class GeneralPermissionManagerCommon extends ModuleCommo
 
 export function isGeneralPermissionManager(wrapper: ContractWrapper): wrapper is GeneralPermissionManagerCommon {
   return wrapper instanceof GeneralPermissionManagerCommon;
-};
+}

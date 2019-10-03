@@ -1,8 +1,17 @@
 import {
   BigNumber,
-  BlacklistTransferManagerContract_3_0_0,
   Web3Wrapper,
   PolyResponse,
+  LogWithDecodedArgs,
+  BlacklistTransferManagerContract_3_0_0,
+  BlacklistTransferManagerEvents_3_0_0,
+  BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0,
+  BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerPauseEventArgs_3_0_0,
+  BlacklistTransferManagerUnpauseEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
@@ -13,6 +22,11 @@ import {
   TxParams,
   ErrorCode,
   TransferResult,
+  GetLogs,
+  EventCallback,
+  SubscribeAsyncParams,
+  GetLogsAsyncParams,
+  Subscribe,
 } from '../../../../types';
 import {
   bigNumberToDate,
@@ -44,6 +58,99 @@ export namespace BlacklistTransferManagerTransactionParams {
   export interface AddInvestorToBlacklistMulti extends InvestorMultiAndBlacklistParams {}
   export interface AddMultiInvestorToBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
   export interface DeleteMultiInvestorsFromBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
+}
+
+interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
+  callback: EventCallback<BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0>;
+}
+
+interface GetDeleteInvestorFromBlacklistLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
+}
+
+interface AddInvestorToBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
+  callback: EventCallback<BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0>;
+}
+
+interface GetAddInvestorToBlacklistLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
+}
+
+interface DeleteBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetDeleteBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
+}
+
+interface ModifyBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetModifyBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
+}
+
+interface AddBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetAddBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<BlacklistTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<BlacklistTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: ModifyBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: DeleteBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: AddInvestorToBlacklistSubscribeAsyncParams): Promise<string>;
+  (params: DeleteInvestorFromBlacklistSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetDeleteBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetAddInvestorToBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetDeleteInvestorFromBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -727,4 +834,4 @@ export default abstract class BlacklistTransferManagerCommon extends ModuleCommo
 
 export function isBlacklistTransferManager(wrapper: ContractWrapper): wrapper is BlacklistTransferManagerCommon {
   return wrapper instanceof BlacklistTransferManagerCommon;
-};
+}

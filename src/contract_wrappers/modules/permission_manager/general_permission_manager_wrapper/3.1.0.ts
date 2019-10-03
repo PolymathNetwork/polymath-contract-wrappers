@@ -2,8 +2,6 @@ import {
   GeneralPermissionManagerContract_3_1_0,
   GeneralPermissionManagerEventArgs_3_1_0,
   GeneralPermissionManagerEvents_3_1_0,
-  GeneralPermissionManagerChangePermissionEventArgs_3_1_0,
-  GeneralPermissionManagerAddDelegateEventArgs_3_1_0,
   Web3Wrapper,
   LogWithDecodedArgs,
   PolyResponse,
@@ -15,49 +13,17 @@ import {
   TxParams,
   GetLogsAsyncParams,
   SubscribeAsyncParams,
-  EventCallback,
-  GetLogs,
-  Subscribe,
   Perm,
   ErrorCode,
   ContractVersion,
   Constructor,
 } from '../../../../types';
 import { stringArrayToBytes32Array } from '../../../../utils/convert';
-import GeneralPermissionManagerCommon from './common';
+import GeneralPermissionManagerCommon, {
+  GeneralPermissionManagerSubscribeAsyncParams,
+  GetGeneralPermissionManagerLogsAsyncParams,
+} from './common';
 import { WithModule_3_0_0 } from '../../module_wrapper';
-
-interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.ChangePermission;
-  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs_3_1_0>;
-}
-
-interface GetChangePermissionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.ChangePermission;
-}
-
-interface AddDelegateSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.AddDelegate;
-  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs_3_1_0>;
-}
-
-interface GetAddDelegateLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.AddDelegate;
-}
-
-interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
-  (params: ChangePermissionSubscribeAsyncParams): Promise<string>;
-  (params: AddDelegateSubscribeAsyncParams): Promise<string>;
-}
-
-interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
-  (params: GetChangePermissionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs_3_1_0>[]
-  >;
-  (params: GetAddDelegateLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_1_0>[]
-  >;
-}
 
 /**
  * @param delegates An array of Ethereum addresses of the delegates
@@ -76,7 +42,9 @@ interface DeleteDelegateMultiParams extends TxParams {
 }
 
 // uses 3.0.0 Module contract
-const GeneralPermissionManagerBase_3_1_0 = WithModule_3_0_0(GeneralPermissionManagerCommon as unknown as Constructor<GeneralPermissionManagerCommon>);
+const GeneralPermissionManagerBase_3_1_0 = WithModule_3_0_0((GeneralPermissionManagerCommon as unknown) as Constructor<
+  GeneralPermissionManagerCommon
+>);
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.

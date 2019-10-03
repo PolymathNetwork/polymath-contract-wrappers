@@ -1,79 +1,23 @@
-import { PercentageTransferManagerEvents_3_0_0, PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0, PercentageTransferManagerModifyWhitelistEventArgs_3_0_0, PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs_3_0_0, PercentageTransferManagerPauseEventArgs_3_0_0, PercentageTransferManagerUnpauseEventArgs_3_0_0, LogWithDecodedArgs, PercentageTransferManagerContract_3_0_0, Web3Wrapper, PercentageTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import {
+  PercentageTransferManagerEvents_3_0_0,
+  LogWithDecodedArgs,
+  PercentageTransferManagerContract_3_0_0,
+  Web3Wrapper,
+  PercentageTransferManagerEventArgs_3_0_0,
+} from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
-import { ContractVersion, Constructor, SubscribeAsyncParams, EventCallback, GetLogsAsyncParams, Subscribe, GetLogs } from '../../../../types';
-import PercentageTransferManagerCommon from './common';
+import { ContractVersion, Constructor, SubscribeAsyncParams, GetLogsAsyncParams } from '../../../../types';
+import PercentageTransferManagerCommon, {
+  PercentageTransferManagerSubscribeAsyncParams,
+  GetPercentageTransferManagerLogsAsyncParams,
+} from './common';
 import { WithModule_3_0_0 } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import assert from '../../../../utils/assert';
 
-interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.ModifyHolderPercentage;
-  callback: EventCallback<PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0>;
-}
-
-interface GetModifyHolderPercentageLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.ModifyHolderPercentage;
-}
-
-interface ModifyWhitelistSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.ModifyWhitelist;
-  callback: EventCallback<PercentageTransferManagerModifyWhitelistEventArgs_3_0_0>;
-}
-
-interface GetModifyWhitelistLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.ModifyWhitelist;
-}
-
-interface SetAllowPrimaryIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.SetAllowPrimaryIssuance;
-  callback: EventCallback<PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs_3_0_0>;
-}
-
-interface GetSetAllowPrimaryIssuanceLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.SetAllowPrimaryIssuance;
-}
-
-interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.Pause;
-  callback: EventCallback<PercentageTransferManagerPauseEventArgs_3_0_0>;
-}
-
-interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.Pause;
-}
-
-interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.Unpause;
-  callback: EventCallback<PercentageTransferManagerUnpauseEventArgs_3_0_0>;
-}
-
-interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: PercentageTransferManagerEvents_3_0_0.Unpause;
-}
-
-interface PercentageTransferManagerSubscribeAsyncParams extends Subscribe {
-  (params: ModifyHolderPercentageSubscribeAsyncParams): Promise<string>;
-  (params: ModifyWhitelistSubscribeAsyncParams): Promise<string>;
-  (params: SetAllowPrimaryIssuanceSubscribeAsyncParams): Promise<string>;
-  (params: PauseSubscribeAsyncParams): Promise<string>;
-  (params: UnpauseSubscribeAsyncParams): Promise<string>;
-}
-
-interface GetPercentageTransferManagerLogsAsyncParams extends GetLogs {
-  (params: GetModifyHolderPercentageLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0>[]
-  >;
-  (params: GetModifyWhitelistLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PercentageTransferManagerModifyWhitelistEventArgs_3_0_0>[]
-  >;
-  (params: GetSetAllowPrimaryIssuanceLogsAsyncParams): Promise<
-    LogWithDecodedArgs<PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs_3_0_0>[]
-  >;
-  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<PercentageTransferManagerPauseEventArgs_3_0_0>[]>;
-  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<PercentageTransferManagerUnpauseEventArgs_3_0_0>[]>;
-}
-
-const PercentageTransferManagerBase_3_0_0 = WithModule_3_0_0(PercentageTransferManagerCommon as unknown as Constructor<PercentageTransferManagerCommon>);
+const PercentageTransferManagerBase_3_0_0 = WithModule_3_0_0(
+  (PercentageTransferManagerCommon as unknown) as Constructor<PercentageTransferManagerCommon>,
+);
 
 export class PercentageTransferManager_3_0_0 extends PercentageTransferManagerBase_3_0_0 {
   public contract: Promise<PercentageTransferManagerContract_3_0_0>;
