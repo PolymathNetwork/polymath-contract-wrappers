@@ -1,5 +1,5 @@
 import { ModuleFactoryContract_3_0_0, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
-import { ContractVersion } from 'types';
+import { ContractVersion } from '../../../types';
 import ModuleFactoryCommon from './common';
 
 /**
