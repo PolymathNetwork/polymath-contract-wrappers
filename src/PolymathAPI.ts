@@ -191,6 +191,10 @@ export class PolymathAPI {
       VestingEscrowWalletContract_3_1_0.ABI(),
     ];
 
+    abiArray.forEach((abi): void => {
+      this.web3Wrapper.abiDecoder.addABI(abi);
+    });
+
     this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 
     this.polymathRegistry = new PolymathRegistryWrapper(
