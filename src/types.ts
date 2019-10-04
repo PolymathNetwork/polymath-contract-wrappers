@@ -279,7 +279,8 @@ export type ContractEventArgs_3_1_0 =
   | CappedSTOEventArgs_3_1_0
   | USDTieredSTOEventArgs_3_1_0
   | GeneralPermissionManagerEventArgs_3_1_0
-  | VestingEscrowWalletEventArgs_3_1_0;
+  | VestingEscrowWalletEventArgs_3_1_0
+  | AdvancedPLCRVotingCheckpointEventArgs_3_1_0;
 
 export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 
@@ -384,8 +385,7 @@ export type GenericModuleContract_3_1_0 =
   | GeneralTransferManagerContract_3_1_0
   | GeneralPermissionManagerContract_3_1_0
   | VestingEscrowWalletContract_3_1_0
-  | RestrictedPartialSaleTMContract_3_1_0
-  | AdvancedPLCRVotingCheckpointContract_3_1_0;
+  | RestrictedPartialSaleTMContract_3_1_0;
 
 export type GenericModuleContract = GenericModuleContract_3_0_0 | GenericModuleContract_3_1_0;
 
@@ -397,7 +397,8 @@ export type STOBaseContract = STOBaseContract_3_0_0 | STOBaseContract_3_1_0;
 
 export type DividendCheckpointBaseContract_3_0_0 =
   | ERC20DividendCheckpointContract_3_0_0
-  | EtherDividendCheckpointContract_3_0_0;
+  | EtherDividendCheckpointContract_3_0_0
+  | AdvancedPLCRVotingCheckpointContract_3_1_0;
 
 export type DividendCheckpointBaseContract = DividendCheckpointBaseContract_3_0_0;
 

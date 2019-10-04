@@ -5,20 +5,15 @@ import {
   BigNumber,
   PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
-import { AssertionError } from 'assert';
 import {
-  parsePermBytes32Value,
-  parseTransferResult,
-  valueToWei,
   numberToBigNumber,
-  weiToValue,
   bigNumberToDate,
   parseBallotStageValue,
   dateToBigNumber,
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { ErrorCode, Perm, TxParams, BallotStage } from '../../../../../types';
-import { ModuleCommon } from '../../../module_wrapper';
+import { DividendCheckpointCommon } from '../../dividend_checkpoint_wrapper';
 import assert from '../../../../../utils/assert';
 
 export namespace AdvancedPLCRVotingCheckpointTransactionParams {
@@ -243,7 +238,7 @@ interface BallotDetails {
 /**
  * This class includes the functionality related to interacting with the Advanced PLCR Voting Checkpoint contract.
  */
-export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleCommon {
+export default abstract class AdvancedPLCRVotingCheckpointCommon extends DividendCheckpointCommon {
   public contract: Promise<AdvancedPLCRVotingCheckpointContract_3_1_0>;
 
   /**
@@ -266,26 +261,6 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    */
   public getDefaultExemptionVotersList = async (): Promise<string[]> => {
     return (await this.contract).getDefaultExemptionVotersList.callAsync();
-  };
-
-  /**
-   * Retrieves list of investors, their balances
-   */
-  public getCheckpointData = async (params: CheckpointIdParams): Promise<CheckpointData[]> => {
-    const result = await (await this.contract).getCheckpointData.callAsync(numberToBigNumber(params.checkpointId));
-    const typedResult: Promise<CheckpointData>[] = [];
-    for (let i = 0; i < result[0].length; i += 1) {
-      typedResult.push(this.pushCheckpointData(result, i));
-    }
-    return Promise.all(typedResult);
-  };
-
-  private pushCheckpointData = async (result: [string[], BigNumber[]], i: number): Promise<CheckpointData> => {
-    const decimals = await (await this.securityTokenContract()).decimals.callAsync();
-    return {
-      investor: result[0][i],
-      balance: weiToValue(result[1][i], decimals),
-    };
   };
 
   /**
