@@ -7,7 +7,7 @@ import {
 import { GeneralPermissionManager_3_0_0, isGeneralPermissionManager_3_0_0 } from './3.0.0';
 import { GeneralPermissionManager_3_1_0, isGeneralPermissionManager_3_1_0 } from './3.1.0';
 import Common, { isGeneralPermissionManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export const GeneralPermissionManagerEvents = {
   ...GeneralPermissionManagerEvents_3_1_0,
@@ -39,8 +39,4 @@ export {
 // for internal use
 export class GeneralPermissionManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

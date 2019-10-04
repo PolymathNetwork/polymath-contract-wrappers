@@ -1,27 +1,7 @@
-import {
-  USDTieredSTOContract_3_0_0,
-  USDTieredSTOEvents_3_0_0,
-  USDTieredSTOEventArgs_3_0_0,
-  BigNumber,
-  Web3Wrapper,
-  LogWithDecodedArgs,
-} from '@polymathnetwork/abi-wrappers';
-import { schemas } from '@0x/json-schemas';
-import USDTieredSTOCommon, {
-  TierIndexParams,
-  USDTieredSTOSubscribeAsyncParams,
-  GetUSDTieredSTOLogsAsyncParams,
-} from './common';
+import { USDTieredSTOContract_3_0_0, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import USDTieredSTOCommon, { TierIndexParams } from './common';
 import assert from '../../../../utils/assert';
-import {
-  ErrorCode,
-  ContractVersion,
-  SubscribeAsyncParams,
-  GetLogsAsyncParams,
-  TxParams,
-  FULL_DECIMALS,
-  Constructor,
-} from '../../../../types';
+import { ErrorCode, ContractVersion, TxParams, FULL_DECIMALS, Constructor } from '../../../../types';
 import { numberToBigNumber, weiToValue } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
@@ -144,45 +124,6 @@ export class USDTieredSTO_3_0_0 extends USDTieredSTOBase_3_0_0 {
     assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
     // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
-  };
-
-  /**
-   * Subscribe to an event type emitted by the contract.
-   * @return Subscription token used later to unsubscribe
-   */
-  public subscribeAsync: USDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
-    params: SubscribeAsyncParams,
-  ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = await this.subscribeInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.indexFilterValues,
-      params.callback,
-      params.isVerbose,
-    );
-    return subscriptionToken;
-  };
-
-  /**
-   * Gets historical logs without creating a subscription
-   * @return Array of logs that match the parameters
-   */
-  public getLogsAsync: GetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
-    params: GetLogsAsyncParams,
-  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
-    );
-    return logs;
   };
 }
 

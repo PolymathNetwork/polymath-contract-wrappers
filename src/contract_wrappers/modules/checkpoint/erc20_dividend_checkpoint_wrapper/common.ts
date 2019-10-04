@@ -1,10 +1,8 @@
 import {
   ERC20DividendCheckpointContract_3_0_0,
   ERC20DetailedContract_3_0_0,
-  BigNumber,
-  Web3Wrapper,
-  PolyResponse,
   ERC20DividendCheckpointEvents_3_0_0,
+  ERC20DividendCheckpointEventArgs_3_0_0,
   ERC20DividendCheckpointERC20DividendDepositedEventArgs_3_0_0,
   ERC20DividendCheckpointERC20DividendClaimedEventArgs_3_0_0,
   ERC20DividendCheckpointERC20DividendWithholdingWithdrawnEventArgs_3_0_0,
@@ -17,7 +15,11 @@ import {
   ERC20DividendCheckpointUnpauseEventArgs_3_0_0,
   ERC20DividendCheckpointUpdateDividendDatesEventArgs_3_0_0,
   LogWithDecodedArgs,
+  BigNumber,
+  Web3Wrapper,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { DividendCheckpointCommon } from '../dividend_checkpoint_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -394,6 +396,49 @@ export default abstract class ERC20DividendCheckpointCommon extends DividendChec
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: ERC20DividendCheckpointSubscribeAsyncParams = async <
+    ArgsType extends ERC20DividendCheckpointEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DividendCheckpointEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetERC20DividendCheckpointLogsAsyncParams = async <
+    ArgsType extends ERC20DividendCheckpointEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ERC20DividendCheckpointEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

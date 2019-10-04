@@ -3,7 +3,7 @@ import { PercentageTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/abi-w
 import { PercentageTransferManager_3_0_0, isPercentageTransferManager_3_0_0 } from './3.0.0';
 
 import Common, { isPercentageTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type PercentageTransferManagerEventArgs = PercentageTransferManagerEventArgs_3_0_0;
 
@@ -23,8 +23,4 @@ export { isPercentageTransferManager, PercentageTransferManager_3_0_0, isPercent
 // for internal use
 export class PercentageTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

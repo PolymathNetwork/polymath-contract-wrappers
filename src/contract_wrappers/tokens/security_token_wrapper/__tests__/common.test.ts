@@ -30,8 +30,6 @@ import {
   CappedSTOFundRaiseType,
   TransferStatusCode,
   ContractVersion,
-  Subscribe,
-  GetLogs,
 } from '../../../../types';
 import SecurityTokenCommon from '../common';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -56,10 +54,6 @@ describe('SecurityTokenCommon', () => {
     public contract: Promise<ISecurityTokenContract_3_0_0>;
 
     public contractVersion!: ContractVersion;
-
-    public subscribeAsync!: Subscribe;
-
-    public getLogsAsync!: GetLogs;
 
     public constructor(
       web3Wrapper: Web3Wrapper,

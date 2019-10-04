@@ -1,16 +1,18 @@
 import {
   PercentageTransferManagerContract_3_0_0,
-  Web3Wrapper,
-  BigNumber,
-  PolyResponse,
   PercentageTransferManagerEvents_3_0_0,
+  PercentageTransferManagerEventArgs_3_0_0,
   PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0,
   PercentageTransferManagerModifyWhitelistEventArgs_3_0_0,
   PercentageTransferManagerSetAllowPrimaryIssuanceEventArgs_3_0_0,
   PercentageTransferManagerPauseEventArgs_3_0_0,
   PercentageTransferManagerUnpauseEventArgs_3_0_0,
   LogWithDecodedArgs,
+  Web3Wrapper,
+  BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import { parseTransferResult, valueToWei, weiToValue } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
@@ -309,6 +311,49 @@ export default abstract class PercentageTransferManagerCommon extends ModuleComm
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: PercentageTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends PercentageTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, PercentageTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetPercentageTransferManagerLogsAsyncParams = async <
+    ArgsType extends PercentageTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, PercentageTransferManagerEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

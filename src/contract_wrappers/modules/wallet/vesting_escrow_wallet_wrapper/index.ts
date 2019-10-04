@@ -8,7 +8,7 @@ import { VestingEscrowWallet_3_0_0, isVestingEscrowWallet_3_0_0 } from './3.0.0'
 import { VestingEscrowWallet_3_1_0, isVestingEscrowWallet_3_1_0 } from './3.1.0';
 
 import Common, { isVestingEscrowWallet } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export const VestingEscrowWalletEvents = {
   ...VestingEscrowWalletEvents_3_1_0,
@@ -46,8 +46,4 @@ export {
 // for internal use
 export class VestingEscrowWalletCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

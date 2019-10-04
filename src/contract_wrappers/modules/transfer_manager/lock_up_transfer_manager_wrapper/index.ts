@@ -3,7 +3,7 @@ import { LockUpTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/abi-wrapp
 import { LockUpTransferManager_3_0_0, isLockUpTransferManager_3_0_0 } from './3.0.0';
 
 import Common, { isLockUpTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type LockUpTansferManagerEventArgs = LockUpTransferManagerEventArgs_3_0_0;
 
@@ -25,8 +25,4 @@ export { isLockUpTransferManager, LockUpTransferManager_3_0_0, isLockUpTransferM
 // for internal use
 export class LockupTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

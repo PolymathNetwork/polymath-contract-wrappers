@@ -1,9 +1,7 @@
 import {
   VolumeRestrictionTMContract_3_0_0,
-  Web3Wrapper,
-  BigNumber,
-  PolyResponse,
   VolumeRestrictionTMEvents_3_0_0,
+  VolumeRestrictionTMEventArgs_3_0_0,
   VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0,
   VolumeRestrictionTMAddIndividualRestrictionEventArgs_3_0_0,
   VolumeRestrictionTMAddIndividualDailyRestrictionEventArgs_3_0_0,
@@ -20,7 +18,11 @@ import {
   VolumeRestrictionTMPauseEventArgs_3_0_0,
   VolumeRestrictionTMUnpauseEventArgs_3_0_0,
   LogWithDecodedArgs,
+  Web3Wrapper,
+  BigNumber,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -1211,6 +1213,49 @@ export default abstract class VolumeRestrictionTransferManagerCommon extends Mod
       decimals = await (await this.securityTokenContract()).decimals.callAsync();
     }
     return decimals;
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: VolumeRestrictionTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends VolumeRestrictionTMEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetVolumeRestrictionTransferManagerLogsAsyncParams = async <
+    ArgsType extends VolumeRestrictionTMEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, VolumeRestrictionTMEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

@@ -5,6 +5,7 @@ import {
   LogWithDecodedArgs,
   BlacklistTransferManagerContract_3_0_0,
   BlacklistTransferManagerEvents_3_0_0,
+  BlacklistTransferManagerEventArgs_3_0_0,
   BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0,
   BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0,
   BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0,
@@ -13,6 +14,7 @@ import {
   BlacklistTransferManagerPauseEventArgs_3_0_0,
   BlacklistTransferManagerUnpauseEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -829,6 +831,51 @@ export default abstract class BlacklistTransferManagerCommon extends ModuleCommo
       ErrorCode.NotFound,
       'Investor is not currently present on any blacklists',
     );
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: BlacklistTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetBlacklistTransferManagerLogsAsyncParams = async <
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

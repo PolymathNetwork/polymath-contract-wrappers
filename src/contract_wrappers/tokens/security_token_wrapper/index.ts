@@ -3,7 +3,7 @@ import { ISecurityTokenEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { SecurityToken_3_0_0, isSecurityToken_3_0_0 } from './3.0.0';
 
 import Common, { isSecurityToken } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../types';
+import { ContractVersion } from '../../../types';
 
 export type SecurityTokenEventArgs = ISecurityTokenEventArgs_3_0_0;
 
@@ -49,8 +49,4 @@ export { isSecurityToken, SecurityToken_3_0_0, isSecurityToken_3_0_0 };
 // for internal use
 export class SecurityTokenCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

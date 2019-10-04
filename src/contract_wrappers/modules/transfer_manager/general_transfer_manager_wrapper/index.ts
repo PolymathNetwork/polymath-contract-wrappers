@@ -8,7 +8,7 @@ import { GeneralTransferManager_3_0_0, isGeneralTransferManager_3_0_0 } from './
 import { GeneralTransferManager_3_1_0, isGeneralTransferManager_3_1_0 } from './3.1.0';
 
 import Common, { isGeneralTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export const GeneralTransferManagerEvents = {
   ...GeneralTransferManagerEvents_3_1_0,
@@ -41,8 +41,4 @@ export {
 // for internal use
 export class GeneralTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

@@ -1,28 +1,9 @@
-import {
-  GeneralPermissionManagerContract_3_1_0,
-  GeneralPermissionManagerEventArgs_3_1_0,
-  GeneralPermissionManagerEvents_3_1_0,
-  Web3Wrapper,
-  LogWithDecodedArgs,
-  PolyResponse,
-} from '@polymathnetwork/abi-wrappers';
-import { schemas } from '@0x/json-schemas';
+import { GeneralPermissionManagerContract_3_1_0, Web3Wrapper, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
-import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
-  Perm,
-  ErrorCode,
-  ContractVersion,
-  Constructor,
-} from '../../../../types';
+import { TxParams, Perm, ErrorCode, ContractVersion, Constructor } from '../../../../types';
 import { stringArrayToBytes32Array } from '../../../../utils/convert';
-import GeneralPermissionManagerCommon, {
-  GeneralPermissionManagerSubscribeAsyncParams,
-  GetGeneralPermissionManagerLogsAsyncParams,
-} from './common';
+import GeneralPermissionManagerCommon from './common';
 import { WithModule_3_0_0 } from '../../module_wrapper';
 
 /**
@@ -135,49 +116,6 @@ export class GeneralPermissionManager_3_1_0 extends GeneralPermissionManagerBase
       ErrorCode.NotFound,
       'Delegate does not exist',
     );
-  };
-
-  /**
-   * Subscribe to an event type emitted by the contract.
-   * @return Subscription token used later to unsubscribe
-   */
-  public subscribeAsync: GeneralPermissionManagerSubscribeAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs_3_1_0
-  >(
-    params: SubscribeAsyncParams,
-  ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_1_0);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = await this.subscribeInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.indexFilterValues,
-      params.callback,
-      params.isVerbose,
-    );
-    return subscriptionToken;
-  };
-
-  /**
-   * Gets historical logs without creating a subscription
-   * @return Array of logs that match the parameters
-   */
-  public getLogsAsync: GetGeneralPermissionManagerLogsAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs_3_1_0
-  >(
-    params: GetLogsAsyncParams,
-  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_1_0);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
-    );
-    return logs;
   };
 }
 

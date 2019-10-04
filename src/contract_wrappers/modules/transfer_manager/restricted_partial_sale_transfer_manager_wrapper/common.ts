@@ -1,13 +1,15 @@
 import {
   RestrictedPartialSaleTMContract_3_1_0,
-  Web3Wrapper,
-  BigNumber,
   RestrictedPartialSaleTMEvents_3_1_0,
+  RestrictedPartialSaleTMEventArgs_3_1_0,
   RestrictedPartialSaleTMChangedExemptWalletListEventArgs_3_1_0,
   RestrictedPartialSaleTMPauseEventArgs_3_1_0,
   RestrictedPartialSaleTMUnpauseEventArgs_3_1_0,
   LogWithDecodedArgs,
+  Web3Wrapper,
+  BigNumber,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import { parsePermBytes32Value, parseTransferResult, valueToWei } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
@@ -210,6 +212,49 @@ export default abstract class RestrictedPartialSaleTransferManagerCommon extends
    */
   public getInitFunction = async (): Promise<string> => {
     return (await this.contract).getInitFunction.callAsync();
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: RestrictedPartialSaleTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends RestrictedPartialSaleTMEventArgs_3_1_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, RestrictedPartialSaleTMEvents_3_1_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetRestrictedPartialSaleTransferManagerLogsAsyncParams = async <
+    ArgsType extends RestrictedPartialSaleTMEventArgs_3_1_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, RestrictedPartialSaleTMEvents_3_1_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

@@ -10,7 +10,7 @@ import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../..
 import { ModuleCommon } from '../../../module_wrapper';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { parsePermBytes32Value, stringArrayToBytes32Array, valueToWei } from '../../../../../utils/convert';
-import { Perm, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { Perm, ContractVersion } from '../../../../../types';
 import RestrictedPartialSaleTransferManagerCommon from '../common';
 
 describe('RestrictedPartialSaleTransferManagerWrapper', () => {
@@ -20,16 +20,16 @@ describe('RestrictedPartialSaleTransferManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<RestrictedPartialSaleTMContract_3_1_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<RestrictedPartialSaleTMContract_3_1_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
   }
-  
+
   let target: FakeRestrictedPartialSaleTransferManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: RestrictedPartialSaleTMContract_3_1_0;

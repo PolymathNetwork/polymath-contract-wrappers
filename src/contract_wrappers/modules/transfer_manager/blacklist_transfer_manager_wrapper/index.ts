@@ -2,7 +2,7 @@
 import { BlacklistTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { BlacklistTransferManager_3_0_0, isBlacklistTransferManager_3_0_0 } from './3.0.0';
 import Common, { isBlacklistTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type BlacklistTransferManagerEventArgs = BlacklistTransferManagerEventArgs_3_0_0;
 
@@ -24,8 +24,4 @@ export { isBlacklistTransferManager, BlacklistTransferManager_3_0_0, isBlacklist
 // for internal use
 export class BlacklistTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

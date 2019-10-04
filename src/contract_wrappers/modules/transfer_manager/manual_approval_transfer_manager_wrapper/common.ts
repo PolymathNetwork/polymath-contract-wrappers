@@ -1,16 +1,18 @@
 import {
   ManualApprovalTransferManagerContract_3_0_0,
-  Web3Wrapper,
-  BigNumber,
-  PolyResponse,
   ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0,
-  LogWithDecodedArgs,
   ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0,
   ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0,
   ManualApprovalTransferManagerPauseEventArgs_3_0_0,
   ManualApprovalTransferManagerUnpauseEventArgs_3_0_0,
   ManualApprovalTransferManagerEvents_3_0_0,
+  ManualApprovalTransferManagerEventArgs_3_0_0,
+  Web3Wrapper,
+  BigNumber,
+  PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -582,6 +584,49 @@ export default abstract class ManualApprovalTransferManagerCommon extends Module
     const approval = await this.getApprovalDetails({ from, to });
     assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
     assert.isFutureDate(approval.expiryTime, 'Approval does not exist');
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: ManualApprovalTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetManualApprovalTransferManagerLogsAsyncParams = async <
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

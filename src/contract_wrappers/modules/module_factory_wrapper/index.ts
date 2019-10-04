@@ -3,7 +3,7 @@ import { ModuleFactoryEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { ModuleFactory_3_0_0, isModuleFactory_3_0_0 } from './3.0.0';
 
 import Common, { isModuleFactory } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../types';
+import { ContractVersion } from '../../../types';
 
 export type ModuleFactoryEventArgs = ModuleFactoryEventArgs_3_0_0;
 
@@ -23,8 +23,4 @@ export { isModuleFactory, ModuleFactory_3_0_0, isModuleFactory_3_0_0 };
 // for internal use
 export class ModuleFactoryCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

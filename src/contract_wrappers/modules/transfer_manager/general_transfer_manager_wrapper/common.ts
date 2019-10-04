@@ -1,11 +1,8 @@
 import {
   GeneralTransferManagerContract_3_0_0,
   GeneralTransferManagerContract_3_1_0,
-  Web3Wrapper,
-  BigNumber,
-  PolyResponse,
-  LogWithDecodedArgs,
   GeneralTransferManagerEvents_3_0_0,
+  GeneralTransferManagerEventArgs_3_0_0,
   GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0,
   GeneralTransferManagerChangeDefaultsEventArgs_3_0_0,
   GeneralTransferManagerPauseEventArgs_3_0_0,
@@ -13,7 +10,12 @@ import {
   GeneralTransferManagerModifyKYCDataEventArgs_3_0_0,
   GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0,
   GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0,
+  Web3Wrapper,
+  BigNumber,
+  PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -853,6 +855,49 @@ export default abstract class GeneralTransferManagerCommon extends ModuleCommon 
   public getAddressBytes32 = async (): Promise<string> => {
     const result = await (await this.contract).getAddressBytes32.callAsync();
     return bytes32ToString(result);
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: GeneralTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetGeneralTransferManagerLogsAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

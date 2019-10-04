@@ -3,7 +3,7 @@ import { EtherDividendCheckpointEventArgs_3_0_0 } from '@polymathnetwork/abi-wra
 import { EtherDividendCheckpoint_3_0_0, isEtherDividendCheckpoint_3_0_0 } from './3.0.0';
 
 import Common, { isEtherDividendCheckpoint } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type EtherDividendCheckpointEventArgs = EtherDividendCheckpointEventArgs_3_0_0;
 export {
@@ -29,8 +29,4 @@ export { isEtherDividendCheckpoint, EtherDividendCheckpoint_3_0_0, isEtherDivide
 // for internal use
 export class EtherDividendCheckpointCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

@@ -3,7 +3,7 @@ import { VolumeRestrictionTMEventArgs_3_0_0 } from '@polymathnetwork/abi-wrapper
 import { VolumeRestrictionTransferManager_3_0_0, isVolumeRestrictionTransferManager_3_0_0 } from './3.0.0';
 
 import Common, { isVolumeRestrictionTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type VolumeRestrictionTMEventArgs = VolumeRestrictionTMEventArgs_3_0_0;
 
@@ -37,8 +37,4 @@ export {
 // for internal use
 export class VolumeRestrictionTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

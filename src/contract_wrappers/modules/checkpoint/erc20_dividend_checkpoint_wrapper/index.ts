@@ -3,7 +3,7 @@ import { ERC20DividendCheckpointEventArgs_3_0_0 } from '@polymathnetwork/abi-wra
 import { ERC20DividendCheckpoint_3_0_0, isERC20DividendCheckpoint_3_0_0 } from './3.0.0';
 
 import Common, { isERC20DividendCheckpoint } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type ERC20DividendCheckpointEventArgs = ERC20DividendCheckpointEventArgs_3_0_0;
 
@@ -29,8 +29,4 @@ export { isERC20DividendCheckpoint, ERC20DividendCheckpoint_3_0_0, isERC20Divide
 // for internal use
 export class ERC20DividendCheckpointCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }

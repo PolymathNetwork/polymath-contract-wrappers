@@ -1,5 +1,7 @@
 import {
   ModuleFactoryContract_3_0_0,
+  ModuleFactoryEvents_3_0_0,
+  ModuleFactoryEventArgs_3_0_0,
   ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0,
   ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0,
   ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
@@ -9,10 +11,10 @@ import {
   TxData,
   Web3Wrapper,
   PolyResponse,
-  ModuleFactoryEvents_3_0_0,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import semver from 'semver';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ContractWrapper from '../../contract_wrapper';
 import {
@@ -395,6 +397,45 @@ export default abstract class ModuleFactoryCommon extends ContractWrapper {
       ErrorCode.Unauthorized,
       'Msg sender must be owner',
     );
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: ModuleFactorySubscribeAsyncParams = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: ModuleFactoryGetLogsAsyncParams = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

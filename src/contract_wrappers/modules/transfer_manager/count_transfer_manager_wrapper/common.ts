@@ -1,6 +1,7 @@
 import {
   CountTransferManagerContract_3_0_0,
   CountTransferManagerEvents_3_0_0,
+  CountTransferManagerEventArgs_3_0_0,
   CountTransferManagerModifyHolderCountEventArgs_3_0_0,
   CountTransferManagerPauseEventArgs_3_0_0,
   CountTransferManagerUnpauseEventArgs_3_0_0,
@@ -9,6 +10,7 @@ import {
   PolyResponse,
   LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { numberToBigNumber, parseTransferResult, valueToWei } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -163,6 +165,49 @@ export default abstract class CountTransferManagerCommon extends ModuleCommon {
       params.txData,
       params.safetyFactor,
     );
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: CountTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends CountTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetCountTransferManagerLogsAsyncParams = async <
+    ArgsType extends CountTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, CountTransferManagerEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

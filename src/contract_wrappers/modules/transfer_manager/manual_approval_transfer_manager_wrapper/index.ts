@@ -3,7 +3,7 @@ import { ManualApprovalTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/a
 import { ManualApprovalTransferManager_3_0_0, isManualApprovalTransferManager_3_0_0 } from './3.0.0';
 
 import Common, { isManualApprovalTransferManager } from './common';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../types';
+import { ContractVersion } from '../../../../types';
 
 export type ManualApprovalTransferManagerEventArgs = ManualApprovalTransferManagerEventArgs_3_0_0;
 
@@ -23,8 +23,4 @@ export { isManualApprovalTransferManager, ManualApprovalTransferManager_3_0_0, i
 // for internal use
 export class ManualApprovalTransferManagerCommon extends Common {
   public contractVersion!: ContractVersion;
-
-  public subscribeAsync!: Subscribe;
-
-  public getLogsAsync!: GetLogs;
 }
