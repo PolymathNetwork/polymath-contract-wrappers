@@ -204,6 +204,7 @@ export enum ModuleName {
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
   VestingEscrowWallet = 'VestingEscrowWallet',
+  AdvancedPLCRVotingCheckpoint = 'AdvancedPLCRVotingCheckpoint',
 }
 
 export enum TransferStatusCode {
@@ -279,7 +280,8 @@ export type ContractEventArgs_3_1_0 =
   | CappedSTOEventArgs_3_1_0
   | USDTieredSTOEventArgs_3_1_0
   | GeneralPermissionManagerEventArgs_3_1_0
-  | VestingEscrowWalletEventArgs_3_1_0;
+  | VestingEscrowWalletEventArgs_3_1_0
+  | AdvancedPLCRVotingCheckpointEventArgs_3_1_0;
 
 export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 

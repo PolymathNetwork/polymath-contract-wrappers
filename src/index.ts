@@ -101,7 +101,7 @@ export {
   CappedSTO_3_1_0,
   isCappedSTO_3_1_0,
 } from './contract_wrappers/modules/sto/capped_sto_wrapper';
-export {  
+export {
   USDTieredSTO,
   isUSDTieredSTO,
   USDTieredSTO_3_0_0,
@@ -159,6 +159,12 @@ export {
   RestrictedPartialSaleTransferManager_3_1_0,
   isRestrictedPartialSaleTransferManager_3_1_0,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+export {
+  AdvancedPLCRVotingCheckpoint,
+  isAdvancedPLCRVotingCheckpoint,
+  AdvancedPLCRVotingCheckpoint_3_1_0,
+  isAdvancedPLCRVotingCheckpoint_3_1_0,
+} from './contract_wrappers/modules/checkpoint/voting/advanced_p_l_c_r_voting_checkpoint_wrapper';
 export {
   VestingEscrowWallet,
   isVestingEscrowWallet,
@@ -243,7 +249,7 @@ export {
   ISecurityTokenTransferEventArgs_3_0_0 as SecurityTokenTransferEventArgs_3_0_0,
   ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0 as SecurityTokenTreasuryWalletChangedEventArgs_3_0_0,
   ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0 as SecurityTokenUpdateTokenDetailsEventArgs_3_0_0,
-  ISecurityTokenUpdateTokenNameEventArgs_3_0_0 as SecurityTokenUpdateTokenNameEventArgs_3_0_0,  
+  ISecurityTokenUpdateTokenNameEventArgs_3_0_0 as SecurityTokenUpdateTokenNameEventArgs_3_0_0,
   ISecurityTokenRegistryContract_3_0_0 as SecurityTokenRegistryContract,
   ISecurityTokenRegistryEvents_3_0_0 as SecurityTokenRegistryEvents,
   ISecurityTokenRegistryEventArgs_3_0_0 as SecurityTokenRegistryEventArgs,

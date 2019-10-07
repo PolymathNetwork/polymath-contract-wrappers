@@ -33,6 +33,7 @@ import {
   GeneralTransferManagerContract_3_1_0,
   RestrictedPartialSaleTMContract_3_1_0,
   VestingEscrowWalletContract_3_1_0,
+  AdvancedPLCRVotingCheckpointContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import PolymathRegistryWrapper from './contract_wrappers/registries/polymath_registry_wrapper';
 import SecurityTokenRegistryWrapper from './contract_wrappers/registries/security_token_registry_wrapper';
@@ -189,7 +190,13 @@ export class PolymathAPI {
       RestrictedPartialSaleTMContract_3_1_0.ABI(),
       // Wallet
       VestingEscrowWalletContract_3_1_0.ABI(),
+      // Checkpoint
+      AdvancedPLCRVotingCheckpointContract_3_1_0.ABI(),
     ];
+
+    abiArray.forEach((abi): void => {
+      this.web3Wrapper.abiDecoder.addABI(abi);
+    });
 
     this.contractFactory = new ContractFactory(this.web3Wrapper, abiArray, params.polymathRegistryAddress);
 

@@ -4,12 +4,10 @@ import {
   Web3Wrapper,
   BigNumber,
   PolyResponse,
+  ethersUtils,
 } from '@polymathnetwork/abi-wrappers';
-import { AssertionError } from 'assert';
+import _ from 'lodash';
 import {
-  parsePermBytes32Value,
-  parseTransferResult,
-  valueToWei,
   numberToBigNumber,
   weiToValue,
   bigNumberToDate,
@@ -17,13 +15,30 @@ import {
   dateToBigNumber,
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
+import ContractWrapper from '../../../../contract_wrapper';
 import { ErrorCode, Perm, TxParams, BallotStage } from '../../../../../types';
 import { ModuleCommon } from '../../../module_wrapper';
 import assert from '../../../../../utils/assert';
 
 export namespace AdvancedPLCRVotingCheckpointTransactionParams {
-  // TODO
-  // export interface xxx extends xxxParams {}
+  export interface Ballot extends BallotParams {}
+  export interface StatutoryBallot extends StatutoryBallotParams {}
+  export interface CustomStatutoryBallot extends CustomStatutoryBallotParams {}
+  export interface CustomCumulativeBallot extends CustomCumulativeBallotParams {}
+  export interface CumulativeBallot extends CumulativeBallotParams {}
+  export interface CustomCumulativeBallotWithExemption extends CustomCumulativeBallotWithExemptionParams {}
+  export interface CumulativeBallotWithExemption extends CumulativeBallotWithExemptionParams {}
+  export interface StatutoryBallotWithExemption extends StatutoryBallotWithExemptionParams {}
+  export interface CommitVote extends CommitVoteParams {}
+  export interface RevealVote extends RevealVoteParams {}
+  export interface CancelBallot extends CancelBallotParams {}
+  export interface ChangeBallotExemptedVotersList extends ChangeBallotExemptedVotersListParams {}
+  export interface ChangeBallotExemptedVotersListMulti extends ChangeBallotExemptedVotersListMultiParams {}
+  export interface ChangeDefaultExemptedVotersList extends ChangeDefaultExemptedVotersListParams {}
+  export interface ChangeDefaultExemptedVotersListMulti extends ChangeDefaultExemptedVotersListMultiParams {}
+  export interface CheckpointId extends CheckpointIdParams {}
+  export interface BallotId extends BallotIdParams {}
+  export interface VoteTokenCount extends VoteTokenCountParams {}
 }
 
 interface BallotParams extends TxParams {
@@ -688,8 +703,6 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const ballot = await this.getBallotDetails({ ballotId: params.ballotId });
     assert.assert(!ballot.isCancelled, ErrorCode.PreconditionRequired, 'Cancelled ballot');
 
-    // TODO uint256 weight = uint256(ballot.totalProposals).mul(securityToken.balanceOfAt(msg.sender, ballot.checkpointId));
-
     return (await this.contract).commitVote.sendTransactionAsync(
       numberToBigNumber(params.ballotId),
       params.secretVote,
@@ -731,7 +744,22 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit,
       indexFilterValues: { _voter: caller },
     });
-    // TODO bytes32(keccak256(abi.encodePacked(_choices, _salt))) == ballot.voteDetails[msg.sender].secretVote
+
+    const args = _.map(getVoteCommitEvents, e => {
+      return e.args;
+    });
+
+    const onlyBallot = _.filter(args, e => {
+      /* eslint-disable no-underscore-dangle */
+      return e._ballotId.toNumber() === 0;
+    });
+
+    /* eslint-disable no-underscore-dangle */
+    const secretHash = onlyBallot[0]._secretHash;
+    const hash = ethersUtils.solidityKeccak256(['uint256', 'uint256'], ['1000000000000000000', '12345678']);
+    assert.assert(secretHash === hash, ErrorCode.InvalidData, 'Invalid vote');
+
+    this.unsubscribeAll();
 
     return (await this.contract).revealVote.sendTransactionAsync(
       numberToBigNumber(params.ballotId),
@@ -936,4 +964,10 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const allBallots: Ballots[] = await this.getAllBallots();
     assert.assert(allBallots.length < 500, ErrorCode.PreconditionRequired, 'Max Limit Reached');
   };
+}
+
+export function isAdvancedPLCRVotingCheckpoint(
+  wrapper: ContractWrapper,
+): wrapper is AdvancedPLCRVotingCheckpointCommon {
+  return wrapper instanceof AdvancedPLCRVotingCheckpointCommon;
 }

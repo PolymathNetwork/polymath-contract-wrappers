@@ -1,4 +1,5 @@
 import { BigNumber } from '@polymathnetwork/abi-wrappers';
+import P from 'bluebird';
 import {
   BlacklistTransferManager,
   CappedSTO,
@@ -18,8 +19,8 @@ import {
   USDTieredSTO,
   VestingEscrowWallet,
   VolumeRestrictionTransferManager,
+  AdvancedPLCRVotingCheckpoint,
 } from '../src';
-import P from 'bluebird';
 import { PolymathError } from '../src/PolymathError';
 import {
   CappedSTOData,
@@ -29,6 +30,7 @@ import {
   RestrictedPartialSaleTransferManagerData,
   USDTieredSTOData,
   VestingEscrowWalletData,
+  AdvancedPLCRVotingCheckpointData,
 } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
@@ -51,7 +53,8 @@ export interface AddingModuleOpts {
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData
-    | VestingEscrowWalletData;
+    | VestingEscrowWalletData
+    | AdvancedPLCRVotingCheckpointData;
 }
 
 interface GetAttachedGeneralPermissionManagersParams extends GetAttachedModulesParams {
@@ -110,6 +113,10 @@ interface GetAttachedEtherDividendCheckpointsParams extends GetAttachedModulesPa
   moduleName: ModuleName.EtherDividendCheckpoint;
 }
 
+interface GetAttachedAdvancedPLCRVotingCheckpointsParams extends GetAttachedModulesParams {
+  moduleName: ModuleName.AdvancedPLCRVotingCheckpoint;
+}
+
 interface GetAttachedModules {
   (params: GetAttachedGeneralPermissionManagersParams, opts?: GetAttachedModulesOpts): Promise<
     GeneralPermissionManager[]
@@ -141,6 +148,9 @@ interface GetAttachedModules {
   (params: GetAttachedEtherDividendCheckpointsParams, opts?: GetAttachedModulesOpts): Promise<
     EtherDividendCheckpoint[]
   >;
+  (params: GetAttachedAdvancedPLCRVotingCheckpointsParams, opts?: GetAttachedModulesOpts): Promise<
+    AdvancedPLCRVotingCheckpoint
+  >;
 }
 
 /**
@@ -157,9 +167,7 @@ export const addModule = async (
   opts: AddingModuleOpts,
 ) => {
   // Create a Security Token Instance
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(
-    ticker ? ticker : '',
-  );
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker || '');
 
   const moduleTypes = {
     [ModuleName.CappedSTO]: ModuleType.STO,
@@ -176,6 +184,7 @@ export const addModule = async (
     [ModuleName.EtherDividendCheckpoint]: ModuleType.Dividends,
     [ModuleName.GeneralPermissionManager]: ModuleType.PermissionManager,
     [ModuleName.VestingEscrowWallet]: ModuleType.Wallet,
+    [ModuleName.AdvancedPLCRVotingCheckpoint]: ModuleType.Dividends,
   };
 
   async function getRequiredPolyTokenBalanceOnSecurityToken(setupCost: BigNumber) {
@@ -457,6 +466,25 @@ export const addModule = async (
       break;
     }
 
+    case ModuleName.AdvancedPLCRVotingCheckpoint: {
+      const address = await getFactoryAddress(
+        polymathAPI,
+        moduleTypes[ModuleName.AdvancedPLCRVotingCheckpoint],
+        ModuleName.AdvancedPLCRVotingCheckpoint,
+      );
+      const factory = await polymathAPI.moduleFactory.getModuleFactory(address);
+      const setupCost = await factory.setupCostInPoly();
+      await getRequiredPolyTokenBalanceOnSecurityToken(setupCost);
+      await tickerSecurityTokenInstance.addModule({
+        moduleName: ModuleName.AdvancedPLCRVotingCheckpoint,
+        address,
+        maxCost: setupCost,
+        budget: setupCost,
+        archived: opts.archived,
+      });
+      break;
+    }
+
     default: {
       throw new PolymathError({
         code: ErrorCode.NotFound,
@@ -510,7 +538,7 @@ export const moduleInstancesLookup = async (
 ): Promise<any[]> => {
   // Create a Security Token Instance
 
-  const securityToken = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker ? ticker : '');
+  const securityToken = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker || '');
   // Get Module Addresses
   const moduleAddresses = await securityToken.getModulesByName({ moduleName });
 
@@ -661,6 +689,16 @@ export const moduleInstancesLookup = async (
     }
 
     case ModuleName.EtherDividendCheckpoint: {
+      wrappedModules = await P.map(filteredModuleAddresses, (moduleAddress: any) =>
+        polymathAPI.moduleFactory.getModuleInstance({
+          address: moduleAddress,
+          name: moduleName,
+        }),
+      );
+      return wrappedModules;
+    }
+
+    case ModuleName.AdvancedPLCRVotingCheckpoint: {
       wrappedModules = await P.map(filteredModuleAddresses, (moduleAddress: any) =>
         polymathAPI.moduleFactory.getModuleInstance({
           address: moduleAddress,

@@ -11,6 +11,7 @@ import {
   ERC20DividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
   RestrictedPartialSaleTMContract_3_1_0,
+  AdvancedPLCRVotingCheckpointContract_3_1_0,
   TxData,
   Web3Wrapper,
   BigNumber,
@@ -534,7 +535,8 @@ interface AddModuleParams extends TxParams {
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData
-    | VestingEscrowWalletData;
+    | VestingEscrowWalletData
+    | AdvancedPLCRVotingCheckpointData;
 }
 
 /**
@@ -549,12 +551,18 @@ interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.ManualApprovalTransferManager
     | ModuleName.VolumeRestrictionTM
     | ModuleName.LockUpTransferManager
-    | ModuleName.BlacklistTransferManager;
+    | ModuleName.BlacklistTransferManager
+    | ModuleName.AdvancedPLCRVotingCheckpoint;
   data?: undefined;
 }
 
 interface AddVestingEscrowWalletParams extends AddModuleParams {
   moduleName: ModuleName.VestingEscrowWallet;
+  data: VestingEscrowWalletData;
+}
+
+interface AddAdvancedPLCRVotingCheckpointParams extends AddModuleParams {
+  moduleName: ModuleName.AdvancedPLCRVotingCheckpoint;
   data: VestingEscrowWalletData;
 }
 
@@ -609,6 +617,8 @@ export interface DividendCheckpointData {
   wallet: string;
 }
 
+export interface AdvancedPLCRVotingCheckpointData {}
+
 export interface CappedSTOData {
   startTime: Date;
   endTime: Date;
@@ -647,6 +657,7 @@ interface AddModuleInterface {
   (params: AddUSDTieredSTOParams): Promise<PolyResponse>;
   (params: AddNoDataModuleParams): Promise<PolyResponse>;
   (params: AddVestingEscrowWalletParams): Promise<PolyResponse>;
+  (params: AddAdvancedPLCRVotingCheckpointParams): Promise<PolyResponse>;
 }
 
 // // Return types ////
@@ -2132,6 +2143,10 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
         iface = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
         break;
+      case ModuleName.AdvancedPLCRVotingCheckpoint:
+        iface = new ethersUtils.Interface(AdvancedPLCRVotingCheckpointContract_3_1_0.ABI());
+        data = NO_MODULE_DATA;
+        break;
       default:
         data = NO_MODULE_DATA;
         break;
@@ -2142,4 +2157,4 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
 
 export function isSecurityToken(wrapper: ContractWrapper): wrapper is SecurityTokenCommon {
   return wrapper instanceof SecurityTokenCommon;
-};
+}
