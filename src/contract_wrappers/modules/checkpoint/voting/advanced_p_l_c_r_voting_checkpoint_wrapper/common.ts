@@ -751,13 +751,15 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
     const onlyBallot = _.filter(args, e => {
       /* eslint-disable no-underscore-dangle */
-      return e._ballotId.toNumber() === 0;
+      return e._ballotId.toNumber() === params.ballotId;
     });
 
-    /* eslint-disable no-underscore-dangle */
-    const secretHash = onlyBallot[0]._secretHash;
-    const hash = ethersUtils.solidityKeccak256(['uint256', 'uint256'], ['1000000000000000000', '12345678']);
-    assert.assert(secretHash === hash, ErrorCode.InvalidData, 'Invalid vote');
+    const keccakKeys = ['uint256'];
+    params.choices.forEach(() => {
+      keccakKeys.push('uint256');
+    });
+    const hash = ethersUtils.solidityKeccak256(keccakKeys, params.choices.concat(params.salt));
+    assert.assert(onlyBallot[0]._secretHash === hash, ErrorCode.InvalidData, 'Invalid vote');
 
     this.unsubscribeAll();
 
