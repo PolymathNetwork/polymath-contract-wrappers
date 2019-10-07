@@ -125,11 +125,13 @@ interface StatutoryBallotWithExemptionParams extends CustomStatutoryBallotParams
 
 /**
  * @param ballotId Given ballot Id
- * @param secretVote The secret hash value (hashed offchain)
+ * @param votes
+ * @param salt
  */
 interface CommitVoteParams extends TxParams {
   ballotId: number;
-  secretVote: string;
+  votes: number[];
+  salt: string;
 }
 
 /**
@@ -680,7 +682,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    */
   public commitVote = async (params: CommitVoteParams): Promise<PolyResponse> => {
     this.checkIndexOutOfBound(params.ballotId);
-    assert.assert(params.secretVote.length > 0, ErrorCode.InvalidData, 'Invalid vote');
+    assert.assert(params.votes.length > 0, ErrorCode.InvalidData, 'Invalid vote');
     this.checkValidStage(
       {
         ballotId: params.ballotId,
@@ -703,9 +705,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const ballot = await this.getBallotDetails({ ballotId: params.ballotId });
     assert.assert(!ballot.isCancelled, ErrorCode.PreconditionRequired, 'Cancelled ballot');
 
+    const keccakKeys = ['uint256'];
+    const bgVotes = params.votes.map(e => {
+      keccakKeys.push('uint256');
+      return new BigNumber(e);
+    });
+
+    const secretVote = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, params.salt]);
+
     return (await this.contract).commitVote.sendTransactionAsync(
       numberToBigNumber(params.ballotId),
-      params.secretVote,
+      secretVote,
       params.txData,
       params.safetyFactor,
     );
