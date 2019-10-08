@@ -223,7 +223,7 @@ interface Ballots {
   // List of the no. of the proposals in the ballot
   totalProposal: number;
   // Current stage of the ballot
-  currentStage: number;
+  currentStage: BallotStage;
   // Array of boolean to know the status of the ballot
   isCancelled: boolean;
 }
@@ -342,7 +342,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
         ballotId: result[0][i].toNumber(),
         name: result[1][i],
         totalProposal: result[2][i].toNumber(),
-        currentStage: result[3][i].toNumber(),
+        currentStage: parseBallotStageValue(result[3][i]),
         isCancelled: result[4][i],
       });
     }
@@ -381,8 +381,12 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Get the voting power for an voter in terms of the token
    */
-  public getVoteTokenCount = async (params: VoteTokenCountParams): Promise<BigNumber> => {
-    return (await this.contract).getVoteTokenCount.callAsync(params.voter, numberToBigNumber(params.ballotId));
+  public getVoteTokenCount = async (params: VoteTokenCountParams): Promise<number> => {
+    const result = await (await this.contract).getVoteTokenCount.callAsync(
+      params.voter,
+      numberToBigNumber(params.ballotId),
+    );
+    return result.toNumber();
   };
 
   /**
