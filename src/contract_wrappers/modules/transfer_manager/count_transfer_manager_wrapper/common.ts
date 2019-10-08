@@ -28,10 +28,6 @@ import {
 import { ModuleCommon } from '../../module_wrapper';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace CountTransferManagerTransactionParams {
-  export interface ChangeHolderCount extends ChangeHolderCountParams {}
-}
-
 interface ModifyHolderCountSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: CountTransferManagerEvents_3_0_0.ModifyHolderCount;
   callback: EventCallback<CountTransferManagerModifyHolderCountEventArgs_3_0_0>;
@@ -89,7 +85,7 @@ interface VerifyTransferParams {
 /**
  * @param maxHolderCount is the new maximum amount of token holders
  */
-interface ChangeHolderCountParams extends TxParams {
+export interface ChangeHolderCountParams extends TxParams {
   maxHolderCount: number;
 }
 

@@ -7,7 +7,20 @@ import {
 import { GeneralTransferManager_3_0_0, isGeneralTransferManager_3_0_0 } from './3.0.0';
 import { GeneralTransferManager_3_1_0, isGeneralTransferManager_3_1_0 } from './3.1.0';
 
-import Common, { isGeneralTransferManager } from './common';
+import Common, {
+  isGeneralTransferManager,
+  ChangeDefaultsParams,
+  ChangeIssuanceAddressParams,
+  ModifyKYCDataParams,
+  ModifyKYCDataSignedParams,
+  ModifyInvestorFlagParams,
+  ModifyInvestorFlagMultiParams,
+  ExecuteTransferParams,
+  ModifyTransferRequirementsParams,
+  ModifyTransferRequirementsMultiParams,
+  ModifyKYCDataMultiParams,
+  ModifyKYCDataSignedMultiParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export const GeneralTransferManagerEvents = {
@@ -37,6 +50,20 @@ export {
   GeneralTransferManager_3_1_0,
   isGeneralTransferManager_3_1_0,
 };
+
+export namespace GeneralTransferManagerTransactionParams {
+  export interface ChangeDefaults extends ChangeDefaultsParams {}
+  export interface ChangeIssuanceAddress extends ChangeIssuanceAddressParams {}
+  export interface ModifyKYCData extends ModifyKYCDataParams {}
+  export interface ModifyKYCDataSigned extends ModifyKYCDataSignedParams {}
+  export interface ModifyInvestorFlag extends ModifyInvestorFlagParams {}
+  export interface ModifyInvestorFlagMulti extends ModifyInvestorFlagMultiParams {}
+  export interface ExecuteTransfer extends ExecuteTransferParams {}
+  export interface ModifyTransferRequirements extends ModifyTransferRequirementsParams {}
+  export interface ModifyTransferRequirementsMulti extends ModifyTransferRequirementsMultiParams {}
+  export interface ModifyKYCDataMulti extends ModifyKYCDataMultiParams {}
+  export interface ModifyKYCDataSignedMulti extends ModifyKYCDataSignedMultiParams {}
+}
 
 // for internal use
 export class GeneralTransferManagerCommon extends Common {

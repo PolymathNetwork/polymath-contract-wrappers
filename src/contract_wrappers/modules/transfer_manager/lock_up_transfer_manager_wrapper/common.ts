@@ -47,21 +47,6 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace LockUpTransferManagerTransactionParams {
-  export interface AddNewLockUpType extends LockUpTypeParams {}
-  export interface ModifyLockUpType extends LockUpTypeParams {}
-  export interface AddNewLockUpTypeMulti extends LockUpTypeMultiParams {}
-  export interface ModifyLockUpTypeMulti extends LockUpTypeMultiParams {}
-  export interface AddLockUpByName extends LockUpByNameParams {}
-  export interface AddLockUpByNameMulti extends LockUpByNameMultiParams {}
-  export interface AddNewLockUpToUser extends AddNewLockUpToUserParams {}
-  export interface AddNewLockUpToUserMulti extends AddNewLockUpToUserMultiParams {}
-  export interface RemoveLockUpFromUser extends RemoveLockUpFromUserParams {}
-  export interface RemoveLockUpFromUserMulti extends RemoveLockUpFromUserMultiParams {}
-  export interface RemoveLockUpType extends RemoveLockUpTypeParams {}
-  export interface RemoveLockUpTypeMulti extends RemoveLockUpTypeMultiParams {}
-}
-
 interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser;
   callback: EventCallback<LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0>;
@@ -200,7 +185,7 @@ interface VerifyTransferParams {
  * @param releaseFrequencySeconds How often to release a tranche of tokens (seconds)
  * @param lockupName Name of the lockup
  */
-interface LockUpTypeParams extends TxParams {
+export interface LockUpTypeParams extends TxParams {
   lockupAmount: BigNumber;
   startTime: Date;
   lockUpPeriodSeconds: number;
@@ -215,7 +200,7 @@ interface LockUpTypeParams extends TxParams {
  * @param releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
  * @param lockupNames Array of names of the lockup
  */
-interface LockUpTypeMultiParams extends TxParams {
+export interface LockUpTypeMultiParams extends TxParams {
   lockupAmounts: BigNumber[];
   startTimes: Date[];
   lockUpPeriodSeconds: number[];
@@ -227,7 +212,7 @@ interface LockUpTypeMultiParams extends TxParams {
  * @param userAddress Address of the user
  * @param lockupName Name of the lockup
  */
-interface LockUpByNameParams extends TxParams {
+export interface LockUpByNameParams extends TxParams {
   userAddress: string;
   lockupName: string;
 }
@@ -236,7 +221,7 @@ interface LockUpByNameParams extends TxParams {
  * @param userAddresses Array of addresses of the users
  * @param lockupNames Array of names of the lockups
  */
-interface LockUpByNameMultiParams extends TxParams {
+export interface LockUpByNameMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
@@ -249,7 +234,7 @@ interface LockUpByNameMultiParams extends TxParams {
  * @param releaseFrequencySeconds How often to release a tranche of tokens (seconds)
  * @param lockupName Name of the lockup
  */
-interface AddNewLockUpToUserParams extends TxParams {
+export interface AddNewLockUpToUserParams extends TxParams {
   userAddress: string;
   lockupAmount: BigNumber;
   startTime: Date;
@@ -266,7 +251,7 @@ interface AddNewLockUpToUserParams extends TxParams {
  * @param releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
  * @param lockupNames Array of names of the lockup
  */
-interface AddNewLockUpToUserMultiParams extends TxParams {
+export interface AddNewLockUpToUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupAmounts: BigNumber[];
   startTimes: Date[];
@@ -279,7 +264,7 @@ interface AddNewLockUpToUserMultiParams extends TxParams {
  * @param userAddress Address of the user whose tokens are locked up
  * @param lockupName Name of the lockup need to be removed.
  */
-interface RemoveLockUpFromUserParams extends TxParams {
+export interface RemoveLockUpFromUserParams extends TxParams {
   userAddress: string;
   lockupName: string;
 }
@@ -288,7 +273,7 @@ interface RemoveLockUpFromUserParams extends TxParams {
  * @param userAddresses Array of addresses of the user whose tokens are locked up
  * @param lockupNames Array of the names of the lockup that needs to be removed.
  */
-interface RemoveLockUpFromUserMultiParams extends TxParams {
+export interface RemoveLockUpFromUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
@@ -296,14 +281,14 @@ interface RemoveLockUpFromUserMultiParams extends TxParams {
 /**
  * @param lockupName Name of the lockup
  */
-interface RemoveLockUpTypeParams extends TxParams {
+export interface RemoveLockUpTypeParams extends TxParams {
   lockupName: string;
 }
 
 /**
  * @param lockupNames Array of the lockup names.
  */
-interface RemoveLockUpTypeMultiParams extends TxParams {
+export interface RemoveLockUpTypeMultiParams extends TxParams {
   lockupNames: string[];
 }
 

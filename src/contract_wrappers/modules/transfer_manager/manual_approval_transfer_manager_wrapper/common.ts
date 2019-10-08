@@ -42,15 +42,6 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace ManualApprovalTransferManagerTransactionParams {
-  export interface AddManualApproval extends AddManualApprovalParams {}
-  export interface AddManualApprovalMulti extends AddManualApprovalMultiParams {}
-  export interface ModifyManualApproval extends ModifyManualApprovalParams {}
-  export interface ModifyManualApprovalMulti extends ModifyManualApprovalMultiParams {}
-  export interface RevokeManualApproval extends RevokeManualApprovalParams {}
-  export interface RevokeManualApprovalMulti extends RevokeManualApprovalMultiParams {}
-}
-
 interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
   callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>;
@@ -147,7 +138,7 @@ interface VerifyTransferParams {
  * @param expiryTime is the time until which the transfer is allowed
  * @param description Description about the manual approval
  */
-interface AddManualApprovalParams extends TxParams {
+export interface AddManualApprovalParams extends TxParams {
   from: string;
   to: string;
   allowance: BigNumber;
@@ -162,7 +153,7 @@ interface AddManualApprovalParams extends TxParams {
  * @param expiryTimes is the array of the times until which eath transfer is allowed
  * @param descriptions is the description array for these manual approvals
  */
-interface AddManualApprovalMultiParams extends TxParams {
+export interface AddManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
   allowances: BigNumber[];
@@ -179,7 +170,7 @@ interface AddManualApprovalMultiParams extends TxParams {
  * @param increase tells whether the allowances will be increased (true) or decreased (false).
  * or any value when there is no change in allowances
  */
-interface ModifyManualApprovalParams extends TxParams {
+export interface ModifyManualApprovalParams extends TxParams {
   from: string;
   to: string;
   expiryTime: Date;
@@ -197,7 +188,7 @@ interface ModifyManualApprovalParams extends TxParams {
  * @param increase Array of bools that tells whether the allowances will be increased (true) or decreased (false).
  * or any value when there is no change in allowances
  */
-interface ModifyManualApprovalMultiParams extends TxParams {
+export interface ModifyManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
   expiryTimes: Date[];
@@ -210,7 +201,7 @@ interface ModifyManualApprovalMultiParams extends TxParams {
  * @param from is the address from which transfers are approved
  * @param to is the address to which transfers are approved
  */
-interface RevokeManualApprovalParams extends TxParams {
+export interface RevokeManualApprovalParams extends TxParams {
   from: string;
   to: string;
 }
@@ -219,7 +210,7 @@ interface RevokeManualApprovalParams extends TxParams {
  * @param from is the address array from which transfers are approved
  * @param to is the address array to which transfers are approved
  */
-interface RevokeManualApprovalMultiParams extends TxParams {
+export interface RevokeManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
 }

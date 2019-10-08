@@ -45,23 +45,6 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace BlacklistTransferManagerTransactionParams {
-  export interface AddBlacklistType extends BlacklistTypeParams {}
-  export interface ModifyBlacklistType extends BlacklistTypeParams {}
-  export interface AddNewInvestorToNewBlacklist extends AddNewInvestorToNewBlacklistParams {}
-  export interface AddNewBlacklistTypeMulti extends BlacklistTypeMultiParams {}
-  export interface ModifyBlacklistTypeMulti extends BlacklistTypeMultiParams {}
-  export interface DeleteBlacklistType extends DeleteBlacklistTypeParams {}
-  export interface DeleteBlacklistTypeMulti extends DeleteBlacklistTypeMultiParams {}
-  export interface AddInvestorToBlacklist extends InvestorAndBlacklistParams {}
-  export interface DeleteInvestorFromBlacklist extends InvestorAndBlacklistParams {}
-  export interface DeleteInvestorFromAllBlacklist extends DeleteInvestorFromAllBlacklistParams {}
-  export interface DeleteInvestorFromAllBlacklistMulti extends DeleteInvestorFromAllBlacklistMultiParams {}
-  export interface AddInvestorToBlacklistMulti extends InvestorMultiAndBlacklistParams {}
-  export interface AddMultiInvestorToBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
-  export interface DeleteMultiInvestorsFromBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
-}
-
 interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
   callback: EventCallback<BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0>;
@@ -199,7 +182,7 @@ interface UserAddressParams {
  * @param blacklistName Name of the blacklist type
  * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  */
-interface BlacklistTypeParams extends TxParams {
+export interface BlacklistTypeParams extends TxParams {
   startTime: Date;
   endTime: Date;
   blacklistName: string;
@@ -213,7 +196,7 @@ interface BlacklistTypeParams extends TxParams {
  * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  * @param investor Address of the investor
  */
-interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
+export interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
   investor: string;
 }
 
@@ -223,7 +206,7 @@ interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
  * @param blacklistNames Names of the blacklist types
  * @param repeatPeriodTimes Repeat periods of the blacklist type (measured in days)
  */
-interface BlacklistTypeMultiParams extends TxParams {
+export interface BlacklistTypeMultiParams extends TxParams {
   startTimes: Date[];
   endTimes: Date[];
   blacklistNames: string[];
@@ -233,14 +216,14 @@ interface BlacklistTypeMultiParams extends TxParams {
 /**
  * @param blacklistName Name of the blacklist type
  */
-interface DeleteBlacklistTypeParams extends TxParams {
+export interface DeleteBlacklistTypeParams extends TxParams {
   blacklistName: string;
 }
 
 /**
  * @param blacklistNames Names of the blacklist types
  */
-interface DeleteBlacklistTypeMultiParams extends TxParams {
+export interface DeleteBlacklistTypeMultiParams extends TxParams {
   blacklistNames: string[];
 }
 
@@ -248,7 +231,7 @@ interface DeleteBlacklistTypeMultiParams extends TxParams {
  * @param investor Address of the investor
  * @param blacklistName Name of the blacklist
  */
-interface InvestorAndBlacklistParams extends TxParams {
+export interface InvestorAndBlacklistParams extends TxParams {
   userAddress: string;
   blacklistName: string;
 }
@@ -256,14 +239,14 @@ interface InvestorAndBlacklistParams extends TxParams {
 /**
  * @param investor Address of the investor
  */
-interface DeleteInvestorFromAllBlacklistParams extends TxParams {
+export interface DeleteInvestorFromAllBlacklistParams extends TxParams {
   investor: string;
 }
 
 /**
  * @param investor Addresses of the investors
  */
-interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
+export interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
   investors: string[];
 }
 
@@ -271,7 +254,7 @@ interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
  * @param investors Address of the investor
  * @param blacklistName Name of the blacklist
  */
-interface InvestorMultiAndBlacklistParams extends TxParams {
+export interface InvestorMultiAndBlacklistParams extends TxParams {
   userAddresses: string[];
   blacklistName: string;
 }
@@ -280,7 +263,7 @@ interface InvestorMultiAndBlacklistParams extends TxParams {
  * @param investors Address of the investor
  * @param blacklistNames Name of the blacklist
  */
-interface InvestorMultiAndBlacklistMultiParams extends TxParams {
+export interface InvestorMultiAndBlacklistMultiParams extends TxParams {
   userAddresses: string[];
   blacklistNames: string[];
 }

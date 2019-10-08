@@ -111,42 +111,42 @@ export interface ModuleFactoryGetLogsAsyncParams extends GetLogs {
 /**
  * @param setupCost Cost to setup module
  */
-interface ChangeSetupCostParams extends TxParams {
+export interface ChangeSetupCostParams extends TxParams {
   setupCost: BigNumber;
 }
 
 /**
  * @param isCostInPoly Boolean if cost is in poly
  */
-interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
+export interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
   isCostInPoly: boolean;
 }
 
 /**
  * @param title New title
  */
-interface ChangeTitleParams extends TxParams {
+export interface ChangeTitleParams extends TxParams {
   title: string;
 }
 
 /**
  * @param description New description
  */
-interface ChangeDescriptionParams extends TxParams {
+export interface ChangeDescriptionParams extends TxParams {
   description: string;
 }
 
 /**
  * @param name New name
  */
-interface ChangeNameParams extends TxParams {
+export interface ChangeNameParams extends TxParams {
   name: string;
 }
 
 /**
  * @param tag New tag
  */
-interface ChangeTagsParams extends TxParams {
+export interface ChangeTagsParams extends TxParams {
   tags: string[];
 }
 
@@ -154,7 +154,7 @@ interface ChangeTagsParams extends TxParams {
  * @param boundType Type of STVersionBound
  * @param newVersion New version
  */
-interface ChangeSTVersionBoundsParams extends TxParams {
+export interface ChangeSTVersionBoundsParams extends TxParams {
   boundType: BoundType;
   newVersion: number[];
 }

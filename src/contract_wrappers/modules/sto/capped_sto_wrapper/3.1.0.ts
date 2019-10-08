@@ -89,7 +89,7 @@ interface GetCappedSTOLogsAsyncParams_3_1_0 extends GetCappedSTOLogsAsyncParams 
 }
 
 // // Return types ////
-export interface CappedSTODetails {
+interface CappedSTODetails {
   /** Timestamp at which offering gets start. */
   startTime: Date;
   /** Timestamp at which offering ends. */

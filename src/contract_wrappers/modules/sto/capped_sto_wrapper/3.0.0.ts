@@ -6,7 +6,7 @@ import { WithSTO_3_0_0 } from '../sto_wrapper';
 import { bigNumberToDate, weiToValue } from '../../../../utils/convert';
 
 // // Return types ////
-export interface CappedSTODetails {
+interface CappedSTODetails {
   /** Timestamp at which offering gets start. */
   startTime: Date;
   /** Timestamp at which offering ends. */

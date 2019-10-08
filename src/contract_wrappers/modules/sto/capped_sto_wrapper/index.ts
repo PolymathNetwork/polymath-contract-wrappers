@@ -10,7 +10,12 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import { CappedSTO_3_0_0, isCappedSTO_3_0_0 } from './3.0.0';
 import { CappedSTO_3_1_0, isCappedSTO_3_1_0 } from './3.1.0';
-import Common, { isCappedSTO } from './common';
+import Common, {
+  isCappedSTO,
+  ChangeAllowBeneficialInvestmentsParams,
+  BuyTokensParams,
+  BuyTokensWithPolyParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export const CappedSTOEvents = {
@@ -41,6 +46,12 @@ export {
 } from '@polymathnetwork/abi-wrappers';
 
 export { isCappedSTO, CappedSTO_3_0_0, isCappedSTO_3_0_0, CappedSTO_3_1_0, isCappedSTO_3_1_0 };
+
+export namespace CappedSTOTransactionParams {
+  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
+  export interface BuyTokens extends BuyTokensParams {}
+  export interface BuyTokensWithPoly extends BuyTokensWithPolyParams {}
+}
 
 // for internal use
 export class CappedSTOCommon extends Common {

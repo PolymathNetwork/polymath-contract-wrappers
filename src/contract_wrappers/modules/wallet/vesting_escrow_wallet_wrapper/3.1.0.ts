@@ -1,24 +1,12 @@
 import { VestingEscrowWalletContract_3_1_0, Web3Wrapper, BigNumber, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
-import { ErrorCode, ContractVersion, TxParams, Perm, Constructor } from '../../../../types';
+import { ErrorCode, ContractVersion, Perm, Constructor } from '../../../../types';
 import { weiToValue, stringToBytes32, dateToBigNumber } from '../../../../utils/convert';
-import VestingEscrowWalletCommon from './common';
+import VestingEscrowWalletCommon, { ModifyScheduleParams } from './common';
 import { WithModule_3_0_0 } from '../../module_wrapper';
 
-/**
- * @param beneficiary Address of the beneficiary for whom it is modified
- * @param templateName Name of the template was used for schedule creation
- * @param startTime Start time of the created vesting schedule
- */
-interface ModifyScheduleParams extends TxParams {
-  beneficiary: string;
-  templateName: string;
-  startTime: Date;
-}
-
 // RETURN TYPES
-
 interface Template {
   numberOfTokens: BigNumber;
   duration: number;

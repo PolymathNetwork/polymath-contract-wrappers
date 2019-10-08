@@ -51,26 +51,6 @@ import {
 } from '../../../../types';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace VolumeRestrictionTransferManagerTransactionParams {
-  export interface RemoveIndividualRestriction extends HolderIndividualRestrictionParams {}
-  export interface RemoveIndividualDailyRestriction extends HolderIndividualRestrictionParams {}
-  export interface ChangeExemptWalletList extends ChangeExemptWalletListParams {}
-  export interface AddDefaultDailyRestriction extends DailyRestrictionParams {}
-  export interface ModifyDefaultDailyRestriction extends DailyRestrictionParams {}
-  export interface ModifyIndividualDailyRestriction extends IndividualDailyRestrictionParams {}
-  export interface AddDefaultRestriction extends RestrictionParams {}
-  export interface ModifyDefaultRestriction extends RestrictionParams {}
-  export interface AddIndividualDailyRestriction extends IndividualRestrictionParams {}
-  export interface AddIndividualRestriction extends IndividualRestrictionParams {}
-  export interface ModifyIndividualRestriction extends IndividualRestrictionParams {}
-  export interface RemoveIndividualRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
-  export interface RemoveIndividualDailyRestrictionMulti extends RemoveIndividualRestrictionMultiParams {}
-  export interface AddIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
-  export interface ModifyIndividualDailyRestrictionMulti extends IndividualDailyRestrictionMultiParams {}
-  export interface AddIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
-  export interface ModifyIndividualRestrictionMulti extends IndividualRestrictionMultiParams {}
-}
-
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VolumeRestrictionTMEvents_3_0_0.ChangedExemptWalletList;
   callback: EventCallback<VolumeRestrictionTMChangedExemptWalletListEventArgs_3_0_0>;
@@ -284,7 +264,7 @@ interface VerifyTransferParams {
 /**
  * @param investor Address of the user
  */
-interface HolderIndividualRestrictionParams extends TxParams {
+export interface HolderIndividualRestrictionParams extends TxParams {
   investor: string;
 }
 
@@ -292,7 +272,7 @@ interface HolderIndividualRestrictionParams extends TxParams {
  * @param wallet Ethereum wallet/contract address that need to be exempted
  * @param exempted Boolean value used to add (i.e true) or remove (i.e false) from the list
  */
-interface ChangeExemptWalletListParams extends TxParams {
+export interface ChangeExemptWalletListParams extends TxParams {
   wallet: string;
   change: boolean;
 }
@@ -304,7 +284,7 @@ interface ChangeExemptWalletListParams extends TxParams {
  * @param restrictionType Whether it will be `Fixed` (fixed no. of tokens allowed to transact)
  * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
  */
-interface DailyRestrictionParams extends TxParams {
+export interface DailyRestrictionParams extends TxParams {
   allowedTokens: BigNumber;
   startTime: Date;
   endTime: Date;
@@ -314,14 +294,14 @@ interface DailyRestrictionParams extends TxParams {
 /**
  * @param holder Address of the token holder, whom restriction will be implied
  */
-interface IndividualDailyRestrictionParams extends DailyRestrictionParams {
+export interface IndividualDailyRestrictionParams extends DailyRestrictionParams {
   holder: string;
 }
 
 /**
  * @param rollingPeriodInDays Rolling period in days (Minimum value should be 1 day)
  */
-interface RestrictionParams extends DailyRestrictionParams {
+export interface RestrictionParams extends DailyRestrictionParams {
   rollingPeriodInDays: number;
 }
 
@@ -334,14 +314,14 @@ interface RestrictionParams extends DailyRestrictionParams {
  * @param restrictionTypes Array of restriction types value whether it will be `Fixed` (fixed no. of tokens allowed to transact)
  * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
  */
-interface IndividualRestrictionParams extends RestrictionParams {
+export interface IndividualRestrictionParams extends RestrictionParams {
   holder: string;
 }
 
 /**
  * @param holders Array of address of the user
  */
-interface RemoveIndividualRestrictionMultiParams extends TxParams {
+export interface RemoveIndividualRestrictionMultiParams extends TxParams {
   holders: string[];
 }
 
@@ -353,7 +333,7 @@ interface RemoveIndividualRestrictionMultiParams extends TxParams {
  * @param restrictionTypes Array of restriction types value whether it will be `Fixed` (fixed no. of tokens allowed to transact)
  * or `Percentage` (tokens are calculated as per the totalSupply in the fly).
  */
-interface IndividualDailyRestrictionMultiParams extends TxParams {
+export interface IndividualDailyRestrictionMultiParams extends TxParams {
   holders: string[];
   allowedTokens: BigNumber[];
   startTimes: Date[];
@@ -364,14 +344,14 @@ interface IndividualDailyRestrictionMultiParams extends TxParams {
 /**
  * @param rollingPeriodInDays Array of rolling period in days (Minimum value should be 1 day)
  */
-interface IndividualRestrictionMultiParams extends IndividualDailyRestrictionMultiParams {
+export interface IndividualRestrictionMultiParams extends IndividualDailyRestrictionMultiParams {
   rollingPeriodInDays: number[];
 }
 
 /**
  * @param user Address of the token holder for whom the bucket details has queried
  */
-interface GetIndividualBucketDetailsToUserParams {
+export interface GetIndividualBucketDetailsToUserParams {
   user: string;
 }
 

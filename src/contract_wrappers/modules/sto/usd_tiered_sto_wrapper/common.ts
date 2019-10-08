@@ -54,23 +54,6 @@ import ContractWrapper from '../../../contract_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
-export namespace USDTieredSTOTransactionParams {
-  export interface ChangeNonAccreditedLimit extends ChangeNonAccreditedLimitParams {}
-  export interface ModifyTimes extends ModifyTimesParams {}
-  export interface ModifyLimits extends ModifyLimitsParams {}
-  export interface ModifyOracle extends ModifyOracleParams {}
-  export interface ModifyFunding extends ModifyFundingParams {}
-  export interface ModifyAddresses extends ModifyAddressesParams {}
-  export interface ModifyTiers extends ModifyTiersParams {}
-  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
-  export interface BuyWithETH extends BuyWithETHParams {}
-  export interface BuyWithETHRateLimited extends BuyWithETHRateLimitedParams {}
-  export interface BuyWithPOLY extends BuyWithPOLYParams {}
-  export interface BuyWithPOLYRateLimited extends BuyWithPOLYRateLimitedParams {}
-  export interface BuyWithUSD extends BuyWithUSDParams {}
-  export interface BuyWithUSDRateLimited extends BuyWithUSDRateLimitedParams {}
-}
-
 interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments;
   callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0>;
@@ -280,7 +263,7 @@ interface InvestorInvestedParams {
  * @param investors Array of investor addresses to modify
  * @param nonAccreditedLimit Array of uints specifying non-accredited limits
  */
-interface ChangeNonAccreditedLimitParams extends TxParams {
+export interface ChangeNonAccreditedLimitParams extends TxParams {
   investors: string[];
   nonAccreditedLimit: BigNumber[];
 }
@@ -289,7 +272,7 @@ interface ChangeNonAccreditedLimitParams extends TxParams {
  * @param startTime start time of sto
  * @param endTime end time of sto
  */
-interface ModifyTimesParams extends TxParams {
+export interface ModifyTimesParams extends TxParams {
   startTime: Date;
   endTime: Date;
 }
@@ -298,7 +281,7 @@ interface ModifyTimesParams extends TxParams {
  * @param nonAccreditedLimitUSD max non accredited invets limit
  * @param minimumInvestmentUSD overall minimum investment limit
  */
-interface ModifyLimitsParams extends TxParams {
+export interface ModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
@@ -307,7 +290,7 @@ interface ModifyLimitsParams extends TxParams {
  * @param nonAccreditedLimitUSD max non accredited invets limit
  * @param minimumInvestmentUSD overall minimum investment limit
  */
-interface ModifyOracleParams extends TxParams {
+export interface ModifyOracleParams extends TxParams {
   fundRaiseType: FundRaiseType;
   oracleAddress: string;
 }
@@ -315,7 +298,7 @@ interface ModifyOracleParams extends TxParams {
 /**
  * @param fundRaiseTypes Array of fund raise types to allow
  */
-interface ModifyFundingParams extends TxParams {
+export interface ModifyFundingParams extends TxParams {
   fundRaiseTypes: FundRaiseType[];
 }
 
@@ -324,7 +307,7 @@ interface ModifyFundingParams extends TxParams {
  * @param treasuryWallet Address of wallet where unsold tokens are sent
  * @param usdTokens Address of usd tokens
  */
-interface ModifyAddressesParams extends TxParams {
+export interface ModifyAddressesParams extends TxParams {
   wallet: string;
   treasuryWallet: string;
   usdTokens: string[];
@@ -336,7 +319,7 @@ interface ModifyAddressesParams extends TxParams {
  * @param tokensPerTierTotal Array of total tokens per tier
  * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
  */
-interface ModifyTiersParams extends TxParams {
+export interface ModifyTiersParams extends TxParams {
   ratePerTier: BigNumber[];
   ratePerTierDiscountPoly: BigNumber[];
   tokensPerTierTotal: BigNumber[];
@@ -346,7 +329,7 @@ interface ModifyTiersParams extends TxParams {
 /**
  * @param allowBeneficialInvestments Boolean to allow or disallow beneficial investments
  */
-interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
+export interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
@@ -354,7 +337,7 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
  * @param beneficiary Address of beneficiary for tokens
  * @param ETH value used to buy
  */
-interface BuyWithETHParams extends TxParams {
+export interface BuyWithETHParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
 }
@@ -362,7 +345,7 @@ interface BuyWithETHParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
+export interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
   minTokens: BigNumber;
 }
 
@@ -370,7 +353,7 @@ interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
  * @param beneficiary Address of beneficiary for tokens
  * @param investedPOLY Value of poly invested
  */
-interface BuyWithPOLYParams extends TxParams {
+export interface BuyWithPOLYParams extends TxParams {
   beneficiary: string;
   investedPOLY: BigNumber;
 }
@@ -378,7 +361,7 @@ interface BuyWithPOLYParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
+export interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
   minTokens: BigNumber;
 }
 
@@ -387,7 +370,7 @@ interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
  * @param investedSC Amount of stable coin invested
  * @param usdToken USD stable coin address to buy tokens with
  */
-interface BuyWithUSDParams extends TxParams {
+export interface BuyWithUSDParams extends TxParams {
   beneficiary: string;
   investedSC: BigNumber;
   usdToken: string;
@@ -396,7 +379,7 @@ interface BuyWithUSDParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
+export interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
   minTokens: BigNumber;
 }
 

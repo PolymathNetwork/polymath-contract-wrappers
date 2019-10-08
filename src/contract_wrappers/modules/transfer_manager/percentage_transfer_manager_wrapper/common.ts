@@ -31,13 +31,6 @@ import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace PercentageTransferManagerTransactionParams {
-  export interface ChangeHolderPercentage extends ChangeHolderPercentageParams {}
-  export interface ModifyWhitelist extends ModifyWhitelistParams {}
-  export interface ModifyWhitelistMulti extends ModifyWhitelistMultiParams {}
-  export interface SetAllowPrimaryIssuance extends SetAllowPrimaryIssuanceParams {}
-}
-
 interface ModifyHolderPercentageSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: PercentageTransferManagerEvents_3_0_0.ModifyHolderPercentage;
   callback: EventCallback<PercentageTransferManagerModifyHolderPercentageEventArgs_3_0_0>;
@@ -128,7 +121,7 @@ interface VerifyTransferParams {
 /**
  * @param maxHolderPercentage is the new maximum percentage
  */
-interface ChangeHolderPercentageParams extends TxParams {
+export interface ChangeHolderPercentageParams extends TxParams {
   maxHolderPercentage: BigNumber;
 }
 
@@ -136,7 +129,7 @@ interface ChangeHolderPercentageParams extends TxParams {
  * @param investor is the address to whitelist
  * @param valid whether or not the address it to be added or removed from the whitelist
  */
-interface ModifyWhitelistParams extends TxParams {
+export interface ModifyWhitelistParams extends TxParams {
   investor: string;
   valid: boolean;
 }
@@ -145,7 +138,7 @@ interface ModifyWhitelistParams extends TxParams {
  * @param investors Array of the addresses to whitelist
  * @param valids Array of boolean value to decide whether or not the address it to be added or removed from the whitelist
  */
-interface ModifyWhitelistMultiParams extends TxParams {
+export interface ModifyWhitelistMultiParams extends TxParams {
   investors: string[];
   valids: boolean[];
 }
@@ -153,7 +146,7 @@ interface ModifyWhitelistMultiParams extends TxParams {
 /**
  * @param allowPrimaryIssuance whether to allow all primary issuance transfers
  */
-interface SetAllowPrimaryIssuanceParams extends TxParams {
+export interface SetAllowPrimaryIssuanceParams extends TxParams {
   allowPrimaryIssuance: boolean;
 }
 

@@ -2,7 +2,13 @@
 import { PercentageTransferManagerEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { PercentageTransferManager_3_0_0, isPercentageTransferManager_3_0_0 } from './3.0.0';
 
-import Common, { isPercentageTransferManager } from './common';
+import Common, {
+  isPercentageTransferManager,
+  ChangeHolderPercentageParams,
+  ModifyWhitelistParams,
+  ModifyWhitelistMultiParams,
+  SetAllowPrimaryIssuanceParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export type PercentageTransferManagerEventArgs = PercentageTransferManagerEventArgs_3_0_0;
@@ -19,6 +25,13 @@ export {
 export type PercentageTransferManager = PercentageTransferManager_3_0_0;
 
 export { isPercentageTransferManager, PercentageTransferManager_3_0_0, isPercentageTransferManager_3_0_0 };
+
+export namespace PercentageTransferManagerTransactionParams {
+  export interface ChangeHolderPercentage extends ChangeHolderPercentageParams {}
+  export interface ModifyWhitelist extends ModifyWhitelistParams {}
+  export interface ModifyWhitelistMulti extends ModifyWhitelistMultiParams {}
+  export interface SetAllowPrimaryIssuance extends SetAllowPrimaryIssuanceParams {}
+}
 
 // for internal use
 export class PercentageTransferManagerCommon extends Common {

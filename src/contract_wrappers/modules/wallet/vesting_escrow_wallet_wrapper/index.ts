@@ -7,7 +7,25 @@ import {
 import { VestingEscrowWallet_3_0_0, isVestingEscrowWallet_3_0_0 } from './3.0.0';
 import { VestingEscrowWallet_3_1_0, isVestingEscrowWallet_3_1_0 } from './3.1.0';
 
-import Common, { isVestingEscrowWallet } from './common';
+import Common, {
+  isVestingEscrowWallet,
+  ChangeTreasuryWalletParams,
+  DepositTokensParams,
+  SendToTreasuryParams,
+  PushAvailableTokensParams,
+  AddTemplateParams,
+  RemoveTemplateParams,
+  AddScheduleParams,
+  AddScheduleFromTemplateParams,
+  RevokeScheduleParams,
+  RevokeAllSchedulesParams,
+  PushAvailableTokensMultiParams,
+  AddScheduleMultiParams,
+  AddScheduleFromTemplateMultiParams,
+  RevokeSchedulesMultiParams,
+  ModifyScheduleMultiParams,
+  ModifyScheduleParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export const VestingEscrowWalletEvents = {
@@ -42,6 +60,25 @@ export {
   VestingEscrowWallet_3_1_0,
   isVestingEscrowWallet_3_1_0,
 };
+
+export namespace VestingEscrowWalletTransactionParams {
+  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
+  export interface DepositTokens extends DepositTokensParams {}
+  export interface SendToTreasury extends SendToTreasuryParams {}
+  export interface PushAvailableTokens extends PushAvailableTokensParams {}
+  export interface AddTemplate extends AddTemplateParams {}
+  export interface RemoveTemplate extends RemoveTemplateParams {}
+  export interface AddSchedule extends AddScheduleParams {}
+  export interface AddScheduleFromTemplate extends AddScheduleFromTemplateParams {}
+  export interface RevokeSchedule extends RevokeScheduleParams {}
+  export interface RevokeAllSchedules extends RevokeAllSchedulesParams {}
+  export interface PushAvailableTokensMulti extends PushAvailableTokensMultiParams {}
+  export interface AddScheduleMulti extends AddScheduleMultiParams {}
+  export interface AddScheduleFromTemplateMulti extends AddScheduleFromTemplateMultiParams {}
+  export interface RevokeSchedulesMulti extends RevokeSchedulesMultiParams {}
+  export interface ModifyScheduleMulti extends ModifyScheduleMultiParams {}
+  export interface ModifySchedule extends ModifyScheduleParams {}
+}
 
 // for internal use
 export class VestingEscrowWalletCommon extends Common {
