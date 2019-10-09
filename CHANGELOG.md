@@ -1,3 +1,21 @@
+# [3.0.0-beta.51](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.50@beta...v3.0.0-beta.51@beta) (2019-10-09)
+
+
+### Bug Fixes
+
+* 🐛 Multi-version support for transactionParams ([0fb4ae7](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/0fb4ae7))
+
+
+### chore
+
+* 🤖 Merge master updates ([1025dca](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/1025dca))
+
+
+### BREAKING CHANGES
+
+* N
+* N
+
 # [3.0.0-beta.50](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.49@beta...v3.0.0-beta.50@beta) (2019-10-09)
 
 
