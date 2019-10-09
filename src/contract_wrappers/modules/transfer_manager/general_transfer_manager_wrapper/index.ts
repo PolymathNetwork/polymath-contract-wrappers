@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 import {
-  GeneralPermissionManagerEventArgs_3_0_0,
   GeneralTransferManagerEvents_3_1_0,
   GeneralTransferManagerEvents_3_0_0,
+  GeneralTransferManagerEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { GeneralTransferManager_3_0_0, isGeneralTransferManager_3_0_0 } from './3.0.0';
 import { GeneralTransferManager_3_1_0, isGeneralTransferManager_3_1_0 } from './3.1.0';
@@ -16,7 +16,7 @@ export const GeneralTransferManagerEvents = {
 };
 export type GeneralTransferManagerEvents = GeneralTransferManagerEvents_3_0_0 | GeneralTransferManagerEvents_3_1_0;
 
-export type GeneralTransferManagerEventArgs = GeneralPermissionManagerEventArgs_3_0_0;
+export type GeneralTransferManagerEventArgs = GeneralTransferManagerEventArgs_3_0_0;
 
 export {
   GeneralTransferManagerChangeDefaultsEventArgs_3_0_0 as GeneralTransferManagerChangeDefaultsEventArgs,
