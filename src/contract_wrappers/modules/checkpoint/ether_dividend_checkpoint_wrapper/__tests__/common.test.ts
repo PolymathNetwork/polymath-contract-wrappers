@@ -11,7 +11,7 @@ import EtherDividendCheckpointCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { DividendCheckpointCommon } from '../../dividend_checkpoint_wrapper';
 import { dateToBigNumber, stringToBytes32, valueToWei } from '../../../../../utils/convert';
-import { ContractVersion, GetLogs, Subscribe } from '../../../../../types';
+import { ContractVersion } from '../../../../../types';
 
 describe('EtherDividendCheckpointWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 EtherDividendCheckpoint contract since it has all common functionality
@@ -20,16 +20,16 @@ describe('EtherDividendCheckpointWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<EtherDividendCheckpointContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<EtherDividendCheckpointContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
   }
-  
+
   let target: FakeERC20DividendCheckpoint;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: EtherDividendCheckpointContract_3_0_0;
@@ -466,5 +466,5 @@ describe('EtherDividendCheckpointWrapper', () => {
       verify(mockedSecurityTokenContract.balanceOf).times(excluded.length);
       excluded.map(verifyBalanceOf);
     });
-  });  
+  });
 });

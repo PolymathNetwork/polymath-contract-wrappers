@@ -12,7 +12,7 @@ import CappedSTOCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { STOCommon } from '../../sto_wrapper';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
-import { FULL_DECIMALS, FundRaiseType, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { FULL_DECIMALS, FundRaiseType, ContractVersion } from '../../../../../types';
 
 describe('Capped STO Common', () => {
   // we extend the class to be able to instance it, using the 3.0.0 STO contract since it has all common functionality
@@ -21,11 +21,11 @@ describe('Capped STO Common', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<CappedSTOContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<CappedSTOContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }

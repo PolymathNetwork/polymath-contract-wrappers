@@ -19,21 +19,20 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { Partition, ContractVersion } from '../../../../../types';
 import BlacklistTransferManagerCommon from '../common';
 
 describe('BlacklistTransferManagerWrapper', () => {
-
   class FakeBlacklistTransferManager extends BlacklistTransferManagerCommon {
     public contract: Promise<BlacklistTransferManagerContract_3_0_0>;
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<BlacklistTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<BlacklistTransferManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -980,7 +979,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.blacklists).thenReturn(instance(mockedBlacklistsMethod));
       for (let i = 0; i < blacklistNames.length; i += 1) {
         when(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistNames[i])))).thenResolve(
-            expectedGetBlacklistResult,
+          expectedGetBlacklistResult,
         );
       }
 
@@ -1070,7 +1069,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
 
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
@@ -1086,7 +1085,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.blacklists).thenReturn(instance(mockedGetBlacklistMethod));
       // Stub the request
       when(
-          mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+        mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
       ).thenResolve(expectedGetBlacklistResult);
 
       const mockedParams = {
@@ -1105,15 +1104,15 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.addInvestorToNewBlacklist).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.startTime)),
-              objectContaining(dateToBigNumber(mockedParams.endTime)),
-              objectContaining(stringToBytes32(mockedParams.blacklistName)),
-              objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
-              mockedParams.investor,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+          mockedParams.investor,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1124,15 +1123,15 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.addInvestorToNewBlacklist).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              objectContaining(dateToBigNumber(mockedParams.startTime)),
-              objectContaining(dateToBigNumber(mockedParams.endTime)),
-              objectContaining(stringToBytes32(mockedParams.blacklistName)),
-              objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
-              mockedParams.investor,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(dateToBigNumber(mockedParams.endTime)),
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          objectContaining(new BigNumber(mockedParams.repeatPeriodTime)),
+          mockedParams.investor,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -1142,11 +1141,10 @@ describe('BlacklistTransferManagerWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.blacklists).once();
       verify(
-          mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
+        mockedGetBlacklistMethod.callAsync(objectContaining(stringToBytes32(mockedGetBlacklistParams.blacklistName))),
       ).once();
     });
   });
-
 
   describe('deleteInvestorFromBlacklist', () => {
     test('should call deleteInvestorFromBlacklist', async () => {
@@ -1165,7 +1163,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
 
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
@@ -1181,7 +1179,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.blacklists).thenReturn(instance(mockedBlacklistsMethod));
       // Stub the request
       when(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistName)))).thenResolve(
-          expectedGetBlacklistResult,
+        expectedGetBlacklistResult,
       );
 
       const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1', 'Blacklist2']);
@@ -1194,7 +1192,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
       // Stub the request
       when(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).thenResolve(
-          expectedGetBlacklistNamesToUserResult,
+        expectedGetBlacklistNamesToUserResult,
       );
 
       const mockedParams = {
@@ -1210,12 +1208,12 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.deleteInvestorFromBlacklist).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.userAddress,
-              objectContaining(stringToBytes32(mockedParams.blacklistName)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddress,
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1226,12 +1224,12 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.deleteInvestorFromBlacklist).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.userAddress,
-              objectContaining(stringToBytes32(mockedParams.blacklistName)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddress,
+          objectContaining(stringToBytes32(mockedParams.blacklistName)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -1267,7 +1265,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
 
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
@@ -1283,11 +1281,15 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.blacklists).thenReturn(instance(mockedBlacklistsMethod));
       for (let i = 0; i < blacklistNames.length; i += 1) {
         when(mockedBlacklistsMethod.callAsync(objectContaining(stringToBytes32(blacklistNames[i])))).thenResolve(
-            expectedGetBlacklistResult,
+          expectedGetBlacklistResult,
         );
       }
 
-      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1','Blacklist2', 'Blacklist3']);
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array([
+        'Blacklist1',
+        'Blacklist2',
+        'Blacklist3',
+      ]);
       // Mocked method
       const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1296,7 +1298,7 @@ describe('BlacklistTransferManagerWrapper', () => {
 
       for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
         when(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).thenResolve(
-            expectedGetBlacklistNamesToUserResult,
+          expectedGetBlacklistNamesToUserResult,
         );
       }
 
@@ -1313,12 +1315,12 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.deleteMultiInvestorsFromBlacklistMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.userAddresses,
-              objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddresses,
+          objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1329,12 +1331,12 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.deleteMultiInvestorsFromBlacklistMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.userAddresses,
-              objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(
+          mockedParams.userAddresses,
+          objectContaining(stringArrayToBytes32Array(mockedParams.blacklistNames)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -1365,7 +1367,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
 
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
@@ -1385,7 +1387,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.getBlacklistNamesToUser).thenReturn(instance(mockedGetBlacklistNamesToUserMethod));
       // Stub the request
       when(mockedGetBlacklistNamesToUserMethod.callAsync(mockedGetBlacklistNamesToUserParams.user)).thenResolve(
-          expectedGetBlacklistNamesToUserResult,
+        expectedGetBlacklistNamesToUserResult,
       );
 
       const mockedParams = {
@@ -1400,11 +1402,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.deleteInvestorFromAllBlacklist).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.investor, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1415,11 +1413,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.deleteInvestorFromAllBlacklist).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investor,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.investor, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
@@ -1448,7 +1442,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
 
       const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
@@ -1458,7 +1452,11 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array(['Blacklist1','Blacklist2', 'Blacklist3']);
+      const expectedGetBlacklistNamesToUserResult = stringArrayToBytes32Array([
+        'Blacklist1',
+        'Blacklist2',
+        'Blacklist3',
+      ]);
       // Mocked method
       const mockedGetBlacklistNamesToUserMethod = mock(MockedCallMethod);
       // Stub the method
@@ -1467,7 +1465,7 @@ describe('BlacklistTransferManagerWrapper', () => {
 
       for (let i = 0; i < expectedBlacklistInvestorAddresses.length; i += 1) {
         when(mockedGetBlacklistNamesToUserMethod.callAsync(expectedBlacklistInvestorAddresses[i])).thenResolve(
-            expectedGetBlacklistNamesToUserResult,
+          expectedGetBlacklistNamesToUserResult,
         );
       }
 
@@ -1483,11 +1481,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       when(mockedContract.deleteInvestorFromAllBlacklistMulti).thenReturn(instance(mockedMethod));
       // Stub the request
       when(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.investors, mockedParams.txData, mockedParams.safetyFactor),
       ).thenResolve(expectedResult);
 
       // Real call
@@ -1498,11 +1492,7 @@ describe('BlacklistTransferManagerWrapper', () => {
       // Verifications
       verify(mockedContract.deleteInvestorFromAllBlacklistMulti).once();
       verify(
-          mockedMethod.sendTransactionAsync(
-              mockedParams.investors,
-              mockedParams.txData,
-              mockedParams.safetyFactor,
-          ),
+        mockedMethod.sendTransactionAsync(mockedParams.investors, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();

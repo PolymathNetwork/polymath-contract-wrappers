@@ -7,7 +7,7 @@ import {
   Web3Wrapper,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
-import { RestrictionType, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { RestrictionType, ContractVersion } from '../../../../../types';
 import { ModuleCommon } from '../../../module_wrapper';
 import ContractFactory from '../../../../../factories/contractFactory';
 import {
@@ -29,11 +29,11 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<VolumeRestrictionTMContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<VolumeRestrictionTMContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -1995,7 +1995,7 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-          instance(mockedSecurityTokenContract),
+        instance(mockedSecurityTokenContract),
       );
       const expectedDecimalsResult = new BigNumber(18);
       const mockedSecurityTokenDecimalsMethod = mock(MockedCallMethod);
@@ -2113,6 +2113,6 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         verify(mockedSecurityTokenDecimalsMethod.callAsync()).twice();
         verify(mockedSecurityTokenContract.decimals).twice();
       });
-    });    
+    });
   });
 });

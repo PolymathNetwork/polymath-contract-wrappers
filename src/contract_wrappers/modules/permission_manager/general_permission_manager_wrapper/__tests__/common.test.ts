@@ -15,7 +15,7 @@ import {
   numberToBigNumber,
 } from '../../../../../utils/convert';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../test_utils/mocked_methods';
-import { Perm, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { Perm, ContractVersion } from '../../../../../types';
 
 describe('GeneralPermissionManagerWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 GeneralPermissionManager contract since it has all common functionality
@@ -24,16 +24,16 @@ describe('GeneralPermissionManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralPermissionManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<GeneralPermissionManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
   }
-  
+
   let target: FakeGeneralPermissionManager;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: GeneralPermissionManagerContract_3_0_0;
