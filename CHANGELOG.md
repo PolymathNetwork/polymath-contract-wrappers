@@ -1,3 +1,24 @@
+# [3.0.0-beta.50](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.49@beta...v3.0.0-beta.50@beta) (2019-10-09)
+
+
+### Bug Fixes
+
+* 🐛 Decode events at getLogsAsync and SubscribeAsync ([77ab063](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/77ab063))
+* 🐛 Improve multi-version events handling ([8961a73](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/8961a73))
+* 🐛 Move getLogs y subscribe methods to common files ([166800d](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/166800d))
+* 🐛 Restore deleted SecurityTokenRegistry events ([c56a46a](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c56a46a))
+* 🐛 Typo ([3ac83e9](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/3ac83e9))
+* 🐛 Typo at GTM eventArgs ([7df1437](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/7df1437))
+* 🐛 Typo at USDTieredSTO eventArgs ([1d67d60](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/1d67d60))
+
+
+### BREAKING CHANGES
+
+* N
+* N
+* N
+* Y
+
 # [3.0.0-beta.49](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.48@beta...v3.0.0-beta.49@beta) (2019-10-03)
 
 
