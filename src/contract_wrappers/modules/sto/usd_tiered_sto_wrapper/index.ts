@@ -2,7 +2,7 @@
 import {
   USDTieredSTOEvents_3_1_0,
   USDTieredSTOEvents_3_0_0,
-  USDTieredSTOEventArgs_3_1_0,
+  USDTieredSTOEventArgs_3_0_0,
   USDTieredSTOAllowPreMintFlagEventArgs_3_1_0,
   USDTieredSTORevokePreMintFlagEventArgs_3_1_0,
   USDTieredSTOReserveTokenTransferEventArgs_3_1_0,
@@ -19,7 +19,7 @@ export const USDTieredSTOEvents = {
 export type USDTieredSTOEvents = USDTieredSTOEvents_3_0_0 | USDTieredSTOEvents_3_1_0;
 
 export type USDTieredSTOEventArgs =
-  | USDTieredSTOEventArgs_3_1_0
+  | USDTieredSTOEventArgs_3_0_0
   | USDTieredSTOAllowPreMintFlagEventArgs_3_1_0
   | USDTieredSTORevokePreMintFlagEventArgs_3_1_0
   | USDTieredSTOReserveTokenTransferEventArgs_3_1_0;
