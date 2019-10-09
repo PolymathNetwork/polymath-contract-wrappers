@@ -9,7 +9,23 @@ import {
 } from '@polymathnetwork/abi-wrappers';
 import { USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0 } from './3.0.0';
 import { USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0 } from './3.1.0';
-import Common, { isUSDTieredSTO } from './common';
+import Common, {
+  isUSDTieredSTO,
+  ChangeNonAccreditedLimitParams,
+  ModifyTimesParams,
+  ModifyLimitsParams,
+  ModifyOracleParams,
+  ModifyFundingParams,
+  ModifyAddressesParams,
+  ModifyTiersParams,
+  ChangeAllowBeneficialInvestmentsParams,
+  BuyWithETHParams,
+  BuyWithETHRateLimitedParams,
+  BuyWithPOLYParams,
+  BuyWithPOLYRateLimitedParams,
+  BuyWithUSDParams,
+  BuyWithUSDRateLimitedParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export const USDTieredSTOEvents = {
@@ -46,6 +62,23 @@ export {
 export type USDTieredSTO = USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0;
 
 export { isUSDTieredSTO, USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0, USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0 };
+
+export namespace USDTieredSTOTransactionParams {
+  export interface ChangeNonAccreditedLimit extends ChangeNonAccreditedLimitParams {}
+  export interface ModifyTimes extends ModifyTimesParams {}
+  export interface ModifyLimits extends ModifyLimitsParams {}
+  export interface ModifyOracle extends ModifyOracleParams {}
+  export interface ModifyFunding extends ModifyFundingParams {}
+  export interface ModifyAddresses extends ModifyAddressesParams {}
+  export interface ModifyTiers extends ModifyTiersParams {}
+  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
+  export interface BuyWithETH extends BuyWithETHParams {}
+  export interface BuyWithETHRateLimited extends BuyWithETHRateLimitedParams {}
+  export interface BuyWithPOLY extends BuyWithPOLYParams {}
+  export interface BuyWithPOLYRateLimited extends BuyWithPOLYRateLimitedParams {}
+  export interface BuyWithUSD extends BuyWithUSDParams {}
+  export interface BuyWithUSDRateLimited extends BuyWithUSDRateLimitedParams {}
+}
 
 // for internal use
 export class USDTieredSTOCommon extends Common {

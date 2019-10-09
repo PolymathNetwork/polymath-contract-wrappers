@@ -36,13 +36,6 @@ import {
 import { numberToBigNumber, dateToBigNumber, stringToBytes32, valueToWei } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace ERC20DividendCheckpointTransactionParams {
-  export interface CreateDividend extends CreateDividendParams {}
-  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
-  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
-  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
-}
-
 interface ERC20DividendDepositedSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: ERC20DividendCheckpointEvents_3_0_0.ERC20DividendDeposited;
   callback: EventCallback<ERC20DividendCheckpointERC20DividendDepositedEventArgs_3_0_0>;
@@ -200,7 +193,7 @@ interface DividendIndexParams {
  * @param amount Amount of specified token for dividend
  * @param name Name/Title for identification
  */
-interface CreateDividendParams extends TxParams {
+export interface CreateDividendParams extends TxParams {
   maturity: Date;
   expiry: Date;
   token: string;
@@ -211,14 +204,14 @@ interface CreateDividendParams extends TxParams {
 /**
  * @param checkpointId Checkpoint id from which to create dividends
  */
-interface CreateDividendWithCheckpointParams extends CreateDividendParams {
+export interface CreateDividendWithCheckpointParams extends CreateDividendParams {
   checkpointId: number;
 }
 
 /**
  * @param excluded List of addresses to exclude
  */
-interface CreateDividendWithExclusionsParams extends CreateDividendParams {
+export interface CreateDividendWithExclusionsParams extends CreateDividendParams {
   excluded: string[];
 }
 
@@ -226,7 +219,7 @@ interface CreateDividendWithExclusionsParams extends CreateDividendParams {
  * @param checkpointId Checkpoint id from which to create dividends
  * @param excluded List of addresses to exclude
  */
-interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividendParams {
+export interface CreateDividendWithCheckpointAndExclusionsParams extends CreateDividendParams {
   checkpointId: number;
   excluded: string[];
 }

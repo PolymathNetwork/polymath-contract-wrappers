@@ -1,8 +1,13 @@
 /* istanbul ignore file */
 import { ERC20DividendCheckpointEventArgs_3_0_0 } from '@polymathnetwork/abi-wrappers';
 import { ERC20DividendCheckpoint_3_0_0, isERC20DividendCheckpoint_3_0_0 } from './3.0.0';
-
-import Common, { isERC20DividendCheckpoint } from './common';
+import Common, {
+  isERC20DividendCheckpoint,
+  CreateDividendParams,
+  CreateDividendWithCheckpointParams,
+  CreateDividendWithExclusionsParams,
+  CreateDividendWithCheckpointAndExclusionsParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export type ERC20DividendCheckpointEventArgs = ERC20DividendCheckpointEventArgs_3_0_0;
@@ -25,6 +30,13 @@ export {
 export type ERC20DividendCheckpoint = ERC20DividendCheckpoint_3_0_0;
 
 export { isERC20DividendCheckpoint, ERC20DividendCheckpoint_3_0_0, isERC20DividendCheckpoint_3_0_0 };
+
+export namespace ERC20DividendCheckpointTransactionParams {
+  export interface CreateDividend extends CreateDividendParams {}
+  export interface CreateDividendWithCheckpoint extends CreateDividendWithCheckpointParams {}
+  export interface CreateDividendWithExclusions extends CreateDividendWithExclusionsParams {}
+  export interface CreateDividendWithCheckpointAndExclusions extends CreateDividendWithCheckpointAndExclusionsParams {}
+}
 
 // for internal use
 export class ERC20DividendCheckpointCommon extends Common {

@@ -5,8 +5,19 @@ import {
   GeneralPermissionManagerEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { GeneralPermissionManager_3_0_0, isGeneralPermissionManager_3_0_0 } from './3.0.0';
-import { GeneralPermissionManager_3_1_0, isGeneralPermissionManager_3_1_0 } from './3.1.0';
-import Common, { isGeneralPermissionManager } from './common';
+import {
+  GeneralPermissionManager_3_1_0,
+  isGeneralPermissionManager_3_1_0,
+  AddDelegateMultiParams,
+  DeleteDelegateMultiParams,
+} from './3.1.0';
+import Common, {
+  isGeneralPermissionManager,
+  DelegateTxParams,
+  AddDelegateParams,
+  ChangePermissionParams,
+  ChangePermissionMultiParams,
+} from './common';
 import { ContractVersion } from '../../../../types';
 
 export const GeneralPermissionManagerEvents = {
@@ -35,6 +46,15 @@ export {
   GeneralPermissionManager_3_1_0,
   isGeneralPermissionManager_3_1_0,
 };
+
+export namespace GeneralPermissionManagerTransactionParams {
+  export interface DeleteDelegate extends DelegateTxParams {}
+  export interface AddDelegate extends AddDelegateParams {}
+  export interface ChangePermission extends ChangePermissionParams {}
+  export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
+  export interface AddDelegateMulti extends AddDelegateMultiParams {}
+  export interface DeleteDelegateMulti extends DeleteDelegateMultiParams {}
+}
 
 // for internal use
 export class GeneralPermissionManagerCommon extends Common {

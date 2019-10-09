@@ -1,3 +1,10 @@
+[![Build Status](https://travis-ci.org/PolymathNetwork/polymath-contract-wrappers.svg?branch=master)](https://travis-ci.org/PolymathNetwork/contract-wrappers)
+[![Coverage Status](https://coveralls.io/repos/github/PolymathNetwork/polymath-contract-wrappers/badge.svg?branch=master)](https://coveralls.io/github/PolymathNetwork/polymath-contract-wrappers?branch=master)
+[![Gitter](https://img.shields.io/badge/chat-gitter-green.svg)](https://gitter.im/PolymathNetwork/Lobby)
+[![Telegram](https://img.shields.io/badge/50k+-telegram-blue.svg)](https://gitter.im/PolymathNetwork/Lobby)
+
+![Polymath logo](Polymath.png)
+
 ## @polymathnetwork/contract-wrappers
 
 Version 3.0.0 of the Polymath-Core Ethereum Smart Contracts
@@ -27,6 +34,7 @@ If your project is in [TypeScript](https://www.typescriptlang.org/), add the fol
 ```
 
 ## Documentation
+
 This project uses typedoc documentation style.
 
 You can access these docs by cloning this repo and opening `docs/index.html` in the browser.
@@ -39,14 +47,14 @@ Commits should follow the [conventional commits](https://www.conventionalcommits
 
 ### A note on breaking changes
 
-*Anything* that forcefully changes the way the client interacts with the package is considered a breaking change and should be described in the `BREAKING CHANGE` section of the corresponding commit.  This includes (but is not limited to):
+_Anything_ that forcefully changes the way the client interacts with the package is considered a breaking change and should be described in the `BREAKING CHANGE` section of the corresponding commit. This includes (but is not limited to):
 
 - Renaming a public function/class/interface/type
 - Deleting a public function/class/interface/type
 - Changing a public function's argument list in a way that the user needs to rewrite existing calls to it
 - Changing a public function's return type
 
-Whatever is written under `BREAKING CHANGES` is literally what will go into the changelog, so please be clear on the messages. For example, if I change the return type of a function called  `foo` in class `Bar`, the `BREAKING CHANGE` section of my commit should say something like
+Whatever is written under `BREAKING CHANGES` is literally what will go into the changelog, so please be clear on the messages. For example, if I change the return type of a function called `foo` in class `Bar`, the `BREAKING CHANGE` section of my commit should say something like
 
 ```
 change return type of the `Bar` class's `foo` function from `string` to `number`
@@ -102,7 +110,7 @@ yarn jest
 
 ## Deployment
 
-This package has automatic publishing and versioning via [semantic-release](https://github.com/semantic-release/semantic-release) and forceful use of [conventional commits](https://www.conventionalcommits.org) 
+This package has automatic publishing and versioning via [semantic-release](https://github.com/semantic-release/semantic-release) and forceful use of [conventional commits](https://www.conventionalcommits.org)
 
 ## Sandbox
 
@@ -153,7 +161,8 @@ async function getInjectedProviderIfExists(): Promise<Provider> {
   return injectedProviderIfExists;
 }
 ```
-*Setting up Polymath API for 4 different cases*
+
+_Setting up Polymath API for 4 different cases_
 
 (1) Using Injected Provider (Metamask) to read from the blockchain and publish transactions on the blockchain.
 
@@ -222,10 +231,11 @@ const polymathAPI = new PolymathAPI(params);
 ```
 
 ### Module code examples
+
 In the `/examples` directory there are several examples to help developers understand how to use the API within the sandbox.
 
 These examples demonstrate the use of the project's PolymathAPI to get data and publish transactions with Polymath's smart contracts. Register a ticker, generate a new security token and then you can add a module.
 
-When a security token has a module successfully attached, the examples demonstrate how one can work with sto creation, transfer restrictions, permissioning, and directly with the security token. 
+When a security token has a module successfully attached, the examples demonstrate how one can work with sto creation, transfer restrictions, permissioning, and directly with the security token.
 
 The sandbox code included in the examples demonstrates how to subscribe to events fired from the smart contracts. It also demonstrates how to better catch issues when they happen, during token transfers for instance.

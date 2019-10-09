@@ -26,15 +26,6 @@ import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 import ContractWrapper from '../../../contract_wrapper';
 
-/**
- * @param wallet Ethereum wallet/contract address that need to be exempted
- * @param exempted Boolean value used to add (i.e true) or remove (i.e false) from the list
- */
-
-export namespace RestrictedPartialSaleTransferManagerTransactionParams {
-  export interface ChangeExemptWalletList extends ChangeExemptWalletListParams {}
-}
-
 interface ChangedExemptWalletListSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: RestrictedPartialSaleTMEvents_3_1_0.ChangedExemptWalletList;
   callback: EventCallback<RestrictedPartialSaleTMChangedExemptWalletListEventArgs_3_1_0>;
@@ -80,7 +71,7 @@ export interface GetRestrictedPartialSaleTransferManagerLogsAsyncParams extends 
  * @param wallet Ethereum wallet/contract address that need to be exempted
  * @param exempted Boolean value used to add (i.e true) or remove (i.e false) from the list
  */
-interface ChangeExemptWalletListParams extends TxParams {
+export interface ChangeExemptWalletListParams extends TxParams {
   wallet: string;
   exempted: boolean;
 }
@@ -89,7 +80,7 @@ interface ChangeExemptWalletListParams extends TxParams {
  * @param wallets Ethereum wallet/contract addresses that need to be exempted
  * @param exempted Boolean values used to add (i.e true) or remove (i.e false) from the list
  */
-interface ChangeExemptWalletListMultiParams extends TxParams {
+export interface ChangeExemptWalletListMultiParams extends TxParams {
   wallets: string[];
   exempted: boolean[];
 }

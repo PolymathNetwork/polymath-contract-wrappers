@@ -34,13 +34,6 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace GeneralPermissionManagerTransactionParams {
-  export interface DeleteDelegate extends DelegateTxParams {}
-  export interface AddDelegate extends AddDelegateParams {}
-  export interface ChangePermission extends ChangePermissionParams {}
-  export interface ChangePermissionMulti extends ChangePermissionMultiParams {}
-}
-
 interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: GeneralPermissionManagerEvents_3_0_0.ChangePermission;
   callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs_3_0_0>;
@@ -141,7 +134,7 @@ interface GetAllModulesAndPermsFromTypesParams {
 /**
  * @param delegate Ethereum address of the delegate
  */
-interface DelegateTxParams extends TxParams {
+export interface DelegateTxParams extends TxParams {
   delegate: string;
 }
 
@@ -149,7 +142,7 @@ interface DelegateTxParams extends TxParams {
  * @param delegate Ethereum address of the delegate
  * @param details Details about the delegate i.e `Belongs to financial firm`
  */
-interface AddDelegateParams extends TxParams {
+export interface AddDelegateParams extends TxParams {
   delegate: string;
   details: string;
 }
@@ -160,7 +153,7 @@ interface AddDelegateParams extends TxParams {
  * @param perm Permission flag
  * @param valid Bool flag use to switch on/off the permission
  */
-interface ChangePermissionParams extends TxParams {
+export interface ChangePermissionParams extends TxParams {
   delegate: string;
   module: string;
   perm: Perm;
@@ -173,7 +166,7 @@ interface ChangePermissionParams extends TxParams {
  * @param perms Multiple permission flag needs to be changed
  * @param valids Bool array consist the flag to switch on/off the permission
  */
-interface ChangePermissionMultiParams extends TxParams {
+export interface ChangePermissionMultiParams extends TxParams {
   delegate: string;
   modules: string[];
   perms: Perm[];

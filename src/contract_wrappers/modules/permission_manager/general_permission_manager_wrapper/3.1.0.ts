@@ -10,7 +10,7 @@ import { WithModule_3_0_0 } from '../../module_wrapper';
  * @param delegates An array of Ethereum addresses of the delegates
  * @param details An array of details about the delegates i.e `Belongs to financial firm`
  */
-interface AddDelegateMultiParams extends TxParams {
+export interface AddDelegateMultiParams extends TxParams {
   delegates: string[];
   details: string[];
 }
@@ -18,7 +18,7 @@ interface AddDelegateMultiParams extends TxParams {
 /**
  * @param delegates An array of Ethereum address of delegates
  */
-interface DeleteDelegateMultiParams extends TxParams {
+export interface DeleteDelegateMultiParams extends TxParams {
   delegates: string[];
 }
 

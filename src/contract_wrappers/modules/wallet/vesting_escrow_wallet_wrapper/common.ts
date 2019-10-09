@@ -48,24 +48,6 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace VestingEscrowWalletTransactionParams {
-  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
-  export interface DepositTokens extends DepositTokensParams {}
-  export interface SendToTreasury extends SendToTreasuryParams {}
-  export interface PushAvailableTokens extends PushAvailableTokensParams {}
-  export interface AddTemplate extends AddTemplateParams {}
-  export interface RemoveTemplate extends RemoveTemplateParams {}
-  export interface AddSchedule extends AddScheduleParams {}
-  export interface AddScheduleFromTemplate extends AddScheduleFromTemplateParams {}
-  export interface RevokeSchedule extends RevokeScheduleParams {}
-  export interface RevokeAllSchedules extends RevokeAllSchedulesParams {}
-  export interface PushAvailableTokensMulti extends PushAvailableTokensMultiParams {}
-  export interface AddScheduleMulti extends AddScheduleMultiParams {}
-  export interface AddScheduleFromTemplateMulti extends AddScheduleFromTemplateMultiParams {}
-  export interface RevokeSchedulesMulti extends RevokeSchedulesMultiParams {}
-  export interface ModifyScheduleMulti extends ModifyScheduleMultiParams {}
-}
-
 interface AddScheduleSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: VestingEscrowWalletEvents_3_0_0.AddSchedule;
   callback: EventCallback<VestingEscrowWalletAddScheduleEventArgs_3_0_0>;
@@ -244,28 +226,28 @@ interface BeneficiariesParams {
 /**
  * @param newTreasuryWallet Address of the treasury wallet
  */
-interface ChangeTreasuryWalletParams extends TxParams {
+export interface ChangeTreasuryWalletParams extends TxParams {
   newTreasuryWallet: string;
 }
 
 /**
  * @param numberOfTokens Number of tokens that should be deposited
  */
-interface DepositTokensParams extends TxParams {
+export interface DepositTokensParams extends TxParams {
   numberOfTokens: BigNumber;
 }
 
 /**
  * @param amount Amount of tokens that should be send to the treasury wallet
  */
-interface SendToTreasuryParams extends TxParams {
+export interface SendToTreasuryParams extends TxParams {
   amount: BigNumber;
 }
 
 /**
  * @param beneficiary Address of the beneficiary who will receive tokens
  */
-interface PushAvailableTokensParams extends TxParams {
+export interface PushAvailableTokensParams extends TxParams {
   beneficiary: string;
 }
 
@@ -275,7 +257,7 @@ interface PushAvailableTokensParams extends TxParams {
  * @param duration Duration of the vesting schedule in seconds
  * @param frequency Frequency of the vesting schedule in seconds
  */
-interface AddTemplateParams extends TxParams {
+export interface AddTemplateParams extends TxParams {
   name: string;
   numberOfTokens: BigNumber;
   duration: number;
@@ -285,7 +267,7 @@ interface AddTemplateParams extends TxParams {
 /**
  * @param name Name of the template that will be removed
  */
-interface RemoveTemplateParams extends TxParams {
+export interface RemoveTemplateParams extends TxParams {
   name: string;
 }
 
@@ -297,7 +279,7 @@ interface RemoveTemplateParams extends TxParams {
  * @param frequency Frequency of the created vesting schedule
  * @param startTime Start time of the created vesting schedule
  */
-interface AddScheduleParams extends TxParams {
+export interface AddScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
   numberOfTokens: BigNumber;
@@ -311,7 +293,7 @@ interface AddScheduleParams extends TxParams {
  * @param templateName Name of the exists template
  * @param startTime Start time of the created vesting schedule
  */
-interface AddScheduleFromTemplateParams extends TxParams {
+export interface AddScheduleFromTemplateParams extends TxParams {
   beneficiary: string;
   templateName: string;
   startTime: Date;
@@ -321,7 +303,7 @@ interface AddScheduleFromTemplateParams extends TxParams {
  * @param beneficiary Address of the beneficiary for whom it is revoked
  * @param templateName Name of the template was used for schedule creation
  */
-interface RevokeScheduleParams extends TxParams {
+export interface RevokeScheduleParams extends TxParams {
   beneficiary: string;
   templateName: string;
 }
@@ -329,8 +311,74 @@ interface RevokeScheduleParams extends TxParams {
 /**
  * @param beneficiary Address of the beneficiary for whom all schedules will be revoked
  */
-interface RevokeAllSchedulesParams extends TxParams {
+export interface RevokeAllSchedulesParams extends TxParams {
   beneficiary: string;
+}
+
+/**
+ * @param fromIndex Start index of array of beneficiary's addresses
+ * @param toIndex End index of array of beneficiary's addresses
+ */
+export interface PushAvailableTokensMultiParams extends TxParams {
+  fromIndex: number;
+  toIndex: number;
+}
+
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ * @param templateNames Array of the template names
+ * @param numberOfTokens Array of number of tokens should be assigned to schedules
+ * @param durations Array of the vesting duration
+ * @param frequencies Array of the vesting frequency
+ * @param startTimes Array of the vesting start time
+ */
+export interface AddScheduleMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  numberOfTokens: BigNumber[];
+  durations: number[];
+  frequencies: number[];
+  startTimes: Date[];
+}
+
+/**
+ * @param beneficiaries Array of beneficiary's addresses
+ * @param templateNames Array of the template names were used for schedule creation
+ * @param startTimes Array of the vesting start time
+ */
+export interface AddScheduleFromTemplateMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  startTimes: Date[];
+}
+
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ */
+export interface RevokeSchedulesMultiParams extends TxParams {
+  beneficiaries: string[];
+}
+
+/**
+ * @param beneficiary Address of the beneficiary for whom it is modified
+ * @param templateName Name of the template was used for schedule creation
+ * @param startTime Start time of the created vesting schedule
+ */
+export interface ModifyScheduleParams extends TxParams {
+  beneficiary: string;
+  templateName: string;
+  startTime: Date;
+}
+
+/**
+ * @param beneficiaries Array of the beneficiary's addresses
+ * @param templateNames Array of the template names
+ * @param startTimes Array of the vesting start time
+ */
+export interface ModifyScheduleMultiParams extends TxParams {
+  beneficiaries: string[];
+  templateNames: string[];
+  startTimes: Date[];
 }
 
 /**
@@ -354,61 +402,6 @@ interface GetTemplateNamesParams {
  */
 interface GetScheduleCountParams {
   beneficiary: string;
-}
-
-/**
- * @param fromIndex Start index of array of beneficiary's addresses
- * @param toIndex End index of array of beneficiary's addresses
- */
-interface PushAvailableTokensMultiParams extends TxParams {
-  fromIndex: number;
-  toIndex: number;
-}
-
-/**
- * @param beneficiaries Array of the beneficiary's addresses
- * @param templateNames Array of the template names
- * @param numberOfTokens Array of number of tokens should be assigned to schedules
- * @param durations Array of the vesting duration
- * @param frequencies Array of the vesting frequency
- * @param startTimes Array of the vesting start time
- */
-interface AddScheduleMultiParams extends TxParams {
-  beneficiaries: string[];
-  templateNames: string[];
-  numberOfTokens: BigNumber[];
-  durations: number[];
-  frequencies: number[];
-  startTimes: Date[];
-}
-
-/**
- * @param beneficiaries Array of beneficiary's addresses
- * @param templateNames Array of the template names were used for schedule creation
- * @param startTimes Array of the vesting start time
- */
-interface AddScheduleFromTemplateMultiParams extends TxParams {
-  beneficiaries: string[];
-  templateNames: string[];
-  startTimes: Date[];
-}
-
-/**
- * @param beneficiaries Array of the beneficiary's addresses
- */
-interface RevokeSchedulesMultiParams extends TxParams {
-  beneficiaries: string[];
-}
-
-/**
- * @param beneficiaries Array of the beneficiary's addresses
- * @param templateNames Array of the template names
- * @param startTimes Array of the vesting start time
- */
-interface ModifyScheduleMultiParams extends TxParams {
-  beneficiaries: string[];
-  templateNames: string[];
-  startTimes: Date[];
 }
 
 enum StateStatus {

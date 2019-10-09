@@ -1,25 +1,10 @@
 import { VestingEscrowWalletContract_3_0_0, Web3Wrapper, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import ContractFactory from '../../../../factories/contractFactory';
-import { ContractVersion, TxParams, Perm, ErrorCode, Constructor } from '../../../../types';
+import { ContractVersion, Perm, ErrorCode, Constructor } from '../../../../types';
 import { stringToBytes32, dateToBigNumber } from '../../../../utils/convert';
-import VestingEscrowWalletCommon from './common';
+import VestingEscrowWalletCommon, { ModifyScheduleParams } from './common';
 import assert from '../../../../utils/assert';
 import { WithModule_3_0_0 } from '../../module_wrapper';
-
-/**
- * @param beneficiary Address of the beneficiary for whom it is modified
- * @param templateName Name of the template was used for schedule creation
- * @param startTime Start time of the created vesting schedule
- */
-interface ModifyScheduleParams extends TxParams {
-  beneficiary: string;
-  templateName: string;
-  startTime: Date;
-}
-
-export namespace VestingEscrowWalletTransactionParams {
-  export interface ModifySchedule extends ModifyScheduleParams {}
-}
 
 const VestingEscrowWalletBase_3_0_0 = WithModule_3_0_0((VestingEscrowWalletCommon as unknown) as Constructor<
   VestingEscrowWalletCommon

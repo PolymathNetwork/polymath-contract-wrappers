@@ -95,53 +95,6 @@ const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
-export namespace SecurityTokenTransactionParams {
-  export interface FreezeIssuance extends FreezeIssuanceParams {}
-  export interface ArchiveModule extends ModuleAddressTxParams {}
-  export interface UnarchiveModule extends ModuleAddressTxParams {}
-  export interface RemoveModule extends ModuleAddressTxParams {}
-  export interface UpgradeModule extends ModuleAddressTxParams {}
-  export interface ChangeDataStore extends DataStoreAddressParams {}
-  export interface SetDocument extends SetDocumentParams {}
-  export interface GetDocument extends DocumentParams {}
-  export interface RemoveDocument extends DocumentParams {}
-  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
-  export interface ChangeApproval extends ChangeApprovalParams {}
-  export interface TransferOwnership extends TransferOwnershipParams {}
-  export interface WithdrawERC20 extends WithdrawERC20Params {}
-  export interface ChangeModuleBudget extends ChangeModuleBudgetParams {}
-  export interface UpdateTokenDetails extends UpdateTokenDetailsParams {}
-  export interface ChangeGranularity extends ChangeGranularityParams {}
-  export interface ChangeName extends ChangeNameParams {}
-  export interface TransferWithData extends TransferWithDataParams {}
-  export interface TransferFromWithData extends TransferFromWithDataParams {}
-  export interface Issue extends IssueParams {}
-  export interface IssueByPartition extends IssueByPartitionParams {}
-  export interface IssueMulti extends IssueMultiParams {}
-  export interface Redeem extends RedeemParams {}
-  export interface RedeemByPartition extends RedeemByPartitionParams {}
-  export interface OperatorRedeemByPartition extends OperatorRedeemByPartitionParams {}
-  export interface RedeemFrom extends RedeemFromParams {}
-  export interface TransferByPartition extends TransferByPartitionParams {}
-  export interface AuthorizeOperator extends AuthorizeOperatorParams {}
-  export interface AuthorizeOperatorByPartition extends AuthorizeOperatorByPartitionParams {}
-  export interface RevokeOperator extends RevokeOperatorParams {}
-  export interface RevokeOperatorByPartition extends RevokeOperatorByPartitionParams {}
-  export interface OperatorTransferByPartition extends OperatorTransferByPartitionParams {}
-  export interface SetController extends SetControllerParams {}
-  export interface DisableController extends DisableControllerParams {}
-  export interface ControllerTransfer extends ControllerTransferParams {}
-  export interface ControllerRedeem extends ControllerRedeemParams {}
-  export interface AddModule extends AddModuleParams {}
-  export interface AddNoDataModule extends AddNoDataModuleParams {}
-  export interface AddVestingEscrowWallet extends AddVestingEscrowWalletParams {}
-  export interface AddCountTransferManager extends AddCountTransferManagerParams {}
-  export interface AddPercentageTransferManager extends AddPercentageTransferManagerParams {}
-  export interface AddDividendCheckpoint extends AddDividendCheckpointParams {}
-  export interface AddCappedSTO extends AddCappedSTOParams {}
-  export interface AddUSDTieredSTO extends AddUSDTieredSTOParams {}
-}
-
 interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: SecurityTokenEvents_3_0_0.Approval;
   callback: EventCallback<ISecurityTokenApprovalEventArgs_3_0_0>;
@@ -572,7 +525,7 @@ interface PartitionsOfParams {
 /**
  * @param signature calldata
  */
-interface FreezeIssuanceParams extends TxParams {
+export interface FreezeIssuanceParams extends TxParams {
   signature: string;
 }
 
@@ -593,14 +546,14 @@ interface ModuleAddressParams {
 /**
  * @param module address of the module
  */
-interface ModuleAddressTxParams extends TxParams {
+export interface ModuleAddressTxParams extends TxParams {
   moduleAddress: string;
 }
 
 /**
  * @param dataStore Address of the token data store
  */
-interface DataStoreAddressParams extends TxParams {
+export interface DataStoreAddressParams extends TxParams {
   dataStore: string;
 }
 
@@ -610,7 +563,7 @@ interface DataStoreAddressParams extends TxParams {
  * @param uri Off-chain uri of the document from where it is accessible to investors/advisors to read.
  * @param documentHash hash (of the contents) of the document.
  */
-interface SetDocumentParams extends TxParams {
+export interface SetDocumentParams extends TxParams {
   name: string;
   uri: string;
   documentHash: string;
@@ -619,14 +572,14 @@ interface SetDocumentParams extends TxParams {
 /**
  * @param name Name of the document. It should be unique always
  */
-interface DocumentParams extends TxParams {
+export interface DocumentParams extends TxParams {
   name: string;
 }
 
 /**
  * @param treasuryWallet Ethereum address of the treasury wallet
  */
-interface ChangeTreasuryWalletParams extends TxParams {
+export interface ChangeTreasuryWalletParams extends TxParams {
   treasuryWallet: string;
 }
 
@@ -660,7 +613,7 @@ interface CanTransferByPartitionParams extends CanTransferFromParams {
  * @param spender Address spending tokens
  * @param value Value associated to approval
  */
-interface ChangeApprovalParams extends TxParams {
+export interface ChangeApprovalParams extends TxParams {
   spender: string;
   value: BigNumber;
 }
@@ -668,7 +621,7 @@ interface ChangeApprovalParams extends TxParams {
 /**
  * @param newOwner Address to transfer ownership to
  */
-interface TransferOwnershipParams extends TxParams {
+export interface TransferOwnershipParams extends TxParams {
   newOwner: string;
 }
 
@@ -683,7 +636,7 @@ interface ModuleNameParams {
  * @param tokenContract Address of the ERC20Basic compliance token
  * @param value Amount of POLY to withdraw
  */
-interface WithdrawERC20Params extends TxParams {
+export interface WithdrawERC20Params extends TxParams {
   tokenContract: string;
   value: BigNumber;
 }
@@ -693,7 +646,7 @@ interface WithdrawERC20Params extends TxParams {
  * @param change Change in allowance
  * @param increase True if budget has to be increased, false if decrease
  */
-interface ChangeModuleBudgetParams extends TxParams {
+export interface ChangeModuleBudgetParams extends TxParams {
   module: string;
   change: BigNumber;
   increase: boolean;
@@ -702,21 +655,21 @@ interface ChangeModuleBudgetParams extends TxParams {
 /**
  * @param newTokenDetails New token details
  */
-interface UpdateTokenDetailsParams extends TxParams {
+export interface UpdateTokenDetailsParams extends TxParams {
   newTokenDetails: string;
 }
 
 /**
  * @param granularity Granularity level of the token
  */
-interface ChangeGranularityParams extends TxParams {
+export interface ChangeGranularityParams extends TxParams {
   granularity: number;
 }
 
 /**
  * @param name new name of the token
  */
-interface ChangeNameParams extends TxParams {
+export interface ChangeNameParams extends TxParams {
   name: string;
 }
 /**
@@ -749,7 +702,7 @@ interface IterateInvestorsParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface TransferWithDataParams extends TxParams {
+export interface TransferWithDataParams extends TxParams {
   to: string;
   value: BigNumber;
   data: string;
@@ -761,7 +714,7 @@ interface TransferWithDataParams extends TxParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface TransferFromWithDataParams extends TxParams {
+export interface TransferFromWithDataParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -773,7 +726,7 @@ interface TransferFromWithDataParams extends TxParams {
  * @param value The amount of tokens need to be issued
  * @param data The `bytes data` allows arbitrary data to be submitted alongside the transfer.
  */
-interface IssueParams extends TxParams {
+export interface IssueParams extends TxParams {
   investor: string;
   value: BigNumber;
   data?: string;
@@ -782,7 +735,7 @@ interface IssueParams extends TxParams {
 /**
  * @param partition The partition to allocate the increase in balance
  */
-interface IssueByPartitionParams extends IssueParams {
+export interface IssueByPartitionParams extends IssueParams {
   partition: Partition;
 }
 
@@ -790,7 +743,7 @@ interface IssueByPartitionParams extends IssueParams {
  * @param investors A list of addresses to whom the minted tokens will be dilivered
  * @param values A list of number of tokens get minted and transfer to corresponding address of the investor from tokenHolders[] list
  */
-interface IssueMultiParams extends TxParams {
+export interface IssueMultiParams extends TxParams {
   investors: string[];
   values: BigNumber[];
 }
@@ -810,7 +763,7 @@ interface CheckPermissionParams {
  * @param value The amount of tokens need to be redeemed
  * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
  */
-interface RedeemParams extends TxParams {
+export interface RedeemParams extends TxParams {
   value: BigNumber;
   data: string;
 }
@@ -818,7 +771,7 @@ interface RedeemParams extends TxParams {
 /**
  * @param partition The partition to allocate the decrease in balance
  */
-interface RedeemByPartitionParams extends RedeemParams {
+export interface RedeemByPartitionParams extends RedeemParams {
   partition: Partition;
 }
 
@@ -826,7 +779,7 @@ interface RedeemByPartitionParams extends RedeemParams {
  * @param tokenHolder The token holder whose balance should be decreased
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
-interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
+export interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
   tokenHolder: string;
   operatorData: string;
 }
@@ -836,7 +789,7 @@ interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
  * @param value The amount of tokens need to be redeemed
  * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
  */
-interface RedeemFromParams extends TxParams {
+export interface RedeemFromParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
@@ -866,7 +819,7 @@ interface BalanceOfByPartitionParams {
  * @param value The amount of tokens to transfer from `partition`
  * @param data Additional data attached to the transfer of tokens
  */
-interface TransferByPartitionParams extends TxParams {
+export interface TransferByPartitionParams extends TxParams {
   partition: Partition;
   to: string;
   value: BigNumber;
@@ -876,28 +829,28 @@ interface TransferByPartitionParams extends TxParams {
 /**
  * @param operator An address which is being authorised.
  */
-interface AuthorizeOperatorParams extends TxParams {
+export interface AuthorizeOperatorParams extends TxParams {
   operator: string;
 }
 
 /**
  * @param partition The partition to which the operator is authorised
  */
-interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
+export interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
   partition: Partition;
 }
 
 /**
  * @param operator An address which is being de-authorised
  */
-interface RevokeOperatorParams extends TxParams {
+export interface RevokeOperatorParams extends TxParams {
   operator: string;
 }
 
 /**
  * @param partition The partition to which the operator is de-authorised
  */
-interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
+export interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
   partition: Partition;
 }
 
@@ -905,7 +858,7 @@ interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
  * @param from The address from which to transfer tokens from
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
-interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
+export interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
   from: string;
   operatorData: string;
 }
@@ -913,14 +866,14 @@ interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
 /**
  * @param controller address of the controller
  */
-interface SetControllerParams extends TxParams {
+export interface SetControllerParams extends TxParams {
   controller: string;
 }
 
 /**
  * @param signature calldata
  */
-interface DisableControllerParams extends TxParams {
+export interface DisableControllerParams extends TxParams {
   signature: string;
 }
 
@@ -933,7 +886,7 @@ interface DisableControllerParams extends TxParams {
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
  */
-interface ControllerTransferParams extends TxParams {
+export interface ControllerTransferParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -949,7 +902,7 @@ interface ControllerTransferParams extends TxParams {
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
  */
-interface ControllerRedeemParams extends TxParams {
+export interface ControllerRedeemParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
@@ -965,7 +918,7 @@ interface ControllerRedeemParams extends TxParams {
  * @param label is the label of the module
  * @param data is data packed into bytes used to further configure the module (See STO usage)
  */
-interface AddModuleParams extends TxParams {
+export interface AddModuleParams extends TxParams {
   moduleName: ModuleName;
   address: string;
   archived: boolean;
@@ -987,7 +940,7 @@ interface AddModuleParams extends TxParams {
  * @param data is data packed into bytes used to further configure the module (here no data)
  */
 
-interface AddNoDataModuleParams extends AddModuleParams {
+export interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
     | ModuleName.GeneralPermissionManager
     | ModuleName.GeneralTransferManager
@@ -998,37 +951,37 @@ interface AddNoDataModuleParams extends AddModuleParams {
   data?: undefined;
 }
 
-interface AddVestingEscrowWalletParams extends AddModuleParams {
+export interface AddVestingEscrowWalletParams extends AddModuleParams {
   moduleName: ModuleName.VestingEscrowWallet;
   data: VestingEscrowWalletData;
 }
 
-interface AddCountTransferManagerParams extends AddModuleParams {
+export interface AddCountTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.CountTransferManager;
   data: CountTransferManagerData;
 }
 
-interface AddPercentageTransferManagerParams extends AddModuleParams {
+export interface AddPercentageTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.PercentageTransferManager;
   data: PercentageTransferManagerData;
 }
 
-interface AddRestrictedPartialSaleTransferManagerParams extends AddModuleParams {
+export interface AddRestrictedPartialSaleTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.RestrictedPartialSaleTM;
   data: RestrictedPartialSaleTransferManagerData;
 }
 
-interface AddDividendCheckpointParams extends AddModuleParams {
+export interface AddDividendCheckpointParams extends AddModuleParams {
   moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
   data: DividendCheckpointData;
 }
 
-interface AddCappedSTOParams extends AddModuleParams {
+export interface AddCappedSTOParams extends AddModuleParams {
   moduleName: ModuleName.CappedSTO;
   data: CappedSTOData;
 }
 
-interface AddUSDTieredSTOParams extends AddModuleParams {
+export interface AddUSDTieredSTOParams extends AddModuleParams {
   moduleName: ModuleName.UsdTieredSTO;
   data: USDTieredSTOData;
 }
