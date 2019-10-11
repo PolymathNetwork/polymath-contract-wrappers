@@ -1,12 +1,25 @@
 import {
   AdvancedPLCRVotingCheckpointContract_3_1_0,
+  AdvancedPLCRVotingCheckpointEventArgs_3_1_0,
   AdvancedPLCRVotingCheckpointEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointStatutoryBallotCreatedEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointCumulativeBallotCreatedEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointVotersExemptedEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointVoteCommitEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointVoteRevealedEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointBallotCancelledEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointChangedBallotExemptedVotersListEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointChangedDefaultExemptedVotersListEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointPauseEventArgs_3_1_0,
+  AdvancedPLCRVotingCheckpointUnpauseEventArgs_3_1_0,
+  LogWithDecodedArgs,
   Web3Wrapper,
   BigNumber,
   PolyResponse,
   ethersUtils,
 } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
+import { schemas } from '@0x/json-schemas';
 import {
   numberToBigNumber,
   weiToValue,
@@ -17,33 +30,156 @@ import {
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
 import ContractWrapper from '../../../../contract_wrapper';
-import { ErrorCode, Perm, TxParams, BallotStage, FULL_DECIMALS } from '../../../../../types';
+import {
+  ErrorCode,
+  Perm,
+  TxParams,
+  BallotStage,
+  FULL_DECIMALS,
+  SubscribeAsyncParams,
+  GetLogsAsyncParams,
+  Subscribe,
+  GetLogs,
+  EventCallback,
+} from '../../../../../types';
 import { ModuleCommon } from '../../../module_wrapper';
 import assert from '../../../../../utils/assert';
 
-export namespace AdvancedPLCRVotingCheckpointTransactionParams {
-  export interface Ballot extends BallotParams {}
-  export interface StatutoryBallot extends StatutoryBallotParams {}
-  export interface CustomStatutoryBallot extends CustomStatutoryBallotParams {}
-  export interface CustomCumulativeBallot extends CustomCumulativeBallotParams {}
-  export interface CumulativeBallot extends CumulativeBallotParams {}
-  export interface CustomCumulativeBallotWithExemption extends CustomCumulativeBallotWithExemptionParams {}
-  export interface CumulativeBallotWithExemption extends CumulativeBallotWithExemptionParams {}
-  export interface StatutoryBallotWithExemption extends StatutoryBallotWithExemptionParams {}
-  export interface CustomStatutoryBallotWithExemption extends CustomStatutoryBallotWithExemptionParams {}
-  export interface CommitVote extends CommitVoteParams {}
-  export interface RevealVote extends RevealVoteParams {}
-  export interface CancelBallot extends CancelBallotParams {}
-  export interface ChangeBallotExemptedVotersList extends ChangeBallotExemptedVotersListParams {}
-  export interface ChangeBallotExemptedVotersListMulti extends ChangeBallotExemptedVotersListMultiParams {}
-  export interface ChangeDefaultExemptedVotersList extends ChangeDefaultExemptedVotersListParams {}
-  export interface ChangeDefaultExemptedVotersListMulti extends ChangeDefaultExemptedVotersListMultiParams {}
-  export interface CheckpointId extends CheckpointIdParams {}
-  export interface BallotId extends BallotIdParams {}
-  export interface VoteTokenCount extends VoteTokenCountParams {}
+interface StatutoryBallotCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.StatutoryBallotCreated;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointStatutoryBallotCreatedEventArgs_3_1_0>;
 }
 
-interface BallotParams extends TxParams {
+interface GetStatutoryBallotCreatedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.StatutoryBallotCreated;
+}
+
+interface CumulativeBallotCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.CumulativeBallotCreated;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointCumulativeBallotCreatedEventArgs_3_1_0>;
+}
+
+interface GetCumulativeBallotCreatedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.CumulativeBallotCreated;
+}
+
+interface VotersExemptedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VotersExempted;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointVotersExemptedEventArgs_3_1_0>;
+}
+
+interface GetVotersExemptedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VotersExempted;
+}
+
+interface VoteCommitSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointVoteCommitEventArgs_3_1_0>;
+}
+
+interface GetVoteCommitLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit;
+}
+
+interface VoteRevealedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteRevealed;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointVoteRevealedEventArgs_3_1_0>;
+}
+
+interface GetVoteRevealedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteRevealed;
+}
+
+interface BallotCancelledSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.BallotCancelled;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointBallotCancelledEventArgs_3_1_0>;
+}
+
+interface GetBallotCancelledLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.BallotCancelled;
+}
+
+interface ChangedBallotExemptedVotersListSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.ChangedBallotExemptedVotersList;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointChangedBallotExemptedVotersListEventArgs_3_1_0>;
+}
+
+interface GetChangedBallotExemptedVotersListLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.ChangedBallotExemptedVotersList;
+}
+
+interface ChangedDefaultExemptedVotersListSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.ChangedDefaultExemptedVotersList;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointChangedDefaultExemptedVotersListEventArgs_3_1_0>;
+}
+
+interface GetChangedDefaultExemptedVotersListLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.ChangedDefaultExemptedVotersList;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.Pause;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointPauseEventArgs_3_1_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.Unpause;
+  callback: EventCallback<AdvancedPLCRVotingCheckpointUnpauseEventArgs_3_1_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.Unpause;
+}
+
+interface AdvancedPLCRVotingCheckpointSubscribeAsyncParams extends Subscribe {
+  (params: StatutoryBallotCreatedSubscribeAsyncParams): Promise<string>;
+  (params: CumulativeBallotCreatedSubscribeAsyncParams): Promise<string>;
+  (params: VotersExemptedSubscribeAsyncParams): Promise<string>;
+  (params: VoteCommitSubscribeAsyncParams): Promise<string>;
+  (params: VoteRevealedSubscribeAsyncParams): Promise<string>;
+  (params: BallotCancelledSubscribeAsyncParams): Promise<string>;
+  (params: ChangedBallotExemptedVotersListSubscribeAsyncParams): Promise<string>;
+  (params: ChangedDefaultExemptedVotersListSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+interface GetAdvancedPLCRVotingCheckpointLogsAsyncParams extends GetLogs {
+  (params: GetStatutoryBallotCreatedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointStatutoryBallotCreatedEventArgs_3_1_0>[]
+  >;
+  (params: GetCumulativeBallotCreatedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointCumulativeBallotCreatedEventArgs_3_1_0>[]
+  >;
+  (params: GetVotersExemptedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointVotersExemptedEventArgs_3_1_0>[]
+  >;
+  (params: GetVoteCommitLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointVoteCommitEventArgs_3_1_0>[]
+  >;
+  (params: GetVoteRevealedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointVoteRevealedEventArgs_3_1_0>[]
+  >;
+  (params: GetBallotCancelledLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointBallotCancelledEventArgs_3_1_0>[]
+  >;
+  (params: GetChangedBallotExemptedVotersListLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointChangedBallotExemptedVotersListEventArgs_3_1_0>[]
+  >;
+  (params: GetChangedDefaultExemptedVotersListLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointChangedDefaultExemptedVotersListEventArgs_3_1_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<AdvancedPLCRVotingCheckpointPauseEventArgs_3_1_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<
+    LogWithDecodedArgs<AdvancedPLCRVotingCheckpointUnpauseEventArgs_3_1_0>[]
+  >;
+}
+
+export interface BallotParams extends TxParams {
   name: string;
   startTime: Date;
   commitDuration: number;
@@ -62,7 +198,7 @@ interface BallotParams extends TxParams {
  * @param choices Choices of proposals
  * @param noOfChoices No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
-interface StatutoryBallotParams extends BallotParams {
+export interface StatutoryBallotParams extends BallotParams {
   name: string;
   startTime: Date;
   commitDuration: number;
@@ -78,7 +214,7 @@ interface StatutoryBallotParams extends BallotParams {
  * @param noOfChoices No. of choices (If it is 0 then it means NAY/YAY/ABSTAIN ballot type is choosen).
  * @param checkpointId Valid checkpoint Id
  */
-interface CustomStatutoryBallotParams extends BallotParams {
+export interface CustomStatutoryBallotParams extends BallotParams {
   checkpointId: number;
   details: string;
   noOfChoices: number;
@@ -89,7 +225,7 @@ interface CustomStatutoryBallotParams extends BallotParams {
  * @param noOfChoices Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  * @param checkpointId Valid checkpoint Id
  */
-interface CustomCumulativeBallotParams extends BallotParams {
+export interface CustomCumulativeBallotParams extends BallotParams {
   checkpointId: number;
   details: string[];
   noOfChoices: number[];
@@ -99,7 +235,7 @@ interface CustomCumulativeBallotParams extends BallotParams {
  * @param details Off-chain details related to the proposal
  * @param noOfChoices Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
-interface CumulativeBallotParams extends BallotParams {
+export interface CumulativeBallotParams extends BallotParams {
   details: string[];
   noOfChoices: number[];
 }
@@ -107,27 +243,27 @@ interface CumulativeBallotParams extends BallotParams {
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-interface CustomCumulativeBallotWithExemptionParams extends CustomCumulativeBallotParams {
+export interface CustomCumulativeBallotWithExemptionParams extends CustomCumulativeBallotParams {
   exemptedAddresses: string[];
 }
 
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-interface CumulativeBallotWithExemptionParams extends CumulativeBallotParams {
+export interface CumulativeBallotWithExemptionParams extends CumulativeBallotParams {
   exemptedAddresses: string[];
 }
 
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-interface StatutoryBallotWithExemptionParams extends BallotParams {
+export interface StatutoryBallotWithExemptionParams extends BallotParams {
   exemptedAddresses: string[];
   details: string;
   noOfChoices: number;
 }
 
-interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithExemptionParams {
+export interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithExemptionParams {
   checkpointId: number;
 }
 
@@ -136,7 +272,7 @@ interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithEx
  * @param votes
  * @param salt
  */
-interface CommitVoteParams extends TxParams {
+export interface CommitVoteParams extends TxParams {
   ballotId: number;
   votes: number[];
   salt: number;
@@ -147,7 +283,7 @@ interface CommitVoteParams extends TxParams {
  * @param choiceOfProposal Proposal chosen by the voter. It varies from (1 to totalProposals)
  * @param salt Used salt for hashing (unique for each user)
  */
-interface RevealVoteParams extends TxParams {
+export interface RevealVoteParams extends TxParams {
   ballotId: number;
   choices: number[];
   salt: number;
@@ -156,7 +292,7 @@ interface RevealVoteParams extends TxParams {
 /**
  * @param ballotId The index of the target ballot
  */
-interface CancelBallotParams extends TxParams {
+export interface CancelBallotParams extends TxParams {
   ballotId: number;
 }
 
@@ -165,7 +301,7 @@ interface CancelBallotParams extends TxParams {
  * @param voter Address of the voter
  * @param exempt Whether it is exempted or not
  */
-interface ChangeBallotExemptedVotersListParams extends TxParams {
+export interface ChangeBallotExemptedVotersListParams extends TxParams {
   ballotId: number;
   exemptedAddress: string;
   exempt: boolean;
@@ -176,7 +312,7 @@ interface ChangeBallotExemptedVotersListParams extends TxParams {
  * @param exemptedAddresses Address of the voters
  * @param exempts Whether it is exempted or not
  */
-interface ChangeBallotExemptedVotersListMultiParams extends TxParams {
+export interface ChangeBallotExemptedVotersListMultiParams extends TxParams {
   ballotId: number;
   exemptedAddress: string[];
   exempt: boolean[];
@@ -186,7 +322,7 @@ interface ChangeBallotExemptedVotersListMultiParams extends TxParams {
  * @param voter Address of the voter
  * @param exempt Whether it is exempted or not
  */
-interface ChangeDefaultExemptedVotersListParams extends TxParams {
+export interface ChangeDefaultExemptedVotersListParams extends TxParams {
   voter: string;
   exempt: boolean;
 }
@@ -195,7 +331,7 @@ interface ChangeDefaultExemptedVotersListParams extends TxParams {
  * @param voters Address of the voter
  * @param exempts Whether it is exempted or not
  */
-interface ChangeDefaultExemptedVotersListMultiParams extends TxParams {
+export interface ChangeDefaultExemptedVotersListMultiParams extends TxParams {
   voters: string[];
   exempts: boolean[];
 }
@@ -203,27 +339,27 @@ interface ChangeDefaultExemptedVotersListMultiParams extends TxParams {
 /**
  * @param checkpointId Checkpoint identifier
  */
-interface CheckpointIdParams {
+export interface CheckpointIdParams {
   checkpointId: number;
 }
 
-interface BallotIdParams {
+export interface BallotIdParams {
   ballotId: number;
 }
 
-interface VoteTokenCountParams {
+export interface VoteTokenCountParams {
   // Address of the voter (Who will vote).
   voter: string;
   // Id of the ballot.
   ballotId: number;
 }
 
-interface CheckpointData {
+export interface CheckpointData {
   investor: string;
   balance: BigNumber;
 }
 
-interface Ballots {
+export interface Ballots {
   // Id list of the ballots
   ballotId: number;
   // Name of the ballots
@@ -236,20 +372,20 @@ interface Ballots {
   isCancelled: boolean;
 }
 
-interface PendingBallots {
+export interface PendingBallots {
   // ballots list of indexes of ballots on which given voter has to commit
   commitCount: number[];
   // ballots list of indexes of ballots on which given voter has to reveal
   revealCount: number[];
 }
 
-interface BallotResults {
+export interface BallotResults {
   choicesWeighting: number;
   noOfChoicesInProposal: number;
   voters: string;
 }
 
-interface BallotDetails {
+export interface BallotDetails {
   name: string;
   totalSupplyAtCheckpoint: number;
   checkpointId: number;
@@ -987,6 +1123,49 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   private validateMaximumLimitCount = async () => {
     const allBallots: Ballots[] = await this.getAllBallots();
     assert.assert(allBallots.length < 500, ErrorCode.PreconditionRequired, 'Max Limit Reached');
+  };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: AdvancedPLCRVotingCheckpointSubscribeAsyncParams = async <
+    ArgsType extends AdvancedPLCRVotingCheckpointEventArgs_3_1_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, AdvancedPLCRVotingCheckpointEvents_3_1_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetAdvancedPLCRVotingCheckpointLogsAsyncParams = async <
+    ArgsType extends AdvancedPLCRVotingCheckpointEventArgs_3_1_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, AdvancedPLCRVotingCheckpointEvents_3_1_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
   };
 }
 

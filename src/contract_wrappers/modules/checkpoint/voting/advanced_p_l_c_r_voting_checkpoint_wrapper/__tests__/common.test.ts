@@ -6,21 +6,19 @@ import {
   BigNumber,
   Web3Wrapper,
   ethersUtils,
+  PolyTokenEvents_3_0_0
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../../test_utils/mocked_methods';
 import { ModuleCommon } from '../../../../module_wrapper';
 import ContractFactory from '../../../../../../factories/contractFactory';
 import {
-  parsePermBytes32Value,
-  stringArrayToBytes32Array,
-  valueToWei,
   weiToValue,
   numberToBigNumber,
   parseBallotStageValue,
   dateToBigNumber,
   bigNumberToDate,
 } from '../../../../../../utils/convert';
-import { Perm, ContractVersion, Subscribe, GetLogs, BallotStage } from '../../../../../../types';
+import { ContractVersion } from '../../../../../../types';
 import AdvancedPLCRVotingCheckpointCommon from '../common';
 
 describe('AdvancedPLCRVotingCheckpointWrapper', () => {
@@ -29,10 +27,6 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
     public contract: Promise<AdvancedPLCRVotingCheckpointContract_3_1_0>;
 
     public contractVersion!: ContractVersion;
-
-    public subscribeAsync!: Subscribe;
-
-    public getLogsAsync!: GetLogs;
 
     public constructor(
       web3Wrapper: Web3Wrapper,
@@ -1482,7 +1476,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
 
       // get logs
-    // TODO
+      // TODO
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -1624,13 +1618,13 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
 
   describe('Change Ballot Exempted Voters List', () => {
     test('should changeBallotExemptedVotersList', async () => {
-        const mockedParams = {
-            ballotId: 1,
-            exemptedAddress: '0x5555555555555555555555555555555555555555',
-            exempt: false,
-            txData: {},
-            safetyFactor: 10,
-          };
+      const mockedParams = {
+        ballotId: 1,
+        exemptedAddress: '0x5555555555555555555555555555555555555555',
+        exempt: false,
+        txData: {},
+        safetyFactor: 10,
+      };
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1729,13 +1723,13 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
 
   describe('Change Ballot Exempted Voters List Multi', () => {
     test('should changeBallotExemptedVotersListMulti', async () => {
-        const mockedParams = {
-            ballotId: 1,
-            exemptedAddress: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
-            exempt: [false, false],
-            txData: {},
-            safetyFactor: 10,
-          };
+      const mockedParams = {
+        ballotId: 1,
+        exemptedAddress: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
+        exempt: [false, false],
+        txData: {},
+        safetyFactor: 10,
+      };
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1812,11 +1806,11 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.changeBallotExemptedVotersListMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(
-            objectContaining(numberToBigNumber(mockedParams.ballotId)),
-            mockedParams.exemptedAddress,
-            mockedParams.exempt,
-            mockedParams.txData,
-            mockedParams.safetyFactor,
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.exemptedAddress,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
         ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
@@ -1832,12 +1826,12 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
 
   describe('Change Default Exempted Voters List', () => {
     test('should changeDefaultExemptedVotersList', async () => {
-        const mockedParams = {
-            voter: '0x5555555555555555555555555555555555555555',
-            exempt: false,
-            txData: {},
-            safetyFactor: 10,
-          };
+      const mockedParams = {
+        voter: '0x5555555555555555555555555555555555555555',
+        exempt: false,
+        txData: {},
+        safetyFactor: 10,
+      };
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1859,7 +1853,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
     // Get all ballots
-    const expectedBallotsResult = [
+      const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
         ['ballot one', 'ballot two'],
         [new BigNumber(2), new BigNumber(2)],
@@ -1903,10 +1897,10 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.changeDefaultExemptedVotersList).once();
       verify(
         mockedMethod.sendTransactionAsync(
-            mockedParams.voter,
-            mockedParams.exempt,
-            mockedParams.txData,
-            mockedParams.safetyFactor,
+          mockedParams.voter,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
         ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
@@ -1922,12 +1916,12 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
 
   describe('Change Default Exempted Voters List Multi', () => {
     test('should changeDefaultExemptedVotersListMulti', async () => {
-        const mockedParams = {
-            voters: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
-            exempts: [false, false],
-            txData: {},
-            safetyFactor: 10,
-          };
+      const mockedParams = {
+        voters: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
+        exempts: [false, false],
+        txData: {},
+        safetyFactor: 10,
+      };
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1948,8 +1942,8 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-    // Get all ballots
-    const expectedBallotsResult = [
+      // Get all ballots
+      const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
         ['ballot one', 'ballot two'],
         [new BigNumber(2), new BigNumber(2)],
@@ -1993,10 +1987,10 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.changeDefaultExemptedVotersListMulti).once();
       verify(
         mockedMethod.sendTransactionAsync(
-            mockedParams.voters,
-            mockedParams.exempts,
-            mockedParams.txData,
-            mockedParams.safetyFactor,
+          mockedParams.voters,
+          mockedParams.exempts,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
         ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
@@ -2007,6 +2001,25 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
       verify(mockedContract.getAllBallots).once();
       verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('SubscribeAsync', () => {
+    test('should throw as eventName does not belong to AdvancedPLCRVotingCheckpoint', async () => {
+      // Mocked parameters
+      const mockedParams = {
+        eventName: PolyTokenEvents_3_0_0.Transfer,
+        indexFilterValues: {},
+        callback: () => {},
+        isVerbose: false,
+      };
+
+      // Real call
+      await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
+        new Error(
+          `Expected eventName to be one of: 'StatutoryBallotCreated', 'CumulativeBallotCreated', 'VotersExempted', 'VoteCommit', 'VoteRevealed', 'BallotCancelled', 'ChangedBallotExemptedVotersList', 'ChangedDefaultExemptedVotersList', 'Pause', 'Unpause', encountered: Transfer`,
+        ),
+      );
     });
   });
 });
