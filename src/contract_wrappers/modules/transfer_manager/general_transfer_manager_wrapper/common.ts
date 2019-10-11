@@ -1,10 +1,21 @@
 import {
   GeneralTransferManagerContract_3_0_0,
   GeneralTransferManagerContract_3_1_0,
+  GeneralTransferManagerEvents_3_0_0,
+  GeneralTransferManagerEventArgs_3_0_0,
+  GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0,
+  GeneralTransferManagerChangeDefaultsEventArgs_3_0_0,
+  GeneralTransferManagerPauseEventArgs_3_0_0,
+  GeneralTransferManagerUnpauseEventArgs_3_0_0,
+  GeneralTransferManagerModifyKYCDataEventArgs_3_0_0,
+  GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0,
+  GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0,
   Web3Wrapper,
   BigNumber,
   PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import {
   bigNumberToDate,
   bytes32ToString,
@@ -16,25 +27,117 @@ import {
   weiToValue,
 } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
-import { ErrorCode, FlagsType, Partition, Perm, TransferResult, TransferType, TxParams } from '../../../../types';
+import {
+  ErrorCode,
+  FlagsType,
+  Partition,
+  Perm,
+  TransferResult,
+  TransferType,
+  TxParams,
+  GetLogs,
+  Subscribe,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
+} from '../../../../types';
 import { ModuleCommon } from '../../module_wrapper';
 import assert from '../../../../utils/assert';
 import ContractWrapper from '../../../contract_wrapper';
 
 const ONE_HUNDRED = new BigNumber(100);
 
-export namespace GeneralTransferManagerTransactionParams {
-  export interface ChangeDefaults extends ChangeDefaultsParams {}
-  export interface ChangeIssuanceAddress extends ChangeIssuanceAddressParams {}
-  export interface ModifyKYCData extends ModifyKYCDataParams {}
-  export interface ModifyKYCDataSigned extends ModifyKYCDataSignedParams {}
-  export interface ModifyInvestorFlag extends ModifyInvestorFlagParams {}
-  export interface ModifyInvestorFlagMulti extends ModifyInvestorFlagMultiParams {}
-  export interface ExecuteTransfer extends ExecuteTransferParams {}
-  export interface ModifyTransferRequirements extends ModifyTransferRequirementsParams {}
-  export interface ModifyTransferRequirementsMulti extends ModifyTransferRequirementsMultiParams {}
-  export interface ModifyKYCDataMulti extends ModifyKYCDataMultiParams {}
-  export interface ModifyKYCDataSignedMulti extends ModifyKYCDataSignedMultiParams {}
+interface ChangeIssuanceAddressSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeIssuanceAddress;
+  callback: EventCallback<GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0>;
+}
+
+interface GetChangeIssuanceAddressLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeIssuanceAddress;
+}
+
+interface ChangeDefaultsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeDefaults;
+  callback: EventCallback<GeneralTransferManagerChangeDefaultsEventArgs_3_0_0>;
+}
+
+interface GetChangeDefaultsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ChangeDefaults;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<GeneralTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<GeneralTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.Unpause;
+}
+
+interface ModifyKYCDataSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyKYCData;
+  callback: EventCallback<GeneralTransferManagerModifyKYCDataEventArgs_3_0_0>;
+}
+
+interface GetModifyKYCDataLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyKYCData;
+}
+
+interface ModifyInvestorFlagSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyInvestorFlag;
+  callback: EventCallback<GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0>;
+}
+
+interface GetModifyInvestorFlagLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyInvestorFlag;
+}
+
+interface ModifyTransferRequirementsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements;
+  callback: EventCallback<GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0>;
+}
+
+interface GetModifyTransferRequirementsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: GeneralTransferManagerEvents_3_0_0.ModifyTransferRequirements;
+}
+
+export interface GeneralTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: ChangeIssuanceAddressSubscribeAsyncParams): Promise<string>;
+  (params: ChangeDefaultsSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+  (params: ModifyKYCDataSubscribeAsyncParams): Promise<string>;
+  (params: ModifyInvestorFlagSubscribeAsyncParams): Promise<string>;
+  (params: ModifyTransferRequirementsSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetGeneralTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetChangeIssuanceAddressLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerChangeIssuanceAddressEventArgs_3_0_0>[]
+  >;
+  (params: GetChangeDefaultsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerChangeDefaultsEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<GeneralTransferManagerUnpauseEventArgs_3_0_0>[]>;
+  (params: GetModifyKYCDataLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyKYCDataEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyInvestorFlagLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyInvestorFlagEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyTransferRequirementsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<GeneralTransferManagerModifyTransferRequirementsEventArgs_3_0_0>[]
+  >;
 }
 
 /**
@@ -50,7 +153,7 @@ interface NonceMapParams {
  * @param defaultCanSendAfter default for zero canSendAfter
  * @param defaultCanReceiveAfter default for zero canReceiveAfter
  */
-interface ChangeDefaultsParams extends TxParams {
+export interface ChangeDefaultsParams extends TxParams {
   defaultFromTime: Date;
   defaultToTime: Date;
 }
@@ -58,7 +161,7 @@ interface ChangeDefaultsParams extends TxParams {
 /**
  * @param issuanceAddress new address for the issuance
  */
-interface ChangeIssuanceAddressParams extends TxParams {
+export interface ChangeIssuanceAddressParams extends TxParams {
   issuanceAddress: string;
 }
 
@@ -68,7 +171,7 @@ interface ChangeIssuanceAddressParams extends TxParams {
  * @param canReceiveAfter is the moment when the purchase lockup period ends and the investor can freely purchase or receive tokens from others
  * @param expiryTime is the moment till investors KYC will be validated. After that investor need to do re-KYC
  */
-interface ModifyKYCDataParams extends TxParams {
+export interface ModifyKYCDataParams extends TxParams {
   investor: string;
   canSendAfter: Date;
   canReceiveAfter: Date;
@@ -85,11 +188,108 @@ interface ModifyKYCDataParams extends TxParams {
  * @param nonce nonce of signature (avoid replay attack)
  * @param signature issuer signature
  */
-interface ModifyKYCDataSignedParams extends TxParams {
+export interface ModifyKYCDataSignedParams extends TxParams {
   investor: string;
   canSendAfter: Date;
   canReceiveAfter: Date;
   expiryTime: Date;
+  validFrom: Date;
+  validTo: Date;
+  nonce: number;
+  signature: string;
+}
+
+/**
+ * @param investor is the address of the investor.
+ * @param flag index of flag to change. flag is used to know specifics about investor like isAccredited.
+ * @param value value of the flag. a flag can be true or false.
+ */
+export interface ModifyInvestorFlagParams extends TxParams {
+  investor: string;
+  flag: FlagsType;
+  value: boolean;
+}
+
+/**
+ * @param investors list of the addresses to modify data about.
+ * @param flag list of flag indexes to change. Flags are used to know specifics about investor like isAccredited.
+ * @param value list of flag values to set. A flag can be true or false.
+ */
+export interface ModifyInvestorFlagMultiParams extends TxParams {
+  investors: string[];
+  flag: FlagsType[];
+  value: boolean[];
+}
+
+/**
+ * @param from Address of the sender
+ * @param to Address of the receiver
+ * @param data Data value
+ */
+export interface ExecuteTransferParams extends TxParams {
+  from: string;
+  to: string;
+  data: string;
+}
+
+/**
+ * @param transferType type of transfer (0 = General, 1 = Issuance, 2 = Redemption)
+ * @param fromValidKYC defines if KYC is required for the sender
+ * @param toValidKYC defines if KYC is required for the receiver
+ * @param fromRestricted defines if transfer time restriction is checked for the sender
+ * @param toRestricted defines if transfer time restriction is checked for the receiver
+ */
+export interface ModifyTransferRequirementsParams extends TxParams {
+  transferType: TransferType;
+  fromValidKYC: boolean;
+  toValidKYC: boolean;
+  fromRestricted: boolean;
+  toRestricted: boolean;
+}
+
+/**
+ * @param transferTypes is a list of types of transfer (0 = General, 1 = Issuance, 2 = Redemption)
+ * @param fromValidKYC is a list that defines if KYC is required for each sender
+ * @param toValidKYC is a list that defines if KYC is required for each receiver
+ * @param fromRestricted is a list that defines if transfer time restriction is checked for each sender
+ * @param toRestricted is a list that defines if transfer time restriction is checked for each receiver
+ */
+export interface ModifyTransferRequirementsMultiParams extends TxParams {
+  transferTypes: TransferType[];
+  fromValidKYC: boolean[];
+  toValidKYC: boolean[];
+  fromRestricted: boolean[];
+  toRestricted: boolean[];
+}
+
+/**
+ * @param investors is a list of addresses to whitelist
+ * @param canSendAfter is a list of the moments when the sale lockup period ends and each investor can freely sell his tokens
+ * @param canReceiveAfter is a list of the moments when the purchase lockup period ends and each investor can freely purchase tokens from others
+ * @param expiryTime is a list of the moments up to which each investor's KYC will be validated. After that investor needs to re-do KYC
+ */
+export interface ModifyKYCDataMultiParams extends TxParams {
+  investors: string[];
+  canSendAfter: Date[];
+  canReceiveAfter: Date[];
+  expiryTime: Date[];
+}
+
+/**
+ * @param investors is a list of addresses to whitelist
+ * @param canSendAfter is a list of the moments when the sale lockup period ends and each investor can freely sell his tokens
+ * @param canReceiveAfter is a list of the moments when the purchase lockup period ends and each investor can freely purchase tokens from others
+ * @param expiryTime is a list of the moments up to which each investor's KYC will be validated. After that investor needs to re-do KYC
+ * @param validFrom is the time from which this signature is valid
+ * @param validTo is the time until which this signature is valid
+ * @param nonce nonce of signature (avoid replay attack)
+ * @param signature issuer signature
+ */
+export interface ModifyKYCDataSignedMultiParams extends TxParams {
+  investors: string[];
+  canSendAfter: Date[];
+  canReceiveAfter: Date[];
+  expiryTime: Date[];
   validFrom: Date;
   validTo: Date;
   nonce: number;
@@ -117,103 +317,6 @@ interface GetInvestorFlags {
  */
 interface GetKYCDataParams {
   investors: string[];
-}
-
-/**
- * @param investor is the address of the investor.
- * @param flag index of flag to change. flag is used to know specifics about investor like isAccredited.
- * @param value value of the flag. a flag can be true or false.
- */
-interface ModifyInvestorFlagParams extends TxParams {
-  investor: string;
-  flag: FlagsType;
-  value: boolean;
-}
-
-/**
- * @param investors list of the addresses to modify data about.
- * @param flag list of flag indexes to change. Flags are used to know specifics about investor like isAccredited.
- * @param value list of flag values to set. A flag can be true or false.
- */
-interface ModifyInvestorFlagMultiParams extends TxParams {
-  investors: string[];
-  flag: FlagsType[];
-  value: boolean[];
-}
-
-/**
- * @param from Address of the sender
- * @param to Address of the receiver
- * @param data Data value
- */
-interface ExecuteTransferParams extends TxParams {
-  from: string;
-  to: string;
-  data: string;
-}
-
-/**
- * @param transferType type of transfer (0 = General, 1 = Issuance, 2 = Redemption)
- * @param fromValidKYC defines if KYC is required for the sender
- * @param toValidKYC defines if KYC is required for the receiver
- * @param fromRestricted defines if transfer time restriction is checked for the sender
- * @param toRestricted defines if transfer time restriction is checked for the receiver
- */
-interface ModifyTransferRequirementsParams extends TxParams {
-  transferType: TransferType;
-  fromValidKYC: boolean;
-  toValidKYC: boolean;
-  fromRestricted: boolean;
-  toRestricted: boolean;
-}
-
-/**
- * @param transferTypes is a list of types of transfer (0 = General, 1 = Issuance, 2 = Redemption)
- * @param fromValidKYC is a list that defines if KYC is required for each sender
- * @param toValidKYC is a list that defines if KYC is required for each receiver
- * @param fromRestricted is a list that defines if transfer time restriction is checked for each sender
- * @param toRestricted is a list that defines if transfer time restriction is checked for each receiver
- */
-interface ModifyTransferRequirementsMultiParams extends TxParams {
-  transferTypes: TransferType[];
-  fromValidKYC: boolean[];
-  toValidKYC: boolean[];
-  fromRestricted: boolean[];
-  toRestricted: boolean[];
-}
-
-/**
- * @param investors is a list of addresses to whitelist
- * @param canSendAfter is a list of the moments when the sale lockup period ends and each investor can freely sell his tokens
- * @param canReceiveAfter is a list of the moments when the purchase lockup period ends and each investor can freely purchase tokens from others
- * @param expiryTime is a list of the moments up to which each investor's KYC will be validated. After that investor needs to re-do KYC
- */
-interface ModifyKYCDataMultiParams extends TxParams {
-  investors: string[];
-  canSendAfter: Date[];
-  canReceiveAfter: Date[];
-  expiryTime: Date[];
-}
-
-/**
- * @param investors is a list of addresses to whitelist
- * @param canSendAfter is a list of the moments when the sale lockup period ends and each investor can freely sell his tokens
- * @param canReceiveAfter is a list of the moments when the purchase lockup period ends and each investor can freely purchase tokens from others
- * @param expiryTime is a list of the moments up to which each investor's KYC will be validated. After that investor needs to re-do KYC
- * @param validFrom is the time from which this signature is valid
- * @param validTo is the time until which this signature is valid
- * @param nonce nonce of signature (avoid replay attack)
- * @param signature issuer signature
- */
-interface ModifyKYCDataSignedMultiParams extends TxParams {
-  investors: string[];
-  canSendAfter: Date[];
-  canReceiveAfter: Date[];
-  expiryTime: Date[];
-  validFrom: Date;
-  validTo: Date;
-  nonce: number;
-  signature: string;
 }
 
 /**
@@ -739,8 +842,51 @@ export default abstract class GeneralTransferManagerCommon extends ModuleCommon 
     const result = await (await this.contract).getAddressBytes32.callAsync();
     return bytes32ToString(result);
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: GeneralTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetGeneralTransferManagerLogsAsyncParams = async <
+    ArgsType extends GeneralTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralTransferManagerEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isGeneralTransferManager(wrapper: ContractWrapper): wrapper is GeneralTransferManagerCommon {
   return wrapper instanceof GeneralTransferManagerCommon;
-};
+}

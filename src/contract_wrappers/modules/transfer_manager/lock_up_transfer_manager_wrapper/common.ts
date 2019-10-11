@@ -1,9 +1,20 @@
 import {
-  BigNumber,
   LockUpTransferManagerContract_3_0_0,
+  LockUpTransferManagerEvents_3_0_0,
+  LockUpTransferManagerEventArgs_3_0_0,
+  LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0,
+  LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0,
+  LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0,
+  LockUpTransferManagerPauseEventArgs_3_0_0,
+  LockUpTransferManagerUnpauseEventArgs_3_0_0,
+  BigNumber,
   Web3Wrapper,
-  PolyResponse
+  PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -13,6 +24,11 @@ import {
   TransferResult,
   TxParams,
   ErrorCode,
+  GetLogs,
+  Subscribe,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
 } from '../../../../types';
 import {
   bigNumberToDate,
@@ -31,19 +47,97 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace LockUpTransferManagerTransactionParams {
-  export interface AddNewLockUpType extends LockUpTypeParams {}
-  export interface ModifyLockUpType extends LockUpTypeParams {}
-  export interface AddNewLockUpTypeMulti extends LockUpTypeMultiParams {}
-  export interface ModifyLockUpTypeMulti extends LockUpTypeMultiParams {}
-  export interface AddLockUpByName extends LockUpByNameParams {}
-  export interface AddLockUpByNameMulti extends LockUpByNameMultiParams {}
-  export interface AddNewLockUpToUser extends AddNewLockUpToUserParams {}
-  export interface AddNewLockUpToUserMulti extends AddNewLockUpToUserMultiParams {}
-  export interface RemoveLockUpFromUser extends RemoveLockUpFromUserParams {}
-  export interface RemoveLockUpFromUserMulti extends RemoveLockUpFromUserMultiParams {}
-  export interface RemoveLockUpType extends RemoveLockUpTypeParams {}
-  export interface RemoveLockUpTypeMulti extends RemoveLockUpTypeMultiParams {}
+interface AddLockUpToUserSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser;
+  callback: EventCallback<LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0>;
+}
+
+interface GetAddLockUpToUserLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.AddLockUpToUser;
+}
+
+interface RemoveLockUpFromUserSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpFromUser;
+  callback: EventCallback<LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0>;
+}
+
+interface GetRemoveLockUpFromUserLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpFromUser;
+}
+
+interface ModifyLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.ModifyLockUpType;
+  callback: EventCallback<LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0>;
+}
+
+interface GetModifyLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.ModifyLockUpType;
+}
+
+interface AddNewLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.AddNewLockUpType;
+  callback: EventCallback<LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0>;
+}
+
+interface GetAddNewLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.AddNewLockUpType;
+}
+
+interface RemoveLockUpTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpType;
+  callback: EventCallback<LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0>;
+}
+
+interface GetRemoveLockUpTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.RemoveLockUpType;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<LockUpTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<LockUpTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: LockUpTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface LockUpTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddLockUpToUserSubscribeAsyncParams): Promise<string>;
+  (params: RemoveLockUpFromUserSubscribeAsyncParams): Promise<string>;
+  (params: ModifyLockUpTypeSubscribeAsyncParams): Promise<string>;
+  (params: AddNewLockUpTypeSubscribeAsyncParams): Promise<string>;
+  (params: RemoveLockUpTypeSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetLockUpTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddLockUpToUserLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerAddLockUpToUserEventArgs_3_0_0>[]
+  >;
+  (params: GetRemoveLockUpFromUserLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpFromUserEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerModifyLockUpTypeEventArgs_3_0_0>[]
+  >;
+  (params: GetAddNewLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerAddNewLockUpTypeEventArgs_3_0_0>[]
+  >;
+  (params: GetRemoveLockUpTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<LockUpTransferManagerRemoveLockUpTypeEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<LockUpTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -91,7 +185,7 @@ interface VerifyTransferParams {
  * @param releaseFrequencySeconds How often to release a tranche of tokens (seconds)
  * @param lockupName Name of the lockup
  */
-interface LockUpTypeParams extends TxParams {
+export interface LockUpTypeParams extends TxParams {
   lockupAmount: BigNumber;
   startTime: Date;
   lockUpPeriodSeconds: number;
@@ -106,7 +200,7 @@ interface LockUpTypeParams extends TxParams {
  * @param releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
  * @param lockupNames Array of names of the lockup
  */
-interface LockUpTypeMultiParams extends TxParams {
+export interface LockUpTypeMultiParams extends TxParams {
   lockupAmounts: BigNumber[];
   startTimes: Date[];
   lockUpPeriodSeconds: number[];
@@ -118,7 +212,7 @@ interface LockUpTypeMultiParams extends TxParams {
  * @param userAddress Address of the user
  * @param lockupName Name of the lockup
  */
-interface LockUpByNameParams extends TxParams {
+export interface LockUpByNameParams extends TxParams {
   userAddress: string;
   lockupName: string;
 }
@@ -127,7 +221,7 @@ interface LockUpByNameParams extends TxParams {
  * @param userAddresses Array of addresses of the users
  * @param lockupNames Array of names of the lockups
  */
-interface LockUpByNameMultiParams extends TxParams {
+export interface LockUpByNameMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
@@ -140,7 +234,7 @@ interface LockUpByNameMultiParams extends TxParams {
  * @param releaseFrequencySeconds How often to release a tranche of tokens (seconds)
  * @param lockupName Name of the lockup
  */
-interface AddNewLockUpToUserParams extends TxParams {
+export interface AddNewLockUpToUserParams extends TxParams {
   userAddress: string;
   lockupAmount: BigNumber;
   startTime: Date;
@@ -157,7 +251,7 @@ interface AddNewLockUpToUserParams extends TxParams {
  * @param releaseFrequenciesSeconds Array of how often to release a tranche of tokens (seconds)
  * @param lockupNames Array of names of the lockup
  */
-interface AddNewLockUpToUserMultiParams extends TxParams {
+export interface AddNewLockUpToUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupAmounts: BigNumber[];
   startTimes: Date[];
@@ -170,7 +264,7 @@ interface AddNewLockUpToUserMultiParams extends TxParams {
  * @param userAddress Address of the user whose tokens are locked up
  * @param lockupName Name of the lockup need to be removed.
  */
-interface RemoveLockUpFromUserParams extends TxParams {
+export interface RemoveLockUpFromUserParams extends TxParams {
   userAddress: string;
   lockupName: string;
 }
@@ -179,7 +273,7 @@ interface RemoveLockUpFromUserParams extends TxParams {
  * @param userAddresses Array of addresses of the user whose tokens are locked up
  * @param lockupNames Array of the names of the lockup that needs to be removed.
  */
-interface RemoveLockUpFromUserMultiParams extends TxParams {
+export interface RemoveLockUpFromUserMultiParams extends TxParams {
   userAddresses: string[];
   lockupNames: string[];
 }
@@ -187,14 +281,14 @@ interface RemoveLockUpFromUserMultiParams extends TxParams {
 /**
  * @param lockupName Name of the lockup
  */
-interface RemoveLockUpTypeParams extends TxParams {
+export interface RemoveLockUpTypeParams extends TxParams {
   lockupName: string;
 }
 
 /**
  * @param lockupNames Array of the lockup names.
  */
-interface RemoveLockUpTypeMultiParams extends TxParams {
+export interface RemoveLockUpTypeMultiParams extends TxParams {
   lockupNames: string[];
 }
 
@@ -787,8 +881,53 @@ export default abstract class LockUpTransferManagerCommon extends ModuleCommon {
       'There are users attached to the lockup that must be removed before removing the lockup type',
     );
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: LockUpTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends LockUpTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetLockUpTransferManagerLogsAsyncParams = async <
+    ArgsType extends LockUpTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, LockUpTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isLockUpTransferManager(wrapper: ContractWrapper): wrapper is LockUpTransferManagerCommon {
   return wrapper instanceof LockUpTransferManagerCommon;
-};
+}

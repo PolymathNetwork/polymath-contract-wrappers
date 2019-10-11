@@ -10,7 +10,7 @@ import ContractFactory from '../../../../../factories/contractFactory';
 import { ModuleCommon } from '../../../module_wrapper';
 import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../../../../../test_utils/mocked_methods';
 import { valueToWei, weiToValue } from '../../../../../utils/convert';
-import { PERCENTAGE_DECIMALS, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { PERCENTAGE_DECIMALS, ContractVersion } from '../../../../../types';
 import PercentageTransferManagerCommon from '../common';
 
 describe('PercentageTransferManagerWrapper', () => {
@@ -20,11 +20,11 @@ describe('PercentageTransferManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<PercentageTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<PercentageTransferManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }

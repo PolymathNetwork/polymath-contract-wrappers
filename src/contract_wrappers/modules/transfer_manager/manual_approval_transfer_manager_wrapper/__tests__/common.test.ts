@@ -22,7 +22,7 @@ import {
 } from '../../../../../utils/convert';
 import ManualApprovalTransferManagerCommon from '../common';
 import { ModuleCommon } from '../../../module_wrapper';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { ContractVersion } from '../../../../../types';
 
 describe('ManualApprovalTransferManagerWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 ManualApprovalTransferManager contract since it has all common functionality
@@ -31,11 +31,11 @@ describe('ManualApprovalTransferManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ManualApprovalTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<ManualApprovalTransferManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }

@@ -16,7 +16,7 @@ import {
   stringToBytes32,
   valueToWei,
 } from '../../../../../utils/convert';
-import { FlagsType, TransferType, Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { FlagsType, TransferType, Partition, ContractVersion } from '../../../../../types';
 import GeneralTransferManagerCommon from '../common';
 
 describe('General Transfer Manager Common', () => {
@@ -26,11 +26,11 @@ describe('General Transfer Manager Common', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<GeneralTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<GeneralTransferManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }

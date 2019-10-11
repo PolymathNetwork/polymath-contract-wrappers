@@ -18,7 +18,43 @@ import {
   ethersUtils,
   CappedSTOContract_3_1_0,
   USDTieredSTOContract_3_1_0,
+  LogWithDecodedArgs,
+  SecurityTokenEvents_3_0_0,
+  ISecurityTokenApprovalEventArgs_3_0_0,
+  ISecurityTokenTransferEventArgs_3_0_0,
+  ISecurityTokenModuleAddedEventArgs_3_0_0,
+  SecurityTokenModuleUpgradedEventArgs_3_0_0, // this event isn't being exported from the interface contracts, so we need to use the non-interface version
+  ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0,
+  ISecurityTokenUpdateTokenNameEventArgs_3_0_0,
+  ISecurityTokenGranularityChangedEventArgs_3_0_0,
+  ISecurityTokenModuleArchivedEventArgs_3_0_0,
+  ISecurityTokenModuleUnarchivedEventArgs_3_0_0,
+  ISecurityTokenModuleRemovedEventArgs_3_0_0,
+  ISecurityTokenModuleBudgetChangedEventArgs_3_0_0,
+  ISecurityTokenTransferByPartitionEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorEventArgs_3_0_0,
+  ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0,
+  ISecurityTokenIssuedByPartitionEventArgs_3_0_0,
+  ISecurityTokenRedeemedByPartitionEventArgs_3_0_0,
+  ISecurityTokenControllerTransferEventArgs_3_0_0,
+  ISecurityTokenControllerRedemptionEventArgs_3_0_0,
+  ISecurityTokenDocumentRemovedEventArgs_3_0_0,
+  ISecurityTokenDocumentUpdatedEventArgs_3_0_0,
+  ISecurityTokenFreezeTransfersEventArgs_3_0_0,
+  ISecurityTokenCheckpointCreatedEventArgs_3_0_0,
+  ISecurityTokenFreezeIssuanceEventArgs_3_0_0,
+  ISecurityTokenIssuedEventArgs_3_0_0,
+  ISecurityTokenRedeemedEventArgs_3_0_0,
+  ISecurityTokenSetControllerEventArgs_3_0_0,
+  ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0,
+  ISecurityTokenDisableControllerEventArgs_3_0_0,
+  ISecurityTokenOwnershipTransferredEventArgs_3_0_0,
+  ISecurityTokenTokenUpgradedEventArgs_3_0_0,
+  ISecurityTokenEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -35,6 +71,11 @@ import {
   CappedSTOFundRaiseType,
   TransferStatusCode,
   ErrorCode,
+  GetLogs,
+  Subscribe,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
+  EventCallback,
 } from '../../../types';
 import {
   bigNumberToDate,
@@ -55,51 +96,408 @@ const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
-export namespace SecurityTokenTransactionParams {
-  export interface FreezeIssuance extends FreezeIssuanceParams {}
-  export interface ArchiveModule extends ModuleAddressTxParams {}
-  export interface UnarchiveModule extends ModuleAddressTxParams {}
-  export interface RemoveModule extends ModuleAddressTxParams {}
-  export interface UpgradeModule extends ModuleAddressTxParams {}
-  export interface ChangeDataStore extends DataStoreAddressParams {}
-  export interface SetDocument extends SetDocumentParams {}
-  export interface GetDocument extends DocumentParams {}
-  export interface RemoveDocument extends DocumentParams {}
-  export interface ChangeTreasuryWallet extends ChangeTreasuryWalletParams {}
-  export interface ChangeApproval extends ChangeApprovalParams {}
-  export interface TransferOwnership extends TransferOwnershipParams {}
-  export interface WithdrawERC20 extends WithdrawERC20Params {}
-  export interface ChangeModuleBudget extends ChangeModuleBudgetParams {}
-  export interface UpdateTokenDetails extends UpdateTokenDetailsParams {}
-  export interface ChangeGranularity extends ChangeGranularityParams {}
-  export interface ChangeName extends ChangeNameParams {}
-  export interface TransferWithData extends TransferWithDataParams {}
-  export interface TransferFromWithData extends TransferFromWithDataParams {}
-  export interface Issue extends IssueParams {}
-  export interface IssueByPartition extends IssueByPartitionParams {}
-  export interface IssueMulti extends IssueMultiParams {}
-  export interface Redeem extends RedeemParams {}
-  export interface RedeemByPartition extends RedeemByPartitionParams {}
-  export interface OperatorRedeemByPartition extends OperatorRedeemByPartitionParams {}
-  export interface RedeemFrom extends RedeemFromParams {}
-  export interface TransferByPartition extends TransferByPartitionParams {}
-  export interface AuthorizeOperator extends AuthorizeOperatorParams {}
-  export interface AuthorizeOperatorByPartition extends AuthorizeOperatorByPartitionParams {}
-  export interface RevokeOperator extends RevokeOperatorParams {}
-  export interface RevokeOperatorByPartition extends RevokeOperatorByPartitionParams {}
-  export interface OperatorTransferByPartition extends OperatorTransferByPartitionParams {}
-  export interface SetController extends SetControllerParams {}
-  export interface DisableController extends DisableControllerParams {}
-  export interface ControllerTransfer extends ControllerTransferParams {}
-  export interface ControllerRedeem extends ControllerRedeemParams {}
-  export interface AddModule extends AddModuleParams {}
-  export interface AddNoDataModule extends AddNoDataModuleParams {}
-  export interface AddVestingEscrowWallet extends AddVestingEscrowWalletParams {}
-  export interface AddCountTransferManager extends AddCountTransferManagerParams {}
-  export interface AddPercentageTransferManager extends AddPercentageTransferManagerParams {}
-  export interface AddDividendCheckpoint extends AddDividendCheckpointParams {}
-  export interface AddCappedSTO extends AddCappedSTOParams {}
-  export interface AddUSDTieredSTO extends AddUSDTieredSTOParams {}
+interface ApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Approval;
+  callback: EventCallback<ISecurityTokenApprovalEventArgs_3_0_0>;
+}
+
+interface GetApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Approval;
+}
+
+interface TransferSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
+  callback: EventCallback<ISecurityTokenTransferEventArgs_3_0_0>;
+}
+
+interface GetTransferLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Transfer;
+}
+
+interface ModuleAddedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
+  callback: EventCallback<ISecurityTokenModuleAddedEventArgs_3_0_0>;
+}
+
+interface GetModuleAddedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleAdded;
+}
+
+interface ModuleUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+  callback: EventCallback<SecurityTokenModuleUpgradedEventArgs_3_0_0>;
+}
+
+interface GetModuleUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUpgraded;
+}
+
+interface UpdateTokenDetailsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
+  callback: EventCallback<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>;
+}
+
+interface GetUpdateTokenDetailsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenDetails;
+}
+
+interface UpdateTokenNameSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
+  callback: EventCallback<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>;
+}
+
+interface GetUpdateTokenNameLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.UpdateTokenName;
+}
+
+interface GranularityChangedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
+  callback: EventCallback<ISecurityTokenGranularityChangedEventArgs_3_0_0>;
+}
+
+interface GetGranularityChangedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.GranularityChanged;
+}
+
+interface ModuleArchivedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
+  callback: EventCallback<ISecurityTokenModuleArchivedEventArgs_3_0_0>;
+}
+
+interface GetModuleArchivedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleArchived;
+}
+
+interface ModuleUnarchivedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
+  callback: EventCallback<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>;
+}
+
+interface GetModuleUnarchivedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleUnarchived;
+}
+
+interface ModuleRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
+  callback: EventCallback<ISecurityTokenModuleRemovedEventArgs_3_0_0>;
+}
+
+interface GetModuleRemovedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleRemoved;
+}
+
+interface ModuleBudgetChangedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+  callback: EventCallback<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>;
+}
+
+interface GetModuleBudgetChangedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ModuleBudgetChanged;
+}
+
+interface TransferByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
+  callback: EventCallback<ISecurityTokenTransferByPartitionEventArgs_3_0_0>;
+}
+
+interface GetTransferByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TransferByPartition;
+}
+
+interface AuthorizedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
+  callback: EventCallback<ISecurityTokenAuthorizedOperatorEventArgs_3_0_0>;
+}
+
+interface GetAuthorizedOperatorLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperator;
+}
+
+interface RevokedOperatorSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
+  callback: EventCallback<ISecurityTokenRevokedOperatorEventArgs_3_0_0>;
+}
+
+interface GetRevokedOperatorLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperator;
+}
+
+interface AuthorizedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+  callback: EventCallback<ISecurityTokenAuthorizedOperatorByPartitionEventArgs_3_0_0>;
+}
+
+interface GetAuthorizedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.AuthorizedOperatorByPartition;
+}
+
+interface RevokedOperatorByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+  callback: EventCallback<ISecurityTokenRevokedOperatorByPartitionEventArgs_3_0_0>;
+}
+
+interface GetRevokedOperatorByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RevokedOperatorByPartition;
+}
+
+interface IssuedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
+  callback: EventCallback<ISecurityTokenIssuedByPartitionEventArgs_3_0_0>;
+}
+
+interface GetIssuedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.IssuedByPartition;
+}
+
+interface RedeemedByPartitionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
+  callback: EventCallback<ISecurityTokenRedeemedByPartitionEventArgs_3_0_0>;
+}
+
+interface GetRedeemedByPartitionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.RedeemedByPartition;
+}
+
+interface ControllerTransferSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
+  callback: EventCallback<ISecurityTokenControllerTransferEventArgs_3_0_0>;
+}
+
+interface GetControllerTransferLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ControllerTransfer;
+}
+
+interface ControllerRedemptionSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
+  callback: EventCallback<ISecurityTokenControllerRedemptionEventArgs_3_0_0>;
+}
+
+interface GetControllerRedemptionLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.ControllerRedemption;
+}
+
+interface DocumentRemovedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
+  callback: EventCallback<ISecurityTokenDocumentRemovedEventArgs_3_0_0>;
+}
+
+interface GetDocumentRemovedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DocumentRemoved;
+}
+
+interface DocumentUpdatedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
+  callback: EventCallback<ISecurityTokenDocumentUpdatedEventArgs_3_0_0>;
+}
+
+interface GetDocumentUpdatedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DocumentUpdated;
+}
+
+interface FreezeTransfersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
+  callback: EventCallback<ISecurityTokenFreezeTransfersEventArgs_3_0_0>;
+}
+
+interface GetFreezeTransfersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.FreezeTransfers;
+}
+
+interface CheckpointCreatedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
+  callback: EventCallback<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>;
+}
+
+interface GetCheckpointCreatedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.CheckpointCreated;
+}
+
+interface FreezeIssuanceSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
+  callback: EventCallback<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>;
+}
+
+interface GetFreezeIssuanceLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.FreezeIssuance;
+}
+
+interface IssuedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Issued;
+  callback: EventCallback<ISecurityTokenIssuedEventArgs_3_0_0>;
+}
+
+interface GetIssuedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Issued;
+}
+
+interface RedeemedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
+  callback: EventCallback<ISecurityTokenRedeemedEventArgs_3_0_0>;
+}
+
+interface GetRedeemedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.Redeemed;
+}
+
+interface SetControllerSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.SetController;
+  callback: EventCallback<ISecurityTokenSetControllerEventArgs_3_0_0>;
+}
+
+interface GetSetControllerLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.SetController;
+}
+
+interface TreasuryWalletChangedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+  callback: EventCallback<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>;
+}
+
+interface GetTreasuryWalletChangedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TreasuryWalletChanged;
+}
+
+interface DisableControllerSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
+  callback: EventCallback<ISecurityTokenDisableControllerEventArgs_3_0_0>;
+}
+
+interface GetDisableControllerLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.DisableController;
+}
+
+interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>;
+}
+
+interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.OwnershipTransferred;
+}
+
+interface TokenUpgradedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
+  callback: EventCallback<ISecurityTokenTokenUpgradedEventArgs_3_0_0>;
+}
+
+interface GetTokenUpgradedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: SecurityTokenEvents_3_0_0.TokenUpgraded;
+}
+
+export interface SecurityTokenSubscribeAsyncParams extends Subscribe {
+  (params: ApprovalSubscribeAsyncParams): Promise<string>;
+  (params: TransferSubscribeAsyncParams): Promise<string>;
+  (params: ModuleAddedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUpgradedSubscribeAsyncParams): Promise<string>;
+  (params: UpdateTokenDetailsSubscribeAsyncParams): Promise<string>;
+  (params: UpdateTokenNameSubscribeAsyncParams): Promise<string>;
+  (params: GranularityChangedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleArchivedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleUnarchivedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleRemovedSubscribeAsyncParams): Promise<string>;
+  (params: ModuleBudgetChangedSubscribeAsyncParams): Promise<string>;
+  (params: TransferByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: AuthorizedOperatorSubscribeAsyncParams): Promise<string>;
+  (params: RevokedOperatorSubscribeAsyncParams): Promise<string>;
+  (params: AuthorizedOperatorByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: RevokedOperatorByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: IssuedByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: RedeemedByPartitionSubscribeAsyncParams): Promise<string>;
+  (params: ControllerTransferSubscribeAsyncParams): Promise<string>;
+  (params: ControllerRedemptionSubscribeAsyncParams): Promise<string>;
+  (params: DocumentRemovedSubscribeAsyncParams): Promise<string>;
+  (params: DocumentUpdatedSubscribeAsyncParams): Promise<string>;
+  (params: FreezeTransfersSubscribeAsyncParams): Promise<string>;
+  (params: CheckpointCreatedSubscribeAsyncParams): Promise<string>;
+  (params: FreezeIssuanceSubscribeAsyncParams): Promise<string>;
+  (params: IssuedSubscribeAsyncParams): Promise<string>;
+  (params: RedeemedSubscribeAsyncParams): Promise<string>;
+  (params: SetControllerSubscribeAsyncParams): Promise<string>;
+  (params: TreasuryWalletChangedSubscribeAsyncParams): Promise<string>;
+  (params: DisableControllerSubscribeAsyncParams): Promise<string>;
+  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
+  (params: TokenUpgradedSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetSecurityTokenLogsAsyncParams extends GetLogs {
+  (params: GetApprovalLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenApprovalEventArgs_3_0_0>[]>;
+  (params: GetTransferLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTransferEventArgs_3_0_0>[]>;
+  (params: GetModuleAddedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleAddedEventArgs_3_0_0>[]>;
+  (params: GetModuleUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<SecurityTokenModuleUpgradedEventArgs_3_0_0>[]>;
+  (params: GetUpdateTokenDetailsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenUpdateTokenDetailsEventArgs_3_0_0>[]
+  >;
+  (params: GetUpdateTokenNameLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenUpdateTokenNameEventArgs_3_0_0>[]
+  >;
+  (params: GetGranularityChangedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenGranularityChangedEventArgs_3_0_0>[]
+  >;
+  (params: GetModuleArchivedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenModuleArchivedEventArgs_3_0_0>[]
+  >;
+  (params: GetModuleUnarchivedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenModuleUnarchivedEventArgs_3_0_0>[]
+  >;
+  (params: GetModuleRemovedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenModuleRemovedEventArgs_3_0_0>[]>;
+  (params: GetModuleBudgetChangedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
+  >;
+  (params: GetTransferByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenModuleBudgetChangedEventArgs_3_0_0>[]
+  >;
+  (params: GetAuthorizedOperatorLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetRevokedOperatorLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetAuthorizedOperatorByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetRevokedOperatorByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetIssuedByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetRedeemedByPartitionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetControllerTransferLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetControllerRedemptionLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetDocumentRemovedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetDocumentUpdatedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetFreezeTransfersLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeTransfersEventArgs_3_0_0>[]
+  >;
+  (params: GetCheckpointCreatedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenCheckpointCreatedEventArgs_3_0_0>[]
+  >;
+  (params: GetFreezeIssuanceLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenFreezeIssuanceEventArgs_3_0_0>[]
+  >;
+  (params: GetIssuedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenIssuedEventArgs_3_0_0>[]>;
+  (params: GetRedeemedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenRedeemedEventArgs_3_0_0>[]>;
+  (params: GetSetControllerLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenSetControllerEventArgs_3_0_0>[]>;
+  (params: GetTreasuryWalletChangedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenTreasuryWalletChangedEventArgs_3_0_0>[]
+  >;
+  (params: GetDisableControllerLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenDisableControllerEventArgs_3_0_0>[]
+  >;
+  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ISecurityTokenOwnershipTransferredEventArgs_3_0_0>[]
+  >;
+  (params: GetTokenUpgradedLogsAsyncParams): Promise<LogWithDecodedArgs<ISecurityTokenTokenUpgradedEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -128,7 +526,7 @@ interface PartitionsOfParams {
 /**
  * @param signature calldata
  */
-interface FreezeIssuanceParams extends TxParams {
+export interface FreezeIssuanceParams extends TxParams {
   signature: string;
 }
 
@@ -149,14 +547,14 @@ interface ModuleAddressParams {
 /**
  * @param module address of the module
  */
-interface ModuleAddressTxParams extends TxParams {
+export interface ModuleAddressTxParams extends TxParams {
   moduleAddress: string;
 }
 
 /**
  * @param dataStore Address of the token data store
  */
-interface DataStoreAddressParams extends TxParams {
+export interface DataStoreAddressParams extends TxParams {
   dataStore: string;
 }
 
@@ -166,7 +564,7 @@ interface DataStoreAddressParams extends TxParams {
  * @param uri Off-chain uri of the document from where it is accessible to investors/advisors to read.
  * @param documentHash hash (of the contents) of the document.
  */
-interface SetDocumentParams extends TxParams {
+export interface SetDocumentParams extends TxParams {
   name: string;
   uri: string;
   documentHash: string;
@@ -175,14 +573,14 @@ interface SetDocumentParams extends TxParams {
 /**
  * @param name Name of the document. It should be unique always
  */
-interface DocumentParams extends TxParams {
+export interface DocumentParams extends TxParams {
   name: string;
 }
 
 /**
  * @param treasuryWallet Ethereum address of the treasury wallet
  */
-interface ChangeTreasuryWalletParams extends TxParams {
+export interface ChangeTreasuryWalletParams extends TxParams {
   treasuryWallet: string;
 }
 
@@ -216,7 +614,7 @@ interface CanTransferByPartitionParams extends CanTransferFromParams {
  * @param spender Address spending tokens
  * @param value Value associated to approval
  */
-interface ChangeApprovalParams extends TxParams {
+export interface ChangeApprovalParams extends TxParams {
   spender: string;
   value: BigNumber;
 }
@@ -224,7 +622,7 @@ interface ChangeApprovalParams extends TxParams {
 /**
  * @param newOwner Address to transfer ownership to
  */
-interface TransferOwnershipParams extends TxParams {
+export interface TransferOwnershipParams extends TxParams {
   newOwner: string;
 }
 
@@ -239,7 +637,7 @@ interface ModuleNameParams {
  * @param tokenContract Address of the ERC20Basic compliance token
  * @param value Amount of POLY to withdraw
  */
-interface WithdrawERC20Params extends TxParams {
+export interface WithdrawERC20Params extends TxParams {
   tokenContract: string;
   value: BigNumber;
 }
@@ -249,7 +647,7 @@ interface WithdrawERC20Params extends TxParams {
  * @param change Change in allowance
  * @param increase True if budget has to be increased, false if decrease
  */
-interface ChangeModuleBudgetParams extends TxParams {
+export interface ChangeModuleBudgetParams extends TxParams {
   module: string;
   change: BigNumber;
   increase: boolean;
@@ -258,21 +656,21 @@ interface ChangeModuleBudgetParams extends TxParams {
 /**
  * @param newTokenDetails New token details
  */
-interface UpdateTokenDetailsParams extends TxParams {
+export interface UpdateTokenDetailsParams extends TxParams {
   newTokenDetails: string;
 }
 
 /**
  * @param granularity Granularity level of the token
  */
-interface ChangeGranularityParams extends TxParams {
+export interface ChangeGranularityParams extends TxParams {
   granularity: number;
 }
 
 /**
  * @param name new name of the token
  */
-interface ChangeNameParams extends TxParams {
+export interface ChangeNameParams extends TxParams {
   name: string;
 }
 /**
@@ -305,7 +703,7 @@ interface IterateInvestorsParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface TransferWithDataParams extends TxParams {
+export interface TransferWithDataParams extends TxParams {
   to: string;
   value: BigNumber;
   data: string;
@@ -317,7 +715,7 @@ interface TransferWithDataParams extends TxParams {
  * @param value value of transfer
  * @param data data to indicate validation
  */
-interface TransferFromWithDataParams extends TxParams {
+export interface TransferFromWithDataParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -329,7 +727,7 @@ interface TransferFromWithDataParams extends TxParams {
  * @param value The amount of tokens need to be issued
  * @param data The `bytes data` allows arbitrary data to be submitted alongside the transfer.
  */
-interface IssueParams extends TxParams {
+export interface IssueParams extends TxParams {
   investor: string;
   value: BigNumber;
   data?: string;
@@ -338,7 +736,7 @@ interface IssueParams extends TxParams {
 /**
  * @param partition The partition to allocate the increase in balance
  */
-interface IssueByPartitionParams extends IssueParams {
+export interface IssueByPartitionParams extends IssueParams {
   partition: Partition;
 }
 
@@ -346,7 +744,7 @@ interface IssueByPartitionParams extends IssueParams {
  * @param investors A list of addresses to whom the minted tokens will be dilivered
  * @param values A list of number of tokens get minted and transfer to corresponding address of the investor from tokenHolders[] list
  */
-interface IssueMultiParams extends TxParams {
+export interface IssueMultiParams extends TxParams {
   investors: string[];
   values: BigNumber[];
 }
@@ -366,7 +764,7 @@ interface CheckPermissionParams {
  * @param value The amount of tokens need to be redeemed
  * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
  */
-interface RedeemParams extends TxParams {
+export interface RedeemParams extends TxParams {
   value: BigNumber;
   data: string;
 }
@@ -374,7 +772,7 @@ interface RedeemParams extends TxParams {
 /**
  * @param partition The partition to allocate the decrease in balance
  */
-interface RedeemByPartitionParams extends RedeemParams {
+export interface RedeemByPartitionParams extends RedeemParams {
   partition: Partition;
 }
 
@@ -382,7 +780,7 @@ interface RedeemByPartitionParams extends RedeemParams {
  * @param tokenHolder The token holder whose balance should be decreased
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
-interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
+export interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
   tokenHolder: string;
   operatorData: string;
 }
@@ -392,7 +790,7 @@ interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams {
  * @param value The amount of tokens need to be redeemed
  * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
  */
-interface RedeemFromParams extends TxParams {
+export interface RedeemFromParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
@@ -422,7 +820,7 @@ interface BalanceOfByPartitionParams {
  * @param value The amount of tokens to transfer from `partition`
  * @param data Additional data attached to the transfer of tokens
  */
-interface TransferByPartitionParams extends TxParams {
+export interface TransferByPartitionParams extends TxParams {
   partition: Partition;
   to: string;
   value: BigNumber;
@@ -432,28 +830,28 @@ interface TransferByPartitionParams extends TxParams {
 /**
  * @param operator An address which is being authorised.
  */
-interface AuthorizeOperatorParams extends TxParams {
+export interface AuthorizeOperatorParams extends TxParams {
   operator: string;
 }
 
 /**
  * @param partition The partition to which the operator is authorised
  */
-interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
+export interface AuthorizeOperatorByPartitionParams extends AuthorizeOperatorParams {
   partition: Partition;
 }
 
 /**
  * @param operator An address which is being de-authorised
  */
-interface RevokeOperatorParams extends TxParams {
+export interface RevokeOperatorParams extends TxParams {
   operator: string;
 }
 
 /**
  * @param partition The partition to which the operator is de-authorised
  */
-interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
+export interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
   partition: Partition;
 }
 
@@ -461,7 +859,7 @@ interface RevokeOperatorByPartitionParams extends RevokeOperatorParams {
  * @param from The address from which to transfer tokens from
  * @param operatorData Additional data attached to the transfer of tokens by the operator
  */
-interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
+export interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
   from: string;
   operatorData: string;
 }
@@ -469,14 +867,14 @@ interface OperatorTransferByPartitionParams extends TransferByPartitionParams {
 /**
  * @param controller address of the controller
  */
-interface SetControllerParams extends TxParams {
+export interface SetControllerParams extends TxParams {
   controller: string;
 }
 
 /**
  * @param signature calldata
  */
-interface DisableControllerParams extends TxParams {
+export interface DisableControllerParams extends TxParams {
   signature: string;
 }
 
@@ -489,7 +887,7 @@ interface DisableControllerParams extends TxParams {
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
  */
-interface ControllerTransferParams extends TxParams {
+export interface ControllerTransferParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
@@ -505,7 +903,7 @@ interface ControllerTransferParams extends TxParams {
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
  */
-interface ControllerRedeemParams extends TxParams {
+export interface ControllerRedeemParams extends TxParams {
   from: string;
   value: BigNumber;
   data: string;
@@ -521,7 +919,7 @@ interface ControllerRedeemParams extends TxParams {
  * @param label is the label of the module
  * @param data is data packed into bytes used to further configure the module (See STO usage)
  */
-interface AddModuleParams extends TxParams {
+export interface AddModuleParams extends TxParams {
   moduleName: ModuleName;
   address: string;
   archived: boolean;
@@ -544,7 +942,7 @@ interface AddModuleParams extends TxParams {
  * @param data is data packed into bytes used to further configure the module (here no data)
  */
 
-interface AddNoDataModuleParams extends AddModuleParams {
+export interface AddNoDataModuleParams extends AddModuleParams {
   moduleName:
     | ModuleName.GeneralPermissionManager
     | ModuleName.GeneralTransferManager
@@ -556,7 +954,7 @@ interface AddNoDataModuleParams extends AddModuleParams {
   data?: undefined;
 }
 
-interface AddVestingEscrowWalletParams extends AddModuleParams {
+export interface AddVestingEscrowWalletParams extends AddModuleParams {
   moduleName: ModuleName.VestingEscrowWallet;
   data: VestingEscrowWalletData;
 }
@@ -566,32 +964,32 @@ interface AddAdvancedPLCRVotingCheckpointParams extends AddModuleParams {
   data: VestingEscrowWalletData;
 }
 
-interface AddCountTransferManagerParams extends AddModuleParams {
+export interface AddCountTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.CountTransferManager;
   data: CountTransferManagerData;
 }
 
-interface AddPercentageTransferManagerParams extends AddModuleParams {
+export interface AddPercentageTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.PercentageTransferManager;
   data: PercentageTransferManagerData;
 }
 
-interface AddRestrictedPartialSaleTransferManagerParams extends AddModuleParams {
+export interface AddRestrictedPartialSaleTransferManagerParams extends AddModuleParams {
   moduleName: ModuleName.RestrictedPartialSaleTM;
   data: RestrictedPartialSaleTransferManagerData;
 }
 
-interface AddDividendCheckpointParams extends AddModuleParams {
+export interface AddDividendCheckpointParams extends AddModuleParams {
   moduleName: ModuleName.EtherDividendCheckpoint | ModuleName.ERC20DividendCheckpoint;
   data: DividendCheckpointData;
 }
 
-interface AddCappedSTOParams extends AddModuleParams {
+export interface AddCappedSTOParams extends AddModuleParams {
   moduleName: ModuleName.CappedSTO;
   data: CappedSTOData;
 }
 
-interface AddUSDTieredSTOParams extends AddModuleParams {
+export interface AddUSDTieredSTOParams extends AddModuleParams {
   moduleName: ModuleName.UsdTieredSTO;
   data: USDTieredSTOData;
 }
@@ -2153,6 +2551,45 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     }
     return { maxCost, budget, data };
   }
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: SecurityTokenSubscribeAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetSecurityTokenLogsAsyncParams = async <ArgsType extends ISecurityTokenEventArgs_3_0_0>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, SecurityTokenEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isSecurityToken(wrapper: ContractWrapper): wrapper is SecurityTokenCommon {

@@ -19,7 +19,7 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { TransferStatusCode, ContractVersion, Subscribe, GetLogs, FULL_DECIMALS } from '../../../../../types';
+import { TransferStatusCode, ContractVersion, FULL_DECIMALS } from '../../../../../types';
 
 describe('VestingEscrowWalletWrapper', () => {
   // we extend the class to be able to instance it, using the 3.0.0 VestingEscrowWallet contract since it has all common functionality
@@ -27,10 +27,6 @@ describe('VestingEscrowWalletWrapper', () => {
     public contract: Promise<VestingEscrowWalletContract_3_0_0>;
 
     public contractVersion!: ContractVersion;
-
-    public subscribeAsync!: Subscribe;
-
-    public getLogsAsync!: GetLogs;
 
     public constructor(
       web3Wrapper: Web3Wrapper,

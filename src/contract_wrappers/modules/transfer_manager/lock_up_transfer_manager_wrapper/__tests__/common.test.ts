@@ -22,7 +22,7 @@ import {
   valueToWei,
   weiToValue,
 } from '../../../../../utils/convert';
-import { Partition, ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { Partition, ContractVersion } from '../../../../../types';
 import LockUpTransferManagerCommon from '../common';
 
 describe('LockUpTransferManagerWrapper', () => {
@@ -32,11 +32,11 @@ describe('LockUpTransferManagerWrapper', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<LockUpTransferManagerContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<LockUpTransferManagerContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -55,11 +55,7 @@ describe('LockUpTransferManagerWrapper', () => {
     mockedSecurityTokenContract = mock(ISecurityTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
-    target = new FakeLockUpTransferManager(
-      instance(mockedWrapper),
-      myContractPromise,
-      instance(mockedContractFactory),
-    );
+    target = new FakeLockUpTransferManager(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
   });
 
   afterEach(() => {

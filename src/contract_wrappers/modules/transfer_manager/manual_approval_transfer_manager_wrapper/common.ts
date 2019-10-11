@@ -1,17 +1,31 @@
 import {
   ManualApprovalTransferManagerContract_3_0_0,
+  ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0,
+  ManualApprovalTransferManagerPauseEventArgs_3_0_0,
+  ManualApprovalTransferManagerUnpauseEventArgs_3_0_0,
+  ManualApprovalTransferManagerEvents_3_0_0,
+  ManualApprovalTransferManagerEventArgs_3_0_0,
   Web3Wrapper,
   BigNumber,
   PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
 import {
-  TxParams,  
+  TxParams,
   Perm,
   ErrorCode,
   TransferResult,
+  Subscribe,
+  GetLogs,
+  GetLogsAsyncParams,
+  EventCallback,
+  SubscribeAsyncParams,
 } from '../../../../types';
 import {
   bigNumberToDate,
@@ -28,13 +42,73 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace ManualApprovalTransferManagerTransactionParams {
-  export interface AddManualApproval extends AddManualApprovalParams {}
-  export interface AddManualApprovalMulti extends AddManualApprovalMultiParams {}
-  export interface ModifyManualApproval extends ModifyManualApprovalParams {}
-  export interface ModifyManualApprovalMulti extends ModifyManualApprovalMultiParams {}
-  export interface RevokeManualApproval extends RevokeManualApprovalParams {}
-  export interface RevokeManualApprovalMulti extends RevokeManualApprovalMultiParams {}
+interface AddManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetAddManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.AddManualApproval;
+}
+
+interface ModifyManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetModifyManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.ModifyManualApproval;
+}
+
+interface RevokeManualApprovalSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
+  callback: EventCallback<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>;
+}
+
+interface GetRevokeManualApprovalLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.RevokeManualApproval;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<ManualApprovalTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ManualApprovalTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface ManualApprovalTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: ModifyManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: RevokeManualApprovalSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetManualApprovalTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerAddManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerModifyManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetRevokeManualApprovalLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerRevokeManualApprovalEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<ManualApprovalTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ManualApprovalTransferManagerUnpauseEventArgs_3_0_0>[]
+  >;
 }
 
 /**
@@ -64,7 +138,7 @@ interface VerifyTransferParams {
  * @param expiryTime is the time until which the transfer is allowed
  * @param description Description about the manual approval
  */
-interface AddManualApprovalParams extends TxParams {
+export interface AddManualApprovalParams extends TxParams {
   from: string;
   to: string;
   allowance: BigNumber;
@@ -79,7 +153,7 @@ interface AddManualApprovalParams extends TxParams {
  * @param expiryTimes is the array of the times until which eath transfer is allowed
  * @param descriptions is the description array for these manual approvals
  */
-interface AddManualApprovalMultiParams extends TxParams {
+export interface AddManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
   allowances: BigNumber[];
@@ -96,7 +170,7 @@ interface AddManualApprovalMultiParams extends TxParams {
  * @param increase tells whether the allowances will be increased (true) or decreased (false).
  * or any value when there is no change in allowances
  */
-interface ModifyManualApprovalParams extends TxParams {
+export interface ModifyManualApprovalParams extends TxParams {
   from: string;
   to: string;
   expiryTime: Date;
@@ -114,7 +188,7 @@ interface ModifyManualApprovalParams extends TxParams {
  * @param increase Array of bools that tells whether the allowances will be increased (true) or decreased (false).
  * or any value when there is no change in allowances
  */
-interface ModifyManualApprovalMultiParams extends TxParams {
+export interface ModifyManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
   expiryTimes: Date[];
@@ -127,7 +201,7 @@ interface ModifyManualApprovalMultiParams extends TxParams {
  * @param from is the address from which transfers are approved
  * @param to is the address to which transfers are approved
  */
-interface RevokeManualApprovalParams extends TxParams {
+export interface RevokeManualApprovalParams extends TxParams {
   from: string;
   to: string;
 }
@@ -136,7 +210,7 @@ interface RevokeManualApprovalParams extends TxParams {
  * @param from is the address array from which transfers are approved
  * @param to is the address array to which transfers are approved
  */
-interface RevokeManualApprovalMultiParams extends TxParams {
+export interface RevokeManualApprovalMultiParams extends TxParams {
   from: string[];
   to: string[];
 }
@@ -502,8 +576,53 @@ export default abstract class ManualApprovalTransferManagerCommon extends Module
     assert.isBigNumberGreaterThanZero(approval.allowance, 'Approval does not exist');
     assert.isFutureDate(approval.expiryTime, 'Approval does not exist');
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: ManualApprovalTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetManualApprovalTransferManagerLogsAsyncParams = async <
+    ArgsType extends ManualApprovalTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ManualApprovalTransferManagerEvents_3_0_0);
+    const normalizedContract_3_0_0Address = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContract_3_0_0Address,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
-export function isManualApprovalTransferManager(wrapper: ContractWrapper): wrapper is ManualApprovalTransferManagerCommon {
+export function isManualApprovalTransferManager(
+  wrapper: ContractWrapper,
+): wrapper is ManualApprovalTransferManagerCommon {
   return wrapper instanceof ManualApprovalTransferManagerCommon;
-};
+}

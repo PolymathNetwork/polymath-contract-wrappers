@@ -1,15 +1,44 @@
 import {
-  BigNumber,
   GeneralTransferManagerContract_3_0_0,
-  PolyResponse,
   USDTieredSTOContract_3_0_0,
   USDTieredSTOContract_3_1_0,
+  USDTieredSTOEvents_3_0_0,
+  USDTieredSTOEventArgs_3_0_0,
+  USDTieredSTOPauseEventArgs_3_0_0,
+  USDTieredSTOUnpauseEventArgs_3_0_0,
+  USDTieredSTOSetTiersEventArgs_3_0_0,
+  USDTieredSTOSetTimesEventArgs_3_0_0,
+  USDTieredSTOSetLimitsEventArgs_3_0_0,
+  USDTieredSTOSetAddressesEventArgs_3_0_0,
+  USDTieredSTOFundsReceivedEventArgs_3_0_0,
+  USDTieredSTOTokenPurchaseEventArgs_3_0_0,
+  USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0,
+  USDTieredSTOSetTreasuryWalletEventArgs_3_0_0,
+  USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0,
+  USDTieredSTOReserveTokenMintEventArgs_3_0_0,
+  USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0,
+  BigNumber,
+  PolyResponse,
   Web3Wrapper,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { STOCommon } from '../sto_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
-import { ContractVersion, ErrorCode, FULL_DECIMALS, FundRaiseType, ModuleName, TxParams } from '../../../../types';
+import {
+  ContractVersion,
+  ErrorCode,
+  FULL_DECIMALS,
+  FundRaiseType,
+  ModuleName,
+  TxParams,
+  SubscribeAsyncParams,
+  GetLogsAsyncParams,
+  EventCallback,
+  Subscribe,
+  GetLogs,
+} from '../../../../types';
 import {
   bigNumberToDate,
   dateToBigNumber,
@@ -25,21 +54,163 @@ import ContractWrapper from '../../../contract_wrapper';
 
 const BIG_NUMBER_ZERO = new BigNumber(0);
 
-export namespace USDTieredSTOTransactionParams {
-  export interface ChangeNonAccreditedLimit extends ChangeNonAccreditedLimitParams {}
-  export interface ModifyTimes extends ModifyTimesParams {}
-  export interface ModifyLimits extends ModifyLimitsParams {}
-  export interface ModifyOracle extends ModifyOracleParams {}
-  export interface ModifyFunding extends ModifyFundingParams {}
-  export interface ModifyAddresses extends ModifyAddressesParams {}
-  export interface ModifyTiers extends ModifyTiersParams {}
-  export interface ChangeAllowBeneficialInvestments extends ChangeAllowBeneficialInvestmentsParams {}
-  export interface BuyWithETH extends BuyWithETHParams {}
-  export interface BuyWithETHRateLimited extends BuyWithETHRateLimitedParams {}
-  export interface BuyWithPOLY extends BuyWithPOLYParams {}
-  export interface BuyWithPOLYRateLimited extends BuyWithPOLYRateLimitedParams {}
-  export interface BuyWithUSD extends BuyWithUSDParams {}
-  export interface BuyWithUSDRateLimited extends BuyWithUSDRateLimitedParams {}
+interface SetAllowBeneficialInvestmentsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments;
+  callback: EventCallback<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0>;
+}
+
+interface GetSetAllowBeneficialInvestmentsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetAllowBeneficialInvestments;
+}
+
+interface SetNonAccreditedLimitSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetNonAccreditedLimit;
+  callback: EventCallback<USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0>;
+}
+
+interface GetSetNonAccreditedLimitLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetNonAccreditedLimit;
+}
+
+interface SetTreasuryWalletSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTreasuryWallet;
+  callback: EventCallback<USDTieredSTOSetTreasuryWalletEventArgs_3_0_0>;
+}
+
+interface GetSetTreasuryWalletLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTreasuryWallet;
+}
+
+interface TokenPurchaseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.TokenPurchase;
+  callback: EventCallback<USDTieredSTOTokenPurchaseEventArgs_3_0_0>;
+}
+
+interface GetTokenPurchaseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.TokenPurchase;
+}
+
+interface FundsReceivedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.FundsReceived;
+  callback: EventCallback<USDTieredSTOFundsReceivedEventArgs_3_0_0>;
+}
+
+interface GetFundsReceivedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.FundsReceived;
+}
+
+interface ReserveTokenMintSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.ReserveTokenMint;
+  callback: EventCallback<USDTieredSTOReserveTokenMintEventArgs_3_0_0>;
+}
+
+interface GetReserveTokenMintLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.ReserveTokenMint;
+}
+
+interface SetAddressesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetAddresses;
+  callback: EventCallback<USDTieredSTOSetAddressesEventArgs_3_0_0>;
+}
+
+interface GetSetAddressesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetAddresses;
+}
+
+interface SetLimitsSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetLimits;
+  callback: EventCallback<USDTieredSTOSetLimitsEventArgs_3_0_0>;
+}
+
+interface GetSetLimitsLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetLimits;
+}
+
+interface SetTimesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTimes;
+  callback: EventCallback<USDTieredSTOSetTimesEventArgs_3_0_0>;
+}
+
+interface GetSetTimesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTimes;
+}
+
+interface SetTiersSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTiers;
+  callback: EventCallback<USDTieredSTOSetTiersEventArgs_3_0_0>;
+}
+
+interface GetSetTiersLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetTiers;
+}
+
+interface SetFundRaiseTypesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetFundRaiseTypes;
+  callback: EventCallback<USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0>;
+}
+
+interface GetSetFundRaiseTypesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.SetFundRaiseTypes;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.Pause;
+  callback: EventCallback<USDTieredSTOPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.Unpause;
+  callback: EventCallback<USDTieredSTOUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_0_0.Unpause;
+}
+
+export interface USDTieredSTOSubscribeAsyncParams extends Subscribe {
+  (params: SetAllowBeneficialInvestmentsSubscribeAsyncParams): Promise<string>;
+  (params: SetNonAccreditedLimitSubscribeAsyncParams): Promise<string>;
+  (params: SetTreasuryWalletSubscribeAsyncParams): Promise<string>;
+  (params: TokenPurchaseSubscribeAsyncParams): Promise<string>;
+  (params: FundsReceivedSubscribeAsyncParams): Promise<string>;
+  (params: ReserveTokenMintSubscribeAsyncParams): Promise<string>;
+  (params: SetAddressesSubscribeAsyncParams): Promise<string>;
+  (params: SetLimitsSubscribeAsyncParams): Promise<string>;
+  (params: SetTimesSubscribeAsyncParams): Promise<string>;
+  (params: SetTiersSubscribeAsyncParams): Promise<string>;
+  (params: SetFundRaiseTypesSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetUSDTieredSTOLogsAsyncParams extends GetLogs {
+  (params: GetSetAllowBeneficialInvestmentsLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetAllowBeneficialInvestmentsEventArgs_3_0_0>[]
+  >;
+  (params: GetSetNonAccreditedLimitLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetNonAccreditedLimitEventArgs_3_0_0>[]
+  >;
+  (params: GetSetTreasuryWalletLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetTreasuryWalletEventArgs_3_0_0>[]
+  >;
+  (params: GetTokenPurchaseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOTokenPurchaseEventArgs_3_0_0>[]>;
+  (params: GetFundsReceivedLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOFundsReceivedEventArgs_3_0_0>[]>;
+  (params: GetReserveTokenMintLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOReserveTokenMintEventArgs_3_0_0>[]
+  >;
+  (params: GetSetAddressesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetAddressesEventArgs_3_0_0>[]>;
+  (params: GetSetLimitsLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetLimitsEventArgs_3_0_0>[]>;
+  (params: GetSetTimesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTimesEventArgs_3_0_0>[]>;
+  (params: GetSetTiersLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetTiersEventArgs_3_0_0>[]>;
+  (params: GetSetFundRaiseTypesLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOSetFundRaiseTypesEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -92,7 +263,7 @@ interface InvestorInvestedParams {
  * @param investors Array of investor addresses to modify
  * @param nonAccreditedLimit Array of uints specifying non-accredited limits
  */
-interface ChangeNonAccreditedLimitParams extends TxParams {
+export interface ChangeNonAccreditedLimitParams extends TxParams {
   investors: string[];
   nonAccreditedLimit: BigNumber[];
 }
@@ -101,7 +272,7 @@ interface ChangeNonAccreditedLimitParams extends TxParams {
  * @param startTime start time of sto
  * @param endTime end time of sto
  */
-interface ModifyTimesParams extends TxParams {
+export interface ModifyTimesParams extends TxParams {
   startTime: Date;
   endTime: Date;
 }
@@ -110,7 +281,7 @@ interface ModifyTimesParams extends TxParams {
  * @param nonAccreditedLimitUSD max non accredited invets limit
  * @param minimumInvestmentUSD overall minimum investment limit
  */
-interface ModifyLimitsParams extends TxParams {
+export interface ModifyLimitsParams extends TxParams {
   nonAccreditedLimitUSD: BigNumber;
   minimumInvestmentUSD: BigNumber;
 }
@@ -119,7 +290,7 @@ interface ModifyLimitsParams extends TxParams {
  * @param nonAccreditedLimitUSD max non accredited invets limit
  * @param minimumInvestmentUSD overall minimum investment limit
  */
-interface ModifyOracleParams extends TxParams {
+export interface ModifyOracleParams extends TxParams {
   fundRaiseType: FundRaiseType;
   oracleAddress: string;
 }
@@ -127,7 +298,7 @@ interface ModifyOracleParams extends TxParams {
 /**
  * @param fundRaiseTypes Array of fund raise types to allow
  */
-interface ModifyFundingParams extends TxParams {
+export interface ModifyFundingParams extends TxParams {
   fundRaiseTypes: FundRaiseType[];
 }
 
@@ -136,7 +307,7 @@ interface ModifyFundingParams extends TxParams {
  * @param treasuryWallet Address of wallet where unsold tokens are sent
  * @param usdTokens Address of usd tokens
  */
-interface ModifyAddressesParams extends TxParams {
+export interface ModifyAddressesParams extends TxParams {
   wallet: string;
   treasuryWallet: string;
   usdTokens: string[];
@@ -148,7 +319,7 @@ interface ModifyAddressesParams extends TxParams {
  * @param tokensPerTierTotal Array of total tokens per tier
  * @param tokensPerTierDiscountPoly Array of discounted tokens per tier
  */
-interface ModifyTiersParams extends TxParams {
+export interface ModifyTiersParams extends TxParams {
   ratePerTier: BigNumber[];
   ratePerTierDiscountPoly: BigNumber[];
   tokensPerTierTotal: BigNumber[];
@@ -158,7 +329,7 @@ interface ModifyTiersParams extends TxParams {
 /**
  * @param allowBeneficialInvestments Boolean to allow or disallow beneficial investments
  */
-interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
+export interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
   allowBeneficialInvestments: boolean;
 }
 
@@ -166,7 +337,7 @@ interface ChangeAllowBeneficialInvestmentsParams extends TxParams {
  * @param beneficiary Address of beneficiary for tokens
  * @param ETH value used to buy
  */
-interface BuyWithETHParams extends TxParams {
+export interface BuyWithETHParams extends TxParams {
   beneficiary: string;
   value: BigNumber;
 }
@@ -174,7 +345,7 @@ interface BuyWithETHParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
+export interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
   minTokens: BigNumber;
 }
 
@@ -182,7 +353,7 @@ interface BuyWithETHRateLimitedParams extends BuyWithETHParams {
  * @param beneficiary Address of beneficiary for tokens
  * @param investedPOLY Value of poly invested
  */
-interface BuyWithPOLYParams extends TxParams {
+export interface BuyWithPOLYParams extends TxParams {
   beneficiary: string;
   investedPOLY: BigNumber;
 }
@@ -190,7 +361,7 @@ interface BuyWithPOLYParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
+export interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
   minTokens: BigNumber;
 }
 
@@ -199,7 +370,7 @@ interface BuyWithPOLYRateLimitedParams extends BuyWithPOLYParams {
  * @param investedSC Amount of stable coin invested
  * @param usdToken USD stable coin address to buy tokens with
  */
-interface BuyWithUSDParams extends TxParams {
+export interface BuyWithUSDParams extends TxParams {
   beneficiary: string;
   investedSC: BigNumber;
   usdToken: string;
@@ -208,7 +379,7 @@ interface BuyWithUSDParams extends TxParams {
 /**
  * @param minTokens Minimum amount of tokens to buy else revert
  */
-interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
+export interface BuyWithUSDRateLimitedParams extends BuyWithUSDParams {
   minTokens: BigNumber;
 }
 
@@ -923,8 +1094,47 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
       );
     }
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: USDTieredSTOSubscribeAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetUSDTieredSTOLogsAsyncParams = async <ArgsType extends USDTieredSTOEventArgs_3_0_0>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, USDTieredSTOEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isUSDTieredSTO(wrapper: ContractWrapper): wrapper is USDTieredSTOCommon {
   return wrapper instanceof USDTieredSTOCommon;
-};
+}

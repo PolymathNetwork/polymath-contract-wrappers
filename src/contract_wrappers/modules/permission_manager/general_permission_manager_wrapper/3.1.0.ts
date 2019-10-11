@@ -1,69 +1,16 @@
-import {
-  GeneralPermissionManagerContract_3_1_0,
-  GeneralPermissionManagerEventArgs_3_1_0,
-  GeneralPermissionManagerEvents_3_1_0,
-  GeneralPermissionManagerChangePermissionEventArgs_3_1_0,
-  GeneralPermissionManagerAddDelegateEventArgs_3_1_0,
-  Web3Wrapper,
-  LogWithDecodedArgs,
-  PolyResponse,
-} from '@polymathnetwork/abi-wrappers';
-import { schemas } from '@0x/json-schemas';
+import { GeneralPermissionManagerContract_3_1_0, Web3Wrapper, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import assert from '../../../../utils/assert';
 import ContractFactory from '../../../../factories/contractFactory';
-import {
-  TxParams,
-  GetLogsAsyncParams,
-  SubscribeAsyncParams,
-  EventCallback,
-  GetLogs,
-  Subscribe,
-  Perm,
-  ErrorCode,
-  ContractVersion,
-  Constructor,
-} from '../../../../types';
+import { TxParams, Perm, ErrorCode, ContractVersion, Constructor } from '../../../../types';
 import { stringArrayToBytes32Array } from '../../../../utils/convert';
 import GeneralPermissionManagerCommon from './common';
 import { WithModule_3_0_0 } from '../../module_wrapper';
-
-interface ChangePermissionSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.ChangePermission;
-  callback: EventCallback<GeneralPermissionManagerChangePermissionEventArgs_3_1_0>;
-}
-
-interface GetChangePermissionLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.ChangePermission;
-}
-
-interface AddDelegateSubscribeAsyncParams extends SubscribeAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.AddDelegate;
-  callback: EventCallback<GeneralPermissionManagerAddDelegateEventArgs_3_1_0>;
-}
-
-interface GetAddDelegateLogsAsyncParams extends GetLogsAsyncParams {
-  eventName: GeneralPermissionManagerEvents_3_1_0.AddDelegate;
-}
-
-interface GeneralPermissionManagerSubscribeAsyncParams extends Subscribe {
-  (params: ChangePermissionSubscribeAsyncParams): Promise<string>;
-  (params: AddDelegateSubscribeAsyncParams): Promise<string>;
-}
-
-interface GetGeneralPermissionManagerLogsAsyncParams extends GetLogs {
-  (params: GetChangePermissionLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralPermissionManagerChangePermissionEventArgs_3_1_0>[]
-  >;
-  (params: GetAddDelegateLogsAsyncParams): Promise<
-    LogWithDecodedArgs<GeneralPermissionManagerAddDelegateEventArgs_3_1_0>[]
-  >;
-}
 
 /**
  * @param delegates An array of Ethereum addresses of the delegates
  * @param details An array of details about the delegates i.e `Belongs to financial firm`
  */
-interface AddDelegateMultiParams extends TxParams {
+export interface AddDelegateMultiParams extends TxParams {
   delegates: string[];
   details: string[];
 }
@@ -71,12 +18,14 @@ interface AddDelegateMultiParams extends TxParams {
 /**
  * @param delegates An array of Ethereum address of delegates
  */
-interface DeleteDelegateMultiParams extends TxParams {
+export interface DeleteDelegateMultiParams extends TxParams {
   delegates: string[];
 }
 
 // uses 3.0.0 Module contract
-const GeneralPermissionManagerBase_3_1_0 = WithModule_3_0_0(GeneralPermissionManagerCommon as unknown as Constructor<GeneralPermissionManagerCommon>);
+const GeneralPermissionManagerBase_3_1_0 = WithModule_3_0_0((GeneralPermissionManagerCommon as unknown) as Constructor<
+  GeneralPermissionManagerCommon
+>);
 
 /**
  * This class includes the functionality related to interacting with the General Permission Manager contract.
@@ -167,49 +116,6 @@ export class GeneralPermissionManager_3_1_0 extends GeneralPermissionManagerBase
       ErrorCode.NotFound,
       'Delegate does not exist',
     );
-  };
-
-  /**
-   * Subscribe to an event type emitted by the contract.
-   * @return Subscription token used later to unsubscribe
-   */
-  public subscribeAsync: GeneralPermissionManagerSubscribeAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs_3_1_0
-  >(
-    params: SubscribeAsyncParams,
-  ): Promise<string> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_1_0);
-    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
-    assert.isFunction('callback', params.callback);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const subscriptionToken = await this.subscribeInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.indexFilterValues,
-      params.callback,
-      params.isVerbose,
-    );
-    return subscriptionToken;
-  };
-
-  /**
-   * Gets historical logs without creating a subscription
-   * @return Array of logs that match the parameters
-   */
-  public getLogsAsync: GetGeneralPermissionManagerLogsAsyncParams = async <
-    ArgsType extends GeneralPermissionManagerEventArgs_3_1_0
-  >(
-    params: GetLogsAsyncParams,
-  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
-    assert.doesBelongToStringEnum('eventName', params.eventName, GeneralPermissionManagerEvents_3_1_0);
-    const normalizedContractAddress = (await this.contract).address.toLowerCase();
-    const logs = await this.getLogsAsyncInternal<ArgsType>(
-      normalizedContractAddress,
-      params.eventName,
-      params.blockRange,
-      params.indexFilterValues,
-    );
-    return logs;
   };
 }
 

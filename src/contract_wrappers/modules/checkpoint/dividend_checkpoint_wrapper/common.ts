@@ -14,19 +14,6 @@ import {
 
 const EXCLUDED_ADDRESS_LIMIT = 150;
 
-export namespace DividendCheckpointTransactionParams {
-  export interface ChangeWallet extends ChangeWalletParams {}
-  export interface SetDefaultExcluded extends SetDefaultExcludedParams {}
-  export interface SetWithholding extends SetWithholdingParams {}
-  export interface SetWithholdingFixed extends SetWithholdingFixedParams {}
-  export interface PushDividendPaymentToAddresses extends PushDividendPaymentToAddressesParams {}
-  export interface PushDividendPayment extends PushDividendPaymentParams {}
-  export interface PullDividendPayment extends DividendIndexTxParams {}
-  export interface ReclaimDividend extends DividendIndexTxParams {}
-  export interface WithdrawWithholding extends DividendIndexTxParams {}
-  export interface UpdateDividendDates extends UpdateDividendDatesParams {}
-}
-
 /**
  * @param dividendIndex Index of the dividend
  */
@@ -69,14 +56,14 @@ interface InvestorStatus {
 /**
  * @param wallet Ethereum account address to receive reclaimed dividends and tax
  */
-interface ChangeWalletParams extends TxParams {
+export interface ChangeWalletParams extends TxParams {
   wallet: string;
 }
 
 /**
  * @param excluded Addresses of investors
  */
-interface SetDefaultExcludedParams extends TxParams {
+export interface SetDefaultExcludedParams extends TxParams {
   excluded: string[];
 }
 
@@ -84,7 +71,7 @@ interface SetDefaultExcludedParams extends TxParams {
  * @param investors Addresses of investors
  * @param withholding Withholding tax array for individual investors
  */
-interface SetWithholdingParams extends TxParams {
+export interface SetWithholdingParams extends TxParams {
   investors: string[];
   withholding: BigNumber[];
 }
@@ -93,7 +80,7 @@ interface SetWithholdingParams extends TxParams {
  * @param investors Addresses of investor
  * @param withholding Single withholding tax for all investors
  */
-interface SetWithholdingFixedParams extends TxParams {
+export interface SetWithholdingFixedParams extends TxParams {
   investors: string[];
   withholding: BigNumber;
 }
@@ -102,7 +89,7 @@ interface SetWithholdingFixedParams extends TxParams {
  * @param dividendIndex Dividend index to push
  * @param payees Addresses to which to push the dividend
  */
-interface PushDividendPaymentToAddressesParams extends TxParams {
+export interface PushDividendPaymentToAddressesParams extends TxParams {
   dividendIndex: number;
   payees: string[];
 }
@@ -112,7 +99,7 @@ interface PushDividendPaymentToAddressesParams extends TxParams {
  * @param start Index in investor list at which to start pushing dividends
  * @param end Index in investor list at which to stop pushing dividends
  */
-interface PushDividendPaymentParams extends TxParams {
+export interface PushDividendPaymentParams extends TxParams {
   dividendIndex: number;
   start: number;
   end: number;
@@ -121,7 +108,7 @@ interface PushDividendPaymentParams extends TxParams {
 /**
  * @param dividendIndex Dividend index to use
  */
-interface DividendIndexTxParams extends TxParams {
+export interface DividendIndexTxParams extends TxParams {
   dividendIndex: number;
 }
 
@@ -130,7 +117,7 @@ interface DividendIndexTxParams extends TxParams {
  * @param maturity Updated maturity date
  * @param expiry Updated expiry date
  */
-interface UpdateDividendDatesParams extends TxParams {
+export interface UpdateDividendDatesParams extends TxParams {
   dividendIndex: number;
   maturity: Date;
   expiry: Date;

@@ -12,7 +12,7 @@ import ERC20DividendCheckpointCommon from '../common';
 import ContractFactory from '../../../../../factories/contractFactory';
 import { DividendCheckpointCommon } from '../../dividend_checkpoint_wrapper';
 import { dateToBigNumber, stringToBytes32, valueToWei } from '../../../../../utils/convert';
-import { ContractVersion, Subscribe, GetLogs } from '../../../../../types';
+import { ContractVersion } from '../../../../../types';
 
 describe('ERC20 Dividend Checkpoint Common', () => {
   // we extend the class to be able to instance it, using the 3.0.0 ERC20DividendCheckpoint contract since it has all common functionality
@@ -21,11 +21,11 @@ describe('ERC20 Dividend Checkpoint Common', () => {
 
     public contractVersion!: ContractVersion;
 
-    public subscribeAsync!: Subscribe
-
-    public getLogsAsync!: GetLogs;
-
-    public constructor(web3Wrapper: Web3Wrapper, contract: Promise<ERC20DividendCheckpointContract_3_0_0>, contractFactory: ContractFactory) {
+    public constructor(
+      web3Wrapper: Web3Wrapper,
+      contract: Promise<ERC20DividendCheckpointContract_3_0_0>,
+      contractFactory: ContractFactory,
+    ) {
       super(web3Wrapper, contract, contractFactory);
       this.contract = contract;
     }
@@ -114,9 +114,7 @@ describe('ERC20 Dividend Checkpoint Common', () => {
 
       const expectedTotalSupplyResult = new BigNumber(1000);
       const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(
-          expectedTotalSupplyResult,
-      );
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(expectedTotalSupplyResult);
       when(mockedSecurityTokenContract.totalSupply).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
 
       const expectedBalanceOfResult = new BigNumber(100);
@@ -130,7 +128,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const expectedAllowanceResult = new BigNumber(100);
       const mockedAllowanceMethod = mock(MockedCallMethod);
       when(mockedERC20DetailedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
-      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(expectedAllowanceResult);
+      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(
+        expectedAllowanceResult,
+      );
 
       when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
@@ -229,7 +229,7 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const expectedTotalSupplyResult = new BigNumber(1000);
       const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).thenResolve(
-          expectedTotalSupplyResult,
+        expectedTotalSupplyResult,
       );
       when(mockedSecurityTokenContract.totalSupplyAt).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
 
@@ -244,7 +244,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const expectedAllowanceResult = new BigNumber(100);
       const mockedAllowanceMethod = mock(MockedCallMethod);
       when(mockedERC20DetailedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
-      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(expectedAllowanceResult);
+      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(
+        expectedAllowanceResult,
+      );
 
       when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
@@ -364,9 +366,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
 
       const expectedSecurityTokenBalanceOfResult = new BigNumber(10);
       const mockedSecurityTokenBalanceOfMethod = mock(MockedCallMethod);
-      function whenBalanceOf (addr: string){
+      function whenBalanceOf(addr: string) {
         when(
-            mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+          mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
         ).thenResolve(expectedSecurityTokenBalanceOfResult);
       }
       when(mockedSecurityTokenContract.balanceOfAt).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
@@ -383,7 +385,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const expectedAllowanceResult = new BigNumber(100);
       const mockedAllowanceMethod = mock(MockedCallMethod);
       when(mockedERC20DetailedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
-      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(expectedAllowanceResult);
+      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(
+        expectedAllowanceResult,
+      );
 
       when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
@@ -473,9 +477,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync(objectContaining(new BigNumber(checkpointId)))).once();
       verify(mockedSecurityTokenContract.totalSupplyAt).once();
-      function verifyBalanceOf (addr: string){
+      function verifyBalanceOf(addr: string) {
         verify(
-            mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
+          mockedSecurityTokenBalanceOfMethod.callAsync(addr, objectContaining(new BigNumber(checkpointId))),
         ).once();
       }
       excluded.map(verifyBalanceOf);
@@ -505,17 +509,13 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const excluded = ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'];
       const expectedTotalSupplyResult = new BigNumber(1000);
       const mockedSecurityTokenTotalSupplyMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(
-          expectedTotalSupplyResult,
-      );
+      when(mockedSecurityTokenTotalSupplyMethod.callAsync()).thenResolve(expectedTotalSupplyResult);
       when(mockedSecurityTokenContract.totalSupply).thenReturn(instance(mockedSecurityTokenTotalSupplyMethod));
 
       const expectedSecurityTokenBalanceOfResult = new BigNumber(10);
       const mockedSecurityTokenBalanceOfMethod = mock(MockedCallMethod);
-      function whenBalanceOf (addr: string){
-        when(
-            mockedSecurityTokenBalanceOfMethod.callAsync(addr),
-        ).thenResolve(expectedSecurityTokenBalanceOfResult);
+      function whenBalanceOf(addr: string) {
+        when(mockedSecurityTokenBalanceOfMethod.callAsync(addr)).thenResolve(expectedSecurityTokenBalanceOfResult);
       }
       when(mockedSecurityTokenContract.balanceOf).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
       excluded.map(whenBalanceOf);
@@ -531,7 +531,9 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       const expectedAllowanceResult = new BigNumber(100);
       const mockedAllowanceMethod = mock(MockedCallMethod);
       when(mockedERC20DetailedContract.allowance).thenReturn(instance(mockedAllowanceMethod));
-      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(expectedAllowanceResult);
+      when(mockedAllowanceMethod.callAsync(expectedOwnerResult, expectedDividendContractAddress)).thenResolve(
+        expectedAllowanceResult,
+      );
 
       when(mockedContractFactory.getERC20DetailedContract(token)).thenResolve(instance(mockedERC20DetailedContract));
 
@@ -608,10 +610,8 @@ describe('ERC20 Dividend Checkpoint Common', () => {
       verify(mockedDecimalsMethod.callAsync()).once();
       verify(mockedSecurityTokenTotalSupplyMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.totalSupply).once();
-      function verifyBalanceOf (addr: string){
-        verify(
-            mockedSecurityTokenBalanceOfMethod.callAsync(addr),
-        ).once();
+      function verifyBalanceOf(addr: string) {
+        verify(mockedSecurityTokenBalanceOfMethod.callAsync(addr)).once();
       }
       when(mockedSecurityTokenContract.balanceOf).thenReturn(instance(mockedSecurityTokenBalanceOfMethod));
       excluded.map(verifyBalanceOf);

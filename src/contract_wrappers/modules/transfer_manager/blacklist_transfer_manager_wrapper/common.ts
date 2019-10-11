@@ -1,9 +1,20 @@
 import {
   BigNumber,
-  BlacklistTransferManagerContract_3_0_0,
   Web3Wrapper,
   PolyResponse,
+  LogWithDecodedArgs,
+  BlacklistTransferManagerContract_3_0_0,
+  BlacklistTransferManagerEvents_3_0_0,
+  BlacklistTransferManagerEventArgs_3_0_0,
+  BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0,
+  BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0,
+  BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0,
+  BlacklistTransferManagerPauseEventArgs_3_0_0,
+  BlacklistTransferManagerUnpauseEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../../utils/assert';
 import { ModuleCommon } from '../../module_wrapper';
 import ContractFactory from '../../../../factories/contractFactory';
@@ -13,6 +24,11 @@ import {
   TxParams,
   ErrorCode,
   TransferResult,
+  GetLogs,
+  EventCallback,
+  SubscribeAsyncParams,
+  GetLogsAsyncParams,
+  Subscribe,
 } from '../../../../types';
 import {
   bigNumberToDate,
@@ -29,21 +45,97 @@ import {
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
-export namespace BlacklistTransferManagerTransactionParams {
-  export interface AddBlacklistType extends BlacklistTypeParams {}
-  export interface ModifyBlacklistType extends BlacklistTypeParams {}
-  export interface AddNewInvestorToNewBlacklist extends AddNewInvestorToNewBlacklistParams {}
-  export interface AddNewBlacklistTypeMulti extends BlacklistTypeMultiParams {}
-  export interface ModifyBlacklistTypeMulti extends BlacklistTypeMultiParams {}
-  export interface DeleteBlacklistType extends DeleteBlacklistTypeParams {}
-  export interface DeleteBlacklistTypeMulti extends DeleteBlacklistTypeMultiParams {}
-  export interface AddInvestorToBlacklist extends InvestorAndBlacklistParams {}
-  export interface DeleteInvestorFromBlacklist extends InvestorAndBlacklistParams {}
-  export interface DeleteInvestorFromAllBlacklist extends DeleteInvestorFromAllBlacklistParams {}
-  export interface DeleteInvestorFromAllBlacklistMulti extends DeleteInvestorFromAllBlacklistMultiParams {}
-  export interface AddInvestorToBlacklistMulti extends InvestorMultiAndBlacklistParams {}
-  export interface AddMultiInvestorToBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
-  export interface DeleteMultiInvestorsFromBlacklistMulti extends InvestorMultiAndBlacklistMultiParams {}
+interface DeleteInvestorFromBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
+  callback: EventCallback<BlacklistTransferManagerDeleteInvestorFromBlacklistEventArgs_3_0_0>;
+}
+
+interface GetDeleteInvestorFromBlacklistLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteInvestorFromBlacklist;
+}
+
+interface AddInvestorToBlacklistSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
+  callback: EventCallback<BlacklistTransferManagerAddInvestorToBlacklistEventArgs_3_0_0>;
+}
+
+interface GetAddInvestorToBlacklistLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddInvestorToBlacklist;
+}
+
+interface DeleteBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerDeleteBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetDeleteBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.DeleteBlacklistType;
+}
+
+interface ModifyBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerModifyBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetModifyBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.ModifyBlacklistType;
+}
+
+interface AddBlacklistTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
+  callback: EventCallback<BlacklistTransferManagerAddBlacklistTypeEventArgs_3_0_0>;
+}
+
+interface GetAddBlacklistTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.AddBlacklistType;
+}
+
+interface PauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
+  callback: EventCallback<BlacklistTransferManagerPauseEventArgs_3_0_0>;
+}
+
+interface GetPauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Pause;
+}
+
+interface UnpauseSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
+  callback: EventCallback<BlacklistTransferManagerUnpauseEventArgs_3_0_0>;
+}
+
+interface GetUnpauseLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: BlacklistTransferManagerEvents_3_0_0.Unpause;
+}
+
+export interface BlacklistTransferManagerSubscribeAsyncParams extends Subscribe {
+  (params: AddBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: ModifyBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: DeleteBlacklistTypeSubscribeAsyncParams): Promise<string>;
+  (params: AddInvestorToBlacklistSubscribeAsyncParams): Promise<string>;
+  (params: DeleteInvestorFromBlacklistSubscribeAsyncParams): Promise<string>;
+  (params: PauseSubscribeAsyncParams): Promise<string>;
+  (params: UnpauseSubscribeAsyncParams): Promise<string>;
+}
+
+export interface GetBlacklistTransferManagerLogsAsyncParams extends GetLogs {
+  (params: GetAddBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetModifyBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetDeleteBlacklistTypeLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetAddInvestorToBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetDeleteInvestorFromBlacklistLogsAsyncParams): Promise<
+    LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]
+  >;
+  (params: GetPauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerPauseEventArgs_3_0_0>[]>;
+  (params: GetUnpauseLogsAsyncParams): Promise<LogWithDecodedArgs<BlacklistTransferManagerUnpauseEventArgs_3_0_0>[]>;
 }
 
 /**
@@ -90,7 +182,7 @@ interface UserAddressParams {
  * @param blacklistName Name of the blacklist type
  * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  */
-interface BlacklistTypeParams extends TxParams {
+export interface BlacklistTypeParams extends TxParams {
   startTime: Date;
   endTime: Date;
   blacklistName: string;
@@ -104,7 +196,7 @@ interface BlacklistTypeParams extends TxParams {
  * @param repeatPeriodTime Repeat period of the blacklist type (measured in days)
  * @param investor Address of the investor
  */
-interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
+export interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
   investor: string;
 }
 
@@ -114,7 +206,7 @@ interface AddNewInvestorToNewBlacklistParams extends BlacklistTypeParams {
  * @param blacklistNames Names of the blacklist types
  * @param repeatPeriodTimes Repeat periods of the blacklist type (measured in days)
  */
-interface BlacklistTypeMultiParams extends TxParams {
+export interface BlacklistTypeMultiParams extends TxParams {
   startTimes: Date[];
   endTimes: Date[];
   blacklistNames: string[];
@@ -124,14 +216,14 @@ interface BlacklistTypeMultiParams extends TxParams {
 /**
  * @param blacklistName Name of the blacklist type
  */
-interface DeleteBlacklistTypeParams extends TxParams {
+export interface DeleteBlacklistTypeParams extends TxParams {
   blacklistName: string;
 }
 
 /**
  * @param blacklistNames Names of the blacklist types
  */
-interface DeleteBlacklistTypeMultiParams extends TxParams {
+export interface DeleteBlacklistTypeMultiParams extends TxParams {
   blacklistNames: string[];
 }
 
@@ -139,7 +231,7 @@ interface DeleteBlacklistTypeMultiParams extends TxParams {
  * @param investor Address of the investor
  * @param blacklistName Name of the blacklist
  */
-interface InvestorAndBlacklistParams extends TxParams {
+export interface InvestorAndBlacklistParams extends TxParams {
   userAddress: string;
   blacklistName: string;
 }
@@ -147,14 +239,14 @@ interface InvestorAndBlacklistParams extends TxParams {
 /**
  * @param investor Address of the investor
  */
-interface DeleteInvestorFromAllBlacklistParams extends TxParams {
+export interface DeleteInvestorFromAllBlacklistParams extends TxParams {
   investor: string;
 }
 
 /**
  * @param investor Addresses of the investors
  */
-interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
+export interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
   investors: string[];
 }
 
@@ -162,7 +254,7 @@ interface DeleteInvestorFromAllBlacklistMultiParams extends TxParams {
  * @param investors Address of the investor
  * @param blacklistName Name of the blacklist
  */
-interface InvestorMultiAndBlacklistParams extends TxParams {
+export interface InvestorMultiAndBlacklistParams extends TxParams {
   userAddresses: string[];
   blacklistName: string;
 }
@@ -171,7 +263,7 @@ interface InvestorMultiAndBlacklistParams extends TxParams {
  * @param investors Address of the investor
  * @param blacklistNames Name of the blacklist
  */
-interface InvestorMultiAndBlacklistMultiParams extends TxParams {
+export interface InvestorMultiAndBlacklistMultiParams extends TxParams {
   userAddresses: string[];
   blacklistNames: string[];
 }
@@ -723,8 +815,53 @@ export default abstract class BlacklistTransferManagerCommon extends ModuleCommo
       'Investor is not currently present on any blacklists',
     );
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: BlacklistTransferManagerSubscribeAsyncParams = async <
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
+  >(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: GetBlacklistTransferManagerLogsAsyncParams = async <
+    ArgsType extends BlacklistTransferManagerEventArgs_3_0_0
+  >(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, BlacklistTransferManagerEvents_3_0_0);
+    assert.doesConformToSchema('blockRange', params.blockRange, schemas.blockRangeSchema);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isBlacklistTransferManager(wrapper: ContractWrapper): wrapper is BlacklistTransferManagerCommon {
   return wrapper instanceof BlacklistTransferManagerCommon;
-};
+}

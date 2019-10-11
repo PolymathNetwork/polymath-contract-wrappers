@@ -1,11 +1,20 @@
 import {
-  BigNumber,
   ModuleFactoryContract_3_0_0,
+  ModuleFactoryEvents_3_0_0,
+  ModuleFactoryEventArgs_3_0_0,
+  ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0,
+  ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0,
+  ModuleFactoryOwnershipTransferredEventArgs_3_0_0,
+  ModuleFactoryChangeCostTypeEventArgs_3_0_0,
+  ModuleFactoryChangeSetupCostEventArgs_3_0_0,
+  BigNumber,
   TxData,
   Web3Wrapper,
   PolyResponse,
+  LogWithDecodedArgs,
 } from '@polymathnetwork/abi-wrappers';
 import semver from 'semver';
+import { schemas } from '@0x/json-schemas';
 import assert from '../../../utils/assert';
 import ContractWrapper from '../../contract_wrapper';
 import {
@@ -14,6 +23,11 @@ import {
   ModuleType,
   TxParams,
   ErrorCode,
+  Subscribe,
+  GetLogs,
+  EventCallback,
+  GetLogsAsyncParams,
+  SubscribeAsyncParams,
 } from '../../../types';
 import {
   bytes32ArrayToStringArray,
@@ -25,45 +39,114 @@ import {
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
 
+interface OwnershipTransferredSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
+  callback: EventCallback<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>;
+}
+
+interface GetOwnershipTransferredLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.OwnershipTransferred;
+}
+
+interface GenerateModuleFromFactorySubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
+  callback: EventCallback<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>;
+}
+
+interface GetGenerateModuleFromFactoryLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.GenerateModuleFromFactory;
+}
+
+interface ChangeSTVersionBoundSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
+  callback: EventCallback<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>;
+}
+
+interface GetChangeSTVersionBoundLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSTVersionBound;
+}
+
+interface ChangeCostTypeSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeCostType;
+  callback: EventCallback<ModuleFactoryChangeCostTypeEventArgs_3_0_0>;
+}
+
+interface GetChangeCostTypeLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeCostType;
+}
+
+interface ChangeSetupCostSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSetupCost;
+  callback: EventCallback<ModuleFactoryChangeSetupCostEventArgs_3_0_0>;
+}
+
+interface GetChangeSetupCostLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: ModuleFactoryEvents_3_0_0.ChangeSetupCost;
+}
+
+export interface ModuleFactorySubscribeAsyncParams extends Subscribe {
+  (params: OwnershipTransferredSubscribeAsyncParams): Promise<string>;
+  (params: GenerateModuleFromFactorySubscribeAsyncParams): Promise<string>;
+  (params: ChangeSTVersionBoundSubscribeAsyncParams): Promise<string>;
+  (params: ChangeCostTypeSubscribeAsyncParams): Promise<string>;
+  (params: ChangeSetupCostSubscribeAsyncParams): Promise<string>;
+}
+
+export interface ModuleFactoryGetLogsAsyncParams extends GetLogs {
+  (params: GetOwnershipTransferredLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryOwnershipTransferredEventArgs_3_0_0>[]
+  >;
+  (params: GetGenerateModuleFromFactoryLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryGenerateModuleFromFactoryEventArgs_3_0_0>[]
+  >;
+  (params: GetChangeSTVersionBoundLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeSTVersionBoundEventArgs_3_0_0>[]
+  >;
+  (params: GetChangeCostTypeLogsAsyncParams): Promise<LogWithDecodedArgs<ModuleFactoryChangeCostTypeEventArgs_3_0_0>[]>;
+  (params: GetChangeSetupCostLogsAsyncParams): Promise<
+    LogWithDecodedArgs<ModuleFactoryChangeSetupCostEventArgs_3_0_0>[]
+  >;
+}
+
 /**
  * @param setupCost Cost to setup module
  */
-interface ChangeSetupCostParams extends TxParams {
+export interface ChangeSetupCostParams extends TxParams {
   setupCost: BigNumber;
 }
 
 /**
  * @param isCostInPoly Boolean if cost is in poly
  */
-interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
+export interface ChangeCostAndTypeParams extends ChangeSetupCostParams {
   isCostInPoly: boolean;
 }
 
 /**
  * @param title New title
  */
-interface ChangeTitleParams extends TxParams {
+export interface ChangeTitleParams extends TxParams {
   title: string;
 }
 
 /**
  * @param description New description
  */
-interface ChangeDescriptionParams extends TxParams {
+export interface ChangeDescriptionParams extends TxParams {
   description: string;
 }
 
 /**
  * @param name New name
  */
-interface ChangeNameParams extends TxParams {
+export interface ChangeNameParams extends TxParams {
   name: string;
 }
 
 /**
  * @param tag New tag
  */
-interface ChangeTagsParams extends TxParams {
+export interface ChangeTagsParams extends TxParams {
   tags: string[];
 }
 
@@ -71,7 +154,7 @@ interface ChangeTagsParams extends TxParams {
  * @param boundType Type of STVersionBound
  * @param newVersion New version
  */
-interface ChangeSTVersionBoundsParams extends TxParams {
+export interface ChangeSTVersionBoundsParams extends TxParams {
   boundType: BoundType;
   newVersion: number[];
 }
@@ -315,8 +398,47 @@ export default abstract class ModuleFactoryCommon extends ContractWrapper {
       'Msg sender must be owner',
     );
   };
+
+  /**
+   * Subscribe to an event type emitted by the contract.
+   * @return Subscription token used later to unsubscribe
+   */
+  public subscribeAsync: ModuleFactorySubscribeAsyncParams = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
+    params: SubscribeAsyncParams,
+  ): Promise<string> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
+    assert.doesConformToSchema('indexFilterValues', params.indexFilterValues, schemas.indexFilterValuesSchema);
+    assert.isFunction('callback', params.callback);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const subscriptionToken = await this.subscribeInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.indexFilterValues,
+      params.callback,
+      params.isVerbose,
+    );
+    return subscriptionToken;
+  };
+
+  /**
+   * Gets historical logs without creating a subscription
+   * @return Array of logs that match the parameters
+   */
+  public getLogsAsync: ModuleFactoryGetLogsAsyncParams = async <ArgsType extends ModuleFactoryEventArgs_3_0_0>(
+    params: GetLogsAsyncParams,
+  ): Promise<LogWithDecodedArgs<ArgsType>[]> => {
+    assert.doesBelongToStringEnum('eventName', params.eventName, ModuleFactoryEvents_3_0_0);
+    const normalizedContractAddress = (await this.contract).address.toLowerCase();
+    const logs = await this.getLogsAsyncInternal<ArgsType>(
+      normalizedContractAddress,
+      params.eventName,
+      params.blockRange,
+      params.indexFilterValues,
+    );
+    return logs;
+  };
 }
 
 export function isModuleFactory(wrapper: ContractWrapper): wrapper is ModuleFactoryCommon {
   return wrapper instanceof ModuleFactoryCommon;
-};
+}
