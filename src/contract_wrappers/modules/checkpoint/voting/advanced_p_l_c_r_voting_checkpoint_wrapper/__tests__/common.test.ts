@@ -5,6 +5,7 @@ import {
   ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
+  ethersUtils,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../../test_utils/mocked_methods';
 import { ModuleCommon } from '../../../../module_wrapper';
@@ -473,7 +474,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the method
       when(mockedContract.isVoterAllowed).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)), params.voter)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)), params.voter)).thenResolve(
+        expectedResult,
+      );
 
       // Real call
       const result = await target.isVoterAllowed(params);
@@ -482,6 +485,1528 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Verifications
       verify(mockedContract.isVoterAllowed).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)), params.voter)).once();
+    });
+  });
+
+  describe('Create Statutory Ballot', () => {
+    test('should createStatutoryBallot', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        details: 'ballot details',
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: 1,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createStatutoryBallot).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createStatutoryBallot(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createStatutoryBallot).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Custom Statutory Ballot', () => {
+    test('should createCustomStatutoryBallot', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: 1,
+        checkpointId: 1,
+        details: 'detail  one',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCustomStatutoryBallot).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCustomStatutoryBallot(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCustomStatutoryBallot).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Custom Cumulative Ballot', () => {
+    test('should createCustomCumulativeBallot', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: [1, 2],
+        checkpointId: 1,
+        details: ['detail  one', 'detail two'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCustomCumulativeBallot).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCustomCumulativeBallot(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCustomCumulativeBallot).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Cumulative Ballot', () => {
+    test('should createCumulativeBallot', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: [1, 2],
+        details: ['detail  one', 'detail two'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCumulativeBallot).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCumulativeBallot(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCumulativeBallot).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Custom Cumulative Ballot With Exemption Ballot', () => {
+    test('should createCustomCumulativeBallotWithExemption', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: [1, 2],
+        checkpointId: 1,
+        details: ['detail  one', 'detail two'],
+        exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCustomCumulativeBallotWithExemption).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCustomCumulativeBallotWithExemption(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCustomCumulativeBallotWithExemption).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Cumulative Ballot With Exemption', () => {
+    test('should createCumulativeBallotWithExemption', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: [1, 2],
+        details: ['detail  one', 'detail two'],
+        exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCumulativeBallotWithExemption).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCumulativeBallotWithExemption(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCumulativeBallotWithExemption).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Statutory Ballot With Exemption', () => {
+    test('should createStatutoryBallotWithExemption', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: 1,
+        details: 'detail  one',
+        exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createStatutoryBallotWithExemption).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createStatutoryBallotWithExemption(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createStatutoryBallotWithExemption).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Create Custom Statutory Ballot With Exemption', () => {
+    test('should createCustomStatutoryBallotWithExemption', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const mockedParams = {
+        name: 'nee ballot',
+        startTime: new Date(2019, 10),
+        commitDuration: 80000,
+        revealDuration: 3000,
+        proposalTitle: 'title proposal',
+        choices: 'choices',
+        noOfChoices: 1,
+        details: 'detail  one',
+        exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
+        checkpointId: 1,
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.createCustomStatutoryBallotWithExemption).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.createCustomStatutoryBallotWithExemption(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.createCustomStatutoryBallotWithExemption).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.name,
+          objectContaining(dateToBigNumber(mockedParams.startTime)),
+          objectContaining(numberToBigNumber(mockedParams.commitDuration)),
+          objectContaining(numberToBigNumber(mockedParams.revealDuration)),
+          mockedParams.proposalTitle,
+          mockedParams.details,
+          mockedParams.choices,
+          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(numberToBigNumber(mockedParams.checkpointId)),
+          mockedParams.exemptedAddresses,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Commit Vote', () => {
+    test('should commitVote', async () => {
+      const mockedParams = {
+        ballotId: 1,
+        votes: [30, 50],
+        salt: 12345678,
+        txData: { from: '0x2222222222222222222222222222222222222222' },
+        safetyFactor: 10,
+      };
+
+      // Check valid stage
+      const expectedCurrentStageResult = new BigNumber(1);
+      const mockedCurrentStageMethod = mock(MockedCallMethod);
+      when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
+      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedCurrentStageResult,
+      );
+
+      // Is voter allowed
+      const expectedIsVoterAllowedResult = true;
+      const mockedIsVoterAllowedMethod = mock(MockedCallMethod);
+      when(mockedContract.isVoterAllowed).thenReturn(instance(mockedIsVoterAllowedMethod));
+      when(
+        mockedIsVoterAllowedMethod.callAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.txData.from,
+        ),
+      ).thenResolve(expectedIsVoterAllowedResult);
+
+      // pending ballots
+      const expectedPendingBallotsResult = [[new BigNumber(1), new BigNumber(2)], [new BigNumber(3), new BigNumber(4)]];
+      const mockedPendingBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.pendingBallots).thenReturn(instance(mockedPendingBallotsMethod));
+      when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
+
+      // get ballot details
+      const expectedBallotDetailsResult = [
+        'ballot name',
+        new BigNumber(1000),
+        new BigNumber(1),
+        dateToBigNumber(new Date(2019, 11)),
+        new BigNumber(86000),
+        new BigNumber(86000),
+        new BigNumber(1),
+        new BigNumber(1),
+        new BigNumber(1),
+        false,
+        new BigNumber(1),
+        ['first proposal'],
+        [new BigNumber(1)],
+      ];
+      const mockedBallotDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getBallotDetails).thenReturn(instance(mockedBallotDetailsMethod));
+      when(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedBallotDetailsResult,
+      );
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      const keccakKeys = ['uint256', 'uint256', 'uint256'];
+      const bgVotes = ['30000000000000000000', '50000000000000000000'];
+      const secretVote = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, mockedParams.salt]);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.commitVote).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          secretVote,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.commitVote(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.commitVote).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          secretVote,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      // get all ballots
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+      // check valid stage
+      verify(mockedContract.getCurrentBallotStage).once();
+      verify(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+      // is voter allowed
+      verify(mockedContract.isVoterAllowed).once();
+      verify(
+        mockedIsVoterAllowedMethod.callAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.txData.from,
+        ),
+      ).once();
+      // pending ballots
+      verify(mockedContract.pendingBallots).once();
+      verify(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).once();
+      // get ballot details
+      verify(mockedContract.getBallotDetails).once();
+      verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+    });
+  });
+
+  /*
+  describe('Reveal Vote', () => {
+    test('should revealVote', async () => {
+      const mockedParams = {
+        ballotId: 1,
+        choices: [30, 50],
+        salt: 12345678,
+        txData: { from: '0x2222222222222222222222222222222222222222' },
+        safetyFactor: 10,
+      };
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      // Check valid stage
+      const expectedCurrentStageResult = new BigNumber(1);
+      const mockedCurrentStageMethod = mock(MockedCallMethod);
+      when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
+      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedCurrentStageResult,
+      );
+
+      // get ballot details
+      const expectedBallotDetailsResult = [
+        'ballot name',
+        new BigNumber(1000),
+        new BigNumber(1),
+        dateToBigNumber(new Date(2019, 11)),
+        new BigNumber(86000),
+        new BigNumber(86000),
+        new BigNumber(2),
+        new BigNumber(1),
+        new BigNumber(1),
+        false,
+        new BigNumber(1),
+        ['first proposal'],
+        [new BigNumber(1), new BigNumber(1)],
+      ];
+      const mockedBallotDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getBallotDetails).thenReturn(instance(mockedBallotDetailsMethod));
+      when(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedBallotDetailsResult,
+      );
+
+      // pending ballots
+      const expectedPendingBallotsResult = [[new BigNumber(1), new BigNumber(2)], [new BigNumber(3), new BigNumber(4)]];
+      const mockedPendingBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.pendingBallots).thenReturn(instance(mockedPendingBallotsMethod));
+      when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
+
+      // get logs
+    // TODO
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.revealVote).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          objectContaining(mockedParams.choices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.salt)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.revealVote(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.revealVote).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          objectContaining(mockedParams.choices.map(v => numberToBigNumber(v))),
+          objectContaining(numberToBigNumber(mockedParams.salt)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+  */
+
+  describe('Cancel Ballot', () => {
+    test('should cancelBallot', async () => {
+        const mockedParams = {
+            ballotId: 1,
+            txData: {},
+            safetyFactor: 10,
+          };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // Get all ballots
+      const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      // get ballot details
+      const expectedBallotDetailsResult = [
+        'ballot name',
+        new BigNumber(1000),
+        new BigNumber(1),
+        dateToBigNumber(new Date(2019, 11)),
+        new BigNumber(86000),
+        new BigNumber(86000),
+        new BigNumber(2),
+        new BigNumber(1),
+        new BigNumber(1),
+        true,
+        new BigNumber(1),
+        ['first proposal'],
+        [new BigNumber(1), new BigNumber(1)],
+      ];
+      const mockedBallotDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getBallotDetails).thenReturn(instance(mockedBallotDetailsMethod));
+      when(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedBallotDetailsResult,
+      );
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.cancelBallot).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.cancelBallot(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.cancelBallot).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+      verify(mockedContract.getBallotDetails).once();
+      verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+    });
+  });
+
+  describe('Change Ballot Exempted Voters List', () => {
+    test('should changeBallotExemptedVotersList', async () => {
+        const mockedParams = {
+            ballotId: 1,
+            exemptedAddress: '0x5555555555555555555555555555555555555555',
+            exempt: false,
+            txData: {},
+            safetyFactor: 10,
+          };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // get ballot details
+      const expectedBallotDetailsResult = [
+        'ballot name',
+        new BigNumber(1000),
+        new BigNumber(1),
+        dateToBigNumber(new Date(2019, 11)),
+        new BigNumber(86000),
+        new BigNumber(86000),
+        new BigNumber(2),
+        new BigNumber(1),
+        new BigNumber(1),
+        false,
+        new BigNumber(0),
+        ['first proposal'],
+        [new BigNumber(1), new BigNumber(1)],
+      ];
+      const mockedBallotDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getBallotDetails).thenReturn(instance(mockedBallotDetailsMethod));
+      when(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedBallotDetailsResult,
+      );
+
+      // get Exempted Voters
+      const expectedExemptedResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      const mockedExemptedMethod = mock(MockedCallMethod);
+      when(mockedContract.getExemptedVotersByBallot).thenReturn(instance(mockedExemptedMethod));
+      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(expectedExemptedResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeBallotExemptedVotersList).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.exemptedAddress,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeBallotExemptedVotersList(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeBallotExemptedVotersList).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+            objectContaining(numberToBigNumber(mockedParams.ballotId)),
+            mockedParams.exemptedAddress,
+            mockedParams.exempt,
+            mockedParams.txData,
+            mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getBallotDetails).once();
+      verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+      verify(mockedContract.getExemptedVotersByBallot).once();
+      verify(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+    });
+  });
+
+  describe('Change Ballot Exempted Voters List Multi', () => {
+    test('should changeBallotExemptedVotersListMulti', async () => {
+        const mockedParams = {
+            ballotId: 1,
+            exemptedAddress: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
+            exempt: [false, false],
+            txData: {},
+            safetyFactor: 10,
+          };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      // get ballot details
+      const expectedBallotDetailsResult = [
+        'ballot name',
+        new BigNumber(1000),
+        new BigNumber(1),
+        dateToBigNumber(new Date(2019, 11)),
+        new BigNumber(86000),
+        new BigNumber(86000),
+        new BigNumber(2),
+        new BigNumber(1),
+        new BigNumber(1),
+        false,
+        new BigNumber(0),
+        ['first proposal'],
+        [new BigNumber(1), new BigNumber(1)],
+      ];
+      const mockedBallotDetailsMethod = mock(MockedCallMethod);
+      when(mockedContract.getBallotDetails).thenReturn(instance(mockedBallotDetailsMethod));
+      when(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedBallotDetailsResult,
+      );
+
+      // get Exempted Voters
+      const expectedExemptedResult = [
+        '0x2222222222222222222222222222222222222222',
+        '0x3333333333333333333333333333333333333333',
+      ];
+      const mockedExemptedMethod = mock(MockedCallMethod);
+      when(mockedContract.getExemptedVotersByBallot).thenReturn(instance(mockedExemptedMethod));
+      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(expectedExemptedResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeBallotExemptedVotersListMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.exemptedAddress,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeBallotExemptedVotersListMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeBallotExemptedVotersListMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+            objectContaining(numberToBigNumber(mockedParams.ballotId)),
+            mockedParams.exemptedAddress,
+            mockedParams.exempt,
+            mockedParams.txData,
+            mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getBallotDetails).twice();
+      verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).twice();
+    });
+  });
+
+  describe('Change Default Exempted Voters List', () => {
+    test('should changeDefaultExemptedVotersList', async () => {
+        const mockedParams = {
+            voter: '0x5555555555555555555555555555555555555555',
+            exempt: false,
+            txData: {},
+            safetyFactor: 10,
+          };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+    // Get all ballots
+    const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      // get current ballot stage
+      const CurrentStageParams = {
+        ballotId: 1,
+      };
+      const expectedCurrentStageResult = new BigNumber(2);
+      const mockedCurrentStageMethod = mock(MockedCallMethod);
+      when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
+      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId)))).thenResolve(expectedCurrentStageResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeDefaultExemptedVotersList).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.voter,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeDefaultExemptedVotersList(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeDefaultExemptedVotersList).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+            mockedParams.voter,
+            mockedParams.exempt,
+            mockedParams.txData,
+            mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Change Default Exempted Voters List Multi', () => {
+    test('should changeDefaultExemptedVotersListMulti', async () => {
+        const mockedParams = {
+            voters: ['0x5555555555555555555555555555555555555555', '0x4555555555555555555555555555555555555555'],
+            exempts: [false, false],
+            txData: {},
+            safetyFactor: 10,
+          };
+
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+    // Get all ballots
+    const expectedBallotsResult = [
+        [new BigNumber(1), new BigNumber(2)],
+        ['ballot one', 'ballot two'],
+        [new BigNumber(2), new BigNumber(2)],
+        [new BigNumber(1), new BigNumber(2)],
+        [false, true],
+      ];
+      const mockedBallotsMethod = mock(MockedCallMethod);
+      when(mockedContract.getAllBallots).thenReturn(instance(mockedBallotsMethod));
+      when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
+
+      // get current ballot stage
+      const CurrentStageParams = {
+        ballotId: 1,
+      };
+      const expectedCurrentStageResult = new BigNumber(2);
+      const mockedCurrentStageMethod = mock(MockedCallMethod);
+      when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
+      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId)))).thenResolve(expectedCurrentStageResult);
+
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+      // Stub the method
+      when(mockedContract.changeDefaultExemptedVotersListMulti).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.voters,
+          mockedParams.exempts,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.changeDefaultExemptedVotersListMulti(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.changeDefaultExemptedVotersListMulti).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+            mockedParams.voters,
+            mockedParams.exempts,
+            mockedParams.txData,
+            mockedParams.safetyFactor,
+        ),
+      ).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
     });
   });
 });

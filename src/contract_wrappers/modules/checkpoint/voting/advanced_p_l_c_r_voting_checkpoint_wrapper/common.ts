@@ -13,10 +13,11 @@ import {
   bigNumberToDate,
   parseBallotStageValue,
   dateToBigNumber,
+  valueToWei,
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
 import ContractWrapper from '../../../../contract_wrapper';
-import { ErrorCode, Perm, TxParams, BallotStage } from '../../../../../types';
+import { ErrorCode, Perm, TxParams, BallotStage, FULL_DECIMALS } from '../../../../../types';
 import { ModuleCommon } from '../../../module_wrapper';
 import assert from '../../../../../utils/assert';
 
@@ -29,6 +30,7 @@ export namespace AdvancedPLCRVotingCheckpointTransactionParams {
   export interface CustomCumulativeBallotWithExemption extends CustomCumulativeBallotWithExemptionParams {}
   export interface CumulativeBallotWithExemption extends CumulativeBallotWithExemptionParams {}
   export interface StatutoryBallotWithExemption extends StatutoryBallotWithExemptionParams {}
+  export interface CustomStatutoryBallotWithExemption extends CustomStatutoryBallotWithExemptionParams {}
   export interface CommitVote extends CommitVoteParams {}
   export interface RevealVote extends RevealVoteParams {}
   export interface CancelBallot extends CancelBallotParams {}
@@ -119,8 +121,14 @@ interface CumulativeBallotWithExemptionParams extends CumulativeBallotParams {
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-interface StatutoryBallotWithExemptionParams extends CustomStatutoryBallotParams {
+interface StatutoryBallotWithExemptionParams extends BallotParams {
   exemptedAddresses: string[];
+  details: string;
+  noOfChoices: number;
+}
+
+interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithExemptionParams {
+  checkpointId: number;
 }
 
 /**
@@ -131,7 +139,7 @@ interface StatutoryBallotWithExemptionParams extends CustomStatutoryBallotParams
 interface CommitVoteParams extends TxParams {
   ballotId: number;
   votes: number[];
-  salt: string;
+  salt: number;
 }
 
 /**
@@ -654,7 +662,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Use to create a custom statutory ballot with exemption
    */
   public createCustomStatutoryBallotWithExemption = async (
-    params: StatutoryBallotWithExemptionParams,
+    params: CustomStatutoryBallotWithExemptionParams,
   ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
@@ -712,7 +720,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const keccakKeys = ['uint256'];
     const bgVotes = params.votes.map(e => {
       keccakKeys.push('uint256');
-      return new BigNumber(e);
+      return valueToWei(new BigNumber(e), FULL_DECIMALS).toString();
     });
 
     const secretVote = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, params.salt]);
@@ -745,10 +753,10 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const alreadyVoted = commitVote.commitCount.find(v => {
       return v === params.ballotId;
     });
-    assert.assert(alreadyVoted === undefined, ErrorCode.PreconditionRequired, 'Secret vote not available');
+    assert.assert(alreadyVoted !== undefined, ErrorCode.PreconditionRequired, 'Secret vote not available');
 
     let choiceCount = 0;
-    for (let i = 0; i < ballot.totalProposals - 1; i += 1) {
+    for (let i = 0; i <= ballot.totalProposals - 1; i += 1) {
       const noOfChoice = ballot.proposalChoicesCounts[i];
       choiceCount += noOfChoice === 0 ? 3 : noOfChoice;
     }
@@ -895,7 +903,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       'Caller is not allowed',
     );
 
-    assert.assert(!this.isAnyBallotRunning(), ErrorCode.PreconditionRequired, 'At least one ballot is running');
+    assert.assert(!(await this.isAnyBallotRunning()), ErrorCode.PreconditionRequired, 'At least one ballot is running');
 
     assert.isNonZeroETHAddressHex('voter', params.voter);
 
@@ -919,7 +927,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       'Caller is not allowed',
     );
 
-    assert.assert(!this.isAnyBallotRunning(), ErrorCode.PreconditionRequired, 'At least one ballot is running');
+    assert.assert(!(await this.isAnyBallotRunning()), ErrorCode.PreconditionRequired, 'At least one ballot is running');
 
     this.isValidLength(params.voters.length, params.exempts.length);
 
