@@ -26,7 +26,7 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
   });
 
   const onlyBallot: any = _.filter(args, (e: any) => {
-    return e._ballotId.toNumber() === 2;
+    return e._ballotId.toNumber() === 1;
   });
 
   const secretHash = onlyBallot[0]._secretHash;

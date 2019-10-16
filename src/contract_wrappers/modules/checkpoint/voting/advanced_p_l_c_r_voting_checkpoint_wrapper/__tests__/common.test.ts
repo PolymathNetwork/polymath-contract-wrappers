@@ -1,7 +1,8 @@
 // AdvancedPLCRVotingCheckpointWrapper test
-import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining, spy } from 'ts-mockito';
 import {
   AdvancedPLCRVotingCheckpointContract_3_1_0,
+  AdvancedPLCRVotingCheckpointEvents_3_1_0,
   ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
@@ -1416,6 +1417,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
     });
   });
 
+  // TODO getLogsAsync mock
   /*
   describe('Reveal Vote', () => {
     test('should revealVote', async () => {
@@ -1475,8 +1477,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedContract.pendingBallots).thenReturn(instance(mockedPendingBallotsMethod));
       when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
 
-      // get logs
+      // Get logs
       // TODO
+      const expectedPLCRContractAddress = '0x4444444444444444444444444444444444444444';
+      when(mockedContract.address).thenReturn(expectedPLCRContractAddress);
+      const targetSpy = spy(target);
+      const targetReturn = [{"logIndex":0,"transactionIndex":0,"transactionHash":"0xa42c721ed1e07d87e610029ada99c71970c54b64034a1f6cc31f473ea4612002","blockHash":"0x8aabe209ce7b58c1db07c364d8d6bfabe6a2a3ba9a7c399b4e867f766ebd0223","blockNumber":102,"address":"0xd550ee9864bf1f8343b25076a0b1d7b0019dcddc","data":"0x00000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000000000000063ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944","topics":["0x9e0779b6b10265b94615da8047e410aefc37f80f2448de116beb21907b824292","0x00000000000000000000000084c3f9d07466a65c3a1dd1eab059dec560a11f0c"],"type":"mined","event":"VoteCommit","args":{"_voter":"0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c","_weight":"1000000000000000000000","_ballotId":"0","_secretHash":"0x63ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944"}}];
+      when(targetSpy.getLogsAsyncInternal(expectedPLCRContractAddress, AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit, undefined, objectContaining({ _voter: '0x2222222222222222222222222222222222222222' }))).thenResolve(targetReturn);
+      // END TODO
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method

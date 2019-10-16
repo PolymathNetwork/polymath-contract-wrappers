@@ -897,7 +897,6 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       choiceCount += noOfChoice === 0 ? 3 : noOfChoice;
     }
     assert.assert(choiceCount === params.choices.length, ErrorCode.MismatchedArrayLength, 'Choices count mismatch');
-
     const getVoteCommitEvents = await this.getLogsAsync({
       eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit,
       indexFilterValues: { _voter: caller },
