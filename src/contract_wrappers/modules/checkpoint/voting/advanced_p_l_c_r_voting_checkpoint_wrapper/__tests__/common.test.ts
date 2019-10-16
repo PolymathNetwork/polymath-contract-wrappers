@@ -1,8 +1,8 @@
 // AdvancedPLCRVotingCheckpointWrapper test
-import { mock, instance, reset, when, verify, objectContaining, spy } from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining, /* spy */ } from 'ts-mockito';
 import {
   AdvancedPLCRVotingCheckpointContract_3_1_0,
-  AdvancedPLCRVotingCheckpointEvents_3_1_0,
+  // AdvancedPLCRVotingCheckpointEvents_3_1_0,
   ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,

@@ -50,6 +50,7 @@ export namespace TransactionParams {
   export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
   export import PolyToken = PolyTokenTransactionParams;
   export import SecurityToken = SecurityTokenTransactionParams;
+  export import AdvancedPLCRVotingCheckpoint = AdvancedPLCRVotingCheckpointTransactionParams;
   /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
