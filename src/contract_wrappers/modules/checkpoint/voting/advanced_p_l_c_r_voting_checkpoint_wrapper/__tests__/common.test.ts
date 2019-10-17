@@ -1,5 +1,5 @@
 // AdvancedPLCRVotingCheckpointWrapper test
-import { mock, instance, reset, when, verify, objectContaining, /* spy */ } from 'ts-mockito';
+import { mock, instance, reset, when, verify, objectContaining /* spy */ } from 'ts-mockito';
 import {
   AdvancedPLCRVotingCheckpointContract_3_1_0,
   // AdvancedPLCRVotingCheckpointEvents_3_1_0,
@@ -7,7 +7,7 @@ import {
   BigNumber,
   Web3Wrapper,
   ethersUtils,
-  PolyTokenEvents_3_0_0
+  PolyTokenEvents_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../../test_utils/mocked_methods';
 import { ModuleCommon } from '../../../../module_wrapper';
@@ -18,6 +18,7 @@ import {
   parseBallotStageValue,
   dateToBigNumber,
   bigNumberToDate,
+  stringToBytes32,
 } from '../../../../../../utils/convert';
 import { ContractVersion } from '../../../../../../types';
 import AdvancedPLCRVotingCheckpointCommon from '../common';
@@ -520,11 +521,11 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         name: 'nee ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
-        details: 'ballot details',
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: 1,
+        proposalTitles: ['title proposal'],
+        proposalDetails: 'ballot details',
+        choices: ['choice'],
+        choicesCounts: 1,
         txData: {},
         safetyFactor: 10,
       };
@@ -536,14 +537,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(stringToBytes32(mockedParams.proposalDetails)),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -558,14 +559,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createStatutoryBallot).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(stringToBytes32(mockedParams.proposalDetails)),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -619,11 +620,11 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: 1,
+        proposalTitles: ['title proposal'],
+        proposalDetails: 'detail one',
+        choices: ['choices'],
+        choicesCounts: 1,
         checkpointId: 1,
-        details: 'detail  one',
         txData: {},
         safetyFactor: 10,
       };
@@ -635,14 +636,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(stringToBytes32(mockedParams.proposalDetails)),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -658,14 +659,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCustomStatutoryBallot).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(stringToBytes32(mockedParams.proposalDetails)),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -716,15 +717,15 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: [1, 2],
+        proposalTitles: ['title proposal'],
+        proposalDetails: ['detail one'],
+        choices: ['choice'],
+        choicesCounts: [1, 2],
         checkpointId: 1,
-        details: ['detail  one', 'detail two'],
         txData: {},
         safetyFactor: 10,
       };
@@ -736,14 +737,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -759,14 +760,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCustomCumulativeBallot).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -817,14 +818,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: [1, 2],
-        details: ['detail  one', 'detail two'],
+        proposalTitles: ['title proposal'],
+        proposalDetails: ['detail one'],
+        choices: ['choice'],
+        choicesCounts: [1],
         txData: {},
         safetyFactor: 10,
       };
@@ -836,14 +837,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -858,14 +859,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCumulativeBallot).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -915,15 +916,15 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: [1, 2],
+        proposalTitles: ['title proposal'],
+        proposalDetails: ['detail one'],
+        choices: ['choices'],
+        choicesCounts: [1, 2],
         checkpointId: 1,
-        details: ['detail  one', 'detail two'],
         exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
         txData: {},
         safetyFactor: 10,
@@ -936,14 +937,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
@@ -960,14 +961,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCustomCumulativeBallotWithExemption).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
@@ -1019,14 +1020,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: [1, 2],
-        details: ['detail  one', 'detail two'],
+        proposalTitles: ['title proposal'],
+        proposalDetails: ['detail one'],
+        choices: ['choice'],
+        choicesCounts: [1, 2],
         exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
         txData: {},
         safetyFactor: 10,
@@ -1039,14 +1040,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1062,14 +1063,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCumulativeBallotWithExemption).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(mockedParams.noOfChoices.map(v => numberToBigNumber(v))),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          objectContaining(mockedParams.proposalDetails.map(v => stringToBytes32(v))),
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(mockedParams.choicesCounts.map(v => numberToBigNumber(v))),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1120,14 +1121,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: 1,
-        details: 'detail  one',
+        proposalTitles: ['title proposal'],
+        proposalDetails: 'detail one',
+        choices: ['choice'],
+        choicesCounts: 1,
         exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
         txData: {},
         safetyFactor: 10,
@@ -1140,14 +1141,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          mockedParams.proposalDetails,
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1163,14 +1164,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createStatutoryBallotWithExemption).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          mockedParams.proposalDetails,
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1221,14 +1222,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
-        proposalTitle: 'title proposal',
-        choices: 'choices',
-        noOfChoices: 1,
-        details: 'detail  one',
+        proposalTitles: ['title proposal'],
+        proposalDetails: 'detail one',
+        choices: ['choice'],
+        choicesCounts: 1,
         exemptedAddresses: ['0x1555555555555555555555555555555555555555', '0x2555555555555555555555555555555555555555'],
         checkpointId: 1,
         txData: {},
@@ -1242,14 +1243,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Stub the request
       when(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          mockedParams.proposalDetails,
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
@@ -1266,14 +1267,14 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.createCustomStatutoryBallotWithExemption).once();
       verify(
         mockedMethod.sendTransactionAsync(
-          mockedParams.name,
+          objectContaining(stringToBytes32(mockedParams.name)),
           objectContaining(dateToBigNumber(mockedParams.startTime)),
           objectContaining(numberToBigNumber(mockedParams.commitDuration)),
           objectContaining(numberToBigNumber(mockedParams.revealDuration)),
-          mockedParams.proposalTitle,
-          mockedParams.details,
-          mockedParams.choices,
-          objectContaining(numberToBigNumber(mockedParams.noOfChoices)),
+          objectContaining(mockedParams.proposalTitles.join(',')),
+          mockedParams.proposalDetails,
+          objectContaining(mockedParams.choices.join(',')),
+          objectContaining(numberToBigNumber(mockedParams.choicesCounts)),
           objectContaining(numberToBigNumber(mockedParams.checkpointId)),
           mockedParams.exemptedAddresses,
           mockedParams.txData,
@@ -1524,11 +1525,11 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
 
   describe('Cancel Ballot', () => {
     test('should cancelBallot', async () => {
-        const mockedParams = {
-            ballotId: 1,
-            txData: {},
-            safetyFactor: 10,
-          };
+      const mockedParams = {
+        ballotId: 1,
+        txData: {},
+        safetyFactor: 10,
+      };
 
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
@@ -1682,7 +1683,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       ];
       const mockedExemptedMethod = mock(MockedCallMethod);
       when(mockedContract.getExemptedVotersByBallot).thenReturn(instance(mockedExemptedMethod));
-      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(expectedExemptedResult);
+      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedExemptedResult,
+      );
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -1709,11 +1712,11 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.changeBallotExemptedVotersList).once();
       verify(
         mockedMethod.sendTransactionAsync(
-            objectContaining(numberToBigNumber(mockedParams.ballotId)),
-            mockedParams.exemptedAddress,
-            mockedParams.exempt,
-            mockedParams.txData,
-            mockedParams.safetyFactor,
+          objectContaining(numberToBigNumber(mockedParams.ballotId)),
+          mockedParams.exemptedAddress,
+          mockedParams.exempt,
+          mockedParams.txData,
+          mockedParams.safetyFactor,
         ),
       ).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
@@ -1787,7 +1790,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       ];
       const mockedExemptedMethod = mock(MockedCallMethod);
       when(mockedContract.getExemptedVotersByBallot).thenReturn(instance(mockedExemptedMethod));
-      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(expectedExemptedResult);
+      when(mockedExemptedMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
+        expectedExemptedResult,
+      );
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -1860,7 +1865,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Mock web3 wrapper owner
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
-    // Get all ballots
+      // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
         ['ballot one', 'ballot two'],
@@ -1879,7 +1884,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       const expectedCurrentStageResult = new BigNumber(2);
       const mockedCurrentStageMethod = mock(MockedCallMethod);
       when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
-      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId)))).thenResolve(expectedCurrentStageResult);
+      when(
+        mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId))),
+      ).thenResolve(expectedCurrentStageResult);
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -1969,7 +1976,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       const expectedCurrentStageResult = new BigNumber(2);
       const mockedCurrentStageMethod = mock(MockedCallMethod);
       when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
-      when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId)))).thenResolve(expectedCurrentStageResult);
+      when(
+        mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(CurrentStageParams.ballotId))),
+      ).thenResolve(expectedCurrentStageResult);
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method

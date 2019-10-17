@@ -27,6 +27,7 @@ import {
   parseBallotStageValue,
   dateToBigNumber,
   valueToWei,
+  stringToBytes32,
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
 import ContractWrapper from '../../../../contract_wrapper';
@@ -179,65 +180,65 @@ interface GetAdvancedPLCRVotingCheckpointLogsAsyncParams extends GetLogs {
   >;
 }
 
-export interface BallotParams extends TxParams {
-  name: string;
-  startTime: Date;
-  commitDuration: number;
-  revealDuration: number;
-  proposalTitle: string;
-  choices: string;
-}
-
 /**
  * @param name Name of the ballot (Should be unique)
  * @param startTime startTime of the ballot
  * @param commitDuration Unix time period till the voters commit there vote
  * @param revealDuration Unix time period till the voters reveal there vote starts when commit duration ends
- * @param proposalTitle Title of proposal
- * @param details Off-chain details related to the proposal
- * @param choices Choices of proposals
- * @param noOfChoices No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
-export interface StatutoryBallotParams extends BallotParams {
+export interface BallotParams extends TxParams {
   name: string;
   startTime: Date;
   commitDuration: number;
-  details: string;
   revealDuration: number;
-  proposalTitle: string;
-  choices: string;
-  noOfChoices: number;
 }
 
 /**
- * @param details Off-chain details related to the proposal
- * @param noOfChoices No. of choices (If it is 0 then it means NAY/YAY/ABSTAIN ballot type is choosen).
+ * @param proposalTitles Title of proposal
+ * @param proposalDetails Off-chain details related to the proposal
+ * @param choices Choices of proposals
+ * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
+ */
+export interface StatutoryBallotParams extends BallotParams {
+  proposalTitles: string[];
+  proposalDetails: string;
+  choices: string[];
+  choicesCounts: number;
+}
+
+/**
  * @param checkpointId Valid checkpoint Id
  */
-export interface CustomStatutoryBallotParams extends BallotParams {
+export interface CustomStatutoryBallotParams extends StatutoryBallotParams {
   checkpointId: number;
-  details: string;
-  noOfChoices: number;
 }
 
 /**
- * @param details Off-chain details related to the proposal
- * @param noOfChoices Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
+ * @param proposalTitles Title of proposal
+ * @param proposalDetails Off-chain details related to the proposal
+ * @param choices Choices of proposals
+ * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  * @param checkpointId Valid checkpoint Id
  */
 export interface CustomCumulativeBallotParams extends BallotParams {
+  proposalTitles: string[];
+  proposalDetails: string[];
+  choices: string[];
+  choicesCounts: number[];
   checkpointId: number;
-  details: string[];
-  noOfChoices: number[];
 }
 
 /**
- * @param details Off-chain details related to the proposal
- * @param noOfChoices Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
+ * @param proposalTitles Title of proposal
+ * @param proposalDetails Off-chain details related to the proposal
+ * @param choices Choices of proposals
+ * @param choicesCounts Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
 export interface CumulativeBallotParams extends BallotParams {
-  details: string[];
-  noOfChoices: number[];
+  proposalTitles: string[];
+  proposalDetails: string[];
+  choices: string[];
+  choicesCounts: number[];
 }
 
 /**
@@ -257,12 +258,13 @@ export interface CumulativeBallotWithExemptionParams extends CumulativeBallotPar
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-export interface StatutoryBallotWithExemptionParams extends BallotParams {
+export interface StatutoryBallotWithExemptionParams extends StatutoryBallotParams {
   exemptedAddresses: string[];
-  details: string;
-  noOfChoices: number;
 }
 
+/**
+ * @param checkpointId Valid checkpoint Id
+ */
 export interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithExemptionParams {
   checkpointId: number;
 }
@@ -600,17 +602,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
     return (await this.contract).createStatutoryBallot.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      numberToBigNumber(params.noOfChoices),
+      params.proposalTitles.join(','),
+      stringToBytes32(params.proposalDetails),
+      params.choices.join(','),
+      numberToBigNumber(params.choicesCounts),
       params.txData,
       params.safetyFactor,
     );
@@ -627,17 +629,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
     return (await this.contract).createCustomStatutoryBallot.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      numberToBigNumber(params.noOfChoices),
+      params.proposalTitles.join(','),
+      stringToBytes32(params.proposalDetails),
+      params.choices.join(','),
+      numberToBigNumber(params.choicesCounts),
       numberToBigNumber(params.checkpointId),
       params.txData,
       params.safetyFactor,
@@ -655,18 +657,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.noOfChoices.length, params.details.length);
+    this.isValidLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCustomCumulativeBallot.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      params.noOfChoices.map(v => numberToBigNumber(v)),
+      params.proposalTitles.join(','),
+      params.proposalDetails.map(d => stringToBytes32(d)),
+      params.choices.join(','),
+      params.choicesCounts.map(v => numberToBigNumber(v)),
       numberToBigNumber(params.checkpointId),
       params.txData,
       params.safetyFactor,
@@ -684,18 +686,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.noOfChoices.length, params.details.length);
+    this.isValidLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCumulativeBallot.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      params.noOfChoices.map(v => numberToBigNumber(v)),
+      params.proposalTitles.join(','),
+      params.proposalDetails.map(v => stringToBytes32(v)),
+      params.choices.join(','),
+      params.choicesCounts.map(v => numberToBigNumber(v)),
       params.txData,
       params.safetyFactor,
     );
@@ -714,18 +716,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.noOfChoices.length, params.details.length);
+    this.isValidLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCustomCumulativeBallotWithExemption.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      params.noOfChoices.map(v => numberToBigNumber(v)),
+      params.proposalTitles.join(','),
+      params.proposalDetails.map(v => stringToBytes32(v)),
+      params.choices.join(','),
+      params.choicesCounts.map(v => numberToBigNumber(v)),
       numberToBigNumber(params.checkpointId),
       params.exemptedAddresses,
       params.txData,
@@ -746,18 +748,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.noOfChoices.length, params.details.length);
+    this.isValidLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCumulativeBallotWithExemption.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      params.noOfChoices.map(v => numberToBigNumber(v)),
+      params.proposalTitles.join(','),
+      params.proposalDetails.map(v => stringToBytes32(v)),
+      params.choices.join(','),
+      params.choicesCounts.map(v => numberToBigNumber(v)),
       params.exemptedAddresses,
       params.txData,
       params.safetyFactor,
@@ -777,17 +779,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
     return (await this.contract).createStatutoryBallotWithExemption.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      numberToBigNumber(params.noOfChoices),
+      params.proposalTitles.join(','),
+      params.proposalDetails,
+      params.choices.join(','),
+      numberToBigNumber(params.choicesCounts),
       params.exemptedAddresses,
       params.txData,
       params.safetyFactor,
@@ -807,17 +809,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     );
     this.validateMaximumLimitCount();
     this.isEmptyString(params.name);
-    this.isEmptyString(params.proposalTitle);
+    params.proposalTitles.map(t => this.isEmptyString(t));
     this.isGreaterThanZero(params.commitDuration, params.revealDuration);
     return (await this.contract).createCustomStatutoryBallotWithExemption.sendTransactionAsync(
-      params.name,
+      stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
       numberToBigNumber(params.commitDuration),
       numberToBigNumber(params.revealDuration),
-      params.proposalTitle,
-      params.details,
-      params.choices,
-      numberToBigNumber(params.noOfChoices),
+      params.proposalTitles.join(','),
+      params.proposalDetails,
+      params.choices.join(','),
+      numberToBigNumber(params.choicesCounts),
       numberToBigNumber(params.checkpointId),
       params.exemptedAddresses,
       params.txData,

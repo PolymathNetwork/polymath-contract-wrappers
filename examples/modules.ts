@@ -553,8 +553,6 @@ export const moduleInstancesLookup = async (
   } else {
     filteredModuleAddresses = moduleAddresses;
   }
-  console.log(filteredModuleAddresses);
-  console.log('Addresses');
   // This has to be done this way because of typescript limitations
   let wrappedModules;
   switch (moduleName) {
