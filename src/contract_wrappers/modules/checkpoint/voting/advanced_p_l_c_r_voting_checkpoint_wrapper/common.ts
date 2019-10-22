@@ -392,12 +392,12 @@ export interface PendingBallots {
 /**
  * @param choicesWeighting Vote's weight
  * @param noOfChoicesInProposal Number of choises in the proposal
- * @param voter Voter's address
+ * @param voters Voter's address
  */
 export interface BallotResult {
-  choicesWeighting: number;
-  noOfChoicesInProposal: number;
-  voter: string;
+  choicesWeighting: number[];
+  noOfChoicesInProposal: number[];
+  voters: string[]
 }
 
 /**
@@ -569,13 +569,12 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   public getBallotResults = async (params: BallotIdParams): Promise<BallotResult[]> => {
     const result = await (await this.contract).getBallotResults.callAsync(numberToBigNumber(params.ballotId));
     const typedResult: BallotResult[] = [];
-    for (let i = 0; i < result[0].length; i += 1) {
-      typedResult.push({
-        choicesWeighting: result[0][i].toNumber(),
-        noOfChoicesInProposal: result[1][i].toNumber(),
-        voter: result[2][i],
-      });
-    }
+    typedResult.push({
+      choicesWeighting: result[0].map(v => weiToValue(v, FULL_DECIMALS).toNumber()),
+      noOfChoicesInProposal: result[1].map(v => v.toNumber()),
+      voters: result[2],
+    });
+
     return typedResult;
   };
 

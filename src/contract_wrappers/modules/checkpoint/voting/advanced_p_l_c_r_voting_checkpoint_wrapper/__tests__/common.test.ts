@@ -21,7 +21,7 @@ import {
   stringToBytes32,
   bytes32ToString
 } from '../../../../../../utils/convert';
-import { ContractVersion } from '../../../../../../types';
+import { ContractVersion, FULL_DECIMALS } from '../../../../../../types';
 import AdvancedPLCRVotingCheckpointCommon from '../common';
 
 describe('AdvancedPLCRVotingCheckpointWrapper', () => {
@@ -365,7 +365,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       const expectedResult = [
         [new BigNumber(1), new BigNumber(2)],
         [new BigNumber(2), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        ['0x2222222222222222222222222222222222222222', '0x2322222222222222222222222222222222222222'],
       ];
       // Mocked method
       const mockedMethod = mock(MockedCallMethod);
@@ -377,9 +377,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Real call
       const result = await target.getBallotResults(params);
       // Result expectation
-      expect(result[0].choicesWeighting).toBe((expectedResult[0][0] as BigNumber).toNumber());
-      expect(result[0].noOfChoicesInProposal).toBe((expectedResult[1][0] as BigNumber).toNumber());
-      expect(result[0].voter).toBe(expectedResult[2][0]);
+      expect(result[0].choicesWeighting[0]).toBe(weiToValue(expectedResult[0][0] as BigNumber, FULL_DECIMALS).toNumber());
+      expect(result[0].noOfChoicesInProposal[0]).toBe((expectedResult[1][0] as BigNumber).toNumber());
+      expect(result[0].voters[0]).toBe(expectedResult[2][0]);
       // Verifications
       verify(mockedContract.getBallotResults).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)))).once();
