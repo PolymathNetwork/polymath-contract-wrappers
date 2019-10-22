@@ -28,6 +28,7 @@ import {
   dateToBigNumber,
   valueToWei,
   stringToBytes32,
+  bytes32ToString,
 } from '../../../../../utils/convert';
 import ContractFactory from '../../../../../factories/contractFactory';
 import ContractWrapper from '../../../../contract_wrapper';
@@ -199,7 +200,7 @@ export interface BallotParams extends TxParams {
  * @param choices Choices of proposals
  * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
-export interface StatutoryBallotParams extends BallotParams {
+export interface CreateStatutoryBallotParams extends BallotParams {
   proposalTitles: string[];
   proposalDetails: string;
   choices: string[];
@@ -209,22 +210,7 @@ export interface StatutoryBallotParams extends BallotParams {
 /**
  * @param checkpointId Valid checkpoint Id
  */
-export interface CustomStatutoryBallotParams extends StatutoryBallotParams {
-  checkpointId: number;
-}
-
-/**
- * @param proposalTitles Title of proposal
- * @param proposalDetails Off-chain details related to the proposal
- * @param choices Choices of proposals
- * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
- * @param checkpointId Valid checkpoint Id
- */
-export interface CustomCumulativeBallotParams extends BallotParams {
-  proposalTitles: string[];
-  proposalDetails: string[];
-  choices: string[];
-  choicesCounts: number[];
+export interface CreateCustomStatutoryBallotParams extends CreateStatutoryBallotParams {
   checkpointId: number;
 }
 
@@ -234,7 +220,7 @@ export interface CustomCumulativeBallotParams extends BallotParams {
  * @param choices Choices of proposals
  * @param choicesCounts Array of No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  */
-export interface CumulativeBallotParams extends BallotParams {
+export interface CreateCumulativeBallotParams extends BallotParams {
   proposalTitles: string[];
   proposalDetails: string[];
   choices: string[];
@@ -242,37 +228,46 @@ export interface CumulativeBallotParams extends BallotParams {
 }
 
 /**
+ * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
+ * @param checkpointId Valid checkpoint Id
+ */
+export interface CreateCustomCumulativeBallotParams extends CreateCumulativeBallotParams {
+  choicesCounts: number[];
+  checkpointId: number;
+}
+
+/**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-export interface CustomCumulativeBallotWithExemptionParams extends CustomCumulativeBallotParams {
+export interface CreateCustomCumulativeBallotWithExemptionParams extends CreateCustomCumulativeBallotParams {
   exemptedAddresses: string[];
 }
 
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-export interface CumulativeBallotWithExemptionParams extends CumulativeBallotParams {
+export interface CreateCumulativeBallotWithExemptionParams extends CreateCumulativeBallotParams {
   exemptedAddresses: string[];
 }
 
 /**
  * @param exemptedAddresses List of addresses not allowed to vote
  */
-export interface StatutoryBallotWithExemptionParams extends StatutoryBallotParams {
+export interface CreateStatutoryBallotWithExemptionParams extends CreateStatutoryBallotParams {
   exemptedAddresses: string[];
 }
 
 /**
  * @param checkpointId Valid checkpoint Id
  */
-export interface CustomStatutoryBallotWithExemptionParams extends StatutoryBallotWithExemptionParams {
+export interface CreateCustomStatutoryBallotWithExemptionParams extends CreateStatutoryBallotWithExemptionParams {
   checkpointId: number;
 }
 
 /**
  * @param ballotId Given ballot Id
- * @param votes
- * @param salt
+ * @param votes An array  value votes
+ * @param salt An 8-digit number to encode your votes
  */
 export interface CommitVoteParams extends TxParams {
   ballotId: number;
@@ -282,7 +277,7 @@ export interface CommitVoteParams extends TxParams {
 
 /**
  * @param ballotId Given ballot Id
- * @param choiceOfProposal Proposal chosen by the voter. It varies from (1 to totalProposals)
+ * @param choices Proposal chosen by the voter. It varies from (1 to totalProposals)
  * @param salt Used salt for hashing (unique for each user)
  */
 export interface RevealVoteParams extends TxParams {
@@ -300,7 +295,7 @@ export interface CancelBallotParams extends TxParams {
 
 /**
  * @param ballotId Given ballot Id
- * @param voter Address of the voter
+ * @param exemptedAddress Address of the voter
  * @param exempt Whether it is exempted or not
  */
 export interface ChangeBallotExemptedVotersListParams extends TxParams {
@@ -330,7 +325,7 @@ export interface ChangeDefaultExemptedVotersListParams extends TxParams {
 }
 
 /**
- * @param voters Address of the voter
+ * @param voters List of voters
  * @param exempts Whether it is exempted or not
  */
 export interface ChangeDefaultExemptedVotersListMultiParams extends TxParams {
@@ -345,48 +340,81 @@ export interface CheckpointIdParams {
   checkpointId: number;
 }
 
+/**
+ * @param ballotId Given ballot Id
+ */
 export interface BallotIdParams {
   ballotId: number;
 }
 
+/**
+ * @param voter Address of the voter (Who will vote)
+ * @param ballotId Id of the ballot
+ */
 export interface VoteTokenCountParams {
-  // Address of the voter (Who will vote).
   voter: string;
-  // Id of the ballot.
   ballotId: number;
 }
 
+/**
+ * @param investor Address of the investor
+ * @param balance Balance at checkpoint moment
+ */
 export interface CheckpointData {
   investor: string;
   balance: BigNumber;
 }
 
-export interface Ballots {
-  // Id list of the ballots
+/**
+ * @param ballotId Id list of the ballot
+ * @param name Name of the ballot
+ * @param totalProposal List of the no. of the proposals in the ballot
+ * @param currentStage Current stage of the ballot
+ * @param isCancelled Boolean value to know the status of the ballot
+ */
+export interface Ballot {
   ballotId: number;
-  // Name of the ballots
   name: string;
-  // List of the no. of the proposals in the ballot
   totalProposal: number;
-  // Current stage of the ballot
   currentStage: BallotStage;
-  // Array of boolean to know the status of the ballot
   isCancelled: boolean;
 }
 
+/**
+ * @param pendingCommitBallots Ballots list of indexes of ballots on which given voter has to commit
+ * @param pendingRevealBallots Ballots list of indexes of ballots on which given voter has to reveal
+ */
 export interface PendingBallots {
-  // ballots list of indexes of ballots on which given voter has to commit
-  commitCount: number[];
-  // ballots list of indexes of ballots on which given voter has to reveal
-  revealCount: number[];
+  pendingCommitBallots: number[];
+  pendingRevealBallots: number[];
 }
 
-export interface BallotResults {
+/**
+ * @param choicesWeighting Vote's weight
+ * @param noOfChoicesInProposal Number of choises in the proposal
+ * @param voter Voter's address
+ */
+export interface BallotResult {
   choicesWeighting: number;
   noOfChoicesInProposal: number;
-  voters: string;
+  voter: string;
 }
 
+/**
+ * @param name
+ * @param totalSupplyAtCheckpoint
+ * @param checkpointId
+ * @param startTime
+ * @param commitDuration
+ * @param revealDuration
+ * @param totalProposals
+ * @param totalVoters
+ * @param commitedVoteCount
+ * @param isCancelled
+ * @param currentStage
+ * @param proposalDetails
+ * @param proposalChoicesCounts
+ */
 export interface BallotDetails {
   name: string;
   totalSupplyAtCheckpoint: number;
@@ -452,8 +480,8 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   };
 
   /**
-   * Retrives the list of investors who are remain to vote
-   * @return address list of invesotrs who are remain to vote
+   * Retrieves the list of investors who haven't voted yet
+   * @return list of investors who are remain to vote
    */
   public getPendingInvestorToVote = async (params: BallotIdParams): Promise<string[]> => {
     return (await this.contract).getPendingInvestorToVote.callAsync(numberToBigNumber(params.ballotId));
@@ -480,13 +508,13 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Get the data of all the ballots
    * @return List of ballots
    */
-  public getAllBallots = async (): Promise<Ballots[]> => {
+  public getAllBallots = async (): Promise<Ballot[]> => {
     const result = await (await this.contract).getAllBallots.callAsync();
-    const typedResult: Ballots[] = [];
+    const typedResult: Ballot[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
       typedResult.push({
         ballotId: result[0][i].toNumber(),
-        name: result[1][i],
+        name: bytes32ToString(result[1][i]),
         totalProposal: result[2][i].toNumber(),
         currentStage: parseBallotStageValue(result[3][i]),
         isCancelled: result[4][i],
@@ -510,8 +538,8 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   public pendingBallots = async (voter: string): Promise<PendingBallots> => {
     const result = await (await this.contract).pendingBallots.callAsync(voter);
     const typedResult: PendingBallots = {
-      commitCount: result[0].map(v => v.toNumber()),
-      revealCount: result[1].map(v => v.toNumber()),
+      pendingCommitBallots: result[0].map(v => v.toNumber()),
+      pendingRevealBallots: result[1].map(v => v.toNumber()),
     };
     return typedResult;
   };
@@ -538,14 +566,14 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Queries the result of a given ballot
    */
-  public getBallotResults = async (params: BallotIdParams): Promise<BallotResults[]> => {
+  public getBallotResults = async (params: BallotIdParams): Promise<BallotResult[]> => {
     const result = await (await this.contract).getBallotResults.callAsync(numberToBigNumber(params.ballotId));
-    const typedResult: BallotResults[] = [];
+    const typedResult: BallotResult[] = [];
     for (let i = 0; i < result[0].length; i += 1) {
       typedResult.push({
         choicesWeighting: result[0][i].toNumber(),
         noOfChoicesInProposal: result[1][i].toNumber(),
-        voters: result[2][i],
+        voter: result[2][i],
       });
     }
     return typedResult;
@@ -594,16 +622,16 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Use to create a statutory ballot
    */
-  public createStatutoryBallot = async (params: StatutoryBallotParams): Promise<PolyResponse> => {
+  public createStatutoryBallot = async (params: CreateStatutoryBallotParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
     return (await this.contract).createStatutoryBallot.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -621,16 +649,16 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Use to create a custom statutory ballot
    */
-  public createCustomStatutoryBallot = async (params: CustomStatutoryBallotParams): Promise<PolyResponse> => {
+  public createCustomStatutoryBallot = async (params: CreateCustomStatutoryBallotParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
     return (await this.contract).createCustomStatutoryBallot.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -649,17 +677,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Use to create a custom cumulative ballot
    */
-  public createCustomCumulativeBallot = async (params: CustomCumulativeBallotParams): Promise<PolyResponse> => {
+  public createCustomCumulativeBallot = async (params: CreateCustomCumulativeBallotParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.choices.length, params.proposalDetails.length);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
+    this.checkSameLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCustomCumulativeBallot.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -678,17 +706,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Use to create a cumulative ballot
    */
-  public createCumulativeBallot = async (params: CumulativeBallotParams): Promise<PolyResponse> => {
+  public createCumulativeBallot = async (params: CreateCumulativeBallotParams): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.choices.length, params.proposalDetails.length);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
+    this.checkSameLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCumulativeBallot.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -707,18 +735,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Use to create a ballot with exemption
    */
   public createCustomCumulativeBallotWithExemption = async (
-    params: CustomCumulativeBallotWithExemptionParams,
+    params: CreateCustomCumulativeBallotWithExemptionParams,
   ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.choices.length, params.proposalDetails.length);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
+    this.checkSameLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCustomCumulativeBallotWithExemption.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -739,18 +767,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Use to create a cumulative ballot with exemption
    */
   public createCumulativeBallotWithExemption = async (
-    params: CumulativeBallotWithExemptionParams,
+    params: CreateCumulativeBallotWithExemptionParams,
   ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
-    this.isValidLength(params.choices.length, params.proposalDetails.length);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
+    this.checkSameLength(params.choices.length, params.proposalDetails.length);
     return (await this.contract).createCumulativeBallotWithExemption.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -770,17 +798,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Use to create a statutory ballot with exemption
    */
   public createStatutoryBallotWithExemption = async (
-    params: StatutoryBallotWithExemptionParams,
+    params: CreateStatutoryBallotWithExemptionParams,
   ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
     return (await this.contract).createStatutoryBallotWithExemption.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -800,17 +828,17 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Use to create a custom statutory ballot with exemption
    */
   public createCustomStatutoryBallotWithExemption = async (
-    params: CustomStatutoryBallotWithExemptionParams,
+    params: CreateCustomStatutoryBallotWithExemptionParams,
   ): Promise<PolyResponse> => {
     assert.assert(
       await this.isCallerAllowed(params.txData, Perm.Admin),
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.validateMaximumLimitCount();
-    this.isEmptyString(params.name);
-    params.proposalTitles.map(t => this.isEmptyString(t));
-    this.isGreaterThanZero(params.commitDuration, params.revealDuration);
+    await this.validateMaximumLimitCount();
+    this.checkNonEmptyTitle(params.name);
+    params.proposalTitles.map(t => this.checkNonEmptyTitle(t));
+    this.checkPositiveDurations(params.commitDuration, params.revealDuration);
     return (await this.contract).createCustomStatutoryBallotWithExemption.sendTransactionAsync(
       stringToBytes32(params.name),
       dateToBigNumber(params.startTime),
@@ -831,9 +859,9 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Used to commit the vote
    */
   public commitVote = async (params: CommitVoteParams): Promise<PolyResponse> => {
-    this.checkIndexOutOfBound(params.ballotId);
+    await this.checkIndexOutOfBound(params.ballotId);
     assert.assert(params.votes.length > 0, ErrorCode.InvalidData, 'Invalid vote');
-    this.checkValidStage(
+    await this.checkValidStage(
       {
         ballotId: params.ballotId,
       },
@@ -847,7 +875,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     assert.assert(isVoterAllowed, ErrorCode.PreconditionRequired, 'Invalid voter');
 
     const commitVote: PendingBallots = await this.pendingBallots(caller);
-    const alreadyVoted = commitVote.commitCount.find(v => {
+    const alreadyVoted = commitVote.pendingCommitBallots.find(v => {
       return v === params.ballotId;
     });
     assert.assert(alreadyVoted !== undefined, ErrorCode.PreconditionRequired, 'Already voted');
@@ -875,12 +903,12 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
    * Used to reveal the vote
    */
   public revealVote = async (params: RevealVoteParams): Promise<PolyResponse> => {
-    this.checkIndexOutOfBound(params.ballotId);
-    this.checkValidStage(
+    await this.checkIndexOutOfBound(params.ballotId);
+    await this.checkValidStage(
       {
         ballotId: params.ballotId,
       },
-      BallotStage.Commit,
+      BallotStage.Reveal,
     );
 
     const ballot = await this.getBallotDetails({ ballotId: params.ballotId });
@@ -888,7 +916,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
     const caller = await this.getCallerAddress(params.txData);
     const commitVote: PendingBallots = await this.pendingBallots(caller);
-    const alreadyVoted = commitVote.commitCount.find(v => {
+    const alreadyVoted = commitVote.pendingRevealBallots.find(v => {
       return v === params.ballotId;
     });
     assert.assert(alreadyVoted !== undefined, ErrorCode.PreconditionRequired, 'Secret vote not available');
@@ -908,23 +936,30 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       return e.args;
     });
 
-    const onlyBallot = _.filter(args, e => {
+    const onlyBallot = _.find(args, e => {
       /* eslint-disable no-underscore-dangle */
       return e._ballotId.toNumber() === params.ballotId;
     });
+    assert.assert(onlyBallot !== undefined, ErrorCode.NotFound, 'Ballot id not found');
 
     const keccakKeys = ['uint256'];
-    params.choices.forEach(() => {
+    const bgVotes = params.choices.map(e => {
       keccakKeys.push('uint256');
+      return valueToWei(new BigNumber(e), FULL_DECIMALS).toString();
     });
-    const hash = ethersUtils.solidityKeccak256(keccakKeys, params.choices.concat(params.salt));
-    assert.assert(onlyBallot[0]._secretHash === hash, ErrorCode.InvalidData, 'Invalid vote');
+    const hash = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, params.salt]);
+
+    assert.assert(
+      (onlyBallot as AdvancedPLCRVotingCheckpointVoteCommitEventArgs_3_1_0)._secretHash === hash,
+      ErrorCode.InvalidData,
+      'Invalid vote',
+    );
 
     this.unsubscribeAll();
 
     return (await this.contract).revealVote.sendTransactionAsync(
       numberToBigNumber(params.ballotId),
-      params.choices.map(v => numberToBigNumber(v)),
+      params.choices.map(v => new BigNumber(valueToWei(new BigNumber(v), FULL_DECIMALS).toString())),
       numberToBigNumber(params.salt),
       params.txData,
       params.safetyFactor,
@@ -940,7 +975,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       ErrorCode.Unauthorized,
       'Caller is not allowed',
     );
-    this.checkIndexOutOfBound(params.ballotId);
+    await this.checkIndexOutOfBound(params.ballotId);
 
     const ballot = await this.getBallotDetails({ ballotId: params.ballotId });
     const now = new Date();
@@ -1001,7 +1036,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
         }),
       );
     }
-    Promise.all(assertResult);
+    await Promise.all(assertResult);
 
     return (await this.contract).changeBallotExemptedVotersListMulti.sendTransactionAsync(
       numberToBigNumber(params.ballotId),
@@ -1066,7 +1101,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
     assert.assert(!(await this.isAnyBallotRunning()), ErrorCode.PreconditionRequired, 'At least one ballot is running');
 
-    this.isValidLength(params.voters.length, params.exempts.length);
+    this.checkSameLength(params.voters.length, params.exempts.length);
 
     for (let i = 0; i < params.voters.length; i += 1) {
       assert.isNonZeroETHAddressHex('voters', params.voters[i]);
@@ -1099,20 +1134,20 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     return false;
   };
 
-  private isGreaterThanZero = (commitDuration: number, revealDuration: number) => {
+  private checkPositiveDurations = (commitDuration: number, revealDuration: number) => {
     assert.assert(commitDuration > 0 && revealDuration > 0, ErrorCode.InvalidData, 'Invalid Duration');
   };
 
-  private isEmptyString = (title: string) => {
+  private checkNonEmptyTitle = (title: string) => {
     assert.assert(title.length > 0, ErrorCode.InvalidData, 'Empty title');
   };
 
-  private isValidLength = (length1: number, length2: number) => {
+  private checkSameLength = (length1: number, length2: number) => {
     assert.assert(length1 === length2, ErrorCode.InvalidData, 'Length mismatch');
   };
 
   private checkIndexOutOfBound = async (ballotId: number) => {
-    const allBallots: Ballots[] = await this.getAllBallots();
+    const allBallots: Ballot[] = await this.getAllBallots();
     assert.assert(allBallots.length > ballotId, ErrorCode.InvalidData, 'Index out of bound');
   };
 
@@ -1122,7 +1157,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   };
 
   private validateMaximumLimitCount = async () => {
-    const allBallots: Ballots[] = await this.getAllBallots();
+    const allBallots: Ballot[] = await this.getAllBallots();
     assert.assert(allBallots.length < 500, ErrorCode.PreconditionRequired, 'Max Limit Reached');
   };
 

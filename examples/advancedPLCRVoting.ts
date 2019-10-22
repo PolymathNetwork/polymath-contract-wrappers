@@ -16,7 +16,6 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Add the AdvancedPLCRVoting module
-  /*
   const options: AddingModuleOpts = {
     archived: false,
     label: 'APLCR Label',
@@ -29,10 +28,8 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
     },
     options,
   );
-  */
 
   // Add all address in the whitelist including myAddress
-  /*
   const kycInvestorMultiData = {
     investors: [myAddress],
     canSendAfter: [new Date()],
@@ -47,52 +44,50 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
     values: [new BigNumber(1000)],
   };
   await issueTokenToInvestors(polymathAPI, ticker, issueMultiParams);
-  */
 
   // Create checkpoint
-  /*
   await tickerSecurityTokenInstance.createCheckpoint({});
 
+  // Get the advancedPLCRVoting module
   const advancedPLCRVoting = (await moduleInstancesLookup(polymathAPI, {
     ticker,
     moduleName: ModuleName.AdvancedPLCRVotingCheckpoint,
   }))[0];
-  */
 
-  /*
+  // Create a new custom statutory ballot
   const ballot = {
     name: 'Custom statutory ballot',
     startTime: new Date(),
-    commitDuration: 86000,
+    commitDuration: 20,
     revealDuration: 86000,
-    proposalTitle: 'Propostal Title Example',
-    choices: 'Choice one',
+    proposalTitles: ['Propostal Title Example'],
+    proposalDetails: 'Proposal Details',
+    choices: ['Choice one', 'Choice two'],
+    choicesCounts: 2,
     checkpointId: 1,
-    details: 'Offchain details',
-    noOfChoices: 2,
   };
-  advancedPLCRVoting.createCustomStatutoryBallot;
-  */
+  await advancedPLCRVoting.createCustomStatutoryBallot(ballot);
 
-  /*
-  const logs = await advancedPLCRVoting.getLogsAsync({
-    eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit,
-    indexFilterValues: { _voter: '0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c' },
+  // Commit vote
+  await advancedPLCRVoting.commitVote({
+    ballotId: 0,
+    votes: [50, 200],
+    salt: 12345678,
   });
 
-  const args = _.map(logs, (e: any) => {
-    return e.args;
+  // Waiting 30 seconds to revel vote
+  const sleep = (milliseconds: number) => {
+    console.log(`Sleeping ${milliseconds / 1000} seconds`);
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  };
+  await sleep(30000);
+
+  // Reveal vote
+  await advancedPLCRVoting.revealVote({
+    ballotId: 0,
+    choices: [50, 200],
+    salt: 12345678,
   });
 
-  const onlyBallot: any = _.filter(args, (e: any) => {
-    return e._ballotId.toNumber() === 1;
-  });
-
-  const secretHash = onlyBallot[0]._secretHash;
-  const hash = ethersUtils.solidityKeccak256(['uint256', 'uint256'], ['1000000000000000000', '12345678']);
-
-  console.log(secretHash, hash);
-
-  advancedPLCRVoting.unsubscribeAll();
-  */
+  console.log('Vote revealed!');
 };

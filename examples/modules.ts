@@ -30,7 +30,6 @@ import {
   RestrictedPartialSaleTransferManagerData,
   USDTieredSTOData,
   VestingEscrowWalletData,
-  AdvancedPLCRVotingCheckpointData,
 } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 import { ModuleFactory } from '../src/contract_wrappers/modules/module_factory_wrapper';
 
@@ -53,8 +52,7 @@ export interface AddingModuleOpts {
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData
-    | VestingEscrowWalletData
-    | AdvancedPLCRVotingCheckpointData;
+    | VestingEscrowWalletData;
 }
 
 interface GetAttachedGeneralPermissionManagersParams extends GetAttachedModulesParams {

@@ -933,8 +933,7 @@ export interface AddModuleParams extends TxParams {
     | DividendCheckpointData
     | CappedSTOData
     | USDTieredSTOData
-    | VestingEscrowWalletData
-    | AdvancedPLCRVotingCheckpointData;
+    | VestingEscrowWalletData;
 }
 
 /**
@@ -956,11 +955,6 @@ export interface AddNoDataModuleParams extends AddModuleParams {
 
 export interface AddVestingEscrowWalletParams extends AddModuleParams {
   moduleName: ModuleName.VestingEscrowWallet;
-  data: VestingEscrowWalletData;
-}
-
-interface AddAdvancedPLCRVotingCheckpointParams extends AddModuleParams {
-  moduleName: ModuleName.AdvancedPLCRVotingCheckpoint;
   data: VestingEscrowWalletData;
 }
 
@@ -1015,8 +1009,6 @@ export interface DividendCheckpointData {
   wallet: string;
 }
 
-export interface AdvancedPLCRVotingCheckpointData {}
-
 export interface CappedSTOData {
   startTime: Date;
   endTime: Date;
@@ -1055,7 +1047,6 @@ interface AddModuleInterface {
   (params: AddUSDTieredSTOParams): Promise<PolyResponse>;
   (params: AddNoDataModuleParams): Promise<PolyResponse>;
   (params: AddVestingEscrowWalletParams): Promise<PolyResponse>;
-  (params: AddAdvancedPLCRVotingCheckpointParams): Promise<PolyResponse>;
 }
 
 // // Return types ////
@@ -2540,10 +2531,6 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
         assert.isNonZeroETHAddressHex('Wallet', (params.data as DividendCheckpointData).wallet);
         iface = new ethersUtils.Interface(EtherDividendCheckpointContract_3_0_0.ABI());
         data = iface.functions.configure.encode([(params.data as DividendCheckpointData).wallet]);
-        break;
-      case ModuleName.AdvancedPLCRVotingCheckpoint:
-        iface = new ethersUtils.Interface(AdvancedPLCRVotingCheckpointContract_3_1_0.ABI());
-        data = NO_MODULE_DATA;
         break;
       default:
         data = NO_MODULE_DATA;

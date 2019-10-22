@@ -2,7 +2,7 @@
 import { mock, instance, reset, when, verify, objectContaining /* spy */ } from 'ts-mockito';
 import {
   AdvancedPLCRVotingCheckpointContract_3_1_0,
-  // AdvancedPLCRVotingCheckpointEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointEvents_3_1_0,
   ISecurityTokenContract_3_0_0,
   BigNumber,
   Web3Wrapper,
@@ -19,6 +19,7 @@ import {
   dateToBigNumber,
   bigNumberToDate,
   stringToBytes32,
+  bytes32ToString
 } from '../../../../../../utils/convert';
 import { ContractVersion } from '../../../../../../types';
 import AdvancedPLCRVotingCheckpointCommon from '../common';
@@ -227,7 +228,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Address expected
       const expectedResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -243,7 +244,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       const result = await target.getAllBallots();
       // Result expectation
       expect(result[0].ballotId).toBe((expectedResult[0][0] as BigNumber).toNumber());
-      expect(result[0].name).toBe(expectedResult[1][0]);
+      expect(result[0].name).toBe(bytes32ToString(expectedResult[1][0] as string));
       expect(result[0].totalProposal).toBe((expectedResult[2][0] as BigNumber).toNumber());
       expect(result[0].currentStage).toBe(parseBallotStageValue(expectedResult[3][0] as BigNumber));
       expect(result[0].isCancelled).toBe(expectedResult[4][0]);
@@ -295,8 +296,8 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Real call
       const result = await target.pendingBallots(params);
       // Result expectation
-      expect(result.commitCount[0]).toBe(expectedResult[0][0].toNumber());
-      expect(result.revealCount[0]).toBe(expectedResult[1][0].toNumber());
+      expect(result.pendingCommitBallots[0]).toBe(expectedResult[0][0].toNumber());
+      expect(result.pendingRevealBallots[0]).toBe(expectedResult[1][0].toNumber());
       // Verifications
       verify(mockedContract.pendingBallots).once();
       verify(mockedMethod.callAsync(params)).once();
@@ -378,7 +379,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Result expectation
       expect(result[0].choicesWeighting).toBe((expectedResult[0][0] as BigNumber).toNumber());
       expect(result[0].noOfChoicesInProposal).toBe((expectedResult[1][0] as BigNumber).toNumber());
-      expect(result[0].voters).toBe(expectedResult[2][0]);
+      expect(result[0].voter).toBe(expectedResult[2][0]);
       // Verifications
       verify(mockedContract.getBallotResults).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)))).once();
@@ -508,7 +509,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -518,7 +519,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'New ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
@@ -606,7 +607,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -707,7 +708,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -808,7 +809,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -906,7 +907,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1010,7 +1011,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1111,7 +1112,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1212,7 +1213,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1352,7 +1353,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1433,7 +1434,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1482,9 +1483,34 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // TODO
       const expectedPLCRContractAddress = '0x4444444444444444444444444444444444444444';
       when(mockedContract.address).thenReturn(expectedPLCRContractAddress);
-      const targetSpy = spy(target);
-      const targetReturn = [{"logIndex":0,"transactionIndex":0,"transactionHash":"0xa42c721ed1e07d87e610029ada99c71970c54b64034a1f6cc31f473ea4612002","blockHash":"0x8aabe209ce7b58c1db07c364d8d6bfabe6a2a3ba9a7c399b4e867f766ebd0223","blockNumber":102,"address":"0xd550ee9864bf1f8343b25076a0b1d7b0019dcddc","data":"0x00000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000000000000063ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944","topics":["0x9e0779b6b10265b94615da8047e410aefc37f80f2448de116beb21907b824292","0x00000000000000000000000084c3f9d07466a65c3a1dd1eab059dec560a11f0c"],"type":"mined","event":"VoteCommit","args":{"_voter":"0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c","_weight":"1000000000000000000000","_ballotId":"0","_secretHash":"0x63ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944"}}];
-      when(targetSpy.getLogsAsyncInternal(expectedPLCRContractAddress, AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit, undefined, objectContaining({ _voter: '0x2222222222222222222222222222222222222222' }))).thenResolve(targetReturn);
+      const targetReturn = [{
+        "logIndex": 0,
+        "transactionIndex": 0,
+        "transactionHash": "0xa42c721ed1e07d87e610029ada99c71970c54b64034a1f6cc31f473ea4612002",
+        "blockHash": "0x8aabe209ce7b58c1db07c364d8d6bfabe6a2a3ba9a7c399b4e867f766ebd0223",
+        "blockNumber": 102,
+        "address": "0xd550ee9864bf1f8343b25076a0b1d7b0019dcddc",
+        "data": "0x00000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000000000000063ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944",
+        "topics":
+          [
+            "0x9e0779b6b10265b94615da8047e410aefc37f80f2448de116beb21907b824292",
+            "0x00000000000000000000000084c3f9d07466a65c3a1dd1eab059dec560a11f0c"
+          ],
+        "type": "mined",
+        "event": "VoteCommit",
+        "args":{
+          "_voter": "0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c",
+          "_weight": new BigNumber(100),
+          "_ballotId": new BigNumber(0),
+          "_secretHash": "0x63ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944"
+        }
+      }];
+      when(target.getLogsAsync({
+        eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit,
+        indexFilterValues: objectContaining({
+          _voter: '0x2222222222222222222222222222222222222222'
+        })
+      }));
       // END TODO
 
       const expectedResult = getMockedPolyResponse();
@@ -1553,7 +1579,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1868,7 +1894,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],
@@ -1960,7 +1986,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Get all ballots
       const expectedBallotsResult = [
         [new BigNumber(1), new BigNumber(2)],
-        ['ballot one', 'ballot two'],
+        [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
         [new BigNumber(1), new BigNumber(2)],
         [false, true],

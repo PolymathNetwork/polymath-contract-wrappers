@@ -4,15 +4,14 @@ import { AdvancedPLCRVotingCheckpoint_3_1_0, isAdvancedPLCRVotingCheckpoint_3_1_
 
 import Common, {
   isAdvancedPLCRVotingCheckpoint,
-  BallotParams,
-  StatutoryBallotParams,
-  CustomStatutoryBallotParams,
-  CustomCumulativeBallotParams,
-  CumulativeBallotParams,
-  CustomCumulativeBallotWithExemptionParams,
-  CumulativeBallotWithExemptionParams,
-  StatutoryBallotWithExemptionParams,
-  CustomStatutoryBallotWithExemptionParams,
+  CreateStatutoryBallotParams,
+  CreateCustomStatutoryBallotParams,
+  CreateCustomCumulativeBallotParams,
+  CreateCumulativeBallotParams,
+  CreateCustomCumulativeBallotWithExemptionParams,
+  CreateCumulativeBallotWithExemptionParams,
+  CreateStatutoryBallotWithExemptionParams,
+  CreateCustomStatutoryBallotWithExemptionParams,
   CommitVoteParams,
   RevealVoteParams,
   CancelBallotParams,
@@ -20,9 +19,6 @@ import Common, {
   ChangeBallotExemptedVotersListMultiParams,
   ChangeDefaultExemptedVotersListParams,
   ChangeDefaultExemptedVotersListMultiParams,
-  CheckpointIdParams,
-  BallotIdParams,
-  VoteTokenCountParams,
 } from './common';
 import { ContractVersion } from '../../../../../types';
 
@@ -47,15 +43,14 @@ export type AdvancedPLCRVotingCheckpoint = AdvancedPLCRVotingCheckpoint_3_1_0;
 export { isAdvancedPLCRVotingCheckpoint, AdvancedPLCRVotingCheckpoint_3_1_0, isAdvancedPLCRVotingCheckpoint_3_1_0 };
 
 export namespace AdvancedPLCRVotingCheckpointTransactionParams {
-  export interface Ballot extends BallotParams {}
-  export interface StatutoryBallot extends StatutoryBallotParams {}
-  export interface CustomStatutoryBallot extends CustomStatutoryBallotParams {}
-  export interface CustomCumulativeBallot extends CustomCumulativeBallotParams {}
-  export interface CumulativeBallot extends CumulativeBallotParams {}
-  export interface CustomCumulativeBallotWithExemption extends CustomCumulativeBallotWithExemptionParams {}
-  export interface CumulativeBallotWithExemption extends CumulativeBallotWithExemptionParams {}
-  export interface StatutoryBallotWithExemption extends StatutoryBallotWithExemptionParams {}
-  export interface CustomStatutoryBallotWithExemption extends CustomStatutoryBallotWithExemptionParams {}
+  export interface CreateStatutoryBallot extends CreateStatutoryBallotParams {}
+  export interface CreateCustomStatutoryBallot extends CreateCustomStatutoryBallotParams {}
+  export interface CreateCustomCumulativeBallot extends CreateCustomCumulativeBallotParams {}
+  export interface CreateCumulativeBallot extends CreateCumulativeBallotParams {}
+  export interface CreateCustomCumulativeBallotWithExemption extends CreateCustomCumulativeBallotWithExemptionParams {}
+  export interface CreateCumulativeBallotWithExemption extends CreateCumulativeBallotWithExemptionParams {}
+  export interface CreateStatutoryBallotWithExemption extends CreateStatutoryBallotWithExemptionParams {}
+  export interface CreateCustomStatutoryBallotWithExemption extends CreateCustomStatutoryBallotWithExemptionParams {}
   export interface CommitVote extends CommitVoteParams {}
   export interface RevealVote extends RevealVoteParams {}
   export interface CancelBallot extends CancelBallotParams {}
@@ -63,9 +58,6 @@ export namespace AdvancedPLCRVotingCheckpointTransactionParams {
   export interface ChangeBallotExemptedVotersListMulti extends ChangeBallotExemptedVotersListMultiParams {}
   export interface ChangeDefaultExemptedVotersList extends ChangeDefaultExemptedVotersListParams {}
   export interface ChangeDefaultExemptedVotersListMulti extends ChangeDefaultExemptedVotersListMultiParams {}
-  export interface CheckpointId extends CheckpointIdParams {}
-  export interface BallotId extends BallotIdParams {}
-  export interface VoteTokenCount extends VoteTokenCountParams {}
 }
 
 // for internal use

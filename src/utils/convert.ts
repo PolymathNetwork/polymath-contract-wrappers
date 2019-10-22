@@ -99,7 +99,8 @@ export function parsePartitionBytes32Value(value: string): Partition {
 
 export function parseBallotStageValue(value: BigNumber): BallotStage {
   let stageResult: BallotStage = BallotStage.Prep;
-  switch (value.toNumber()) {
+  const numStage = typeof value === 'number' ? value : value.toNumber();
+  switch (numStage) {
     case 0: {
       stageResult = BallotStage.Prep;
       break;
