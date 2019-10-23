@@ -1450,7 +1450,6 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
     });
   });
 
-  // TODO getLogsAsync mock
   describe('Reveal Vote', () => {
     test('should revealVote', async () => {
       const mockedParams = {
