@@ -397,7 +397,7 @@ export interface PendingBallots {
 export interface BallotResult {
   choicesWeighting: number[];
   noOfChoicesInProposal: number[];
-  voters: string[]
+  voters: string[];
 }
 
 /**

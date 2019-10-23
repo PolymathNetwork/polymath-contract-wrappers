@@ -11,7 +11,6 @@ import {
   ERC20DividendCheckpointContract_3_0_0,
   VestingEscrowWalletContract_3_0_0,
   RestrictedPartialSaleTMContract_3_1_0,
-  AdvancedPLCRVotingCheckpointContract_3_1_0,
   TxData,
   Web3Wrapper,
   BigNumber,

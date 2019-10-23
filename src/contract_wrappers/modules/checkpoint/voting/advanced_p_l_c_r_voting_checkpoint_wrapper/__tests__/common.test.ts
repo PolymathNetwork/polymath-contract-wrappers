@@ -8,6 +8,7 @@ import {
   Web3Wrapper,
   ethersUtils,
   PolyTokenEvents_3_0_0,
+  AdvancedPLCRVotingCheckpointEventArgs_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { MockedCallMethod, MockedSendMethod, getMockedPolyResponse } from '../../../../../../test_utils/mocked_methods';
 import { ModuleCommon } from '../../../../module_wrapper';
@@ -19,9 +20,10 @@ import {
   dateToBigNumber,
   bigNumberToDate,
   stringToBytes32,
-  bytes32ToString
+  bytes32ToString,
+  valueToWei,
 } from '../../../../../../utils/convert';
-import { ContractVersion, FULL_DECIMALS } from '../../../../../../types';
+import { ContractVersion, FULL_DECIMALS, GetLogsAsyncParams } from '../../../../../../types';
 import AdvancedPLCRVotingCheckpointCommon from '../common';
 
 describe('AdvancedPLCRVotingCheckpointWrapper', () => {
@@ -30,6 +32,35 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
     public contract: Promise<AdvancedPLCRVotingCheckpointContract_3_1_0>;
 
     public contractVersion!: ContractVersion;
+
+    public getLogsAsync = async <ArgsType extends AdvancedPLCRVotingCheckpointEventArgs_3_1_0>(
+      params: GetLogsAsyncParams,
+    ): Promise<any> => {
+      return [
+        {
+          logIndex: 0,
+          transactionIndex: 0,
+          transactionHash: '0xa42c721ed1e07d87e610029ada99c71970c54b64034a1f6cc31f473ea4612002',
+          blockHash: '0x8aabe209ce7b58c1db07c364d8d6bfabe6a2a3ba9a7c399b4e867f766ebd0223',
+          blockNumber: 102,
+          address: '0xd550ee9864bf1f8343b25076a0b1d7b0019dcddc',
+          data:
+            '0x00000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000000000000063ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944',
+          topics: [
+            '0x9e0779b6b10265b94615da8047e410aefc37f80f2448de116beb21907b824292',
+            '0x00000000000000000000000084c3f9d07466a65c3a1dd1eab059dec560a11f0c',
+          ],
+          type: 'mined',
+          event: 'VoteCommit',
+          args: {
+            _voter: '0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c',
+            _weight: new BigNumber(100),
+            _ballotId: new BigNumber(1),
+            _secretHash: '0xa8532c58388f623ee2f3826ea54024c740308983e01353015d566b9e84fd356d',
+          },
+        },
+      ];
+    };
 
     public constructor(
       web3Wrapper: Web3Wrapper,
@@ -1420,7 +1451,6 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
   });
 
   // TODO getLogsAsync mock
-  /*
   describe('Reveal Vote', () => {
     test('should revealVote', async () => {
       const mockedParams = {
@@ -1436,7 +1466,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         [new BigNumber(1), new BigNumber(2)],
         [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
-        [new BigNumber(1), new BigNumber(2)],
+        [new BigNumber(2), new BigNumber(2)],
         [false, true],
       ];
       const mockedBallotsMethod = mock(MockedCallMethod);
@@ -1444,7 +1474,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       // Check valid stage
-      const expectedCurrentStageResult = new BigNumber(1);
+      const expectedCurrentStageResult = new BigNumber(2);
       const mockedCurrentStageMethod = mock(MockedCallMethod);
       when(mockedContract.getCurrentBallotStage).thenReturn(instance(mockedCurrentStageMethod));
       when(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).thenResolve(
@@ -1463,7 +1493,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         new BigNumber(1),
         new BigNumber(1),
         false,
-        new BigNumber(1),
+        new BigNumber(2),
         ['first proposal'],
         [new BigNumber(1), new BigNumber(1)],
       ];
@@ -1474,44 +1504,20 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       );
 
       // pending ballots
-      const expectedPendingBallotsResult = [[new BigNumber(1), new BigNumber(2)], [new BigNumber(3), new BigNumber(4)]];
+      const expectedPendingBallotsResult = [[new BigNumber(1)], [new BigNumber(1)]];
       const mockedPendingBallotsMethod = mock(MockedCallMethod);
       when(mockedContract.pendingBallots).thenReturn(instance(mockedPendingBallotsMethod));
       when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
 
       // Get logs
-      // TODO
       const expectedPLCRContractAddress = '0x4444444444444444444444444444444444444444';
       when(mockedContract.address).thenReturn(expectedPLCRContractAddress);
-      const targetReturn = [{
-        "logIndex": 0,
-        "transactionIndex": 0,
-        "transactionHash": "0xa42c721ed1e07d87e610029ada99c71970c54b64034a1f6cc31f473ea4612002",
-        "blockHash": "0x8aabe209ce7b58c1db07c364d8d6bfabe6a2a3ba9a7c399b4e867f766ebd0223",
-        "blockNumber": 102,
-        "address": "0xd550ee9864bf1f8343b25076a0b1d7b0019dcddc",
-        "data": "0x00000000000000000000000000000000000000000000003635c9adc5dea00000000000000000000000000000000000000000000000000000000000000000000063ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944",
-        "topics":
-          [
-            "0x9e0779b6b10265b94615da8047e410aefc37f80f2448de116beb21907b824292",
-            "0x00000000000000000000000084c3f9d07466a65c3a1dd1eab059dec560a11f0c"
-          ],
-        "type": "mined",
-        "event": "VoteCommit",
-        "args":{
-          "_voter": "0x84c3f9d07466a65c3a1dd1eab059dec560a11f0c",
-          "_weight": new BigNumber(100),
-          "_ballotId": new BigNumber(0),
-          "_secretHash": "0x63ec21c7bccf3df8ef2251d0827013e8309d63bf5802ceb6d450138a30926944"
-        }
-      }];
-      when(target.getLogsAsync({
+      target.getLogsAsync({
         eventName: AdvancedPLCRVotingCheckpointEvents_3_1_0.VoteCommit,
-        indexFilterValues: objectContaining({
-          _voter: '0x2222222222222222222222222222222222222222'
-        })
-      }));
-      // END TODO
+        indexFilterValues: {
+          _voter: '0x2222222222222222222222222222222222222222',
+        },
+      });
 
       const expectedResult = getMockedPolyResponse();
       // Mocked method
@@ -1522,7 +1528,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(
         mockedMethod.sendTransactionAsync(
           objectContaining(numberToBigNumber(mockedParams.ballotId)),
-          objectContaining(mockedParams.choices.map(v => numberToBigNumber(v))),
+          objectContaining(
+            mockedParams.choices.map(v => new BigNumber(valueToWei(new BigNumber(v), FULL_DECIMALS).toString())),
+          ),
           objectContaining(numberToBigNumber(mockedParams.salt)),
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1539,15 +1547,23 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           objectContaining(numberToBigNumber(mockedParams.ballotId)),
-          objectContaining(mockedParams.choices.map(v => numberToBigNumber(v))),
+          objectContaining(
+            mockedParams.choices.map(v => new BigNumber(valueToWei(new BigNumber(v), FULL_DECIMALS).toString())),
+          ),
           objectContaining(numberToBigNumber(mockedParams.salt)),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
       ).once();
+      verify(mockedContract.getAllBallots).once();
+      verify(mockedBallotsMethod.callAsync()).once();
+      verify(mockedContract.getCurrentBallotStage).once();
+      verify(mockedContract.getBallotDetails).once();
+      verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
+      verify(mockedContract.pendingBallots).once();
+      verify(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).once();
     });
   });
-  */
 
   describe('Cancel Ballot', () => {
     test('should cancelBallot', async () => {
