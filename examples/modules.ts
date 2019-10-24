@@ -161,11 +161,11 @@ interface GetAttachedModules {
 
 export const addModule = async (
   polymathAPI: PolymathAPI,
-  { ticker, moduleName }: GetAttachedModulesParams,
+  { ticker = '', moduleName }: GetAttachedModulesParams,
   opts: AddingModuleOpts,
 ) => {
   // Create a Security Token Instance
-  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker || '');
+  const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker);
 
   const moduleTypes = {
     [ModuleName.CappedSTO]: ModuleType.STO,
@@ -531,12 +531,12 @@ export const getFactoryAddress = async (
  */
 export const moduleInstancesLookup = async (
   polymathAPI: PolymathAPI,
-  { ticker, moduleName }: GetAttachedModulesParams,
+  { ticker = '', moduleName }: GetAttachedModulesParams,
   opts?: GetAttachedModulesOpts,
 ): Promise<any[]> => {
   // Create a Security Token Instance
 
-  const securityToken = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker || '');
+  const securityToken = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker);
   // Get Module Addresses
   const moduleAddresses = await securityToken.getModulesByName({ moduleName });
 

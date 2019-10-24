@@ -1,4 +1,4 @@
-import { AdvancedPLCRVotingCheckpointEvents_3_1_0, BigNumber, ethersUtils } from '@polymathnetwork/abi-wrappers';
+import { BigNumber } from '@polymathnetwork/abi-wrappers';
 import _ from 'lodash';
 import { PolymathAPI, ModuleName } from '../src';
 import { issueTokenToInvestors } from './issueTokenToInvestor';
@@ -16,7 +16,6 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
   // Add the AdvancedPLCRVoting module
-  /*
   const options: AddingModuleOpts = {
     archived: false,
     label: 'APLCR Label',
@@ -48,7 +47,6 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
 
   // Create checkpoint
   await tickerSecurityTokenInstance.createCheckpoint({});
-  */
 
   // Get the advancedPLCRVoting module
   const advancedPLCRVoting = (await moduleInstancesLookup(polymathAPI, {
@@ -56,12 +54,6 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
     moduleName: ModuleName.AdvancedPLCRVotingCheckpoint,
   }))[0];
 
-  const ballotId = {
-    ballotId: 0,
-  };
-  console.log(await advancedPLCRVoting.getBallotResults(ballotId));
-
-  /*
   // Create a new custom statutory ballot
   const ballot = {
     name: 'Custom statutory ballot',
@@ -98,5 +90,4 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
   });
 
   console.log('Vote revealed!');
-  */
 };

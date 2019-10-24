@@ -18,7 +18,7 @@ import {
   PolyResponse,
   ethersUtils,
 } from '@polymathnetwork/abi-wrappers';
-import _ from 'lodash';
+import { map, find, times, constant } from 'lodash';
 import { schemas } from '@0x/json-schemas';
 import {
   numberToBigNumber,
@@ -481,7 +481,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
   /**
    * Retrieves the list of investors who haven't voted yet
-   * @return list of investors who are remain to vote
+   * @return list of investors
    */
   public getPendingInvestorToVote = async (params: BallotIdParams): Promise<string[]> => {
     return (await this.contract).getPendingInvestorToVote.callAsync(numberToBigNumber(params.ballotId));
@@ -566,16 +566,13 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   /**
    * Queries the result of a given ballot
    */
-  public getBallotResults = async (params: BallotIdParams): Promise<BallotResult[]> => {
+  public getBallotResults = async (params: BallotIdParams): Promise<BallotResult> => {
     const result = await (await this.contract).getBallotResults.callAsync(numberToBigNumber(params.ballotId));
-    const typedResult: BallotResult[] = [];
-    typedResult.push({
+    return {
       choicesWeighting: result[0].map(v => weiToValue(v, FULL_DECIMALS).toNumber()),
       noOfChoicesInProposal: result[1].map(v => v.toNumber()),
       voters: result[2],
-    });
-
-    return typedResult;
+    };
   };
 
   /**
@@ -931,21 +928,18 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
       indexFilterValues: { _voter: caller },
     });
 
-    const args = _.map(getVoteCommitEvents, e => {
+    const args = map(getVoteCommitEvents, e => {
       return e.args;
     });
 
-    const onlyBallot = _.find(args, e => {
+    const onlyBallot = find(args, e => {
       /* eslint-disable no-underscore-dangle */
       return e._ballotId.toNumber() === params.ballotId;
     });
     assert.assert(onlyBallot !== undefined, ErrorCode.NotFound, 'Ballot id not found');
 
-    const keccakKeys = ['uint256'];
-    const bgVotes = params.choices.map(e => {
-      keccakKeys.push('uint256');
-      return valueToWei(new BigNumber(e), FULL_DECIMALS).toString();
-    });
+    const bgVotes = params.choices.map(e => valueToWei(new BigNumber(e), FULL_DECIMALS).toString());
+    const keccakKeys = times(bgVotes.length + 1, constant('uint256'));
     const hash = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, params.salt]);
 
     assert.assert(

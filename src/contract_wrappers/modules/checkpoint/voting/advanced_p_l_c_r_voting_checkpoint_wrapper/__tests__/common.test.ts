@@ -257,7 +257,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
   describe('Get All Ballots', () => {
     test('should getAllBallots', async () => {
       // Address expected
-      const expectedResult = [
+      const expectedResult: [[BigNumber, BigNumber], [string, string], [BigNumber, BigNumber], [BigNumber, BigNumber], [boolean, boolean]] = [
         [new BigNumber(1), new BigNumber(2)],
         [stringToBytes32('ballot one'), stringToBytes32('ballot two')],
         [new BigNumber(2), new BigNumber(2)],
@@ -274,10 +274,10 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Real call
       const result = await target.getAllBallots();
       // Result expectation
-      expect(result[0].ballotId).toBe((expectedResult[0][0] as BigNumber).toNumber());
-      expect(result[0].name).toBe(bytes32ToString(expectedResult[1][0] as string));
-      expect(result[0].totalProposal).toBe((expectedResult[2][0] as BigNumber).toNumber());
-      expect(result[0].currentStage).toBe(parseBallotStageValue(expectedResult[3][0] as BigNumber));
+      expect(result[0].ballotId).toBe(expectedResult[0][0].toNumber());
+      expect(result[0].name).toBe(bytes32ToString(expectedResult[1][0]));
+      expect(result[0].totalProposal).toBe(expectedResult[2][0].toNumber());
+      expect(result[0].currentStage).toBe(parseBallotStageValue(expectedResult[3][0]));
       expect(result[0].isCancelled).toBe(expectedResult[4][0]);
       // Verifications
       verify(mockedContract.getAllBallots).once();
@@ -393,7 +393,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       };
 
       // Address expected
-      const expectedResult = [
+      const expectedResult: [[BigNumber, BigNumber], [BigNumber, BigNumber], [string, string]] = [
         [new BigNumber(1), new BigNumber(2)],
         [new BigNumber(2), new BigNumber(2)],
         ['0x2222222222222222222222222222222222222222', '0x2322222222222222222222222222222222222222'],
@@ -408,9 +408,9 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       // Real call
       const result = await target.getBallotResults(params);
       // Result expectation
-      expect(result[0].choicesWeighting[0]).toBe(weiToValue(expectedResult[0][0] as BigNumber, FULL_DECIMALS).toNumber());
-      expect(result[0].noOfChoicesInProposal[0]).toBe((expectedResult[1][0] as BigNumber).toNumber());
-      expect(result[0].voters[0]).toBe(expectedResult[2][0]);
+      expect(result.choicesWeighting[0]).toBe(weiToValue(expectedResult[0][0], FULL_DECIMALS).toNumber());
+      expect(result.noOfChoicesInProposal[0]).toBe(expectedResult[1][0].toNumber());
+      expect(result.voters[0]).toBe(expectedResult[2][0]);
       // Verifications
       verify(mockedContract.getBallotResults).once();
       verify(mockedMethod.callAsync(objectContaining(numberToBigNumber(params.ballotId)))).once();
@@ -1557,6 +1557,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       verify(mockedContract.getAllBallots).once();
       verify(mockedBallotsMethod.callAsync()).once();
       verify(mockedContract.getCurrentBallotStage).once();
+      verify(mockedCurrentStageMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
       verify(mockedContract.getBallotDetails).once();
       verify(mockedBallotDetailsMethod.callAsync(objectContaining(numberToBigNumber(mockedParams.ballotId)))).once();
       verify(mockedContract.pendingBallots).once();
