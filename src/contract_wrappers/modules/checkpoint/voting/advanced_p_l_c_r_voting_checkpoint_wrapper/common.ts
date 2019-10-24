@@ -943,7 +943,8 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
     const hash = ethersUtils.solidityKeccak256(keccakKeys, [...bgVotes, params.salt]);
 
     assert.assert(
-      (onlyBallot as AdvancedPLCRVotingCheckpointVoteCommitEventArgs_3_1_0)._secretHash === hash,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      onlyBallot!._secretHash === hash,
       ErrorCode.InvalidData,
       'Invalid vote',
     );
