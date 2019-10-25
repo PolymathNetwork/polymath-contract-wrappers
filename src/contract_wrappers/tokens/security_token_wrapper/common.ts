@@ -2056,7 +2056,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       producedAddModuleInfo.data,
       producedAddModuleInfo.maxCost,
       producedAddModuleInfo.budget,
-      params.label ? stringToBytes32(params.label) : '',
+      stringToBytes32(params.label || ''),
       params.archived,
       params.txData,
       params.safetyFactor,
