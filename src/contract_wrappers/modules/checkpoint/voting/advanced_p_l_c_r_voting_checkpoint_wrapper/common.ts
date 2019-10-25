@@ -184,8 +184,8 @@ interface GetAdvancedPLCRVotingCheckpointLogsAsyncParams extends GetLogs {
 /**
  * @param name Name of the ballot (Should be unique)
  * @param startTime startTime of the ballot
- * @param commitDuration Unix time period till the voters commit there vote
- * @param revealDuration Unix time period till the voters reveal there vote starts when commit duration ends
+ * @param commitDuration Unix time period till the voters commit their vote
+ * @param revealDuration Unix time period till the voters reveal their vote starts when commit duration ends
  */
 export interface BallotParams extends TxParams {
   name: string;
@@ -228,11 +228,9 @@ export interface CreateCumulativeBallotParams extends BallotParams {
 }
 
 /**
- * @param choicesCounts No. of choices (If it is 0 then it means NAY/YAY ballot type is choosen).
  * @param checkpointId Valid checkpoint Id
  */
 export interface CreateCustomCumulativeBallotParams extends CreateCumulativeBallotParams {
-  choicesCounts: number[];
   checkpointId: number;
 }
 
@@ -546,6 +544,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
   /**
    * Used to get the current stage of the ballot
+   * @return ballot state
    */
   public getCurrentBallotStage = async (params: BallotIdParams): Promise<BallotStage> => {
     const result = await (await this.contract).getCurrentBallotStage.callAsync(numberToBigNumber(params.ballotId));
@@ -553,7 +552,8 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   };
 
   /**
-   * Get the voting power for an voter in terms of the token
+   * Get the voting power for a voter in terms of the token
+   * @return voting power
    */
   public getVoteTokenCount = async (params: VoteTokenCountParams): Promise<number> => {
     const result = await (await this.contract).getVoteTokenCount.callAsync(
@@ -565,6 +565,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
   /**
    * Queries the result of a given ballot
+   * @return ballot result
    */
   public getBallotResults = async (params: BallotIdParams): Promise<BallotResult> => {
     const result = await (await this.contract).getBallotResults.callAsync(numberToBigNumber(params.ballotId));
@@ -576,7 +577,8 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   };
 
   /**
-   *  Get the details of the ballot
+   * Get the details of the ballot
+   * @return ballot details
    */
   public getBallotDetails = async (params: BallotIdParams): Promise<BallotDetails> => {
     const result = await (await this.contract).getBallotDetails.callAsync(numberToBigNumber(params.ballotId));
@@ -961,7 +963,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
   };
 
   /**
-   * Allows the token issuer to scrapped down a ballot
+   * Allows the token issuer to cancel a ballot
    */
   public cancelBallot = async (params: CancelBallotParams): Promise<PolyResponse> => {
     assert.assert(
@@ -1142,7 +1144,7 @@ export default abstract class AdvancedPLCRVotingCheckpointCommon extends ModuleC
 
   private checkIndexOutOfBound = async (ballotId: number) => {
     const allBallots: Ballot[] = await this.getAllBallots();
-    assert.assert(allBallots.length > ballotId, ErrorCode.InvalidData, 'Index out of bound');
+    assert.assert(allBallots.length > ballotId, ErrorCode.InvalidData, 'Index out of bounds');
   };
 
   private checkValidStage = async (ballot: BallotIdParams, stage: BallotStage) => {

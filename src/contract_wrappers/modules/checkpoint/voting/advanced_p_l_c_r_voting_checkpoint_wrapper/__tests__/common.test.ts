@@ -648,7 +648,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
       when(mockedBallotsMethod.callAsync()).thenResolve(expectedBallotsResult);
 
       const mockedParams = {
-        name: 'nee ballot',
+        name: 'new ballot',
         startTime: new Date(2019, 10),
         commitDuration: 80000,
         revealDuration: 3000,
@@ -1353,13 +1353,13 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         ),
       ).thenResolve(expectedIsVoterAllowedResult);
 
-      // pending ballots
+      // Pending ballots
       const expectedPendingBallotsResult = [[new BigNumber(1), new BigNumber(2)], [new BigNumber(3), new BigNumber(4)]];
       const mockedPendingBallotsMethod = mock(MockedCallMethod);
       when(mockedContract.pendingBallots).thenReturn(instance(mockedPendingBallotsMethod));
       when(mockedPendingBallotsMethod.callAsync(mockedParams.txData.from)).thenResolve(expectedPendingBallotsResult);
 
-      // get ballot details
+      // Get ballot details
       const expectedBallotDetailsResult = [
         'ballot name',
         new BigNumber(1000),

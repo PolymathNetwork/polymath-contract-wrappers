@@ -34,7 +34,7 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
     investors: [myAddress],
     canSendAfter: [new Date()],
     canReceiveAfter: [new Date()],
-    expiryTime: [new Date(2021, 10)],
+    expiryTime: [new Date(2030, 10)],
   };
   await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 
@@ -60,7 +60,7 @@ export const advancedPLCRVotingCheckpoint = async (polymathAPI: PolymathAPI, tic
     startTime: new Date(),
     commitDuration: 20,
     revealDuration: 20,
-    proposalTitles: ['Propostal Title Example'],
+    proposalTitles: ['Proposal Title Example'],
     proposalDetails: 'Proposal Details',
     choices: ['Choice one', 'Choice two'],
     choicesCounts: 2,
