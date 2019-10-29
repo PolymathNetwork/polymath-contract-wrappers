@@ -1,3 +1,10 @@
+# [3.0.0-beta.52](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.51@beta...v3.0.0-beta.52@beta) (2019-10-25)
+
+
+### Bug Fixes
+
+* 🐛 fix faulty non-hex default ([068e0bc](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/068e0bc))
+
 # [3.0.0-beta.51](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.50@beta...v3.0.0-beta.51@beta) (2019-10-09)
 
 
