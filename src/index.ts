@@ -23,6 +23,7 @@ import { PolyTokenFaucetTransactionParams } from './contract_wrappers/tokens/pol
 import { PolyTokenTransactionParams } from './contract_wrappers/tokens/poly_token_wrapper';
 import { GeneralPermissionManagerTransactionParams } from './contract_wrappers/modules/permission_manager/general_permission_manager_wrapper';
 import { SecurityTokenTransactionParams } from './contract_wrappers/tokens/security_token_wrapper';
+import { AdvancedPLCRVotingCheckpointTransactionParams } from './contract_wrappers/modules/checkpoint/voting/advanced_p_l_c_r_voting_checkpoint_wrapper';
 
 export namespace TransactionParams {
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -49,6 +50,7 @@ export namespace TransactionParams {
   export import PolyTokenFaucet = PolyTokenFaucetTransactionParams;
   export import PolyToken = PolyTokenTransactionParams;
   export import SecurityToken = SecurityTokenTransactionParams;
+  export import AdvancedPLCRVotingCheckpoint = AdvancedPLCRVotingCheckpointTransactionParams;
   /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
@@ -329,6 +331,24 @@ export {
   RestrictedPartialSaleTMPauseEventArgs,
   RestrictedPartialSaleTMUnpauseEventArgs,
 } from './contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+export {
+  AdvancedPLCRVotingCheckpoint,
+  isAdvancedPLCRVotingCheckpoint,
+  AdvancedPLCRVotingCheckpoint_3_1_0,
+  isAdvancedPLCRVotingCheckpoint_3_1_0,
+  AdvancedPLCRVotingCheckpointEventArgs,
+  AdvancedPLCRVotingCheckpointEvents,
+  AdvancedPLCRVotingCheckpointStatutoryBallotCreatedEventArgs,
+  AdvancedPLCRVotingCheckpointCumulativeBallotCreatedEventArgs,
+  AdvancedPLCRVotingCheckpointVotersExemptedEventArgs,
+  AdvancedPLCRVotingCheckpointVoteCommitEventArgs,
+  AdvancedPLCRVotingCheckpointVoteRevealedEventArgs,
+  AdvancedPLCRVotingCheckpointBallotCancelledEventArgs,
+  AdvancedPLCRVotingCheckpointChangedBallotExemptedVotersListEventArgs,
+  AdvancedPLCRVotingCheckpointChangedDefaultExemptedVotersListEventArgs,
+  AdvancedPLCRVotingCheckpointPauseEventArgs,
+  AdvancedPLCRVotingCheckpointUnpauseEventArgs,
+} from './contract_wrappers/modules/checkpoint/voting/advanced_p_l_c_r_voting_checkpoint_wrapper';
 export {
   VestingEscrowWallet,
   isVestingEscrowWallet,

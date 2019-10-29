@@ -23,6 +23,7 @@ import {
   VestingEscrowWallet_3_1_0,
 } from '../contract_wrappers/modules/wallet/vesting_escrow_wallet_wrapper';
 import { RestrictedPartialSaleTransferManager_3_1_0 } from '../contract_wrappers/modules/transfer_manager/restricted_partial_sale_transfer_manager_wrapper';
+import { AdvancedPLCRVotingCheckpoint_3_1_0 } from '../contract_wrappers/modules/checkpoint/voting/advanced_p_l_c_r_voting_checkpoint_wrapper';
 import ContractFactory from './contractFactory';
 import assert from '../utils/assert';
 import { ModuleName, ErrorCode, ContractVersion } from '../types';
@@ -89,6 +90,10 @@ interface GetEtherDividendCheckpoint extends GetModuleParams {
   name: ModuleName.EtherDividendCheckpoint;
 }
 
+interface GetAdvancedPLCRCheckpointCheckpoint extends GetModuleParams {
+  name: ModuleName.AdvancedPLCRVotingCheckpoint;
+}
+
 interface GetModuleInstance {
   (params: GetGeneralPermissionManager): Promise<GeneralPermissionManager_3_0_0 | GeneralPermissionManager_3_1_0>;
   (params: GetGeneralTransferManager): Promise<GeneralTransferManager_3_0_0 | GeneralTransferManager_3_1_0>;
@@ -105,6 +110,7 @@ interface GetModuleInstance {
   (params: GetVestingEscrowWallet): Promise<VestingEscrowWallet_3_0_0 | VestingEscrowWallet_3_1_0>;
   (params: GetERC20DividendCheckpoint): Promise<ERC20DividendCheckpoint_3_0_0>;
   (params: GetEtherDividendCheckpoint): Promise<EtherDividendCheckpoint_3_0_0>;
+  (params: GetAdvancedPLCRCheckpointCheckpoint): Promise<AdvancedPLCRVotingCheckpoint_3_1_0>;
 }
 
 /**
@@ -258,6 +264,13 @@ export default class ModuleWrapperFactory {
         moduleWrapper = new EtherDividendCheckpoint_3_0_0(
           this.web3Wrapper,
           this.contractFactory.getEtherDividendCheckpointContract(params.address),
+          this.contractFactory,
+        );
+        break;
+      case ModuleName.AdvancedPLCRVotingCheckpoint:
+        moduleWrapper = new AdvancedPLCRVotingCheckpoint_3_1_0(
+          this.web3Wrapper,
+          this.contractFactory.getAdvancedPLCRVotingCheckpointContract(params.address),
           this.contractFactory,
         );
         break;

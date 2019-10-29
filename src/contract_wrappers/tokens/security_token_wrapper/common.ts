@@ -947,7 +947,8 @@ export interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.ManualApprovalTransferManager
     | ModuleName.VolumeRestrictionTM
     | ModuleName.LockUpTransferManager
-    | ModuleName.BlacklistTransferManager;
+    | ModuleName.BlacklistTransferManager
+    | ModuleName.AdvancedPLCRVotingCheckpoint;
   data?: undefined;
 }
 

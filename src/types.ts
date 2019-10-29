@@ -90,6 +90,9 @@ import {
   VestingEscrowWalletEventArgs_3_1_0,
   CappedSTOEvents_3_1_0,
   USDTieredSTOEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointContract_3_1_0,
+  AdvancedPLCRVotingCheckpointEvents_3_1_0,
+  AdvancedPLCRVotingCheckpointEventArgs_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -149,6 +152,13 @@ export enum TransferResult {
   FORCE_VALID,
 }
 
+export enum BallotStage {
+  Prep = 'PREP',
+  Commit = 'COMMIT',
+  Reveal = 'REVEAL',
+  Resolved = 'RESOLVED',
+}
+
 export enum FeeType {
   TickerRegFee = 'tickerRegFee',
   StLaunchFee = 'stLaunchFee',
@@ -194,6 +204,7 @@ export enum ModuleName {
   ERC20DividendCheckpoint = 'ERC20DividendCheckpoint',
   EtherDividendCheckpoint = 'EtherDividendCheckpoint',
   VestingEscrowWallet = 'VestingEscrowWallet',
+  AdvancedPLCRVotingCheckpoint = 'AdvancedPLCRVotingCheckpoint',
 }
 
 export enum TransferStatusCode {
@@ -269,7 +280,8 @@ export type ContractEventArgs_3_1_0 =
   | CappedSTOEventArgs_3_1_0
   | USDTieredSTOEventArgs_3_1_0
   | GeneralPermissionManagerEventArgs_3_1_0
-  | VestingEscrowWalletEventArgs_3_1_0;
+  | VestingEscrowWalletEventArgs_3_1_0
+  | AdvancedPLCRVotingCheckpointEventArgs_3_1_0;
 
 export type ContractEventArgs = ContractEventArgs_3_0_0 | ContractEventArgs_3_1_0;
 
@@ -306,7 +318,8 @@ export type ContractEvents_3_1_0 =
   | GeneralPermissionManagerEvents_3_1_0
   | VestingEscrowWalletEvents_3_1_0
   | CappedSTOEvents_3_1_0
-  | USDTieredSTOEvents_3_1_0;
+  | USDTieredSTOEvents_3_1_0
+  | AdvancedPLCRVotingCheckpointEvents_3_1_0;
 
 export type ContractEvents = ContractEvents_3_0_0 | ContractEvents_3_1_0;
 
@@ -373,7 +386,8 @@ export type GenericModuleContract_3_1_0 =
   | GeneralTransferManagerContract_3_1_0
   | GeneralPermissionManagerContract_3_1_0
   | VestingEscrowWalletContract_3_1_0
-  | RestrictedPartialSaleTMContract_3_1_0;
+  | RestrictedPartialSaleTMContract_3_1_0
+  | AdvancedPLCRVotingCheckpointContract_3_1_0;
 
 export type GenericModuleContract = GenericModuleContract_3_0_0 | GenericModuleContract_3_1_0;
 
