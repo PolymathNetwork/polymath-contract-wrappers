@@ -947,7 +947,8 @@ export interface AddNoDataModuleParams extends AddModuleParams {
     | ModuleName.ManualApprovalTransferManager
     | ModuleName.VolumeRestrictionTM
     | ModuleName.LockUpTransferManager
-    | ModuleName.BlacklistTransferManager;
+    | ModuleName.BlacklistTransferManager
+    | ModuleName.AdvancedPLCRVotingCheckpoint;
   data?: undefined;
 }
 
@@ -2056,7 +2057,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       producedAddModuleInfo.data,
       producedAddModuleInfo.maxCost,
       producedAddModuleInfo.budget,
-      params.label ? stringToBytes32(params.label) : '',
+      stringToBytes32(params.label || ''),
       params.archived,
       params.txData,
       params.safetyFactor,

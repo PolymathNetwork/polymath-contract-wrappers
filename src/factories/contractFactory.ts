@@ -34,6 +34,7 @@ import {
   RestrictedPartialSaleTMContract_3_1_0,
   GeneralTransferManagerContract_3_1_0,
   GeneralPermissionManagerContract_3_1_0,
+  AdvancedPLCRVotingCheckpointContract_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
 import { PolymathError } from '../PolymathError';
 import assert from '../utils/assert';
@@ -136,10 +137,21 @@ export default class ContractFactory {
     return contract;
   }
 
+  public async getAdvancedPLCRVotingCheckpointContract(
+    address: string,
+  ): Promise<AdvancedPLCRVotingCheckpointContract_3_1_0> {
+    assert.isETHAddressHex('address', address);
+    const contract = new AdvancedPLCRVotingCheckpointContract_3_1_0(address, this.provider, this.contractDefaults);
+    this.abiArray.forEach((abi): void => {
+      contract.addABItoDecoder(abi);
+    });
+    return contract;
+  }
+
   public getVestingEscrowWalletContract: GetVestingEscrowWalletContract = async (
     address: string,
     version: ContractVersion,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: VestingEscrowWalletContract_3_0_0 | VestingEscrowWalletContract_3_1_0;
@@ -210,7 +222,7 @@ export default class ContractFactory {
   public getGeneralPermissionManagerContract: GetGeneralPermissionManagerContract = async (
     address: string,
     version: ContractVersion,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: GeneralPermissionManagerContract_3_0_0 | GeneralPermissionManagerContract_3_1_0;
@@ -238,7 +250,7 @@ export default class ContractFactory {
   public getCappedSTOContract: GetCappedSTOContract = async (
     address: string,
     version: ContractVersion,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: CappedSTOContract_3_0_0 | CappedSTOContract_3_1_0;
@@ -267,7 +279,7 @@ export default class ContractFactory {
   public getUSDTieredSTOContract: GetUSDTieredSTOContract = async (
     address: string,
     version: ContractVersion,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: USDTieredSTOContract_3_0_0 | USDTieredSTOContract_3_1_0;
@@ -296,7 +308,7 @@ export default class ContractFactory {
   public getGeneralTransferManagerContract: GetGeneralTransferManagerContract = async (
     address: string,
     version: ContractVersion,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     assert.isETHAddressHex('address', address);
     let contract: GeneralTransferManagerContract_3_0_0 | GeneralTransferManagerContract_3_1_0;

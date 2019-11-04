@@ -1,3 +1,39 @@
+# [3.0.0-beta.53](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.52@beta...v3.0.0-beta.53@beta) (2019-10-29)
+
+
+### Bug Fixes
+
+* 🐛 adapt plcr to new events refactor ([dea59ec](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/dea59ec))
+* 🐛 add improvements requested by VW ([fab0d35](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/fab0d35))
+* 🐛 add new assert funcion in revealVote method ([62ee776](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/62ee776))
+* 🐛 add new fixes regarding Jere's feedback ([44fc54e](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/44fc54e))
+* 🐛 add no-non-null-assertion disable line ([c4b9017](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c4b9017))
+* 🐛 add revealVote test and cover 100% ([36c1e03](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/36c1e03))
+* 🐛 add solidityKeccak256 function in commitVote method ([26b9989](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/26b9989))
+* 🐛 advances in revealVote and TODO comment for getLogsAsync ([92d0372](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/92d0372))
+* 🐛 comlete example file and fix feedback requested by PR ([5488990](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/5488990))
+* 🐛 extends from DividendCheckpoint instead Module ([4229b77](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/4229b77))
+* 🐛 fix all create ballot methods ([2cb54a4](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/2cb54a4))
+* 🐛 fix lint wrnings ([6e3d746](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/6e3d746))
+* 🐛 fix solidityKeccak256 assertion for multiple choices ([b8a453d](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/b8a453d))
+* 🐛 getBallotResults fix ([c8488e3](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c8488e3))
+* 🐛 manual merge from develop into it this branch ([05b9b96](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/05b9b96))
+* 🐛 remove TODO comment ([87863bd](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/87863bd))
+
+
+### Features
+
+* 🎸 [WIP] add scaffolding and base code for AdvancedPLCRVC ([6d69fbd](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/6d69fbd))
+* 🎸 add methods and assertions for Advanced PLCR voting ([157bbfb](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/157bbfb))
+* 🎸 merge develop into advancedVoting ([3aa3197](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/3aa3197))
+
+# [3.0.0-beta.52](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.51@beta...v3.0.0-beta.52@beta) (2019-10-25)
+
+
+### Bug Fixes
+
+* 🐛 fix faulty non-hex default ([068e0bc](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/068e0bc))
+
 # [3.0.0-beta.51](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.50@beta...v3.0.0-beta.51@beta) (2019-10-09)
 
 

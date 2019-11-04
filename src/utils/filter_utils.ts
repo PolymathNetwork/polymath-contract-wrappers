@@ -43,22 +43,20 @@ const filterUtils = {
   },
   getTopicsForIndexedArgs(abi: EventAbi, indexFilterValues: IndexedFilterValues): (string | null)[] {
     const topics: (string | null)[] = [];
-    abi.inputs.forEach(
-      (eventInput): void => {
-        if (eventInput.indexed) {
-          if (_.isUndefined(indexFilterValues[eventInput.name])) {
-            // Null is a wildcard topic in a JSON-RPC call
-            topics.push(null);
-          } else {
-            const value = indexFilterValues[eventInput.name] as string;
-            const buffer = ethUtil.toBuffer(value);
-            const paddedBuffer = ethUtil.setLengthLeft(buffer, TOPIC_LENGTH);
-            const topic = ethUtil.bufferToHex(paddedBuffer as Buffer);
-            topics.push(topic);
-          }
+    abi.inputs.forEach((eventInput): void => {
+      if (eventInput.indexed) {
+        if (_.isUndefined(indexFilterValues[eventInput.name])) {
+          // Null is a wildcard topic in a JSON-RPC call
+          topics.push(null);
+        } else {
+          const value = indexFilterValues[eventInput.name] as string;
+          const buffer = ethUtil.toBuffer(value);
+          const paddedBuffer = ethUtil.setLengthLeft(buffer, TOPIC_LENGTH);
+          const topic = ethUtil.bufferToHex(paddedBuffer as Buffer);
+          topics.push(topic);
         }
-      },
-    );
+      }
+    });
     return topics;
   },
   matchesFilter(log: LogEntry, filter: FilterObject): boolean {
