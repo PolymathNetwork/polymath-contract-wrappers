@@ -1,3 +1,10 @@
+# [3.0.0-beta.54](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.53@beta...v3.0.0-beta.54@beta) (2019-11-04)
+
+
+### Bug Fixes
+
+* 🐛 remake valid module check to support archived modules ([b860eae](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/b860eae))
+
 # [3.0.0-beta.53](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.52@beta...v3.0.0-beta.53@beta) (2019-10-29)
 
 
