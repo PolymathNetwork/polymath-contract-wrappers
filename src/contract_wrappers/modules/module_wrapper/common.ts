@@ -186,8 +186,9 @@ export default abstract class ModuleCommon extends ContractWrapper {
     }
 
     const address = await this.address();
-    const result = await (await this.securityTokenContract()).isModule.callAsync(address, types[0]);
-    return result;
+    // if the module doesn't exist, the data returned by this call will be empty (i.e. the name would be an empty string)
+    const [name] = await (await this.securityTokenContract()).getModule.callAsync(address);
+    return name !== '';
   };
 
   public isCallerTheSecurityTokenOwner = async (txData: Partial<TxData> | undefined): Promise<boolean> => {
