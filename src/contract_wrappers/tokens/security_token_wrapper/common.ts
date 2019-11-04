@@ -592,7 +592,7 @@ export interface ChangeTreasuryWalletParams extends TxParams {
 interface CanTransferParams {
   to: string;
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 /**
@@ -2159,7 +2159,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     const result = await (await this.contract).canTransfer.callAsync(
       params.to,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      stringToBytes32(params.data || ''),
     );
     const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
