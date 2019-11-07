@@ -31,6 +31,7 @@ import {
   stringToBytes32,
   stringArrayToBytes32Array,
   parsePermBytes32Value,
+  bytes32ToString,
 } from '../../../../utils/convert';
 import ContractWrapper from '../../../contract_wrapper';
 
@@ -223,7 +224,8 @@ export default abstract class GeneralPermissionManagerCommon extends ModuleCommo
    */
   public delegateDetails = async (params: DelegateParams): Promise<string> => {
     assert.isETHAddressHex('delegate', params.delegate);
-    return (await this.contract).delegateDetails.callAsync(params.delegate);
+    const delegateDetails = await (await this.contract).delegateDetails.callAsync(params.delegate);
+    return bytes32ToString(delegateDetails);
   };
 
   /**
