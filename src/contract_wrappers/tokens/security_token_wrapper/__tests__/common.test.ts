@@ -975,7 +975,7 @@ describe('SecurityTokenCommon', () => {
         from: '0x1111111111111111111111111111111111111111',
         to: '0x2222222222222222222222222222222222222222',
         value: new BigNumber(0.9),
-        data: 'string',
+        data: '',
       };
 
       const expectedDecimalsResult = new BigNumber(18);
@@ -993,7 +993,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.from,
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).thenResolve(expectedResult);
 
@@ -1009,7 +1009,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.from,
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).once();
       verify(mockedContract.decimals).once();
@@ -1029,7 +1029,7 @@ describe('SecurityTokenCommon', () => {
       const mockedParams = {
         to: '0x2222222222222222222222222222222222222222',
         value: new BigNumber(0.9),
-        data: 'string',
+        data: '',
       };
 
       const expectedDecimalsResult = new BigNumber(18);
@@ -1046,7 +1046,7 @@ describe('SecurityTokenCommon', () => {
         mockedMethod.callAsync(
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).thenResolve(expectedResult);
 
@@ -1061,7 +1061,7 @@ describe('SecurityTokenCommon', () => {
         mockedMethod.callAsync(
           mockedParams.to,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).once();
       verify(mockedContract.decimals).once();
@@ -1089,7 +1089,7 @@ describe('SecurityTokenCommon', () => {
         to: '0x2222222222222222222222222222222222222222',
         partition: expectedPartition,
         value: new BigNumber(0.9),
-        data: 'string',
+        data: '',
       };
 
       const expectedDecimalsResult = new BigNumber(18);
@@ -1108,7 +1108,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.to,
           stringToBytes32(mockedParams.partition),
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).thenResolve(expectedResult);
 
@@ -1126,7 +1126,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.to,
           stringToBytes32(mockedParams.partition),
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).once();
       verify(mockedContract.decimals).once();
@@ -2559,7 +2559,7 @@ describe('SecurityTokenCommon', () => {
       const mockedParams = {
         investor: '0x1234111111111111111111111111111111111111',
         value: new BigNumber(2),
-        data: '0x00',
+        data: '',
         txData: {},
         safetyFactor: 10,
       };
@@ -2579,7 +2579,7 @@ describe('SecurityTokenCommon', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2607,7 +2607,7 @@ describe('SecurityTokenCommon', () => {
         mockedCanMethod.callAsync(
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).thenResolve(expectedCanResult);
 
@@ -2629,7 +2629,7 @@ describe('SecurityTokenCommon', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2646,7 +2646,7 @@ describe('SecurityTokenCommon', () => {
         mockedCanMethod.callAsync(
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
         ),
       ).once();
     });
@@ -2660,7 +2660,7 @@ describe('SecurityTokenCommon', () => {
         partition: Partition.Unlocked,
         investor: '0x1111111111111111111111111111111111111111',
         value: new BigNumber(2),
-        data: 'string',
+        data: '',
         txData: {},
         safetyFactor: 10,
       };
@@ -2681,7 +2681,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.partition,
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2718,7 +2718,7 @@ describe('SecurityTokenCommon', () => {
           mockedParams.partition,
           mockedParams.investor,
           objectContaining(valueToWei(mockedParams.value, expectedDecimalsResult)),
-          mockedParams.data,
+          stringToBytes32(mockedParams.data),
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
