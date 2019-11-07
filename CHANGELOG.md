@@ -1,3 +1,10 @@
+# [3.0.0-beta.56](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.55@beta...v3.0.0-beta.56@beta) (2019-11-07)
+
+
+### Bug Fixes
+
+* 🐛 Delegate details return type ([6668d85](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/6668d85))
+
 # [3.0.0-beta.55](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.54@beta...v3.0.0-beta.55@beta) (2019-11-07)
 
 
