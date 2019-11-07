@@ -1,3 +1,11 @@
+# [3.0.0-beta.55](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.54@beta...v3.0.0-beta.55@beta) (2019-11-07)
+
+
+### Bug Fixes
+
+* 🐛 convert 'data' properly in transfer functions ([f166885](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/f166885))
+* 🐛 make data optional and convert it properly ([1d08f07](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/1d08f07))
+
 # [3.0.0-beta.54](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.53@beta...v3.0.0-beta.54@beta) (2019-11-04)
 
 
