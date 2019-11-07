@@ -123,7 +123,7 @@ describe('GeneralPermissionManagerWrapper', () => {
       // Stub the method
       when(mockedContract.delegateDetails).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.callAsync(params.delegate)).thenResolve(expectedResult);
+      when(mockedMethod.callAsync(params.delegate)).thenResolve(stringToBytes32(expectedResult));
 
       // Real call
       const result = await target.delegateDetails(params);
