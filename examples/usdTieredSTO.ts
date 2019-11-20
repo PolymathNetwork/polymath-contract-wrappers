@@ -26,10 +26,12 @@ export const usdTieredSTO = async (polymathAPI: PolymathAPI, ticker: string) => 
     tokensPerTierDiscountPoly: [new BigNumber(8), new BigNumber(8)],
     nonAccreditedLimitUSD: new BigNumber(5),
     minimumInvestmentUSD: new BigNumber(5),
-    fundRaiseTypes: [FundRaiseType.ETH, FundRaiseType.POLY],
+    fundRaiseTypes: [FundRaiseType.StableCoin],
     wallet: '0x3333333333333333333333333333333333333333',
     treasuryWallet: '0x5555555555555555555555555555555555555555',
-    usdTokens: ['0x6666666666666666666666666666666666666666', '0x4444444444444444444444444444444444444444'],
+    stableTokens: ['0x6666666666666666666666666666666666666666', '0x4444444444444444444444444444444444444444'],
+    customOracleAddresses: ['0x1666666666666666666666666666666666666666', '0x1444444444444444444444444444444444444444'],
+    denominatedCurrency: 'USDC',
   };
   const options: AddingModuleOpts = {
     data: usdTieredSTOData,

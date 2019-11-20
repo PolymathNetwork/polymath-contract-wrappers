@@ -11,10 +11,16 @@ import { getMockedPolyResponse, MockedCallMethod, MockedSendMethod } from '../..
 import USDTieredSTOCommon from '../common';
 import { USDTieredSTO_3_1_0 } from '../3.1.0';
 import ContractFactory from '../../../../../factories/contractFactory';
-import { weiToValue } from '../../../../../utils/convert';
-import { FULL_DECIMALS } from '../../../../../types';
+import {
+  weiToValue,
+  stringToBytes32,
+  bytes32ToString,
+  weiArrayToValueArray,
+  dateToBigNumber,
+} from '../../../../../utils/convert';
+import { FULL_DECIMALS, FundRaiseType } from '../../../../../types';
 
-describe('USD Tiered STO 3.1.0', () => {  
+describe('USD Tiered STO 3.1.0', () => {
   let target: USDTieredSTO_3_1_0;
   let mockedWrapper: Web3Wrapper;
   let mockedContract: USDTieredSTOContract_3_1_0;
@@ -44,7 +50,7 @@ describe('USD Tiered STO 3.1.0', () => {
     });
   });
 
-  describe('GetTotalTokensSoldByTierr', () => {
+  describe('Get Total Tokens Sold By Tier', () => {
     test('should get value of getTotalTokensSoldByTier', async () => {
       // TokensSoldByTier value expected
       const expectedAmount = new BigNumber(100);
@@ -97,27 +103,6 @@ describe('USD Tiered STO 3.1.0', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
-    });
-  });
-
-  describe('IsFinalized', () => {
-    test('should get boolean of isFinalized', async () => {
-      // Address expected
-      const expectedResult = true;
-      // Mocked method
-      const mockedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.isFinalized).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(mockedMethod.callAsync()).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.isFinalized();
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.isFinalized).once();
-      verify(mockedMethod.callAsync()).once();
     });
   });
 
@@ -176,7 +161,7 @@ describe('USD Tiered STO 3.1.0', () => {
     });
   });
 
-  describe('GetTokensSoldByTier', () => {
+  describe('Get Tokens Sold By Tier', () => {
     test('should get value of getTokensSoldByTier', async () => {
       // TokensSoldByTier value expected
       const expectedAmount = [new BigNumber(100), new BigNumber(200), new BigNumber(300)];
@@ -235,18 +220,98 @@ describe('USD Tiered STO 3.1.0', () => {
     });
   });
 
-  describe('Finalize', () => {
-    test('should finalize STO', async () => {
-      // Address expected
-      const expectedIsFinalizedResult = false;
-      // Mocked method
-      const mockedIsFinalizedMethod = mock(MockedCallMethod);
-      // Stub the method
-      when(mockedContract.isFinalized).thenReturn(instance(mockedIsFinalizedMethod));
-      // Stub the request
-      when(mockedIsFinalizedMethod.callAsync()).thenResolve(expectedIsFinalizedResult);
+  describe('Get STO Details', () => {
+    test('should call getSTODetails', async () => {
+      const expectedStartTime = new Date(2025, 1);
+      const expectedEndTime = new Date(2026, 1);
+      const capPerTier = [new BigNumber(1), new BigNumber(2)];
+      const ratePerTier = [new BigNumber(1), new BigNumber(2)];
+      const fundsRaised = new BigNumber(1);
+      const tokensSold = new BigNumber(1);
+      const expectedResult = [
+        dateToBigNumber(expectedStartTime),
+        dateToBigNumber(expectedEndTime),
+        new BigNumber(1),
+        capPerTier,
+        ratePerTier,
+        fundsRaised,
+        new BigNumber(1),
+        tokensSold,
+        [true, false, false],
+        true,
+      ];
 
-      // Mock Only Owner and Security Token
+      // Security Token, its address, and decimals mocked
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const expectedDecimalsResult = new BigNumber(18);
+      const mockedDecimalsMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
+      when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
+
+      // Mocked method
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getSTODetails).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getSTODetails();
+      // Result expectation
+      expect(result.startTime).toEqual(expectedStartTime);
+      expect(result.endTime).toEqual(expectedEndTime);
+      expect(result.currentTier).toEqual(1);
+      expect(result.capPerTier).toEqual(weiArrayToValueArray(capPerTier, expectedDecimalsResult));
+      expect(result.ratePerTier).toEqual(weiArrayToValueArray(ratePerTier, FULL_DECIMALS));
+      expect(result.fundsRaised).toEqual(weiToValue(fundsRaised, FULL_DECIMALS));
+      expect(result.investorCount).toEqual(1);
+      expect(result.tokensSold).toEqual(weiToValue(tokensSold, expectedDecimalsResult));
+      expect(result.isRaisedInETH).toBe(true);
+      expect(result.isRaisedInPOLY).toBe(false);
+      expect(result.isRaisedInSC).toBe(false);
+      expect(result.preMintingAllowed).toBe(true);
+
+      // Verifications
+      verify(mockedContract.getSTODetails).once();
+      verify(mockedMethod.callAsync()).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContract.securityToken).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenContract.decimals).once();
+      verify(mockedDecimalsMethod.callAsync()).once();
+    });
+  });
+
+  describe('Get Denominated Currency', () => {
+    test('should get currency from denominatedCurrency', async () => {
+      const expectedResult = stringToBytes32('USDT');
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.denominatedCurrency).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync()).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.denominatedCurrency();
+
+      // Result expectation
+      expect(result).toBe(bytes32ToString(expectedResult));
+
+      // Verifications
+      verify(mockedContract.denominatedCurrency).once();
+      verify(mockedMethod.callAsync()).once();
+    });
+  });
+
+  describe('Modify Oracles', () => {
+    test('should modifyOracles', async () => {
+      // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
       const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
@@ -254,6 +319,7 @@ describe('USD Tiered STO 3.1.0', () => {
       const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
       when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
       when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
@@ -265,6 +331,11 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
 
       const mockedParams = {
+        customOracleAddresses: [
+          '0x1111111111111111111111111111111111111111',
+          '0x2221111111111111111111111111111111111111',
+        ],
+        denominatedCurrencySymbol: 'USDT',
         txData: {},
         safetyFactor: 10,
       };
@@ -272,28 +343,63 @@ describe('USD Tiered STO 3.1.0', () => {
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
       // Stub the method
-      when(mockedContract.finalize).thenReturn(instance(mockedMethod));
+      when(mockedContract.modifyOracles).thenReturn(instance(mockedMethod));
       // Stub the request
-      when(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).thenResolve(
-        expectedResult,
-      );
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.customOracleAddresses,
+          objectContaining(stringToBytes32(mockedParams.denominatedCurrencySymbol)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
 
       // Real call
-      const result = await target.finalize(mockedParams);
+      const result = await target.modifyOracles(mockedParams);
 
       // Result expectation
       expect(result).toBe(expectedResult);
       // Verifications
-      verify(mockedContract.finalize).once();
-      verify(mockedMethod.sendTransactionAsync(mockedParams.txData, mockedParams.safetyFactor)).once();
       verify(mockedContract.securityToken).once();
       verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedContract.isFinalized).once();
-      verify(mockedIsFinalizedMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedContract.modifyOracles).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.customOracleAddresses,
+          objectContaining(stringToBytes32(mockedParams.denominatedCurrencySymbol)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+  });
+
+  describe('Get Custom Oracle Address', () => {
+    test('should call getCustomOracleAddress', async () => {
+      // Params
+      const params = {
+        fundRaiseType: FundRaiseType.StableCoin,
+      };
+      const expectedResult = '0x5555555555555555555555555555555555555555';
+      const mockedMethod = mock(MockedCallMethod);
+      // Stub the method
+      when(mockedContract.getCustomOracleAddress).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(mockedMethod.callAsync(params.fundRaiseType)).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.getCustomOracleAddress(params);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+
+      // Verifications
+      verify(mockedContract.getCustomOracleAddress).once();
+      verify(mockedMethod.callAsync(params.fundRaiseType)).once();
     });
   });
 
@@ -310,7 +416,7 @@ describe('USD Tiered STO 3.1.0', () => {
       // Real call
       await expect(target.subscribeAsync(mockedParams)).rejects.toEqual(
         new Error(
-          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'ReserveTokenTransfer', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetTreasuryWallet', 'Pause', 'Unpause', 'SetFundRaiseTypes', 'RevokePreMintFlag', 'AllowPreMintFlag', encountered: Transfer`,
+          `Expected eventName to be one of: 'SetAllowBeneficialInvestments', 'SetNonAccreditedLimit', 'TokenPurchase', 'FundsReceived', 'ReserveTokenMint', 'ReserveTokenTransfer', 'SetAddresses', 'SetLimits', 'SetTimes', 'SetTiers', 'SetTreasuryWallet', 'SetOracles', 'UsageFeeDeducted', 'Pause', 'Unpause', 'SetFundRaiseTypes', 'RevokePreMintFlag', 'AllowPreMintFlag', encountered: Transfer`,
         ),
       );
     });

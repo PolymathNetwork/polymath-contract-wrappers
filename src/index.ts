@@ -212,6 +212,8 @@ export {
   USDTieredSTOSetTreasuryWalletEventArgs,
   USDTieredSTOTokenPurchaseEventArgs,
   USDTieredSTOUnpauseEventArgs,
+  USDTieredSTOSetOraclesEventArgs,
+  USDTieredSTOUsageFeeDeductedEventArgs,
 } from './contract_wrappers/modules/sto/usd_tiered_sto_wrapper';
 export {
   GeneralTransferManager,

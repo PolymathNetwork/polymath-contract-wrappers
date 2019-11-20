@@ -3,18 +3,19 @@ import {
   USDTieredSTOEvents_3_1_0,
   USDTieredSTOEvents_3_0_0,
   USDTieredSTOEventArgs_3_0_0,
+  USDTieredSTOSetOraclesEventArgs_3_1_0,
+  USDTieredSTOUsageFeeDeductedEventArgs_3_1_0,
   USDTieredSTOAllowPreMintFlagEventArgs_3_1_0,
   USDTieredSTORevokePreMintFlagEventArgs_3_1_0,
   USDTieredSTOReserveTokenTransferEventArgs_3_1_0,
 } from '@polymathnetwork/abi-wrappers';
-import { USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0 } from './3.0.0';
-import { USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0 } from './3.1.0';
+import { USDTieredSTO_3_0_0, isUSDTieredSTO_3_0_0, ModifyOracleParams } from './3.0.0';
+import { USDTieredSTO_3_1_0, isUSDTieredSTO_3_1_0, ModifyOraclesParams, GetCustomOracleAddressParams } from './3.1.0';
 import Common, {
   isUSDTieredSTO,
   ChangeNonAccreditedLimitParams,
   ModifyTimesParams,
   ModifyLimitsParams,
-  ModifyOracleParams,
   ModifyFundingParams,
   ModifyAddressesParams,
   ModifyTiersParams,
@@ -36,6 +37,8 @@ export type USDTieredSTOEvents = USDTieredSTOEvents_3_0_0 | USDTieredSTOEvents_3
 
 export type USDTieredSTOEventArgs =
   | USDTieredSTOEventArgs_3_0_0
+  | USDTieredSTOSetOraclesEventArgs_3_1_0
+  | USDTieredSTOUsageFeeDeductedEventArgs_3_1_0
   | USDTieredSTOAllowPreMintFlagEventArgs_3_1_0
   | USDTieredSTORevokePreMintFlagEventArgs_3_1_0
   | USDTieredSTOReserveTokenTransferEventArgs_3_1_0;
@@ -57,6 +60,8 @@ export {
   USDTieredSTOAllowPreMintFlagEventArgs_3_1_0 as USDTieredSTOAllowPreMintFlagEventArgs,
   USDTieredSTORevokePreMintFlagEventArgs_3_1_0 as USDTieredSTORevokePreMintFlagEventArgs,
   USDTieredSTOReserveTokenTransferEventArgs_3_1_0 as USDTieredSTOReserveTokenTransferEventArgs,
+  USDTieredSTOSetOraclesEventArgs_3_1_0 as USDTieredSTOSetOraclesEventArgs,
+  USDTieredSTOUsageFeeDeductedEventArgs_3_1_0 as USDTieredSTOUsageFeeDeductedEventArgs,
 } from '@polymathnetwork/abi-wrappers';
 
 export type USDTieredSTO = USDTieredSTO_3_0_0 | USDTieredSTO_3_1_0;
@@ -67,7 +72,6 @@ export namespace USDTieredSTOTransactionParams {
   export interface ChangeNonAccreditedLimit extends ChangeNonAccreditedLimitParams {}
   export interface ModifyTimes extends ModifyTimesParams {}
   export interface ModifyLimits extends ModifyLimitsParams {}
-  export interface ModifyOracle extends ModifyOracleParams {}
   export interface ModifyFunding extends ModifyFundingParams {}
   export interface ModifyAddresses extends ModifyAddressesParams {}
   export interface ModifyTiers extends ModifyTiersParams {}
@@ -78,6 +82,9 @@ export namespace USDTieredSTOTransactionParams {
   export interface BuyWithPOLYRateLimited extends BuyWithPOLYRateLimitedParams {}
   export interface BuyWithUSD extends BuyWithUSDParams {}
   export interface BuyWithUSDRateLimited extends BuyWithUSDRateLimitedParams {}
+  export interface ModifyOracle extends ModifyOracleParams {}
+  export interface ModifyOracles extends ModifyOraclesParams {}
+  export interface GetCustomOracleAddress extends GetCustomOracleAddressParams {}
 }
 
 // for internal use

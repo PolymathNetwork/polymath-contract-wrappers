@@ -4383,7 +4383,9 @@ describe('SecurityTokenCommon', () => {
         fundRaiseTypes: [FundRaiseType.StableCoin],
         wallet: '0x1111111111111111111111111111111111111111',
         treasuryWallet: '0x2222222222222222222222222222222222222222',
-        usdTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+        stableTokens: ['0x1111111111111111111111111111111111111111', '0x2222222222222222222222222222222222222222'],
+        customOracleAddresses: ['0x2111111111111111111111111111111111111111', '0x3222222222222222222222222222222222222222'],
+        denominatedCurrency: 'USDC'
       };
       const mockedUsdTieredStoParams = {
         moduleName: ModuleName.UsdTieredSTO,
@@ -4417,7 +4419,9 @@ describe('SecurityTokenCommon', () => {
         mockedUsdTieredStoParams.data.fundRaiseTypes,
         mockedUsdTieredStoParams.data.wallet,
         mockedUsdTieredStoParams.data.treasuryWallet,
-        mockedUsdTieredStoParams.data.usdTokens,
+        mockedUsdTieredStoParams.data.stableTokens,
+        mockedUsdTieredStoParams.data.customOracleAddresses,
+        stringToBytes32(mockedUsdTieredStoParams.data.denominatedCurrency),
       ]);
 
       when(
@@ -4450,7 +4454,9 @@ describe('SecurityTokenCommon', () => {
           fundRaiseTypes: usdTieredStoParams.fundRaiseTypes,
           wallet: usdTieredStoParams.wallet,
           treasuryWallet: usdTieredStoParams.treasuryWallet,
-          usdTokens: usdTieredStoParams.usdTokens,
+          stableTokens: usdTieredStoParams.stableTokens,
+          customOracleAddresses: usdTieredStoParams.customOracleAddresses,
+          denominatedCurrency: usdTieredStoParams.denominatedCurrency
         },
         txData: mockedUsdTieredStoParams.txData,
         safetyFactor: mockedUsdTieredStoParams.safetyFactor,

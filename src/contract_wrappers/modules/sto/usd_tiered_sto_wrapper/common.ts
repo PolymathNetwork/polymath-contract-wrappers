@@ -287,15 +287,6 @@ export interface ModifyLimitsParams extends TxParams {
 }
 
 /**
- * @param nonAccreditedLimitUSD max non accredited invets limit
- * @param minimumInvestmentUSD overall minimum investment limit
- */
-export interface ModifyOracleParams extends TxParams {
-  fundRaiseType: FundRaiseType;
-  oracleAddress: string;
-}
-
-/**
  * @param fundRaiseTypes Array of fund raise types to allow
  */
 export interface ModifyFundingParams extends TxParams {
@@ -305,12 +296,12 @@ export interface ModifyFundingParams extends TxParams {
 /**
  * @param wallet Address of wallet where funds are sent
  * @param treasuryWallet Address of wallet where unsold tokens are sent
- * @param usdTokens Address of usd tokens
+ * @param stableTokens Address of stable tokens
  */
 export interface ModifyAddressesParams extends TxParams {
   wallet: string;
   treasuryWallet: string;
-  usdTokens: string[];
+  stableTokens: string[];
 }
 
 /**
@@ -854,28 +845,6 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
   };
 
   /**
-   * Modifies oracle
-   */
-  public modifyOracle = async (params: ModifyOracleParams): Promise<PolyResponse> => {
-    assert.assert(
-      await this.isCallerTheSecurityTokenOwner(params.txData),
-      ErrorCode.Unauthorized,
-      'The caller must be the ST owner',
-    );
-    assert.assert(
-      params.fundRaiseType === FundRaiseType.POLY || params.fundRaiseType === FundRaiseType.ETH,
-      ErrorCode.InvalidData,
-      'Invalid currency',
-    );
-    return (await this.contract).modifyOracle.sendTransactionAsync(
-      params.fundRaiseType,
-      params.oracleAddress,
-      params.txData,
-      params.safetyFactor,
-    );
-  };
-
-  /**
    * Modifies max non accredited investment limit and overall minimum investment limit
    */
   public modifyLimits = async (params: ModifyLimitsParams): Promise<PolyResponse> => {
@@ -919,13 +888,13 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
       ErrorCode.Unauthorized,
       'The caller must be the ST owner',
     );
-    params.usdTokens.forEach(address => assert.isETHAddressHex('usdTokens', address));
+    params.stableTokens.forEach(address => assert.isETHAddressHex('stableTokens', address));
     assert.isNonZeroETHAddressHex('wallet', params.wallet);
     assert.isNonZeroETHAddressHex('treasuryWallet', params.treasuryWallet);
     return (await this.contract).modifyAddresses.sendTransactionAsync(
       params.wallet,
       params.treasuryWallet,
-      params.usdTokens,
+      params.stableTokens,
       params.txData,
       params.safetyFactor,
     );

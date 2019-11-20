@@ -2186,72 +2186,6 @@ describe('USD Tiered STO Common', () => {
     });
   });
 
-  describe('ModifyOracle', () => {
-    test('should modifyOracle', async () => {
-      // Mock Only Owner and Security Token
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
-      // Security Token Address expected
-      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
-      // Setup get Security Token Address
-      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
-      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
-      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
-      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
-        instance(mockedSecurityTokenContract),
-      );
-      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
-      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
-      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
-
-      // Mock web3 wrapper owner
-      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
-
-      const mockedParams = {
-        oracleAddress: '0x1111111111111111111111111111111111111111',
-        fundRaiseType: FundRaiseType.ETH,
-        txData: {},
-        safetyFactor: 10,
-      };
-
-      const expectedResult = getMockedPolyResponse();
-      // Mocked method
-      const mockedMethod = mock(MockedSendMethod);
-      // Stub the method
-      when(mockedContract.modifyOracle).thenReturn(instance(mockedMethod));
-      // Stub the request
-      when(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.fundRaiseType,
-          mockedParams.oracleAddress,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).thenResolve(expectedResult);
-
-      // Real call
-      const result = await target.modifyOracle(mockedParams);
-
-      // Result expectation
-      expect(result).toBe(expectedResult);
-      // Verifications
-      verify(mockedContract.modifyOracle).once();
-      verify(
-        mockedMethod.sendTransactionAsync(
-          mockedParams.fundRaiseType,
-          mockedParams.oracleAddress,
-          mockedParams.txData,
-          mockedParams.safetyFactor,
-        ),
-      ).once();
-      verify(mockedContract.securityToken).once();
-      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
-      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
-      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
-      verify(mockedSecurityTokenContract.owner).once();
-      verify(mockedWrapper.getAvailableAddressesAsync()).once();
-    });
-  });
-
   describe('ModifyLimits', () => {
     test('should modifyLimits', async () => {
       // Mock Only Owner and Security Token
@@ -2424,7 +2358,7 @@ describe('USD Tiered STO Common', () => {
       const mockedParams = {
         wallet: '0x1234567890123456789012345678901234567890',
         treasuryWallet: '0x0987654321098765432109876543210987654321',
-        usdTokens: ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'],
+        stableTokens: ['0x9999999999999999999999999999999999999999', '0x8888888888888888888888888888888888888888'],
         txData: {},
         safetyFactor: 10,
       };
@@ -2438,7 +2372,7 @@ describe('USD Tiered STO Common', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
           mockedParams.treasuryWallet,
-          mockedParams.usdTokens,
+          mockedParams.stableTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
@@ -2455,7 +2389,7 @@ describe('USD Tiered STO Common', () => {
         mockedMethod.sendTransactionAsync(
           mockedParams.wallet,
           mockedParams.treasuryWallet,
-          mockedParams.usdTokens,
+          mockedParams.stableTokens,
           mockedParams.txData,
           mockedParams.safetyFactor,
         ),
