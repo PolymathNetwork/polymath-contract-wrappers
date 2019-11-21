@@ -36,7 +36,6 @@ import {
   bigNumberToDate,
   weiArrayToValueArray,
   stringToBytes32,
-  stringArrayToBytes32Array,
   bytes32ToString,
 } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
