@@ -2453,7 +2453,8 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       }
       if (data.fundRaiseTypes[1] === FundRaiseType.POLY) {
         assert.isNonZeroETHAddressHex('customOracleAddresses[1]', data.customOracleAddresses[0]);
-      } else {
+      }
+      if (data.fundRaiseTypes[0] !== FundRaiseType.ETH && data.fundRaiseTypes[1] !== FundRaiseType.POLY) {
         data.customOracleAddresses.forEach(address => assert.isNonZeroETHAddressHex('customOracleAddresses', address));
       }
       assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Denominated Currency not provided');
