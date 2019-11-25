@@ -287,12 +287,42 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
       ErrorCode.Unauthorized,
       'The caller must be the ST owner',
     );
-    assert.assert(params.denominatedCurrencySymbol !== '', ErrorCode.InvalidData, 'Invalid denominatedCurrencySymbol');
-    assert.assert(
-      params.customOracleAddresses.length === 2,
-      ErrorCode.InvalidLength,
-      'Invalid customOracleAddresses length',
-    );
+
+    if ((await this.denominatedCurrency()) !== params.denominatedCurrencySymbol) {
+      assert.assert(
+        (await this.startTime()) >= new Date(),
+        ErrorCode.PreconditionRequired,
+        "The denominated currency can change only if the STO hasn't started yet",
+      );
+    }
+
+    if (params.customOracleAddresses.length > 0) {
+      assert.assert(
+        params.denominatedCurrencySymbol !== '',
+        ErrorCode.InvalidData,
+        'Invalid denominatedCurrencySymbol',
+      );
+      assert.assert(
+        params.customOracleAddresses.length === 2,
+        ErrorCode.InvalidLength,
+        'Invalid customOracleAddresses length',
+      );
+
+      if (await this.fundRaiseTypes({ type: FundRaiseType.ETH })) {
+        assert.isNonZeroETHAddressHex('customOracleAddresses[0]', params.customOracleAddresses[0]);
+      }
+
+      if (await this.fundRaiseTypes({ type: FundRaiseType.POLY })) {
+        assert.isNonZeroETHAddressHex('customOracleAddresses[1]', params.customOracleAddresses[1]);
+      }
+    } else {
+      assert.assert(
+        params.denominatedCurrencySymbol !== '',
+        ErrorCode.InvalidData,
+        'Invalid denominatedCurrencySymbol',
+      );
+    }
+
     return (await this.contract).modifyOracles.sendTransactionAsync(
       params.customOracleAddresses,
       stringToBytes32(params.denominatedCurrencySymbol),

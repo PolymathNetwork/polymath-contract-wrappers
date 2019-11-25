@@ -2446,8 +2446,25 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
     data.stableTokens.forEach(address => assert.isNonZeroETHAddressHex('stableTokens', address));
-    data.customOracleAddresses.forEach(address => assert.isNonZeroETHAddressHex('customOracleAddresses', address));
-    assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Denominated Currency not provided');
+
+    if (data.customOracleAddresses.length > 0) {
+      if (data.fundRaiseTypes[0] === FundRaiseType.ETH) {
+        assert.isNonZeroETHAddressHex('customOracleAddresses[0]', data.customOracleAddresses[0]);
+      }
+      if (data.fundRaiseTypes[1] === FundRaiseType.POLY) {
+        assert.isNonZeroETHAddressHex('customOracleAddresses[1]', data.customOracleAddresses[0]);
+      } else {
+        data.customOracleAddresses.forEach(address => assert.isNonZeroETHAddressHex('customOracleAddresses', address));
+      }
+      assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Denominated Currency not provided');
+      assert.assert(
+        data.customOracleAddresses.length === 2,
+        ErrorCode.InvalidLength,
+        'Invalid customOracleAddresses length',
+      );
+    } else {
+      assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Invalid denominatedCurrencySymbol');
+    }
   };
 
   public async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {

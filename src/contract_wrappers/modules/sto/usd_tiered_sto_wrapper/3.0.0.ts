@@ -7,8 +7,8 @@ import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
 
 /**
- * @param nonAccreditedLimitUSD max non accredited invets limit
- * @param minimumInvestmentUSD overall minimum investment limit
+ * @param fundRaiseType Actual currency
+ * @param oracleAddress Address of the oracle
  */
 export interface ModifyOracleParams extends TxParams {
   fundRaiseType: FundRaiseType;
