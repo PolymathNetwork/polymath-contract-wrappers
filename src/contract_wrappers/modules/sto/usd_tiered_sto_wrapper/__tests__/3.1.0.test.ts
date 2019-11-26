@@ -67,7 +67,7 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const expectedDecimalsResult = new BigNumber(18);
+      const expectedDecimalsResult = FULL_DECIMALS;
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
@@ -129,7 +129,7 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const expectedDecimalsResult = new BigNumber(18);
+      const expectedDecimalsResult = FULL_DECIMALS;
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
@@ -178,7 +178,7 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const expectedDecimalsResult = new BigNumber(18);
+      const expectedDecimalsResult = FULL_DECIMALS;
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
@@ -249,7 +249,7 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
         instance(mockedSecurityTokenContract),
       );
-      const expectedDecimalsResult = new BigNumber(18);
+      const expectedDecimalsResult = FULL_DECIMALS;
       const mockedDecimalsMethod = mock(MockedCallMethod);
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
@@ -350,7 +350,7 @@ describe('USD Tiered STO 3.1.0', () => {
       when(mockedDenominatedCurrencyMethod.callAsync()).thenResolve(expectedDenominatedCurrencyResult);
 
       // startTime mock
-      const expectedStartTimeResult = new BigNumber(3876536279);
+      const expectedStartTimeResult = dateToBigNumber(new Date(2022, 11, 11));
       const mockedStartTimeMethod = mock(MockedCallMethod);
       when(mockedContract.startTime).thenReturn(instance(mockedStartTimeMethod));
       when(mockedStartTimeMethod.callAsync()).thenResolve(expectedStartTimeResult);

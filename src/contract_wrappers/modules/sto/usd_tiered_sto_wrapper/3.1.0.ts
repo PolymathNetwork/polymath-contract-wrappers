@@ -289,9 +289,8 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
     );
 
     if ((await this.denominatedCurrency()) !== params.denominatedCurrencySymbol) {
-      assert.assert(
-        (await this.startTime()) >= new Date(),
-        ErrorCode.PreconditionRequired,
+      assert.isFutureDate(
+        await this.startTime(),
         "The denominated currency can change only if the STO hasn't started yet",
       );
     }
@@ -300,12 +299,12 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
       assert.assert(
         params.denominatedCurrencySymbol !== '',
         ErrorCode.InvalidData,
-        'Invalid denominatedCurrencySymbol',
+        'Denominated currency symbol can not be empty',
       );
       assert.assert(
         params.customOracleAddresses.length === 2,
         ErrorCode.InvalidLength,
-        'Invalid customOracleAddresses length',
+        'Custom oracle addresses array must have two values',
       );
 
       if (await this.fundRaiseTypes({ type: FundRaiseType.ETH })) {

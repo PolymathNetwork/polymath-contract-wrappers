@@ -2447,16 +2447,10 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
     data.stableTokens.forEach(address => assert.isNonZeroETHAddressHex('stableTokens', address));
     if (data.customOracleAddresses.length > 0) {
-      const ETH = data.fundRaiseTypes.findIndex(fundRaiseType => {
-        return fundRaiseType === FundRaiseType.ETH;
-      });
-      const POLY = data.fundRaiseTypes.findIndex(fundRaiseType => {
-        return fundRaiseType === FundRaiseType.POLY;
-      });
-      if (ETH > -1) {
+      if (data.fundRaiseTypes.includes(FundRaiseType.ETH)) {
         assert.isNonZeroETHAddressHex('ETH Oracle Address', data.customOracleAddresses[0]);
       }
-      if (POLY > -1) {
+      if (data.fundRaiseTypes.includes(FundRaiseType.POLY)) {
         assert.isNonZeroETHAddressHex('POLY Oracle Address', data.customOracleAddresses[1]);
       }
       assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Denominated Currency not provided');
