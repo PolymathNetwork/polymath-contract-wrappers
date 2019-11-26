@@ -310,7 +310,7 @@ describe('USD Tiered STO 3.1.0', () => {
   });
 
   describe('Modify Oracles', () => {
-    test('should modifyOracles', async () => {
+    test('should modify oracles with different currency symbol', async () => {
       // Owner Address expected
       const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
       // Security Token Address expected
@@ -335,13 +335,31 @@ describe('USD Tiered STO 3.1.0', () => {
           '0x1111111111111111111111111111111111111111',
           '0x2221111111111111111111111111111111111111',
         ],
-        denominatedCurrencySymbol: 'USDT',
+        denominatedCurrencySymbol: 'DAI',
         txData: {},
         safetyFactor: 10,
       };
       const expectedResult = getMockedPolyResponse();
       // Mocked method
       const mockedMethod = mock(MockedSendMethod);
+
+      // denominatedCurrency mock
+      const expectedDenominatedCurrencyResult = stringToBytes32('USDT');
+      const mockedDenominatedCurrencyMethod = mock(MockedCallMethod);
+      when(mockedContract.denominatedCurrency).thenReturn(instance(mockedDenominatedCurrencyMethod));
+      when(mockedDenominatedCurrencyMethod.callAsync()).thenResolve(expectedDenominatedCurrencyResult);
+
+      // startTime mock
+      const expectedStartTimeResult = new BigNumber(3876536279);
+      const mockedStartTimeMethod = mock(MockedCallMethod);
+      when(mockedContract.startTime).thenReturn(instance(mockedStartTimeMethod));
+      when(mockedStartTimeMethod.callAsync()).thenResolve(expectedStartTimeResult);
+
+      // fundRaiseTypes POLY mock
+      const mockedFundRaiseTypesPolyMethod = mock(MockedCallMethod);
+      when(mockedContract.fundRaiseTypes).thenReturn(instance(mockedFundRaiseTypesPolyMethod));
+      when(mockedFundRaiseTypesPolyMethod.callAsync(FundRaiseType.POLY)).thenResolve(true);
+
       // Stub the method
       when(mockedContract.modifyOracles).thenReturn(instance(mockedMethod));
       // Stub the request
@@ -366,6 +384,98 @@ describe('USD Tiered STO 3.1.0', () => {
       verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
       verify(mockedSecurityTokenContract.owner).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      // denominatedCurrency
+      verify(mockedContract.denominatedCurrency).once();
+      verify(mockedDenominatedCurrencyMethod.callAsync()).once();
+      // startTime
+      verify(mockedContract.startTime).once();
+      verify(mockedStartTimeMethod.callAsync()).once();
+      // fundRaiseTypes
+      verify(mockedContract.fundRaiseTypes).twice();
+      verify(mockedFundRaiseTypesPolyMethod.callAsync(FundRaiseType.ETH)).once();
+      verify(mockedContract.modifyOracles).once();
+      verify(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.customOracleAddresses,
+          objectContaining(stringToBytes32(mockedParams.denominatedCurrencySymbol)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).once();
+    });
+
+    test('should modify oracles without oracle addresses', async () => {
+      // Owner Address expected
+      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      // Security Token Address expected
+      const expectedSecurityTokenAddress = '0x3333333333333333333333333333333333333333';
+      // Setup get Security Token Address
+      const mockedGetSecurityTokenAddressMethod = mock(MockedCallMethod);
+      when(mockedContract.securityToken).thenReturn(instance(mockedGetSecurityTokenAddressMethod));
+      when(mockedGetSecurityTokenAddressMethod.callAsync()).thenResolve(expectedSecurityTokenAddress);
+
+      when(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).thenResolve(
+        instance(mockedSecurityTokenContract),
+      );
+      const mockedSecurityTokenOwnerMethod = mock(MockedCallMethod);
+      when(mockedSecurityTokenOwnerMethod.callAsync()).thenResolve(expectedOwnerResult);
+      when(mockedSecurityTokenContract.owner).thenReturn(instance(mockedSecurityTokenOwnerMethod));
+
+      // Mock web3 wrapper owner
+      when(mockedWrapper.getAvailableAddressesAsync()).thenResolve([expectedOwnerResult]);
+
+      const mockedParams = {
+        customOracleAddresses: [],
+        denominatedCurrencySymbol: '',
+        txData: {},
+        safetyFactor: 10,
+      };
+      const expectedResult = getMockedPolyResponse();
+      // Mocked method
+      const mockedMethod = mock(MockedSendMethod);
+
+      // denominatedCurrency mock
+      const expectedDenominatedCurrencyResult = stringToBytes32('USDT');
+      const mockedDenominatedCurrencyMethod = mock(MockedCallMethod);
+      when(mockedContract.denominatedCurrency).thenReturn(instance(mockedDenominatedCurrencyMethod));
+      when(mockedDenominatedCurrencyMethod.callAsync()).thenResolve(expectedDenominatedCurrencyResult);
+
+      // startTime mock
+      const expectedStartTimeResult = new BigNumber(3876536279);
+      const mockedStartTimeMethod = mock(MockedCallMethod);
+      when(mockedContract.startTime).thenReturn(instance(mockedStartTimeMethod));
+      when(mockedStartTimeMethod.callAsync()).thenResolve(expectedStartTimeResult);
+
+      // Stub the method
+      when(mockedContract.modifyOracles).thenReturn(instance(mockedMethod));
+      // Stub the request
+      when(
+        mockedMethod.sendTransactionAsync(
+          mockedParams.customOracleAddresses,
+          objectContaining(stringToBytes32(mockedParams.denominatedCurrencySymbol)),
+          mockedParams.txData,
+          mockedParams.safetyFactor,
+        ),
+      ).thenResolve(expectedResult);
+
+      // Real call
+      const result = await target.modifyOracles(mockedParams);
+
+      // Result expectation
+      expect(result).toBe(expectedResult);
+      // Verifications
+      verify(mockedContract.securityToken).once();
+      verify(mockedGetSecurityTokenAddressMethod.callAsync()).once();
+      verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).once();
+      verify(mockedSecurityTokenOwnerMethod.callAsync()).once();
+      verify(mockedSecurityTokenContract.owner).once();
+      verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      // denominatedCurrency
+      verify(mockedContract.denominatedCurrency).once();
+      verify(mockedDenominatedCurrencyMethod.callAsync()).once();
+      // startTime
+      verify(mockedContract.startTime).once();
+      verify(mockedStartTimeMethod.callAsync()).once();
       verify(mockedContract.modifyOracles).once();
       verify(
         mockedMethod.sendTransactionAsync(

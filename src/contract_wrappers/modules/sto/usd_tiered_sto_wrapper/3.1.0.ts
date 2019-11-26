@@ -309,15 +309,15 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
       );
 
       if (await this.fundRaiseTypes({ type: FundRaiseType.ETH })) {
-        assert.isNonZeroETHAddressHex('customOracleAddresses[0]', params.customOracleAddresses[0]);
+        assert.isNonZeroETHAddressHex('ETH Oracle Address', params.customOracleAddresses[0]);
       }
 
       if (await this.fundRaiseTypes({ type: FundRaiseType.POLY })) {
-        assert.isNonZeroETHAddressHex('customOracleAddresses[1]', params.customOracleAddresses[1]);
+        assert.isNonZeroETHAddressHex('POLY Oracle Address', params.customOracleAddresses[1]);
       }
     } else {
       assert.assert(
-        params.denominatedCurrencySymbol !== '',
+        params.denominatedCurrencySymbol === '',
         ErrorCode.InvalidData,
         'Invalid denominatedCurrencySymbol',
       );
