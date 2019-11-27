@@ -1,3 +1,25 @@
+# [3.0.0-beta.57](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.56@beta...v3.0.0-beta.57@beta) (2019-11-27)
+
+
+### Bug Fixes
+
+* 🐛 add missing behavior and cover it with new tests ([4d81af4](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/4d81af4))
+* 🐛 add new assert logic ([db3f8e7](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/db3f8e7))
+* 🐛 change mocked currency symbol to make it more consistent ([7e2d068](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/7e2d068))
+* 🐛 improve typos and definitions ([eacfe73](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/eacfe73))
+* 🐛 remove else and add new if condition ([dc0dd30](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/dc0dd30))
+* 🐛 remove stringArrayToBytes32Array import ([e0bba41](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/e0bba41))
+
+
+### Features
+
+* 🎸 usd tiered sto with capability to support stablecoins ([14ccf21](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/14ccf21))
+
+
+### BREAKING CHANGES
+
+* New USDTieredSTO configure interface
+
 # [3.0.0-beta.56](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.55@beta...v3.0.0-beta.56@beta) (2019-11-07)
 
 
