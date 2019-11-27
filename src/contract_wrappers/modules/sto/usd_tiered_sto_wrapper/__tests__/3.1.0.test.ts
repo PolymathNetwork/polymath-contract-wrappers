@@ -335,7 +335,7 @@ describe('USD Tiered STO 3.1.0', () => {
           '0x1111111111111111111111111111111111111111',
           '0x2221111111111111111111111111111111111111',
         ],
-        denominatedCurrencySymbol: 'DAI',
+        denominatedCurrencySymbol: 'CAD',
         txData: {},
         safetyFactor: 10,
       };
@@ -344,7 +344,7 @@ describe('USD Tiered STO 3.1.0', () => {
       const mockedMethod = mock(MockedSendMethod);
 
       // denominatedCurrency mock
-      const expectedDenominatedCurrencyResult = stringToBytes32('USDT');
+      const expectedDenominatedCurrencyResult = stringToBytes32('USD');
       const mockedDenominatedCurrencyMethod = mock(MockedCallMethod);
       when(mockedContract.denominatedCurrency).thenReturn(instance(mockedDenominatedCurrencyMethod));
       when(mockedDenominatedCurrencyMethod.callAsync()).thenResolve(expectedDenominatedCurrencyResult);
