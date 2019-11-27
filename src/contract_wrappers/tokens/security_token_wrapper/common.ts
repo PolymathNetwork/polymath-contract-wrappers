@@ -1034,7 +1034,9 @@ export interface USDTieredSTOData {
   fundRaiseTypes: FundRaiseType[];
   wallet: string;
   treasuryWallet: string;
-  usdTokens: string[];
+  stableTokens: string[];
+  customOracleAddresses: string[];
+  denominatedCurrency: string;
 }
 
 interface AddModuleInterface {
@@ -1615,7 +1617,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     const canTransfer = await this.canTransfer({
       to: params.investor,
-      value: params.value,    
+      value: params.value,
     });
     assert.assert(
       canTransfer.statusCode !== TransferStatusCode.TransferFailure,
@@ -2179,7 +2181,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       params.from,
       params.to,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),      
+      stringToBytes32(params.data || ''),
     );
     const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
@@ -2443,6 +2445,23 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     );
     assert.isNonZeroETHAddressHex('Wallet', data.wallet);
     assert.isNonZeroETHAddressHex('ReserveWallet', data.treasuryWallet);
+    data.stableTokens.forEach(address => assert.isNonZeroETHAddressHex('stableTokens', address));
+    if (data.customOracleAddresses.length > 0) {
+      if (data.fundRaiseTypes.includes(FundRaiseType.ETH)) {
+        assert.isNonZeroETHAddressHex('ETH Oracle Address', data.customOracleAddresses[0]);
+      }
+      if (data.fundRaiseTypes.includes(FundRaiseType.POLY)) {
+        assert.isNonZeroETHAddressHex('POLY Oracle Address', data.customOracleAddresses[1]);
+      }
+      assert.assert(data.denominatedCurrency !== '', ErrorCode.InvalidData, 'Denominated Currency not provided');
+      assert.assert(
+        data.customOracleAddresses.length === 2,
+        ErrorCode.InvalidLength,
+        'Invalid customOracleAddresses length',
+      );
+    } else {
+      assert.assert(data.denominatedCurrency === '', ErrorCode.InvalidData, 'Invalid denominatedCurrencySymbol');
+    }
   };
 
   public async addModuleRequirementsAndGetData(params: AddModuleParams): Promise<ProduceAddModuleInformation> {
@@ -2517,7 +2536,9 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
           (params.data as USDTieredSTOData).fundRaiseTypes,
           (params.data as USDTieredSTOData).wallet,
           (params.data as USDTieredSTOData).treasuryWallet,
-          (params.data as USDTieredSTOData).usdTokens,
+          (params.data as USDTieredSTOData).stableTokens,
+          (params.data as USDTieredSTOData).customOracleAddresses,
+          stringToBytes32((params.data as USDTieredSTOData).denominatedCurrency),
         ]);
         break;
       case ModuleName.ERC20DividendCheckpoint:

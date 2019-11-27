@@ -1,10 +1,19 @@
-import { USDTieredSTOContract_3_0_0, BigNumber, Web3Wrapper } from '@polymathnetwork/abi-wrappers';
+import { USDTieredSTOContract_3_0_0, BigNumber, Web3Wrapper, PolyResponse } from '@polymathnetwork/abi-wrappers';
 import USDTieredSTOCommon, { TierIndexParams } from './common';
 import assert from '../../../../utils/assert';
-import { ErrorCode, ContractVersion, TxParams, FULL_DECIMALS, Constructor } from '../../../../types';
+import { ErrorCode, ContractVersion, TxParams, FULL_DECIMALS, Constructor, FundRaiseType } from '../../../../types';
 import { numberToBigNumber, weiToValue } from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_0_0 } from '../sto_wrapper';
+
+/**
+ * @param fundRaiseType Actual currency
+ * @param oracleAddress Address of the oracle
+ */
+export interface ModifyOracleParams extends TxParams {
+  fundRaiseType: FundRaiseType;
+  oracleAddress: string;
+}
 
 interface MintedByTier {
   mintedInETH: BigNumber;
@@ -124,6 +133,28 @@ export class USDTieredSTO_3_0_0 extends USDTieredSTOBase_3_0_0 {
     assert.assert(!(await this.isFinalized()), ErrorCode.PreconditionRequired, 'STO is already finalized');
     // we can't execute mint to validate the method
     return (await this.contract).finalize.sendTransactionAsync(params.txData, params.safetyFactor);
+  };
+
+  /**
+   * Modifies oracle
+   */
+  public modifyOracle = async (params: ModifyOracleParams): Promise<PolyResponse> => {
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
+    assert.assert(
+      params.fundRaiseType === FundRaiseType.POLY || params.fundRaiseType === FundRaiseType.ETH,
+      ErrorCode.InvalidData,
+      'Invalid currency',
+    );
+    return (await this.contract).modifyOracle.sendTransactionAsync(
+      params.fundRaiseType,
+      params.oracleAddress,
+      params.txData,
+      params.safetyFactor,
+    );
   };
 }
 

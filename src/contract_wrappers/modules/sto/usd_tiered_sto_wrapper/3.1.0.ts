@@ -2,12 +2,15 @@ import {
   USDTieredSTOContract_3_1_0,
   USDTieredSTOEvents_3_1_0,
   USDTieredSTOEventArgs_3_1_0,
+  USDTieredSTOSetOraclesEventArgs_3_1_0,
+  USDTieredSTOUsageFeeDeductedEventArgs_3_1_0,
   USDTieredSTOReserveTokenTransferEventArgs_3_1_0,
   USDTieredSTOAllowPreMintFlagEventArgs_3_1_0,
   USDTieredSTORevokePreMintFlagEventArgs_3_1_0,
   LogWithDecodedArgs,
   BigNumber,
   Web3Wrapper,
+  PolyResponse,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
 import USDTieredSTOCommon, {
@@ -24,10 +27,37 @@ import {
   FULL_DECIMALS,
   Constructor,
   EventCallback,
+  TxParams,
+  FundRaiseType,
 } from '../../../../types';
-import { numberToBigNumber, weiToValue, bigNumberToDate, weiArrayToValueArray } from '../../../../utils/convert';
+import {
+  numberToBigNumber,
+  weiToValue,
+  bigNumberToDate,
+  weiArrayToValueArray,
+  stringToBytes32,
+  bytes32ToString,
+} from '../../../../utils/convert';
 import ContractFactory from '../../../../factories/contractFactory';
 import { WithSTO_3_1_0 } from '../sto_wrapper';
+
+interface SetOraclesSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_1_0.SetOracles;
+  callback: EventCallback<USDTieredSTOSetOraclesEventArgs_3_1_0>;
+}
+
+interface GetSetOraclesLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_1_0.SetOracles;
+}
+
+interface UsageFeeDeductedSubscribeAsyncParams extends SubscribeAsyncParams {
+  eventName: USDTieredSTOEvents_3_1_0.UsageFeeDeducted;
+  callback: EventCallback<USDTieredSTOUsageFeeDeductedEventArgs_3_1_0>;
+}
+
+interface GetUsageFeeDeductedLogsAsyncParams extends GetLogsAsyncParams {
+  eventName: USDTieredSTOEvents_3_1_0.UsageFeeDeducted;
+}
 
 interface ReserveTokenTransferSubscribeAsyncParams extends SubscribeAsyncParams {
   eventName: USDTieredSTOEvents_3_1_0.ReserveTokenTransfer;
@@ -60,6 +90,8 @@ interface USDTieredSTOSubscribeAsyncParams_3_1_0 extends USDTieredSTOSubscribeAs
   (params: ReserveTokenTransferSubscribeAsyncParams): Promise<string>;
   (params: AllowPreMintFlagSubscribeAsyncParams): Promise<string>;
   (params: RevokePreMintFlagSubscribeAsyncParams): Promise<string>;
+  (params: SetOraclesSubscribeAsyncParams): Promise<string>;
+  (params: UsageFeeDeductedSubscribeAsyncParams): Promise<string>;
 }
 
 interface GetUSDTieredSTOLogsAsyncParams_3_1_0 extends GetUSDTieredSTOLogsAsyncParams {
@@ -71,6 +103,10 @@ interface GetUSDTieredSTOLogsAsyncParams_3_1_0 extends GetUSDTieredSTOLogsAsyncP
   >;
   (params: GetRevokePreMintFlagLogsAsyncParams): Promise<
     LogWithDecodedArgs<USDTieredSTORevokePreMintFlagEventArgs_3_1_0>[]
+  >;
+  (params: GetSetOraclesLogsAsyncParams): Promise<LogWithDecodedArgs<USDTieredSTOSetOraclesEventArgs_3_1_0>[]>;
+  (params: GetUsageFeeDeductedLogsAsyncParams): Promise<
+    LogWithDecodedArgs<USDTieredSTOUsageFeeDeductedEventArgs_3_1_0>[]
   >;
 }
 
@@ -105,6 +141,22 @@ export interface USDTieredSTOData {
   isRaisedInSC: boolean;
   /** Whether all tokens will be minted when the STO starts or on each buy */
   preMintingAllowed: boolean;
+}
+
+/**
+ * @param customOracleAddresses Addresses of the oracles
+ * @param denominatedCurrencySymbol Symbol of the Fiat currency used for denomination
+ */
+export interface ModifyOraclesParams extends TxParams {
+  customOracleAddresses: string[];
+  denominatedCurrencySymbol: string;
+}
+
+/**
+ * @param fundRaiseType Fund raise type to get rate of
+ */
+export interface GetCustomOracleAddressParams {
+  fundRaiseType: FundRaiseType;
 }
 
 interface Tier {
@@ -215,6 +267,75 @@ export class USDTieredSTO_3_1_0 extends USDTieredSTOBase_3_1_0 {
       mintedInSC: weiToValue(result[2], decimals),
     };
     return typedResult;
+  };
+
+  /**
+   * Return symbol of the denominated currency
+   * @return token symbol string
+   */
+  public denominatedCurrency = async () => {
+    const result = await (await this.contract).denominatedCurrency.callAsync();
+    return bytes32ToString(result);
+  };
+
+  /**
+   * Modifies oracle
+   */
+  public modifyOracles = async (params: ModifyOraclesParams): Promise<PolyResponse> => {
+    assert.assert(
+      await this.isCallerTheSecurityTokenOwner(params.txData),
+      ErrorCode.Unauthorized,
+      'The caller must be the ST owner',
+    );
+
+    if ((await this.denominatedCurrency()) !== params.denominatedCurrencySymbol) {
+      assert.isFutureDate(
+        await this.startTime(),
+        "The denominated currency can change only if the STO hasn't started yet",
+      );
+    }
+
+    if (params.customOracleAddresses.length > 0) {
+      assert.assert(
+        params.denominatedCurrencySymbol !== '',
+        ErrorCode.InvalidData,
+        'Denominated currency symbol can not be empty',
+      );
+      assert.assert(
+        params.customOracleAddresses.length === 2,
+        ErrorCode.InvalidLength,
+        'Custom oracle addresses array must have two values',
+      );
+
+      if (await this.fundRaiseTypes({ type: FundRaiseType.ETH })) {
+        assert.isNonZeroETHAddressHex('ETH Oracle Address', params.customOracleAddresses[0]);
+      }
+
+      if (await this.fundRaiseTypes({ type: FundRaiseType.POLY })) {
+        assert.isNonZeroETHAddressHex('POLY Oracle Address', params.customOracleAddresses[1]);
+      }
+    } else {
+      assert.assert(
+        params.denominatedCurrencySymbol === '',
+        ErrorCode.InvalidData,
+        'Invalid denominatedCurrencySymbol',
+      );
+    }
+
+    return (await this.contract).modifyOracles.sendTransactionAsync(
+      params.customOracleAddresses,
+      stringToBytes32(params.denominatedCurrencySymbol),
+      params.txData,
+      params.safetyFactor,
+    );
+  };
+
+  /**
+   * Returns the custom oracle address
+   */
+  public getCustomOracleAddress = async (params: GetCustomOracleAddressParams) => {
+    const result = await (await this.contract).getCustomOracleAddress.callAsync(params.fundRaiseType);
+    return result;
   };
 
   /**
