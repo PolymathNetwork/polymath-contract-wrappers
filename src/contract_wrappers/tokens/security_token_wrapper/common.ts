@@ -54,6 +54,7 @@ import {
   ISecurityTokenEventArgs_3_0_0,
 } from '@polymathnetwork/abi-wrappers';
 import { schemas } from '@0x/json-schemas';
+import { recoverTypedSignature } from 'eth-sig-util';
 import assert from '../../../utils/assert';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import ContractFactory from '../../../factories/contractFactory';
@@ -90,6 +91,7 @@ import {
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
 import ContractWrapper from '../../contract_wrapper';
+import { getFreezeIssuanceTypedData, getDisableControllerTypedData } from '../../../utils/sign_utils';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -1590,14 +1592,8 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public freezeIssuance = async (params: FreezeIssuanceParams): Promise<PolyResponse> => {
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
-    assert.assert(
-      functionsUtils.checksumAddressComparision(
-        await this.owner(),
-        (await this.web3Wrapper.getAvailableAddressesAsync())[0],
-      ),
-      ErrorCode.Unauthorized,
-      'Msg sender must be owner',
-    );
+    await this.checkOnlyOwner(params.txData);
+    await this.checkFreezeIssuanceSignature(params.signature, await this.owner());
     return (await this.contract).freezeIssuance.sendTransactionAsync(
       params.signature,
       params.txData,
@@ -1953,6 +1949,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public disableController = async (params: DisableControllerParams): Promise<PolyResponse> => {
     await this.checkOnlyOwner(params.txData);
     await this.checkIsControllable();
+    await this.checkDisableControllerSignature(params.signature, await this.owner());
     return (await this.contract).disableController.sendTransactionAsync(
       params.signature,
       params.txData,
@@ -2268,6 +2265,37 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     return bytes32ArrayToStringArray(await (await this.contract).getAllDocuments.callAsync());
   };
 
+  // public signTransferData = async (txData: Partial<TxData> | undefined): Promise<string> => {
+
+  // };
+
+  public signFreezeIssuanceAck = async (txData: Partial<TxData> | undefined): Promise<string> => {
+    const callerAddress = await this.getCallerAddress(txData);
+    const networkId = await this.web3Wrapper.getNetworkIdAsync();
+    const stAddress = await this.address();
+    const typedData = getFreezeIssuanceTypedData(networkId, stAddress);
+
+    return this.web3Wrapper.signTypedDataAsync(callerAddress, typedData);
+  };
+
+  public signDisableControllerAck = async (txData: Partial<TxData> | undefined): Promise<string> => {
+    const callerAddress = await this.getCallerAddress(txData);
+    const networkId = await this.web3Wrapper.getNetworkIdAsync();
+    const stAddress = await this.address();
+    const typedData = getDisableControllerTypedData(networkId, stAddress);
+
+    return this.web3Wrapper.signTypedDataAsync(callerAddress, typedData);
+  };
+
+  public getCurrentNonce = async (txData: Partial<TxData> | undefined): Promise<number> => {
+    const nonce = await this.web3Wrapper.sendRawPayloadAsync<string>({
+      method: 'eth_getTransactionCount',
+      params: [await this.getCallerAddress(txData), 'latest'],
+    });
+    const nonceNumber = new BigNumber(nonce);
+    return nonceNumber.toNumber();
+  };
+
   public checkModuleExists = async (moduleAddress: string) => {
     assert.assert((await this.getModule({ moduleAddress })).name !== '', ErrorCode.NotFound, 'Module does not exist');
   };
@@ -2365,6 +2393,32 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       await this.isCompatibleModule(address),
       ErrorCode.InvalidVersion,
       'Version should within the compatible range of ST',
+    );
+  };
+
+  public checkFreezeIssuanceSignature = async (signature: string, owner: string) => {
+    const networkId = await this.web3Wrapper.getNetworkIdAsync();
+    const stAddress = await this.address();
+    const typedData = getFreezeIssuanceTypedData(networkId, stAddress);
+
+    assert.isHexString('signature', signature);
+    assert.assert(
+      recoverTypedSignature({ data: typedData, sig: signature }) === owner,
+      ErrorCode.PreconditionRequired,
+      'Message must be signed by Security Token owner',
+    );
+  };
+
+  public checkDisableControllerSignature = async (signature: string, owner: string) => {
+    const networkId = await this.web3Wrapper.getNetworkIdAsync();
+    const stAddress = await this.address();
+    const typedData = getDisableControllerTypedData(networkId, stAddress);
+
+    assert.isHexString('signature', signature);
+    assert.assert(
+      recoverTypedSignature({ data: typedData, sig: signature }) === owner,
+      ErrorCode.PreconditionRequired,
+      'Message must be signed by Security Token owner',
     );
   };
 
