@@ -2265,23 +2265,23 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     return bytes32ArrayToStringArray(await (await this.contract).getAllDocuments.callAsync());
   };
 
-  // public signTransferData = async (txData: Partial<TxData> | undefined): Promise<string> => {
-
-  // };
-
   public signFreezeIssuanceAck = async (txData: Partial<TxData> | undefined): Promise<string> => {
-    const callerAddress = await this.getCallerAddress(txData);
-    const networkId = await this.web3Wrapper.getNetworkIdAsync();
-    const stAddress = await this.address();
+    const [callerAddress, networkId, stAddress] = await Promise.all([
+      this.getCallerAddress(txData),
+      this.web3Wrapper.getNetworkIdAsync(),
+      this.address(),
+    ]);
     const typedData = getFreezeIssuanceTypedData(networkId, stAddress);
 
     return this.web3Wrapper.signTypedDataAsync(callerAddress, typedData);
   };
 
   public signDisableControllerAck = async (txData: Partial<TxData> | undefined): Promise<string> => {
-    const callerAddress = await this.getCallerAddress(txData);
-    const networkId = await this.web3Wrapper.getNetworkIdAsync();
-    const stAddress = await this.address();
+    const [callerAddress, networkId, stAddress] = await Promise.all([
+      this.getCallerAddress(txData),
+      this.web3Wrapper.getNetworkIdAsync(),
+      this.address(),
+    ]);
     const typedData = getDisableControllerTypedData(networkId, stAddress);
 
     return this.web3Wrapper.signTypedDataAsync(callerAddress, typedData);
@@ -2397,10 +2397,8 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   };
 
   public checkFreezeIssuanceSignature = async (signature: string, owner: string) => {
-    const networkId = await this.web3Wrapper.getNetworkIdAsync();
-    const stAddress = await this.address();
+    const [networkId, stAddress] = await Promise.all([this.web3Wrapper.getNetworkIdAsync(), this.address()]);
     const typedData = getFreezeIssuanceTypedData(networkId, stAddress);
-
     assert.isHexString('signature', signature);
     assert.assert(
       recoverTypedSignature({ data: typedData, sig: signature }) === owner,
@@ -2410,8 +2408,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   };
 
   public checkDisableControllerSignature = async (signature: string, owner: string) => {
-    const networkId = await this.web3Wrapper.getNetworkIdAsync();
-    const stAddress = await this.address();
+    const [networkId, stAddress] = await Promise.all([this.web3Wrapper.getNetworkIdAsync(), this.address()]);
     const typedData = getDisableControllerTypedData(networkId, stAddress);
 
     assert.isHexString('signature', signature);

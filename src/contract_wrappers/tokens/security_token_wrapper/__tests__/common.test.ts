@@ -2501,7 +2501,7 @@ describe('SecurityTokenCommon', () => {
     test('should send the transaction to freezeIssuance', async () => {
       // Mocked parameters
       const mockedParams = {
-        signature: 'signature',
+        signature: '0x55b159bfb202de4aaacdb90061c5735f1359479027c8d9b8e5ee8a6ae9efc37b2dd4eb5668e3a51e9aa0902def27427344fcaab05fedd73c91eb16ba6b2796701c',
         txData: {},
         safetyFactor: 10,
       };
@@ -2516,7 +2516,14 @@ describe('SecurityTokenCommon', () => {
       ).thenResolve(expectedResult);
 
       // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedOwnerResult = '0x0a519b4b6501f92e8f516230b97aca83257b0c01';
+      // Contrac address expected
+      const contractAddress = '0x2A07c0303944a298267Ca991018cbb73503aE7a4';
+      // Stub the method
+      when(mockedContract.address).thenReturn(contractAddress);
+      // Stub the method
+      when(mockedWrapper.getNetworkIdAsync()).thenResolve(15);
+
       // Mocked method
       const mockedOwnerMethod = mock(MockedCallMethod);
       // Stub the method
@@ -2544,11 +2551,12 @@ describe('SecurityTokenCommon', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedContract.isIssuable).once();
       verify(mockedIsIssuableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getNetworkIdAsync()).once();
     });
   });
 
@@ -3243,7 +3251,7 @@ describe('SecurityTokenCommon', () => {
     test('should send the transaction to disableController', async () => {
       // Mocked parameters
       const mockedParams = {
-        signature: 'Signed',
+        signature: '0x6c9740778a0fb46d71d3a1d743bb3eae79c7cb54b605866934013e47612635287ec02ebdd51d921765771cb19f83708a8eaf991249ad3b7b614ad3970ab636ab1b',
         txData: {},
         safetyFactor: 10,
       };
@@ -3258,7 +3266,14 @@ describe('SecurityTokenCommon', () => {
       ).thenResolve(expectedResult);
 
       // Owner Address expected
-      const expectedOwnerResult = '0x5555555555555555555555555555555555555555';
+      const expectedOwnerResult = '0x0a519b4b6501f92e8f516230b97aca83257b0c01';
+      // Contrac address expected
+      const contractAddress = '0x2A07c0303944a298267Ca991018cbb73503aE7a4';
+      // Stub the method
+      when(mockedContract.address).thenReturn(contractAddress);
+      // Stub the method
+      when(mockedWrapper.getNetworkIdAsync()).thenResolve(15);
+
       // Mocked method
       const mockedOwnerMethod = mock(MockedCallMethod);
       // Stub the method
@@ -3286,11 +3301,12 @@ describe('SecurityTokenCommon', () => {
       verify(
         mockedMethod.sendTransactionAsync(mockedParams.signature, mockedParams.txData, mockedParams.safetyFactor),
       ).once();
-      verify(mockedContract.owner).once();
-      verify(mockedOwnerMethod.callAsync()).once();
+      verify(mockedContract.owner).twice();
+      verify(mockedOwnerMethod.callAsync()).twice();
       verify(mockedContract.isControllable).once();
       verify(mockedIsControllableMethod.callAsync()).once();
       verify(mockedWrapper.getAvailableAddressesAsync()).once();
+      verify(mockedWrapper.getNetworkIdAsync()).once();
     });
   });
 

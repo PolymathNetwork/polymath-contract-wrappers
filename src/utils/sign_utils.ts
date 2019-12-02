@@ -1,4 +1,6 @@
 function getTypedData(networkId: number, securityTokenAddress: string, reason: string) {
+  // Using EIP720 to check signed acknowledgment
+  // https://github.com/PolymathNetwork/polymath-core/blob/master/contracts/libraries/TokenLib.sol
   const typedData = {
     types: {
       EIP712Domain: [
