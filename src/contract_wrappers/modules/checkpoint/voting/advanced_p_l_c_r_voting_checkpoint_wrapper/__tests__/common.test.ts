@@ -1609,7 +1609,7 @@ describe('AdvancedPLCRVotingCheckpointWrapper', () => {
         'ballot name',
         new BigNumber(1000),
         new BigNumber(1),
-        dateToBigNumber(new Date(2019, 11)),
+        dateToBigNumber(new Date(2030, 11)),
         new BigNumber(86000),
         new BigNumber(86000),
         new BigNumber(2),
