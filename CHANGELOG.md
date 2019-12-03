@@ -1,3 +1,20 @@
+# [3.0.0-beta.58](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.57@beta...v3.0.0-beta.58@beta) (2019-12-03)
+
+
+### Bug Fixes
+
+* 🐛 fix advanced_p_l_c_r_voting_checkpoint_wrapper test ([72bb1b4](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/72bb1b4))
+
+
+### Features
+
+* 🎸 Sign ack methods for freezeIssuance & disableController ([28d69e8](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/28d69e8))
+
+
+### BREAKING CHANGES
+
+* N
+
 # [3.0.0-beta.57](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.56@beta...v3.0.0-beta.57@beta) (2019-11-27)
 
 
