@@ -2,6 +2,14 @@ import { ethersUtils } from '@polymathnetwork/abi-wrappers';
 import { dateToBigNumber, numberToBigNumber } from './convert';
 import { InvestorTransferData } from '../contract_wrappers/tokens/security_token_wrapper/common';
 
+function splitInvestorDataIntoArrays(investorsData: InvestorTransferData[]) {
+  const investorAddresses = investorsData.map(i => i.investorAddress);
+  const fromTimes = investorsData.map(i => dateToBigNumber(i.canSendAfter).toString());
+  const toTimes = investorsData.map(i => dateToBigNumber(i.canReceiveAfter).toString());
+  const expiryTimes = investorsData.map(i => dateToBigNumber(i.expiryTime).toString());
+  return { investorAddresses, fromTimes, toTimes, expiryTimes };
+}
+
 function getTypedData(networkId: number, securityTokenAddress: string, reason: string) {
   // Using EIP720 to check signed acknowledgment
   // https://github.com/PolymathNetwork/polymath-core/blob/master/contracts/libraries/TokenLib.sol
@@ -42,10 +50,7 @@ export function getHashedTransferData(
   validTo: Date,
   nonce: number,
 ) {
-  const investorAddresses = investorsData.map(i => i.investorAddress);
-  const fromTimes = investorsData.map(i => dateToBigNumber(i.canSendAfter).toString());
-  const toTimes = investorsData.map(i => dateToBigNumber(i.canReceiveAfter).toString());
-  const expiryTimes = investorsData.map(i => dateToBigNumber(i.expiryTime).toString());
+  const { investorAddresses, fromTimes, toTimes, expiryTimes } = splitInvestorDataIntoArrays(investorsData);
 
   const types = ['address', 'address[]', 'uint256[]', 'uint256[]', 'uint256[]', 'uint256', 'uint256', 'uint256'];
   const values = [
@@ -69,10 +74,7 @@ export function encodeSignedTransferData(
   nonce: number,
   signature: string,
 ) {
-  const investorAddresses = investorsData.map(i => i.investorAddress);
-  const fromTimes = investorsData.map(i => dateToBigNumber(i.canSendAfter).toString());
-  const toTimes = investorsData.map(i => dateToBigNumber(i.canReceiveAfter).toString());
-  const expiryTimes = investorsData.map(i => dateToBigNumber(i.expiryTime).toString());
+  const { investorAddresses, fromTimes, toTimes, expiryTimes } = splitInvestorDataIntoArrays(investorsData);
 
   const packedData = ethersUtils.defaultAbiCoder.encode(
     ['address[]', 'uint256[]', 'uint256[]', 'uint256[]', 'bytes'],
