@@ -44,6 +44,7 @@ import Common, {
   AddUSDTieredSTOParams,
   RedeemByPartitionParams,
   OperatorRedeemByPartitionParams,
+  SignTransferDataParams,
 } from './common';
 import { ContractVersion } from '../../../types';
 
@@ -133,6 +134,7 @@ export namespace SecurityTokenTransactionParams {
   export interface AddDividendCheckpoint extends AddDividendCheckpointParams {}
   export interface AddCappedSTO extends AddCappedSTOParams {}
   export interface AddUSDTieredSTO extends AddUSDTieredSTOParams {}
+  export interface SignTransferData extends SignTransferDataParams {}
 }
 
 // for internal use

@@ -91,7 +91,12 @@ import {
 } from '../../../utils/convert';
 import functionsUtils from '../../../utils/functions_utils';
 import ContractWrapper from '../../contract_wrapper';
-import { getFreezeIssuanceTypedData, getDisableControllerTypedData } from '../../../utils/sign_utils';
+import {
+  getFreezeIssuanceTypedData,
+  getDisableControllerTypedData,
+  getHashedTransferData,
+  encodeSignedTransferData,
+} from '../../../utils/sign_utils';
 
 const NO_MODULE_DATA = '0x0000000000000000';
 const MAX_CHECKPOINT_NUMBER = new BigNumber(2 ** 256 - 1);
@@ -586,10 +591,9 @@ export interface ChangeTreasuryWalletParams extends TxParams {
 }
 
 /**
- * @param from sender of transfer
  * @param to receiver of transfer
  * @param value value of transfer
- * @param data data to indicate validation
+ * @param data signed data for dynamic whitelisting purposes
  */
 interface CanTransferParams {
   to: string;
@@ -702,7 +706,7 @@ interface IterateInvestorsParams {
 /**
  * @param to receiver of transfer
  * @param value value of transfer
- * @param data data to indicate validation
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface TransferWithDataParams extends TxParams {
   to: string;
@@ -714,7 +718,7 @@ export interface TransferWithDataParams extends TxParams {
  * @param from sender of transfer
  * @param to receiver of transfer
  * @param value value of transfer
- * @param data data to indicate validation
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface TransferFromWithDataParams extends TxParams {
   from: string;
@@ -726,7 +730,7 @@ export interface TransferFromWithDataParams extends TxParams {
 /**
  * @param investor The account that will receive the created tokens (account should be whitelisted or KYCed).
  * @param value The amount of tokens need to be issued
- * @param data The `bytes data` allows arbitrary data to be submitted alongside the transfer.
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface IssueParams extends TxParams {
   investor: string;
@@ -763,11 +767,11 @@ interface CheckPermissionParams {
 
 /**
  * @param value The amount of tokens need to be redeemed
- * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
+ * @param data The signed bytes data can be used in the token contract to authenticate the redemption.
  */
 export interface RedeemParams extends TxParams {
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 /**
@@ -789,12 +793,12 @@ export interface OperatorRedeemByPartitionParams extends RedeemByPartitionParams
 /**
  * @param from The account whose tokens gets redeemed.
  * @param value The amount of tokens need to be redeemed
- * @param data The `bytes data` it can be used in the token contract to authenticate the redemption.
+ * @param data The signed bytes data it can be used in the token contract to authenticate the redemption.
  */
 export interface RedeemFromParams extends TxParams {
   from: string;
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 /**
@@ -819,13 +823,13 @@ interface BalanceOfByPartitionParams {
  * @param partition The partition from which to transfer tokens
  * @param to The address to which to transfer tokens to
  * @param value The amount of tokens to transfer from `partition`
- * @param data Additional data attached to the transfer of tokens
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface TransferByPartitionParams extends TxParams {
   partition: Partition;
   to: string;
   value: BigNumber;
-  data: string;
+  data?: string;
 }
 
 /**
@@ -883,32 +887,54 @@ export interface DisableControllerParams extends TxParams {
  * @param from Address The address which you want to send tokens from
  * @param to Address The address which you want to transfer to
  * @param value the amount of tokens to be transferred
- * @param data data to validate the transfer. (It is not used in this reference implementation
- * because use of `data` parameter is implementation specific).
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface ControllerTransferParams extends TxParams {
   from: string;
   to: string;
   value: BigNumber;
-  data: string;
   operatorData: string;
+  data?: string;
 }
 
 /**
  * @param from The account whose tokens will be redeemed.
  * @param value uint256 the amount of tokens need to be redeemed.
- * @param data data to validate the transfer. (It is not used in this reference implementation
- * because use of `data` parameter is implementation specific).
  * @param operatorData data attached to the transfer by controller to emit in event. (It is more like a reason string
  * for calling this function (aka force transfer) which provides the transparency on-chain).
+ * @param data Signed data for dynamic whitelisting purposes
  */
 export interface ControllerRedeemParams extends TxParams {
   from: string;
   value: BigNumber;
-  data: string;
   operatorData: string;
+  data?: string;
+}
+
+/**
+ * @param investorAddress The investor account to whitelist
+ * @param canSendAfter Moment when the sale lockup period ends and each investor can freely sell his tokens
+ * @param canReceiveAfter Moment when the purchase lockup period ends and each investor can freely purchase tokens from others
+ * @param expiryTime Moment up to which each investor's KYC will be validated. After that investor needs to re-do KYC
+ */
+export interface InvestorTransferData {
+  investorAddress: string;
+  canSendAfter: Date;
+  canReceiveAfter: Date;
+  expiryTime: Date;
+}
+
+/**
+ * @param investorsData list of investors' KYC data
+ * @param validFrom is the time from which the signature is valid
+ * @param validTo is the time until which the signature is valid
+ */
+export interface SignTransferDataParams {
+  investorsData: InvestorTransferData[];
+  validFrom: Date;
+  validTo: Date;
 }
 
 /**
@@ -1560,6 +1586,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public transferWithData = async (params: TransferWithDataParams): Promise<PolyResponse> => {
     assert.isNonZeroETHAddressHex('to', params.to);
+    assert.isHexString('data', params.data);
     return (await this.contract).transferWithData.sendTransactionAsync(
       params.to,
       valueToWei(params.value, await this.decimals()),
@@ -1576,6 +1603,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public transferFromWithData = async (params: TransferFromWithDataParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('from', params.from);
     assert.isNonZeroETHAddressHex('to', params.to);
+    assert.isHexString('data', params.data);
     return (await this.contract).transferFromWithData.sendTransactionAsync(
       params.from,
       params.to,
@@ -1611,9 +1639,12 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('investor', params.investor);
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     const canTransfer = await this.canTransfer({
       to: params.investor,
       value: params.value,
+      data,
     });
     assert.assert(
       canTransfer.statusCode !== TransferStatusCode.TransferFailure,
@@ -1623,7 +1654,7 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     return (await this.contract).issue.sendTransactionAsync(
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1637,11 +1668,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     await this.checkOnlyOwner(params.txData);
     assert.assert(await this.isIssuable(), ErrorCode.PreconditionRequired, 'Issuance frozen');
     assert.isValidPartition(params.partition);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).issueByPartition.sendTransactionAsync(
       params.partition,
       params.investor,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1691,9 +1724,11 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public redeem = async (params: RedeemParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).redeem.sendTransactionAsync(
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data),
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1705,10 +1740,12 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public redeemByPartition = async (params: RedeemByPartitionParams): Promise<PolyResponse> => {
     await this.checkBalanceFromGreaterThanValue((await this.web3Wrapper.getAvailableAddressesAsync())[0], params.value);
     assert.isValidPartition(params.partition);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).redeemByPartition.sendTransactionAsync(
       params.partition,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data),
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1728,11 +1765,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('TokenHolder', params.tokenHolder);
     assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).operatorRedeemByPartition.sendTransactionAsync(
       params.partition,
       params.tokenHolder,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data),
+      data,
       stringToBytes32(params.operatorData),
       params.txData,
       params.safetyFactor,
@@ -1756,10 +1795,12 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
       'Insufficient allowance for inputted burn value',
     );
     assert.isETHAddressHex('from', params.from);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).redeemFrom.sendTransactionAsync(
       params.from,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1839,11 +1880,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public transferByPartition = async (params: TransferByPartitionParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('To', params.to);
     assert.isValidPartition(params.partition);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).transferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.to,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      data,
       params.txData,
       params.safetyFactor,
     );
@@ -1916,12 +1959,14 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isETHAddressHex('From', params.from);
     assert.assert(params.operatorData.length > 0, ErrorCode.InvalidData, 'Operator data cannot be 0');
     assert.isValidPartition(params.partition);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).operatorTransferByPartition.sendTransactionAsync(
       stringToBytes32(params.partition),
       params.from,
       params.to,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      data,
       params.operatorData,
       params.txData,
       params.safetyFactor,
@@ -1968,12 +2013,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isNonZeroETHAddressHex('to', params.to);
     await this.checkMsgSenderIsController(params.txData);
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
-
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).controllerTransfer.sendTransactionAsync(
       params.from,
       params.to,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      data,
       params.operatorData,
       params.txData,
       params.safetyFactor,
@@ -1990,10 +2036,12 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
     assert.isETHAddressHex('from', params.from);
     await this.checkBalanceFromGreaterThanValue(params.from, params.value);
     await this.checkMsgSenderIsController(params.txData);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     return (await this.contract).controllerRedeem.sendTransactionAsync(
       params.from,
       valueToWei(params.value, await this.decimals()),
-      params.data,
+      data,
       params.operatorData,
       params.txData,
       params.safetyFactor,
@@ -2154,10 +2202,12 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public canTransfer = async (params: CanTransferParams): Promise<CanTransferFromData> => {
     assert.isETHAddressHex('to', params.to);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     const result = await (await this.contract).canTransfer.callAsync(
       params.to,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),
+      data,
     );
     const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
@@ -2174,11 +2224,13 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public canTransferFrom = async (params: CanTransferFromParams): Promise<CanTransferFromData> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     const result = await (await this.contract).canTransferFrom.callAsync(
       params.from,
       params.to,
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),
+      data,
     );
     const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferFromData = {
@@ -2195,12 +2247,14 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
   public canTransferByPartition = async (params: CanTransferByPartitionParams): Promise<CanTransferByPartitionData> => {
     assert.isETHAddressHex('from', params.from);
     assert.isETHAddressHex('to', params.to);
+    const data = params.data || stringToBytes32('');
+    assert.isHexString('data', data);
     const result = await (await this.contract).canTransferByPartition.callAsync(
       params.from,
       params.to,
       stringToBytes32(params.partition),
       valueToWei(params.value, await this.decimals()),
-      stringToBytes32(params.data || ''),
+      data,
     );
     const status = this.getTransferStatusCode(result[0]);
     const typedResult: CanTransferByPartitionData = {
@@ -2263,6 +2317,25 @@ export default abstract class SecurityTokenCommon extends ERC20TokenWrapper {
    */
   public getAllDocuments = async (): Promise<string[]> => {
     return bytes32ArrayToStringArray(await (await this.contract).getAllDocuments.callAsync());
+  };
+
+  public signTransferData = async (params: SignTransferDataParams): Promise<string> => {
+    const [callerAddress, gtmAddresses, nonce] = await Promise.all([
+      this.getCallerAddress({}),
+      this.getModulesByName({ moduleName: ModuleName.GeneralTransferManager }),
+      this.getCurrentNonce({}),
+    ]);
+    const hash = getHashedTransferData(gtmAddresses[0], params.investorsData, params.validFrom, params.validTo, nonce);
+    const signature = await this.web3Wrapper.signMessageAsync(callerAddress, hash);
+
+    return encodeSignedTransferData(
+      gtmAddresses[0],
+      params.investorsData,
+      params.validFrom,
+      params.validTo,
+      nonce,
+      signature,
+    );
   };
 
   public signFreezeIssuanceAck = async (txData: Partial<TxData> | undefined): Promise<string> => {
