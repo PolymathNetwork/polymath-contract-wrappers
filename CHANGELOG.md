@@ -1,3 +1,15 @@
+# [3.0.0-beta.59](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.58@beta...v3.0.0-beta.59@beta) (2019-12-04)
+
+
+### Features
+
+* 🎸 Add sign transfer data method for dynamic whitelisting ([a2373d8](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/a2373d8))
+
+
+### BREAKING CHANGES
+
+* data arg must be hex string when required
+
 # [3.0.0-beta.58](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.57@beta...v3.0.0-beta.58@beta) (2019-12-03)
 
 
