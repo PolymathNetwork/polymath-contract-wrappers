@@ -4,6 +4,7 @@ import { PolymathError } from '../PolymathError';
 
 const networkToAddresses: { [networkId: number]: string } = {
   1: '0xdfabf3e4793cd30affb47ab6fa4cf4eef26bbc27',
+  5: '0x7e3c8af98538ba19a10dfc7e8f5469a76998b0f0',
   42: '0x5b215a7d39ee305ad28da29bf2f0425c6c2a00b3',
   15: '0x8b21e65058a5e52b423080044634ffac53c1e5ce',
 };
