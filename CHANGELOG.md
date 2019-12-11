@@ -1,3 +1,10 @@
+# [3.0.0-beta.60](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.59@beta...v3.0.0-beta.60@beta) (2019-12-11)
+
+
+### Features
+
+* 🎸 Goerli PolymathRegistry address support ([c78a87b](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/c78a87b))
+
 # [3.0.0-beta.59](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.58@beta...v3.0.0-beta.59@beta) (2019-12-04)
 
 
