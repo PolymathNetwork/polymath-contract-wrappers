@@ -9,6 +9,9 @@ export function bytes32ToString(value: string): string {
 }
 
 export function stringToBytes32(value: string): string {
+  if (value.length > 32) {
+    throw new PolymathError({ message: 'String can be a maximum 32 characters long', code: ErrorCode.InvalidLength });
+  }
   return ethersUtils.formatBytes32String(value);
 }
 
