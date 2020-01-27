@@ -1,3 +1,10 @@
+# [3.0.0-beta.61](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.60@beta...v3.0.0-beta.61@beta) (2020-01-27)
+
+
+### Bug Fixes
+
+* add error message when bytes32 string is over 32 chars long ([00b4269](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/00b4269))
+
 # [3.0.0-beta.60](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0-beta.59@beta...v3.0.0-beta.60@beta) (2019-12-11)
 
 
