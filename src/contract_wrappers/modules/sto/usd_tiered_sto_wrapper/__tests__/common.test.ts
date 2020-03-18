@@ -48,6 +48,7 @@ describe('USD Tiered STO Common', () => {
   let mockedGeneralTransferManagerContract: GeneralTransferManagerContract_3_0_0;
   let mockedDetailedERC20Contract: ERC20DetailedContract_3_0_0;
   let mockedPolyTokenContract: PolyTokenContract_3_0_0;
+  let mockedSCContract: ERC20DetailedContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
@@ -57,6 +58,7 @@ describe('USD Tiered STO Common', () => {
     mockedGeneralTransferManagerContract = mock(GeneralTransferManagerContract_3_0_0);
     mockedDetailedERC20Contract = mock(ERC20DetailedContract_3_0_0);
     mockedPolyTokenContract = mock(PolyTokenContract_3_0_0);
+    mockedSCContract = mock(ERC20DetailedContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new FakeUSDTieredSTO(instance(mockedWrapper), myContractPromise, instance(mockedContractFactory));
@@ -70,6 +72,7 @@ describe('USD Tiered STO Common', () => {
     reset(mockedContractFactory);
     reset(mockedDetailedERC20Contract);
     reset(mockedPolyTokenContract);
+    reset(mockedSCContract);
   });
 
   describe('Types', () => {
@@ -846,11 +849,14 @@ describe('USD Tiered STO Common', () => {
       when(mockedSecurityTokenContract.decimals).thenReturn(instance(mockedDecimalsMethod));
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
-      // Security Token Address expected
-      const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
+      const expectedSCDecimalsResult = new BigNumber(6);
+      const expectedBalanceOfResult = valueToWei(new BigNumber(100), expectedSCDecimalsResult);
       const usdToken = '0x0123456789012345678901234567890123456789';
-      // Setup get Security Token Address
+      // Setup Stable Token
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      const mockedSCDecimalsMethod = mock(MockedCallMethod);
+      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedSCDecimalsMethod));
+      when(mockedSCDecimalsMethod.callAsync()).thenResolve(expectedSCDecimalsResult);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
       when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
@@ -859,7 +865,7 @@ describe('USD Tiered STO Common', () => {
         beneficiary: investorAddress,
         investedSC: new BigNumber(1),
         minTokens: new BigNumber(1),
-        usdToken: '0x0123456789012345678901234567890123456789',
+        usdToken,
         value: new BigNumber(1),
         txData: {},
         safetyFactor: 10,
@@ -874,7 +880,7 @@ describe('USD Tiered STO Common', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-          objectContaining(valueToWei(mockedParams.investedSC, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.investedSC, expectedSCDecimalsResult)),
           objectContaining(mockedParams.minTokens),
           mockedParams.usdToken,
           mockedParams.txData,
@@ -892,7 +898,7 @@ describe('USD Tiered STO Common', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-          objectContaining(valueToWei(mockedParams.investedSC, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.investedSC, expectedSCDecimalsResult)),
           objectContaining(mockedParams.minTokens),
           mockedParams.usdToken,
           mockedParams.txData,
@@ -921,6 +927,11 @@ describe('USD Tiered STO Common', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getERC20DetailedContract(usdToken)).twice();
+      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedSCDecimalsMethod.callAsync()).once();
+      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(
         mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
       ).once();
@@ -1516,10 +1527,14 @@ describe('USD Tiered STO Common', () => {
       when(mockedDecimalsMethod.callAsync()).thenResolve(expectedDecimalsResult);
 
       // Balance expected
-      const expectedBalanceOfResult = valueToWei(new BigNumber(100), FULL_DECIMALS);
+      const expectedSCDecimalsResult = new BigNumber(6);
+      const expectedBalanceOfResult = valueToWei(new BigNumber(100), expectedSCDecimalsResult);
       const usdToken = '0x0123456789012345678901234567890123456789';
-      // Setup get Security Token Address
+      // Setup Stable Token
       const mockedBalanceOfAddressMethod = mock(MockedCallMethod);
+      const mockedSCDecimalsMethod = mock(MockedCallMethod);
+      when(mockedDetailedERC20Contract.decimals).thenReturn(instance(mockedSCDecimalsMethod));
+      when(mockedSCDecimalsMethod.callAsync()).thenResolve(expectedSCDecimalsResult);
       when(mockedDetailedERC20Contract.balanceOf).thenReturn(instance(mockedBalanceOfAddressMethod));
       when(mockedBalanceOfAddressMethod.callAsync(investorAddress)).thenResolve(expectedBalanceOfResult);
       when(mockedContractFactory.getERC20DetailedContract(usdToken)).thenResolve(instance(mockedDetailedERC20Contract));
@@ -1542,7 +1557,7 @@ describe('USD Tiered STO Common', () => {
       when(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-          objectContaining(valueToWei(mockedParams.investedSC, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.investedSC, expectedSCDecimalsResult)),
           mockedParams.usdToken,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1559,7 +1574,7 @@ describe('USD Tiered STO Common', () => {
       verify(
         mockedMethod.sendTransactionAsync(
           mockedParams.beneficiary,
-          objectContaining(valueToWei(mockedParams.investedSC, FULL_DECIMALS)),
+          objectContaining(valueToWei(mockedParams.investedSC, expectedSCDecimalsResult)),
           mockedParams.usdToken,
           mockedParams.txData,
           mockedParams.safetyFactor,
@@ -1587,6 +1602,11 @@ describe('USD Tiered STO Common', () => {
       verify(mockedContractFactory.getSecurityTokenContract(expectedSecurityTokenAddress)).twice();
       verify(mockedSecurityTokenContract.decimals).once();
       verify(mockedDecimalsMethod.callAsync()).once();
+      verify(mockedContractFactory.getERC20DetailedContract(usdToken)).twice();
+      verify(mockedDetailedERC20Contract.decimals).once();
+      verify(mockedSCDecimalsMethod.callAsync()).once();
+      verify(mockedDetailedERC20Contract.balanceOf).once();
+      verify(mockedBalanceOfAddressMethod.callAsync(investorAddress)).once();
       verify(
         mockedContractFactory.getGeneralTransferManagerContract(expectedGeneralTMAddress, ContractVersion.V3_0_0),
       ).once();

@@ -391,8 +391,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addIndividualRestriction', () => {
     test('should addIndividualRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
@@ -491,8 +491,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addIndividualDailyRestriction', () => {
     test('should addIndividualDailyRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
@@ -579,8 +579,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addIndividualDailyRestrictionMulti', () => {
     test('should addIndividualDailyRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(0), new BigNumber(0)];
-      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
-      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const startTimes = [new Date(2025, 1), new Date(2025, 2)];
+      const endTimes = [new Date(2026, 1), new Date(2026, 2)];
       const restrictionTypes = [1, 1];
       const mockedParams = {
         holders: ['0x7777777777777777777777777777777777777777', '0x8888888888888888888888888888888888888888'],
@@ -661,8 +661,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addIndividualRestrictionMulti', () => {
     test('should addIndividualRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(0), new BigNumber(0)];
-      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
-      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const startTimes = [new Date(2025, 1), new Date(2025, 2)];
+      const endTimes = [new Date(2026, 1), new Date(2026, 2)];
       const restrictionTypes = [1, 1];
       const mockedParams = {
         rollingPeriodInDays: [1, 2],
@@ -756,8 +756,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addDefaultRestriction', () => {
     test('should addDefaultRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
@@ -843,8 +843,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('addDefaultDailyRestriction', () => {
     test('should addDefaultDailyRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         allowedTokens,
@@ -1000,8 +1000,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         holders,
         rollingPeriodInDays: [5, 10],
         allowedTokens: [new BigNumber(1), new BigNumber(2)],
-        startTimes: [new Date(2020, 1), new Date(2020, 2)],
-        endTimes: [new Date(2021, 1), new Date(2021, 2)],
+        startTimes: [new Date(2025, 1), new Date(2025, 2)],
+        endTimes: [new Date(2026, 1), new Date(2026, 2)],
         restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
@@ -1074,8 +1074,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         investor: '0x5555555555555555555555555555555555555555',
         rollingPeriodInDays: [5, 10],
         allowedTokens: [new BigNumber(1), new BigNumber(2)],
-        startTimes: [new Date(2020, 1), new Date(2020, 2)],
-        endTimes: [new Date(2021, 1), new Date(2021, 2)],
+        startTimes: [new Date(2025, 1), new Date(2025, 2)],
+        endTimes: [new Date(2026, 1), new Date(2026, 2)],
         restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
@@ -1149,8 +1149,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
         holders,
         rollingPeriodInDays: [5, 10],
         allowedTokens: [new BigNumber(1), new BigNumber(2)],
-        startTimes: [new Date(2020, 1), new Date(2020, 2)],
-        endTimes: [new Date(2021, 1), new Date(2021, 2)],
+        startTimes: [new Date(2025, 1), new Date(2025, 2)],
+        endTimes: [new Date(2026, 1), new Date(2026, 2)],
         restrictionTypes: [0, 1],
         txData: {},
         safetyFactor: 10,
@@ -1348,8 +1348,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyIndividualRestriction', () => {
     test('should modifyIndividualRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
@@ -1438,8 +1438,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyIndividualDailyRestriction', () => {
     test('should modifyIndividualDailyRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         holder: '0x7777777777777777777777777777777777777777',
@@ -1525,8 +1525,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyIndividualDailyRestrictionMulti', () => {
     test('should modifyIndividualDailyRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(1), new BigNumber(2)];
-      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
-      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const startTimes = [new Date(2025, 1), new Date(2025, 2)];
+      const endTimes = [new Date(2026, 1), new Date(2026, 2)];
       const restrictionTypes = [0, 0];
       const mockedParams = {
         holders: ['0x7777777777777777777777777777777777777777', '0x7777777777777777777777777777777777777777'],
@@ -1612,8 +1612,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyIndividualRestrictionMulti', () => {
     test('should modifyIndividualRestrictionMulti', async () => {
       const allowedTokens = [new BigNumber(1), new BigNumber(2)];
-      const startTimes = [new Date(2020, 1), new Date(2020, 2)];
-      const endTimes = [new Date(2021, 1), new Date(2021, 2)];
+      const startTimes = [new Date(2025, 1), new Date(2025, 2)];
+      const endTimes = [new Date(2026, 1), new Date(2026, 2)];
       const restrictionTypes = [0, 0];
       const mockedParams = {
         rollingPeriodInDays: [1, 2],
@@ -1702,8 +1702,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyDefaultRestriction', () => {
     test('should modifyDefaultRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         rollingPeriodInDays: 1,
@@ -1789,8 +1789,8 @@ describe('VolumeRestrictionTransferManagerWrapper', () => {
   describe('modifyDefaultDailyRestriction', () => {
     test('should modifyDefaultDailyRestriction', async () => {
       const allowedTokens = new BigNumber(1);
-      const startTime = new Date(2020, 1);
-      const endTime = new Date(2021, 1);
+      const startTime = new Date(2025, 1);
+      const endTime = new Date(2026, 1);
       const restrictionType = 0;
       const mockedParams = {
         allowedTokens,
