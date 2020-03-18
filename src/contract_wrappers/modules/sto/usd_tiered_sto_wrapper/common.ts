@@ -551,7 +551,8 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
   public buyWithUSD = async (params: BuyWithUSDParams): Promise<PolyResponse> => {
     assert.isETHAddressHex('beneficiary', params.beneficiary);
     assert.isETHAddressHex('usdToken', params.usdToken);
-    const investmentValue = valueToWei(params.investedSC, FULL_DECIMALS);
+    const decimals = await (await this.contractFactory.getERC20DetailedContract(params.usdToken)).decimals.callAsync();
+    const investmentValue = valueToWei(params.investedSC, decimals);
     await this.checkIfBuyIsValid(
       params.beneficiary,
       await this.getCallerAddress(params.txData),
@@ -615,7 +616,8 @@ export default abstract class USDTieredSTOCommon extends STOCommon {
    * Buy tokens with usd stable coin and with rate restriction
    */
   public buyWithUSDRateLimited = async (params: BuyWithUSDRateLimitedParams): Promise<PolyResponse> => {
-    const investmentValue = valueToWei(params.investedSC, FULL_DECIMALS);
+    const decimals = await (await this.contractFactory.getERC20DetailedContract(params.usdToken)).decimals.callAsync();
+    const investmentValue = valueToWei(params.investedSC, decimals);
     await this.checkIfBuyIsValid(
       params.beneficiary,
       await this.getCallerAddress(params.txData),
