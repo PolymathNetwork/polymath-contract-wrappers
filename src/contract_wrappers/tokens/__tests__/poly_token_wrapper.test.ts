@@ -1,6 +1,6 @@
 // PolymathRegistryWrapper test
 import { mock, instance, reset, when, verify, objectContaining } from 'ts-mockito';
-import { PolyTokenContract, SecurityTokenRegistryEvents, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { PolyTokenContract_3_0_0, ISecurityTokenRegistryEvents_3_0_0, Web3Wrapper, BigNumber } from '@polymathnetwork/abi-wrappers';
 import ERC20TokenWrapper from '../erc20_wrapper';
 import PolyTokenWrapper from '../poly_token_wrapper';
 import { MockedSendMethod, getMockedPolyResponse, MockedCallMethod } from '../../../test_utils/mocked_methods';
@@ -10,11 +10,11 @@ describe('PolyTokenWrapper', () => {
   // Declare PolyTokenWrapper object
   let target: PolyTokenWrapper;
   let mockedWrapper: Web3Wrapper;
-  let mockedContract: PolyTokenContract;
+  let mockedContract: PolyTokenContract_3_0_0;
 
   beforeAll(() => {
     mockedWrapper = mock(Web3Wrapper);
-    mockedContract = mock(PolyTokenContract);
+    mockedContract = mock(PolyTokenContract_3_0_0);
 
     const myContractPromise = Promise.resolve(instance(mockedContract));
     target = new PolyTokenWrapper(instance(mockedWrapper), myContractPromise);
@@ -157,7 +157,7 @@ describe('PolyTokenWrapper', () => {
     test('should throw as eventName does not belong to SecurityTokenRegistryEvents', async () => {
       // Mocked parameters
       const mockedParams = {
-        eventName: SecurityTokenRegistryEvents.RegisterTicker,
+        eventName: ISecurityTokenRegistryEvents_3_0_0.RegisterTicker,
         indexFilterValues: {},
         callback: () => {},
         isVerbose: false,

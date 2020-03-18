@@ -1,19 +1,26 @@
-import { ethers, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ModuleType, Partition, Perm, TransferResult, ErrorCode } from '../types';
+import { BigNumber, ethersUtils } from '@polymathnetwork/abi-wrappers';
+import { ErrorCode, ModuleType, Partition, Perm, TransferResult, BallotStage } from '../types';
 import { PolymathError } from '../PolymathError';
 
 const BASE = new BigNumber(10);
 
 export function bytes32ToString(value: string): string {
-  return ethers.utils.parseBytes32String(value);
+  return ethersUtils.parseBytes32String(value);
 }
 
 export function stringToBytes32(value: string): string {
-  return ethers.utils.formatBytes32String(value);
+  if (value.length > 32) {
+    throw new PolymathError({ message: 'String can be a maximum 32 characters long', code: ErrorCode.InvalidLength });
+  }
+  return ethersUtils.formatBytes32String(value);
+}
+
+export function stringToKeccak256(value: string): string {
+  return ethersUtils.id(value);
 }
 
 export function checksumAddress(value: string): string {
-  return ethers.utils.getAddress(value);
+  return ethersUtils.getAddress(value);
 }
 
 export function bigNumberToDate(value: BigNumber) {
@@ -92,6 +99,34 @@ export function parsePartitionBytes32Value(value: string): Partition {
       throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
   }
 }
+
+export function parseBallotStageValue(value: BigNumber): BallotStage {
+  let stageResult: BallotStage = BallotStage.Prep;
+  const numStage = typeof value === 'number' ? value : value.toNumber();
+  switch (numStage) {
+    case 0: {
+      stageResult = BallotStage.Prep;
+      break;
+    }
+    case 1: {
+      stageResult = BallotStage.Commit;
+      break;
+    }
+    case 2: {
+      stageResult = BallotStage.Reveal;
+      break;
+    }
+    case 3: {
+      stageResult = BallotStage.Resolved;
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return stageResult;
+}
+
 export function parsePermBytes32Value(value: string): Perm {
   switch (bytes32ToString(value)) {
     case Perm.Admin:
@@ -99,9 +134,10 @@ export function parsePermBytes32Value(value: string): Perm {
     case Perm.Operator:
       return Perm.Operator;
     default:
-      throw new PolymathError({ message: 'Partition not recognized', code: ErrorCode.NotFound });
+      throw new PolymathError({ message: 'Permission not recognized', code: ErrorCode.NotFound });
   }
 }
+
 export function parseModuleTypeValue(value: BigNumber): ModuleType {
   switch (value.toNumber()) {
     case ModuleType.Dividends:
@@ -114,10 +150,13 @@ export function parseModuleTypeValue(value: BigNumber): ModuleType {
       return ModuleType.PermissionManager;
     case ModuleType.Burn:
       return ModuleType.Burn;
+    case ModuleType.Wallet:
+      return ModuleType.Wallet;
     default:
       throw new PolymathError({ message: 'Module Type not recognized', code: ErrorCode.NotFound });
   }
 }
+
 export function parseTransferResult(value: BigNumber): TransferResult {
   let transferResult: TransferResult = TransferResult.NA;
   switch (value.toNumber()) {

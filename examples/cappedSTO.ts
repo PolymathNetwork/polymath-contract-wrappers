@@ -1,98 +1,47 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { ModuleRegistryEvents, BigNumber, CappedSTOEvents } from '@polymathnetwork/abi-wrappers';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { CappedSTOFundRaiseType, ModuleName, ModuleType } from '../src';
+import { ModuleRegistryEvents_3_0_0, BigNumber, CappedSTOEvents_3_0_0 } from '@polymathnetwork/abi-wrappers';
+import { PolymathAPI } from '../src/PolymathAPI';
+import { CappedSTOFundRaiseType, ModuleName } from '../src';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
+import { CappedSTOData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
 
-// This file acts as a valid sandbox.ts file in root directory for adding a cappedSTO module on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry Address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
+/**
+ * This method adds a CappedSTO module and uses it. Requires that a valid security token has already been generated.
+ * @param polymathAPI The polymathAPI instance.
+ * @param ticker Ticker symbol.
+ */
+export const cappedSTO = async (polymathAPI: PolymathAPI, ticker: string) => {
   const myAddress = await polymathAPI.getAccount();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('Ticker', '');
-  const tokenName = prompt('Token Name', '');
-
-  // Double check available
-  await polymathAPI.securityTokenRegistry.tickerAvailable({
-    ticker: ticker!,
-  });
-  // Get the ticker fee and approve the security token registry to spend
-  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: tickerFee,
-  });
-  // Register a ticker
-  await polymathAPI.securityTokenRegistry.registerTicker({
-    ticker: ticker!,
-    tokenName: tokenName!,
-  });
-  // Get the st launch fee and approve the security token registry to spend
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: securityTokenLaunchFee,
-  });
-
-  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
-    name: tokenName!,
-    ticker: ticker!,
-    tokenDetails: 'details',
-    divisible: true,
-    treasuryWallet: myAddress,
-    protocolVersion: '0',
-  });
-
-  console.log('Security Token Generated');
-
-  const moduleName = ModuleName.CappedSTO;
-
-  const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.STO,
-  });
-
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
-  modules.map(address => {
-    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
-  });
-  const resultInstances = await Promise.all(instances);
-
-  const names: Promise<string>[] = [];
-  resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name());
-  });
-  const resultNames = await Promise.all(names);
-
-  const index = resultNames.indexOf(moduleName);
-
-  // Create a Security Token Instance
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
-  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.setupCostInPoly();
 
-  // Get some poly tokens on the security token instance
-  await polymathAPI.polyToken.transfer({
-    to: await tickerSecurityTokenInstance.address(),
-    value: setupCost,
-  });
+  // Add the CappedSTO module
+  const startTime = new Date(Date.now() + 10000);
+  const cappedSTOData: CappedSTOData = {
+    startTime,
+    endTime: new Date(2031, 1),
+    cap: new BigNumber(10),
+    rate: new BigNumber(10),
+    fundRaiseType: CappedSTOFundRaiseType.ETH,
+    fundsReceiver: await polymathAPI.getAccount(),
+    treasuryWallet: myAddress,
+  };
+  const options: AddingModuleOpts = {
+    data: cappedSTOData,
+    archived: false,
+    label: 'TM Label',
+  };
+  await addModule(
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.CappedSTO,
+    },
+    options,
+  );
 
   await polymathAPI.moduleRegistry.subscribeAsync({
-    eventName: ModuleRegistryEvents.ModuleRegistered,
+    eventName: ModuleRegistryEvents_3_0_0.ModuleRegistered,
     indexFilterValues: {},
     callback: async (error, log) => {
       if (error) {
@@ -103,50 +52,33 @@ window.addEventListener('load', async () => {
     },
   });
 
-  // Get General Transfer Manager to whitelist an address to buy tokens
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.GeneralTransferManager,
-  }))[0];
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralTransferManager,
-    address: generalTMAddress,
-  });
+  // Declare some random beneficiaries to work with later on
+  const randomBeneficiaries = [
+    '0x3444444444444444444444444444444444444444',
+    '0x5544444444444444444444444444444444444444',
+    '0x6644444444444444444444444444444444444444',
+  ];
 
-  await generalTM.modifyKYCData({
-    investor: myAddress,
-    canSendAfter: new Date(),
-    canReceiveAfter: new Date(),
-    expiryTime: new Date(2020, 0),
-    txData: {
-      from: await polymathAPI.getAccount(),
-    },
-  });
+  // Add all address in the whitelist including myAddress
+  const kycInvestorMultiData = {
+    investors: randomBeneficiaries.concat(myAddress),
+    canSendAfter: [new Date(), new Date(), new Date(), new Date()],
+    canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
+  };
+  await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
 
-  const startTime = new Date(Date.now() + 10000);
-  await tickerSecurityTokenInstance.addModule({
-    moduleName,
-    address: modules[index],
-    maxCost: setupCost,
-    budget: setupCost,
-    archived: false,
-    data: {
-      startTime,
-      endTime: new Date(2031, 1),
-      cap: new BigNumber(10),
-      rate: new BigNumber(10),
-      fundRaiseType: CappedSTOFundRaiseType.ETH,
-      fundsReceiver: await polymathAPI.getAccount(),
-    },
-  });
+  // Issue tokens to the investors
+  const issueMultiParams = {
+    investors: [myAddress],
+    values: [new BigNumber(1000)],
+  };
+  await issueTokenToInvestors(polymathAPI, ticker, issueMultiParams);
 
-  const cappedSTOAddress = (await tickerSecurityTokenInstance.getModulesByName({
+  const cappedSTO = (await moduleInstancesLookup(polymathAPI, {
+    ticker,
     moduleName: ModuleName.CappedSTO,
   }))[0];
-
-  const cappedSTO = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.CappedSTO,
-    address: cappedSTOAddress,
-  });
 
   const sleep = (milliseconds: number) => {
     console.log('Sleeping until the STO starts');
@@ -156,9 +88,9 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of token purchase
   await cappedSTO.subscribeAsync({
-    eventName: CappedSTOEvents.TokenPurchase,
+    eventName: CappedSTOEvents_3_0_0.TokenPurchase,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
@@ -171,4 +103,4 @@ window.addEventListener('load', async () => {
   console.log('Buy Tokens has been called');
 
   tickerSecurityTokenInstance.unsubscribeAll();
-});
+};

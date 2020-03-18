@@ -1,142 +1,68 @@
-import { RedundantSubprovider, RPCSubprovider, Web3ProviderEngine } from '@0x/subproviders';
-import { ERC20DividendCheckpointEvents, BigNumber } from '@polymathnetwork/abi-wrappers';
-import { ApiConstructorParams, PolymathAPI } from '../src/PolymathAPI';
-import { ModuleName, ModuleType } from '../src';
-import ModuleFactoryWrapper from '../src/contract_wrappers/modules/module_factory_wrapper';
+import { ERC20DividendCheckpointEvents_3_0_0, BigNumber } from '@polymathnetwork/abi-wrappers';
+import { PolymathAPI, ModuleName } from '../src';
+import { DividendCheckpointData } from '../src/contract_wrappers/tokens/security_token_wrapper/common';
+import { AddingModuleOpts, addModule, moduleInstancesLookup } from './modules';
+import { addInvestorsToWhitelist } from './addInvestorsToWhitelist';
+import { issueTokenToInvestors } from './issueTokenToInvestor';
 
-// This file acts as a valid sandbox for adding a erc20Dividend module on an unlocked node (like ganache)
-
-window.addEventListener('load', async () => {
-  // Setup the redundant provider
-  const providerEngine = new Web3ProviderEngine();
-  providerEngine.addProvider(new RedundantSubprovider([new RPCSubprovider('http://127.0.0.1:8545')]));
-  providerEngine.start();
-  const params: ApiConstructorParams = {
-    provider: providerEngine,
-    polymathRegistryAddress: '<Deployed Polymath Registry address>',
-  };
-
-  // Instantiate the API
-  const polymathAPI = new PolymathAPI(params);
-
-  // Get some poly tokens in your account and the security token
-  const myAddress = (await polymathAPI.getAccount()).toLowerCase();
-  await polymathAPI.getPolyTokens({ amount: new BigNumber(1000000), address: myAddress });
-
-  // Prompt to setup your ticker and token name
-  const ticker = prompt('ticker', '');
-  const tokenName = prompt('token name', '');
-
-  // Get the ticker fee and approve the security token registry to spend
-  const tickerFee = await polymathAPI.securityTokenRegistry.getTickerRegistrationFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: tickerFee,
-  });
-  // Register a ticker
-  console.log('Ticker is:' + ticker);
-  await polymathAPI.securityTokenRegistry.registerNewTicker({
-    owner: myAddress,
-    ticker: ticker!,
-  });
-
-  // Get the st launch fee and approve the security token registry to spend
-  const securityTokenLaunchFee = await polymathAPI.securityTokenRegistry.getSecurityTokenLaunchFee();
-  await polymathAPI.polyToken.approve({
-    spender: await polymathAPI.securityTokenRegistry.address(),
-    value: securityTokenLaunchFee,
-  });
-
-  // Generate a security token
-  await polymathAPI.securityTokenRegistry.generateNewSecurityToken({
-    name: tokenName!,
-    ticker: ticker!,
-    tokenDetails: 'details',
-    divisible: true,
-    treasuryWallet: myAddress,
-    protocolVersion: '0',
-  });
-
-  console.log('Security token has been generated');
-
-  // Create a Security Token Instance
+/**
+ * This method adds a ERC20DividendCheckpoint module and uses it. Requires that a valid security token has already been generated.
+ * @param polymathAPI The polymathAPI instance.
+ * @param ticker Ticker symbol.
+ */
+export const erc20DividendCheckpoint = async (polymathAPI: PolymathAPI, ticker: string) => {
+  const myAddress = await polymathAPI.getAccount();
   const tickerSecurityTokenInstance = await polymathAPI.tokenFactory.getSecurityTokenInstanceFromTicker(ticker!);
 
-  const moduleName = ModuleName.ERC20DividendCheckpoint;
-  const modules = await polymathAPI.moduleRegistry.getModulesByType({
-    moduleType: ModuleType.Dividends,
-  });
+  // Declare some random investors to work with later on
+  const randomInvestors = [
+    '0x3444444444444444444444444444444444444444',
+    '0x5544444444444444444444444444444444444444',
+    '0x6644444444444444444444444444444444444444',
+  ];
 
-  const instances: Promise<ModuleFactoryWrapper>[] = [];
-  modules.map(address => {
-    instances.push(polymathAPI.moduleFactory.getModuleFactory(address));
-  });
-  const resultInstances = await Promise.all(instances);
-  const names: Promise<string>[] = [];
-  resultInstances.map(instanceFactory => {
-    names.push(instanceFactory.name());
-  });
-  const resultNames = await Promise.all(names);
-  const index = resultNames.indexOf(moduleName);
-
-  // Get setup cost
-  const factory = await polymathAPI.moduleFactory.getModuleFactory(modules[index]);
-  const setupCost = await factory.setupCostInPoly();
-
-  // Call to add erc20 dividend module
-  await tickerSecurityTokenInstance.addModule({
-    moduleName,
-    address: modules[index],
-    maxCost: setupCost,
-    budget: setupCost,
+  // Add the ERC20Dividend module
+  const erc20DividendData: DividendCheckpointData = {
+    wallet: '0x3333333333333333333333333333333333333333',
+  };
+  const options: AddingModuleOpts = {
+    data: erc20DividendData,
     archived: false,
-    data: {
-      wallet: '0x3333333333333333333333333333333333333333',
+    label: 'TM Label',
+  };
+  await addModule(
+    polymathAPI,
+    {
+      ticker,
+      moduleName: ModuleName.ERC20DividendCheckpoint,
     },
-  });
+    options,
+  );
 
-  // Get module for erc20 dividend checkpoint and address for module
-  const erc20DividendAddress = (await tickerSecurityTokenInstance.getModulesByName({
+  // Add all address in the whitelist including myAddress
+  const kycInvestorMultiData = {
+    investors: randomInvestors.concat(myAddress),
+    canSendAfter: [new Date(), new Date(), new Date(), new Date()],
+    canReceiveAfter: [new Date(), new Date(), new Date(), new Date()],
+    expiryTime: [new Date(2021, 10), new Date(2021, 10), new Date(2021, 10), new Date(2021, 10)],
+  };
+  await addInvestorsToWhitelist(polymathAPI, ticker, kycInvestorMultiData);
+
+  // Issue tokens to the investors
+  const issueMultiParams = {
+    investors: randomInvestors.concat(myAddress),
+    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20), new BigNumber(1000)],
+  };
+  await issueTokenToInvestors(polymathAPI, ticker, issueMultiParams);
+
+  const erc20DividendCheckpoint = (await moduleInstancesLookup(polymathAPI, {
+    ticker,
     moduleName: ModuleName.ERC20DividendCheckpoint,
   }))[0];
 
-  const erc20DividendCheckpoint = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.ERC20DividendCheckpoint,
-    address: erc20DividendAddress,
-  });
-
-  // Get General TM Address to whitelist transfers
-  const generalTMAddress = (await tickerSecurityTokenInstance.getModulesByName({
-    moduleName: ModuleName.GeneralTransferManager,
-  }))[0];
-  const generalTM = await polymathAPI.moduleFactory.getModuleInstance({
-    name: ModuleName.GeneralTransferManager,
-    address: generalTMAddress,
-  });
-
   await polymathAPI.polyToken.approve({
-    spender: erc20DividendAddress,
+    spender: await erc20DividendCheckpoint.address(),
     value: new BigNumber(4),
-  });
-
-  const randomInvestors = [
-    '0x1111111111111111111111111111111111111111',
-    '0x2222222222222222222222222222222222222222',
-    '0x3333333333333333333333333333333333333333',
-  ];
-
-  // Add beneficiaries address to whitelist
-  await generalTM.modifyKYCDataMulti({
-    investors: randomInvestors,
-    canSendAfter: [new Date(), new Date(), new Date()],
-    canReceiveAfter: [new Date(), new Date(), new Date()],
-    expiryTime: [new Date(2020, 0), new Date(2020, 0), new Date(2020, 0)],
-  });
-
-  // Issue some tokens for investors
-  await tickerSecurityTokenInstance.issueMulti({
-    investors: randomInvestors,
-    values: [new BigNumber(10), new BigNumber(20), new BigNumber(20)],
   });
 
   // Create Dividends
@@ -186,9 +112,9 @@ window.addEventListener('load', async () => {
 
   // Subscribe to event of update dividend dates
   await erc20DividendCheckpoint.subscribeAsync({
-    eventName: ERC20DividendCheckpointEvents.UpdateDividendDates,
+    eventName: ERC20DividendCheckpointEvents_3_0_0.UpdateDividendDates,
     indexFilterValues: {},
-    callback: async (error, log) => {
+    callback: async (error: any, log: any) => {
       if (error) {
         console.log(error);
       } else {
@@ -204,4 +130,4 @@ window.addEventListener('load', async () => {
     maturity: new Date(2037, 4),
   });
   erc20DividendCheckpoint.unsubscribeAll();
-});
+};
