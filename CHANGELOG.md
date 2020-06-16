@@ -1,3 +1,10 @@
+# [3.1.0-beta.1](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v3.0.0...v3.1.0-beta.1) (2020-06-16)
+
+
+### Features
+
+* 🎸 update wrappers version ([efb7c5a](https://github.com/PolymathNetwork/polymath-contract-wrappers/commit/efb7c5a))
+
 # [3.0.0](https://github.com/PolymathNetwork/polymath-contract-wrappers/compare/v2.0.0...v3.0.0) (2020-03-18)
 
 
